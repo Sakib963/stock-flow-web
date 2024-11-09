@@ -1,27 +1,17 @@
-# StockFlowWeb
+# StockFlow
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 16.2.6.
+**StockFlow** is a demo Inventory/Warehouse Management System designed to help warehouse managers and business owners efficiently track and manage product inventory, batches, and sales with detailed purchase information. This project is built using Angular for the frontend, Express.js for the backend, and PostgreSQL for data storage.
 
-## Development server
+## Features
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+- **Product Management**: Add and manage product types and categories.
+- **Inventory Tracking**: Record and track product batches with quantity, purchase date, and variable pricing.
+- **Sales Tracking**: Track sales by batch to differentiate prices based on purchase history.
+- **Barcode Generation**: Generate barcodes for easy product identification and tracking.
+- **Analytics**: View inventory and sales data to support decision-making.
 
-## Code scaffolding
+## Technology Stack
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
-
-## Build
-
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
-
-## Running unit tests
-
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
-
-## Running end-to-end tests
-
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
-
-## Further help
-
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+- **Frontend**: Angular
+- **Backend**: Express.js
+- **Database**: PostgreSQL
