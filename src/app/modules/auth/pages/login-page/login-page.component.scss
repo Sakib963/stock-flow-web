@@ -1,0 +1,14 @@
+.is__invalid-input {
+  border-color: #e11d48;
+}
+
+.is__invalid-error {
+  color: #e11d48;
+  @apply px-1 pt-1 text-xs;
+}
+
+.sign-in-box {
+  border-radius: 15px;
+  background: linear-gradient(0deg, #fff 0%, #fff 100%), #f9f9f9;
+  box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.2);
+}

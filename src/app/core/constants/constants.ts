@@ -12,7 +12,7 @@ export class Constants {
   static MOBILE_NO_REGEX = /^((01[3-9]{1})[0-9]{8})$/;
   static ONLY_NUMERIC_REGEX = /^\d+(\.\d+)?$/;
   static PAGE_SIZE = 10;
-  static AUTH_STORE_KEY = 'sad'
+  static AUTH_STORE_KEY = 'sad';
 }
 
 export class HttpStatus {
@@ -28,3 +28,6 @@ export class HttpStatus {
   static ERROR = [500, 501, 502, 503, 504, 505, 506, 507, 508, 510, 511];
 }
 
+export class ROLES {
+  static ADMIN = 'Admin';
+}

@@ -20,7 +20,7 @@ export class HttpService {
     accept: 'application/json',
   });
 
-  get<T>(apiUrl: string, isNotify: boolean = true, params?: any): any {
+  get<T>(apiUrl: string, params?: any): any {
     return this._httpClient.get<T>(`${environment.baseUrl}${apiUrl}`, {
       params: params,
       headers: this._headers,
@@ -28,14 +28,14 @@ export class HttpService {
     });
   }
 
-  post(apiUrl: string, body: any, isNotify: boolean = true): any {
+  post(apiUrl: string, body: any): any {
     return this._httpClient.post(`${environment.baseUrl}${apiUrl}`, body, {
       headers: this._headers,
       observe: 'response',
     });
   }
 
-  put(apiUrl: string, body: any, isNotify: boolean = true): any {
+  put(apiUrl: string, body: any): any {
     return this._httpClient.put(`${environment.baseUrl}${apiUrl}`, body, {
       headers: this._headers,
       observe: 'response',

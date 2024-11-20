@@ -1,1 +1,137 @@
-<p>login-page works!</p>
+<div
+  class="h-screen flex justify-center items-center lg:w-3/4 lg:mx-auto lg:p-10 p-5"
+>
+  <div class="grid lg:grid-cols-2 lg:gap-20 gap-10 w-full grid-flow-row-dense">
+    <div class="flex justify-center items-center">
+      <img
+        class="hidden lg:block lg:max-h-[550px] object-contain"
+        src="./assets/images/login.png"
+        alt="Login Background"
+      />
+      <img
+        class="block lg:hidden w-11/12 mx-auto"
+        src="./assets/images/login-sm.png"
+        alt="Login Background"
+      />
+    </div>
+    <div class="flex justify-center items-center">
+      <div class="overflow-y-auto p-8 min-w-full md:min-w-[400px] sign-in-box">
+        <form class="space-y-3" [formGroup]="form" (ngSubmit)="handleForm()">
+          <div class="text-center">
+            <h2 class="pb-1 text-3xl font-semibold text-[#000000] uppercase">
+              Welcome back
+            </h2>
+            <p class="pb-2 text-[#000000] max-w-xs">
+              We've missed you! Please sign in to catch up on what you've missed
+            </p>
+          </div>
+
+          <div class="space-y-3 text-left">
+            <div class="form__group">
+              <div class="relative">
+                <input
+                  id="email"
+                  class="peer block h-10 custom-input"
+                  type="text"
+                  formControlName="email"
+                  placeholder=" "
+                  [ngClass]="{
+                    'is__invalid-input': submitted && f['email'].errors
+                  }"
+                />
+                <label
+                  class="absolute top-2 left-1 origin-[0] -translate-y-4 scale-95 transform bg-white px-2 text-gray-500 duration-300 peer-placeholder-shown:top-1/2 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:scale-100 peer-focus:top-2 peer-focus:-translate-y-4 peer-focus:scale-95 peer-focus:px-2 peer-focus:text-primary-500 dark:bg-night-700"
+                  for="email"
+                >
+                  Email
+                </label>
+              </div>
+              <div
+                *ngIf="submitted && f['email'].errors"
+                class="is__invalid-error"
+              >
+                <div *ngIf="f['email'].errors['required']" class=" ">
+                  Email is required.
+                </div>
+              </div>
+            </div>
+
+            <div class="form__group">
+              <div class="relative">
+                <input
+                  id="password"
+                  class="peer block h-10 custom-input"
+                  autocomplete="on"
+                  formControlName="password"
+                  placeholder=" "
+                  [ngClass]="{
+                    'is__invalid-input': submitted && f['password'].errors
+                  }"
+                  [type]="passwordTextType ? 'text' : 'password'"
+                />
+                <label
+                  class="absolute top-2 left-1 origin-[0] -translate-y-4 scale-95 transform bg-white px-2 text-gray-500 duration-300 peer-placeholder-shown:top-1/2 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:scale-100 peer-focus:top-2 peer-focus:-translate-y-4 peer-focus:scale-95 peer-focus:px-2 peer-focus:text-primary-600 dark:bg-night-700"
+                  for="password"
+                >
+                  Password
+                </label>
+                <span
+                  class="absolute top-2.5 right-5 cursor-pointer text-gray-400 dark:text-night-300"
+                  (click)="togglePasswordTextType()"
+                >
+                  <img
+                    [src]="
+                      !passwordTextType
+                        ? 'assets/icons/eye.svg'
+                        : 'assets/icons/eye-off.svg'
+                    "
+                    [ngClass]="'h-5 w-5'"
+                  />
+                </span>
+              </div>
+              <div
+                *ngIf="submitted && f['password'].errors"
+                class="is__invalid-error"
+              >
+                <div *ngIf="f['password'].errors['required']" class=" ">
+                  Password is required.
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex items-center justify-end space-x-3 pb-3">
+            <div class=" ">
+              <a
+                class="font-medium text-[#000000] hover:text-[#A74ED1] hover:underline"
+                routerLink="/auth/forgot-password"
+              >
+                Forgot Password
+              </a>
+            </div>
+          </div>
+
+          <!-- Submit Button -->
+          <div class="flex justify-center">
+            <button
+              class="uppercase flex w-full justify-center rounded-full border border-transparent bg-[#000000] py-2 px-4 font-medium text-white focus:outline-none hover:bg-[#000000] transition ease-in-out delay-150 hover:scale-95 duration-300 disabled:cursor-wait"
+              type="submit"
+              [disabled]="authService.loading()"
+            >
+              <span *ngIf="authService.loading()">
+                <app-spinner></app-spinner>
+              </span>
+              <div
+                *ngIf="!authService.loading()"
+                class="flex justify-center items-center gap-4"
+              >
+                <p>Sign In</p>
+                <img src="./assets/icons/login.svg" alt="Login Icon" />
+              </div>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

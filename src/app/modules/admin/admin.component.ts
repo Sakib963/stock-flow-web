@@ -3,10 +3,12 @@ import { CommonModule } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
 
 @Component({
-  selector: 'app-layout',
+  selector: 'app-admin',
   standalone: true,
   imports: [CommonModule, RouterOutlet],
-  templateUrl: './layout.component.html',
-  styleUrls: ['./layout.component.scss'],
+  templateUrl: './admin.component.html',
+  styleUrls: ['./admin.component.scss']
 })
-export class LayoutComponent {}
+export class AdminComponent {
+
+}
