@@ -1,7 +1,21 @@
-<div
-  class="flex justify-between items-center w-full bg-gray-600 p-5 drop-shadow-md"
->
-  <h2>StockFlow</h2>
-  <button (click)="handleLogout()" class="text-white bg-black px-3 py-2 rounded-md">Logout</button>
+<div class="h-screen flex flex-col">
+  <!-- Navbar -->
+  <app-navbar
+    class="flex-shrink-0"
+    (actionEmitter)="handleActions($event)"
+  ></app-navbar>
+
+  <!-- Main Content Area -->
+  <div class="flex flex-grow">
+    <!-- Sidebar -->
+    <app-sidebar class="hidden lg:block lg:w-64 bg-gray-200 flex-shrink-0"></app-sidebar>
+
+    <!-- Router Outlet -->
+    <div class="flex-grow p-4 bg-white overflow-auto">
+      <router-outlet></router-outlet>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <app-footer class="flex-shrink-0"></app-footer>
 </div>
-<router-outlet></router-outlet>

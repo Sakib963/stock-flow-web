@@ -40,6 +40,7 @@ import { NzToolTipModule } from 'ng-zorro-antd/tooltip';
 import { NzTreeModule } from 'ng-zorro-antd/tree';
 import { NzTreeSelectModule } from 'ng-zorro-antd/tree-select';
 import { NzUploadModule } from 'ng-zorro-antd/upload';
+import { NzLayoutModule } from 'ng-zorro-antd/layout';
 
 const NG_ZORRO_MODULES = [
   NzGridModule,
@@ -82,6 +83,7 @@ const NG_ZORRO_MODULES = [
   NzAlertModule,
   NzResultModule,
   NzPopoverModule,
+  NzLayoutModule
 ];
 
 @NgModule({
