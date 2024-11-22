@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
 import { AuthService } from '@app/modules/auth/services/auth.service';
@@ -22,6 +22,8 @@ import { FooterComponent } from '@app/shared/components/footer/footer.component'
   styleUrls: ['./layout.component.scss'],
 })
 export class LayoutComponent {
+  isMenuOpen: boolean = false;
+
   constructor(private _authService: AuthService) {}
   handleLogout(): any {
     this._authService.logout();
@@ -31,5 +33,26 @@ export class LayoutComponent {
     if (event.action === 'logout') {
       this.handleLogout();
     }
+    if (event.action === 'menu_open') {
+      this.isMenuOpen = true;
+    }
+  }
+
+  toggleMenu(): any {
+    this.isMenuOpen = !this.isMenuOpen;
+  }
+
+  onOverlayClick(event: MouseEvent) {
+    if (event.target === event.currentTarget) {
+      this.toggleMenu();
+    }
+  }
+
+  onSidebarClick(event: any) {
+    event.stopPropagation();
+  }
+
+  onMenuItemClick(event: any) {
+    this.toggleMenu();
   }
 }

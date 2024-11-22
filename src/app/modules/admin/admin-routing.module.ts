@@ -14,6 +14,13 @@ const routes: Routes = [
             (m) => m.AdminDashboardComponent
           ),
       },
+      {
+        path: 'user-list',
+        loadComponent: () =>
+          import('./pages/user/user-list/user-list.component').then(
+            (m) => m.UserListComponent
+          ),
+      },
     ],
   },
 ];

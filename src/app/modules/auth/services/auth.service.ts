@@ -105,6 +105,8 @@ export class AuthService {
   }
 
   private storeTokens(tokens: any) {
+    console.log(tokens, 'getting token');
+    
     localStorage.setItem(
       Constants.AUTH_STORE_KEY,
       JSON.stringify({

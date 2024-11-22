@@ -1,16 +1,27 @@
 <div class="h-screen flex flex-col">
   <!-- Navbar -->
-  <app-navbar
-    class="flex-shrink-0"
-    (actionEmitter)="handleActions($event)"
-  ></app-navbar>
+  <app-navbar class="flex-shrink-0" (actionEmitter)="handleActions($event)"></app-navbar>
 
   <!-- Main Content Area -->
   <div class="flex flex-grow">
-    <!-- Sidebar -->
-    <app-sidebar class="hidden lg:block lg:w-64 bg-gray-200 flex-shrink-0"></app-sidebar>
+    <!-- Sidebar for Desktop -->
+    <app-sidebar class="hidden lg:block lg:w-64 bg-[#D9DBE9] flex-shrink-0"></app-sidebar>
 
-    <!-- Router Outlet -->
+    <!-- Mobile Sidebar (Drawer) -->
+    <div *ngIf="isMenuOpen"
+      class="lg:hidden fixed inset-0 bg-black bg-opacity-50 z-10 opacity-100 duration-300 transition ease-in-out">
+      <!-- Overlay (background that closes the menu when clicked) -->
+      <div class="w-full h-full" (click)="onOverlayClick($event)"></div>
+
+      <!-- Sidebar Drawer -->
+      <app-sidebar
+        class="w-64 bg-[#D9DBE9] fixed left-0 top-0 h-full z-20 transition-all duration-300 transform translate-x-0"
+        (click)="onSidebarClick($event)" (actionEmitter)="onMenuItemClick($event)">
+      </app-sidebar>
+    </div>
+
+
+    <!-- Main Content (Router Outlet) -->
     <div class="flex-grow p-4 bg-white overflow-auto">
       <router-outlet></router-outlet>
     </div>

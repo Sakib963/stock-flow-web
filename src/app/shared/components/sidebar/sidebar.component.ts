@@ -1,13 +1,43 @@
-import { Component } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { AuthService } from '@app/modules/auth/services/auth.service';
+import { SessionService } from '@app/core/services/session.service';
+import { Menu } from '@app/core/constants/menu';
+import { Router, RouterLink } from '@angular/router';
+import { ROLES } from '@app/core/constants/constants';
+import { AngularSvgIconModule } from 'angular-svg-icon';
 
 @Component({
   selector: 'app-sidebar',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterLink, AngularSvgIconModule],
   templateUrl: './sidebar.component.html',
-  styleUrls: ['./sidebar.component.scss']
+  styleUrls: ['./sidebar.component.scss'],
 })
-export class SidebarComponent {
+export class SidebarComponent implements OnInit {
+  @Output() readonly actionEmitter: EventEmitter<object> = new EventEmitter();
+  userRole: string = '';
+  menu: any = [];
 
+  constructor(private _authService: AuthService, private _router: Router) {}
+
+  ngOnInit(): void {
+    this.userRole = this._authService.currentUserRole;
+
+    if (this.userRole === ROLES.ADMIN) {
+      this.menu = Menu.adminPages;
+    } else {
+      this.menu = Menu.defaultPages;
+    }
+    console.log('User Role:', this.userRole);
+    console.log('Menu:', this.menu);
+  }
+
+  isActive(route: string): boolean {
+    return this._router.url === route;
+  }
+
+  handleClick(): any {
+    this.actionEmitter.emit({ action: 'menu_click', value: null });
+  }
 }

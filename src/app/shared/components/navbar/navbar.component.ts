@@ -10,7 +10,12 @@ import { CommonModule } from '@angular/common';
 })
 export class NavbarComponent {
   @Output() readonly actionEmitter: EventEmitter<object> = new EventEmitter();
+  
   handleLogout() {
     this.actionEmitter.emit({ action: 'logout', value: null });
+  }
+
+  handleMenuOpen() {
+    this.actionEmitter.emit({ action: 'menu_open', value: null });
   }
 }

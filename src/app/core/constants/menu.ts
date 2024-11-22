@@ -1,15 +1,19 @@
 import { MenuItem } from '../models/menu.model';
 
 export class Menu {
-  static pages: MenuItem[] = [
+  static adminPages: MenuItem[] = [
     {
-      group: 'user',
-      separator: false,
+      group: 'Admin',
       items: [
         {
           icon: 'assets/icons/dashboard.svg',
-          label: 'Application',
-          route: '/dashboard',
+          label: 'Dashboard',
+          route: '/',
+        },
+        {
+          icon: 'assets/icons/user.svg',
+          label: 'User',
+          route: '/user-list',
         },
       ],
     },
@@ -22,6 +26,19 @@ export class Menu {
           icon: 'assets/icons/heroicons/outline/home.svg',
           label: 'Home',
           route: '/',
+        },
+      ],
+    },
+  ];
+
+  static defaultPages: MenuItem[] = [
+    {
+      group: 'Default',
+      items: [
+        {
+          icon: 'assets/icons/help.svg',
+          label: 'Help',
+          route: '/help',
         },
       ],
     },
