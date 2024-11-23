@@ -3,7 +3,7 @@
     <ul class="space-y-2">
       <li *ngFor="let item of group.items"
       (click)="handleClick()"
-        class="flex items-center p-2 rounded cursor-pointer duration-100 ease-in-out hover:bg-black hover:text-white transition delay-150 hover:border-l-4 hover:border-l-[#594ED1]"
+        class="flex items-center p-2 rounded cursor-pointer duration-100 ease-in-out hover:bg-black hover:text-white transition delay-150 hover:border-l-4 hover:border-l-[#594ED1] tracking-wide font-medium"
         [routerLink]="item.route" [ngClass]="{
       'bg-black text-white border-l-4 border-l-[#594ED1]': isActive(item.route)
     }">

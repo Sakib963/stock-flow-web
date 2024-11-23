@@ -1,11 +1,11 @@
 <div class="h-screen flex flex-col">
   <!-- Navbar -->
-  <app-navbar class="flex-shrink-0" (actionEmitter)="handleActions($event)"></app-navbar>
+  <app-navbar class="flex-none" (actionEmitter)="handleActions($event)"></app-navbar>
 
   <!-- Main Content Area -->
-  <div class="flex flex-grow">
+  <div class="flex flex-grow overflow-hidden">
     <!-- Sidebar for Desktop -->
-    <app-sidebar class="hidden lg:block lg:w-64 bg-[#D9DBE9] flex-shrink-0"></app-sidebar>
+    <app-sidebar class="hidden lg:block lg:w-64 bg-[#D9DBE9] flex-none"></app-sidebar>
 
     <!-- Mobile Sidebar (Drawer) -->
     <div *ngIf="isMenuOpen"
@@ -20,13 +20,14 @@
       </app-sidebar>
     </div>
 
-
-    <!-- Main Content (Router Outlet) -->
-    <div class="flex-grow p-4 bg-white overflow-auto">
-      <router-outlet></router-outlet>
+    <!-- Main Content Area -->
+    <div class="flex-grow overflow-auto bg-gray-100 stockflow-scrollbar">
+      <div class="p-4 shadow-inherit rounded-md mb-4">
+        <router-outlet></router-outlet>
+      </div>
+      <!-- Footer -->
+      <app-footer class="flex-none w-full bg-gray-100"></app-footer>
     </div>
   </div>
 
-  <!-- Footer -->
-  <app-footer class="flex-shrink-0"></app-footer>
 </div>
