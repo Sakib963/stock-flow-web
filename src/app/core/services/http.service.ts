@@ -41,4 +41,19 @@ export class HttpService {
       observe: 'response',
     });
   }
+
+  getList(url: string, params?: any): Observable<any> {
+    let httpParams = new HttpParams();
+    for (const key in params) {
+      if (params.hasOwnProperty(key)) {
+        if (params[key]) {
+          httpParams = httpParams.set(key, params[key]);
+        } else if (httpParams.has(key)) {
+          httpParams = httpParams.delete(key);
+        }
+      }
+    }
+
+    return this._httpClient.get(`${url}`, { params: httpParams });
+  }
 }

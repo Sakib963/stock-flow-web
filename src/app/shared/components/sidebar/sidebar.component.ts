@@ -29,8 +29,6 @@ export class SidebarComponent implements OnInit {
     } else {
       this.menu = Menu.defaultPages;
     }
-    console.log('User Role:', this.userRole);
-    console.log('Menu:', this.menu);
   }
 
   isActive(route: string): boolean {

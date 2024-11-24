@@ -17,8 +17,8 @@ const routes: Routes = [
       {
         path: 'user-list',
         loadComponent: () =>
-          import('./pages/user/user-list/user-list.component').then(
-            (m) => m.UserListComponent
+          import('./pages/user/display-user-list/display-user-list.component').then(
+            (m) => m.DisplayUserListComponent
           ),
       },
     ],

@@ -6,6 +6,18 @@ body {
   @apply font-tenor text-sm;
 }
 
+.custom-input {
+  @apply w-full rounded-md border border-gray-300 px-3 text-xs placeholder-gray-400 focus:z-10 focus:border-purple-500 focus:outline-none focus:ring-purple-500;
+}
+
+.custom-checkbox {
+  @apply h-4 w-4 rounded border-gray-300 bg-gray-100 text-purple-600 focus:ring-0;
+}
+
+.custom-radio {
+  @apply border-gray-300 bg-gray-100 text-purple-600 focus:ring-0;
+}
+
 @layer utilities {
   .stockflow-scrollbar::-webkit-scrollbar {
     width: 6px;
