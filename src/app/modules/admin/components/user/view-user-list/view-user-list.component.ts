@@ -15,4 +15,8 @@ export class ViewUserListComponent {
   ngOnInit() {
     console.log('Data passed:', this.data);
   }
+
+  handleAddUser(): any {
+    this.actionEmitter.emit({ action: 'create', value: null });
+  }
 }

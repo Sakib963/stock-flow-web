@@ -1,0 +1,76 @@
+<div class="rounded-md bg-white">
+      <form nz-form [formGroup]="form" [nzLayout]="'vertical'" (ngSubmit)="handleForm()">
+            <div class="grid grid-cols-1 gap-x-6 md:grid-cols-2 lg:grid-cols-3 border-[0.5px] p-4 rounded-md">
+                  <!-- Name -->
+                  <nz-form-item>
+                        <nz-form-label [nzRequired]="hasRequiredValidator('name')">Name</nz-form-label>
+                        <nz-form-control nzErrorTip="Name is Required.">
+                              <input formControlName="name" nz-input placeholder="Enter Name" />
+                        </nz-form-control>
+                  </nz-form-item>
+                  <!-- Email -->
+                  <nz-form-item>
+                        <nz-form-label [nzRequired]="hasRequiredValidator('email')">Email</nz-form-label>
+                        <nz-form-control nzErrorTip="Email is Required.">
+                              <input formControlName="email" nz-input placeholder="Enter Email Address" />
+                        </nz-form-control>
+                  </nz-form-item>
+                  <!-- Phone -->
+                  <nz-form-item>
+                        <nz-form-label [nzRequired]="hasRequiredValidator('phone')">Phone</nz-form-label>
+                        <nz-form-control nzErrorTip="Phone is Required.">
+                              <input formControlName="phone" nz-input placeholder="Enter Phone Number" />
+                        </nz-form-control>
+                  </nz-form-item>
+                  <!-- Role -->
+                  <nz-form-item>
+                        <nz-form-label [nzRequired]="hasRequiredValidator('role')">Role</nz-form-label>
+                        <nz-form-control nzErrorTip="Role is Required.">
+                              <input formControlName="role" nz-input placeholder="Enter Role Address" />
+                        </nz-form-control>
+                  </nz-form-item>
+                  <!-- Designation -->
+                  <nz-form-item>
+                        <nz-form-label [nzRequired]="hasRequiredValidator('designation')">Designation</nz-form-label>
+                        <nz-form-control nzErrorTip="Designation is Required.">
+                              <input formControlName="designation" nz-input placeholder="Enter Designation" />
+                        </nz-form-control>
+                  </nz-form-item>
+                  <!-- Password -->
+                  <nz-form-item>
+                        <nz-form-label [nzRequired]="hasRequiredValidator('password')">Password</nz-form-label>
+                        <nz-form-control nzErrorTip="Password is Required.">
+                              <input formControlName="password" nz-input placeholder="Enter Password" />
+                        </nz-form-control>
+                  </nz-form-item>
+                  <!-- Status -->
+                  <nz-form-item>
+                        <nz-form-label [nzRequired]="hasRequiredValidator('status')">Status</nz-form-label>
+                        <nz-form-control nzErrorTip="Status is required.">
+                              <nz-select class="w-full" formControlName="status" nz-input nzAllowClear
+                                    nzPlaceHolder="Select Status">
+                                    <nz-option nzLabel="Active" nzValue="Active"></nz-option>
+                                    <nz-option nzLabel="Inactive" nzValue="Inactive"></nz-option>
+                              </nz-select>
+                        </nz-form-control>
+                  </nz-form-item>
+            </div>
+            <!-- Actions -->
+            <div class="flex justify-end mt-4">
+                  <div class="flex items-center gap-4">
+                        <button class="secondary-button" type="button" (click)="goBack()">
+                              Cancel
+                        </button>
+                        <button class="primary-button disabled:cursor-wait" type="submit" [disabled]="loading">
+                              <span *ngIf="loading">
+                                    <app-spinner></app-spinner>
+                              </span>
+                              <div *ngIf="!loading" class="flex justify-center items-center gap-2">
+                                    <p>Submit</p>
+                              </div>
+                        </button>
+                  </div>
+            </div>
+
+      </form>
+</div>

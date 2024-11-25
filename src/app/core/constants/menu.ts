@@ -13,7 +13,7 @@ export class Menu {
         {
           icon: 'assets/icons/user.svg',
           label: 'User',
-          route: '/user-list',
+          route: '/user',
         },
       ],
     },

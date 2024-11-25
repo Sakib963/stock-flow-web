@@ -15,11 +15,28 @@ const routes: Routes = [
           ),
       },
       {
-        path: 'user-list',
-        loadComponent: () =>
-          import('./pages/user/display-user-list/display-user-list.component').then(
-            (m) => m.DisplayUserListComponent
-          ),
+        path: 'user',
+        children: [
+          {
+            path: '',
+            redirectTo: 'user-list',
+            pathMatch: 'full',
+          },
+          {
+            path: 'user-list',
+            loadComponent: () =>
+              import(
+                './pages/user/display-user-list/display-user-list.component'
+              ).then((m) => m.DisplayUserListComponent),
+          },
+          {
+            path: 'create-user',
+            loadComponent: () =>
+              import('./pages/user/create-user/create-user.component').then(
+                (m) => m.CreateUserComponent
+              ),
+          },
+        ],
       },
     ],
   },

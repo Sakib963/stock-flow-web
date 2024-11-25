@@ -21,15 +21,16 @@
     </div>
 
     <!-- Main Content Area -->
-    <div class="flex-grow overflow-auto bg-gray-100 stockflow-scrollbar">
-      <div class="p-4 shadow-inherit rounded-md">
-        <div class="bg-white rounded-md shadow-lg">
-          <router-outlet></router-outlet>
+    <div class="flex-grow flex flex-col">
+      <div class="flex-grow overflow-auto bg-gray-100 stockflow-scrollbar">
+        <div class="p-4 shadow-inherit rounded-md">
+          <div class="bg-white rounded-md shadow-lg">
+            <router-outlet></router-outlet>
+          </div>
         </div>
       </div>
       <!-- Footer -->
       <app-footer class="flex-none w-full bg-gray-100"></app-footer>
     </div>
   </div>
-
 </div>

@@ -32,7 +32,10 @@ export class SidebarComponent implements OnInit {
   }
 
   isActive(route: string): boolean {
-    return this._router.url === route;
+    if (route === '/') {
+      return this._router.url === '/';
+    }
+    return this._router.url.startsWith(route);
   }
 
   handleClick(): any {
