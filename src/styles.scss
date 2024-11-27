@@ -2,6 +2,16 @@
 @tailwind components;
 @tailwind utilities;
 
+.ant-form-vertical .ant-form-item {
+  @apply flex-row;
+}
+
+@media (min-width: 576px) {
+  .ant-form-vertical .ant-form-item {
+    @apply flex-col;
+  }
+}
+
 body {
   @apply font-tenor text-sm;
 }

@@ -1,59 +1,80 @@
 <div class="rounded-md bg-white">
       <form nz-form [formGroup]="form" [nzLayout]="'vertical'" (ngSubmit)="handleForm()">
-            <div class="grid grid-cols-1 gap-x-6 md:grid-cols-2 lg:grid-cols-3 border-[0.5px] p-4 rounded-md">
-                  <!-- Name -->
-                  <nz-form-item>
-                        <nz-form-label [nzRequired]="hasRequiredValidator('name')">Name</nz-form-label>
-                        <nz-form-control nzErrorTip="Name is Required.">
-                              <input formControlName="name" nz-input placeholder="Enter Name" />
-                        </nz-form-control>
-                  </nz-form-item>
-                  <!-- Email -->
-                  <nz-form-item>
-                        <nz-form-label [nzRequired]="hasRequiredValidator('email')">Email</nz-form-label>
-                        <nz-form-control nzErrorTip="Email is Required.">
-                              <input formControlName="email" nz-input placeholder="Enter Email Address" />
-                        </nz-form-control>
-                  </nz-form-item>
-                  <!-- Phone -->
-                  <nz-form-item>
-                        <nz-form-label [nzRequired]="hasRequiredValidator('phone')">Phone</nz-form-label>
-                        <nz-form-control nzErrorTip="Phone is Required.">
-                              <input formControlName="phone" nz-input placeholder="Enter Phone Number" />
-                        </nz-form-control>
-                  </nz-form-item>
-                  <!-- Role -->
-                  <nz-form-item>
-                        <nz-form-label [nzRequired]="hasRequiredValidator('role')">Role</nz-form-label>
-                        <nz-form-control nzErrorTip="Role is Required.">
-                              <input formControlName="role" nz-input placeholder="Enter Role Address" />
-                        </nz-form-control>
-                  </nz-form-item>
-                  <!-- Designation -->
-                  <nz-form-item>
-                        <nz-form-label [nzRequired]="hasRequiredValidator('designation')">Designation</nz-form-label>
-                        <nz-form-control nzErrorTip="Designation is Required.">
-                              <input formControlName="designation" nz-input placeholder="Enter Designation" />
-                        </nz-form-control>
-                  </nz-form-item>
-                  <!-- Password -->
-                  <nz-form-item>
-                        <nz-form-label [nzRequired]="hasRequiredValidator('password')">Password</nz-form-label>
-                        <nz-form-control nzErrorTip="Password is Required.">
-                              <input formControlName="password" nz-input placeholder="Enter Password" />
-                        </nz-form-control>
-                  </nz-form-item>
-                  <!-- Status -->
-                  <nz-form-item>
-                        <nz-form-label [nzRequired]="hasRequiredValidator('status')">Status</nz-form-label>
-                        <nz-form-control nzErrorTip="Status is required.">
-                              <nz-select class="w-full" formControlName="status" nz-input nzAllowClear
-                                    nzPlaceHolder="Select Status">
-                                    <nz-option nzLabel="Active" nzValue="Active"></nz-option>
-                                    <nz-option nzLabel="Inactive" nzValue="Inactive"></nz-option>
-                              </nz-select>
-                        </nz-form-control>
-                  </nz-form-item>
+            <div class="grid grid-cols-1 gap-y-6 lg:gap-6 md:grid-cols-2 lg:grid-cols-3 border-[0.5px] p-4 rounded-md">
+                  <!-- Photo -->
+                  <div
+                        class="p-4 border-[0.5px] rounded-md shadow-md md:col-span-2 lg:col-span-1 flex flex-col items-center justify-center">
+                        <!-- Content -->
+                        <div class=" flex flex-col items-center justify-center w-32 h-32 border-[0.5px] border-dashed rounded-full shadow-md cursor-pointer"
+                              (click)="triggerFileInput()">
+                              <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-gray-500" fill="none"
+                                    viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                          d="M3 16l4-4m0 0l4-4m-4 4H21m-5-5l4 4m-4 4l4-4" />
+                              </svg>
+                              <p class="text-center text-blue-500 font-medium">Upload a file</p>
+                              <p class="text-xs text-gray-500">PNG, JPG, GIF up to 10MB</p>
+                        </div>
+                        <input type="file" accept=".png,.jpg,.jpeg,.gif" #fileInput class="hidden"
+                              (change)="onFileSelected($event)" />
+
+                  </div>
+                  <div class="grid grid-cols-1 gap-x-6 md:grid-cols-2 border-[0.5px] p-4 rounded-md col-span-2">
+                        <!-- Name -->
+                        <nz-form-item>
+                              <nz-form-label [nzRequired]="hasRequiredValidator('name')">Name</nz-form-label>
+                              <nz-form-control nzErrorTip="Name is Required.">
+                                    <input formControlName="name" nz-input placeholder="Enter Name" />
+                              </nz-form-control>
+                        </nz-form-item>
+                        <!-- Email -->
+                        <nz-form-item>
+                              <nz-form-label [nzRequired]="hasRequiredValidator('email')">Email</nz-form-label>
+                              <nz-form-control nzErrorTip="Email is Required.">
+                                    <input formControlName="email" nz-input placeholder="Enter Email Address" />
+                              </nz-form-control>
+                        </nz-form-item>
+                        <!-- Phone -->
+                        <nz-form-item>
+                              <nz-form-label [nzRequired]="hasRequiredValidator('phone')">Phone</nz-form-label>
+                              <nz-form-control nzErrorTip="Phone is Required.">
+                                    <input formControlName="phone" nz-input placeholder="Enter Phone Number" />
+                              </nz-form-control>
+                        </nz-form-item>
+                        <!-- Role -->
+                        <nz-form-item>
+                              <nz-form-label [nzRequired]="hasRequiredValidator('role')">Role</nz-form-label>
+                              <nz-form-control nzErrorTip="Role is Required.">
+                                    <input formControlName="role" nz-input placeholder="Enter Role Address" />
+                              </nz-form-control>
+                        </nz-form-item>
+                        <!-- Designation -->
+                        <nz-form-item>
+                              <nz-form-label
+                                    [nzRequired]="hasRequiredValidator('designation')">Designation</nz-form-label>
+                              <nz-form-control nzErrorTip="Designation is Required.">
+                                    <input formControlName="designation" nz-input placeholder="Enter Designation" />
+                              </nz-form-control>
+                        </nz-form-item>
+                        <!-- Password -->
+                        <nz-form-item>
+                              <nz-form-label [nzRequired]="hasRequiredValidator('password')">Password</nz-form-label>
+                              <nz-form-control nzErrorTip="Password is Required.">
+                                    <input formControlName="password" nz-input placeholder="Enter Password" />
+                              </nz-form-control>
+                        </nz-form-item>
+                        <!-- Status -->
+                        <nz-form-item>
+                              <nz-form-label [nzRequired]="hasRequiredValidator('status')">Status</nz-form-label>
+                              <nz-form-control nzErrorTip="Status is required.">
+                                    <nz-select class="w-full" formControlName="status" nz-input nzAllowClear
+                                          nzPlaceHolder="Select Status">
+                                          <nz-option nzLabel="Active" nzValue="Active"></nz-option>
+                                          <nz-option nzLabel="Inactive" nzValue="Inactive"></nz-option>
+                                    </nz-select>
+                              </nz-form-control>
+                        </nz-form-item>
+                  </div>
             </div>
             <!-- Actions -->
             <div class="flex justify-end mt-4">
