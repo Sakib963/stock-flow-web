@@ -48,7 +48,6 @@ export class DisplayUserListComponent implements OnInit {
   }
 
   onSearchChange(value: string): void {
-    console.log('Search input value:', value);
     this.payload.search_text = value;
     this.isFilter = true;
     this.loadUserList();
@@ -68,7 +67,7 @@ export class DisplayUserListComponent implements OnInit {
         next: (res: any) => {
           if (res.status === 200) {
             this.data = [];
-            if (res.body.data.length) {
+            if (res.body?.data?.length) {
               this.data = res.body.data;
             } else {
               this.data = [];

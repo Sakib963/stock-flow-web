@@ -6,6 +6,10 @@
   @apply flex-row;
 }
 
+.ant-select-clear {
+  margin-top: -8px !important;
+}
+
 @media (min-width: 576px) {
   .ant-form-vertical .ant-form-item {
     @apply flex-col;

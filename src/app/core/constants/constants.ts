@@ -30,4 +30,5 @@ export class HttpStatus {
 
 export class ROLES {
   static ADMIN = 'Admin';
+  static MANAGER = 'Manager';
 }
