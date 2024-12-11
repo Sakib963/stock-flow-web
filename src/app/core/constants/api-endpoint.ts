@@ -5,4 +5,6 @@ export class APIEndpoint {
 
   static GET_USER_LIST = '/api/v1/admin/user/get-user-list';
   static CREATE_USER = '/api/v1/admin/user/create-user';
+  static GET_USER_DETAILS = '/api/v1/admin/user/get-user-details';
+  static UPDATE_USER_DETAILS = "/api/v1/admin/user/update-user-details";
 }

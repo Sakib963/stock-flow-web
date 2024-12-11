@@ -17,7 +17,7 @@
                         <div class="hidden shrink-0 sm:flex sm:flex-col sm:items-center">
                               <p class="text-sm/6 text-gray-900">{{ item?.designation }}</p>
                               <div class="mt-1 text-xs/5 text-black flex justify-center items-center gap-4">
-                                    <button>
+                                    <button (click)="handleAction('view', item)">
                                           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                                 stroke-width="1.5" stroke="currentColor" class="size-6">
                                                 <path stroke-linecap="round" stroke-linejoin="round"
@@ -26,7 +26,7 @@
                                                       d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
                                           </svg>
                                     </button>
-                                    <button>
+                                    <button (click)="handleAction('edit', item)">
                                           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                                 stroke-width="1.5" stroke="currentColor" class="size-6">
                                                 <path stroke-linecap="round" stroke-linejoin="round"

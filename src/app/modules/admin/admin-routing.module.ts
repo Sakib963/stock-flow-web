@@ -36,6 +36,13 @@ const routes: Routes = [
                 (m) => m.CreateUserComponent
               ),
           },
+          {
+            path: 'view-user/:oid',
+            loadComponent: () =>
+              import('./pages/user/view-user-details/view-user-details.component').then(
+                (m) => m.ViewUserDetailsComponent
+              ),
+          },
         ],
       },
     ],

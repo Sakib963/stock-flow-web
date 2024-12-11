@@ -27,10 +27,13 @@ export class TokenInterceptor implements HttpInterceptor {
     if (this.authService.getJwtToken()) {
       request = this.addToken(request, this.authService.getJwtToken());
     }
-
     return next.handle(request).pipe(
       catchError((error) => {
-        return throwError(() => error);
+        if (error instanceof HttpErrorResponse && error.status === 401) {
+          return this.handle401Error(request, next);
+        } else {
+          return throwError(() => error);
+        }
       })
     );
   }

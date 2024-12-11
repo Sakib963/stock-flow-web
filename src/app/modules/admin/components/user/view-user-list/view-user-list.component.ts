@@ -16,6 +16,10 @@ export class ViewUserListComponent {
     this.actionEmitter.emit({ action: 'create', value: null });
   }
 
+  handleAction(action: any, value: any): any {
+    this.actionEmitter.emit({ action, value });
+  }
+
   getFirstLetter(name: any): any {
     return name[0];
   }

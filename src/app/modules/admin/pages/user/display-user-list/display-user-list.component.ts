@@ -75,7 +75,8 @@ export class DisplayUserListComponent implements OnInit {
           }
         },
         error: (err: any) => {
-          this._notificationService.error('Error!', 'Something Went Wrong!');
+          console.log(err);
+          this._notificationService.error("Error!", err?.error?.message)
         },
       });
   }
@@ -83,12 +84,30 @@ export class DisplayUserListComponent implements OnInit {
   handleListActions(event: any): any {
     if (event.action === 'create') {
       this.handleAddUser();
+    } else if (event.action === 'view') {
+      this.handleViewUser(event.value.oid);
+    } else if (event.action === 'edit') {
+      this.handleEditUser(event.value.oid);
     }
   }
 
   handleAddUser(): any {
     this._router.navigate(['../create-user'], {
       relativeTo: this._activatedRoute,
+    });
+  }
+
+  handleViewUser(value: any): any {
+    this._router.navigate([`../view-user/${value}`], {
+      relativeTo: this._activatedRoute,
+      state: { edit: false },
+    });
+  }
+
+  handleEditUser(value: any): any {
+    this._router.navigate([`../view-user/${value}`], {
+      relativeTo: this._activatedRoute,
+      state: { edit: true },
     });
   }
 }

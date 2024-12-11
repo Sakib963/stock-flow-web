@@ -1,7 +1,21 @@
-import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
+import { HttpClientModule } from "@angular/common/http";
+import { importProvidersFrom } from "@angular/core";
+import { bootstrapApplication, BrowserModule } from "@angular/platform-browser";
+import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
+import { AppRoutingModule } from "@app/app-routing.module";
+import { AppComponent } from "@app/app.component";
+import { tokenInterceptor } from "@app/core/interceptor/token-interceptor.service";
+import { NgZorroCustomModule } from "@app/shared/ng-zorro-custom.module";
 
-import { AppModule } from './app/app.module';
-
-
-platformBrowserDynamic().bootstrapModule(AppModule)
-  .catch(err => console.error(err));
+bootstrapApplication(AppComponent, {
+  providers: [
+    importProvidersFrom(
+      BrowserModule,
+      HttpClientModule,
+      NgZorroCustomModule,
+      BrowserAnimationsModule,
+      AppRoutingModule
+    ),
+    tokenInterceptor,
+  ],
+}).catch((err) => console.error(err));

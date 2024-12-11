@@ -8,10 +8,12 @@
                         <div *ngIf="!form.controls['photo'].value"
                               class=" flex flex-col items-center justify-center w-32 h-32 border-[0.5px] border-dashed rounded-full shadow-md cursor-pointer"
                               (click)="fileInput.click()">
-                              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5m-13.5-9L12 3m0 0 4.5 4.5M12 3v13.5" />
-                                  </svg>
-                                  
+                              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                                    stroke="currentColor" class="size-6">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                          d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5m-13.5-9L12 3m0 0 4.5 4.5M12 3v13.5" />
+                              </svg>
+
                         </div>
                         <p *ngIf="!form.controls['photo'].value" class="text-center text-blue-500 font-medium mt-4">
                               Upload a file</p>
@@ -37,12 +39,14 @@
                         <nz-form-item>
                               <nz-form-label [nzRequired]="hasRequiredValidator('email')">Email</nz-form-label>
                               <nz-form-control nzErrorTip="Email is Required.">
-                                    <input formControlName="email" nz-input placeholder="Enter Email Address" />
+                                    <input formControlName="email" nz-input placeholder="Enter Email Address"
+                                          [readOnly]="formData" />
                               </nz-form-control>
                         </nz-form-item>
                         <!-- mobile_number -->
                         <nz-form-item>
-                              <nz-form-label [nzRequired]="hasRequiredValidator('mobile_number')">Mobile Number</nz-form-label>
+                              <nz-form-label [nzRequired]="hasRequiredValidator('mobile_number')">Mobile
+                                    Number</nz-form-label>
                               <nz-form-control nzErrorTip="Mobile Number is Required.">
                                     <input formControlName="mobile_number" nz-input placeholder="Enter Mobile Number" />
                               </nz-form-control>
@@ -68,7 +72,7 @@
                               </nz-form-control>
                         </nz-form-item>
                         <!-- Password -->
-                        <nz-form-item>
+                        <nz-form-item *ngIf="!formData">
                               <nz-form-label [nzRequired]="hasRequiredValidator('password')">Password</nz-form-label>
                               <nz-form-control nzErrorTip="Password is Required.">
                                     <input formControlName="password" nz-input placeholder="Enter Password" />
@@ -103,6 +107,5 @@
                         </button>
                   </div>
             </div>
-
       </form>
 </div>

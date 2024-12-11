@@ -1,6 +1,6 @@
 <div class="p-4 space-y-3">
       <h2 class="text-2xl font-medium mb-4 animate-text">User List</h2>
-      <app-loader *ngIf="loading"></app-loader>
+      <app-loader *ngIf="loading" [isVisible]="loading"></app-loader>
       <div *ngIf="!loading">
             <div class="flex justify-between items-center mb-4">
                   <!-- Search Text -->

@@ -59,11 +59,14 @@ export class UserFormComponent implements OnInit {
 
     if (this.formData) {
       this.form.patchValue(this.formData);
+      // Remove password control if formData exists
+      this.form.removeControl('password');
     }
   }
 
   createForm(): FormGroup {
     return this._fb.group({
+      oid: [null],
       name: [null, [Validators.required]],
       email: [null, [Validators.required]],
       mobile_number: [null, [Validators.required]],
@@ -118,9 +121,7 @@ export class UserFormComponent implements OnInit {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files[0]) {
       const file = input.files[0];
-      console.log('Selected file:', file);
       convertImageToBase64(file).then((base64) => {
-        console.log('Base64 string:', base64);
         this.form.controls['photo'].setValue(base64);
       });
     }
