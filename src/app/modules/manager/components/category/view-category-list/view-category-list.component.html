@@ -1,0 +1,54 @@
+<div class="p-4 border rounded-md shadow-md">
+      <ul *ngIf="data.length" class="divide-y divide-gray-100">
+            <ng-container *ngFor="let item of data">
+                  <li class="flex justify-between gap-x-6 py-5">
+                        <p class="text-sm/6 text-gray-900">{{ item?.name }}</p>
+                        <div class="hidden shrink-0 sm:flex sm:flex-col sm:items-center">
+                              <div class="mt-1 text-xs/5 text-black flex justify-center items-center gap-4">
+                                    <button (click)="handleAction('view', item)">
+                                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                                stroke-width="1.5" stroke="currentColor" class="size-6">
+                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                      d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
+                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                      d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                                          </svg>
+                                    </button>
+                                    <button (click)="handleAction('edit', item)">
+                                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                                stroke-width="1.5" stroke="currentColor" class="size-6">
+                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                      d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125" />
+                                          </svg>
+                                    </button>
+                              </div>
+                        </div>
+                  </li>
+            </ng-container>
+      </ul>
+      <div *ngIf="!data.length"
+            class="flex flex-col items-center justify-center h-full text-center bg-gray-50 p-8 rounded-md">
+            <svg class="h-16 w-16 text-[#000000] mb-4" data-slot="icon" fill="none" stroke-width="1.5"
+                  stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                  <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M15.182 16.318A4.486 4.486 0 0 0 12.016 15a4.486 4.486 0 0 0-3.198 1.318M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0ZM9.75 9.75c0 .414-.168.75-.375.75S9 10.164 9 9.75 9.168 9 9.375 9s.375.336.375.75Zm-.375 0h.008v.015h-.008V9.75Zm5.625 0c0 .414-.168.75-.375.75s-.375-.336-.375-.75.168-.75.375-.75.375.336.375.75Zm-.375 0h.008v.015h-.008V9.75Z">
+                  </path>
+            </svg>
+
+            <h2 class="text-lg font-semibold text-black">No Data Found</h2>
+            <p class="text-black mt-2">Try refining your search or adding new data.</p>
+            <button (click)="handleAddCategory()"
+                  class="mt-4 uppercase flex justify-center items-center rounded-md border border-transparent bg-[#000000] py-2 px-4 font-medium text-white focus:outline-none hover:bg-[#000000] transition ease-in-out delay-150 hover:scale-95 duration-300 disabled:cursor-wait"
+                  type="button">
+                  <div class="flex justify-center items-center gap-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                              stroke="currentColor" class="size-6">
+                              <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                        </svg>
+                        <p>Add Category</p>
+                  </div>
+            </button>
+      </div>
+
+</div>

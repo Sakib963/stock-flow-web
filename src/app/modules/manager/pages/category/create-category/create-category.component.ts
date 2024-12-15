@@ -1,20 +1,20 @@
 import { Component, DestroyRef } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
-import { UserFormComponent } from '@app/modules/admin/components/user/user-form/user-form.component';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { HttpService } from '@app/core/services/http.service';
-import { finalize } from 'rxjs';
 import { APIEndpoint } from '@app/core/constants/api-endpoint';
+import { HttpService } from '@app/core/services/http.service';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
+import { finalize } from 'rxjs';
+import { CategoryFormComponent } from '@app/modules/manager/components/category/category-form/category-form.component';
 
 @Component({
-  selector: 'app-create-user',
+  selector: 'app-create-category',
   standalone: true,
-  imports: [CommonModule, UserFormComponent],
-  templateUrl: './create-user.component.html',
-  styleUrls: ['./create-user.component.scss'],
+  imports: [CommonModule, CategoryFormComponent],
+  templateUrl: './create-category.component.html',
+  styleUrls: ['./create-category.component.scss']
 })
-export class CreateUserComponent {
+export class CreateCategoryComponent {
   loading: boolean = false;
 
   constructor(
@@ -26,16 +26,18 @@ export class CreateUserComponent {
 
   handleActions(event: any): any {
     if (event.action === 'submit') {
-      this.handleCreateUser(event.value);
+      this.handleCreateCategory(event.value);
     } else if (event.action === 'back') {
       this._location.back();
     }
   }
 
-  handleCreateUser(payload: any): any {
+  handleCreateCategory(payload: any): any {
     this.loading = true;
+    console.log(payload);
+    
     this._httpService
-      .post(APIEndpoint.CREATE_USER, payload)
+      .post(APIEndpoint.CREATE_CATEGORY, payload)
       .pipe(
         takeUntilDestroyed(this._destroyRef),
         finalize(() => (this.loading = false))
@@ -51,4 +53,5 @@ export class CreateUserComponent {
         },
       });
   }
+
 }

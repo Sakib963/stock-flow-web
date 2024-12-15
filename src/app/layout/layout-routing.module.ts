@@ -12,11 +12,18 @@ const routes: Routes = [
     resolve: { userInfo: UserInfoResolver },
     children: [
       {
-        path: '',
+        path: 'admin',
         loadChildren: () =>
           import('../modules/admin/admin.module').then((m) => m.AdminModule),
         canActivate: [RoleGuard],
         data: { roles: [ROLES.ADMIN] },
+      },
+      {
+        path: '',
+        loadChildren: () =>
+          import('../modules/manager/manager.module').then((m) => m.ManagerModule),
+        canActivate: [RoleGuard],
+        data: { roles: [ROLES.MANAGER] },
       },
     ],
   },

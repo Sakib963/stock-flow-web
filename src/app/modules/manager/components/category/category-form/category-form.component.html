@@ -1,0 +1,57 @@
+<div class="rounded-md bg-white">
+      <form nz-form [formGroup]="form" [nzLayout]="'vertical'" (ngSubmit)="handleForm()">
+            <div class="grid grid-cols-1 lg:gap-x-6 md:grid-cols-2 lg:grid-cols-3 border-[0.5px] p-4 rounded-md">
+                  <!-- Form -->
+                  <!-- Name -->
+                  <nz-form-item>
+                        <nz-form-label [nzRequired]="hasRequiredValidator('name')">Name</nz-form-label>
+                        <nz-form-control nzErrorTip="Name is Required.">
+                              <input formControlName="name" nz-input placeholder="Enter Name" />
+                        </nz-form-control>
+                  </nz-form-item>
+                  <!-- category_code -->
+                  <nz-form-item>
+                        <nz-form-label [nzRequired]="hasRequiredValidator('category_code')">Category
+                              Code</nz-form-label>
+                        <nz-form-control nzErrorTip="Category Code is Required.">
+                              <input formControlName="category_code" nz-input placeholder="Enter Category Code" />
+                        </nz-form-control>
+                  </nz-form-item>
+                  <!-- Description -->
+                  <nz-form-item>
+                        <nz-form-label [nzRequired]="hasRequiredValidator('description')">Description</nz-form-label>
+                        <nz-form-control nzErrorTip="Description is Required.">
+                              <textarea formControlName="description" nz-input placeholder="Enter Description"
+                                    nzAutosize></textarea>
+                        </nz-form-control>
+                  </nz-form-item>
+                  <!-- Status -->
+                  <nz-form-item>
+                        <nz-form-label [nzRequired]="hasRequiredValidator('status')">Status</nz-form-label>
+                        <nz-form-control nzErrorTip="Status is required.">
+                              <nz-select class="w-full" formControlName="status" nz-input nzAllowClear
+                                    nzPlaceHolder="Select Status">
+                                    <nz-option nzLabel="Active" nzValue="Active"></nz-option>
+                                    <nz-option nzLabel="Inactive" nzValue="Inactive"></nz-option>
+                              </nz-select>
+                        </nz-form-control>
+                  </nz-form-item>
+            </div>
+            <!-- Actions -->
+            <div class="flex justify-end mt-4">
+                  <div class="flex items-center gap-4">
+                        <button class="secondary-button" type="button" (click)="goBack()">
+                              Cancel
+                        </button>
+                        <button class="primary-button disabled:cursor-wait" type="submit" [disabled]="loading">
+                              <span *ngIf="loading">
+                                    <app-spinner></app-spinner>
+                              </span>
+                              <div *ngIf="!loading" class="flex justify-center items-center gap-2">
+                                    <p>Submit</p>
+                              </div>
+                        </button>
+                  </div>
+            </div>
+      </form>
+</div>

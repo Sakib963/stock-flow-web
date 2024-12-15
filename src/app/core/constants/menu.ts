@@ -8,24 +8,30 @@ export class Menu {
         {
           icon: 'assets/icons/dashboard.svg',
           label: 'Dashboard',
-          route: '/',
+          route: '/admin/dashboard',
         },
         {
           icon: 'assets/icons/user.svg',
           label: 'User',
-          route: '/user',
+          route: '/admin/user',
         },
       ],
     },
   ];
 
-  static publicPages: MenuItem[] = [
+  static managerPages: MenuItem[] = [
     {
+      group: 'Manager',
       items: [
         {
-          icon: 'assets/icons/heroicons/outline/home.svg',
-          label: 'Home',
+          icon: 'assets/icons/dashboard.svg',
+          label: 'Dashboard',
           route: '/',
+        },
+        {
+          icon: 'assets/icons/category.svg',
+          label: 'Category',
+          route: '/category',
         },
       ],
     },

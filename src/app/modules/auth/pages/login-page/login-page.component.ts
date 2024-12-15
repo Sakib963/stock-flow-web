@@ -94,6 +94,9 @@ export class LoginPageComponent implements OnInit {
                 email: res.data.email,
               });
               if (res.data.role === ROLES.ADMIN) {
+                this._router.navigate(['/admin/dashboard']);
+                console.log(this.authService.currentUserRole);
+              } else if (res.data.role === ROLES.MANAGER) {
                 this._router.navigate(['/']);
                 console.log(this.authService.currentUserRole);
               }

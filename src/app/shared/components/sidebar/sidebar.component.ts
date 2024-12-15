@@ -26,6 +26,8 @@ export class SidebarComponent implements OnInit {
 
     if (this.userRole === ROLES.ADMIN) {
       this.menu = Menu.adminPages;
+    } else if (this.userRole === ROLES.MANAGER) {
+      this.menu = Menu.managerPages;
     } else {
       this.menu = Menu.defaultPages;
     }
