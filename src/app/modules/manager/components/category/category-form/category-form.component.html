@@ -17,14 +17,6 @@
                               <input formControlName="category_code" nz-input placeholder="Enter Category Code" />
                         </nz-form-control>
                   </nz-form-item>
-                  <!-- Description -->
-                  <nz-form-item>
-                        <nz-form-label [nzRequired]="hasRequiredValidator('description')">Description</nz-form-label>
-                        <nz-form-control nzErrorTip="Description is Required.">
-                              <textarea formControlName="description" nz-input placeholder="Enter Description"
-                                    nzAutosize></textarea>
-                        </nz-form-control>
-                  </nz-form-item>
                   <!-- Status -->
                   <nz-form-item>
                         <nz-form-label [nzRequired]="hasRequiredValidator('status')">Status</nz-form-label>
@@ -34,6 +26,14 @@
                                     <nz-option nzLabel="Active" nzValue="Active"></nz-option>
                                     <nz-option nzLabel="Inactive" nzValue="Inactive"></nz-option>
                               </nz-select>
+                        </nz-form-control>
+                  </nz-form-item>
+                  <!-- Description -->
+                  <nz-form-item>
+                        <nz-form-label [nzRequired]="hasRequiredValidator('description')">Description</nz-form-label>
+                        <nz-form-control nzErrorTip="Description is Required.">
+                              <textarea formControlName="description" nz-input placeholder="Enter Description"
+                                    nzAutosize></textarea>
                         </nz-form-control>
                   </nz-form-item>
             </div>

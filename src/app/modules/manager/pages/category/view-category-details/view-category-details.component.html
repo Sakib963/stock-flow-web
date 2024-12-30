@@ -1,1 +1,42 @@
-<p>view-category-details works!</p>
+<div class="p-4 space-y-3">
+      <h2 class="text-2xl font-medium mb-4 animate-text">Category Details</h2>
+      <app-loader *ngIf="loading" [isVisible]="loading"></app-loader>
+      <div *ngIf="!loading && categoryDetails">
+            <!-- Edit mode On -->
+            <div *ngIf="editMode">
+                  <app-category-form [formData]="categoryDetails"  (actionEmitter)="handleActions($event)"></app-category-form>
+            </div>
+            <div *ngIf="!editMode">
+                  <div class="grid grid-cols-1 gap-x-6 gap-y-4 md:grid-cols-3 border-[0.5px] p-4 rounded-md">
+                        <!-- Name -->
+                        <div class="space-y-1">
+                              <p>Name</p>
+                              <p class="font-semibold">{{ categoryDetails?.name }}</p>
+                        </div>
+                        <!-- category_code -->
+                        <div class="space-y-1">
+                              <p>Category Code</p>
+                              <p class="font-semibold">{{ categoryDetails?.category_code }}</p>
+                        </div>
+                        <!-- status -->
+                        <div class="space-y-1">
+                              <p>status</p>
+                              <p class="font-semibold">{{ categoryDetails?.status }}</p>
+                        </div>
+                        <!-- Description -->
+                        <div class="space-y-1">
+                              <p>Description</p>
+                              <p class="font-semibold">{{ categoryDetails?.description }}</p>
+                        </div>
+                  </div>
+                  <!-- Actions -->
+                  <div class="flex justify-end mt-4">
+                        <div class="flex items-center gap-4">
+                              <button class="secondary-button" type="button" (click)="goBack()">
+                                    Go Back
+                              </button>
+                        </div>
+                  </div>
+            </div>
+      </div>
+</div>

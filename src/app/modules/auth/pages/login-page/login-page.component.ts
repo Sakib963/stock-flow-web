@@ -62,7 +62,7 @@ export class LoginPageComponent implements OnInit {
   createForm(): FormGroup {
     return this._fb.group({
       email: [null, [Validators.required]],
-      password: [null, [Validators.required]],
+      password: ['asdfgh', [Validators.required]],
     });
   }
 

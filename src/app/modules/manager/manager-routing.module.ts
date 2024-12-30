@@ -9,10 +9,7 @@ const routes: Routes = [
     children: [
       {
         path: '',
-        loadComponent: () =>
-          import('./pages/manager-dashboard/manager-dashboard.component').then(
-            (m) => m.ManagerDashboardComponent
-          ),
+        loadComponent: () =>import('./pages/manager-dashboard/manager-dashboard.component').then((m) => m.ManagerDashboardComponent),
       },
       {
         path: 'category',
@@ -24,24 +21,15 @@ const routes: Routes = [
           },
           {
             path: 'category-list',
-            loadComponent: () =>
-              import(
-                './pages/category/display-category-list/display-category-list.component'
-              ).then((m) => m.DisplayCategoryListComponent),
+            loadComponent: () =>import('./pages/category/display-category-list/display-category-list.component').then((m) => m.DisplayCategoryListComponent),
           },
           {
             path: 'create-category',
-            loadComponent: () =>
-              import('./pages/category/create-category/create-category.component').then(
-                (m) => m.CreateCategoryComponent
-              ),
+            loadComponent: () => import('./pages/category/create-category/create-category.component').then((m) => m.CreateCategoryComponent),
           },
           {
             path: 'view-category/:oid',
-            loadComponent: () =>
-              import(
-                './pages/category/view-category-details/view-category-details.component'
-              ).then((m) => m.ViewCategoryDetailsComponent),
+            loadComponent: () => import('./pages/category/view-category-details/view-category-details.component').then((m) => m.ViewCategoryDetailsComponent),
           },
         ],
       },
