@@ -1,15 +1,45 @@
 <div class="overflow-y-auto text-black h-full p-4">
   <div *ngFor="let group of menu">
     <ul class="space-y-2">
-      <li *ngFor="let item of group.items"
-      (click)="handleClick()"
-        class="flex items-center p-2 rounded cursor-pointer duration-100 ease-in-out hover:bg-black hover:text-white transition delay-150 hover:border-l-4 hover:border-l-[#594ED1] tracking-wide font-medium"
-        [routerLink]="item.route" [ngClass]="{
-      'bg-black text-white border-l-4 border-l-[#594ED1]': isActive(item.route)
-    }">
-        <svg-icon *ngIf="!isActive(item.route)" [src]="item.icon" class="w-5 h-5 mr-3 fill-current"></svg-icon>
-        <svg-icon *ngIf="isActive(item.route)" [src]="item.icon" class="w-5 h-5 mr-3 fill-current"></svg-icon>
-        <span>{{ item.label }}</span>
+      <li *ngFor="let item of group.items">
+        <!-- Items with children -->
+        <div *ngIf="item.children">
+          <!-- Parent Item -->
+          <div
+            class="flex items-center justify-between p-2 rounded cursor-pointer duration-100 ease-in-out hover:bg-black hover:text-white transition delay-150 hover:border-l-4 hover:border-l-[#594ED1] tracking-wide font-medium"
+            [ngClass]="{ 'bg-black text-white border-l-4 border-l-[#594ED1]': item.expanded }"
+            (click)="toggleChildren(item)">
+            <div class="flex items-center">
+              <svg-icon [src]="item.icon" class="w-5 h-5 mr-3 fill-current"></svg-icon>
+              <span>{{ item.label }}</span>
+            </div>
+            <svg-icon [src]="item.expanded ? '/assets/icons/up.svg' : '/assets/icons/down.svg'"
+              class="w-5 h-5"></svg-icon>
+          </div>
+
+          <!-- Child Drawer -->
+          <div *ngIf="item.expanded"
+            class="bg-black border-l-4 border-l-[#594ED1] p-2 shadow-inner">
+            <ul class="space-y-2">
+              <li *ngFor="let child of item.children" (click)="handleChildClick(child)"
+                class="bg-white flex items-center p-2 rounded cursor-pointer duration-100 ease-in-out transition delay-150 hover:border-l-4 hover:border-l-[#594ED1] tracking-wide font-medium"
+                [routerLink]="child.route"
+                [ngClass]="{ 'bg-black text-black border-l-4 border-l-[#594ED1]': isActive(child.route) }">
+                <svg-icon [src]="child.icon" class="w-5 h-5 mr-3 fill-current"></svg-icon>
+                <span>{{ child.label }}</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Items without children -->
+        <div *ngIf="!item.children" (click)="handleChildClick(item)"
+          class="flex items-center p-2 rounded cursor-pointer duration-100 ease-in-out hover:bg-black hover:text-white transition delay-150 hover:border-l-4 hover:border-l-[#594ED1] tracking-wide font-medium"
+          [routerLink]="item.route"
+          [ngClass]="{ 'bg-black text-white border-l-4 border-l-[#594ED1]': isActive(item.route) }">
+          <svg-icon [src]="item.icon" class="w-5 h-5 mr-3 fill-current"></svg-icon>
+          <span>{{ item.label }}</span>
+        </div>
       </li>
     </ul>
   </div>

@@ -28,8 +28,6 @@ export class SidebarComponent implements OnInit {
       this.menu = Menu.adminPages;
     } else if (this.userRole === ROLES.MANAGER) {
       this.menu = Menu.managerPages;
-    } else {
-      this.menu = Menu.defaultPages;
     }
   }
 
@@ -42,5 +40,14 @@ export class SidebarComponent implements OnInit {
 
   handleClick(): any {
     this.actionEmitter.emit({ action: 'menu_click', value: null });
+  }
+
+  toggleChildren(item: any): void {
+    item.expanded = !item.expanded;
+    console.log(item);
+  }
+
+  handleChildClick(item: any): void {
+    console.log(`${item.label} clicked`);
   }
 }

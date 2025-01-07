@@ -33,18 +33,10 @@ export class Menu {
           label: 'Category',
           route: '/category',
         },
-      ],
-    },
-  ];
-
-  static defaultPages: MenuItem[] = [
-    {
-      group: 'Default',
-      items: [
         {
-          icon: 'assets/icons/help.svg',
-          label: 'Help',
-          route: '/help',
+          icon: 'assets/icons/product.svg',
+          label: 'Product',
+          route: '/product',
         },
       ],
     },

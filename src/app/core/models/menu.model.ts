@@ -4,6 +4,7 @@ export interface MenuItem {
   selected?: boolean;
   active?: boolean;
   items: SubMenuItem[];
+  expanded?: boolean;
 }
 
 export interface SubMenuItem {
