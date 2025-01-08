@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { AdminComponent } from './admin.component';
+import { NotFoundComponent } from '@app/shared/components/not-found/not-found.component';
 
 const routes: Routes = [
   {
@@ -46,6 +47,14 @@ const routes: Routes = [
         ],
       },
     ],
+  },
+  {
+    path: 'not-found',
+    component: NotFoundComponent,
+  },
+  {
+    path: '**',
+    redirectTo: 'not-found',
   },
 ];
 

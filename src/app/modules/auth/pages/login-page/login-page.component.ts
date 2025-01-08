@@ -97,7 +97,7 @@ export class LoginPageComponent implements OnInit {
                 this._router.navigate(['/admin/dashboard']);
                 console.log(this.authService.currentUserRole);
               } else if (res.data.role === ROLES.MANAGER) {
-                this._router.navigate(['/']);
+                this._router.navigate(['/manager/dashboard']);
                 console.log(this.authService.currentUserRole);
               }
             }

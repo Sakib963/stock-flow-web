@@ -31,11 +31,15 @@ export class SidebarComponent implements OnInit {
     }
   }
 
-  isActive(route: string): boolean {
+  /* isActive(route: string): boolean {
     if (route === '/') {
       return this._router.url === '/';
     }
     return this._router.url.startsWith(route);
+  } */
+
+  isActive(route: string): boolean {
+    return ( this._router.url === route || this._router.url.startsWith(route + '/'));
   }
 
   handleClick(): any {

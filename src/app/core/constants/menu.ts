@@ -21,16 +21,23 @@ export class Menu {
 
   static managerPages: MenuItem[] = [
     {
-      group: 'Dashboard',
+      group: '',
       items: [
-        { icon: 'assets/icons/dashboard.svg', label: 'Dashboard', route: '/' },
+        { icon: 'assets/icons/dashboard.svg', label: 'Dashboard', route: '/manager/dashboard' },
       ],
     },
     {
       group: 'Configuration',
       items: [
-        { icon: 'assets/icons/category.svg', label: 'Category', route: '/category' },
-        { icon: 'assets/icons/product.svg', label: 'Product', route: '/product' },
+        { icon: 'assets/icons/category.svg', label: 'Category', route: '/manager/category' },
+        { icon: 'assets/icons/source.svg', label: 'Supplier/Dealer', route: '/manager/supplier-dealer' },
+        { icon: 'assets/icons/product.svg', label: 'Product', route: '/manager/product' },
+      ],
+    },
+    {
+      group: 'Tech',
+      items: [
+        { icon: 'assets/icons/category.svg', label: 'Portfolio', route: '/manager/portfolio' },
       ],
     },
   ];

@@ -1,31 +1,28 @@
-import { Component, DestroyRef } from '@angular/core';
+import { Component, DestroyRef, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { LoaderComponent } from '@app/shared/components/loader/loader.component';
 import { NgZorroCustomModule } from '@app/shared/ng-zorro-custom.module';
-import { Constants } from '@app/core/constants/constants';
-import { APIEndpoint } from '@app/core/constants/api-endpoint';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router, ActivatedRoute } from '@angular/router';
+import { APIEndpoint } from '@app/core/constants/api-endpoint';
+import { Constants } from '@app/core/constants/constants';
 import { HttpService } from '@app/core/services/http.service';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { finalize } from 'rxjs';
-import { ViewCategoryListComponent } from '@app/modules/manager/components/category/view-category-list/view-category-list.component';
 
 @Component({
-  selector: 'app-display-category-list',
+  selector: 'app-display-product-list',
   standalone: true,
-  imports: [
-    CommonModule,
-    LoaderComponent,
-    NgZorroCustomModule,
-    ReactiveFormsModule,
-    ViewCategoryListComponent,
-  ],
-  templateUrl: './display-category-list.component.html',
-  styleUrls: ['./display-category-list.component.scss'],
+  imports: [CommonModule,
+      LoaderComponent,
+      NgZorroCustomModule,
+      ReactiveFormsModule,
+      ],
+  templateUrl: './display-product-list.component.html',
+  styleUrls: ['./display-product-list.component.scss']
 })
-export class DisplayCategoryListComponent {
+export class DisplayProductListComponent implements OnInit {
   data: any[] = [];
   loading: boolean = false;
   payload: any = {
@@ -88,31 +85,32 @@ export class DisplayCategoryListComponent {
 
   handleListActions(event: any): any {
     if (event.action === 'create') {
-      this.handleAddCategory();
+      this.handleAdd();
     } else if (event.action === 'view') {
-      this.handleViewCategory(event.value.oid);
+      this.handleView(event.value.oid);
     } else if (event.action === 'edit') {
-      this.handleEditCategory(event.value.oid);
+      this.handleEdit(event.value.oid);
     }
   }
 
-  handleAddCategory(): any {
-    this._router.navigate(['../create-category'], {
+  handleAdd(): any {
+    this._router.navigate(['../create-product'], {
       relativeTo: this._activatedRoute,
     });
   }
 
-  handleViewCategory(value: any): any {
-    this._router.navigate([`../view-category/${value}`], {
+  handleView(value: any): any {
+    this._router.navigate([`../view-product/${value}`], {
       relativeTo: this._activatedRoute,
       state: { edit: false },
     });
   }
 
-  handleEditCategory(value: any): any {
-    this._router.navigate([`../view-category/${value}`], {
+  handleEdit(value: any): any {
+    this._router.navigate([`../view-product/${value}`], {
       relativeTo: this._activatedRoute,
       state: { edit: true },
     });
   }
+
 }

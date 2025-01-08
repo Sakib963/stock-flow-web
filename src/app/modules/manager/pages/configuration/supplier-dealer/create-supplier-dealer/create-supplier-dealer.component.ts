@@ -1,20 +1,20 @@
 import { Component, DestroyRef } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
+import { SupplierDealerFormComponent } from '@app/modules/manager/components/configuration/supplier-dealer/supplier-dealer-form/supplier-dealer-form.component';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { APIEndpoint } from '@app/core/constants/api-endpoint';
 import { HttpService } from '@app/core/services/http.service';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { finalize } from 'rxjs';
-import { CategoryFormComponent } from '@app/modules/manager/components/category/category-form/category-form.component';
 
 @Component({
-  selector: 'app-create-category',
+  selector: 'app-create-supplier-dealer',
   standalone: true,
-  imports: [CommonModule, CategoryFormComponent],
-  templateUrl: './create-category.component.html',
-  styleUrls: ['./create-category.component.scss']
+  imports: [CommonModule, SupplierDealerFormComponent],
+  templateUrl: './create-supplier-dealer.component.html',
+  styleUrls: ['./create-supplier-dealer.component.scss']
 })
-export class CreateCategoryComponent {
+export class CreateSupplierDealerComponent {
   loading: boolean = false;
 
   constructor(
@@ -26,13 +26,14 @@ export class CreateCategoryComponent {
 
   handleActions(event: any): any {
     if (event.action === 'submit') {
-      this.handleCreateCategory(event.value);
+      console.log(event.value);
+      // this.handleCreateSupplierDealer(event.value);
     } else if (event.action === 'back') {
       this._location.back();
     }
   }
 
-  handleCreateCategory(payload: any): any {
+  handleCreateSupplierDealer(payload: any): any {
     this.loading = true;
     console.log(payload);
     
@@ -53,5 +54,4 @@ export class CreateCategoryComponent {
         },
       });
   }
-
 }

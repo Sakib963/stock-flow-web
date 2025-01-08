@@ -1,0 +1,40 @@
+<div class="p-4 space-y-3">
+      <h2 class="text-2xl font-medium mb-4 animate-text">Product List</h2>
+      <app-loader *ngIf="loading" [isVisible]="loading"></app-loader>
+      <div *ngIf="!loading">
+            <div class="flex justify-between items-center mb-4">
+                  <!-- Search Text -->
+                  <div class="w-2/3 grid grid-cols-3">
+                        <div class="relative">
+                              <input id="searchControl" class="peer block h-10 custom-input" type="text"
+                                    [formControl]="searchControl" placeholder=" " />
+                              <label class="absolute top-2 left-1 origin-[0] -translate-y-4 scale-95 transform bg-white px-2 text-gray-500 duration-300 peer-placeholder-shown:top-1/2 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:scale-100 peer-focus:top-2 peer-focus:-translate-y-4 peer-focus:scale-95 peer-focus:px-2 peer-focus:text-primary-500 dark:bg-night-700"
+                                    for="searchControl">
+                                    Enter Search Text Here
+                              </label>
+                        </div>
+                  </div>
+                  <!-- Buttons -->
+                  <div class="flex justify-center items-center gap-4">
+                        <button (click)="handleAdd()"
+                              class="group relative flex items-center gap-4 overflow-hidden rounded-sm bg-white px-6 py-2 shadow font-medium disabled:cursor-wait"
+                              type="button">
+                              <div
+                                    class="absolute inset-0 w-2 bg-primary transition-all duration-300 ease-in-out group-hover:w-full">
+                              </div>
+                              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                                    stroke="currentColor"
+                                    class="size-6 relative z-10 text-black transition-colors duration-300 group-hover:text-white">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                          d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                              </svg>
+                              <span
+                                    class="relative z-10 whitespace-nowrap text-black transition-all duration-300 group-hover:text-white">
+                                    Add Product
+                              </span>
+                        </button>
+                  </div>
+            </div>
+            <!-- <app-view-category-list [data]="data" (actionEmitter)="handleListActions($event)"></app-view-category-list> -->
+      </div>
+</div>

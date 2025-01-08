@@ -20,20 +20,12 @@ const routes: Routes = [
         data: { roles: [ROLES.ADMIN] },
       },
       {
-        path: '',
+        path: 'manager',
         loadChildren: () =>
           import('../modules/manager/manager.module').then((m) => m.ManagerModule),
         canActivate: [RoleGuard],
         data: { roles: [ROLES.MANAGER] },
-      },
-      {
-        path: 'not-found',
-        component: NotFoundComponent,
-      },
-      {
-        path: '**',
-        redirectTo: 'not-found',
-      },
+      }
     ],
   },
 ];
