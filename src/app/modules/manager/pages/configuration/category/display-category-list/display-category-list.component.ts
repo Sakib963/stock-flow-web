@@ -11,6 +11,7 @@ import { HttpService } from '@app/core/services/http.service';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { finalize } from 'rxjs';
 import { ViewCategoryListComponent } from '@app/modules/manager/components/configuration/category/view-category-list/view-category-list.component';
+import { PrimaryButtonWithPlusIcon } from '@app/shared/components/buttons/primary-button-with-plus-icon/primary-button-with-plus-icon.component';
 
 @Component({
   selector: 'app-display-category-list',
@@ -21,6 +22,7 @@ import { ViewCategoryListComponent } from '@app/modules/manager/components/confi
     NgZorroCustomModule,
     ReactiveFormsModule,
     ViewCategoryListComponent,
+    PrimaryButtonWithPlusIcon
   ],
   templateUrl: './display-category-list.component.html',
   styleUrls: ['./display-category-list.component.scss'],

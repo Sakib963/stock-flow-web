@@ -1,0 +1,13 @@
+<button [disabled]="loading" [type]="type"
+      class="min-w-min group relative flex items-center gap-4 overflow-hidden rounded-sm bg-white px-6 py-2 shadow font-medium disabled:cursor-wait">
+      <div [ngClass]="loading ? 'w-full': ''"
+            class="absolute inset-0 w-2 bg-primary transition-all duration-300 ease-in-out group-hover:w-full">
+      </div>
+      <span *ngIf="loading">
+            <app-spinner></app-spinner>
+      </span>
+      <span *ngIf="!loading"
+            class="relative z-10 whitespace-nowrap text-black transition-all duration-300 group-hover:text-white">
+            {{label}}
+      </span>
+</button>

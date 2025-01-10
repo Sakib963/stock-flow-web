@@ -1,17 +1,8 @@
-<div class="w-full flex flex-col items-center bg-[#F4F7FD] rounded-2xl p-5">
-      <svg class="h-8 w-8" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-            stroke="currentColor" class="size-6">
-            <path stroke-linecap="round" stroke-linejoin="round"
-                  d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z" />
-      </svg>
-
-      <p class="text-black mt-6 mb-9">{{ modalData.message }}</p>
-      <div class="flex items-center gap-4">
-            <button class="secondary-button" type="button" (click)="closeModal()">
-                  Cancel
-            </button>
-            <button class="primary-button" type="button" (click)="handleConfirm()">
-                  Confirm
-            </button>
+<div class="w-full flex flex-col items-center p-5">
+      <img class="w-2/3 mx-auto" src="/assets/icons/undraw_confirmation.svg" alt="">
+      <p class="text-black mt-6 mb-9 font-semibold text-lg">{{ modalData.message }}</p>
+      <div class="flex items-center gap-8">
+            <secondary-button [label]="'Cancel'" [type]="'button'" (click)="closeModal()"></secondary-button>
+            <primary-button [label]="'Confirm'" [type]="'button'" (click)="handleConfirm()"></primary-button>
       </div>
 </div>

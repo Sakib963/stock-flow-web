@@ -25,5 +25,11 @@ export const DROPDOWN_OPTIONS = {
     { label: 'Supplier', value: 'supplier' },
     { label: 'Dealer', value: 'dealer' },
     { label: 'Store', value: 'store' },
+    { label: 'Distributor', value: 'distributor' },
+    { label: 'Wholesaler', value: 'wholesaler' },
+    { label: 'Manufacturer', value: 'manufacturer' },
+    { label: 'Retailer', value: 'retailer' },
+    { label: 'Service Provider', value: 'service_provider' },
+    { label: 'Import/Export', value: 'import_export' },
   ]
 };

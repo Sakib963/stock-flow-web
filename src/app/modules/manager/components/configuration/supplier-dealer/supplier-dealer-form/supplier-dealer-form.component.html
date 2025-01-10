@@ -66,18 +66,10 @@
             </div>
             <!-- Actions -->
             <div class="flex justify-end mt-4">
-                  <div class="flex items-center gap-4">
-                        <button class="secondary-button" type="button" (click)="goBack()">
-                              Cancel
-                        </button>
-                        <button class="primary-button disabled:cursor-wait" type="submit" [disabled]="loading">
-                              <span *ngIf="loading">
-                                    <app-spinner></app-spinner>
-                              </span>
-                              <div *ngIf="!loading" class="flex justify-center items-center gap-2">
-                                    <p>Submit</p>
-                              </div>
-                        </button>
+
+                  <div class="flex gap-4 items-center">
+                        <secondary-button [label]="'Cancel'" (click)="goBack()"></secondary-button>
+                        <primary-button [label]="'Submit'" [type]="'submit'" [loading]="loading"></primary-button>
                   </div>
             </div>
       </form>

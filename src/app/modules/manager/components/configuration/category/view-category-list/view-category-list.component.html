@@ -2,7 +2,11 @@
       <ul *ngIf="data.length" class="divide-y divide-gray-100">
             <ng-container *ngFor="let item of data">
                   <li class="flex justify-between gap-x-6 py-5">
-                        <p class="text-sm/6 text-gray-900">{{ item?.name }}</p>
+                        <div>
+                              <p class="text-sm/6 text-gray-900 font-semibold">{{ item?.name }}</p>
+                              <p class="text-sm/6 text-gray-900">{{ item?.category_code }}</p>
+
+                        </div>
                         <div class="hidden shrink-0 sm:flex sm:flex-col sm:items-center">
                               <div class="mt-1 text-xs/5 text-black flex justify-center items-center gap-4">
                                     <button (click)="handleAction('view', item)">
@@ -27,28 +31,10 @@
             </ng-container>
       </ul>
       <div *ngIf="!data.length"
-            class="flex flex-col items-center justify-center h-full text-center bg-gray-50 p-8 rounded-md">
-            <svg class="h-16 w-16 text-[#000000] mb-4" data-slot="icon" fill="none" stroke-width="1.5"
-                  stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                  <path stroke-linecap="round" stroke-linejoin="round"
-                        d="M15.182 16.318A4.486 4.486 0 0 0 12.016 15a4.486 4.486 0 0 0-3.198 1.318M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0ZM9.75 9.75c0 .414-.168.75-.375.75S9 10.164 9 9.75 9.168 9 9.375 9s.375.336.375.75Zm-.375 0h.008v.015h-.008V9.75Zm5.625 0c0 .414-.168.75-.375.75s-.375-.336-.375-.75.168-.75.375-.75.375.336.375.75Zm-.375 0h.008v.015h-.008V9.75Z">
-                  </path>
-            </svg>
-
+            class="flex flex-col items-center justify-center h-full text-center bg-gray-50 p-8 rounded-md space-y-4">
+            <img src="/assets/icons/no_data.svg" alt="No Data Found">
             <h2 class="text-lg font-semibold text-black">No Data Found</h2>
-            <p class="text-black mt-2">Try refining your search or adding new data.</p>
-            <button (click)="handleAddCategory()"
-                  class="mt-4 uppercase flex justify-center items-center rounded-md border border-transparent bg-[#000000] py-2 px-4 font-medium text-white focus:outline-none hover:bg-[#000000] transition ease-in-out delay-150 hover:scale-95 duration-300 disabled:cursor-wait"
-                  type="button">
-                  <div class="flex justify-center items-center gap-4">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                              stroke="currentColor" class="size-6">
-                              <path stroke-linecap="round" stroke-linejoin="round"
-                                    d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                        </svg>
-                        <p>Add Category</p>
-                  </div>
-            </button>
+            <p class="text-black">Try refining your search or adding new data.</p>
       </div>
 
 </div>

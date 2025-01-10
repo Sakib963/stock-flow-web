@@ -26,8 +26,7 @@ export class CreateSupplierDealerComponent {
 
   handleActions(event: any): any {
     if (event.action === 'submit') {
-      console.log(event.value);
-      // this.handleCreateSupplierDealer(event.value);
+      this.handleCreateSupplierDealer(event.value);
     } else if (event.action === 'back') {
       this._location.back();
     }
@@ -38,7 +37,7 @@ export class CreateSupplierDealerComponent {
     console.log(payload);
     
     this._httpService
-      .post(APIEndpoint.CREATE_CATEGORY, payload)
+      .post(APIEndpoint.CREATE_SUPPLIER_DEALER, payload)
       .pipe(
         takeUntilDestroyed(this._destroyRef),
         finalize(() => (this.loading = false))
@@ -46,7 +45,7 @@ export class CreateSupplierDealerComponent {
       .subscribe({
         next: (res: any) => {
           this._notificationService.success("Success!", res?.body?.message)
-          this._location.back();
+          // this._location.back();
         },
         error: (err: any) => {
           console.log(err);

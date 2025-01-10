@@ -10,6 +10,10 @@ import { Constants } from '@app/core/constants/constants';
 import { HttpService } from '@app/core/services/http.service';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { finalize } from 'rxjs';
+import { PrimaryButtonWithPlusIcon } from '@app/shared/components/buttons/primary-button-with-plus-icon/primary-button-with-plus-icon.component';
+import { ViewSupplierDealerDetailsComponent } from '../view-supplier-dealer-details/view-supplier-dealer-details.component';
+import { ViewSupplierDealerListComponent } from "../../../../components/configuration/supplier-dealer/view-supplier-dealer-list/view-supplier-dealer-list.component";
+import { DROPDOWN_OPTIONS } from '@app/core/constants/dropdown-options';
 
 @Component({
   selector: 'app-display-supplier-dealer-list',
@@ -19,7 +23,9 @@ import { finalize } from 'rxjs';
     LoaderComponent,
     NgZorroCustomModule,
     ReactiveFormsModule,
-  ],
+    PrimaryButtonWithPlusIcon,
+    ViewSupplierDealerListComponent
+],
   templateUrl: './display-supplier-dealer-list.component.html',
   styleUrls: ['./display-supplier-dealer-list.component.scss'],
 })
@@ -35,6 +41,8 @@ export class DisplaySupplierDealerListComponent implements OnInit {
   isFilter: boolean = false;
   searchControl: FormControl = new FormControl('');
 
+  sourceTypes: any = [];
+
   constructor(
     private _httpService: HttpService,
     private _destroyRef: DestroyRef,
@@ -44,6 +52,7 @@ export class DisplaySupplierDealerListComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.sourceTypes = DROPDOWN_OPTIONS.SOURCE_TYPES;
     this.loadCategoryList();
     this.searchControl.valueChanges.subscribe((value) => {
       this.onSearchChange(value);
@@ -61,7 +70,7 @@ export class DisplaySupplierDealerListComponent implements OnInit {
       this.loading = true;
     }
     this._httpService
-      .get(APIEndpoint.GET_CATEGORY_LIST, this.payload)
+      .get(APIEndpoint.GET_SUPPLIER_DEALER_LIST, this.payload)
       .pipe(
         takeUntilDestroyed(this._destroyRef),
         finalize(() => (this.loading = false))
@@ -72,6 +81,8 @@ export class DisplaySupplierDealerListComponent implements OnInit {
             this.data = [];
             if (res.body?.data?.length) {
               this.data = res.body.data;
+              console.log(this.data);
+              
             } else {
               this.data = [];
             }

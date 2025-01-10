@@ -7,6 +7,8 @@ import { markFormGroupTouched, checkRequiredValidator } from '@app/core/constant
 import { ConfirmationModalComponent } from '@app/shared/components/confirmation-modal/confirmation-modal.component';
 import { NzModalService } from 'ng-zorro-antd/modal';
 import { DROPDOWN_OPTIONS } from '@app/core/constants/dropdown-options';
+import { SecondaryButton } from '@app/shared/components/buttons/secondary-button/secondary-button.component';
+import { PrimaryButton } from '@app/shared/components/buttons/primary-button/primary-button.component';
 
 @Component({
   selector: 'app-supplier-dealer-form',
@@ -14,7 +16,8 @@ import { DROPDOWN_OPTIONS } from '@app/core/constants/dropdown-options';
   imports: [CommonModule,
     NgZorroCustomModule,
     ReactiveFormsModule,
-    SpinnerComponent,],
+    PrimaryButton,
+    SecondaryButton],
   templateUrl: './supplier-dealer-form.component.html',
   styleUrls: ['./supplier-dealer-form.component.scss']
 })
@@ -42,8 +45,8 @@ export class SupplierDealerFormComponent implements OnInit {
     return this._fb.group({
       oid: [null],
       name: [null, [Validators.required]],
-      source_type: [null, [Validators.required]], // Supplier/Dealer/Store
-      contact_person: [null, [Validators.required]],
+      source_type: [null, [Validators.required]],
+      contact_person: [null],
       phone_number: [null, [Validators.required]],
       email: [null, [Validators.required]],
       address: [null],

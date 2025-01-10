@@ -1,1 +1,55 @@
-<p>view-supplier-dealer-details works!</p>
+<div class="p-4 space-y-3">
+      <h2 class="text-2xl font-medium mb-4 animate-text">Category Details</h2>
+      <app-loader *ngIf="loading" [isVisible]="loading"></app-loader>
+      <div *ngIf="!loading && supplierDealerDetails">
+            <!-- Edit mode On -->
+            <div *ngIf="editMode">
+                  <app-supplier-dealer-form [formData]="supplierDealerDetails"  (actionEmitter)="handleActions($event)"></app-supplier-dealer-form>
+            </div>
+            <div *ngIf="!editMode">
+                  <div class="grid grid-cols-1 gap-x-6 gap-y-4 md:grid-cols-3 border-[0.5px] p-4 rounded-md">
+                        <!-- Name -->
+                        <div class="space-y-1">
+                              <p>Name</p>
+                              <p class="font-semibold">{{ supplierDealerDetails?.name }}</p>
+                        </div>
+                        <!-- source_type -->
+                        <div class="space-y-1">
+                              <p>Type Of Source</p>
+                              <p class="font-semibold">{{ getSourceType(supplierDealerDetails?.source_type) }}</p>
+                        </div>
+                        <!-- contact_person -->
+                        <div class="space-y-1">
+                              <p>Contact Person</p>
+                              <p class="font-semibold">{{ supplierDealerDetails?.contact_person }}</p>
+                        </div>
+                        <!-- phone_number -->
+                        <div class="space-y-1">
+                              <p>Phone Number</p>
+                              <p class="font-semibold">{{ supplierDealerDetails?.phone_number }}</p>
+                        </div>
+                        <!-- email -->
+                        <div class="space-y-1">
+                              <p>Email</p>
+                              <p class="font-semibold">{{ supplierDealerDetails?.email }}</p>
+                        </div>
+                        <!-- address -->
+                        <div class="space-y-1">
+                              <p>Address</p>
+                              <p class="font-semibold">{{ supplierDealerDetails?.address }}</p>
+                        </div>
+                        <!-- status -->
+                        <div class="space-y-1">
+                              <p>Status</p>
+                              <p class="font-semibold">{{ supplierDealerDetails?.status }}</p>
+                        </div>
+                  </div>
+                  <!-- Actions -->
+                  <div class="flex justify-end mt-4">
+                        <div class="flex items-center gap-4">
+                              <secondary-button [label]="'Go Back'" (click)="goBack()"></secondary-button>
+                        </div>
+                  </div>
+            </div>
+      </div>
+</div>

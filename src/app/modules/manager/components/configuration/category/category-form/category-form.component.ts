@@ -20,6 +20,8 @@ import { ConfirmationModalComponent } from '@app/shared/components/confirmation-
 import { NzModalService } from 'ng-zorro-antd/modal';
 import { SpinnerComponent } from '@app/shared/components/spinner/spinner.component';
 import { NgZorroCustomModule } from '@app/shared/ng-zorro-custom.module';
+import { PrimaryButton } from '@app/shared/components/buttons/primary-button/primary-button.component';
+import { SecondaryButton } from '@app/shared/components/buttons/secondary-button/secondary-button.component';
 
 @Component({
   selector: 'app-category-form',
@@ -28,7 +30,8 @@ import { NgZorroCustomModule } from '@app/shared/ng-zorro-custom.module';
     CommonModule,
     NgZorroCustomModule,
     ReactiveFormsModule,
-    SpinnerComponent,
+    PrimaryButton,
+    SecondaryButton
   ],
   templateUrl: './category-form.component.html',
   styleUrls: ['./category-form.component.scss'],

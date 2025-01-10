@@ -12,4 +12,9 @@ export class APIEndpoint {
   static CREATE_CATEGORY = '/api/v1/manager/category/create-category';
   static GET_CATEGORY_DETAILS = '/api/v1/manager/category/get-category-details';
   static UPDATE_CATEGORY_DETAILS = "/api/v1/manager/category/update-category-details";
+
+  static GET_SUPPLIER_DEALER_LIST = '/api/v1/manager/supplier-dealer/get-supplier-dealer-list';
+  static CREATE_SUPPLIER_DEALER = '/api/v1/manager/supplier-dealer/create-supplier-dealer';
+  static GET_SUPPLIER_DEALER_DETAILS = '/api/v1/manager/supplier-dealer/get-supplier-dealer-details';
+  static UPDATE_SUPPLIER_DEALER_DETAILS = "/api/v1/manager/supplier-dealer/update-supplier-dealer-details";
 }
