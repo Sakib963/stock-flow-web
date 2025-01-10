@@ -45,7 +45,7 @@ export class CreateSupplierDealerComponent {
       .subscribe({
         next: (res: any) => {
           this._notificationService.success("Success!", res?.body?.message)
-          // this._location.back();
+          this._location.back();
         },
         error: (err: any) => {
           console.log(err);

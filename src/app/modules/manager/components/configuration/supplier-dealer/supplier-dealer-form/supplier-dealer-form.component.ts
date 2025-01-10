@@ -55,9 +55,9 @@ export class SupplierDealerFormComponent implements OnInit {
   }
 
   handleConfirm(): void {
-    let message = 'Do you want to create an category?';
+    let message = 'Do you want to create an suppler/dealer?';
     if (this.formData) {
-      message = 'Do you want to update this category?';
+      message = 'Do you want to update this suppler/dealer?';
     }
     this._modal.create({
       nzContent: ConfirmationModalComponent,

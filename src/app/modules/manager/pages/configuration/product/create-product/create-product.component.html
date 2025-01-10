@@ -1,1 +1,4 @@
-<p>create-product works!</p>
+<div class="p-4">
+      <h2 class="text-2xl font-medium mb-4 animate-text">Create New Product</h2>
+      <app-product-form (actionEmitter)="handleActions($event)" [loading]="loading"></app-product-form>
+</div>

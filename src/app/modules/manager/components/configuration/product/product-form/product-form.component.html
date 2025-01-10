@@ -1,1 +1,145 @@
-<p>product-form works!</p>
+<div class="rounded-md bg-white">
+      <!-- Form -->
+      <form nz-form [formGroup]="form" [nzLayout]="'vertical'" (ngSubmit)="handleForm()">
+            <div class="grid grid-cols-1 gap-y-6 lg:gap-6 md:grid-cols-2 lg:grid-cols-3 border-[0.5px] p-4 rounded-md">
+                  <!-- Photo -->
+                  <div
+                        class="p-4 border-[0.5px] rounded-md shadow-md md:col-span-2 lg:col-span-1 flex flex-col items-center justify-center">
+                        <!-- Content -->
+                        <div *ngIf="!form.controls['photo'].value"
+                              class="flex flex-col items-center justify-center w-3/4 h-full border-[0.5px] border-dashed rounded-md shadow-md cursor-pointer"
+                              (click)="fileInput.click()">
+                              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                                    stroke="currentColor" class="size-6">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                          d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5m-13.5-9L12 3m0 0 4.5 4.5M12 3v13.5" />
+                              </svg>
+                        </div>
+                        <p *ngIf="!form.controls['photo'].value" class="text-center text-blue-500 font-medium mt-4">
+                              Upload a file
+                        </p>
+                        <p *ngIf="!form.controls['photo'].value" class="text-xs text-gray-500">
+                              PNG, JPG, GIF up to 10MB
+                        </p>
+                        <input type="file" accept=".png,.jpg,.jpeg,.gif" #fileInput class="hidden"
+                              (change)="onFileSelected($event)" />
+                        <div *ngIf="form.controls['photo'].value"
+                              class="w-full flex flex-col items-center h-full gap-4">
+                              <div class="flex-1 flex items-center justify-center w-full">
+                                    <img class="w-3/4 max-h-full border-[0.5px] border-dashed rounded-md shadow-md object-contain"
+                                          [src]="form.controls['photo'].value" alt="Product Photo">
+                              </div>
+                              <div class="mt-auto w-full flex justify-center">
+                                    <danger-button [label]="'Retake Photo'" [type]="'button'"
+                                          (click)="removePhoto()"></danger-button>
+                              </div>
+                        </div>
+
+                  </div>
+
+                  <div class="grid grid-cols-1 gap-x-6 md:grid-cols-2 border-[0.5px] p-4 rounded-md col-span-2">
+                        <!-- Name -->
+                        <nz-form-item>
+                              <nz-form-label [nzRequired]="hasRequiredValidator('name')">Product Name</nz-form-label>
+                              <nz-form-control nzErrorTip="Product Name is Required.">
+                                    <input formControlName="name" nz-input placeholder="Enter Product Name" />
+                              </nz-form-control>
+                        </nz-form-item>
+                        <!-- sku -->
+                        <nz-form-item>
+                              <nz-form-label [nzRequired]="hasRequiredValidator('sku')">SKU</nz-form-label>
+                              <nz-form-control nzErrorTip="SKU is Required.">
+                                    <input formControlName="sku" nz-input placeholder="Enter SKU" />
+                              </nz-form-control>
+                        </nz-form-item>
+                        <!-- category_oid -->
+                        <nz-form-item>
+                              <nz-form-label
+                                    [nzRequired]="hasRequiredValidator('category_oid')">Category</nz-form-label>
+                              <nz-form-control nzErrorTip="Category is required.">
+                                    <nz-select class="w-full" formControlName="category_oid" nz-input nzAllowClear
+                                          nzPlaceHolder="Select Category">
+                                          <ng-container *ngFor="let item of categoryList">
+                                                <nz-option [nzLabel]="item.label" [nzValue]="item.value"></nz-option>
+                                          </ng-container>
+                                    </nz-select>
+                              </nz-form-control>
+                        </nz-form-item>
+                        <!-- source_oid -->
+                        <nz-form-item>
+                              <nz-form-label
+                                    [nzRequired]="hasRequiredValidator('source_oid')">Supplier/Dealer</nz-form-label>
+                              <nz-form-control nzErrorTip="Supplier/Dealer is required.">
+                                    <nz-select class="w-full" formControlName="source_oid" nz-input nzAllowClear
+                                          nzPlaceHolder="Select Supplier/Dealer">
+                                          <ng-container *ngFor="let item of sourceList">
+                                                <nz-option [nzLabel]="item.label" [nzValue]="item.value"></nz-option>
+                                          </ng-container>
+                                    </nz-select>
+                              </nz-form-control>
+                        </nz-form-item>
+                        <!-- unit_type -->
+                        <nz-form-item>
+                              <nz-form-label [nzRequired]="hasRequiredValidator('unit_type')">Unit Type</nz-form-label>
+                              <nz-form-control nzErrorTip="Unit Type is required.">
+                                    <nz-select class="w-full" formControlName="unit_type" nz-input nzAllowClear
+                                          nzPlaceHolder="Select Unit Type">
+                                          <ng-container *ngFor="let item of unitTypes">
+                                                <nz-option [nzLabel]="item.label" [nzValue]="item.value"></nz-option>
+                                          </ng-container>
+                                    </nz-select>
+                              </nz-form-control>
+                        </nz-form-item>
+                        <!-- product_nature -->
+                        <nz-form-item>
+                              <nz-form-label [nzRequired]="hasRequiredValidator('product_nature')">Product
+                                    Nature</nz-form-label>
+                              <nz-form-control nzErrorTip="Product Nature is required.">
+                                    <nz-select class="w-full" formControlName="product_nature" nz-input nzAllowClear
+                                          nzPlaceHolder="Select Product Nature">
+                                          <ng-container *ngFor="let item of productNatures">
+                                                <nz-option [nzLabel]="item.label" [nzValue]="item.value"></nz-option>
+                                          </ng-container>
+                                    </nz-select>
+                              </nz-form-control>
+                        </nz-form-item>
+                        <!-- restock_threshold -->
+                        <nz-form-item>
+                              <nz-form-label [nzRequired]="hasRequiredValidator('restock_threshold')">Restock
+                                    Threshold</nz-form-label>
+                              <nz-form-control nzErrorTip="Restock Threshold is Required.">
+                                    <input formControlName="restock_threshold" nz-input
+                                          placeholder="Enter Restock Threshold" />
+                              </nz-form-control>
+                        </nz-form-item>
+                        <!-- Description -->
+                        <nz-form-item>
+                              <nz-form-label
+                                    [nzRequired]="hasRequiredValidator('description')">Description</nz-form-label>
+                              <nz-form-control nzErrorTip="Description is Required.">
+                                    <textarea formControlName="description" nz-input placeholder="Enter Description"
+                                          nzAutosize></textarea>
+                              </nz-form-control>
+                        </nz-form-item>
+                        <!-- Status -->
+                        <nz-form-item>
+                              <nz-form-label [nzRequired]="hasRequiredValidator('status')">Status</nz-form-label>
+                              <nz-form-control nzErrorTip="Status is required.">
+                                    <nz-select class="w-full" formControlName="status" nz-input nzAllowClear
+                                          nzPlaceHolder="Select Status">
+                                          <nz-option nzLabel="Active" nzValue="Active"></nz-option>
+                                          <nz-option nzLabel="Inactive" nzValue="Inactive"></nz-option>
+                                    </nz-select>
+                              </nz-form-control>
+                        </nz-form-item>
+                  </div>
+            </div>
+            <!-- Actions -->
+            <div class="flex justify-end mt-4">
+                  <div class="flex items-center gap-4">
+                        <secondary-button (click)="goBack()" [label]="'Cancel'"></secondary-button>
+                        <primary-button [label]="'Submit'" [loading]="loading" [type]="'submit'"></primary-button>
+                  </div>
+            </div>
+      </form>
+</div>
