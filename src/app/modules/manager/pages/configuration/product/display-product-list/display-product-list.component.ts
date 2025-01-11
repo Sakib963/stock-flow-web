@@ -10,6 +10,7 @@ import { Constants } from '@app/core/constants/constants';
 import { HttpService } from '@app/core/services/http.service';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { finalize } from 'rxjs';
+import { ViewProductListComponent } from '@app/modules/manager/components/configuration/product/view-product-list/view-product-list.component';
 
 @Component({
   selector: 'app-display-product-list',
@@ -18,6 +19,7 @@ import { finalize } from 'rxjs';
       LoaderComponent,
       NgZorroCustomModule,
       ReactiveFormsModule,
+      ViewProductListComponent
       ],
   templateUrl: './display-product-list.component.html',
   styleUrls: ['./display-product-list.component.scss']
@@ -43,7 +45,7 @@ export class DisplayProductListComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.loadCategoryList();
+    this.loadProductList();
     this.searchControl.valueChanges.subscribe((value) => {
       this.onSearchChange(value);
     });
@@ -52,15 +54,15 @@ export class DisplayProductListComponent implements OnInit {
   onSearchChange(value: string): void {
     this.payload.search_text = value;
     this.isFilter = true;
-    this.loadCategoryList();
+    this.loadProductList();
   }
 
-  loadCategoryList(): any {
+  loadProductList(): any {
     if (!this.isFilter) {
       this.loading = true;
     }
     this._httpService
-      .get(APIEndpoint.GET_CATEGORY_LIST, this.payload)
+      .get(APIEndpoint.GET_PRODUCT_LIST, this.payload)
       .pipe(
         takeUntilDestroyed(this._destroyRef),
         finalize(() => (this.loading = false))
@@ -74,6 +76,7 @@ export class DisplayProductListComponent implements OnInit {
             } else {
               this.data = [];
             }
+            console.log(this.data);
           }
         },
         error: (err: any) => {

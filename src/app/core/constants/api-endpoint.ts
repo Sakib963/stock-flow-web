@@ -19,4 +19,10 @@ export class APIEndpoint {
   static GET_SUPPLIER_DEALER_DETAILS = '/api/v1/manager/supplier-dealer/get-supplier-dealer-details';
   static UPDATE_SUPPLIER_DEALER_DETAILS = "/api/v1/manager/supplier-dealer/update-supplier-dealer-details";
   static GET_SUPPLIER_DEALER_LIST_FOR_DROPDOWN = "/api/v1/manager/supplier-dealer/get-supplier-dealer-list-for-dropdown";
+  
+  static GET_PRODUCT_LIST = "/api/v1/manager/product/get-product-list";
+  static CREATE_PRODUCT = "/api/v1/manager/product/create-product";
+  static UPDATE_PRODUCT_DETAILS = "/api/v1/manager/product/update-product-details";
+  static GET_PRODUCT_DETAILS = "/api/v1/manager/product/get-product-details";
+  static GET_PRODUCT_LIST_FOR_DROPDOWN = "/api/v1/manager/product/get-product-list-for-dropdown";
 }

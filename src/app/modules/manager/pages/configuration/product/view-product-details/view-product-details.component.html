@@ -1,1 +1,66 @@
-<p>view-product-details works!</p>
+<div class="p-4 space-y-3">
+      <h2 class="text-2xl font-medium mb-4 animate-text">Product Details</h2>
+      <app-loader *ngIf="loading" [isVisible]="loading"></app-loader>
+      <div *ngIf="!loading && productDetails">
+            <!-- Edit mode On -->
+            <div *ngIf="editMode">
+                  <app-product-form [formData]="productDetails"
+                        (actionEmitter)="handleActions($event)"></app-product-form>
+            </div>
+            <div *ngIf="!editMode">
+                  <div class="grid grid-cols-1 gap-x-6 gap-y-4 md:grid-cols-3 border-[0.5px] p-4 rounded-md">
+                        <!-- Name -->
+                        <div class="space-y-1">
+                              <p>Product Name</p>
+                              <p class="font-semibold">{{ productDetails?.name }}</p>
+                        </div>
+                        <!-- sku -->
+                        <div class="space-y-1">
+                              <p>SKU</p>
+                              <p class="font-semibold">{{ productDetails?.sku }}</p>
+                        </div>
+                        <!-- Category -->
+                        <div class="space-y-1">
+                              <p>Category</p>
+                              <p class="font-semibold">{{ productDetails?.category_name }}</p>
+                        </div>
+                        <!-- Source -->
+                        <div class="space-y-1">
+                              <p>Supplier/Dealer</p>
+                              <p class="font-semibold">{{ productDetails?.source_name }}</p>
+                        </div>
+                        <!-- Unit Type -->
+                        <div class="space-y-1">
+                              <p>Unit Type</p>
+                              <p class="font-semibold">{{ productDetails?.unit_type }}</p>
+                        </div>
+                        <!-- Product Nature -->
+                        <div class="space-y-1">
+                              <p>Product Nature</p>
+                              <p class="font-semibold">{{ productDetails?.product_nature }}</p>
+                        </div>
+                        <!-- Restock Threshold -->
+                        <div class="space-y-1">
+                              <p>Restock Threshold</p>
+                              <p class="font-semibold">{{ productDetails?.restock_threshold }}</p>
+                        </div>
+                        <!-- Description -->
+                        <div class="space-y-1">
+                              <p>Description</p>
+                              <p class="font-semibold">{{ productDetails?.description }}</p>
+                        </div>
+                        <!-- status -->
+                        <div class="space-y-1">
+                              <p>status</p>
+                              <p class="font-semibold">{{ productDetails?.status }}</p>
+                        </div>
+                  </div>
+                  <!-- Actions -->
+                  <div class="flex justify-end mt-4">
+                        <div class="flex items-center gap-4">
+                              <secondary-button [label]="'Go Back'" (click)="goBack()"></secondary-button>
+                        </div>
+                  </div>
+            </div>
+      </div>
+</div>

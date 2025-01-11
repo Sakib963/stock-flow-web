@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -9,5 +9,19 @@ import { CommonModule } from '@angular/common';
   styleUrls: ['./view-product-list.component.scss']
 })
 export class ViewProductListComponent {
+  @Input() data: any[] = [];
+  @Output() readonly actionEmitter: EventEmitter<object> = new EventEmitter();
+
+  handleAddCategory(): any {
+    this.actionEmitter.emit({ action: 'create', value: null });
+  }
+
+  handleAction(action: any, value: any): any {
+    this.actionEmitter.emit({ action, value });
+  }
+
+  getFirstLetter(name: any): any {
+    return name[0];
+  }
 
 }
