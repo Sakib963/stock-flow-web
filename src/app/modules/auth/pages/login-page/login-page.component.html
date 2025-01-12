@@ -1,32 +1,20 @@
 <div
-  class="h-screen flex justify-center items-center lg:w-3/4 lg:mx-auto lg:p-10 p-5"
+  class="h-screen flex justify-center items-center login_banner p-5"
 >
-  <div class="grid lg:grid-cols-2 lg:gap-20 gap-10 w-full grid-flow-row-dense">
+  <div class="flex justify-center items-center">
     <div class="flex justify-center items-center">
-      <img
-        class="hidden lg:block lg:max-h-[550px] object-contain"
-        src="./assets/images/login.png"
-        alt="Login Background"
-      />
-      <img
-        class="block lg:hidden w-11/12 mx-auto"
-        src="./assets/images/login-sm.png"
-        alt="Login Background"
-      />
-    </div>
-    <div class="flex justify-center items-center">
-      <div class="overflow-y-auto p-8 min-w-full md:min-w-[400px] sign-in-box">
+      <div class="overflow-y-auto p-8 min-w-full md:min-w-[400px] bg-[#594ED1] bg-opacity-20 backdrop-blur-2xl rounded-md">
         <form class="space-y-3" [formGroup]="form" (ngSubmit)="handleForm()">
           <div class="text-center">
-            <h2 class="pb-1 text-3xl font-semibold text-[#000000] uppercase">
+            <h2 class="pb-1 text-3xl font-semibold text-white uppercase">
               Welcome back
             </h2>
-            <p class="pb-2 text-[#000000] max-w-xs">
+            <p class="pb-2 text-white max-w-xs">
               We've missed you! Please sign in to catch up on what you've missed
             </p>
           </div>
 
-          <div class="space-y-3 text-left">
+          <div class="space-y-8 text-left">
             <div class="form__group">
               <div class="relative">
                 <input
@@ -103,7 +91,7 @@
           <div class="flex items-center justify-end space-x-3 pb-3">
             <div class=" ">
               <a
-                class="font-medium text-[#000000] hover:text-[#A74ED1] hover:underline"
+                class="font-medium text-white hover:text-[#A74ED1] hover:underline"
                 routerLink="/auth/forgot-password"
               >
                 Forgot Password
@@ -114,7 +102,7 @@
           <!-- Submit Button -->
           <div class="flex justify-center">
             <button
-              class="uppercase flex w-full justify-center rounded-full border border-transparent bg-[#000000] py-2 px-4 font-medium text-white focus:outline-none hover:bg-[#000000] transition ease-in-out delay-150 hover:scale-95 duration-300 disabled:cursor-wait"
+              class="uppercase flex w-full justify-center rounded-full border border-transparent bg-[#180B26] py-2 px-4 font-medium text-white focus:outline-none hover:bg-[#180B26] transition ease-in-out delay-150 hover:scale-95 duration-300 disabled:cursor-wait"
               type="submit"
               [disabled]="authService.loading()"
             >
