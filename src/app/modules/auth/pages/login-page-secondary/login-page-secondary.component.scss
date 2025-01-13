@@ -1,0 +1,21 @@
+.login_banner {
+  background-image: url("/assets/images/login_bg_sm.svg");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+@media (min-width: 768px) {
+  .login_banner {
+    background-image: url("/assets/images/login_bg_lg.svg");
+  }
+}
+
+.is__invalid-input {
+  border-color: #e11d48;
+}
+
+.is__invalid-error {
+  color: #e11d48;
+  @apply px-1 text-sm;
+}

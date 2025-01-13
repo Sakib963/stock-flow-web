@@ -1,125 +1,147 @@
-<div
-  class="h-screen flex justify-center items-center login_banner p-5"
->
-  <div class="flex justify-center items-center">
-    <div class="flex justify-center items-center">
-      <div class="overflow-y-auto p-8 min-w-full md:min-w-[400px] bg-[#594ED1] bg-opacity-20 backdrop-blur-2xl rounded-md">
-        <form class="space-y-3" [formGroup]="form" (ngSubmit)="handleForm()">
-          <div class="text-center">
-            <h2 class="pb-1 text-3xl font-semibold text-white uppercase">
-              Welcome back
-            </h2>
-            <p class="pb-2 text-white max-w-xs">
-              We've missed you! Please sign in to catch up on what you've missed
-            </p>
-          </div>
+<div class="h-screen grid md:grid-cols-3 lg:grid-cols-4">
+  <div class="hidden md:block h-full login_banner p-10 space-y-8">
+    <div class="flex gap-4 items-center">
+      <img class="h-12" src="/assets/icons/logo.svg" alt="StockFlow Logo">
+      <h2 class="text-2xl font-bold">StockFlow</h2>
+    </div>
+    <!-- Features -->
+    <ul class="space-y-4">
+      <li class="flex items-start gap-3">
+        <span class="flex h-10 w-10 items-center justify-center rounded-full bg-primary-500 text-black">
+          <img src="/assets/icons/inventory.svg" alt="Inventory Icon" class="h-8 w-8">
+        </span>
+        <div>
+          <h2 class="text-lg font-semibold text-gray-800">Streamlined Inventory</h2>
+          <p class="text-sm text-gray-600">Effortlessly track and manage your stock in real time.</p>
+        </div>
+      </li>
 
-          <div class="space-y-8 text-left">
-            <div class="form__group">
-              <div class="relative">
-                <input
-                  id="email"
-                  class="peer block h-10 custom-input"
-                  type="text"
-                  formControlName="email"
-                  placeholder=" "
-                  [ngClass]="{
-                    'is__invalid-input': submitted && f['email'].errors
-                  }"
-                />
-                <label
-                  class="absolute top-2 left-1 origin-[0] -translate-y-4 scale-95 transform bg-white px-2 text-gray-500 duration-300 peer-placeholder-shown:top-1/2 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:scale-100 peer-focus:top-2 peer-focus:-translate-y-4 peer-focus:scale-95 peer-focus:px-2 peer-focus:text-primary-500 dark:bg-night-700"
-                  for="email"
-                >
-                  Email
-                </label>
-              </div>
-              <div
-                *ngIf="submitted && f['email'].errors"
-                class="is__invalid-error"
-              >
-                <div *ngIf="f['email'].errors['required']" class=" ">
-                  Email is required.
-                </div>
-              </div>
+      <li class="flex items-start gap-3">
+        <span class="flex h-10 w-10 items-center justify-center rounded-full bg-primary-500 text-black">
+          <img src="/assets/icons/order.svg" alt="Order Icon" class="h-8 w-8">
+        </span>
+        <div>
+          <h2 class="text-lg font-semibold text-gray-800">Order Management</h2>
+          <p class="text-sm text-gray-600">Simplify your order tracking and fulfillment process.</p>
+        </div>
+      </li>
+
+      <li class="flex items-start gap-3">
+        <span class="flex h-10 w-10 items-center justify-center rounded-full bg-primary-500 text-black">
+          <img src="/assets/icons/data.svg" alt="Insights Icon" class="h-8 w-8">
+        </span>
+        <div>
+          <h2 class="text-lg font-semibold text-gray-800">Data Insights</h2>
+          <p class="text-sm text-gray-600">Get actionable reports to make smarter business decisions.</p>
+        </div>
+      </li>
+
+      <li class="flex items-start gap-3">
+        <span class="flex h-10 w-10 items-center justify-center rounded-full bg-primary-500 text-black">
+          <img src="/assets/icons/shipping.svg" alt="Shipping Icon" class="h-8 w-8">
+        </span>
+        <div>
+          <h2 class="text-lg font-semibold text-gray-800">Seamless Shipping</h2>
+          <p class="text-sm text-gray-600">Coordinate deliveries and logistics with ease.</p>
+        </div>
+      </li>
+
+      <li class="flex items-start gap-3">
+        <span class="flex h-10 w-10 items-center justify-center rounded-full bg-primary-500 text-black">
+          <img src="/assets/icons/welcome.svg" alt="Welcome Icon" class="h-8 w-8">
+        </span>
+        <div>
+          <h2 class="text-lg font-semibold text-gray-800">Welcome to StockFlow!</h2>
+          <p class="text-sm text-gray-600">Transform your warehouse operations in just a few clicks.</p>
+        </div>
+      </li>
+    </ul>
+  </div>
+  <div class="md:col-span-2 lg:col-span-3 flex justify-center items-center p-5 md:p-0 login_sm_banner">
+    <div
+      class="overflow-y-auto p-8 min-w-full md:min-w-[400px] bg-[#F1F1F1] rounded-md shadow-xl">
+      <form class="space-y-3" [formGroup]="form" (ngSubmit)="handleForm()">
+        <div class="text-center space-y-3">
+          <img class="h-12 mx-auto" src="/assets/icons/logo.svg" alt="StockFlow Logo">
+          <h2 class="pb-1 text-3xl font-semibold text-black">
+            Welcome to StockFlow!
+          </h2>
+          <p class="pb-2 text-black max-w-xs">
+            Welcome back! Let's simplify your inventory and warehouse management journey.
+          </p>
+        </div>
+
+        <div class="space-y-8 text-left">
+          <div class="form__group">
+            <div class="relative">
+              <input id="email" class="peer block h-10 custom-input" type="text" formControlName="email" placeholder=" "
+                [ngClass]="{
+                'is__invalid-input': submitted && f['email'].errors
+              }" />
+              <label
+                class="absolute top-2 left-1 origin-[0] -translate-y-4 scale-95 transform bg-white px-2 text-gray-500 duration-300 peer-placeholder-shown:top-1/2 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:scale-100 peer-focus:top-2 peer-focus:-translate-y-4 peer-focus:scale-95 peer-focus:px-2 peer-focus:text-primary-500 dark:bg-night-700"
+                for="email">
+                Email
+              </label>
             </div>
-
-            <div class="form__group">
-              <div class="relative">
-                <input
-                  id="password"
-                  class="peer block h-10 custom-input"
-                  autocomplete="on"
-                  formControlName="password"
-                  placeholder=" "
-                  [ngClass]="{
-                    'is__invalid-input': submitted && f['password'].errors
-                  }"
-                  [type]="passwordTextType ? 'text' : 'password'"
-                />
-                <label
-                  class="absolute top-2 left-1 origin-[0] -translate-y-4 scale-95 transform bg-white px-2 text-gray-500 duration-300 peer-placeholder-shown:top-1/2 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:scale-100 peer-focus:top-2 peer-focus:-translate-y-4 peer-focus:scale-95 peer-focus:px-2 peer-focus:text-primary-600 dark:bg-night-700"
-                  for="password"
-                >
-                  Password
-                </label>
-                <span
-                  class="absolute top-2.5 right-5 cursor-pointer text-gray-400 dark:text-night-300"
-                  (click)="togglePasswordTextType()"
-                >
-                  <img
-                    [src]="
-                      !passwordTextType
-                        ? 'assets/icons/eye.svg'
-                        : 'assets/icons/eye-off.svg'
-                    "
-                    [ngClass]="'h-5 w-5'"
-                  />
-                </span>
+            <div *ngIf="submitted && f['email'].errors" class="is__invalid-error">
+              <div *ngIf="f['email'].errors['required']" class=" ">
+                Email is required.
               </div>
-              <div
-                *ngIf="submitted && f['password'].errors"
-                class="is__invalid-error"
-              >
-                <div *ngIf="f['password'].errors['required']" class=" ">
-                  Password is required.
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="flex items-center justify-end space-x-3 pb-3">
-            <div class=" ">
-              <a
-                class="font-medium text-white hover:text-[#A74ED1] hover:underline"
-                routerLink="/auth/forgot-password"
-              >
-                Forgot Password
-              </a>
             </div>
           </div>
 
-          <!-- Submit Button -->
-          <div class="flex justify-center">
-            <button
-              class="uppercase flex w-full justify-center rounded-full border border-transparent bg-[#180B26] py-2 px-4 font-medium text-white focus:outline-none hover:bg-[#180B26] transition ease-in-out delay-150 hover:scale-95 duration-300 disabled:cursor-wait"
-              type="submit"
-              [disabled]="authService.loading()"
-            >
-              <span *ngIf="authService.loading()">
-                <app-spinner></app-spinner>
+          <div class="form__group">
+            <div class="relative">
+              <input id="password" class="peer block h-10 custom-input" autocomplete="on" formControlName="password"
+                placeholder=" " [ngClass]="{
+                'is__invalid-input': submitted && f['password'].errors
+              }" [type]="passwordTextType ? 'text' : 'password'" />
+              <label
+                class="absolute top-2 left-1 origin-[0] -translate-y-4 scale-95 transform bg-white px-2 text-gray-500 duration-300 peer-placeholder-shown:top-1/2 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:scale-100 peer-focus:top-2 peer-focus:-translate-y-4 peer-focus:scale-95 peer-focus:px-2 peer-focus:text-primary-600 dark:bg-night-700"
+                for="password">
+                Password
+              </label>
+              <span class="absolute top-2.5 right-5 cursor-pointer text-gray-400 dark:text-night-300"
+                (click)="togglePasswordTextType()">
+                <img [src]="
+                  !passwordTextType
+                    ? 'assets/icons/eye.svg'
+                    : 'assets/icons/eye-off.svg'
+                " [ngClass]="'h-5 w-5'" />
               </span>
-              <div
-                *ngIf="!authService.loading()"
-                class="flex justify-center items-center gap-4"
-              >
-                <p>Sign In</p>
-                <img src="./assets/icons/login.svg" alt="Login Icon" />
+            </div>
+            <div *ngIf="submitted && f['password'].errors" class="is__invalid-error">
+              <div *ngIf="f['password'].errors['required']" class=" ">
+                Password is required.
               </div>
-            </button>
+            </div>
           </div>
-        </form>
-      </div>
+        </div>
+
+        <div class="flex items-center justify-end space-x-3 pb-3">
+          <div class=" ">
+            <a class="font-medium text-black hover:text-[#A74ED1] hover:underline" routerLink="/auth/forgot-password">
+              Forgot Password
+            </a>
+          </div>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="flex justify-center">
+          <button
+            class="uppercase flex w-full justify-center rounded-full border border-transparent bg-[#180B26] py-2 px-4 font-medium text-white focus:outline-none hover:bg-[#180B26] transition ease-in-out delay-150 hover:scale-95 duration-300 disabled:cursor-wait"
+            type="submit" [disabled]="authService.loading()">
+            <span *ngIf="authService.loading()">
+              <app-spinner></app-spinner>
+            </span>
+            <div *ngIf="!authService.loading()" class="flex justify-center items-center gap-4">
+              <p>Sign In</p>
+              <img src="./assets/icons/login.svg" alt="Login Icon" />
+            </div>
+          </button>
+        </div>
+      </form>
     </div>
   </div>
 </div>

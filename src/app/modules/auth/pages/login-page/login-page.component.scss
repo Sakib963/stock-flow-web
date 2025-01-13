@@ -1,13 +1,22 @@
 .login_banner {
-  background-image: url("/assets/images/login_bg_sm.svg");
+  background-image: url("/assets/images/landing_sidebar.png");
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;
 }
 
-@media (min-width: 768px) {
+/* @media (min-width: 768px) {
   .login_banner {
     background-image: url("/assets/images/login_bg_lg.svg");
+  }
+} */
+
+@media (max-width: 768px) {
+  .login_sm_banner {
+    background-image: url("/assets/images/landing_sidebar.png");
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
   }
 }
 
