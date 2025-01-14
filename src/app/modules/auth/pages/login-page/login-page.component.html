@@ -59,14 +59,14 @@
   </div>
   <div class="md:col-span-2 lg:col-span-3 flex justify-center items-center p-5 md:p-0 login_sm_banner">
     <div
-      class="overflow-y-auto p-8 min-w-full md:min-w-[400px] bg-[#F1F1F1] rounded-md shadow-xl">
+      class="overflow-y-auto p-8 min-w-full md:min-w-[400px] bg-[#F1F1F1] rounded-md bg-opacity-20 backdrop-blur-2xl">
       <form class="space-y-3" [formGroup]="form" (ngSubmit)="handleForm()">
         <div class="text-center space-y-3">
           <img class="h-12 mx-auto" src="/assets/icons/logo.svg" alt="StockFlow Logo">
-          <h2 class="pb-1 text-3xl font-semibold text-black">
+          <h2 class="pb-1 text-3xl font-semibold text-[#180B26]">
             Welcome to StockFlow!
           </h2>
-          <p class="pb-2 text-black max-w-xs">
+          <p class="pb-2 text-[#180B26] max-w-xs">
             Welcome back! Let's simplify your inventory and warehouse management journey.
           </p>
         </div>
@@ -121,7 +121,7 @@
 
         <div class="flex items-center justify-end space-x-3 pb-3">
           <div class=" ">
-            <a class="font-medium text-black hover:text-[#A74ED1] hover:underline" routerLink="/auth/forgot-password">
+            <a class="font-medium text-[#180B26] hover:text-primary hover:underline" routerLink="/auth/forgot-password">
               Forgot Password
             </a>
           </div>

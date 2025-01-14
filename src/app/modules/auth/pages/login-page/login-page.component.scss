@@ -5,20 +5,29 @@
   background-size: cover;
 }
 
+.login_sm_banner {
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.209), rgba(0, 0, 0, 0.54)),
+    url("/assets/images/login_form_bg.jpg");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+
 /* @media (min-width: 768px) {
   .login_banner {
     background-image: url("/assets/images/login_bg_lg.svg");
   }
 } */
 
-@media (max-width: 768px) {
+/* @media (max-width: 768px) {
   .login_sm_banner {
     background-image: url("/assets/images/landing_sidebar.png");
     background-position: center;
     background-repeat: no-repeat;
     background-size: cover;
   }
-}
+} */
 
 .is__invalid-input {
   border-color: #e11d48;
