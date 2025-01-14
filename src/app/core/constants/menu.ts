@@ -38,9 +38,9 @@ export class Menu {
     {
       group: 'Inventory',
       items: [
-        { icon: 'assets/icons/category.svg', label: 'Overview', route: '/manager/inventory/overview' },
-        { icon: 'assets/icons/source.svg', label: 'Purchase', route: '/manager/inventory/purchase' },
-        { icon: 'assets/icons/product.svg', label: 'Dispatch', route: '/manager/inventory/dispatch' },
+        { icon: 'assets/icons/inventory.svg', label: 'Overview', route: '/manager/inventory/overview' },
+        { icon: 'assets/icons/purchase.svg', label: 'Purchase', route: '/manager/inventory/purchase' },
+        { icon: 'assets/icons/dispatch.svg', label: 'Dispatch', route: '/manager/inventory/dispatch' },
       ],
     },
     {

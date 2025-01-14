@@ -144,6 +144,37 @@ const routes: Routes = [
           },
         ],
       },
+      {
+        path: 'inventory',
+        children: [
+          {
+            path: '',
+            redirectTo: 'overview',
+            pathMatch: 'full',
+          },
+          {
+            path: 'overview',
+            loadComponent: () =>
+              import(
+                './pages/inventory/inventory-overview/inventory-overview.component'
+              ).then((m) => m.InventoryOverviewComponent),
+          },
+          {
+            path: 'purchase',
+            loadComponent: () =>
+              import(
+                './pages/inventory/purchase-products/purchase-products.component'
+              ).then((m) => m.PurchaseProductsComponent),
+          },
+          {
+            path: 'dispatch',
+            loadComponent: () =>
+              import(
+                './pages/inventory/dispatch-products/dispatch-products.component'
+              ).then((m) => m.DispatchProductsComponent),
+          },
+        ]
+      }
     ],
   },
   {
