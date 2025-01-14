@@ -129,16 +129,25 @@
 
         <!-- Submit Button -->
         <div class="flex justify-center">
-          <button
-            class="uppercase flex w-full justify-center rounded-full border border-transparent bg-[#180B26] py-2 px-4 font-medium text-white focus:outline-none hover:bg-[#180B26] transition ease-in-out delay-150 hover:scale-95 duration-300 disabled:cursor-wait"
-            type="submit" [disabled]="authService.loading()">
-            <span *ngIf="authService.loading()">
-              <app-spinner></app-spinner>
-            </span>
-            <div *ngIf="!authService.loading()" class="flex justify-center items-center gap-4">
-              <p>Sign In</p>
-              <img src="./assets/icons/login.svg" alt="Login Icon" />
+          <button [disabled]="authService.loading()" type="submit"
+            class="w-full group relative flex justify-center items-center gap-4 overflow-hidden rounded-sm bg-white px-6 py-2 shadow font-medium disabled:cursor-wait">
+            <div [ngClass]="authService.loading() ? 'w-full': ''"
+              class="absolute inset-0 w-2 bg-primary transition-all duration-300 ease-in-out group-hover:w-full">
             </div>
+            <span *ngIf="authService.loading()">
+              <svg class="h-5 w-5 animate-spin text-white" fill="none" viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  fill="currentColor"></path>
+              </svg>
+
+            </span>
+            <span *ngIf="!authService.loading()"
+              class="relative z-10 whitespace-nowrap text-black transition-all duration-300 group-hover:text-white">
+              Sign In
+            </span>
           </button>
         </div>
       </form>

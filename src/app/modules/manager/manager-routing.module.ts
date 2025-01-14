@@ -108,6 +108,37 @@ const routes: Routes = [
           },
         ],
       },
+      {
+        path: 'warehouse',
+        children: [
+          {
+            path: '',
+            redirectTo: 'warehouse-list',
+            pathMatch: 'full',
+          },
+          {
+            path: 'warehouse-list',
+            loadComponent: () =>
+              import(
+                './pages/configuration/warehouse/display-warehouse-list/display-warehouse-list.component'
+              ).then((m) => m.DisplayWarehouseListComponent),
+          },
+          {
+            path: 'create-warehouse',
+            loadComponent: () =>
+              import(
+                './pages/configuration/warehouse/create-warehouse/create-warehouse.component'
+              ).then((m) => m.CreateWarehouseComponent),
+          },
+          {
+            path: 'view-warehouse/:oid',
+            loadComponent: () =>
+              import(
+                './pages/configuration/warehouse/view-warehouse-details/view-warehouse-details.component'
+              ).then((m) => m.ViewWarehouseDetailsComponent),
+          },
+        ],
+      },
     ],
   },
   {

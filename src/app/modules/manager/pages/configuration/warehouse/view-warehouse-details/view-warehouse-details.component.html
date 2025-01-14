@@ -1,0 +1,46 @@
+<div class="p-4 space-y-3">
+      <h2 class="text-2xl font-medium mb-4 animate-text">Product Details</h2>
+      <app-loader *ngIf="loading" [isVisible]="loading"></app-loader>
+      <div *ngIf="!loading && itemDetails">
+            <!-- Edit mode On -->
+            <div *ngIf="editMode">
+                  <app-warehouse-form [formData]="itemDetails"
+                        (actionEmitter)="handleActions($event)"></app-warehouse-form>
+            </div>
+            <div *ngIf="!editMode">
+                  <div class="grid grid-cols-1 gap-x-6 gap-y-4 md:grid-cols-3 border-[0.5px] p-4 rounded-md">
+                        <!-- Name -->
+                        <div class="space-y-1">
+                              <p>Warehouse Name</p>
+                              <p class="font-semibold">{{ itemDetails?.name }}</p>
+                        </div>
+                        <!-- Code -->
+                        <div class="space-y-1">
+                              <p>Code</p>
+                              <p class="font-semibold">{{ itemDetails?.code }}</p>
+                        </div>
+                        <!-- Capacity -->
+                        <div class="space-y-1">
+                              <p>Capacity</p>
+                              <p class="font-semibold">{{ itemDetails?.capacity }}</p>
+                        </div>
+                        <!-- Location -->
+                        <div class="space-y-1">
+                              <p>Location</p>
+                              <p class="font-semibold">{{ itemDetails?.location }}</p>
+                        </div>
+                        <!-- status -->
+                        <div class="space-y-1">
+                              <p>status</p>
+                              <p class="font-semibold">{{ itemDetails?.status }}</p>
+                        </div>
+                  </div>
+                  <!-- Actions -->
+                  <div class="flex justify-end mt-4">
+                        <div class="flex items-center gap-4">
+                              <secondary-button [label]="'Go Back'" (click)="goBack()"></secondary-button>
+                        </div>
+                  </div>
+            </div>
+      </div>
+</div>

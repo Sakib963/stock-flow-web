@@ -1,5 +1,5 @@
 <div class="p-4 space-y-3">
-      <h2 class="text-2xl font-medium mb-4 animate-text">Product List</h2>
+      <h2 class="text-2xl font-medium mb-4 animate-text">Warehouse List</h2>
       <app-loader *ngIf="loading" [isVisible]="loading"></app-loader>
       <div *ngIf="!loading">
             <div class="flex justify-between items-center mb-4">
@@ -16,9 +16,9 @@
                   </div>
                   <!-- Buttons -->
                   <div class="flex justify-center items-center gap-4">
-                        <primary-button-with-plus-icon (click)="handleAdd()" [label]="'Add Product'"></primary-button-with-plus-icon>
+                        <primary-button-with-plus-icon (click)="handleAdd()" [label]="'Add Warehouse'"></primary-button-with-plus-icon>
                   </div>
             </div>
-            <app-view-product-list [data]="data" (actionEmitter)="handleListActions($event)"></app-view-product-list>
+            <app-view-warehouse-list [data]="data" (actionEmitter)="handleListActions($event)"></app-view-warehouse-list>
       </div>
 </div>

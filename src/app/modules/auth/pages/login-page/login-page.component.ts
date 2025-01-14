@@ -9,14 +9,12 @@ import {
 } from '@angular/forms';
 import { ROLES } from '@app/core/constants/constants';
 import { markFormGroupTouched } from '@app/core/constants/helper';
-import { ActivatedRoute, Route, Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AngularSvgIconModule } from 'angular-svg-icon';
 import { HttpService } from '@app/core/services/http.service';
-import { APIEndpoint } from '@app/core/constants/api-endpoint';
 import { finalize } from 'rxjs';
 import { AuthService } from '../../services/auth.service';
-import { SpinnerComponent } from '@app/shared/components/spinner/spinner.component';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
 
 @Component({
@@ -28,7 +26,6 @@ import { NzNotificationService } from 'ng-zorro-antd/notification';
     ReactiveFormsModule,
     AngularSvgIconModule,
     RouterLink,
-    SpinnerComponent,
   ],
   templateUrl: './login-page.component.html',
   styleUrls: ['./login-page.component.scss'],
@@ -117,27 +114,6 @@ export class LoginPageComponent implements OnInit {
             });
           },
         });
-
-      /* this.authService.loading.set(true);
-      this._httpService
-        .post(APIEndpoint.SIGN_IN, this.form.getRawValue())
-        .pipe(
-          takeUntilDestroyed(this._destroyRef),
-          finalize(() => this.authService.loading.set(false))
-        )
-        .subscribe({
-          next: (res: any) => {
-            console.log(res.body);
-            if (res.body.role === ROLES.ADMIN) {
-                this._router.navigate(['/']);
-            }
-          },
-          error: (err: any) => {
-            if (err?.status === 404) {
-              console.log('No User');
-            }
-          },
-        }); */
     } else {
       markFormGroupTouched(this.form);
     }

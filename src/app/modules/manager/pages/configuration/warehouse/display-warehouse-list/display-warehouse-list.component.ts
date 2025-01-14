@@ -1,9 +1,7 @@
 import { Component, DestroyRef, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import { LoaderComponent } from '@app/shared/components/loader/loader.component';
-import { NgZorroCustomModule } from '@app/shared/ng-zorro-custom.module';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { APIEndpoint } from '@app/core/constants/api-endpoint';
 import { Constants } from '@app/core/constants/constants';
@@ -11,22 +9,26 @@ import { HttpService } from '@app/core/services/http.service';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { finalize } from 'rxjs';
 import { ViewProductListComponent } from '@app/modules/manager/components/configuration/product/view-product-list/view-product-list.component';
+import { LoaderComponent } from '@app/shared/components/loader/loader.component';
+import { NgZorroCustomModule } from '@app/shared/ng-zorro-custom.module';
 import { PrimaryButtonWithPlusIcon } from '@app/shared/components/buttons/primary-button-with-plus-icon/primary-button-with-plus-icon.component';
+import { ViewWarehouseListComponent } from '@app/modules/manager/components/configuration/warehouse/view-warehouse-list/view-warehouse-list.component';
 
 @Component({
-  selector: 'app-display-product-list',
+  selector: 'app-display-warehouse-list',
   standalone: true,
-  imports: [CommonModule,
-      LoaderComponent,
-      NgZorroCustomModule,
-      ReactiveFormsModule,
-      ViewProductListComponent,
-      PrimaryButtonWithPlusIcon
-      ],
-  templateUrl: './display-product-list.component.html',
-  styleUrls: ['./display-product-list.component.scss']
+  imports: [
+    CommonModule,
+    LoaderComponent,
+    NgZorroCustomModule,
+    ReactiveFormsModule,
+    PrimaryButtonWithPlusIcon,
+    ViewWarehouseListComponent,
+  ],
+  templateUrl: './display-warehouse-list.component.html',
+  styleUrls: ['./display-warehouse-list.component.scss'],
 })
-export class DisplayProductListComponent implements OnInit {
+export class DisplayWarehouseListComponent implements OnInit {
   data: any[] = [];
   loading: boolean = false;
   payload: any = {
@@ -47,7 +49,7 @@ export class DisplayProductListComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.loadProductList();
+    this.loadWarehouseList();
     this.searchControl.valueChanges.subscribe((value) => {
       this.onSearchChange(value);
     });
@@ -56,15 +58,15 @@ export class DisplayProductListComponent implements OnInit {
   onSearchChange(value: string): void {
     this.payload.search_text = value;
     this.isFilter = true;
-    this.loadProductList();
+    this.loadWarehouseList();
   }
 
-  loadProductList(): any {
+  loadWarehouseList(): any {
     if (!this.isFilter) {
       this.loading = true;
     }
     this._httpService
-      .get(APIEndpoint.GET_PRODUCT_LIST, this.payload)
+      .get(APIEndpoint.GET_WAREHOUSE_LIST, this.payload)
       .pipe(
         takeUntilDestroyed(this._destroyRef),
         finalize(() => (this.loading = false))
@@ -99,23 +101,22 @@ export class DisplayProductListComponent implements OnInit {
   }
 
   handleAdd(): any {
-    this._router.navigate(['../create-product'], {
+    this._router.navigate(['../create-warehouse'], {
       relativeTo: this._activatedRoute,
     });
   }
 
   handleView(value: any): any {
-    this._router.navigate([`../view-product/${value}`], {
+    this._router.navigate([`../view-warehouse/${value}`], {
       relativeTo: this._activatedRoute,
       state: { edit: false },
     });
   }
 
   handleEdit(value: any): any {
-    this._router.navigate([`../view-product/${value}`], {
+    this._router.navigate([`../view-warehouse/${value}`], {
       relativeTo: this._activatedRoute,
       state: { edit: true },
     });
   }
-
 }

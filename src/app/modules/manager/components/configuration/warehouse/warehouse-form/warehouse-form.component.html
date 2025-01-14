@@ -1,0 +1,54 @@
+<div class="rounded-md bg-white">
+      <form nz-form [formGroup]="form" [nzLayout]="'vertical'" (ngSubmit)="handleForm()">
+            <div class="grid grid-cols-1 lg:gap-x-6 md:grid-cols-2 lg:grid-cols-3 border-[0.5px] p-4 rounded-md">
+                  <!-- Form -->
+                  <!-- Name -->
+                  <nz-form-item>
+                        <nz-form-label [nzRequired]="hasRequiredValidator('name')">Name</nz-form-label>
+                        <nz-form-control nzErrorTip="Name is Required.">
+                              <input formControlName="name" nz-input placeholder="Enter Name" />
+                        </nz-form-control>
+                  </nz-form-item>
+                  <!-- code -->
+                  <nz-form-item>
+                        <nz-form-label [nzRequired]="hasRequiredValidator('code')">Code</nz-form-label>
+                        <nz-form-control nzErrorTip="Code is Required.">
+                              <input formControlName="code" nz-input placeholder="Enter Code" />
+                        </nz-form-control>
+                  </nz-form-item>
+                  <!-- capacity -->
+                  <nz-form-item>
+                        <nz-form-label [nzRequired]="hasRequiredValidator('capacity')">Capacity</nz-form-label>
+                        <nz-form-control nzErrorTip="Capacity is Required.">
+                              <input formControlName="capacity" nz-input placeholder="Enter Capacity" />
+                        </nz-form-control>
+                  </nz-form-item>
+                  <!-- location -->
+                  <nz-form-item>
+                        <nz-form-label [nzRequired]="hasRequiredValidator('location')">Location</nz-form-label>
+                        <nz-form-control nzErrorTip="Location is Required.">
+                              <textarea formControlName="location" nz-input placeholder="Enter Location"
+                                    nzAutosize></textarea>
+                        </nz-form-control>
+                  </nz-form-item>
+                  <!-- Status -->
+                  <nz-form-item>
+                        <nz-form-label [nzRequired]="hasRequiredValidator('status')">Status</nz-form-label>
+                        <nz-form-control nzErrorTip="Status is required.">
+                              <nz-select class="w-full" formControlName="status" nz-input nzAllowClear
+                                    nzPlaceHolder="Select Status">
+                                    <nz-option nzLabel="Active" nzValue="Active"></nz-option>
+                                    <nz-option nzLabel="Inactive" nzValue="Inactive"></nz-option>
+                              </nz-select>
+                        </nz-form-control>
+                  </nz-form-item>
+            </div>
+            <!-- Actions -->
+            <div class="flex justify-end mt-4">
+                  <div class="flex items-center gap-4">
+                        <secondary-button (click)="goBack()" [label]="'Cancel'"></secondary-button>
+                        <primary-button [label]="'Submit'" [loading]="loading" [type]="'submit'"></primary-button>
+                  </div>
+            </div>
+      </form>
+</div>

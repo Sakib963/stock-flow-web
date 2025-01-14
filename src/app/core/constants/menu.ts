@@ -32,6 +32,7 @@ export class Menu {
         { icon: 'assets/icons/category.svg', label: 'Category', route: '/manager/category' },
         { icon: 'assets/icons/source.svg', label: 'Supplier/Dealer', route: '/manager/supplier-dealer' },
         { icon: 'assets/icons/product.svg', label: 'Product', route: '/manager/product' },
+        { icon: 'assets/icons/warehouse.svg', label: 'Warehouse', route: '/manager/warehouse' },
       ],
     },
     {
