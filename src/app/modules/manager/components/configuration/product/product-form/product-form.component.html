@@ -68,10 +68,10 @@
                         <!-- source_oid -->
                         <nz-form-item>
                               <nz-form-label
-                                    [nzRequired]="hasRequiredValidator('source_oid')">Supplier/Dealer</nz-form-label>
-                              <nz-form-control nzErrorTip="Supplier/Dealer is required.">
+                                    [nzRequired]="hasRequiredValidator('source_oid')">Supplier</nz-form-label>
+                              <nz-form-control nzErrorTip="Supplier is required.">
                                     <nz-select class="w-full" formControlName="source_oid" nz-input nzAllowClear
-                                          nzPlaceHolder="Select Supplier/Dealer">
+                                          nzPlaceHolder="Select Supplier">
                                           <ng-container *ngFor="let item of sourceList">
                                                 <nz-option [nzLabel]="item.label" [nzValue]="item.value"></nz-option>
                                           </ng-container>

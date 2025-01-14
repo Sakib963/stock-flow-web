@@ -152,7 +152,7 @@ export class ProductFormComponent implements OnInit {
 
   loadSourceList(): any {
     this._httpService
-      .get(APIEndpoint.GET_SUPPLIER_DEALER_LIST_FOR_DROPDOWN)
+      .get(APIEndpoint.GET_SUPPLIER_DEALER_LIST_FOR_DROPDOWN, {source_type: 'supplier'})
       .pipe(
         takeUntilDestroyed(this._destroyRef),
         finalize(() => (this.loading = false))

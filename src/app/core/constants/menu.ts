@@ -29,10 +29,18 @@ export class Menu {
     {
       group: 'Configuration',
       items: [
-        { icon: 'assets/icons/category.svg', label: 'Category', route: '/manager/category' },
-        { icon: 'assets/icons/source.svg', label: 'Supplier/Dealer', route: '/manager/supplier-dealer' },
-        { icon: 'assets/icons/product.svg', label: 'Product', route: '/manager/product' },
-        { icon: 'assets/icons/warehouse.svg', label: 'Warehouse', route: '/manager/warehouse' },
+        { icon: 'assets/icons/category.svg', label: 'Category', route: '/manager/configuration/category' },
+        { icon: 'assets/icons/source.svg', label: 'Supplier/Dealer', route: '/manager/configuration/supplier-dealer' },
+        { icon: 'assets/icons/product.svg', label: 'Product', route: '/manager/configuration/product' },
+        { icon: 'assets/icons/warehouse.svg', label: 'Warehouse', route: '/manager/configuration/warehouse' },
+      ],
+    },
+    {
+      group: 'Inventory',
+      items: [
+        { icon: 'assets/icons/category.svg', label: 'Overview', route: '/manager/inventory/overview' },
+        { icon: 'assets/icons/source.svg', label: 'Purchase', route: '/manager/inventory/purchase' },
+        { icon: 'assets/icons/product.svg', label: 'Dispatch', route: '/manager/inventory/dispatch' },
       ],
     },
     {

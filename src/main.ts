@@ -6,6 +6,7 @@ import { AppRoutingModule } from '@app/app-routing.module';
 import { AppComponent } from '@app/app.component';
 import { tokenInterceptor } from '@app/core/interceptor/token-interceptor.service';
 import { NgZorroCustomModule } from '@app/shared/ng-zorro-custom.module';
+import { NZ_I18N, en_US } from 'ng-zorro-antd/i18n';
 
 bootstrapApplication(AppComponent, {
   providers: [
@@ -17,5 +18,6 @@ bootstrapApplication(AppComponent, {
       AppRoutingModule
     ),
     tokenInterceptor,
+    { provide: NZ_I18N, useValue: en_US },
   ],
 }).catch((err) => console.error(err));
