@@ -40,6 +40,7 @@ export class AuthService {
   }
 
   getUserInfo(): Observable<any> {
+    this.loading.set(true);
     return this._httpClient.get<any>(`${environment.baseUrl + APIEndpoint.GET_USER_INFO}`);
   }
 

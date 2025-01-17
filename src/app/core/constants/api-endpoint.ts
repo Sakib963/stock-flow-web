@@ -14,6 +14,13 @@ export class APIEndpoint {
   static UPDATE_CATEGORY_DETAILS = "/api/v1/manager/category/update-category-details";
   static GET_CATEGORY_LIST_FOR_DROPDOWN = "/api/v1/manager/category/get-category-list-for-dropdown";
 
+  
+  static GET_SUB_CATEGORY_LIST = "/api/v1/manager/sub-category/get-sub-category-list";
+  static CREATE_SUB_CATEGORY = "/api/v1/manager/sub-category/create-sub-category";
+  static UPDATE_SUB_CATEGORY_DETAILS = "/api/v1/manager/sub-category/update-sub-category-details";
+  static GET_SUB_CATEGORY_DETAILS = "/api/v1/manager/sub-category/get-sub-category-details";
+  static GET_SUB_CATEGORY_LIST_FOR_DROPDOWN = "/api/v1/manager/sub-category/get-sub-category-list-for-dropdown";
+
   static GET_SUPPLIER_DEALER_LIST = '/api/v1/manager/supplier-dealer/get-supplier-dealer-list';
   static CREATE_SUPPLIER_DEALER = '/api/v1/manager/supplier-dealer/create-supplier-dealer';
   static GET_SUPPLIER_DEALER_DETAILS = '/api/v1/manager/supplier-dealer/get-supplier-dealer-details';

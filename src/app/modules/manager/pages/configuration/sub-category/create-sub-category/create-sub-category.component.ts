@@ -1,20 +1,20 @@
 import { Component, DestroyRef } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
+import { SubCategoryFormComponent } from '@app/modules/manager/components/configuration/sub-category/sub-category-form/sub-category-form.component';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { APIEndpoint } from '@app/core/constants/api-endpoint';
 import { HttpService } from '@app/core/services/http.service';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { finalize } from 'rxjs';
-import { CategoryFormComponent } from '@app/modules/manager/components/configuration/category/category-form/category-form.component';
 
 @Component({
-  selector: 'app-create-category',
+  selector: 'app-create-sub-category',
   standalone: true,
-  imports: [CommonModule, CategoryFormComponent],
-  templateUrl: './create-category.component.html',
-  styleUrls: ['./create-category.component.scss']
+  imports: [CommonModule, SubCategoryFormComponent],
+  templateUrl: './create-sub-category.component.html',
+  styleUrls: ['./create-sub-category.component.scss'],
 })
-export class CreateCategoryComponent {
+export class CreateSubCategoryComponent {
   loading: boolean = false;
 
   constructor(
@@ -26,30 +26,29 @@ export class CreateCategoryComponent {
 
   handleActions(event: any): any {
     if (event.action === 'submit') {
-      this.handleCreateCategory(event.value);
+      this.handleCreate(event.value);
     } else if (event.action === 'back') {
       this._location.back();
     }
   }
 
-  handleCreateCategory(payload: any): any {
+  handleCreate(payload: any): any {
     this.loading = true;
     this._httpService
-      .post(APIEndpoint.CREATE_CATEGORY, payload)
+      .post(APIEndpoint.CREATE_SUB_CATEGORY, payload)
       .pipe(
         takeUntilDestroyed(this._destroyRef),
         finalize(() => (this.loading = false))
       )
       .subscribe({
         next: (res: any) => {
-          this._notificationService.success("Success!", res?.body?.message)
+          this._notificationService.success('Success!', res?.body?.message);
           this._location.back();
         },
         error: (err: any) => {
           console.log(err);
-          this._notificationService.error("Error!", err?.error?.message)
+          this._notificationService.error('Error!', err?.error?.message);
         },
       });
   }
-
 }

@@ -4,7 +4,7 @@ import {
   ResolveFn,
   RouterStateSnapshot,
 } from '@angular/router';
-import { Observable, catchError, tap, throwError } from 'rxjs';
+import { Observable, catchError, finalize, tap, throwError } from 'rxjs';
 import { AuthService } from 'src/app/modules/auth/services/auth.service';
 
 export const UserInfoResolver: ResolveFn<any> = (
@@ -20,8 +20,11 @@ export const UserInfoResolver: ResolveFn<any> = (
         email: res.data.email || '',
       });
     }),
+    finalize(() => {
+      authService.loading.set(false);
+    }),
     catchError((err) => {
-      // authService.logout()
+      authService.loading.set(false);
       return throwError(() => err);
     })
   );

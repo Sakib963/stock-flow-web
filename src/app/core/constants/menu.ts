@@ -30,6 +30,7 @@ export class Menu {
       group: 'Configuration',
       items: [
         { icon: 'assets/icons/category.svg', label: 'Category', route: '/manager/configuration/category' },
+        { icon: 'assets/icons/sub_category.svg', label: 'Sub Category', route: '/manager/configuration/sub-category' },
         { icon: 'assets/icons/source.svg', label: 'Supplier/Dealer', route: '/manager/configuration/supplier-dealer' },
         { icon: 'assets/icons/product.svg', label: 'Product', route: '/manager/configuration/product' },
         { icon: 'assets/icons/warehouse.svg', label: 'Warehouse', route: '/manager/configuration/warehouse' },

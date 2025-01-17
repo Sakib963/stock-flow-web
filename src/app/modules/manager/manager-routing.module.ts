@@ -55,6 +55,37 @@ const routes: Routes = [
             ],
           },
           {
+            path: 'sub-category',
+            children: [
+              {
+                path: '',
+                redirectTo: 'sub-category-list',
+                pathMatch: 'full',
+              },
+              {
+                path: 'sub-category-list',
+                loadComponent: () =>
+                  import(
+                    './pages/configuration/sub-category/display-sub-category-list/display-sub-category-list.component'
+                  ).then((m) => m.DisplaySubCategoryListComponent),
+              },
+              {
+                path: 'create-sub-category',
+                loadComponent: () =>
+                  import(
+                    './pages/configuration/sub-category/create-sub-category/create-sub-category.component'
+                  ).then((m) => m.CreateSubCategoryComponent),
+              },
+              {
+                path: 'view-sub-category/:oid',
+                loadComponent: () =>
+                  import(
+                    './pages/configuration/sub-category/view-sub-category-details/view-sub-category-details.component'
+                  ).then((m) => m.ViewSubCategoryDetailsComponent),
+              },
+            ],
+          },
+          {
             path: 'supplier-dealer',
             children: [
               {
@@ -166,10 +197,20 @@ const routes: Routes = [
           },
           {
             path: 'purchase',
-            loadComponent: () =>
-              import(
-                './pages/inventory/purchase-products/purchase-products.component'
-              ).then((m) => m.PurchaseProductsComponent),
+            children: [
+              {
+                path: '',
+                redirectTo: 'purchase-list',
+                pathMatch: 'full',
+              },
+              {
+                path: 'purchase-list',
+                loadComponent: () =>
+                  import(
+                    './pages/inventory/purchase-products/product-purchase-list/product-purchase-list.component'
+                  ).then((m) => m.ProductPurchaseListComponent),
+              },
+            ],
           },
           {
             path: 'dispatch',
@@ -178,8 +219,8 @@ const routes: Routes = [
                 './pages/inventory/dispatch-products/dispatch-products.component'
               ).then((m) => m.DispatchProductsComponent),
           },
-        ]
-      }
+        ],
+      },
     ],
   },
   {

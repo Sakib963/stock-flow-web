@@ -1,0 +1,61 @@
+<div class="rounded-md bg-white">
+      <form nz-form [formGroup]="form" [nzLayout]="'vertical'" (ngSubmit)="handleForm()">
+            <div class="grid grid-cols-1 lg:gap-x-6 md:grid-cols-2 lg:grid-cols-3 border-[0.5px] p-4 rounded-md">
+                  <!-- Form -->
+                  <!-- category_oid -->
+                  <nz-form-item>
+                        <nz-form-label [nzRequired]="hasRequiredValidator('category_oid')">Parent
+                              Category</nz-form-label>
+                        <nz-form-control nzErrorTip="Category is required.">
+                              <nz-select class="w-full" formControlName="category_oid" nz-input nzAllowClear
+                                    nzPlaceHolder="Select Category">
+                                    <ng-container *ngFor="let item of categoryList">
+                                          <nz-option [nzLabel]="item.label" [nzValue]="item.value"></nz-option>
+                                    </ng-container>
+                              </nz-select>
+                        </nz-form-control>
+                  </nz-form-item>
+                  <!-- Name -->
+                  <nz-form-item>
+                        <nz-form-label [nzRequired]="hasRequiredValidator('name')">Sub Category Name</nz-form-label>
+                        <nz-form-control nzErrorTip="Sub Category Name is Required.">
+                              <input formControlName="name" nz-input placeholder="Enter Sub Category Name" />
+                        </nz-form-control>
+                  </nz-form-item>
+                  <!-- category_code -->
+                  <nz-form-item>
+                        <nz-form-label [nzRequired]="hasRequiredValidator('category_code')">Sub Category
+                              Code</nz-form-label>
+                        <nz-form-control nzErrorTip="Sub Category Code is Required.">
+                              <input formControlName="category_code" nz-input placeholder="Enter Sub Category Code" />
+                        </nz-form-control>
+                  </nz-form-item>
+                  <!-- Description -->
+                  <nz-form-item>
+                        <nz-form-label [nzRequired]="hasRequiredValidator('description')">Description</nz-form-label>
+                        <nz-form-control nzErrorTip="Description is Required.">
+                              <textarea formControlName="description" nz-input placeholder="Enter Description"
+                                    nzAutosize></textarea>
+                        </nz-form-control>
+                  </nz-form-item>
+                  <!-- Status -->
+                  <nz-form-item>
+                        <nz-form-label [nzRequired]="hasRequiredValidator('status')">Status</nz-form-label>
+                        <nz-form-control nzErrorTip="Status is required.">
+                              <nz-select class="w-full" formControlName="status" nz-input nzAllowClear
+                                    nzPlaceHolder="Select Status">
+                                    <nz-option nzLabel="Active" nzValue="Active"></nz-option>
+                                    <nz-option nzLabel="Inactive" nzValue="Inactive"></nz-option>
+                              </nz-select>
+                        </nz-form-control>
+                  </nz-form-item>
+            </div>
+            <!-- Actions -->
+            <div class="flex justify-end mt-4">
+                  <div class="flex items-center gap-4">
+                        <secondary-button (click)="goBack()" [label]="'Cancel'"></secondary-button>
+                        <primary-button [label]="'Submit'" [loading]="loading" [type]="'submit'"></primary-button>
+                  </div>
+            </div>
+      </form>
+</div>

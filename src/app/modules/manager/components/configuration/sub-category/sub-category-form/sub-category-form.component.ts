@@ -1,9 +1,17 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import {
+  Component,
+  DestroyRef,
+  EventEmitter,
+  Input,
+  OnInit,
+  Output,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   FormGroup,
   FormBuilder,
   Validators,
+  FormArray,
   ReactiveFormsModule,
 } from '@angular/forms';
 import {
@@ -12,13 +20,16 @@ import {
 } from '@app/core/constants/helper';
 import { ConfirmationModalComponent } from '@app/shared/components/confirmation-modal/confirmation-modal.component';
 import { NzModalService } from 'ng-zorro-antd/modal';
-import { SpinnerComponent } from '@app/shared/components/spinner/spinner.component';
-import { NgZorroCustomModule } from '@app/shared/ng-zorro-custom.module';
 import { PrimaryButton } from '@app/shared/components/buttons/primary-button/primary-button.component';
 import { SecondaryButton } from '@app/shared/components/buttons/secondary-button/secondary-button.component';
+import { NgZorroCustomModule } from '@app/shared/ng-zorro-custom.module';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { APIEndpoint } from '@app/core/constants/api-endpoint';
+import { finalize } from 'rxjs';
+import { HttpService } from '@app/core/services/http.service';
 
 @Component({
-  selector: 'app-category-form',
+  selector: 'app-sub-category-form',
   standalone: true,
   imports: [
     CommonModule,
@@ -27,19 +38,26 @@ import { SecondaryButton } from '@app/shared/components/buttons/secondary-button
     PrimaryButton,
     SecondaryButton,
   ],
-  templateUrl: './category-form.component.html',
-  styleUrls: ['./category-form.component.scss'],
+  templateUrl: './sub-category-form.component.html',
+  styleUrls: ['./sub-category-form.component.scss'],
 })
-export class CategoryFormComponent implements OnInit {
+export class SubCategoryFormComponent implements OnInit {
   @Output() readonly actionEmitter: EventEmitter<object> = new EventEmitter();
   @Input() formData: any;
   @Input() loading: boolean = false;
   form!: FormGroup;
+  categoryList: any = [];
 
-  constructor(private _fb: FormBuilder, private _modal: NzModalService) {}
+  constructor(
+    private _fb: FormBuilder,
+    private _modal: NzModalService,
+    private _httpService: HttpService,
+    private _destroyRef: DestroyRef
+  ) {}
 
   ngOnInit(): void {
     this.form = this.createForm();
+    this.loadCategoryList();
 
     if (this.formData) {
       this.form.patchValue(this.formData);
@@ -49,6 +67,7 @@ export class CategoryFormComponent implements OnInit {
   createForm(): FormGroup {
     return this._fb.group({
       oid: [null],
+      category_oid: [null, [Validators.required]],
       name: [null, [Validators.required]],
       description: [null],
       category_code: [null, [Validators.required]],
@@ -57,9 +76,9 @@ export class CategoryFormComponent implements OnInit {
   }
 
   handleConfirm(): void {
-    let message = 'Do you want to create an category?';
+    let message = 'Do you want to create a sub category?';
     if (this.formData) {
-      message = 'Do you want to update this category?';
+      message = 'Do you want to update this sub category?';
     }
     this._modal.create({
       nzContent: ConfirmationModalComponent,
@@ -88,5 +107,29 @@ export class CategoryFormComponent implements OnInit {
   hasRequiredValidator(controlName: string): boolean {
     const control = this.form.get(controlName);
     return control ? checkRequiredValidator(control) : false;
+  }
+
+  loadCategoryList(): any {
+    this._httpService
+      .get(APIEndpoint.GET_CATEGORY_LIST_FOR_DROPDOWN)
+      .pipe(
+        takeUntilDestroyed(this._destroyRef),
+        finalize(() => (this.loading = false))
+      )
+      .subscribe({
+        next: (res: any) => {
+          if (res.status === 200) {
+            this.categoryList = [];
+            if (res.body?.data?.length) {
+              this.categoryList = res.body.data;
+            } else {
+              this.categoryList = [];
+            }
+          }
+        },
+        error: (err: any) => {
+          console.log(err);
+        },
+      });
   }
 }
