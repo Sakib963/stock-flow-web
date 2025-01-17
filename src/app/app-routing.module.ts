@@ -7,6 +7,7 @@ import { NotFoundComponent } from './shared/components/not-found/not-found.compo
 const routes: Routes = [
   {
     path: '',
+    resolve: { userInfo: UserInfoResolver },
     canActivate: [AuthGuard],
     loadChildren: () =>
       import('./layout/layout.module').then((m) => m.LayoutModule),

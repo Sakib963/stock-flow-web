@@ -9,6 +9,11 @@ const routes: Routes = [
     component: ManagerComponent,
     children: [
       {
+        path: '',
+        redirectTo: 'dashboard',
+        pathMatch: 'full',
+      },
+      {
         path: 'dashboard',
         loadComponent: () =>
           import('./pages/manager-dashboard/manager-dashboard.component').then(

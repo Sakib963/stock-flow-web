@@ -10,8 +10,16 @@ const routes: Routes = [
   {
     path: '',
     component: LayoutComponent,
-    resolve: { userInfo: UserInfoResolver },
     children: [
+      {
+        path: '',
+        redirectTo: 'redirect',
+        pathMatch: 'full',
+      },
+      {
+        path: 'redirect',
+        loadComponent: () => import('../shared/components/redirect/redirect.component').then((c) => c.RedirectComponent)
+      },
       {
         path: 'admin',
         loadChildren: () =>
@@ -22,10 +30,12 @@ const routes: Routes = [
       {
         path: 'manager',
         loadChildren: () =>
-          import('../modules/manager/manager.module').then((m) => m.ManagerModule),
+          import('../modules/manager/manager.module').then(
+            (m) => m.ManagerModule
+          ),
         canActivate: [RoleGuard],
         data: { roles: [ROLES.MANAGER] },
-      }
+      },
     ],
   },
 ];
