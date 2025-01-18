@@ -27,10 +27,11 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { APIEndpoint } from '@app/core/constants/api-endpoint';
 import { finalize } from 'rxjs';
 import { HttpService } from '@app/core/services/http.service';
-import { Constants } from '@app/core/constants/constants';
 import { DROPDOWN_OPTIONS } from '@app/core/constants/dropdown-options';
 import { DangerButton } from '@app/shared/components/buttons/danger-button/danger-button.component';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
+import { FileService } from '@app/core/services/file.service';
+import { LoaderComponent } from '@app/shared/components/loader/loader.component';
 
 @Component({
   selector: 'app-product-form',
@@ -42,6 +43,7 @@ import { NzNotificationService } from 'ng-zorro-antd/notification';
     PrimaryButton,
     SecondaryButton,
     DangerButton,
+    LoaderComponent,
   ],
   templateUrl: './product-form.component.html',
   styleUrls: ['./product-form.component.scss'],
@@ -51,6 +53,8 @@ export class ProductFormComponent implements OnInit {
   @Input() formData: any;
   @Input() loading: boolean = false;
   form!: FormGroup;
+
+  imgLoading: boolean = false;
 
   categoryList: any = [];
   subCategoryList: any = [];
@@ -62,7 +66,8 @@ export class ProductFormComponent implements OnInit {
     private _modal: NzModalService,
     private _httpService: HttpService,
     private _destroyRef: DestroyRef,
-    private _notificationService: NzNotificationService
+    private _notificationService: NzNotificationService,
+    private _fileService: FileService
   ) {}
 
   ngOnInit(): void {
@@ -79,7 +84,7 @@ export class ProductFormComponent implements OnInit {
     this.form.controls['category_oid'].valueChanges.subscribe((value: any) => {
       if (value) {
         this.loadSubCategoryList(value);
-        this.form.controls['sub_category_oid'].setValue(null)
+        this.form.controls['sub_category_oid'].setValue(null);
       }
     });
   }
@@ -186,16 +191,27 @@ export class ProductFormComponent implements OnInit {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files[0]) {
       const file = input.files[0];
-      const maxSizeInBytes = 15 * 1024; // 15 KB
+      const maxSizeInBytes = 500 * 1024; // 500 KB
       if (file.size > maxSizeInBytes) {
         this._notificationService.error(
           'Error',
-          'File size exceeds 15 KB. Please upload a smaller file.'
+          'File size exceeds 500 KB. Please upload a smaller file.'
         );
         return;
       }
-      convertImageToBase64(file).then((base64) => {
-        this.form.controls['photo'].setValue(base64);
+
+      this.imgLoading = true;
+      this._fileService.uploadImage(file).subscribe({
+        next: (res: any) => {
+          const imageUrl = res.secure_url;
+          this.form.controls['photo'].setValue(imageUrl);
+          this.imgLoading = false;
+        },
+        error: (err: any) => {
+          this._notificationService.error('Error', 'Failed to upload image');
+          console.error('Image upload error:', err);
+          this.imgLoading = false;
+        },
       });
     }
   }

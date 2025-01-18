@@ -7,6 +7,7 @@ import { AppComponent } from '@app/app.component';
 import { tokenInterceptor } from '@app/core/interceptor/token-interceptor.service';
 import { NgZorroCustomModule } from '@app/shared/ng-zorro-custom.module';
 import { NZ_I18N, en_US } from 'ng-zorro-antd/i18n';
+import {CloudinaryModule} from '@cloudinary/ng';
 
 bootstrapApplication(AppComponent, {
   providers: [
@@ -15,7 +16,8 @@ bootstrapApplication(AppComponent, {
       HttpClientModule,
       NgZorroCustomModule,
       BrowserAnimationsModule,
-      AppRoutingModule
+      AppRoutingModule,
+      CloudinaryModule
     ),
     tokenInterceptor,
     { provide: NZ_I18N, useValue: en_US },

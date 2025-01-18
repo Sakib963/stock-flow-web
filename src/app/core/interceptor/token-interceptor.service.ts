@@ -14,19 +14,21 @@ import { AuthService } from '@app/modules/auth/services/auth.service';
 @Injectable()
 export class TokenInterceptor implements HttpInterceptor {
   private isRefreshing = false;
-  private refreshTokenSubject: BehaviorSubject<any> = new BehaviorSubject<any>(
-    null
-  );
+  private refreshTokenSubject: BehaviorSubject<any> = new BehaviorSubject<any>(null);
 
   constructor(private authService: AuthService) {}
 
-  intercept(
-    request: HttpRequest<any>,
-    next: HttpHandler
-  ): Observable<HttpEvent<any>> {
+  intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+    // Skip adding token for Cloudinary requests (or other external APIs)
+    if (request.url.includes('cloudinary.com')) {
+      return next.handle(request);
+    }
+
+    // If there's a JWT token, add it to the request
     if (this.authService.getJwtToken()) {
       request = this.addToken(request, this.authService.getJwtToken());
     }
+
     return next.handle(request).pipe(
       catchError((error) => {
         if (error instanceof HttpErrorResponse && error.status === 401) {
@@ -46,10 +48,7 @@ export class TokenInterceptor implements HttpInterceptor {
     });
   }
 
-  private handle401Error(
-    request: HttpRequest<any>,
-    next: HttpHandler
-  ): Observable<HttpEvent<any>> {
+  private handle401Error(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     if (!this.isRefreshing) {
       this.isRefreshing = true;
       this.refreshTokenSubject.next(null);
