@@ -4,7 +4,8 @@
       <div *ngIf="!loading && categoryDetails">
             <!-- Edit mode On -->
             <div *ngIf="editMode">
-                  <app-category-form [formData]="categoryDetails"  (actionEmitter)="handleActions($event)"></app-category-form>
+                  <app-category-form [formData]="categoryDetails"
+                        (actionEmitter)="handleActions($event)"></app-category-form>
             </div>
             <div *ngIf="!editMode">
                   <div class="grid grid-cols-1 gap-x-6 gap-y-4 md:grid-cols-3 border-[0.5px] p-4 rounded-md">
@@ -20,7 +21,7 @@
                         </div>
                         <!-- status -->
                         <div class="space-y-1">
-                              <p>status</p>
+                              <p>Status</p>
                               <p class="font-semibold">{{ categoryDetails?.status }}</p>
                         </div>
                         <!-- Description -->
@@ -32,9 +33,7 @@
                   <!-- Actions -->
                   <div class="flex justify-end mt-4">
                         <div class="flex items-center gap-4">
-                              <button class="secondary-button" type="button" (click)="goBack()">
-                                    Go Back
-                              </button>
+                              <secondary-button [label]="'Go Back'" type="button" (click)="goBack()"></secondary-button>
                         </div>
                   </div>
             </div>

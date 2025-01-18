@@ -24,20 +24,21 @@
                               <p>Category</p>
                               <p class="font-semibold">{{ productDetails?.category_name }}</p>
                         </div>
-                        <!-- Source -->
+                        <!-- Sub Category -->
                         <div class="space-y-1">
-                              <p>Supplier</p>
-                              <p class="font-semibold">{{ productDetails?.source_name }}</p>
+                              <p>Sub Category</p>
+                              <p class="font-semibold">{{ productDetails?.sub_category_name }}</p>
                         </div>
                         <!-- Unit Type -->
                         <div class="space-y-1">
                               <p>Unit Type</p>
-                              <p class="font-semibold">{{ productDetails?.unit_type }}</p>
+                              <p class="font-semibold">{{ getLabel(productDetails?.unit_type, 'unit_type') }}</p>
                         </div>
                         <!-- Product Nature -->
                         <div class="space-y-1">
                               <p>Product Nature</p>
-                              <p class="font-semibold">{{ productDetails?.product_nature }}</p>
+                              <p class="font-semibold">{{ getLabel(productDetails?.product_nature, 'product_nature') }}
+                              </p>
                         </div>
                         <!-- Restock Threshold -->
                         <div class="space-y-1">
@@ -51,7 +52,7 @@
                         </div>
                         <!-- status -->
                         <div class="space-y-1">
-                              <p>status</p>
+                              <p>Status</p>
                               <p class="font-semibold">{{ productDetails?.status }}</p>
                         </div>
                   </div>

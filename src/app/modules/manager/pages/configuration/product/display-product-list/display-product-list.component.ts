@@ -28,6 +28,7 @@ import { PrimaryButtonWithPlusIcon } from '@app/shared/components/buttons/primar
 })
 export class DisplayProductListComponent implements OnInit {
   data: any[] = [];
+  totalCount: number = 0;
   loading: boolean = false;
   payload: any = {
     offset: 0,
@@ -47,7 +48,7 @@ export class DisplayProductListComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.loadProductList();
+    this.loadList();
     this.searchControl.valueChanges.subscribe((value) => {
       this.onSearchChange(value);
     });
@@ -56,10 +57,19 @@ export class DisplayProductListComponent implements OnInit {
   onSearchChange(value: string): void {
     this.payload.search_text = value;
     this.isFilter = true;
-    this.loadProductList();
+    this.loadList();
   }
 
-  loadProductList(): any {
+  handlePaginationEvent(event: any) {
+    this.payload = {
+      ...this.payload,
+      offset: event.offset,
+      limit: event.limit,
+    };
+    this.loadList();
+  }
+
+  loadList(): any {
     if (!this.isFilter) {
       this.loading = true;
     }
@@ -75,10 +85,10 @@ export class DisplayProductListComponent implements OnInit {
             this.data = [];
             if (res.body?.data?.length) {
               this.data = res.body.data;
+              this.totalCount = res.body.total;
             } else {
               this.data = [];
             }
-            console.log(this.data);
           }
         },
         error: (err: any) => {

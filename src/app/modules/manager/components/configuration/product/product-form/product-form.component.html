@@ -19,7 +19,7 @@
                               Upload a file
                         </p>
                         <p *ngIf="!form.controls['photo'].value" class="text-xs text-gray-500">
-                              PNG, JPG, GIF up to 10MB
+                              PNG, JPG, JPEG up to 15KB
                         </p>
                         <input type="file" accept=".png,.jpg,.jpeg,.gif" #fileInput class="hidden"
                               (change)="onFileSelected($event)" />
@@ -65,17 +65,26 @@
                                     </nz-select>
                               </nz-form-control>
                         </nz-form-item>
-                        <!-- source_oid -->
+                        <!-- sub_category_oid -->
                         <nz-form-item>
-                              <nz-form-label
-                                    [nzRequired]="hasRequiredValidator('source_oid')">Supplier</nz-form-label>
-                              <nz-form-control nzErrorTip="Supplier is required.">
-                                    <nz-select class="w-full" formControlName="source_oid" nz-input nzAllowClear
-                                          nzPlaceHolder="Select Supplier">
-                                          <ng-container *ngFor="let item of sourceList">
+                              <nz-form-label [nzRequired]="hasRequiredValidator('category_oid')">Sub
+                                    Category</nz-form-label>
+                              <nz-form-control nzErrorTip="Sub Category is required.">
+                                    <nz-select class="w-full" formControlName="sub_category_oid" nz-input nzAllowClear
+                                          nzPlaceHolder="Select Sub Category">
+                                          <ng-container *ngFor="let item of subCategoryList">
                                                 <nz-option [nzLabel]="item.label" [nzValue]="item.value"></nz-option>
                                           </ng-container>
                                     </nz-select>
+                              </nz-form-control>
+                        </nz-form-item>
+                        <!-- restock_threshold -->
+                        <nz-form-item>
+                              <nz-form-label [nzRequired]="hasRequiredValidator('restock_threshold')">Restock
+                                    Threshold</nz-form-label>
+                              <nz-form-control nzErrorTip="Restock Threshold is Required.">
+                                    <input formControlName="restock_threshold" nz-input
+                                          placeholder="Enter Restock Threshold" />
                               </nz-form-control>
                         </nz-form-item>
                         <!-- unit_type -->
@@ -97,19 +106,10 @@
                               <nz-form-control nzErrorTip="Product Nature is required.">
                                     <nz-select class="w-full" formControlName="product_nature" nz-input nzAllowClear
                                           nzPlaceHolder="Select Product Nature">
-                                          <ng-container *ngFor="let item of productNatures">
+                                          <ng-container *ngFor="let item of productNatureList">
                                                 <nz-option [nzLabel]="item.label" [nzValue]="item.value"></nz-option>
                                           </ng-container>
                                     </nz-select>
-                              </nz-form-control>
-                        </nz-form-item>
-                        <!-- restock_threshold -->
-                        <nz-form-item>
-                              <nz-form-label [nzRequired]="hasRequiredValidator('restock_threshold')">Restock
-                                    Threshold</nz-form-label>
-                              <nz-form-control nzErrorTip="Restock Threshold is Required.">
-                                    <input formControlName="restock_threshold" nz-input
-                                          placeholder="Enter Restock Threshold" />
                               </nz-form-control>
                         </nz-form-item>
                         <!-- Description -->

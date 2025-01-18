@@ -1,1 +1,51 @@
-<p>view-supplier-details works!</p>
+<div class="p-4 space-y-3">
+      <h2 class="text-2xl font-medium mb-4 animate-text">Supplier Details</h2>
+      <app-loader *ngIf="loading" [isVisible]="loading"></app-loader>
+      <div *ngIf="!loading && itemDetails">
+            <!-- Edit mode On -->
+            <div *ngIf="editMode">
+                  <app-supplier-form [formData]="itemDetails"
+                        (actionEmitter)="handleActions($event)"></app-supplier-form>
+            </div>
+            <div *ngIf="!editMode">
+                  <div class="grid grid-cols-1 gap-x-6 gap-y-4 md:grid-cols-3 border-[0.5px] p-4 rounded-md">
+                        <!-- Name -->
+                        <div class="space-y-1">
+                              <p>Name</p>
+                              <p class="font-semibold">{{ itemDetails?.name }}</p>
+                        </div>
+                        <!-- phone_number -->
+                        <div class="space-y-1">
+                              <p>Phone Number</p>
+                              <p class="font-semibold">{{ itemDetails?.phone_number }}</p>
+                        </div>
+                        <!-- email -->
+                        <div class="space-y-1">
+                              <p>Email</p>
+                              <p class="font-semibold">{{ itemDetails?.email }}</p>
+                        </div>
+                        <!-- contact_person -->
+                        <div class="space-y-1">
+                              <p>Contact Person</p>
+                              <p class="font-semibold">{{ itemDetails?.contact_person }}</p>
+                        </div>
+                        <!-- address -->
+                        <div class="space-y-1">
+                              <p>Address</p>
+                              <p class="font-semibold">{{ itemDetails?.address }}</p>
+                        </div>
+                        <!-- status -->
+                        <div class="space-y-1">
+                              <p>Status</p>
+                              <p class="font-semibold">{{ itemDetails?.status }}</p>
+                        </div>
+                  </div>
+                  <!-- Actions -->
+                  <div class="flex justify-end mt-4">
+                        <div class="flex items-center gap-4">
+                              <secondary-button [label]="'Go Back'" type="button" (click)="goBack()"></secondary-button>
+                        </div>
+                  </div>
+            </div>
+      </div>
+</div>

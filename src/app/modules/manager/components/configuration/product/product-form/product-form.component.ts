@@ -30,6 +30,7 @@ import { HttpService } from '@app/core/services/http.service';
 import { Constants } from '@app/core/constants/constants';
 import { DROPDOWN_OPTIONS } from '@app/core/constants/dropdown-options';
 import { DangerButton } from '@app/shared/components/buttons/danger-button/danger-button.component';
+import { NzNotificationService } from 'ng-zorro-antd/notification';
 
 @Component({
   selector: 'app-product-form',
@@ -40,7 +41,7 @@ import { DangerButton } from '@app/shared/components/buttons/danger-button/dange
     ReactiveFormsModule,
     PrimaryButton,
     SecondaryButton,
-    DangerButton
+    DangerButton,
   ],
   templateUrl: './product-form.component.html',
   styleUrls: ['./product-form.component.scss'],
@@ -52,15 +53,16 @@ export class ProductFormComponent implements OnInit {
   form!: FormGroup;
 
   categoryList: any = [];
-  sourceList: any = [];
+  subCategoryList: any = [];
+  productNatureList: any = [];
   unitTypes: any = [];
-  productNatures: any = [];
 
   constructor(
     private _fb: FormBuilder,
     private _modal: NzModalService,
     private _httpService: HttpService,
-    private _destroyRef: DestroyRef
+    private _destroyRef: DestroyRef,
+    private _notificationService: NzNotificationService
   ) {}
 
   ngOnInit(): void {
@@ -71,9 +73,15 @@ export class ProductFormComponent implements OnInit {
     }
 
     this.loadCategoryList();
-    this.loadSourceList();
+    this.productNatureList = DROPDOWN_OPTIONS.PRODUCT_NATURE;
     this.unitTypes = DROPDOWN_OPTIONS.MEASUREMENT_UNITS;
-    this.productNatures = DROPDOWN_OPTIONS.NATURE_OF_ASSET;
+
+    this.form.controls['category_oid'].valueChanges.subscribe((value: any) => {
+      if (value) {
+        this.loadSubCategoryList(value);
+        this.form.controls['sub_category_oid'].setValue(null)
+      }
+    });
   }
 
   createForm(): FormGroup {
@@ -82,7 +90,7 @@ export class ProductFormComponent implements OnInit {
       name: [null, [Validators.required]],
       sku: [null, [Validators.required]],
       category_oid: [null, [Validators.required]],
-      source_oid: [null, [Validators.required]],
+      sub_category_oid: [null, [Validators.required]],
       unit_type: [null],
       description: [null],
       photo: [null],
@@ -150,9 +158,9 @@ export class ProductFormComponent implements OnInit {
       });
   }
 
-  loadSourceList(): any {
+  loadSubCategoryList(category_oid: any): any {
     this._httpService
-      .get(APIEndpoint.GET_SUPPLIER_DEALER_LIST_FOR_DROPDOWN, {source_type: 'supplier'})
+      .get(APIEndpoint.GET_SUB_CATEGORY_LIST_FOR_DROPDOWN, { category_oid })
       .pipe(
         takeUntilDestroyed(this._destroyRef),
         finalize(() => (this.loading = false))
@@ -160,11 +168,11 @@ export class ProductFormComponent implements OnInit {
       .subscribe({
         next: (res: any) => {
           if (res.status === 200) {
-            this.sourceList = [];
+            this.subCategoryList = [];
             if (res.body?.data?.length) {
-              this.sourceList = res.body.data;
+              this.subCategoryList = res.body.data;
             } else {
-              this.sourceList = [];
+              this.subCategoryList = [];
             }
           }
         },
@@ -178,6 +186,14 @@ export class ProductFormComponent implements OnInit {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files[0]) {
       const file = input.files[0];
+      const maxSizeInBytes = 15 * 1024; // 15 KB
+      if (file.size > maxSizeInBytes) {
+        this._notificationService.error(
+          'Error',
+          'File size exceeds 15 KB. Please upload a smaller file.'
+        );
+        return;
+      }
       convertImageToBase64(file).then((base64) => {
         this.form.controls['photo'].setValue(base64);
       });
@@ -185,12 +201,12 @@ export class ProductFormComponent implements OnInit {
   }
 
   removePhoto(): void {
-    this.form.controls['photo'].setValue(null); // Clear the form control value
+    this.form.controls['photo'].setValue(null);
     const fileInput = document.querySelector(
       'input[type="file"]'
     ) as HTMLInputElement;
     if (fileInput) {
-      fileInput.value = ''; // Reset the file input
+      fileInput.value = '';
     }
   }
 }

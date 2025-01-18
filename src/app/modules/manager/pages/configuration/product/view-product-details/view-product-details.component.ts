@@ -9,11 +9,17 @@ import { map, finalize } from 'rxjs';
 import { LoaderComponent } from '@app/shared/components/loader/loader.component';
 import { ProductFormComponent } from '@app/modules/manager/components/configuration/product/product-form/product-form.component';
 import { SecondaryButton } from '@app/shared/components/buttons/secondary-button/secondary-button.component';
+import { DROPDOWN_OPTIONS } from '@app/core/constants/dropdown-options';
 
 @Component({
   selector: 'app-view-product-details',
   standalone: true,
-  imports: [CommonModule, LoaderComponent, ProductFormComponent, SecondaryButton],
+  imports: [
+    CommonModule,
+    LoaderComponent,
+    ProductFormComponent,
+    SecondaryButton,
+  ],
   templateUrl: './view-product-details.component.html',
   styleUrls: ['./view-product-details.component.scss'],
 })
@@ -21,6 +27,8 @@ export class ViewProductDetailsComponent implements OnInit {
   @Input() oid: any;
   editMode: boolean = false;
   loading: boolean = false;
+  productNatureList: any = [];
+  unitTypes: any = [];
 
   productDetails: any;
 
@@ -41,10 +49,28 @@ export class ViewProductDetailsComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadProductDetails();
+    this.productNatureList = DROPDOWN_OPTIONS.PRODUCT_NATURE;
+    this.unitTypes = DROPDOWN_OPTIONS.MEASUREMENT_UNITS;
   }
 
   goBack(): void {
     this._location.back();
+  }
+
+  getLabel(
+    value: string | number,
+    type: 'unit_type' | 'product_nature'
+  ): string {
+    let list = [];
+
+    if (type === 'unit_type') {
+      list = this.unitTypes;
+    } else if (type === 'product_nature') {
+      list = this.productNatureList;
+    }
+
+    const item = list.find((option: any) => option.value === value);
+    return item ? item.label : 'Unknown';
   }
 
   handleActions(event: any): any {

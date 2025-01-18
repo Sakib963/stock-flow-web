@@ -11,6 +11,16 @@ export const DROPDOWN_OPTIONS = {
     { label: 'Ton (t)', value: 't' },
     { label: 'Barrel (bbl)', value: 'bbl' },
   ],
+  PRODUCT_NATURE: [
+    { label: 'For Sale', value: 'for_sale' },
+    { label: 'For Office Use', value: 'for_office_use' },
+    { label: 'For Delivery', value: 'for_delivery' },
+    { label: 'For Packaging', value: 'for_packaging' },
+    { label: 'For Storage', value: 'for_storage' },
+    { label: 'For Maintenance', value: 'for_maintenance' },
+    { label: 'For Personal Use', value: 'for_personal_use' },
+    { label: 'For Promotion', value: 'for_promotion' },
+  ],
   NATURE_OF_ASSET: [
     { label: 'Tangible', value: 'tangible' },
     { label: 'Consumable', value: 'consumable' },

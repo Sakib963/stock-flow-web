@@ -8,11 +8,12 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { finalize, map } from 'rxjs';
 import { LoaderComponent } from '@app/shared/components/loader/loader.component';
 import { CategoryFormComponent } from '@app/modules/manager/components/configuration/category/category-form/category-form.component';
+import { SecondaryButton } from '@app/shared/components/buttons/secondary-button/secondary-button.component';
 
 @Component({
   selector: 'app-view-category-details',
   standalone: true,
-  imports: [CommonModule, LoaderComponent, CategoryFormComponent],
+  imports: [CommonModule, LoaderComponent, CategoryFormComponent, SecondaryButton],
   templateUrl: './view-category-details.component.html',
   styleUrls: ['./view-category-details.component.scss'],
 })
