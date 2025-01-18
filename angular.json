@@ -36,8 +36,8 @@
             "production": {
               "fileReplacements": [
                 {
-                  "replace": "src/environments/environment.development.ts",
-                  "with": "src/environments/environment.ts"
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.prod.ts"
                 }
               ],
               "budgets": [
@@ -60,13 +60,7 @@
               "vendorChunk": true,
               "extractLicenses": false,
               "sourceMap": true,
-              "namedChunks": true,
-              "fileReplacements": [
-                {
-                  "replace": "src/environments/environment.ts",
-                  "with": "src/environments/environment.development.ts"
-                }
-              ]
+              "namedChunks": true
             }
           },
           "defaultConfiguration": "production"
