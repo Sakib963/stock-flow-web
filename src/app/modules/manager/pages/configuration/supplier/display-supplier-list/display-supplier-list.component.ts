@@ -1,31 +1,31 @@
 import { Component, DestroyRef, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
+import { PrimaryButtonWithPlusIcon } from '@app/shared/components/buttons/primary-button-with-plus-icon/primary-button-with-plus-icon.component';
 import { NgZorroCustomModule } from '@app/shared/ng-zorro-custom.module';
-import { Constants } from '@app/core/constants/constants';
-import { APIEndpoint } from '@app/core/constants/api-endpoint';
+import { ViewSupplierListComponent } from '@app/modules/manager/components/configuration/supplier/view-supplier-list/view-supplier-list.component';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router, ActivatedRoute } from '@angular/router';
+import { APIEndpoint } from '@app/core/constants/api-endpoint';
+import { Constants } from '@app/core/constants/constants';
 import { HttpService } from '@app/core/services/http.service';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { finalize } from 'rxjs';
-import { ViewCategoryListComponent } from '@app/modules/manager/components/configuration/category/view-category-list/view-category-list.component';
-import { PrimaryButtonWithPlusIcon } from '@app/shared/components/buttons/primary-button-with-plus-icon/primary-button-with-plus-icon.component';
 
 @Component({
-  selector: 'app-display-category-list',
+  selector: 'app-display-supplier-list',
   standalone: true,
   imports: [
     CommonModule,
     NgZorroCustomModule,
     ReactiveFormsModule,
-    ViewCategoryListComponent,
-    PrimaryButtonWithPlusIcon
+    ViewSupplierListComponent,
+    PrimaryButtonWithPlusIcon,
   ],
-  templateUrl: './display-category-list.component.html',
-  styleUrls: ['./display-category-list.component.scss'],
+  templateUrl: './display-supplier-list.component.html',
+  styleUrls: ['./display-supplier-list.component.scss'],
 })
-export class DisplayCategoryListComponent implements OnInit {
+export class DisplaySupplierListComponent implements OnInit {
   data: any[] = [];
   totalCount: number = 0;
   loading: boolean = false;
@@ -73,7 +73,7 @@ export class DisplayCategoryListComponent implements OnInit {
       this.loading = true;
     }
     this._httpService
-      .get(APIEndpoint.GET_CATEGORY_LIST, this.payload)
+      .get(APIEndpoint.GET_SUPPLIER_LIST, this.payload)
       .pipe(
         takeUntilDestroyed(this._destroyRef),
         finalize(() => (this.loading = false))
@@ -99,29 +99,29 @@ export class DisplayCategoryListComponent implements OnInit {
 
   handleListActions(event: any): any {
     if (event.action === 'create') {
-      this.handleAddCategory();
+      this.handleAdd();
     } else if (event.action === 'view') {
-      this.handleViewCategory(event.value.oid);
+      this.handleView(event.value.oid);
     } else if (event.action === 'edit') {
-      this.handleEditCategory(event.value.oid);
+      this.handleEdit(event.value.oid);
     }
   }
 
-  handleAddCategory(): any {
-    this._router.navigate(['../create-category'], {
+  handleAdd(): any {
+    this._router.navigate(['../create-supplier'], {
       relativeTo: this._activatedRoute,
     });
   }
 
-  handleViewCategory(value: any): any {
-    this._router.navigate([`../view-category/${value}`], {
+  handleView(value: any): any {
+    this._router.navigate([`../view-supplier/${value}`], {
       relativeTo: this._activatedRoute,
       state: { edit: false },
     });
   }
 
-  handleEditCategory(value: any): any {
-    this._router.navigate([`../view-category/${value}`], {
+  handleEdit(value: any): any {
+    this._router.navigate([`../view-supplier/${value}`], {
       relativeTo: this._activatedRoute,
       state: { edit: true },
     });

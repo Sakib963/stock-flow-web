@@ -1,7 +1,6 @@
 <div class="p-4 space-y-3">
       <h2 class="text-2xl font-medium mb-4 animate-text">Category List</h2>
-      <app-loader *ngIf="loading" [isVisible]="loading"></app-loader>
-      <div *ngIf="!loading">
+      <div>
             <div class="flex justify-between items-center mb-4">
                   <!-- Search Text -->
                   <div class="w-2/3 grid grid-cols-3">
@@ -20,6 +19,7 @@
                               [label]="'Add Category'"></primary-button-with-plus-icon>
                   </div>
             </div>
-            <app-view-category-list [data]="data" (actionEmitter)="handleListActions($event)"></app-view-category-list>
+            <app-view-category-list [loading]="loading" [data]="data" [totalCount]="totalCount" (actionEmitter)="handleListActions($event)"
+                  (paginationEvent)="handlePaginationEvent($event)"></app-view-category-list>
       </div>
 </div>

@@ -1,5 +1,5 @@
 <div class="p-4 space-y-3">
-      <h2 class="text-2xl font-medium mb-4 animate-text">Sub Category List</h2>
+      <h2 class="text-2xl font-medium mb-4 animate-text">Supplier List</h2>
       <div>
             <div class="flex justify-between items-center mb-4">
                   <!-- Search Text -->
@@ -16,11 +16,11 @@
                   <!-- Buttons -->
                   <div class="flex justify-center items-center gap-4">
                         <primary-button-with-plus-icon [type]="'button'" (click)="handleAdd()"
-                              [label]="'Add Sub Category'"></primary-button-with-plus-icon>
+                              [label]="'Add Supplier'"></primary-button-with-plus-icon>
                   </div>
             </div>
-            <app-view-sub-category-list [loading]="loading" [data]="data" (actionEmitter)="handleListActions($event)"
-                  [totalCount]="totalCount"
-                  (paginationEvent)="handlePaginationEvent($event)"></app-view-sub-category-list>
+            <app-view-supplier-list [loading]="loading" [data]="data" [totalCount]="totalCount"
+                  (actionEmitter)="handleListActions($event)"
+                  (paginationEvent)="handlePaginationEvent($event)"></app-view-supplier-list>
       </div>
 </div>

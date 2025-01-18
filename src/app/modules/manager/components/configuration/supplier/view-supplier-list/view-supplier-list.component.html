@@ -4,17 +4,17 @@
             <ng-container *ngFor="let item of data">
                   <li class="grid grid-cols-3 gap-x-6 py-5">
                         <div>
-                              <p class="text-sm/6 text-gray-900 font-semibold">Sub Category Name: <span
+                              <p class="text-sm/6 text-gray-900 font-semibold">Supplier Name: <span
                                           class="font-normal">{{ item?.name }}</span></p>
-                              <p class="text-sm/6 text-gray-900 font-semibold">Parent Category: <span
-                                          class="font-normal">{{ item?.category_name }}</span></p>
+                              <p class="text-sm/6 text-gray-900 font-semibold">Contact Person: <span
+                                          class="font-normal">{{ item?.contact_person }}</span></p>
 
                         </div>
                         <div>
-                              <p class="mt-1 text-xs/5 text-gray-500 font-semibold">Code: <span class="font-normal">{{
-                                          item?.category_code }}</span></p>
-                              <p class="mt-1 text-xs/5 text-gray-500 font-semibold">Description: <span
-                                          class="font-normal">{{ item?.description }}</span></p>
+                              <p class="mt-1 text-xs/5 text-gray-500 font-semibold">Phone: <span class="font-normal">{{
+                                          item?.phone_number }}</span></p>
+                              <p class="mt-1 text-xs/5 text-gray-500 font-semibold">Email: <span class="font-normal">{{
+                                          item?.email }}</span></p>
                         </div>
                         <div class="flex justify-end">
                               <div class="hidden shrink-0 sm:flex sm:flex-col sm:items-center">
@@ -56,7 +56,6 @@
                   <ng-template #rangeTemplate let-range="range" let-total>
                         {{ range[0] }} - {{ range[1] }} of {{ total }} items
                   </ng-template>
-
             </div>
       </div>
 </div>

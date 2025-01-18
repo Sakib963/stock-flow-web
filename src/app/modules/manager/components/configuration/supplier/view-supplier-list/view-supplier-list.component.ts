@@ -1,17 +1,17 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { LoaderComponent } from '@app/shared/components/loader/loader.component';
 import { NgZorroCustomModule } from '@app/shared/ng-zorro-custom.module';
 import { Constants } from '@app/core/constants/constants';
-import { LoaderComponent } from '@app/shared/components/loader/loader.component';
 
 @Component({
-  selector: 'app-view-sub-category-list',
+  selector: 'app-view-supplier-list',
   standalone: true,
   imports: [CommonModule, NgZorroCustomModule, LoaderComponent],
-  templateUrl: './view-sub-category-list.component.html',
-  styleUrls: ['./view-sub-category-list.component.scss'],
+  templateUrl: './view-supplier-list.component.html',
+  styleUrls: ['./view-supplier-list.component.scss']
 })
-export class ViewSubCategoryListComponent {
+export class ViewSupplierListComponent {
   @Input() data: any[] = [];
   @Output() readonly actionEmitter: EventEmitter<object> = new EventEmitter();
   @Output() paginationEvent: EventEmitter<object> = new EventEmitter();
@@ -41,13 +41,5 @@ export class ViewSubCategoryListComponent {
 
   handleAction(action: any, value: any): any {
     this.actionEmitter.emit({ action, value });
-  }
-
-  getFirstLetter(name: any): any {
-    return name[0];
-  }
-
-  getParentCategory(item: any): string {
-    return '';
   }
 }

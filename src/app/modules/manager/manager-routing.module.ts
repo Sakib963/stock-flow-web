@@ -86,33 +86,33 @@ const routes: Routes = [
             ],
           },
           {
-            path: 'supplier-dealer',
+            path: 'supplier',
             children: [
               {
                 path: '',
-                redirectTo: 'supplier-dealer-list',
+                redirectTo: 'supplier-list',
                 pathMatch: 'full',
               },
               {
-                path: 'supplier-dealer-list',
+                path: 'supplier-list',
                 loadComponent: () =>
                   import(
-                    './pages/configuration/supplier-dealer/display-supplier-dealer-list/display-supplier-dealer-list.component'
-                  ).then((m) => m.DisplaySupplierDealerListComponent),
+                    './pages/configuration/supplier/display-supplier-list/display-supplier-list.component'
+                  ).then((m) => m.DisplaySupplierListComponent),
               },
               {
-                path: 'create-supplier-dealer',
+                path: 'create-supplier',
                 loadComponent: () =>
                   import(
-                    './pages/configuration/supplier-dealer/create-supplier-dealer/create-supplier-dealer.component'
-                  ).then((m) => m.CreateSupplierDealerComponent),
+                    './pages/configuration/supplier/create-supplier/create-supplier.component'
+                  ).then((m) => m.CreateSupplierComponent),
               },
               {
-                path: 'view-supplier-dealer/:oid',
+                path: 'view-supplier/:oid',
                 loadComponent: () =>
                   import(
-                    './pages/configuration/supplier-dealer/view-supplier-dealer-details/view-supplier-dealer-details.component'
-                  ).then((m) => m.ViewSupplierDealerDetailsComponent),
+                    './pages/configuration/supplier/view-supplier-details/view-supplier-details.component'
+                  ).then((m) => m.ViewSupplierDetailsComponent),
               },
             ],
           },

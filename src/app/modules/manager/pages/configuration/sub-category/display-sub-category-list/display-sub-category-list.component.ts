@@ -8,20 +8,18 @@ import { Constants } from '@app/core/constants/constants';
 import { HttpService } from '@app/core/services/http.service';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { finalize } from 'rxjs';
-import { ViewCategoryListComponent } from '@app/modules/manager/components/configuration/category/view-category-list/view-category-list.component';
 import { PrimaryButtonWithPlusIcon } from '@app/shared/components/buttons/primary-button-with-plus-icon/primary-button-with-plus-icon.component';
-import { LoaderComponent } from '@app/shared/components/loader/loader.component';
 import { NgZorroCustomModule } from '@app/shared/ng-zorro-custom.module';
+import { ViewSubCategoryListComponent } from '@app/modules/manager/components/configuration/sub-category/view-sub-category-list/view-sub-category-list.component';
 
 @Component({
   selector: 'app-display-sub-category-list',
   standalone: true,
   imports: [
     CommonModule,
-    LoaderComponent,
     NgZorroCustomModule,
     ReactiveFormsModule,
-    ViewCategoryListComponent,
+    ViewSubCategoryListComponent,
     PrimaryButtonWithPlusIcon,
   ],
   templateUrl: './display-sub-category-list.component.html',
@@ -29,6 +27,7 @@ import { NgZorroCustomModule } from '@app/shared/ng-zorro-custom.module';
 })
 export class DisplaySubCategoryListComponent implements OnInit {
   data: any[] = [];
+  totalCount: number = 0;
   loading: boolean = false;
   payload: any = {
     offset: 0,
@@ -48,7 +47,7 @@ export class DisplaySubCategoryListComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.loadCategoryList();
+    this.loadList();
     this.searchControl.valueChanges.subscribe((value) => {
       this.onSearchChange(value);
     });
@@ -57,10 +56,19 @@ export class DisplaySubCategoryListComponent implements OnInit {
   onSearchChange(value: string): void {
     this.payload.search_text = value;
     this.isFilter = true;
-    this.loadCategoryList();
+    this.loadList();
   }
 
-  loadCategoryList(): any {
+  handlePaginationEvent(event: any) {
+    this.payload = {
+      ...this.payload,
+      offset: event.offset,
+      limit: event.limit,
+    };
+    this.loadList();
+  }
+
+  loadList(): any {
     if (!this.isFilter) {
       this.loading = true;
     }
@@ -76,6 +84,7 @@ export class DisplaySubCategoryListComponent implements OnInit {
             this.data = [];
             if (res.body?.data?.length) {
               this.data = res.body.data;
+              this.totalCount = res.body.total;
             } else {
               this.data = [];
             }

@@ -1,0 +1,64 @@
+<div class="rounded-md bg-white">
+      <form nz-form [formGroup]="form" [nzLayout]="'vertical'" (ngSubmit)="handleForm()">
+            <div class="grid grid-cols-1 lg:gap-x-6 md:grid-cols-2 lg:grid-cols-3 border-[0.5px] p-4 rounded-md">
+                  <!-- Form -->
+                  <!-- Name -->
+                  <nz-form-item>
+                        <nz-form-label [nzRequired]="hasRequiredValidator('name')">Name</nz-form-label>
+                        <nz-form-control nzErrorTip="Name is Required.">
+                              <input formControlName="name" nz-input placeholder="Enter Name" />
+                        </nz-form-control>
+                  </nz-form-item>
+                  <!-- phone_number -->
+                  <nz-form-item>
+                        <nz-form-label [nzRequired]="hasRequiredValidator('phone_number')">Phone Number</nz-form-label>
+                        <nz-form-control nzErrorTip="Phone Number is Required.">
+                              <input formControlName="phone_number" nz-input placeholder="Enter Phone Number" />
+                        </nz-form-control>
+                  </nz-form-item>
+                  <!-- email -->
+                  <nz-form-item>
+                        <nz-form-label [nzRequired]="hasRequiredValidator('email')">Email</nz-form-label>
+                        <nz-form-control nzErrorTip="Email is Required.">
+                              <input formControlName="email" nz-input placeholder="Enter Email" />
+                        </nz-form-control>
+                  </nz-form-item>
+                  <!-- contact_person -->
+                  <nz-form-item>
+                        <nz-form-label [nzRequired]="hasRequiredValidator('contact_person')">Contact
+                              Person</nz-form-label>
+                        <nz-form-control nzErrorTip="Contact Person is Required.">
+                              <input formControlName="contact_person" nz-input
+                                    placeholder="Enter Contact Person Name" />
+                        </nz-form-control>
+                  </nz-form-item>
+                  <!-- address -->
+                  <nz-form-item>
+                        <nz-form-label [nzRequired]="hasRequiredValidator('address')">Address</nz-form-label>
+                        <nz-form-control nzErrorTip="Address is Required.">
+                              <textarea formControlName="address" nz-input placeholder="Enter Address"
+                                    nzAutosize></textarea>
+                        </nz-form-control>
+                  </nz-form-item>
+                  <!-- Status -->
+                  <nz-form-item>
+                        <nz-form-label [nzRequired]="hasRequiredValidator('status')">Status</nz-form-label>
+                        <nz-form-control nzErrorTip="Status is required.">
+                              <nz-select class="w-full" formControlName="status" nz-input nzAllowClear
+                                    nzPlaceHolder="Select Status">
+                                    <nz-option nzLabel="Active" nzValue="Active"></nz-option>
+                                    <nz-option nzLabel="Inactive" nzValue="Inactive"></nz-option>
+                              </nz-select>
+                        </nz-form-control>
+                  </nz-form-item>
+            </div>
+            <!-- Actions -->
+            <div class="flex justify-end mt-4">
+
+                  <div class="flex gap-4 items-center">
+                        <secondary-button [label]="'Cancel'" (click)="goBack()"></secondary-button>
+                        <primary-button [label]="'Submit'" [type]="'submit'" [loading]="loading"></primary-button>
+                  </div>
+            </div>
+      </form>
+</div>
