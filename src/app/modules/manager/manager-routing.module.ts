@@ -178,6 +178,37 @@ const routes: Routes = [
               },
             ],
           },
+          {
+            path: 'aisle',
+            children: [
+              {
+                path: '',
+                redirectTo: 'aisle-list',
+                pathMatch: 'full',
+              },
+              {
+                path: 'aisle-list',
+                loadComponent: () =>
+                  import(
+                    './pages/configuration/aisle/display-aisle-list/display-aisle-list.component'
+                  ).then((m) => m.DisplayAisleListComponent),
+              },
+              {
+                path: 'create-aisle',
+                loadComponent: () =>
+                  import(
+                    './pages/configuration/aisle/create-aisle/create-aisle.component'
+                  ).then((m) => m.CreateAisleComponent),
+              },
+              {
+                path: 'view-aisle/:oid',
+                loadComponent: () =>
+                  import(
+                    './pages/configuration/aisle/view-aisle-details/view-aisle-details.component'
+                  ).then((m) => m.ViewAisleDetailsComponent),
+              },
+            ],
+          },
         ],
       },
       {

@@ -34,6 +34,7 @@ export class Menu {
         { icon: 'assets/icons/source.svg', label: 'Supplier', route: '/manager/configuration/supplier' },
         { icon: 'assets/icons/product.svg', label: 'Product', route: '/manager/configuration/product' },
         { icon: 'assets/icons/warehouse.svg', label: 'Warehouse', route: '/manager/configuration/warehouse' },
+        { icon: 'assets/icons/shelf.svg', label: 'Aisle/Zone', route: '/manager/configuration/aisle' },
       ],
     },
     {
