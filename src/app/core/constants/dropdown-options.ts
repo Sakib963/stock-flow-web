@@ -33,6 +33,17 @@ export const DROPDOWN_OPTIONS = {
   ],
   SOURCE_TYPES: [
     { label: 'Supplier', value: 'supplier' },
-    { label: 'Dealer', value: 'dealer' }
-  ]
+    { label: 'Dealer', value: 'dealer' },
+  ],
+  STORAGE_TYPES: [
+    { label: 'Pallet Storage', value: 'pallet' },
+    { label: 'Shelf Storage', value: 'shelf' },
+    { label: 'Bin Storage', value: 'bin' },
+    { label: 'Bulk Storage', value: 'bulk' },
+    { label: 'Cold Storage', value: 'cold' },
+    { label: 'Rack Storage', value: 'rack' },
+    { label: 'Drive-In Rack Storage', value: 'drive_in_rack' },
+    { label: 'Drawer Storage', value: 'drawer' },
+    { label: 'Secure Vaults', value: 'secure_vaults' },
+  ],
 };

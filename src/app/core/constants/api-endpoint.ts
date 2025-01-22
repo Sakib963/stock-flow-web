@@ -45,4 +45,10 @@ export class APIEndpoint {
   static UPDATE_WAREHOUSE_DETAILS = "/api/v1/manager/warehouse/update-warehouse-details";
   static GET_WAREHOUSE_DETAILS = "/api/v1/manager/warehouse/get-warehouse-details";
   static GET_WAREHOUSE_LIST_FOR_DROPDOWN = "/api/v1/manager/warehouse/get-warehouse-list-for-dropdown";
+
+  static GET_AISLE_LIST = "/api/v1/manager/aisle/get-aisle-list";
+  static CREATE_AISLE = "/api/v1/manager/aisle/create-aisle";
+  static UPDATE_AISLE_DETAILS = "/api/v1/manager/aisle/update-aisle-details";
+  static GET_AISLE_DETAILS = "/api/v1/manager/aisle/get-aisle-details";
+  static GET_AISLE_LIST_FOR_DROPDOWN = "/api/v1/manager/aisle/get-aisle-list-for-dropdown";
 }

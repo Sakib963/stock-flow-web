@@ -1,7 +1,6 @@
 <div class="p-4 space-y-3">
       <h2 class="text-2xl font-medium mb-4 animate-text">Warehouse List</h2>
-      <app-loader *ngIf="loading" [isVisible]="loading"></app-loader>
-      <div *ngIf="!loading">
+      <div>
             <div class="flex justify-between items-center mb-4">
                   <!-- Search Text -->
                   <div class="w-2/3 grid grid-cols-3">
@@ -16,9 +15,12 @@
                   </div>
                   <!-- Buttons -->
                   <div class="flex justify-center items-center gap-4">
-                        <primary-button-with-plus-icon (click)="handleAdd()" [label]="'Add Warehouse'"></primary-button-with-plus-icon>
+                        <primary-button-with-plus-icon (click)="handleAdd()"
+                              [label]="'Add Warehouse'"></primary-button-with-plus-icon>
                   </div>
             </div>
-            <app-view-warehouse-list [data]="data" (actionEmitter)="handleListActions($event)"></app-view-warehouse-list>
+            <app-view-warehouse-list [loading]="loading" [totalCount]="totalCount" [data]="data"
+                  (paginationEvent)="handlePaginationEvent($event)"
+                  (actionEmitter)="handleListActions($event)"></app-view-warehouse-list>
       </div>
 </div>

@@ -30,6 +30,7 @@ import { ViewWarehouseListComponent } from '@app/modules/manager/components/conf
 })
 export class DisplayWarehouseListComponent implements OnInit {
   data: any[] = [];
+  totalCount: number = 0;
   loading: boolean = false;
   payload: any = {
     offset: 0,
@@ -49,7 +50,7 @@ export class DisplayWarehouseListComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.loadWarehouseList();
+    this.loadList();
     this.searchControl.valueChanges.subscribe((value) => {
       this.onSearchChange(value);
     });
@@ -58,10 +59,19 @@ export class DisplayWarehouseListComponent implements OnInit {
   onSearchChange(value: string): void {
     this.payload.search_text = value;
     this.isFilter = true;
-    this.loadWarehouseList();
+    this.loadList();
   }
 
-  loadWarehouseList(): any {
+  handlePaginationEvent(event: any) {
+    this.payload = {
+      ...this.payload,
+      offset: event.offset,
+      limit: event.limit,
+    };
+    this.loadList();
+  }
+
+  loadList(): any {
     if (!this.isFilter) {
       this.loading = true;
     }
@@ -77,6 +87,7 @@ export class DisplayWarehouseListComponent implements OnInit {
             this.data = [];
             if (res.body?.data?.length) {
               this.data = res.body.data;
+              this.totalCount = res.body.total;
             } else {
               this.data = [];
             }

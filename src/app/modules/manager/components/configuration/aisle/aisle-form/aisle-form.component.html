@@ -1,1 +1,80 @@
-<p>aisle-form works!</p>
+<div class="rounded-md bg-white">
+      <!-- Form -->
+      <form nz-form [formGroup]="form" [nzLayout]="'vertical'" (ngSubmit)="handleForm()">
+            <div class="grid grid-cols-1 lg:gap-x-6 md:grid-cols-2 lg:grid-cols-3 border-[0.5px] p-4 rounded-md">
+                  <!-- Name -->
+                  <nz-form-item>
+                        <nz-form-label [nzRequired]="hasRequiredValidator('name')">Aisle/Zone Name</nz-form-label>
+                        <nz-form-control nzErrorTip="Aisle/Zone Name is Required.">
+                              <input formControlName="name" nz-input placeholder="Enter Aisle/Zone Name" />
+                        </nz-form-control>
+                  </nz-form-item>
+                  <!-- code -->
+                  <nz-form-item>
+                        <nz-form-label [nzRequired]="hasRequiredValidator('code')">Code</nz-form-label>
+                        <nz-form-control nzErrorTip="Code is Required.">
+                              <input formControlName="code" nz-input placeholder="Enter Code" />
+                        </nz-form-control>
+                  </nz-form-item>
+                  <!-- warehouse_oid -->
+                  <nz-form-item>
+                        <nz-form-label [nzRequired]="hasRequiredValidator('warehouse_oid')">Warehouse</nz-form-label>
+                        <nz-form-control nzErrorTip="Warehouse is required.">
+                              <nz-select class="w-full" formControlName="warehouse_oid" nz-input nzAllowClear
+                                    nzPlaceHolder="Select Warehouse">
+                                    <ng-container *ngFor="let item of warehouseList">
+                                          <nz-option [nzLabel]="item.label" [nzValue]="item.value"></nz-option>
+                                    </ng-container>
+                              </nz-select>
+                        </nz-form-control>
+                  </nz-form-item>
+                  <!-- capacity -->
+                  <nz-form-item>
+                        <nz-form-label [nzRequired]="hasRequiredValidator('capacity')">Capacity</nz-form-label>
+                        <nz-form-control nzErrorTip="Capacity is Required.">
+                              <input formControlName="capacity" nz-input placeholder="Enter Capacity" />
+                        </nz-form-control>
+                  </nz-form-item>
+                  <!-- type_of_storage -->
+                  <nz-form-item>
+                        <nz-form-label [nzRequired]="hasRequiredValidator('type_of_storage')">Type Of
+                              Storage</nz-form-label>
+                        <nz-form-control nzErrorTip="Type Of Storage is required.">
+                              <nz-select class="w-full" formControlName="type_of_storage" nz-input nzAllowClear
+                                    nzPlaceHolder="Select Type Of Storage">
+                                    <ng-container *ngFor="let item of storageTypes">
+                                          <nz-option [nzLabel]="item.label" [nzValue]="item.value"></nz-option>
+                                    </ng-container>
+                              </nz-select>
+                        </nz-form-control>
+                  </nz-form-item>
+                  <!-- Status -->
+                  <nz-form-item>
+                        <nz-form-label [nzRequired]="hasRequiredValidator('status')">Status</nz-form-label>
+                        <nz-form-control nzErrorTip="Status is required.">
+                              <nz-select class="w-full" formControlName="status" nz-input nzAllowClear
+                                    nzPlaceHolder="Select Status">
+                                    <nz-option nzLabel="Active" nzValue="Active"></nz-option>
+                                    <nz-option nzLabel="Inactive" nzValue="Inactive"></nz-option>
+                              </nz-select>
+                        </nz-form-control>
+                  </nz-form-item>
+                  <!-- special_notes -->
+                  <nz-form-item>
+                        <nz-form-label [nzRequired]="hasRequiredValidator('special_notes')">Special
+                              Notes</nz-form-label>
+                        <nz-form-control nzErrorTip="Special Notes is Required.">
+                              <textarea rows="2" formControlName="special_notes" nz-input
+                                    placeholder="Special Note (if any)" nzAutosize></textarea>
+                        </nz-form-control>
+                  </nz-form-item>
+            </div>
+            <!-- Actions -->
+            <div class="flex justify-end mt-4">
+                  <div class="flex items-center gap-4">
+                        <secondary-button (click)="goBack()" [label]="'Cancel'"></secondary-button>
+                        <primary-button [label]="'Submit'" [loading]="loading" [type]="'submit'"></primary-button>
+                  </div>
+            </div>
+      </form>
+</div>

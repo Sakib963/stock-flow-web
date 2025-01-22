@@ -1,1 +1,55 @@
-<p>view-aisle-details works!</p>
+<div class="p-4 space-y-3">
+      <h2 class="text-2xl font-medium mb-4 animate-text">Category Details</h2>
+      <app-loader *ngIf="loading" [isVisible]="loading"></app-loader>
+      <div *ngIf="!loading && itemDetails">
+            <!-- Edit mode On -->
+            <div *ngIf="editMode">
+                  <app-aisle-form [formData]="itemDetails" (actionEmitter)="handleActions($event)"></app-aisle-form>
+            </div>
+            <div *ngIf="!editMode">
+                  <div class="grid grid-cols-1 gap-x-6 gap-y-4 md:grid-cols-3 border-[0.5px] p-4 rounded-md">
+                        <!-- Name -->
+                        <div class="space-y-1">
+                              <p>Name</p>
+                              <p class="font-semibold">{{ itemDetails?.name }}</p>
+                        </div>
+                        <!-- code -->
+                        <div class="space-y-1">
+                              <p>Code</p>
+                              <p class="font-semibold">{{ itemDetails?.code }}</p>
+                        </div>
+                        <!-- warehouse_oid -->
+                        <div class="space-y-1">
+                              <p>Code</p>
+                              <p class="font-semibold">{{ itemDetails?.warehouse_name }}</p>
+                        </div>
+                        <!-- capacity -->
+                        <div class="space-y-1">
+                              <p>Capacity</p>
+                              <p class="font-semibold">{{ itemDetails?.capacity }}</p>
+                        </div>
+                        <!-- type_of_storage -->
+                        <div class="space-y-1">
+                              <p>Type Of Storage</p>
+                              <p class="font-semibold">{{ getStorageType(itemDetails?.type_of_storage) }}</p>
+                        </div>
+                        <!-- special_notes -->
+                        <div class="space-y-1">
+                              <p>Special Notes</p>
+                              <p class="font-semibold">{{ itemDetails?.special_notes }}</p>
+                        </div>
+                        <!-- status -->
+                        <div class="space-y-1">
+                              <p>Status</p>
+                              <p class="font-semibold">{{ itemDetails?.status }}</p>
+                        </div>
+                  </div>
+                  <!-- Actions -->
+                  <div class="flex justify-end mt-4">
+                        <div class="flex items-center gap-4">
+                              <secondary-button [label]="'Go Back'" type="button" (click)="goBack()"></secondary-button>
+                        </div>
+                  </div>
+            </div>
+      </div>
+</div>

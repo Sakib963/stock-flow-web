@@ -1,4 +1,5 @@
-<div class="p-4 border rounded-md shadow-md">
+<app-loader *ngIf="loading" [isVisible]="loading"></app-loader>
+<div *ngIf="!loading" class="p-4 border rounded-md shadow-md">
       <ul *ngIf="data.length" class="divide-y divide-gray-100">
             <ng-container *ngFor="let item of data">
                   <li class="grid grid-cols-3 gap-x-6 py-5">
@@ -47,5 +48,16 @@
             <h2 class="text-lg font-semibold text-black">No Data Found</h2>
             <p class="text-black">Try refining your search or adding new data.</p>
       </div>
+      <div class="bg-white grid grid-cols-1 h-16">
+            <div class="flex items-center justify-end mr-6">
+                  <nz-pagination [(nzPageIndex)]="currentIndex" [(nzPageSize)]="pageSize" [nzShowSizeChanger]="true"
+                        [nzShowTotal]="rangeTemplate" [nzTotal]="totalCount"
+                        (nzPageIndexChange)="onPageIndexChange($event)" (nzPageSizeChange)="onPageSizeChange($event)">
+                  </nz-pagination>
+                  <ng-template #rangeTemplate let-range="range" let-total>
+                        {{ range[0] }} - {{ range[1] }} of {{ total }} items
+                  </ng-template>
 
+            </div>
+      </div>
 </div>

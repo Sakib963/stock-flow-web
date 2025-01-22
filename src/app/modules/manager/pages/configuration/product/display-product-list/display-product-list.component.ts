@@ -1,7 +1,6 @@
 import { Component, DestroyRef, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import { LoaderComponent } from '@app/shared/components/loader/loader.component';
 import { NgZorroCustomModule } from '@app/shared/ng-zorro-custom.module';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router, ActivatedRoute } from '@angular/router';
@@ -17,7 +16,6 @@ import { PrimaryButtonWithPlusIcon } from '@app/shared/components/buttons/primar
   selector: 'app-display-product-list',
   standalone: true,
   imports: [CommonModule,
-      LoaderComponent,
       NgZorroCustomModule,
       ReactiveFormsModule,
       ViewProductListComponent,
