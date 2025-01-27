@@ -106,9 +106,9 @@ export class ProductFormComponent implements OnInit {
   }
 
   handleConfirm(): void {
-    let message = 'Do you want to create an product?';
+    let message = 'Do you want to create a product?';
     if (this.formData) {
-      message = 'Do you want to update this product?';
+      message = 'Are you sure you want to save these updates?';
     }
     this._modal.create({
       nzContent: ConfirmationModalComponent,

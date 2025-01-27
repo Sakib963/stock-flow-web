@@ -86,7 +86,7 @@ export class AisleFormComponent implements OnInit {
   handleConfirm(): void {
     let message = 'Do you want to create an aisle/zone?';
     if (this.formData) {
-      message = 'Do you want to update this aisle/zone?';
+      message = 'Are you sure you want to save these updates?';
     }
     this._modal.create({
       nzContent: ConfirmationModalComponent,

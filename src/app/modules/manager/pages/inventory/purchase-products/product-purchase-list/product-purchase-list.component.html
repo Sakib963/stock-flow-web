@@ -1,1 +1,26 @@
-<p>product-purchase-list works!</p>
+<div class="p-4 space-y-3">
+      <h2 class="text-2xl font-medium mb-4 animate-text">Purchase List</h2>
+      <div>
+            <div class="flex justify-between items-center mb-4">
+                  <!-- Search Text -->
+                  <div class="w-2/3 grid grid-cols-3">
+                        <div class="relative">
+                              <input id="searchControl" class="peer block h-10 custom-input" type="text"
+                                    [formControl]="searchControl" placeholder=" " />
+                              <label class="absolute top-2 left-1 origin-[0] -translate-y-4 scale-95 transform bg-white px-2 text-gray-500 duration-300 peer-placeholder-shown:top-1/2 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:scale-100 peer-focus:top-2 peer-focus:-translate-y-4 peer-focus:scale-95 peer-focus:px-2 peer-focus:text-primary-500 dark:bg-night-700"
+                                    for="searchControl">
+                                    Enter Search Text Here
+                              </label>
+                        </div>
+                  </div>
+                  <!-- Buttons -->
+                  <div class="flex justify-center items-center gap-4">
+                        <primary-button-with-plus-icon (click)="handleAdd()"
+                              [label]="'Add Purchase'"></primary-button-with-plus-icon>
+                  </div>
+            </div>
+            <app-view-product-list [loading]="loading" [data]="data" [totalCount]="totalCount"
+                  (actionEmitter)="handleListActions($event)"
+                  (paginationEvent)="handlePaginationEvent($event)"></app-view-product-list>
+      </div>
+</div>

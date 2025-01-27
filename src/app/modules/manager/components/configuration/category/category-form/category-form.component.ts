@@ -57,9 +57,9 @@ export class CategoryFormComponent implements OnInit {
   }
 
   handleConfirm(): void {
-    let message = 'Do you want to create an category?';
+    let message = 'Do you want to create a category?';
     if (this.formData) {
-      message = 'Do you want to update this category?';
+      message = 'Are you sure you want to save these updates?';
     }
     this._modal.create({
       nzContent: ConfirmationModalComponent,

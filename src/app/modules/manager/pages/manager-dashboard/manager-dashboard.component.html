@@ -1,70 +1,32 @@
-<div class=" bg-gray-100 p-4">
-      <!-- Feature Cards -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <!-- Product Catalog -->
-            <div class="bg-white shadow-md rounded-lg p-4 animate-slide-in-up">
-                  <h2 class="text-lg font-semibold text-gray-700">Product Catalog</h2>
-                  <p class="text-gray-600 mt-2">Manage and create individual products.</p>
-                  <button
-                  (click)="redirectToUrl('Product')"
-                        class="mt-4 bg-[#000000] text-white px-4 py-2 rounded-md hover:scale-105 hover:shadow-lg transform transition-transform duration-300">
-                        Go to Product Catalog
-                  </button>
-            </div>
-
-            <!-- Category Management -->
-            <div class="bg-white shadow-md rounded-lg p-4 animate-slide-in-up">
-                  <h2 class="text-lg font-semibold text-gray-700">Category Management</h2>
-                  <p class="text-gray-600 mt-2">Organize categories hierarchically.</p>
-                  <button
-                  (click)="redirectToUrl('Categories')"
-                        class="mt-4 bg-[#000000] text-white px-4 py-2 rounded-md hover:scale-105 hover:shadow-lg transform transition-transform duration-300">
-                        Manage Categories
-                  </button>
-            </div>
-
-            <!-- Batch Management -->
-            <div class="bg-white shadow-md rounded-lg p-4 animate-slide-in-up">
-                  <h2 class="text-lg font-semibold text-gray-700">Batch Management</h2>
-                  <p class="text-gray-600 mt-2">Track product batches with barcode generation.</p>
-                  <button
-                  (click)="redirectToUrl('Batches')"
-                        class="mt-4 bg-[#000000] text-white px-4 py-2 rounded-md hover:scale-105 hover:shadow-lg transform transition-transform duration-300">
-                        Manage Batches
-                  </button>
-            </div>
-
-            <!-- Product Storage -->
-            <div class="bg-white shadow-md rounded-lg p-4 animate-slide-in-up">
-                  <h2 class="text-lg font-semibold text-gray-700">Product Storage</h2>
-                  <p class="text-gray-600 mt-2">Link batches to warehouse locations.</p>
-                  <button
-                  (click)="redirectToUrl('Storage')"
-                        class="mt-4 bg-[#000000] text-white px-4 py-2 rounded-md hover:scale-105 hover:shadow-lg transform transition-transform duration-300">
-                        Manage Storage
-                  </button>
-            </div>
-
-            <!-- Batch-Specific Pricing -->
-            <div class="bg-white shadow-md rounded-lg p-4 animate-slide-in-up">
-                  <h2 class="text-lg font-semibold text-gray-700">Pricing & Cost Management</h2>
-                  <p class="text-gray-600 mt-2">Track pricing using FIFO, LIFO, or average methods.</p>
-                  <button
-                  (click)="redirectToUrl('Pricing')"
-                        class="mt-4 bg-[#000000] text-white px-4 py-2 rounded-md hover:scale-105 hover:shadow-lg transform transition-transform duration-300">
-                        View Pricing Details
-                  </button>
-            </div>
-
-            <!-- Order Management -->
-            <div class="bg-white shadow-md rounded-lg p-4 animate-slide-in-up">
-                  <h2 class="text-lg font-semibold text-gray-700">Order Management</h2>
-                  <p class="text-gray-600 mt-2">Sell from specific batches with details.</p>
-                  <button
-                  (click)="redirectToUrl('Orders')"
-                        class="mt-4 bg-[#000000] text-white px-4 py-2 rounded-md hover:scale-105 hover:shadow-lg transform transition-transform duration-300">
-                        Manage Orders
-                  </button>
-            </div>
-      </div>
+<div class="p-4 space-y-4">
+      <ul class="grid grid-cols-4 gap-4">
+            <li class="p-6 bg-[#F9F9F9] rounded-md flex items-center gap-6">
+                  <svg-icon src="assets/icons/dashboard/category.svg"></svg-icon>
+                  <span class="text">
+                        <h3 class="text-2xl font-semibold ">1020</h3>
+                        <p>Categories</p>
+                  </span>
+            </li>
+            <li class="p-6 bg-[#F9F9F9] rounded-md flex items-center gap-6">
+                  <svg-icon src="assets/icons/dashboard/source.svg"></svg-icon>
+                  <span class="text">
+                        <h3 class="text-2xl font-semibold ">2834</h3>
+                        <p>Supplier</p>
+                  </span>
+            </li>
+            <li class="p-6 bg-[#F9F9F9] rounded-md flex items-center gap-6">
+                  <svg-icon src="assets/icons/dashboard/warehouse.svg"></svg-icon>
+                  <span class="text">
+                        <h3 class="text-2xl font-semibold ">2543</h3>
+                        <p>Warehouse</p>
+                  </span>
+            </li>
+            <li class="p-6 bg-[#F9F9F9] rounded-md flex items-center gap-6">
+                  <svg-icon src="assets/icons/dashboard/product.svg"></svg-icon>
+                  <span class="text">
+                        <h3 class="text-2xl font-semibold ">164</h3>
+                        <p>Product</p>
+                  </span>
+            </li>
+      </ul>
 </div>

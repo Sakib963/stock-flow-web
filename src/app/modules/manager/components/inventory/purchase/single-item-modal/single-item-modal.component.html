@@ -1,0 +1,77 @@
+<div class="rounded-md bg-white max-w-full w-full">
+      <form nz-form [formGroup]="form" [nzLayout]="'vertical'" (ngSubmit)="handleForm()" class="space-y-4">
+            <div class="border-[0.5px] p-4 rounded-md">
+                  <h2 class="text-xl font-medium mb-4">Add Item</h2>
+                  <div class="grid grid-cols-1 md:gap-x-6 md:grid-cols-2 lg:grid-cols-3">
+                        <!-- Form -->
+                        <!-- product_oid -->
+                        <nz-form-item>
+                              <nz-form-label
+                                    [nzRequired]="hasRequiredValidator('product_oid')">Product</nz-form-label>
+                              <nz-form-control nzErrorTip="Product is required.">
+                                    <nz-select class="w-full" formControlName="product_oid" nz-input nzAllowClear
+                                          nzPlaceHolder="Select Product">
+                                          <ng-container *ngFor="let item of productList">
+                                                <nz-option [nzDisabled]="checkDisabledStatus(item.value)" [nzLabel]="item.label" [nzValue]="item.value"></nz-option>
+                                          </ng-container>
+                                    </nz-select>
+                              </nz-form-control>
+                        </nz-form-item>
+                        <!-- warehouse_oid -->
+                        <nz-form-item>
+                              <nz-form-label
+                                    [nzRequired]="hasRequiredValidator('warehouse_oid')">Warehouse</nz-form-label>
+                              <nz-form-control nzErrorTip="Warehouse is required.">
+                                    <nz-select class="w-full" formControlName="warehouse_oid" nz-input nzAllowClear
+                                          nzPlaceHolder="Select Warehouse">
+                                          <ng-container *ngFor="let item of warehouseList">
+                                                <nz-option [nzLabel]="item.label" [nzValue]="item.value"></nz-option>
+                                          </ng-container>
+                                    </nz-select>
+                              </nz-form-control>
+                        </nz-form-item>
+                        <!-- aisle_oid -->
+                        <nz-form-item>
+                              <nz-form-label
+                                    [nzRequired]="hasRequiredValidator('aisle_oid')">Aisle</nz-form-label>
+                              <nz-form-control nzErrorTip="Aisle is required.">
+                                    <nz-select class="w-full" formControlName="aisle_oid" nz-input nzAllowClear
+                                          nzPlaceHolder="Select Aisle">
+                                          <ng-container *ngFor="let item of aisleList">
+                                                <nz-option [nzLabel]="item.label" [nzValue]="item.value"></nz-option>
+                                          </ng-container>
+                                    </nz-select>
+                              </nz-form-control>
+                        </nz-form-item>
+                        <!-- quantity -->
+                        <nz-form-item>
+                              <nz-form-label [nzRequired]="hasRequiredValidator('quantity')">Quantity</nz-form-label>
+                              <nz-form-control nzErrorTip="Quantity is Required.">
+                                    <input formControlName="quantity" type="number" nz-input placeholder="Enter Quantity" />
+                              </nz-form-control>
+                        </nz-form-item>
+                        <!-- unit_price -->
+                        <nz-form-item>
+                              <nz-form-label [nzRequired]="hasRequiredValidator('unit_price')">Unit Price</nz-form-label>
+                              <nz-form-control nzErrorTip="Unit Price is Required.">
+                                    <input formControlName="unit_price" type="number" nz-input placeholder="Enter Unit Price" />
+                              </nz-form-control>
+                        </nz-form-item>
+                        <!-- total_price -->
+                        <nz-form-item>
+                              <nz-form-label [nzRequired]="hasRequiredValidator('total_price')">Total Price</nz-form-label>
+                              <nz-form-control nzErrorTip="Total Price is Required.">
+                                    <input formControlName="total_price" readonly type="number" nz-input placeholder="Enter Total Price" />
+                              </nz-form-control>
+                        </nz-form-item>
+                  </div>
+            </div>
+            <!-- Actions -->
+            <div class="flex justify-end mt-4">
+                  <div class="flex items-center gap-4">
+                        <secondary-button (click)="closeModal()" [label]="'Cancel'"></secondary-button>
+                        <primary-button [label]="'Submit'" [loading]="loading" [type]="'submit'"></primary-button>
+                  </div>
+            </div>
+      </form>
+</div>

@@ -241,6 +241,20 @@ const routes: Routes = [
                     './pages/inventory/purchase-products/product-purchase-list/product-purchase-list.component'
                   ).then((m) => m.ProductPurchaseListComponent),
               },
+              {
+                path: 'create-purchase',
+                loadComponent: () =>
+                  import(
+                    './pages/inventory/purchase-products/create-product-purchase/create-product-purchase.component'
+                  ).then((m) => m.CreateProductPurchaseComponent),
+              },
+              {
+                path: 'view-purchase/:oid',
+                loadComponent: () =>
+                  import(
+                    './pages/inventory/purchase-products/view-product-purchase/view-product-purchase.component'
+                  ).then((m) => m.ViewProductPurchaseComponent),
+              },
             ],
           },
           {
