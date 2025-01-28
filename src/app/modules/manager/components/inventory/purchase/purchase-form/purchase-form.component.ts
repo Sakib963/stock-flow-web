@@ -67,12 +67,12 @@ export class PurchaseFormComponent implements OnInit {
   createForm(): FormGroup {
     return this._fb.group({
       oid: [null],
-      bill_no: [null],
-      date_of_purchase: [null, [Validators.required]],
+      bill_no: [null, [Validators.required]],
+      date_of_purchase: [new Date(), [Validators.required]],
       supplier_oid: [null, [Validators.required]],
       total_amount: [null],
       special_notes: [null],
-      status: [null, [Validators.required]],
+      status: ['Active', [Validators.required]],
       products: [[]],
     });
   }
@@ -139,9 +139,9 @@ export class PurchaseFormComponent implements OnInit {
   }
 
   handleCardActions(event: any, index: number): void {
-    if (event.type === 'delete') {
+    if (event.action === 'delete') {
       this.removeProduct(index);
-    } else if (event.type === 'edit') {
+    } else if (event.action === 'edit') {
       this.editProduct(index);
     }
   }

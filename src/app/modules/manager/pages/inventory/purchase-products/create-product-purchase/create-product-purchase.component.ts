@@ -34,10 +34,8 @@ export class CreateProductPurchaseComponent {
 
   handleCreate(payload: any): any {
     this.loading = true;
-    console.log(payload);
-    
-    /* this._httpService
-      .post(APIEndpoint.CREATE_AISLE, payload)
+    this._httpService
+      .post(APIEndpoint.CREATE_PURCHASE, payload)
       .pipe(
         takeUntilDestroyed(this._destroyRef),
         finalize(() => (this.loading = false))
@@ -51,6 +49,6 @@ export class CreateProductPurchaseComponent {
           console.log(err);
           this._notificationService.error('Error!', err?.error?.message);
         },
-      }); */
+      });
   }
 }

@@ -186,20 +186,16 @@ export class SingleItemModalComponent {
   }
 
   loadAisleList(warehouse_oid: any): void {
-    this.loading = true;
     this._httpService
       .get(APIEndpoint.GET_AISLE_LIST_FOR_DROPDOWN, { warehouse_oid })
       .subscribe({
         next: (res: any) => {
-          this.loading = false;
           this.aisleList = [];
           if (res.body.code === 200) {
             this.aisleList = res.body.data;
           }
         },
-        error: () => {
-          this.loading = false;
-        },
+        error: () => {},
       });
   }
 }
