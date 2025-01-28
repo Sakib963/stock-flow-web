@@ -19,8 +19,8 @@
                               [label]="'Add Purchase'"></primary-button-with-plus-icon>
                   </div>
             </div>
-            <app-view-product-list [loading]="loading" [data]="data" [totalCount]="totalCount"
+            <app-view-purchase-list [loading]="loading" [data]="data" [totalCount]="totalCount"
                   (actionEmitter)="handleListActions($event)"
-                  (paginationEvent)="handlePaginationEvent($event)"></app-view-product-list>
+                  (paginationEvent)="handlePaginationEvent($event)"></app-view-purchase-list>
       </div>
 </div>

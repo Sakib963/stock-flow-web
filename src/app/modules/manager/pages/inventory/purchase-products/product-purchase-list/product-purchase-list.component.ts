@@ -8,9 +8,9 @@ import { Constants } from '@app/core/constants/constants';
 import { HttpService } from '@app/core/services/http.service';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { finalize } from 'rxjs';
-import { ViewProductListComponent } from '@app/modules/manager/components/configuration/product/view-product-list/view-product-list.component';
 import { PrimaryButtonWithPlusIcon } from '@app/shared/components/buttons/primary-button-with-plus-icon/primary-button-with-plus-icon.component';
 import { NgZorroCustomModule } from '@app/shared/ng-zorro-custom.module';
+import { ViewPurchaseListComponent } from '@app/modules/manager/components/inventory/purchase/view-purchase-list/view-purchase-list.component';
 
 @Component({
   selector: 'app-product-purchase-list',
@@ -18,7 +18,7 @@ import { NgZorroCustomModule } from '@app/shared/ng-zorro-custom.module';
   imports: [CommonModule,
       NgZorroCustomModule,
       ReactiveFormsModule,
-      ViewProductListComponent,
+      ViewPurchaseListComponent,
       PrimaryButtonWithPlusIcon],
   templateUrl: './product-purchase-list.component.html',
   styleUrls: ['./product-purchase-list.component.scss']
@@ -71,7 +71,7 @@ export class ProductPurchaseListComponent implements OnInit {
       this.loading = true;
     }
     this._httpService
-      .get(APIEndpoint.GET_PRODUCT_LIST, this.payload)
+      .get(APIEndpoint.GET_PURCHASE_LIST, this.payload)
       .pipe(
         takeUntilDestroyed(this._destroyRef),
         finalize(() => (this.loading = false))
