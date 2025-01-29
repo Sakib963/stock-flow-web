@@ -1,16 +1,16 @@
 <div
       class="w-full h-full  flex flex-col relative overflow-hidden bg-white divide-y-2 border border-[#C6C6C6] rounded-md shadow-lg hover:scale-95 transition-all duration-300 ease-in-out">
-      <div class="flex-grow p-4 flex flex-col text-[#180B26] font-extrabold text-xl space-y-2">
+      <div class="flex-grow p-4 flex flex-col text-secondary font-extrabold text-xl space-y-2">
             <span>{{itemDetails.product_name}}</span>
-            <p class="text-sm font-light text-[#180B26]">Quantity: {{itemDetails.quantity}}</p>
-            <p class="text-sm font-light text-[#180B26]">Unit Price: {{itemDetails.unit_price}}</p>
-            <p class="text-sm font-light text-[#180B26]">Total Price: {{itemDetails.total_price}}</p>
+            <p class="text-sm font-light text-secondary">Quantity: {{itemDetails.quantity}}</p>
+            <p class="text-sm font-light text-secondary">Unit Price: {{itemDetails.unit_price}}</p>
+            <p class="text-sm font-light text-secondary">Total Price: {{itemDetails.total_price}}</p>
       </div>
-      <div class="flex justify-between items-center w-full rounded-b-md overflow-hidden divide-x-2">
+      <div *ngIf="!isDisplay" class="flex justify-between items-center w-full rounded-b-md overflow-hidden divide-x-2">
             <button type="button" (click)="handleEdit()" class="flex justify-center items-center bg-white hover:bg-gray-300 w-full p-2  transition-all duration-300 ease-in-out">
                   <svg-icon src="/assets/icons/edit.svg"></svg-icon>
             </button>
-            <button type="button" (click)="handleDelete()" class="flex justify-center items-center bg-white hover:bg-gray-300 w-full p-2  transition-all duration-300 ease-in-out">
+            <button *ngIf="!isEdit" type="button" (click)="handleDelete()" class="flex justify-center items-center bg-white hover:bg-gray-300 w-full p-2  transition-all duration-300 ease-in-out">
                   <svg-icon src="/assets/icons/delete_dark.svg"></svg-icon>
             </button>
       </div>

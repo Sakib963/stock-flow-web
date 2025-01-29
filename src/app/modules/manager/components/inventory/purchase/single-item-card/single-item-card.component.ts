@@ -12,6 +12,8 @@ import { AngularSvgIconModule } from 'angular-svg-icon';
 export class SingleItemCardComponent {
   @Output() readonly actionEmitter: EventEmitter<object> = new EventEmitter();
   @Input() itemDetails: any;
+  @Input() isEdit: boolean = false;
+  @Input() isDisplay: boolean = false;
 
   handleEdit(): void {
     this.actionEmitter.emit({ action: 'edit' });

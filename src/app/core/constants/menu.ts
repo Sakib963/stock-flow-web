@@ -44,13 +44,7 @@ export class Menu {
         { icon: 'assets/icons/purchase.svg', label: 'Purchase', route: '/manager/inventory/purchase' },
         { icon: 'assets/icons/dispatch.svg', label: 'Dispatch', route: '/manager/inventory/dispatch' },
       ],
-    },
-    {
-      group: 'Tech',
-      items: [
-        { icon: 'assets/icons/category.svg', label: 'Portfolio', route: '/manager/portfolio' },
-      ],
-    },
+    }
   ];
 
   static menuItems: MenuItem[] = [

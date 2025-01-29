@@ -1,1 +1,59 @@
-<p>view-product-purchase works!</p>
+<div class="p-4 space-y-3">
+      <h2 class="text-2xl font-medium mb-4 animate-text">Product Details</h2>
+      <app-loader *ngIf="loading" [isVisible]="loading"></app-loader>
+      <div *ngIf="!loading && purchaseDetails">
+            <!-- Edit mode On -->
+            <div *ngIf="editMode">
+                  <app-purchase-form [formData]="purchaseDetails"
+                        (actionEmitter)="handleActions($event)"></app-purchase-form>
+            </div>
+            <div *ngIf="!editMode" class="space-y-4">
+                  <div class="grid grid-cols-1 gap-x-6 gap-y-4 md:grid-cols-3 border-[0.5px] p-4 rounded-md">
+                        <!-- Bill No -->
+                        <div class="space-y-1">
+                              <p>Bill No</p>
+                              <p class="font-semibold">{{ purchaseDetails?.bill_no }}</p>
+                        </div>
+                        <!-- date_of_purchase -->
+                        <div class="space-y-1">
+                              <p>Date Of Purchase</p>
+                              <p class="font-semibold">{{ purchaseDetails?.date_of_purchase_text }}</p>
+                        </div>
+                        <!-- Supplier -->
+                        <div class="space-y-1">
+                              <p>Supplier</p>
+                              <p class="font-semibold">{{ purchaseDetails?.supplier_name }}</p>
+                        </div>
+                        <!-- Total Amount -->
+                        <div class="space-y-1">
+                              <p>Total Amount</p>
+                              <p class="font-semibold">{{ purchaseDetails?.total_amount }}</p>
+                        </div>
+                        <!-- Special Notes -->
+                        <div class="space-y-1">
+                              <p>Special Notes</p>
+                              <p class="font-semibold">{{ purchaseDetails?.special_notes }}</p>
+                        </div>
+                        <!-- status -->
+                        <div class="space-y-1">
+                              <p>Status</p>
+                              <p class="font-semibold">{{ purchaseDetails?.status }}</p>
+                        </div>
+                  </div>
+                  <div class=" border-[0.5px] p-4 rounded-md">
+                        <h2 class="text-xl font-medium mb-4 animate-text">Products</h2>
+                        <div class="grid grid-cols-1 gap-x-6 gap-y-4 md:grid-cols-5">
+                              <ng-container *ngFor="let product of products">
+                                    <app-single-item-card [itemDetails]="product" [isDisplay]="true"></app-single-item-card>
+                              </ng-container>
+                        </div>
+                  </div>
+                  <!-- Actions -->
+                  <div class="flex justify-end mt-4">
+                        <div class="flex items-center gap-4">
+                              <secondary-button [label]="'Go Back'" (click)="goBack()"></secondary-button>
+                        </div>
+                  </div>
+            </div>
+      </div>
+</div>

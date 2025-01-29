@@ -27,7 +27,7 @@ import { HttpService } from '@app/core/services/http.service';
 import { APIEndpoint } from '@app/core/constants/api-endpoint';
 import { AngularSvgIconModule } from 'angular-svg-icon';
 import { SingleItemModalComponent } from '../single-item-modal/single-item-modal.component';
-import { SingleItemCardComponent } from "../single-item-card/single-item-card.component";
+import { SingleItemCardComponent } from '../single-item-card/single-item-card.component';
 
 @Component({
   selector: 'app-purchase-form',
@@ -39,8 +39,8 @@ import { SingleItemCardComponent } from "../single-item-card/single-item-card.co
     PrimaryButton,
     SecondaryButton,
     AngularSvgIconModule,
-    SingleItemCardComponent
-],
+    SingleItemCardComponent,
+  ],
   templateUrl: './purchase-form.component.html',
   styleUrls: ['./purchase-form.component.scss'],
 })
@@ -62,6 +62,10 @@ export class PurchaseFormComponent implements OnInit {
   ngOnInit(): void {
     this.form = this.createForm();
     this.loadSupplierList();
+
+    if (this.formData) {
+      this.form.patchValue(this.formData);
+    }
   }
 
   createForm(): FormGroup {
@@ -114,7 +118,7 @@ export class PurchaseFormComponent implements OnInit {
       nzClosable: false,
       nzWidth: 800,
       nzData: {
-        productsList: products
+        productsList: products,
       },
     });
 
@@ -155,6 +159,14 @@ export class PurchaseFormComponent implements OnInit {
     this.updateTotalAmount();
   }
 
+  getEditStatus():boolean {
+    if (this.formData) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   editProduct(index: number): void {
     const products = this.form.get('products')?.value || [];
 
@@ -166,7 +178,7 @@ export class PurchaseFormComponent implements OnInit {
       nzWidth: 800,
       nzData: {
         formData: products[index],
-        productsList: products
+        productsList: products,
       },
     });
 
