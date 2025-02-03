@@ -24,10 +24,10 @@ import { FooterComponent } from '@app/shared/components/footer/footer.component'
 export class LayoutComponent {
   isMenuOpen: boolean = false;
 
-  constructor(private _authService: AuthService) {}
+  constructor(public authService: AuthService) {}
 
   handleLogout(): any {
-    this._authService.logout();
+    this.authService.logout();
   }
 
   handleActions(event: any): any {

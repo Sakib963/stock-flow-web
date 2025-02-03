@@ -1,4 +1,9 @@
-<div class="h-screen flex flex-col">
+<div *ngIf="authService.isLoading" class="h-screen flex justify-center items-center">
+  <div class="mx-auto">
+    <div class="home_loader"></div>
+  </div>
+</div>
+<div *ngIf="!authService.isLoading" class="h-screen flex flex-col">
   <!-- Navbar -->
   <app-navbar class="flex-none" (actionEmitter)="handleActions($event)"></app-navbar>
 

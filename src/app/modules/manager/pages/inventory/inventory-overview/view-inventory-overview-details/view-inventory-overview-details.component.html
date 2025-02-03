@@ -1,0 +1,129 @@
+<div class="p-4 space-y-4">
+      <h2 class="text-2xl font-medium mb-4 animate-text">Product Details</h2>
+      <app-loader *ngIf="loading" [isVisible]="loading"></app-loader>
+      <div *ngIf="!loading && productDetails" class="grid grid-cols-1 gap-4 md:grid-cols-3">
+            <div class="md:col-span-2 space-y-4  order-2 md:order-1">
+                  <div class="grid grid-cols-1 gap-x-6 gap-y-4 md:grid-cols-3 border-[0.5px] p-4 rounded-md">
+                        <!-- Name -->
+                        <div class="space-y-1">
+                              <p>Product Name</p>
+                              <p class="font-semibold text-secondary">{{ productDetails?.name }}</p>
+                        </div>
+                        <!-- sku -->
+                        <div class="space-y-1">
+                              <p>SKU</p>
+                              <p class="font-semibold text-secondary">{{ productDetails?.sku }}</p>
+                        </div>
+                        <!-- Category -->
+                        <div class="space-y-1">
+                              <p>Category</p>
+                              <p class="font-semibold text-secondary">{{ productDetails?.category_name }}</p>
+                        </div>
+                        <!-- Sub Category -->
+                        <div class="space-y-1">
+                              <p>Sub Category</p>
+                              <p class="font-semibold text-secondary">{{ productDetails?.sub_category_name }}</p>
+                        </div>
+                        <!-- Unit Type -->
+                        <div class="space-y-1">
+                              <p>Unit Type</p>
+                              <p class="font-semibold text-secondary">{{ getLabel(productDetails?.unit_type,
+                                    'unit_type') }}</p>
+                        </div>
+                        <!-- Product Nature -->
+                        <div class="space-y-1">
+                              <p>Product Nature</p>
+                              <p class="font-semibold text-secondary">{{ getLabel(productDetails?.product_nature,
+                                    'product_nature') }}
+                              </p>
+                        </div>
+                        <!-- Restock Threshold -->
+                        <div class="space-y-1">
+                              <p>Restock Threshold</p>
+                              <p class="font-semibold text-secondary">{{ productDetails?.restock_threshold }}</p>
+                        </div>
+                        <!-- Description -->
+                        <div class="space-y-1">
+                              <p>Description</p>
+                              <p class="font-semibold text-secondary">{{ productDetails?.description }}</p>
+                        </div>
+                        <!-- status -->
+                        <div class="space-y-1">
+                              <p>Status</p>
+                              <p class="font-semibold text-secondary">{{ productDetails?.status }}</p>
+                        </div>
+                  </div>
+                  <!-- Batch Details -->
+                  <div class="border-[0.5px] p-4 rounded-md">
+                        <h2 class="text-xl font-medium mb-4 animate-text">Batch List</h2>
+                        <ul *ngIf="batch_data.length" class="divide-y divide-gray-100">
+                              <ng-container *ngFor="let item of batch_data">
+                                    <li class="grid md:grid-cols-3 gap-x-6 py-5">
+                                          <div class="flex min-w-0 gap-x-4">
+                                                <div class="min-w-0 flex-auto">
+                                                      <div class="text-sm/6 text-[#180B26] font-semibold flex gap-2">
+                                                            <p>Batch Code: <span class="font-normal">{{
+                                                                        item?.batch_code }}</span></p>
+                                                      </div>
+                                                      <p class="mt-1 truncate text-xs/5 text-[#180B26] font-semibold">
+                                                            Supplier: <span class="font-normal">{{
+                                                                  item?.supplier_name
+                                                                  }}</span></p>
+                                                      <p class="mt-1 truncate text-xs/5 text-[#180B26] font-semibold">
+                                                            Total Price: <span class="font-normal">{{
+                                                                  item?.total_price
+                                                                  }}</span></p>
+                                                </div>
+                                          </div>
+                                          <div>
+                                                <p class="mt-1 truncate text-xs/5 text-[#180B26] font-semibold">
+                                                      Unit Price: <span class="font-normal">{{
+                                                            item?.unit_price }}</span></p>
+                                                <p class="mt-1 truncate text-xs/5 text-[#180B26] font-semibold">
+                                                      Purchase Quantity:
+                                                      <span class="font-normal">{{ item?.purchase_quantity
+                                                            }}</span>
+                                                </p>
+                                                <p class="mt-1 truncate text-xs/5 text-[#180B26] font-semibold">
+                                                      Available Quantity:
+                                                      <span class="font-normal">{{ item?.available_quantity
+                                                            }}</span>
+                                                </p>
+                                          </div>
+                                          <div>
+                                                <p class="mt-1 truncate text-xs/5 text-gray-500 font-semibold">
+                                                      Warehouse: <span class="font-normal">{{
+                                                            item?.warehouse_name }}</span></p>
+                                                <p class="mt-1 truncate text-xs/5 text-gray-500 font-semibold">
+                                                      Aisle/Zone:
+                                                      <span class="font-normal">{{ item?.aisle_name
+                                                            }}</span>
+                                                </p>
+                                          </div>
+                                    </li>
+                              </ng-container>
+                        </ul>
+                        <div *ngIf="!batch_data.length"
+                              class="flex flex-col items-center justify-center h-full text-center bg-gray-50 p-8 rounded-md space-y-4">
+                              <img src="/assets/icons/no_data.svg" alt="No Data Found">
+                              <h2 class="text-lg font-semibold text-black">No Data Found</h2>
+                        </div>
+                  </div>
+            </div>
+            <div
+                  class="p-4 border-[0.5px] rounded-md shadow-md md:col-span-1 flex flex-col items-center justify-center order-1 md:order-2">
+                  <div class="w-full flex flex-col items-center h-full gap-4">
+                        <div class="flex-1 flex items-center justify-center w-full">
+                              <img class="w-3/4 max-h-full border-[0.5px] border-dashed rounded-md shadow-md object-contain"
+                                    [src]="productDetails.photo" alt="Product Photo">
+                        </div>
+                  </div>
+            </div>
+      </div>
+      <!-- Actions -->
+      <div class="flex justify-end mt-4">
+            <div class="flex items-center gap-4">
+                  <secondary-button [label]="'Go Back'" (click)="goBack()"></secondary-button>
+            </div>
+      </div>
+</div>

@@ -51,4 +51,7 @@ export class APIEndpoint {
   static UPDATE_PURCHASE_DETAILS = "/api/v1/manager/purchase/update-purchase-details";
   static GET_PURCHASE_DETAILS = "/api/v1/manager/purchase/get-purchase-details";
   static GET_PURCHASE_LIST_FOR_DROPDOWN = "/api/v1/manager/purchase/get-purchase-list-for-dropdown";
+
+  static GET_PRODUCT_LIST_FOR_OVERVIEW = "/api/v1/manager/inventory-overview/get-product-list";
+  static GET_PRODUCT_DETAILS_FOR_OVERVIEW = "/api/v1/manager/inventory-overview/get-product-details";
 }

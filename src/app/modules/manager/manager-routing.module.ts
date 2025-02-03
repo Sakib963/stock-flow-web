@@ -221,10 +221,22 @@ const routes: Routes = [
           },
           {
             path: 'overview',
-            loadComponent: () =>
-              import(
-                './pages/inventory/inventory-overview/inventory-overview.component'
-              ).then((m) => m.InventoryOverviewComponent),
+            children: [
+              {
+                path: '',
+                loadComponent: () =>
+                  import(
+                    './pages/inventory/inventory-overview/inventory-overview-list/inventory-overview-list.component'
+                  ).then((m) => m.InventoryOverviewListComponent),
+              },
+              {
+                path: 'view-product/:oid',
+                loadComponent: () =>
+                  import(
+                    './pages/inventory/inventory-overview/view-inventory-overview-details/view-inventory-overview-details.component'
+                  ).then((m) => m.ViewInventoryOverviewDetailsComponent),
+              },
+            ]
           },
           {
             path: 'purchase',

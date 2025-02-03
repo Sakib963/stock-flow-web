@@ -16,9 +16,6 @@ export class ManagerDashboardComponent {
   redirectToUrl(type: any): any {
     console.log(type);
     if (type === 'Product') {
-      // this._router.navigate(['../product-list'], {
-      //   relativeTo: this._activatedRoute,
-      // });
     } else if (type === 'Categories') {
       this._router.navigate(['/category/category-list']);
     }
