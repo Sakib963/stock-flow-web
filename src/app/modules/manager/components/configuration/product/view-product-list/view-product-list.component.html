@@ -2,7 +2,7 @@
 <div *ngIf="!loading" class="p-4 border rounded-md shadow-md">
       <ul *ngIf="data.length" class="divide-y divide-gray-100">
             <ng-container *ngFor="let item of data">
-                  <li class="grid grid-cols-3 gap-x-6 py-5">
+                  <li class="grid md:grid-cols-3 gap-x-6 py-5">
                         <div class="flex min-w-0 gap-x-4">
                               <img *ngIf="item?.photo" class="size-12 flex-none rounded-full bg-gray-50"
                                     [src]="item.photo" alt="Picture Of User">
@@ -24,7 +24,7 @@
                                           class="font-normal">{{ item?.source_name }}</span></p>
                         </div>
                         <div class="flex justify-end">
-                              <div class="hidden shrink-0 sm:flex sm:flex-col sm:items-center">
+                              <div class="shrink-0 sm:flex sm:flex-col sm:items-center">
                                     <div class="mt-1 text-xs/5 text-black flex justify-center items-center gap-4">
                                           <button (click)="handleAction('view', item)">
                                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
