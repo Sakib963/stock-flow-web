@@ -99,6 +99,9 @@ export class LoginPageComponent implements OnInit {
               } else if (res.data.role === ROLES.MANAGER) {
                 this._router.navigate(['/manager/dashboard']);
                 console.log(this.authService.currentUserRole);
+              } else if (res.data.role === ROLES.GUEST) {
+                this.authService.setGuestUser(true);
+                this._router.navigate(['/manager/dashboard']);
               }
             }
           },

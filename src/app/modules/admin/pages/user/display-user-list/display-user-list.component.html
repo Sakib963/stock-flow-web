@@ -2,9 +2,9 @@
       <h2 class="text-2xl font-medium mb-4 animate-text">User List</h2>
       <app-loader *ngIf="loading" [isVisible]="loading"></app-loader>
       <div *ngIf="!loading">
-            <div class="flex justify-between items-center mb-4">
+            <div class="md:flex justify-between items-center mb-4">
                   <!-- Search Text -->
-                  <div class="w-2/3 grid grid-cols-3">
+                  <div class="md:w-2/3 grid lg:grid-cols-3">
                         <div class="relative">
                               <input id="searchControl" class="peer block h-10 custom-input" type="text"
                                     [formControl]="searchControl" placeholder=" " />
@@ -15,19 +15,9 @@
                         </div>
                   </div>
                   <!-- Buttons -->
-                  <div class="flex justify-center items-center gap-4">
-                        <button (click)="handleAddUser()"
-                              class="uppercase flex w-full justify-center items-center rounded-md border border-transparent bg-[#000000] py-2 px-4 font-medium text-white focus:outline-none hover:bg-[#000000] transition ease-in-out delay-150 hover:scale-95 duration-300 disabled:cursor-wait"
-                              type="button">
-                              <div class="flex justify-center items-center gap-4">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                          stroke-width="1.5" stroke="currentColor" class="size-6">
-                                          <path stroke-linecap="round" stroke-linejoin="round"
-                                                d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                                    </svg>
-                                    <p>Add User</p>
-                              </div>
-                        </button>
+                  <div class="flex justify-end md:justify-center items-center gap-4 mt-4 md:mt-0">
+                        <primary-button-with-plus-icon (click)="handleAddUser()"
+                              [label]="'Add User'"></primary-button-with-plus-icon>
                   </div>
             </div>
             <app-view-user-list [data]="data" (actionEmitter)="handleListActions($event)"></app-view-user-list>

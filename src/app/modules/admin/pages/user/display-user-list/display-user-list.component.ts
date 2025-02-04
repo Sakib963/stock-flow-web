@@ -11,6 +11,7 @@ import { ViewUserListComponent } from '@app/modules/admin/components/user/view-u
 import { LoaderComponent } from '@app/shared/components/loader/loader.component';
 import { NgZorroCustomModule } from '@app/shared/ng-zorro-custom.module';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
+import { PrimaryButtonWithPlusIcon } from '@app/shared/components/buttons/primary-button-with-plus-icon/primary-button-with-plus-icon.component';
 
 @Component({
   selector: 'app-display-user-list',
@@ -21,6 +22,7 @@ import { FormControl, ReactiveFormsModule } from '@angular/forms';
     LoaderComponent,
     NgZorroCustomModule,
     ReactiveFormsModule,
+    PrimaryButtonWithPlusIcon
   ],
   templateUrl: './display-user-list.component.html',
   styleUrls: ['./display-user-list.component.scss'],

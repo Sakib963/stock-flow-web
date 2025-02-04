@@ -21,6 +21,7 @@ export class AuthService {
     designation: ''
   });
   loading = signal(false);
+  private isGuestUser = false;
 
   constructor(
     private _httpClient: HttpClient,
@@ -28,6 +29,14 @@ export class AuthService {
     private _notificationService: NzNotificationService
   ) {
     this.baseUrl = environment.baseUrl;
+  }
+
+  setGuestUser(status: boolean) {
+    this.isGuestUser = status;
+  }
+
+  getGuestUserStatus(): boolean {
+    return this.isGuestUser;
   }
 
   get isLoading(): any {

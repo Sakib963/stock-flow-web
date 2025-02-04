@@ -22,7 +22,7 @@
                         <p *ngIf="!form.controls['photo'].value" class="text-xs text-gray-500">
                               PNG, JPG, JPEG up to 500KB
                         </p>
-                        <input type="file" accept=".png,.jpg,.jpeg,.gif" #fileInput class="hidden"
+                        <input disableForGuest type="file" accept=".png,.jpg,.jpeg,.gif" #fileInput class="hidden"
                               (change)="onFileSelected($event)" />
                         <div *ngIf="form.controls['photo'].value"
                               class="w-full flex flex-col items-center h-full gap-4">

@@ -6,6 +6,7 @@ import {
 } from '@angular/router';
 import { Observable, catchError, finalize, tap, throwError } from 'rxjs';
 import { AuthService } from 'src/app/modules/auth/services/auth.service';
+import { ROLES } from '../constants/constants';
 
 export const UserInfoResolver: ResolveFn<any> = (
   route: ActivatedRouteSnapshot,
@@ -22,6 +23,9 @@ export const UserInfoResolver: ResolveFn<any> = (
         mobile_number: res.data.mobile_number || '',
         designation: res.data.designation || '',
       });
+      if (res.data.role === ROLES.GUEST) {
+        authService.setGuestUser(true);
+      }
     }),
     finalize(() => {
       authService.loading.set(false);

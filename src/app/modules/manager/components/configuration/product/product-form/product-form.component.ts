@@ -32,6 +32,7 @@ import { DangerButton } from '@app/shared/components/buttons/danger-button/dange
 import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { FileService } from '@app/core/services/file.service';
 import { LoaderComponent } from '@app/shared/components/loader/loader.component';
+import { DisableForGuestDirective } from '@app/shared/directives/guest-user.directive';
 
 @Component({
   selector: 'app-product-form',
@@ -44,6 +45,7 @@ import { LoaderComponent } from '@app/shared/components/loader/loader.component'
     SecondaryButton,
     DangerButton,
     LoaderComponent,
+    DisableForGuestDirective
   ],
   templateUrl: './product-form.component.html',
   styleUrls: ['./product-form.component.scss'],

@@ -16,7 +16,6 @@ import {
 } from '@angular/forms';
 import {
   checkRequiredValidator,
-  convertImageToBase64,
   markFormGroupTouched,
 } from '@app/core/constants/helper';
 import { HttpService } from '@app/core/services/http.service';
@@ -24,6 +23,9 @@ import { NzModalService } from 'ng-zorro-antd/modal';
 import { SpinnerComponent } from '@app/shared/components/spinner/spinner.component';
 import { ConfirmationModalComponent } from '@app/shared/components/confirmation-modal/confirmation-modal.component';
 import { ROLES } from '@app/core/constants/constants';
+import { FileService } from '@app/core/services/file.service';
+import { NzNotificationService } from 'ng-zorro-antd/notification';
+import { LoaderComponent } from '@app/shared/components/loader/loader.component';
 
 @Component({
   selector: 'app-user-form',
@@ -33,6 +35,7 @@ import { ROLES } from '@app/core/constants/constants';
     NgZorroCustomModule,
     ReactiveFormsModule,
     SpinnerComponent,
+    LoaderComponent
   ],
   templateUrl: './user-form.component.html',
   styleUrls: ['./user-form.component.scss'],
@@ -42,6 +45,7 @@ export class UserFormComponent implements OnInit {
   @Input() formData: any;
   @Input() loading: boolean = false;
   form!: FormGroup;
+  imgLoading: boolean = false;
 
   roleList: any[] = [];
 
@@ -49,7 +53,9 @@ export class UserFormComponent implements OnInit {
     private _fb: FormBuilder,
     private _modal: NzModalService,
     private _httpService: HttpService,
-    private _destroyRef: DestroyRef
+    private _destroyRef: DestroyRef,
+    private _notificationService: NzNotificationService,
+    private _fileService: FileService
   ) {
     this.roleList = Object.values(ROLES);
   }
@@ -121,8 +127,27 @@ export class UserFormComponent implements OnInit {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files[0]) {
       const file = input.files[0];
-      convertImageToBase64(file).then((base64) => {
-        this.form.controls['photo'].setValue(base64);
+      const maxSizeInBytes = 500 * 1024; // 500 KB
+      if (file.size > maxSizeInBytes) {
+        this._notificationService.error(
+          'Error',
+          'File size exceeds 500 KB. Please upload a smaller file.'
+        );
+        return;
+      }
+
+      this.imgLoading = true;
+      this._fileService.uploadImage(file).subscribe({
+        next: (res: any) => {
+          const imageUrl = res.secure_url;
+          this.form.controls['photo'].setValue(imageUrl);
+          this.imgLoading = false;
+        },
+        error: (err: any) => {
+          this._notificationService.error('Error', 'Failed to upload image');
+          console.error('Image upload error:', err);
+          this.imgLoading = false;
+        },
       });
     }
   }

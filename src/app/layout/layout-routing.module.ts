@@ -34,7 +34,7 @@ const routes: Routes = [
             (m) => m.ManagerModule
           ),
         canActivate: [RoleGuard],
-        data: { roles: [ROLES.MANAGER] },
+        data: { roles: [ROLES.MANAGER, ROLES.GUEST] },
       },
     ],
   },
