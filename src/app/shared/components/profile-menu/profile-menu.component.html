@@ -1,29 +1,25 @@
 <div class="relative pr-2">
       <div class="relative flex items-center gap-6 text-sm">
             <!-- Notification Button -->
-            <div class="flex gap-2">
-                  <button class="relative" type="button">
-                        <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" stroke-width="2"
-                              viewBox="0 0 24 24">
-                              <path stroke-linecap="round" stroke-linejoin="round"
-                                    d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14V9a6 6 0 00-12 0v5c0 .386-.146.752-.405 1.095L4 17h5m6 0a3 3 0 11-6 0" />
-                        </svg>
-                        <span *ngIf="notifications.length"
-                              class="absolute -top-2 -right-2 bg-red-500 text-white text-xs px-1.5 py-0.5 rounded-full">{{
-                              notifications.length }}</span>
-                  </button>
-            </div>
+            <button class="relative" type="button" (click)="handleNotificationClick()">
+                  <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" stroke-width="2"
+                        viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                              d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14V9a6 6 0 00-12 0v5c0 .386-.146.752-.405 1.095L4 17h5m6 0a3 3 0 11-6 0" />
+                  </svg>
+                  <span *ngIf="notifications.length"
+                        class="absolute -top-2 -right-2 bg-red-500 text-white text-xs px-1.5 py-0.5 rounded-full">{{
+                        notifications.length }}</span>
+            </button>
             <!-- Profile Button -->
-            <div class="flex gap-2" (clickOutside)="isDropdownOpen = false">
-                  <button (click)="toggleDropdown()" type="button">
-                        <img *ngIf="userInfo.photo" [src]="userInfo.photo" alt="User Avatar"
-                              class="w-10 h-10 rounded-full object-cover outline outline-1 outline-primary">
-                        <div *ngIf="!userInfo.photo"
-                              class="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center font-medium text-gray-700 border">
-                              {{ getFirstLetter(userInfo.name) }}
-                        </div>
-                  </button>
-            </div>
+            <button (click)="toggleDropdown()" type="button">
+                  <img *ngIf="userInfo.photo" [src]="userInfo.photo" alt="User Avatar"
+                        class="w-10 h-10 rounded-full object-cover outline outline-1 outline-primary">
+                  <div *ngIf="!userInfo.photo"
+                        class="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center font-medium text-gray-700 border">
+                        {{ getFirstLetter(userInfo.name) }}
+                  </div>
+            </button>
       </div>
       <!-- Dropdown -->
       <nz-drawer [nzVisible]="isDropdownOpen" [nzSize]="'default'" (nzOnClose)="toggleDropdown()"

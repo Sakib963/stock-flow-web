@@ -1,14 +1,18 @@
 import { Component, EventEmitter, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '@app/modules/auth/services/auth.service';
-import { ClickOutsideDirective } from '@app/shared/directives/click-outside.directive';
 import { NgZorroCustomModule } from '@app/shared/ng-zorro-custom.module';
 import { AngularSvgIconModule } from 'angular-svg-icon';
+import { NzNotificationService } from 'ng-zorro-antd/notification';
 
 @Component({
   selector: 'app-profile-menu',
   standalone: true,
-  imports: [CommonModule, ClickOutsideDirective, NgZorroCustomModule, AngularSvgIconModule],
+  imports: [
+    CommonModule,
+    NgZorroCustomModule,
+    AngularSvgIconModule,
+  ],
   templateUrl: './profile-menu.component.html',
   styleUrls: ['./profile-menu.component.scss'],
 })
@@ -18,7 +22,10 @@ export class ProfileMenuComponent {
   userInfo: any;
   isDropdownOpen: boolean = false;
 
-  constructor(private _authService: AuthService) {
+  constructor(
+    private _authService: AuthService,
+    private _notificationService: NzNotificationService
+  ) {
     this.userInfo = this._authService.userInfo;
   }
 
@@ -40,5 +47,9 @@ export class ProfileMenuComponent {
 
   navigateTo(route: any): void {
     console.log(route);
+  }
+
+  handleNotificationClick(): void {
+    this._notificationService.info('Sorry!', 'Sorry! This feature is not available right now!')
   }
 }
