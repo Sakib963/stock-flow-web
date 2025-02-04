@@ -1,7 +1,12 @@
 import { Component, DestroyRef, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { FormGroup, FormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
+import {
+  FormGroup,
+  FormBuilder,
+  Validators,
+  ReactiveFormsModule,
+} from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { ROLES } from '@app/core/constants/constants';
 import { markFormGroupTouched } from '@app/core/constants/helper';
@@ -25,7 +30,7 @@ import { AngularSvgIconModule } from 'angular-svg-icon';
     SpinnerComponent,
   ],
   templateUrl: './login-page-secondary.component.html',
-  styleUrls: ['./login-page-secondary.component.scss']
+  styleUrls: ['./login-page-secondary.component.scss'],
 })
 export class LoginPageSecondaryComponent implements OnInit {
   form!: FormGroup;
@@ -86,6 +91,9 @@ export class LoginPageSecondaryComponent implements OnInit {
                 role: res.data.role,
                 name: res.data.name,
                 email: res.data.email,
+                photo: '',
+                mobile_number: res.data.mobile_number,
+                designation: res.data.designation,
               });
               if (res.data.role === ROLES.ADMIN) {
                 this._router.navigate(['/admin/dashboard']);
@@ -108,6 +116,9 @@ export class LoginPageSecondaryComponent implements OnInit {
               role: '',
               name: '',
               email: '',
+              photo: '',
+              mobile_number: '',
+              designation: '',
             });
           },
         });
@@ -137,4 +148,3 @@ export class LoginPageSecondaryComponent implements OnInit {
     }
   }
 }
-

@@ -1,0 +1,73 @@
+<div class="relative pr-2">
+      <div class="relative flex items-center gap-6 text-sm">
+            <!-- Notification Button -->
+            <div class="flex gap-2">
+                  <button class="relative" type="button">
+                        <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" stroke-width="2"
+                              viewBox="0 0 24 24">
+                              <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14V9a6 6 0 00-12 0v5c0 .386-.146.752-.405 1.095L4 17h5m6 0a3 3 0 11-6 0" />
+                        </svg>
+                        <span *ngIf="notifications.length"
+                              class="absolute -top-2 -right-2 bg-red-500 text-white text-xs px-1.5 py-0.5 rounded-full">{{
+                              notifications.length }}</span>
+                  </button>
+            </div>
+            <!-- Profile Button -->
+            <div class="flex gap-2" (clickOutside)="isDropdownOpen = false">
+                  <button (click)="toggleDropdown()" type="button">
+                        <img *ngIf="userInfo.photo" [src]="userInfo.photo" alt="User Avatar"
+                              class="w-10 h-10 rounded-full object-cover outline outline-1 outline-primary">
+                        <div *ngIf="!userInfo.photo"
+                              class="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center font-medium text-gray-700 border">
+                              {{ getFirstLetter(userInfo.name) }}
+                        </div>
+                  </button>
+            </div>
+      </div>
+      <!-- Dropdown -->
+      <nz-drawer [nzVisible]="isDropdownOpen" [nzSize]="'default'" (nzOnClose)="toggleDropdown()"
+            [nzTitle]="profileDropdownHeader" [nzKeyboard]="true">
+            <ng-container *nzDrawerContent>
+                  <div (click)="$event.stopPropagation()" class="flex flex-col justify-between h-full">
+                        <div class="space-y-4">
+                              <img *ngIf="userInfo.photo" [src]="userInfo.photo" alt="User Avatar"
+                                    class="w-20 h-20 mx-auto rounded-full object-cover outline outline-1 outline-primary">
+                              <div *ngIf="!userInfo.photo"
+                                    class="w-20 h-20 mx-auto rounded-full bg-gray-300 flex items-center justify-center font-medium text-gray-700 border">
+                                    {{ getFirstLetter(userInfo.name) }}
+                              </div>
+                              <nz-divider></nz-divider>
+                              <nz-descriptions [nzColumn]="1" nzTitle="Personal Details">
+                                    <nz-descriptions-item nzTitle="Full Name"><span class="font-semibold">{{
+                                                userInfo.name }}</span></nz-descriptions-item>
+                                    <nz-descriptions-item nzTitle="Account"><span class="font-semibold">{{
+                                                userInfo.email }}</span></nz-descriptions-item>
+                                    <nz-descriptions-item nzTitle="Designation"><span class="font-semibold">{{
+                                                userInfo.designation
+                                                }}</span></nz-descriptions-item>
+                                    <nz-descriptions-item nzTitle="Mobile No"><span class="font-semibold">{{
+                                                userInfo.mobile_number
+                                                }}</span></nz-descriptions-item>
+                              </nz-descriptions>
+                              <nz-divider></nz-divider>
+                        </div>
+                        <button (click)="handleLogout()"
+                              class="flex w-full justify-center cursor-pointer items-center gap-2 rounded-md p-2 outline outline-1 outline-primary hover:outline-none hover:bg-[#DF1463] hover:text-white transition-all duration-300 ease-in-out">
+                              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
+                                    stroke="currentColor" aria-hidden="true" class="h-4 w-4">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                          d="M5.636 5.636a9 9 0 1012.728 0M12 3v9"></path>
+                              </svg>
+                              <p class="block text-sm leading-normal antialiased">
+                                    Sign Out
+                              </p>
+                        </button>
+                  </div>
+            </ng-container>
+      </nz-drawer>
+
+      <ng-template #profileDropdownHeader>
+            <h2 class="text-2xl font-medium animate-text">Profile</h2>
+      </ng-template>
+</div>

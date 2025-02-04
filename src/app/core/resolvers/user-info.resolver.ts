@@ -18,6 +18,9 @@ export const UserInfoResolver: ResolveFn<any> = (
         role: res.data.role || '',
         name: res.data.name || '',
         email: res.data.email || '',
+        photo: res.data.photo || '',
+        mobile_number: res.data.mobile_number || '',
+        designation: res.data.designation || '',
       });
     }),
     finalize(() => {

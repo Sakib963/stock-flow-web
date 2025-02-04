@@ -16,6 +16,9 @@ export class AuthService {
     role: '',
     name: '',
     email: '',
+    photo: '',
+    mobile_number: '',
+    designation: ''
   });
   loading = signal(false);
 

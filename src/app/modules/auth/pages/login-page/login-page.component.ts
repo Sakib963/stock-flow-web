@@ -89,6 +89,9 @@ export class LoginPageComponent implements OnInit {
                 role: res.data.role,
                 name: res.data.name,
                 email: res.data.email,
+                photo: res.data.photo,
+                mobile_number: res.data.mobile_number,
+                designation: res.data.designation,
               });
               if (res.data.role === ROLES.ADMIN) {
                 this._router.navigate(['/admin/dashboard']);
@@ -111,6 +114,9 @@ export class LoginPageComponent implements OnInit {
               role: '',
               name: '',
               email: '',
+              photo: '',
+              mobile_number: '',
+              designation: '',
             });
           },
         });
