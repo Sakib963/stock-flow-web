@@ -15,10 +15,12 @@ export class RedirectComponent implements OnInit {
   constructor(private _authService: AuthService, private _router: Router) {}
 
   ngOnInit(): void {
-    if (this._authService.currentUserRole === ROLES.ADMIN) {
-      this._router.navigate(['/admin/dashboard']);
-    } else if (this._authService.currentUserRole === ROLES.MANAGER) {
-      this._router.navigate(['/manager/dashboard']);
+    if (!this._authService.isLoading) {
+      if (this._authService.currentUserRole === ROLES.ADMIN) {
+        this._router.navigate(['/admin/dashboard']);
+      } else if (this._authService.currentUserRole === ROLES.MANAGER || this._authService.currentUserRole === ROLES.GUEST) {
+        this._router.navigate(['/manager/dashboard']);
+      }
     }
   }
 }
