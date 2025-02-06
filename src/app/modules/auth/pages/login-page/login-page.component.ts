@@ -59,7 +59,7 @@ export class LoginPageComponent implements OnInit {
   createForm(): FormGroup {
     return this._fb.group({
       email: [null, [Validators.required]],
-      password: ['asdfgh', [Validators.required]],
+      password: [null, [Validators.required]],
     });
   }
 
@@ -71,6 +71,20 @@ export class LoginPageComponent implements OnInit {
     this.passwordTextType = !this.passwordTextType;
   }
 
+  copyToClipboard(button: HTMLButtonElement): void {
+    const password = 'stockflow123';
+    navigator.clipboard.writeText(password).then(() => {
+      button.innerText = 'Copied! ✅';
+      button.classList.add('text-green-600');
+
+      // Reset text after 2 seconds
+      setTimeout(() => {
+        button.innerText = 'Click to Copy';
+        button.classList.remove('text-green-600');
+      }, 2000);
+    });
+  }
+
   handleForm(): any {
     this.submitted = true;
 
@@ -79,8 +93,8 @@ export class LoginPageComponent implements OnInit {
       this.authService
         .login(this.form.getRawValue())
         .pipe(
-          takeUntilDestroyed(this._destroyRef),
-          finalize(() => this.authService.loading.set(false))
+          takeUntilDestroyed(this._destroyRef)
+          // finalize(() => this.authService.loading.set(false))
         )
         .subscribe({
           next: (res: any) => {
@@ -95,10 +109,8 @@ export class LoginPageComponent implements OnInit {
               });
               if (res.data.role === ROLES.ADMIN) {
                 this._router.navigate(['/admin/dashboard']);
-                console.log(this.authService.currentUserRole);
               } else if (res.data.role === ROLES.MANAGER) {
                 this._router.navigate(['/manager/dashboard']);
-                console.log(this.authService.currentUserRole);
               } else if (res.data.role === ROLES.GUEST) {
                 this.authService.setGuestUser(true);
                 this._router.navigate(['/manager/dashboard']);
@@ -107,12 +119,13 @@ export class LoginPageComponent implements OnInit {
           },
           error: (e) => {
             console.log(e);
-
+            this.authService.loading.set(false);
             if (e.status == 404) {
               this._notificationService.error('Error!', e?.message);
             }
           },
           complete: () => {
+            this.authService.loading.set(false);
             this.authService._userInfo.set({
               role: '',
               name: '',

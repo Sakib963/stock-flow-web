@@ -7,52 +7,76 @@
     <!-- Features -->
     <ul class="space-y-4">
       <li class="flex items-start gap-3">
-        <span class="flex h-10 w-10 items-center justify-center rounded-full bg-primary-500 text-black">
+        <span class="flex-shrink-0 flex h-10 w-10 items-center justify-center rounded-full bg-primary-500 text-black">
           <img src="assets/icons/inventory.svg" alt="Inventory Icon" class="h-8 w-8">
         </span>
-        <div>
+        <div class="flex-1">
           <h2 class="text-lg font-semibold text-gray-800">Streamlined Inventory</h2>
           <p class="text-sm text-gray-600">Effortlessly track and manage your stock in real time.</p>
         </div>
       </li>
 
       <li class="flex items-start gap-3">
-        <span class="flex h-10 w-10 items-center justify-center rounded-full bg-primary-500 text-black">
+        <span class="flex-shrink-0 flex h-10 w-10 items-center justify-center rounded-full bg-primary-500 text-black">
           <img src="assets/icons/order.svg" alt="Order Icon" class="h-8 w-8">
         </span>
-        <div>
+        <div class="flex-1">
           <h2 class="text-lg font-semibold text-gray-800">Order Management</h2>
-          <p class="text-sm text-gray-600">Simplify your order tracking and fulfillment process.</p>
+          <p class="text-sm text-gray-600">Simplify your order tracking and fulfillment of the process.</p>
         </div>
       </li>
 
       <li class="flex items-start gap-3">
-        <span class="flex h-10 w-10 items-center justify-center rounded-full bg-primary-500 text-black">
+        <span class="flex-shrink-0 flex h-10 w-10 items-center justify-center rounded-full bg-primary-500 text-black">
           <img src="assets/icons/data.svg" alt="Insights Icon" class="h-8 w-8">
         </span>
-        <div>
+        <div class="flex-1">
           <h2 class="text-lg font-semibold text-gray-800">Data Insights</h2>
           <p class="text-sm text-gray-600">Get actionable reports to make smarter business decisions.</p>
         </div>
       </li>
 
       <li class="flex items-start gap-3">
-        <span class="flex h-10 w-10 items-center justify-center rounded-full bg-primary-500 text-black">
+        <span class="flex-shrink-0 flex h-10 w-10 items-center justify-center rounded-full bg-primary-500 text-black">
           <img src="assets/icons/shipping.svg" alt="Shipping Icon" class="h-8 w-8">
         </span>
-        <div>
+        <div class="flex-1">
           <h2 class="text-lg font-semibold text-gray-800">Seamless Shipping</h2>
-          <p class="text-sm text-gray-600">Coordinate deliveries and logistics with ease.</p>
+          <p class="text-sm text-gray-600">Coordinate deliveries, logistics and handle every scenario with ease.</p>
         </div>
       </li>
 
       <li class="flex items-start gap-3">
-        <span class="flex h-10 w-10 items-center justify-center rounded-full bg-primary-500 text-black">
+        <span class="flex-shrink-0 flex h-10 w-10 items-center justify-center rounded-full bg-primary-500 text-black">
           <img src="assets/icons/welcome.svg" alt="Welcome Icon" class="h-8 w-8">
         </span>
-        <div>
+        <div class="flex-1">
           <h2 class="text-lg font-semibold text-gray-800">Welcome to StockFlow!</h2>
           <p class="text-sm text-gray-600">Transform your warehouse operations in just a few clicks.</p>
+        </div>
+      </li>
+
+      <li class="flex items-start gap-3">
+        <span class="flex-shrink-0 flex h-10 w-10 items-center justify-center rounded-full bg-primary-500 text-black">
+          <img src="assets/icons/info.svg" alt="Info Icon" class="h-8 w-8">
+        </span>
+        <div class="flex-1">
+          <h2 class="text-lg font-semibold text-gray-800">No Sign-ups, No Fuss!</h2>
+          <p class="text-sm text-gray-600">
+            Just log in and start exploring! Because who has time to sign up anyway?
+          </p>
+          <div class="mt-2 space-y-1 rounded-lg">
+            <p class="text-sm text-gray-600">
+              <strong>Email:</strong> guest&#64;stockflow.com
+            </p>
+            <p class="text-sm text-gray-600 flex items-center gap-2">
+              <strong>Password:</strong>
+              <button #copyButton class="text-blue-600 hover:text-blue-800 transition"
+                (click)="copyToClipboard(copyButton)">
+                Click to Copy
+              </button>
+            </p>
+          </div>
         </div>
       </li>
     </ul>

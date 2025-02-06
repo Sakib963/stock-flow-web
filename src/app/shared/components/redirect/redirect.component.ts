@@ -3,11 +3,12 @@ import { CommonModule } from '@angular/common';
 import { AuthService } from '@app/modules/auth/services/auth.service';
 import { Router } from '@angular/router';
 import { ROLES } from '@app/core/constants/constants';
+import { LoaderComponent } from '../loader/loader.component';
 
 @Component({
   selector: 'app-redirect',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, LoaderComponent],
   templateUrl: './redirect.component.html',
   styleUrls: ['./redirect.component.scss'],
 })
