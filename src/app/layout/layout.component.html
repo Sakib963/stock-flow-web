@@ -27,9 +27,9 @@
 
     <!-- Main Content Area -->
     <div class="flex-grow flex flex-col">
-      <div class="flex-grow overflow-auto bg-[#E7EAEF] stockflow-scrollbar mb-[78px]">
+      <div class="flex-grow overflow-auto bg-[#E7EAEF] stockflow-scrollbar">
         <div class="p-4 shadow-inherit rounded-md">
-          <div class="bg-white rounded-md shadow-lg">
+          <div class="bg-white rounded-md shadow-lg mb-14">
             <router-outlet></router-outlet>
           </div>
         </div>
@@ -37,7 +37,7 @@
 
       <!-- Footer -->
       <app-footer
-        class="fixed bottom-0 left-0 right-0 mt-4 lg:flex justify-end gap-4 border-t border-gray-200 bg-white bg-opacity-50 p-4 backdrop-blur-sm lg:ml-64">
+        class="fixed bottom-0 left-0 right-0 lg:flex justify-end gap-4 border-t border-gray-200 bg-white bg-opacity-50 backdrop-blur-sm lg:ml-64">
       </app-footer>
     </div>
   </div>
