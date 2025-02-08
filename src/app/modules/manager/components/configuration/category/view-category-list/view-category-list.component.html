@@ -1,5 +1,5 @@
 <app-loader *ngIf="loading" [isVisible]="loading"></app-loader>
-<div *ngIf="!loading" class="p-4 border rounded-md shadow-md">
+<div *ngIf="!loading" class="p-4 border rounded-md">
       <ul *ngIf="data.length" class="divide-y divide-gray-100">
             <ng-container *ngFor="let item of data">
                   <li class="grid md:grid-cols-3 gap-x-6 py-5">
