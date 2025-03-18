@@ -10,7 +10,9 @@ import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { finalize } from 'rxjs';
 import { PrimaryButtonWithPlusIcon } from '@app/shared/components/buttons/primary-button-with-plus-icon/primary-button-with-plus-icon.component';
 import { NgZorroCustomModule } from '@app/shared/ng-zorro-custom.module';
-import { ViewAisleListComponent } from '@app/modules/manager/components/configuration/aisle/view-aisle-list/view-aisle-list.component';
+import { ListModel } from '@app/core/models/list.model';
+import { AISLE_LIST_CONFIG } from '@app/core/constants/list-config';
+import { ListComponent } from '@app/shared/components/list/list.component';
 
 @Component({
   selector: 'app-display-aisle-list',
@@ -19,7 +21,7 @@ import { ViewAisleListComponent } from '@app/modules/manager/components/configur
     CommonModule,
     NgZorroCustomModule,
     ReactiveFormsModule,
-    ViewAisleListComponent,
+    ListComponent,
     PrimaryButtonWithPlusIcon,
   ],
   templateUrl: './display-aisle-list.component.html',
@@ -37,6 +39,7 @@ export class DisplayAisleListComponent implements OnInit {
   };
   isFilter: boolean = false;
   searchControl: FormControl = new FormControl('');
+  listConfig!: ListModel;
 
   constructor(
     private _httpService: HttpService,
@@ -47,6 +50,7 @@ export class DisplayAisleListComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.listConfig = AISLE_LIST_CONFIG;
     this.loadList();
     this.searchControl.valueChanges.subscribe((value) => {
       this.onSearchChange(value);

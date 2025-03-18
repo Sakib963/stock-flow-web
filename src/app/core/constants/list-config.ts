@@ -2,11 +2,14 @@ import { ListModel } from '../models/list.model';
 
 export const AISLE_LIST_CONFIG: ListModel = {
   columns: [
-    { type: 'text', label: 'ID', key: '5%' },
-    { type: 'text', label: 'Name', key: '20%' },
-    { type: 'text', label: 'Email', key: '25%' },
-    { type: 'text', label: 'Role', key: '15%' },
-    { type: 'text', label: 'Action', key: '10%' },
+    [
+      { type: 'text', label: 'Aisle/Zone Name', key: 'name' },
+      { type: 'text', label: 'Warehouse', key: 'warehouse_name' },
+    ],
+    [
+      { type: 'text', label: 'Code', key: 'code' },
+      { type: 'text', label: 'Capacity', key: 'capacity' },
+    ],
   ],
-  actions: ['view', 'edit']
+  actions: ['view', 'edit'],
 };

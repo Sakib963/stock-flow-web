@@ -1,10 +1,10 @@
 export interface ColumnModel {
-  type: 'text' | 'image'; // Strictly allows only 'text' or 'image'
+  type: 'text' | 'image'; // Only 'text' or 'image' allowed
   label: string;
   key: string;
 }
 
 export interface ListModel {
-  columns: ColumnModel[];
-  actions: ('view' | 'edit')[]; // Ensures the array contains only 'view' or 'edit'
+  columns: ColumnModel[][]; // Now an array of arrays of ColumnModel
+  actions: ('view' | 'edit')[];
 }
