@@ -13,6 +13,7 @@ import { NgZorroCustomModule } from '@app/shared/ng-zorro-custom.module';
 import { ListModel } from '@app/core/models/list.model';
 import { AISLE_LIST_CONFIG } from '@app/core/constants/list-config';
 import { ListComponent } from '@app/shared/components/list/list.component';
+import { ViewToggleComponent } from '@app/shared/components/view-toggle/view-toggle.component';
 
 @Component({
   selector: 'app-display-aisle-list',
@@ -22,12 +23,14 @@ import { ListComponent } from '@app/shared/components/list/list.component';
     NgZorroCustomModule,
     ReactiveFormsModule,
     ListComponent,
+    ViewToggleComponent,
     PrimaryButtonWithPlusIcon,
   ],
   templateUrl: './display-aisle-list.component.html',
   styleUrls: ['./display-aisle-list.component.scss'],
 })
 export class DisplayAisleListComponent implements OnInit {
+  isGridView: boolean = true;
   data: any[] = [];
   totalCount: number = 0;
   loading: boolean = false;
