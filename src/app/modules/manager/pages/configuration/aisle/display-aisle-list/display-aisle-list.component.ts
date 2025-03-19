@@ -30,7 +30,7 @@ import { ViewToggleComponent } from '@app/shared/components/view-toggle/view-tog
   styleUrls: ['./display-aisle-list.component.scss'],
 })
 export class DisplayAisleListComponent implements OnInit {
-  isGridView: boolean = true;
+  isListView: boolean = true;
   data: any[] = [];
   totalCount: number = 0;
   loading: boolean = false;
@@ -133,5 +133,13 @@ export class DisplayAisleListComponent implements OnInit {
       relativeTo: this._activatedRoute,
       state: { edit: true },
     });
+  }
+
+  handleToggleChange(event: any): void {
+    if (event.action === 'toggle') {
+      this.isListView = event.value;
+      console.log(this.isListView, 'from aisle list');
+      
+    }
   }
 }

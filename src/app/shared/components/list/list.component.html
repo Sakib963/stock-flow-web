@@ -1,6 +1,6 @@
 <app-loader *ngIf="loading" [isVisible]="loading"></app-loader>
 <div *ngIf="!loading" class="p-4 border rounded-md">
-      <ul *ngIf="data.length" class="divide-y divide-gray-100">
+      <ul *ngIf="data.length" [class]="getULClass()">
             <ng-container *ngFor="let item of data">
                   <li [class]="getListParentClass()">
                         <ng-container *ngFor="let row of listConfig.columns; let rowIndex = index;">

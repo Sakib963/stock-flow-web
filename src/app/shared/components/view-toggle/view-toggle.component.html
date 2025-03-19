@@ -1,22 +1,16 @@
-<!-- <div class="flex border rounded-md divide-black divide-x-2">
-      <button (click)="isGridView = true" [ngClass]="isGridView ? 'bg-primary' : ''"
-            class="p-2 hover:bg-gray-200">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 6.75h4.5m4.5 0h6M4.5 12h15m-15 5.25h15">
-                  </path>
-            </svg>
-      </button>
-
-      <button (click)="isGridView = false" [ngClass]="isGridView ? '' : 'bg-primary'"
-            class="p-2 hover:bg-gray-200">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round"
-                        d="M3.75 6.75h4.5v4.5h-4.5zM3.75 13.5h4.5v4.5h-4.5zM10.5 6.75h4.5v4.5h-4.5zM10.5 13.5h4.5v4.5h-4.5zM17.25 6.75h4.5v4.5h-4.5zM17.25 13.5h4.5v4.5h-4.5z">
-                  </path>
-            </svg>
-      </button>
-</div> -->
-<nz-radio-group [(ngModel)]="isGridView" nzSize="large" nzButtonStyle="solid">
-      <div nz-radio-button [nzValue]="true">List</div>
-      <div nz-radio-button [nzValue]="false">Card</div>
-</nz-radio-group>
+<input id="switch" [formControl]="toggle" (ngModelChange)="handleToggleChange()" type="checkbox">
+<div class="content">
+      <label for="switch">
+            <div class="toggle"></div>
+            <div class="names">
+                  <div class="flex gap-1 items-center">
+                        <img src="assets/icons/card.svg" alt="Grid Icon">
+                        <p>Grid</p>
+                  </div>
+                  <div class="flex gap-1 items-center">
+                        <img src="assets/icons/list.svg" alt="List Icon">
+                        <p>List</p>
+                  </div>
+            </div>
+      </label>
+</div>

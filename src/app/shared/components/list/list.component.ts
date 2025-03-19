@@ -19,6 +19,7 @@ export class ListComponent {
   @Output() paginationEvent: EventEmitter<object> = new EventEmitter();
   @Input() loading: boolean = false;
   @Input() totalCount: number = 0;
+  @Input() isListView: boolean = true;
 
   currentIndex: number = 1;
   offset: number = 0;
@@ -44,6 +45,18 @@ export class ListComponent {
   getListParentClass(): string {
     const columnLength = this.listConfig?.columns.length;
     const actionLength = this.listConfig?.actions.length ? 1 : 0;
-    return `grid md:grid-cols-${columnLength + actionLength} gap-x-6 py-5`;
+    if (this.isListView) {
+      return `grid md:grid-cols-${columnLength + actionLength} gap-x-6 py-5`;
+    } else {
+      return `grid gap-6 p-5 border rounded-sm`;
+    }
+  }
+
+  getULClass(): string {
+    if (this.isListView) {
+      return 'divide-y divide-gray-100';
+    } else {
+      return 'grid grid-cols-3 gap-6 ';
+    }
   }
 }

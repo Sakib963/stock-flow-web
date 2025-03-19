@@ -1,0 +1,74 @@
+.content {
+  display: flex;
+  text-align: center;
+}
+
+label,
+.toggle {
+  height: 2.8rem;
+  border-radius: 10px;
+}
+
+label {
+  width: 100%;
+  background-color: rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  position: relative;
+  cursor: pointer;
+}
+
+.toggle {
+  position: absolute;
+  width: 50%;
+  background-color: #fff;
+  -webkit-box-shadow: 0 2px 15px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 2px 15px rgba(0, 0, 0, 0.15);
+  -webkit-transition: -webkit-transform 0.3s
+    cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  transition: -webkit-transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    -webkit-transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.names {
+  gap: 66px;
+  font-size: 90%;
+  font-weight: bolder;
+  color: #1c1c1d;
+  width: 65%;
+  margin-left: 12.5%;
+  margin-top: 5%;
+  position: absolute;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: justify;
+  -ms-flex-pack: justify;
+  justify-content: space-between;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+/* -------- Switch Styles ------------*/
+[type="checkbox"] {
+  display: none;
+}
+/* Toggle */
+[type="checkbox"]:checked + .content .toggle {
+  -webkit-transform: translateX(100%);
+  -ms-transform: translateX(100%);
+  transform: translateX(100%);
+  background-color: #fff;
+}
+
+[type="checkbox"]:checked {
+  opacity: 1;
+  background-color: #fff;
+  color: #1c1c1d;
+  -webkit-transform: scale(1);
+  -ms-transform: scale(1);
+  transform: scale(1);
+  background: #26242e;
+}

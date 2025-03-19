@@ -12,7 +12,10 @@
                                     Enter Search Text Here
                               </label>
                         </div>
-                        <view-toggle [isGridView]="isGridView"></view-toggle>
+                        <div class=" md:w-1/2">
+                              <view-toggle [isListView]="isListView"
+                                    (actionEmitter)="handleToggleChange($event)"></view-toggle>
+                        </div>
                   </div>
                   <!-- Buttons -->
                   <div class="flex justify-end md:justify-center items-center gap-4 mt-4 md:mt-0">
@@ -24,6 +27,7 @@
                   (actionEmitter)="handleListActions($event)"
                   (paginationEvent)="handlePaginationEvent($event)"></app-view-aisle-list> -->
             <list [listConfig]="listConfig" [loading]="loading" [data]="data" [totalCount]="totalCount"
-                  (actionEmitter)="handleListActions($event)" (paginationEvent)="handlePaginationEvent($event)"></list>
+                  (actionEmitter)="handleListActions($event)" (paginationEvent)="handlePaginationEvent($event)"
+                  [isListView]="isListView"></list>
       </div>
 </div>
