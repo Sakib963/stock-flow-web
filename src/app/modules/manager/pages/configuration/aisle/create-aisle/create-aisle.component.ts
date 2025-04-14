@@ -1,6 +1,6 @@
 import { Component, DestroyRef } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
-import { AisleFormComponent } from '@app/modules/manager/components/configuration/aisle/aisle-form/aisle-form.component';
+import { AisleFormComponent } from '@app/modules/manager/components/configuration/aisle-form/aisle-form.component';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { APIEndpoint } from '@app/core/constants/api-endpoint';
 import { HttpService } from '@app/core/services/http.service';

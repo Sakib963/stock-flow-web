@@ -137,9 +137,11 @@ export class DisplayAisleListComponent implements OnInit {
 
   handleToggleChange(event: any): void {
     if (event.action === 'toggle') {
-      this.isListView = event.value;
-      console.log(this.isListView, 'from aisle list');
-      
+      this.loading = true;
+      setTimeout(() => {
+        this.loading = false;
+        this.isListView = event.value;
+      }, 300);
     }
   }
 }

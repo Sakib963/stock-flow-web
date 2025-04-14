@@ -2,7 +2,7 @@ import { Component, DestroyRef, Input, OnInit } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { SecondaryButton } from '@app/shared/components/buttons/secondary-button/secondary-button.component';
 import { LoaderComponent } from '@app/shared/components/loader/loader.component';
-import { AisleFormComponent } from '@app/modules/manager/components/configuration/aisle/aisle-form/aisle-form.component';
+import { AisleFormComponent } from '@app/modules/manager/components/configuration/aisle-form/aisle-form.component';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router, ActivatedRoute } from '@angular/router';
 import { APIEndpoint } from '@app/core/constants/api-endpoint';

@@ -26,7 +26,7 @@
 
                               <!-- Middle Indexes Template -->
                               <ng-container *ngIf="rowIndex !== 0">
-                                    <div class="flex items-center justify-center">
+                                    <div class="flex items-center " [ngClass]="isListView ? 'justify-center' : ''">
                                           <div>
                                                 <ng-container *ngFor="let child of row;">
                                                       <p class="mt-1 truncate text-xs/5 text-gray-500 font-semibold">{{
@@ -71,7 +71,7 @@
 
 
             </ng-container>
-            <div class="bg-white grid grid-cols-1 h-16">
+            <div [ngClass]="isListView ? 'bg-white grid grid-cols-1 h-16': 'bg-white col-span-3 grid grid-cols-1 h-16'">
                   <div class="flex items-center justify-end mr-6">
                         <nz-pagination [(nzPageIndex)]="currentIndex" [(nzPageSize)]="pageSize"
                               [nzShowSizeChanger]="true" [nzShowTotal]="rangeTemplate" [nzTotal]="totalCount"

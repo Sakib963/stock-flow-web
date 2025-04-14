@@ -23,9 +23,6 @@
                               [label]="'Add Aisle/Zone'"></primary-button-with-plus-icon>
                   </div>
             </div>
-            <!-- <app-view-aisle-list [loading]="loading" [data]="data" [totalCount]="totalCount"
-                  (actionEmitter)="handleListActions($event)"
-                  (paginationEvent)="handlePaginationEvent($event)"></app-view-aisle-list> -->
             <list [listConfig]="listConfig" [loading]="loading" [data]="data" [totalCount]="totalCount"
                   (actionEmitter)="handleListActions($event)" (paginationEvent)="handlePaginationEvent($event)"
                   [isListView]="isListView"></list>

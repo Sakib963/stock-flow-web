@@ -48,7 +48,7 @@ export class ListComponent {
     if (this.isListView) {
       return `grid md:grid-cols-${columnLength + actionLength} gap-x-6 py-5`;
     } else {
-      return `grid gap-6 p-5 border rounded-sm`;
+      return `grid gap-1 p-5 border rounded-md`;
     }
   }
 
@@ -56,7 +56,7 @@ export class ListComponent {
     if (this.isListView) {
       return 'divide-y divide-gray-100';
     } else {
-      return 'grid grid-cols-3 gap-6 ';
+      return '';
     }
   }
 }
