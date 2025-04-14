@@ -3,7 +3,7 @@
       <div>
             <div class="md:flex justify-between items-center mb-4">
                   <!-- Search Text -->
-                  <div class="md:w-2/3 grid lg:grid-cols-3">
+                  <div class="md:w-4/5 grid lg:grid-cols-3 gap-8">
                         <div class="relative">
                               <input id="searchControl" class="peer block h-10 custom-input" type="text"
                                     [formControl]="searchControl" placeholder=" " />
@@ -12,6 +12,10 @@
                                     Enter Search Text Here
                               </label>
                         </div>
+                        <div class=" md:w-1/2">
+                              <view-toggle [isListView]="isListView"
+                                    (actionEmitter)="handleToggleChange($event)"></view-toggle>
+                        </div>
                   </div>
                   <!-- Buttons -->
                   <div class="flex justify-end md:justify-center items-center gap-4 mt-4 md:mt-0">
@@ -19,7 +23,8 @@
                               [label]="'Add Category'"></primary-button-with-plus-icon>
                   </div>
             </div>
-            <app-view-category-list [loading]="loading" [data]="data" [totalCount]="totalCount" (actionEmitter)="handleListActions($event)"
-                  (paginationEvent)="handlePaginationEvent($event)"></app-view-category-list>
+            <list [listConfig]="listConfig" [loading]="loading" [data]="data" [totalCount]="totalCount"
+                  (actionEmitter)="handleListActions($event)" (paginationEvent)="handlePaginationEvent($event)"
+                  [isListView]="isListView"></list>
       </div>
 </div>

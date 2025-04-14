@@ -5,7 +5,7 @@ import { APIEndpoint } from '@app/core/constants/api-endpoint';
 import { HttpService } from '@app/core/services/http.service';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { finalize } from 'rxjs';
-import { CategoryFormComponent } from '@app/modules/manager/components/configuration/category/category-form/category-form.component';
+import { CategoryFormComponent } from '@app/modules/manager/components/configuration/category-form/category-form.component';
 
 @Component({
   selector: 'app-create-category',

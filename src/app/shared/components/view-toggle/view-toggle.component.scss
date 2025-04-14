@@ -38,7 +38,7 @@ label {
   color: #1c1c1d;
   width: 65%;
   margin-left: 12.5%;
-  margin-top: 5%;
+  margin-top: 3.5%;
   position: absolute;
   display: -webkit-box;
   display: -ms-flexbox;
@@ -71,4 +71,11 @@ label {
   -ms-transform: scale(1);
   transform: scale(1);
   background: #26242e;
+}
+
+
+@media (min-width: 768px) {
+  .names {
+    margin-top: 5%;
+  }
 }

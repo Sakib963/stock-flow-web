@@ -11,6 +11,10 @@ import { finalize } from 'rxjs';
 import { PrimaryButtonWithPlusIcon } from '@app/shared/components/buttons/primary-button-with-plus-icon/primary-button-with-plus-icon.component';
 import { NgZorroCustomModule } from '@app/shared/ng-zorro-custom.module';
 import { ViewSubCategoryListComponent } from '@app/modules/manager/components/configuration/sub-category/view-sub-category-list/view-sub-category-list.component';
+import { ListComponent } from '@app/shared/components/list/list.component';
+import { ViewToggleComponent } from '@app/shared/components/view-toggle/view-toggle.component';
+import { ListModel } from '@app/core/models/list.model';
+import { AISLE_LIST_CONFIG, SUB_CATEGORY_LIST_CONFIG } from '@app/core/constants/list-config';
 
 @Component({
   selector: 'app-display-sub-category-list',
@@ -19,13 +23,15 @@ import { ViewSubCategoryListComponent } from '@app/modules/manager/components/co
     CommonModule,
     NgZorroCustomModule,
     ReactiveFormsModule,
-    ViewSubCategoryListComponent,
+    ListComponent,
+    ViewToggleComponent,
     PrimaryButtonWithPlusIcon,
   ],
   templateUrl: './display-sub-category-list.component.html',
   styleUrls: ['./display-sub-category-list.component.scss'],
 })
 export class DisplaySubCategoryListComponent implements OnInit {
+  isListView: boolean = true;
   data: any[] = [];
   totalCount: number = 0;
   loading: boolean = false;
@@ -37,6 +43,7 @@ export class DisplaySubCategoryListComponent implements OnInit {
   };
   isFilter: boolean = false;
   searchControl: FormControl = new FormControl('');
+  listConfig!: ListModel;
 
   constructor(
     private _httpService: HttpService,
@@ -47,6 +54,7 @@ export class DisplaySubCategoryListComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.listConfig = SUB_CATEGORY_LIST_CONFIG;
     this.loadList();
     this.searchControl.valueChanges.subscribe((value) => {
       this.onSearchChange(value);
@@ -125,5 +133,15 @@ export class DisplaySubCategoryListComponent implements OnInit {
       relativeTo: this._activatedRoute,
       state: { edit: true },
     });
+  }
+
+  handleToggleChange(event: any): void {
+    if (event.action === 'toggle') {
+      this.loading = true;
+      setTimeout(() => {
+        this.loading = false;
+        this.isListView = event.value;
+      }, 300);
+    }
   }
 }

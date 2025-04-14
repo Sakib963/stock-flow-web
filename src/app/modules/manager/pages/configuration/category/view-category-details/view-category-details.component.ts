@@ -7,7 +7,7 @@ import { APIEndpoint } from '@app/core/constants/api-endpoint';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { finalize, map } from 'rxjs';
 import { LoaderComponent } from '@app/shared/components/loader/loader.component';
-import { CategoryFormComponent } from '@app/modules/manager/components/configuration/category/category-form/category-form.component';
+import { CategoryFormComponent } from '@app/modules/manager/components/configuration/category-form/category-form.component';
 import { SecondaryButton } from '@app/shared/components/buttons/secondary-button/secondary-button.component';
 
 @Component({

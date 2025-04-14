@@ -9,8 +9,11 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { HttpService } from '@app/core/services/http.service';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { finalize } from 'rxjs';
-import { ViewCategoryListComponent } from '@app/modules/manager/components/configuration/category/view-category-list/view-category-list.component';
 import { PrimaryButtonWithPlusIcon } from '@app/shared/components/buttons/primary-button-with-plus-icon/primary-button-with-plus-icon.component';
+import { ListComponent } from '@app/shared/components/list/list.component';
+import { ViewToggleComponent } from '@app/shared/components/view-toggle/view-toggle.component';
+import { ListModel } from '@app/core/models/list.model';
+import { AISLE_LIST_CONFIG, CATEGORY_LIST_CONFIG } from '@app/core/constants/list-config';
 
 @Component({
   selector: 'app-display-category-list',
@@ -19,13 +22,15 @@ import { PrimaryButtonWithPlusIcon } from '@app/shared/components/buttons/primar
     CommonModule,
     NgZorroCustomModule,
     ReactiveFormsModule,
-    ViewCategoryListComponent,
+    ListComponent,
+    ViewToggleComponent,
     PrimaryButtonWithPlusIcon
   ],
   templateUrl: './display-category-list.component.html',
   styleUrls: ['./display-category-list.component.scss'],
 })
 export class DisplayCategoryListComponent implements OnInit {
+  isListView: boolean = true;
   data: any[] = [];
   totalCount: number = 0;
   loading: boolean = false;
@@ -37,6 +42,7 @@ export class DisplayCategoryListComponent implements OnInit {
   };
   isFilter: boolean = false;
   searchControl: FormControl = new FormControl('');
+  listConfig!: ListModel;
 
   constructor(
     private _httpService: HttpService,
@@ -47,6 +53,7 @@ export class DisplayCategoryListComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.listConfig = CATEGORY_LIST_CONFIG;
     this.loadList();
     this.searchControl.valueChanges.subscribe((value) => {
       this.onSearchChange(value);
@@ -125,5 +132,15 @@ export class DisplayCategoryListComponent implements OnInit {
       relativeTo: this._activatedRoute,
       state: { edit: true },
     });
+  }
+
+  handleToggleChange(event: any): void {
+    if (event.action === 'toggle') {
+      this.loading = true;
+      setTimeout(() => {
+        this.loading = false;
+        this.isListView = event.value;
+      }, 300);
+    }
   }
 }

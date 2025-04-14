@@ -56,7 +56,7 @@ export class ListComponent {
     if (this.isListView) {
       return 'divide-y divide-gray-100';
     } else {
-      return '';
+      return 'space-y-4 md:space-y-0 md:grid md:grid-cols-3 md:gap-6';
     }
   }
 }
