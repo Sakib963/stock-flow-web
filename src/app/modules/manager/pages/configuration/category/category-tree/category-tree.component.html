@@ -1,0 +1,30 @@
+<div class="p-4 space-y-3">
+      <h2 class="text-2xl font-medium mb-4 animate-text">Category Tree</h2>
+      <nz-tree-view *ngIf="categoryTreeData.length" [nzTreeControl]="treeControl" [nzDataSource]="dataSource">
+            <nz-tree-node *nzTreeNodeDef="let node" nzTreeNodePadding>
+                  <nz-tree-node-toggle nzTreeNodeNoopToggle></nz-tree-node-toggle>
+                  <nz-tree-node-option [nzDisabled]="node.disabled" [nzSelected]="selectListSelection.isSelected(node)"
+                        (nzClick)="selectListSelection.toggle(node)">
+                        <span nz-icon nzType="file" nzTreeNodeToggleRotateIcon></span>
+                        {{ node.name }}
+                  </nz-tree-node-option>
+            </nz-tree-node>
+
+            <nz-tree-node *nzTreeNodeDef="let node; when: hasChild" nzTreeNodePadding>
+                  <nz-tree-node-toggle>
+                        <span nz-icon nzType="caret-down" nzTreeNodeToggleRotateIcon></span>
+                  </nz-tree-node-toggle>
+                  <nz-tree-node-option [nzSelected]="selectListSelection.isSelected(node)"
+                        (nzClick)="selectListSelection.toggle(node)">
+                        <span nz-icon [nzType]="treeControl.isExpanded(node) ? 'folder-open' : 'folder'"
+                              nzTreeNodeToggleRotateIcon></span>
+                        {{ node.name }}
+                  </nz-tree-node-option>
+            </nz-tree-node>
+      </nz-tree-view>
+      <div *ngIf="!categoryTreeData.length"
+            class="flex flex-col items-center justify-center h-full text-center bg-gray-50 p-8 rounded-md space-y-4">
+            <img src="assets/icons/no_data.svg" alt="No Data Found">
+            <h2 class="text-lg font-semibold text-black">No Data Found</h2>
+      </div>
+</div>
