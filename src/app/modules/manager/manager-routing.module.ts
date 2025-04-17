@@ -31,19 +31,12 @@ const routes: Routes = [
                 redirectTo: 'category-list',
                 pathMatch: 'full',
               },
-              /* {
+              {
                 path: 'category-list',
                 loadComponent: () =>
                   import(
                     './pages/configuration/category/display-category-list/display-category-list.component'
                   ).then((m) => m.DisplayCategoryListComponent),
-              }, */
-              {
-                path: 'category-list',
-                loadComponent: () =>
-                  import(
-                    './pages/configuration/category/category-tree/category-tree.component'
-                  ).then((m) => m.CategoryTreeComponent),
               },
               {
                 path: 'create-category',
