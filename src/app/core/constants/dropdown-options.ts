@@ -46,4 +46,14 @@ export const DROPDOWN_OPTIONS = {
     { label: 'Drawer Storage', value: 'drawer' },
     { label: 'Secure Vaults', value: 'secure_vaults' },
   ],
+  PURCHASE_TYPES: [
+    { label: 'Instant', value: 'instant' },
+    { label: 'Advance', value: 'advance' },
+    { label: 'Overseas', value: 'overseas' },
+  ],
+  PAYMENT_STATUS: [
+    { label: 'Paid', value: 'paid' },
+    { label: 'Partially Paid', value: 'partially_paid' },
+    { label: 'Unpaid', value: 'unpaid' },
+  ]
 };

@@ -1,0 +1,218 @@
+<div class="rounded-md bg-white">
+      <form nz-form [formGroup]="form" [nzLayout]="'vertical'" (ngSubmit)="handleForm()" class="space-y-4">
+            <div class="border-[0.5px] p-4 rounded-md">
+                  <h2 class="text-xl font-medium">Purchase Details</h2>
+                  <nz-divider class="my-4"></nz-divider>
+                  <div class="grid grid-cols-1 md:gap-x-6 md:grid-cols-2 lg:grid-cols-3">
+                        <!-- Form -->
+                        <!-- supplier_oid -->
+                        <nz-form-item>
+                              <nz-form-label
+                                    [nzRequired]="hasRequiredValidator('supplier_oid')">Supplier</nz-form-label>
+                              <nz-form-control nzErrorTip="Supplier is required.">
+                                    <nz-select class="w-full" formControlName="supplier_oid" nz-input nzAllowClear
+                                          nzPlaceHolder="Select Supplier">
+                                          <ng-container *ngFor="let item of supplierList">
+                                                <nz-option [nzLabel]="item.label" [nzValue]="item.value"></nz-option>
+                                          </ng-container>
+                                    </nz-select>
+                              </nz-form-control>
+                        </nz-form-item>
+
+                        <!-- total_amount -->
+                        <nz-form-item>
+                              <nz-form-label [nzRequired]="hasRequiredValidator('total_amount')">Total
+                                    Amount</nz-form-label>
+                              <nz-form-control nzErrorTip="Total Amount is Required.">
+                                    <input formControlName="total_amount" type="number" nz-input
+                                          placeholder="Enter Total Amount" />
+                              </nz-form-control>
+                        </nz-form-item>
+
+                        <!-- Purchase Type -->
+                        <nz-form-item>
+                              <nz-form-label [nzRequired]="hasRequiredValidator('purchase_type')">Purchase
+                                    Type</nz-form-label>
+                              <nz-form-control nzErrorTip="Purchase Type is Required.">
+                                    <nz-select nzPlaceHolder="Select Purchase Type" formControlName="purchase_type"
+                                          class="w-full">
+                                          <nz-option *ngFor="let type of purchaseTypes" [nzValue]="type.value"
+                                                [nzLabel]="type.label"></nz-option>
+                                    </nz-select>
+                              </nz-form-control>
+                        </nz-form-item>
+
+                        <!-- Payment Status -->
+                        <nz-form-item>
+                              <nz-form-label [nzRequired]="hasRequiredValidator('payment_status')">Payment
+                                    Status</nz-form-label>
+                              <nz-form-control nzErrorTip="Payment Status is Required.">
+                                    <nz-select nzPlaceHolder="Select Payment Status" formControlName="payment_status"
+                                          class="w-full">
+                                          <nz-option *ngFor="let status of paymentStatuses" [nzValue]="status.value"
+                                                [nzLabel]="status.label"></nz-option>
+                                    </nz-select>
+                              </nz-form-control>
+                        </nz-form-item>
+
+                        <!-- Paid Amount -->
+                        <nz-form-item>
+                              <nz-form-label [nzRequired]="hasRequiredValidator('paid_amount')">Paid
+                                    Amount</nz-form-label>
+                              <nz-form-control nzErrorTip="Paid Amount is Required.">
+                                    <input placeHolder="Enter Paid Amount (if needed)" formControlName="paid_amount"
+                                          type="number" class="w-full" nz-input />
+                              </nz-form-control>
+                        </nz-form-item>
+
+                        <!-- special_notes -->
+                        <nz-form-item>
+                              <nz-form-label [nzRequired]="hasRequiredValidator('special_notes')">Special
+                                    Notes</nz-form-label>
+                              <nz-form-control nzErrorTip="Special Notes is Required.">
+                                    <textarea formControlName="special_notes" nz-input
+                                          placeholder="Enter Special Notes (if any)" nzAutosize></textarea>
+                              </nz-form-control>
+                        </nz-form-item>
+                  </div>
+            </div>
+            <div class="border-[0.5px] p-4 rounded-md">
+                  <div class="flex justify-between items-center">
+                        <h2 class="text-xl font-medium">Products Information</h2>
+                        <p>Calculated Amount: &#2547; <span class="font-semibold">{{ currentTotalPrice }}</span></p>
+                  </div>
+                  <nz-divider class="my-4"></nz-divider>
+                  <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4">
+                        <!-- Loop through all products -->
+                        <ng-container *ngFor="let product of form.get('products')?.value; let i = index">
+                              <nz-card [nzActions]="[actionSetting, actionEdit]" [nzTitle]="titleTem" class="shadow-lg">
+                                    <nz-card-meta [nzDescription]="descriptionTem"></nz-card-meta>
+                              </nz-card>
+                              <ng-template #titleTem>
+                                    <p class="font-semibold text-secondary">{{ getProductName(product.product_oid)
+                                          }}
+                                    </p>
+                              </ng-template>
+                              <ng-template #descriptionTem>
+                                    <div class="space-y-1">
+                                          <p class="text-sm font-light text-secondary">Quantity:
+                                                <span class="font-semibold">{{product.quantity}}</span>
+                                          </p>
+                                          <p class="text-sm font-light text-secondary">Unit Price:
+                                                <span class="font-semibold">&#2547;{{product.unit_price}}</span>
+                                          </p>
+                                          <p class="text-sm font-light text-secondary">Total Price:
+                                                <span class="font-semibold">&#2547;{{ calculateTotalPrice(product)
+                                                      }}</span>
+                                          </p>
+                                          <p class="text-sm font-light text-secondary">Warehouse:
+                                                <span class="font-semibold">{{getWarehouseName(product.warehouse_oid)
+                                                      }}</span>
+                                          </p>
+                                    </div>
+                              </ng-template>
+                              <ng-template #actionSetting>
+                                    <span (click)="handleItemDelete(i)" nzType="delete" nzDanger nz-icon></span>
+                              </ng-template>
+                              <ng-template #actionEdit>
+                                    <span (click)="handleItemEdit(i)" nzType="edit" nz-icon></span>
+                              </ng-template>
+                        </ng-container>
+
+                        <!-- Add product button card -->
+                        <div *ngIf="!formData" (click)="handleAdd()"
+                              class="border border-[#C6C6C6] rounded-md shadow-lg p-4 flex items-center justify-center cursor-pointer hover:scale-95 transition-all duration-300 ease-in-out">
+                              <div>
+                                    <svg-icon src="assets/icons/add_item.svg"
+                                          class="transition-transform duration-150 ease-in-out"></svg-icon>
+                              </div>
+                        </div>
+                  </div>
+
+            </div>
+            <!-- Actions -->
+            <div class="flex justify-end mt-4">
+                  <div class="flex items-center gap-4">
+                        <secondary-button (click)="goBack()" [label]="'Cancel'"></secondary-button>
+                        <primary-button [label]="'Submit'" [loading]="loading" [type]="'submit'"></primary-button>
+                  </div>
+            </div>
+      </form>
+</div>
+
+<nz-drawer [nzBodyStyle]="{ overflow: 'auto' }" [nzMaskClosable]="false" [nzVisible]="visible" nzTitle="Product Details"
+      (nzOnClose)="close()" nzSize="default" [nzFooter]="footerTpl">
+      <pre>{{ drawerForm.value | json }}</pre>
+
+      <form nz-form *nzDrawerContent [formGroup]="drawerForm" [nzLayout]="'vertical'" (ngSubmit)="handleDrawerForm()"
+            class="space-y-4">
+            <div class="grid grid-cols-1">
+                  <!-- Form -->
+                  <!-- product_oid -->
+                  <nz-form-item>
+                        <nz-form-label
+                              [nzRequired]="hasRequiredValidatorDrawerForm('product_oid')">Product</nz-form-label>
+                        <nz-form-control nzErrorTip="Product is required.">
+                              <nz-select class="w-full" formControlName="product_oid" nz-input nzAllowClear
+                                    nzPlaceHolder="Select Product">
+                                    <ng-container *ngFor="let item of productList">
+                                          <nz-option [nzDisabled]="checkDisabledStatus(item.value)"
+                                                [nzLabel]="item.label" [nzValue]="item.value"></nz-option>
+                                    </ng-container>
+                              </nz-select>
+                        </nz-form-control>
+                  </nz-form-item>
+                  <!-- warehouse_oid -->
+                  <nz-form-item>
+                        <nz-form-label
+                              [nzRequired]="hasRequiredValidatorDrawerForm('warehouse_oid')">Warehouse</nz-form-label>
+                        <nz-form-control nzErrorTip="Warehouse is required.">
+                              <nz-select class="w-full" formControlName="warehouse_oid" nz-input nzAllowClear
+                                    nzPlaceHolder="Select Warehouse">
+                                    <ng-container *ngFor="let item of warehouseList">
+                                          <nz-option [nzLabel]="item.label" [nzValue]="item.value"></nz-option>
+                                    </ng-container>
+                              </nz-select>
+                        </nz-form-control>
+                  </nz-form-item>
+                  <!-- aisle_oid -->
+                  <nz-form-item>
+                        <nz-form-label [nzRequired]="hasRequiredValidatorDrawerForm('aisle_oid')">Aisle</nz-form-label>
+                        <nz-form-control nzErrorTip="Aisle is required.">
+                              <nz-select class="w-full" formControlName="aisle_oid" nz-input nzAllowClear
+                                    nzPlaceHolder="Select Aisle">
+                                    <ng-container *ngFor="let item of aisleList">
+                                          <nz-option [nzLabel]="item.label" [nzValue]="item.value"></nz-option>
+                                    </ng-container>
+                              </nz-select>
+                        </nz-form-control>
+                  </nz-form-item>
+                  <!-- quantity -->
+                  <nz-form-item>
+                        <nz-form-label
+                              [nzRequired]="hasRequiredValidatorDrawerForm('quantity')">Quantity</nz-form-label>
+                        <nz-form-control nzErrorTip="Quantity is Required.">
+                              <input formControlName="quantity" type="number" nz-input placeholder="Enter Quantity" />
+                        </nz-form-control>
+                  </nz-form-item>
+                  <!-- unit_price -->
+                  <nz-form-item>
+                        <nz-form-label [nzRequired]="hasRequiredValidatorDrawerForm('unit_price')">Unit
+                              Price</nz-form-label>
+                        <nz-form-control nzErrorTip="Unit Price is Required.">
+                              <input formControlName="unit_price" type="number" nz-input
+                                    placeholder="Enter Unit Price" />
+                        </nz-form-control>
+                  </nz-form-item>
+            </div>
+      </form>
+</nz-drawer>
+<ng-template #footerTpl>
+      <div style="float: right">
+            <div class="flex items-center gap-4">
+                  <secondary-button (click)="close()" [label]="'Cancel'"></secondary-button>
+                  <primary-button [label]="'Submit'" [loading]="loading" [type]="'button'"
+                        (click)="handleDrawerForm()"></primary-button>
+            </div>
+      </div>
+</ng-template>

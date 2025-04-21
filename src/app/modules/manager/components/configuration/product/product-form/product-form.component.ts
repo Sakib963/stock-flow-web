@@ -95,13 +95,13 @@ export class ProductFormComponent implements OnInit {
     return this._fb.group({
       oid: [null],
       name: [null, [Validators.required]],
-      sku: [null, [Validators.required]],
+      sku: [null],
       category_oid: [null, [Validators.required]],
       sub_category_oid: [null, [Validators.required]],
       unit_type: [null],
       description: [null],
       photo: [null],
-      product_nature: [null],
+      product_nature: [null, [Validators.required]],
       restock_threshold: [null, [Validators.required]],
       status: ['Active', [Validators.required]],
     });

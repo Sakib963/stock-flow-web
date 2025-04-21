@@ -41,7 +41,7 @@ export class Menu {
       group: 'Inventory',
       items: [
         { icon: 'assets/icons/inventory.svg', label: 'Overview', route: '/manager/inventory/overview' },
-        { icon: 'assets/icons/purchase.svg', label: 'Purchase', route: '/manager/inventory/purchase' },
+        { icon: 'assets/icons/purchase.svg', label: 'Purchase Order', route: '/manager/inventory/purchase-order' },
         { icon: 'assets/icons/dispatch.svg', label: 'Dispatch', route: '/manager/inventory/dispatch' },
       ],
     }

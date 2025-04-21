@@ -46,11 +46,17 @@
                                     <input formControlName="name" nz-input placeholder="Enter Product Name" />
                               </nz-form-control>
                         </nz-form-item>
-                        <!-- sku -->
+                        <!-- product_nature -->
                         <nz-form-item>
-                              <nz-form-label [nzRequired]="hasRequiredValidator('sku')">SKU</nz-form-label>
-                              <nz-form-control nzErrorTip="SKU is Required.">
-                                    <input formControlName="sku" nz-input placeholder="Enter SKU" />
+                              <nz-form-label [nzRequired]="hasRequiredValidator('product_nature')">Product
+                                    Nature</nz-form-label>
+                              <nz-form-control nzErrorTip="Product Nature is required.">
+                                    <nz-select class="w-full" formControlName="product_nature" nz-input nzAllowClear
+                                          nzPlaceHolder="Select Product Nature">
+                                          <ng-container *ngFor="let item of productNatureList">
+                                                <nz-option [nzLabel]="item.label" [nzValue]="item.value"></nz-option>
+                                          </ng-container>
+                                    </nz-select>
                               </nz-form-control>
                         </nz-form-item>
                         <!-- category_oid -->
@@ -100,17 +106,11 @@
                                     </nz-select>
                               </nz-form-control>
                         </nz-form-item>
-                        <!-- product_nature -->
+                        <!-- sku -->
                         <nz-form-item>
-                              <nz-form-label [nzRequired]="hasRequiredValidator('product_nature')">Product
-                                    Nature</nz-form-label>
-                              <nz-form-control nzErrorTip="Product Nature is required.">
-                                    <nz-select class="w-full" formControlName="product_nature" nz-input nzAllowClear
-                                          nzPlaceHolder="Select Product Nature">
-                                          <ng-container *ngFor="let item of productNatureList">
-                                                <nz-option [nzLabel]="item.label" [nzValue]="item.value"></nz-option>
-                                          </ng-container>
-                                    </nz-select>
+                              <nz-form-label [nzRequired]="hasRequiredValidator('sku')">SKU</nz-form-label>
+                              <nz-form-control nzErrorTip="SKU is Required.">
+                                    <input formControlName="sku" nz-input placeholder="Enter SKU" />
                               </nz-form-control>
                         </nz-form-item>
                         <!-- Description -->

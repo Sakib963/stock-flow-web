@@ -239,33 +239,33 @@ const routes: Routes = [
             ]
           },
           {
-            path: 'purchase',
+            path: 'purchase-order',
             children: [
               {
                 path: '',
-                redirectTo: 'purchase-list',
+                redirectTo: 'purchase-order-list',
                 pathMatch: 'full',
               },
               {
-                path: 'purchase-list',
+                path: 'purchase-order-list',
                 loadComponent: () =>
                   import(
-                    './pages/inventory/purchase-products/product-purchase-list/product-purchase-list.component'
-                  ).then((m) => m.ProductPurchaseListComponent),
+                    './pages/inventory/purchase-order/purchase-order-list/purchase-order-list.component'
+                  ).then((m) => m.PurchaseOrderListComponent),
               },
               {
-                path: 'create-purchase',
+                path: 'create-purchase-order',
                 loadComponent: () =>
                   import(
-                    './pages/inventory/purchase-products/create-product-purchase/create-product-purchase.component'
-                  ).then((m) => m.CreateProductPurchaseComponent),
+                    './pages/inventory/purchase-order/create-purchase-order/create-purchase-order.component'
+                  ).then((m) => m.CreatePurchaseOrderComponent),
               },
               {
-                path: 'view-purchase/:oid',
+                path: 'view-purchase-order/:oid',
                 loadComponent: () =>
                   import(
-                    './pages/inventory/purchase-products/view-product-purchase/view-product-purchase.component'
-                  ).then((m) => m.ViewProductPurchaseComponent),
+                    './pages/inventory/purchase-order/view-purchase-order/view-purchase-order.component'
+                  ).then((m) => m.ViewPurchaseOrderComponent),
               },
             ],
           },

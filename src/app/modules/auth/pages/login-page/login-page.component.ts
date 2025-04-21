@@ -108,8 +108,10 @@ export class LoginPageComponent implements OnInit {
                 designation: res.data.designation,
               });
               if (res.data.role === ROLES.ADMIN) {
+                this.authService.setGuestUser(false);
                 this._router.navigate(['/admin/dashboard']);
               } else if (res.data.role === ROLES.MANAGER) {
+                this.authService.setGuestUser(false);
                 this._router.navigate(['/manager/dashboard']);
               } else if (res.data.role === ROLES.GUEST) {
                 this.authService.setGuestUser(true);
