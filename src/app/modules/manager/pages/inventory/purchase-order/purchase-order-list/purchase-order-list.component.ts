@@ -15,13 +15,15 @@ import { ViewPurchaseOrderListComponent } from '@app/modules/manager/components/
 @Component({
   selector: 'app-purchase-order-list',
   standalone: true,
-  imports: [CommonModule,
-      NgZorroCustomModule,
-      ReactiveFormsModule,
-      ViewPurchaseOrderListComponent,
-      PrimaryButtonWithPlusIcon],
+  imports: [
+    CommonModule,
+    NgZorroCustomModule,
+    ReactiveFormsModule,
+    ViewPurchaseOrderListComponent,
+    PrimaryButtonWithPlusIcon,
+  ],
   templateUrl: './purchase-order-list.component.html',
-  styleUrls: ['./purchase-order-list.component.scss']
+  styleUrls: ['./purchase-order-list.component.scss'],
 })
 export class PurchaseOrderListComponent implements OnInit {
   data: any[] = [];
@@ -35,6 +37,12 @@ export class PurchaseOrderListComponent implements OnInit {
   };
   isFilter: boolean = false;
   searchControl: FormControl = new FormControl('');
+  selectControl: FormControl = new FormControl('');
+  options = [
+    { value: 'paid', label: 'Paid' },
+    { value: 'unpaid', label: 'Unpaid' },
+    { value: 'partially_paid', label: 'Partially Paid' },
+  ];
 
   constructor(
     private _httpService: HttpService,
@@ -83,6 +91,10 @@ export class PurchaseOrderListComponent implements OnInit {
             if (res.body?.data?.length) {
               this.data = res.body.data;
               this.totalCount = res.body.total;
+              console.log('-------------------------------------------------');
+              console.log(this.totalCount, 'total count');
+              console.log('-------------------------------------------------');
+              console.table(this.data);
             } else {
               this.data = [];
             }
@@ -124,7 +136,4 @@ export class PurchaseOrderListComponent implements OnInit {
       state: { edit: true },
     });
   }
-
 }
-
-
