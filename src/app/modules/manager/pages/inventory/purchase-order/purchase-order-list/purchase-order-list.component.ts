@@ -91,10 +91,6 @@ export class PurchaseOrderListComponent implements OnInit {
             if (res.body?.data?.length) {
               this.data = res.body.data;
               this.totalCount = res.body.total;
-              console.log('-------------------------------------------------');
-              console.log(this.totalCount, 'total count');
-              console.log('-------------------------------------------------');
-              console.table(this.data);
             } else {
               this.data = [];
             }

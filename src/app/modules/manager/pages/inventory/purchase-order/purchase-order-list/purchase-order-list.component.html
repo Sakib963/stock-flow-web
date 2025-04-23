@@ -22,7 +22,7 @@
                               [label]="'Add Purchase'"></primary-button-with-plus-icon>
                   </div>
             </div>
-            <nz-divider class=" mb-4"></nz-divider>
+            <nz-divider></nz-divider>
             <app-view-purchase-order-list [data]="data" [totalCount]="totalCount"
                   (actionEmitter)="handleListActions($event)"
                   (paginationEvent)="handlePaginationEvent($event)"></app-view-purchase-order-list>

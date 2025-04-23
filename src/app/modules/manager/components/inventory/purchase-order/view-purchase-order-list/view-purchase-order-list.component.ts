@@ -9,7 +9,7 @@ import { NgZorroCustomModule } from '@app/shared/ng-zorro-custom.module';
   standalone: true,
   imports: [CommonModule, NgZorroCustomModule, LoaderComponent],
   templateUrl: './view-purchase-order-list.component.html',
-  styleUrls: ['./view-purchase-order-list.component.scss']
+  styleUrls: ['./view-purchase-order-list.component.scss'],
 })
 export class ViewPurchaseOrderListComponent {
   @Input() data: any[] = [];
@@ -41,5 +41,15 @@ export class ViewPurchaseOrderListComponent {
 
   getFirstLetter(name: any): any {
     return name[0];
+  }
+
+  getRibbonColor(item: any): any {
+    if (item.status === 'Submitted') {
+      return 'purple';
+    } else if (item.status === 'Verified') {
+      return 'green';
+    } else if (item.status === 'Cancelled') {
+      return 'red';
+    }
   }
 }
