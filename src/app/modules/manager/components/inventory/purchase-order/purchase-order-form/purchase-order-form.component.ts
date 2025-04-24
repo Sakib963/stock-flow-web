@@ -81,6 +81,12 @@ export class PurchaseOrderFormComponent implements OnInit {
 
     if (this.formData) {
       this.form.patchValue(this.formData);
+      this.formData.products.forEach((product: any) => {
+        const group = this.createProductGroup();
+        group.patchValue(product);
+        this.products.push(group);
+        this.calculateTotalPriceFromProducts();
+      });
     }
 
     this.form.get('payment_status')?.valueChanges.subscribe((value) => {

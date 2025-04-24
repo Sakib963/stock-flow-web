@@ -112,7 +112,7 @@
                                     </div>
                               </ng-template>
                               <ng-template #actionSetting>
-                                    <span (click)="handleItemDelete(i)" nzType="delete" nzDanger nz-icon></span>
+                                    <span *ngIf="!product.oid" (click)="handleItemDelete(i)" nzType="delete" nzDanger nz-icon></span>
                               </ng-template>
                               <ng-template #actionEdit>
                                     <span (click)="handleItemEdit(i)" nzType="edit" nz-icon></span>

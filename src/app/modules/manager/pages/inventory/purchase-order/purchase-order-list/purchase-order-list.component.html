@@ -6,8 +6,10 @@
                   <div class="md:w-2/3 grid lg:grid-cols-3 gap-4">
                         <nz-select class="w-full" [formControl]="selectControl" nz-input nzAllowClear
                               nzPlaceHolder="Select Order Status">
-                              <nz-option nzLabel="Active" nzValue="Active"></nz-option>
-                              <nz-option nzLabel="Inactive" nzValue="Inactive"></nz-option>
+                              <nz-option nzLabel="Submitted" nzValue="Submitted"></nz-option>
+                              <nz-option nzLabel="Verified" nzValue="Verified"></nz-option>
+                              <nz-option nzLabel="Cancelled" nzValue="Cancelled"></nz-option>
+                              <nz-option nzLabel="Rejected" nzValue="Rejected"></nz-option>
                         </nz-select>
                         <nz-input-group [nzSuffix]="suffixIconSearch">
                               <input type="text" nz-input placeholder="Enter Search Text Here" />
@@ -23,7 +25,7 @@
                   </div>
             </div>
             <nz-divider></nz-divider>
-            <app-view-purchase-order-list [data]="data" [totalCount]="totalCount"
+            <app-view-purchase-order-list [loading]="loading" [data]="data" [totalCount]="totalCount"
                   (actionEmitter)="handleListActions($event)"
                   (paginationEvent)="handlePaginationEvent($event)"></app-view-purchase-order-list>
       </div>

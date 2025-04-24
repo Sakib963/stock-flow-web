@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { Constants } from '@app/core/constants/constants';
 import { LoaderComponent } from '@app/shared/components/loader/loader.component';
 import { NgZorroCustomModule } from '@app/shared/ng-zorro-custom.module';
+import { DROPDOWN_OPTIONS } from '@app/core/constants/dropdown-options';
+import { AuthService } from '@app/modules/auth/services/auth.service';
 
 @Component({
   selector: 'app-view-purchase-order-list',
@@ -17,10 +19,16 @@ export class ViewPurchaseOrderListComponent {
   @Output() paginationEvent: EventEmitter<object> = new EventEmitter();
   @Input() loading: boolean = false;
   @Input() totalCount: number = 0;
+  purchaseTypes = DROPDOWN_OPTIONS.PURCHASE_TYPES;
 
   currentIndex: number = 1;
   offset: number = 0;
   pageSize: number = Constants.PAGE_SIZE;
+
+  user_id: any;
+  constructor(private _authService: AuthService) {
+    this.user_id = this._authService._userInfo()?.email;
+  }
 
   onPageIndexChange(pageIndex: number): void {
     this.currentIndex = pageIndex;
@@ -39,8 +47,8 @@ export class ViewPurchaseOrderListComponent {
     this.actionEmitter.emit({ action, value });
   }
 
-  getFirstLetter(name: any): any {
-    return name[0];
+  getPurchaseType(value: any): any {
+    return this.purchaseTypes.find((item: any) => item.value === value)?.label;
   }
 
   getRibbonColor(item: any): any {
@@ -49,7 +57,16 @@ export class ViewPurchaseOrderListComponent {
     } else if (item.status === 'Verified') {
       return 'green';
     } else if (item.status === 'Cancelled') {
+      return 'pink';
+    } else if (item.status === 'Rejected') {
       return 'red';
     }
+  }
+
+  getEditButtonStatus(item: any): boolean {
+    if (item.status === 'Submitted' && this.user_id === item.created_by) {
+      return true;
+    }
+    return false;
   }
 }

@@ -3,15 +3,16 @@
       <ul *ngIf="data.length" class="divide-y divide-gray-100">
             <ng-container *ngFor="let item of data">
                   <nz-ribbon [nzText]="item.status" [nzColor]="getRibbonColor(item)">
-                        <li class="grid md:grid-cols-3 gap-x-6 py-5">
+                        <li class="grid md:grid-cols-3 gap-x-6 py-5 shadow-sm border p-4 rounded-md">
                               <div class="min-w-0 flex-auto">
-                                    <p class="text-sm/6 text-[#180B26] font-semibold">Total Product: <span
+                                    <p class="text-sm/6 text-[#180B26] font-semibold">Total Amount: <span
                                                 class="font-normal">{{
-                                                item?.product_count }}</span></p>
-                                    <p class="mt-1 truncate text-xs/5 text-[#180B26] font-semibold">Total Amount: <span
-                                                class="font-normal">{{ item?.total_amount }}</span></p>
+                                                item?.total_amount }}</span></p>
+                                    <p class="mt-1 truncate text-xs/5 text-[#180B26] font-semibold">Total Product: <span
+                                                class="font-normal">{{ item?.product_count }}</span></p>
                                     <p class="mt-1 truncate text-xs/5 text-[#180B26] font-semibold">Purchase
-                                          Type: <span class="font-normal">{{ item?.purchase_type }}</span></p>
+                                          Type: <span class="font-normal">{{ getPurchaseType(item?.purchase_type)
+                                                }}</span></p>
                               </div>
                               <div>
                                     <p class="mt-1 truncate text-xs/5 text-gray-500 font-semibold">Supplier Name: <span
@@ -34,13 +35,15 @@
                                                                   d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
                                                       </svg>
                                                 </button>
-                                                <!-- <button (click)="handleAction('edit', item)">
-                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                                      stroke-width="1.5" stroke="currentColor" class="size-6">
-                                                      <path stroke-linecap="round" stroke-linejoin="round"
-                                                            d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125" />
-                                                </svg>
-                                          </button> -->
+                                                <button *ngIf="getEditButtonStatus(item)"
+                                                      (click)="handleAction('edit', item)">
+                                                      <svg xmlns="http://www.w3.org/2000/svg" fill="none"
+                                                            viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+                                                            class="size-6">
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                  d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125" />
+                                                      </svg>
+                                                </button>
                                           </div>
                                     </div>
                               </div>

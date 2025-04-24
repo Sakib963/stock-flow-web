@@ -127,7 +127,7 @@ export class PurchaseOrderListComponent implements OnInit {
   }
 
   handleEdit(value: any): any {
-    this._router.navigate([`../view-purchase/${value}`], {
+    this._router.navigate([`../view-purchase-order/${value}`], {
       relativeTo: this._activatedRoute,
       state: { edit: true },
     });
