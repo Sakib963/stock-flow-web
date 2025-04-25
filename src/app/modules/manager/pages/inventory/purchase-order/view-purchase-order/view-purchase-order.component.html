@@ -84,8 +84,11 @@
                         </ng-container>
                   </div>
             </div>
+            <app-order-verification-form class="" *ngIf="displayFormType === 'Verify'"
+                  [purchaseDetails]="purchaseDetails"
+                  (actionEmitter)="handleVerificationFormActions($event)"></app-order-verification-form>
             <!-- Actions -->
-            <div class="flex justify-end mt-4">
+            <div *ngIf="displayFormType === ''" class="flex justify-end mt-4">
                   <div class="flex items-center gap-4">
                         <secondary-button [label]="'Go Back'" (click)="goBack()"></secondary-button>
                         <primary-button *ngIf="getVerificationButtonStatus()" [label]="'Verify Order'" [type]="'button'"

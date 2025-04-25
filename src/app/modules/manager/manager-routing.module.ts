@@ -266,7 +266,7 @@ const routes: Routes = [
                   import(
                     './pages/inventory/purchase-order/view-purchase-order/view-purchase-order.component'
                   ).then((m) => m.ViewPurchaseOrderComponent),
-              },
+              }
             ],
           },
           {

@@ -3,7 +3,7 @@ import { CommonModule, Location } from '@angular/common';
 import { SecondaryButton } from '@app/shared/components/buttons/secondary-button/secondary-button.component';
 import { LoaderComponent } from '@app/shared/components/loader/loader.component';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { APIEndpoint } from '@app/core/constants/api-endpoint';
 import { HttpService } from '@app/core/services/http.service';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
@@ -14,6 +14,7 @@ import { PurchaseOrderFormComponent } from '@app/modules/manager/components/inve
 import { PrimaryButton } from '@app/shared/components/buttons/primary-button/primary-button.component';
 import { DangerButton } from '@app/shared/components/buttons/danger-button/danger-button.component';
 import { AuthService } from '@app/modules/auth/services/auth.service';
+import { OrderVerificationFormComponent } from '@app/modules/manager/components/inventory/purchase-order/order-verification-form/order-verification-form.component';
 
 @Component({
   selector: 'app-view-purchase-order',
@@ -26,6 +27,7 @@ import { AuthService } from '@app/modules/auth/services/auth.service';
     NgZorroCustomModule,
     PrimaryButton,
     DangerButton,
+    OrderVerificationFormComponent,
   ],
   templateUrl: './view-purchase-order.component.html',
   styleUrls: ['./view-purchase-order.component.scss'],
@@ -42,11 +44,14 @@ export class ViewPurchaseOrderComponent implements OnInit {
   purchaseTypes = DROPDOWN_OPTIONS.PURCHASE_TYPES;
   paymentStatuses = DROPDOWN_OPTIONS.PAYMENT_STATUS;
 
+  displayFormType: any = '';
+
   constructor(
     private _httpService: HttpService,
     private _destroyRef: DestroyRef,
     private _notificationService: NzNotificationService,
     private _activatedRoute: ActivatedRoute,
+    private _router: Router,
     private _location: Location,
     private _authService: AuthService
   ) {
@@ -167,6 +172,14 @@ export class ViewPurchaseOrderComponent implements OnInit {
   }
 
   handleVerifyPurchaseOrder(): void {
-    console.log('purchase Verify');
+    this.displayFormType = 'Verify';
+  }
+
+  handleVerificationFormActions(event: any): void {
+    if (event.action === 'cancel') {
+      this.displayFormType = '';
+    } else {
+      console.log(event.value);
+    }
   }
 }

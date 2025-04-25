@@ -1,0 +1,39 @@
+<form nz-form [formGroup]="form" [nzLayout]="'vertical'" (ngSubmit)="handleForm()" class="space-y-4 mt-4">
+      <div class="border-[0.5px] p-4 rounded-md">
+            <h2 class="text-xl font-medium">Verify Purchase Details</h2>
+            <nz-divider class="my-4"></nz-divider>
+
+            <!-- Product Table -->
+            <nz-table [nzData]="products.controls" [nzBordered]="true" [nzSize]="'middle'" [nzShowPagination]="false">
+                  <thead>
+                        <tr>
+                              <th>#</th>
+                              <th>Product Name</th>
+                              <th>Verified Quantity</th>
+                              <th>Verified Unit Price</th>
+                        </tr>
+                  </thead>
+                  <tbody>
+                        <tr *ngFor="let group of productsFormGroups; let i = index" [formGroup]="group">
+                              <td>{{ i + 1 }}</td>
+                              <td>{{ purchaseDetails.products[i].product_name }}</td>
+                              <td>
+                                    <input nz-input type="number" formControlName="verified_quantity" />
+                              </td>
+                              <td>
+                                    <input nz-input type="number" formControlName="verified_unit_price" />
+                              </td>
+                        </tr>
+
+
+                  </tbody>
+            </nz-table>
+      </div>
+
+      <div class="flex justify-end mt-4">
+            <div class="flex items-center gap-4">
+                  <secondary-button [label]="'Cancel'" (click)="goBack()"></secondary-button>
+                  <primary-button [label]="'Verify Order'" [type]="'submit'"></primary-button>
+            </div>
+      </div>
+</form>
