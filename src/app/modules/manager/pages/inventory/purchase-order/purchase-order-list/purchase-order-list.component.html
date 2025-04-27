@@ -9,10 +9,9 @@
                               <nz-option nzLabel="Submitted" nzValue="Submitted"></nz-option>
                               <nz-option nzLabel="Verified" nzValue="Verified"></nz-option>
                               <nz-option nzLabel="Cancelled" nzValue="Cancelled"></nz-option>
-                              <nz-option nzLabel="Rejected" nzValue="Rejected"></nz-option>
                         </nz-select>
                         <nz-input-group [nzSuffix]="suffixIconSearch">
-                              <input type="text" nz-input placeholder="Enter Search Text Here" />
+                              <input type="text" [formControl]="searchControl" nz-input placeholder="Enter Search Text Here" />
                         </nz-input-group>
                         <ng-template #suffixIconSearch>
                               <span nzType="search" nz-icon></span>

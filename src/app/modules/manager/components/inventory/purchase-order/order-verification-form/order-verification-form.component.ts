@@ -24,7 +24,6 @@ import { DROPDOWN_OPTIONS } from '@app/core/constants/dropdown-options';
     ReactiveFormsModule,
     PrimaryButton,
     SecondaryButton,
-    ConfirmationModalComponent,
   ],
   templateUrl: './order-verification-form.component.html',
   styleUrls: ['./order-verification-form.component.scss'],

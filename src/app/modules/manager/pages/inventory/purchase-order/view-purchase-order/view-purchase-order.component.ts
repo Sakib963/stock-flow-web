@@ -15,6 +15,8 @@ import { PrimaryButton } from '@app/shared/components/buttons/primary-button/pri
 import { DangerButton } from '@app/shared/components/buttons/danger-button/danger-button.component';
 import { AuthService } from '@app/modules/auth/services/auth.service';
 import { OrderVerificationFormComponent } from '@app/modules/manager/components/inventory/purchase-order/order-verification-form/order-verification-form.component';
+import { NzModalService } from 'ng-zorro-antd/modal';
+import { ConfirmationModalComponent } from '@app/shared/components/confirmation-modal/confirmation-modal.component';
 
 @Component({
   selector: 'app-view-purchase-order',
@@ -53,7 +55,8 @@ export class ViewPurchaseOrderComponent implements OnInit {
     private _activatedRoute: ActivatedRoute,
     private _router: Router,
     private _location: Location,
-    private _authService: AuthService
+    private _authService: AuthService,
+    private _modal: NzModalService
   ) {
     const state$ = this._activatedRoute.paramMap.pipe(
       map(() => window.history.state)
@@ -167,8 +170,40 @@ export class ViewPurchaseOrderComponent implements OnInit {
     return false;
   }
 
-  handleCancelPurchaseOrder(): void {
+  displayCancelConfirmation(): void {
     console.log('purchase cancel');
+    let message = 'Do you want to cancel this purchase?';
+    this._modal.create({
+      nzContent: ConfirmationModalComponent,
+      nzData: {
+        message,
+      },
+      nzFooter: null,
+      nzClosable: false,
+      nzOnOk: () => this.handleCancelPurchaseOrder(),
+    });
+  }
+
+  handleCancelPurchaseOrder(): any {
+    this.loading = true;
+    this._httpService
+      .get(APIEndpoint.CANCEL_PURCHASE, { oid: this.oid })
+      .pipe(
+        takeUntilDestroyed(this._destroyRef),
+        finalize(() => (this.loading = false))
+      )
+      .subscribe({
+        next: (res: any) => {
+          if (res.status === 200) {
+            this._notificationService.success('Success!', res?.body?.message);
+            this._location.back();
+          }
+        },
+        error: (err: any) => {
+          console.log(err);
+          this._notificationService.error('Error!', err?.error?.message);
+        },
+      });
   }
 
   handleVerifyPurchaseOrder(): void {
@@ -199,10 +234,9 @@ export class ViewPurchaseOrderComponent implements OnInit {
     }
   }
 
-
   getStatusClass(status: any): any {
-    if (status === 'Verified') return 'space-y-1 text-green-600'
-    if (status === 'Cancelled') return 'space-y-1 text-red-600'
-    return 'space-y-1'
+    if (status === 'Verified') return 'font-semibold text-green-600';
+    if (status === 'Cancelled') return 'font-semibold text-red-600';
+    return 'font-semibold';
   }
 }

@@ -89,7 +89,7 @@
                         <primary-button *ngIf="getVerificationButtonStatus()" [label]="'Verify Order'" [type]="'button'"
                               (click)="handleVerifyPurchaseOrder()"></primary-button>
                         <danger-button *ngIf="getCancelButtonStatus()" [label]="'Cancel Order'" [type]="'button'"
-                              (click)="handleCancelPurchaseOrder()"></danger-button>
+                              (click)="displayCancelConfirmation()"></danger-button>
                   </div>
             </div>
       </div>

@@ -1,6 +1,6 @@
 <app-loader *ngIf="loading" [isVisible]="loading"></app-loader>
 <div *ngIf="!loading" class="p-4 border rounded-md">
-      <ul *ngIf="data.length" class="divide-y divide-gray-100">
+      <ul *ngIf="data.length" class="divide-y divide-gray-100 space-y-4">
             <ng-container *ngFor="let item of data">
                   <nz-ribbon [nzText]="item.status" [nzColor]="getRibbonColor(item)">
                         <li class="grid md:grid-cols-3 gap-x-6 py-5 shadow-sm border p-4 rounded-md">

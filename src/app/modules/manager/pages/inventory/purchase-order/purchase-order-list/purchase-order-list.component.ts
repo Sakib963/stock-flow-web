@@ -57,10 +57,20 @@ export class PurchaseOrderListComponent implements OnInit {
     this.searchControl.valueChanges.subscribe((value) => {
       this.onSearchChange(value);
     });
+    this.selectControl.valueChanges.subscribe((value) => {
+      this.onSelectChange(value);
+    });
   }
 
   onSearchChange(value: string): void {
     this.payload.search_text = value;
+    this.isFilter = true;
+    this.loadList();
+  }
+
+  onSelectChange(value: string): void {
+    if (value) this.payload.status = value;
+    else this.payload.status = '';
     this.isFilter = true;
     this.loadList();
   }
