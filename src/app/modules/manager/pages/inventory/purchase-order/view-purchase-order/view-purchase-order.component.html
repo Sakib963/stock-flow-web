@@ -36,15 +36,10 @@
                               <p>Special Notes</p>
                               <p class="font-semibold">{{ purchaseDetails?.special_notes }}</p>
                         </div>
-                        <!-- special_notes -->
-                        <div class="space-y-1">
-                              <p>Special Notes</p>
-                              <p class="font-semibold">{{ purchaseDetails?.special_notes }}</p>
-                        </div>
                         <!-- status -->
                         <div class="space-y-1">
                               <p>Status</p>
-                              <p class="font-semibold">{{ purchaseDetails?.status }}</p>
+                              <p [class]="getStatusClass(purchaseDetails?.status)">{{ purchaseDetails?.status }}</p>
                         </div>
                   </div>
             </div>

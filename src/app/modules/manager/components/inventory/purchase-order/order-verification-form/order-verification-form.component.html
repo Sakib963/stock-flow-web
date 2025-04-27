@@ -11,6 +11,7 @@
                               <th>Product Name</th>
                               <th>Verified Quantity</th>
                               <th>Verified Unit Price</th>
+                              <th>Intended Use</th>
                         </tr>
                   </thead>
                   <tbody>
@@ -23,9 +24,16 @@
                               <td>
                                     <input nz-input type="number" formControlName="verified_unit_price" />
                               </td>
+                              <td>
+                                    <nz-form-control [nzValidateStatus]="group.get('intended_use') || ''"
+                                          [nzHasFeedback]="true">
+                                          <nz-select formControlName="intended_use" [nzOptions]="INTENDED_USE_OPTIONS"
+                                                [nzBorderless]="false" nzPlaceHolder="Select Intended Use"
+                                                class="w-full">
+                                          </nz-select>
+                                    </nz-form-control>
+                              </td>
                         </tr>
-
-
                   </tbody>
             </nz-table>
       </div>

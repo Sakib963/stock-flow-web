@@ -10,6 +10,10 @@ import {
 import { NgZorroCustomModule } from '@app/shared/ng-zorro-custom.module';
 import { PrimaryButton } from '@app/shared/components/buttons/primary-button/primary-button.component';
 import { SecondaryButton } from '@app/shared/components/buttons/secondary-button/secondary-button.component';
+import { NzModalService } from 'ng-zorro-antd/modal';
+import { ConfirmationModalComponent } from '@app/shared/components/confirmation-modal/confirmation-modal.component';
+import { markFormGroupTouched } from '@app/core/constants/helper';
+import { DROPDOWN_OPTIONS } from '@app/core/constants/dropdown-options';
 
 @Component({
   selector: 'app-order-verification-form',
@@ -20,6 +24,7 @@ import { SecondaryButton } from '@app/shared/components/buttons/secondary-button
     ReactiveFormsModule,
     PrimaryButton,
     SecondaryButton,
+    ConfirmationModalComponent,
   ],
   templateUrl: './order-verification-form.component.html',
   styleUrls: ['./order-verification-form.component.scss'],
@@ -30,7 +35,9 @@ export class OrderVerificationFormComponent implements OnInit {
 
   form!: FormGroup;
 
-  constructor(private _fb: FormBuilder) {}
+  INTENDED_USE_OPTIONS = DROPDOWN_OPTIONS.INTENDED_USE_OPTIONS;
+
+  constructor(private _fb: FormBuilder, private _modal: NzModalService) {}
 
   ngOnInit(): void {
     this.form = this._fb.group({
@@ -39,6 +46,7 @@ export class OrderVerificationFormComponent implements OnInit {
         this.purchaseDetails.products.map((product: any) =>
           this._fb.group({
             oid: [product.oid],
+            product_oid: [product.product_oid],
             verified_quantity: [
               product.quantity,
               [Validators.required, Validators.min(0)],
@@ -47,6 +55,7 @@ export class OrderVerificationFormComponent implements OnInit {
               product.unit_price,
               [Validators.required, Validators.min(0)],
             ],
+            intended_use: [null, Validators.required]
           })
         )
       ),
@@ -62,7 +71,25 @@ export class OrderVerificationFormComponent implements OnInit {
   }
 
   handleForm(): void {
-    console.log(this.form.value);
+    if (this.form.valid) {
+      this.handleConfirm();
+    } else {
+      markFormGroupTouched(this.form);
+    }
+  }
+
+  handleConfirm(): void {
+    let message = 'Do you want to verify this purchase?';
+    this._modal.create({
+      nzContent: ConfirmationModalComponent,
+      nzData: {
+        message,
+      },
+      nzFooter: null,
+      nzClosable: false,
+      nzOnOk: () =>
+        this.actionEmitter.emit({ action: 'submit', value: this.form.value }),
+    });
   }
 
   goBack(): any {

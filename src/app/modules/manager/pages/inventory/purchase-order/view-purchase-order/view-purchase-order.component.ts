@@ -179,7 +179,30 @@ export class ViewPurchaseOrderComponent implements OnInit {
     if (event.action === 'cancel') {
       this.displayFormType = '';
     } else {
-      console.log(event.value);
+      this.loading = true;
+      this._httpService
+        .post(APIEndpoint.VERIFY_PURCHASE, event.value)
+        .pipe(
+          takeUntilDestroyed(this._destroyRef),
+          finalize(() => (this.loading = false))
+        )
+        .subscribe({
+          next: (res: any) => {
+            this._notificationService.success('Success!', res?.body?.message);
+            this._location.back();
+          },
+          error: (err: any) => {
+            console.log(err);
+            this._notificationService.error('Error!', err?.error?.message);
+          },
+        });
     }
+  }
+
+
+  getStatusClass(status: any): any {
+    if (status === 'Verified') return 'space-y-1 text-green-600'
+    if (status === 'Cancelled') return 'space-y-1 text-red-600'
+    return 'space-y-1'
   }
 }

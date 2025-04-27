@@ -55,5 +55,9 @@ export const DROPDOWN_OPTIONS = {
     { label: 'Paid', value: 'paid' },
     { label: 'Partially Paid', value: 'partially_paid' },
     { label: 'Unpaid', value: 'unpaid' },
+  ],
+  INTENDED_USE_OPTIONS: [
+    { label: 'For Sale', value: 'for_sale' },
+    { label: 'For Internal Use', value: 'for_internal_use' },
   ]
 };
