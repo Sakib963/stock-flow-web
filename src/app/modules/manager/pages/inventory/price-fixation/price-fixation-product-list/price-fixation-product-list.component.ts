@@ -1,29 +1,37 @@
 import { Component, DestroyRef, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import {
+  FormBuilder,
+  FormControl,
+  FormGroup,
+  FormsModule,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
+import { NgZorroCustomModule } from '@app/shared/ng-zorro-custom.module';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import { Router, ActivatedRoute } from '@angular/router';
 import { APIEndpoint } from '@app/core/constants/api-endpoint';
-import { Constants } from '@app/core/constants/constants';
+import { finalize } from 'rxjs';
 import { HttpService } from '@app/core/services/http.service';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
-import { finalize } from 'rxjs';
-import { PrimaryButtonWithPlusIcon } from '@app/shared/components/buttons/primary-button-with-plus-icon/primary-button-with-plus-icon.component';
-import { NgZorroCustomModule } from '@app/shared/ng-zorro-custom.module';
-import { ViewPurchaseListComponent } from '@app/modules/manager/components/inventory/purchase/view-purchase-list/view-purchase-list.component';
+import { Router, ActivatedRoute } from '@angular/router';
+import { Constants } from '@app/core/constants/constants';
+import { ViewPriceFixationProductListComponent } from '@app/modules/manager/components/inventory/price-fixation/view-price-fixation-product-list/view-price-fixation-product-list.component';
 
 @Component({
-  selector: 'app-product-purchase-list',
+  selector: 'app-price-fixation-product-list',
   standalone: true,
-  imports: [CommonModule,
-      NgZorroCustomModule,
-      ReactiveFormsModule,
-      ViewPurchaseListComponent,
-      PrimaryButtonWithPlusIcon],
-  templateUrl: './product-purchase-list.component.html',
-  styleUrls: ['./product-purchase-list.component.scss']
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    NgZorroCustomModule,
+    FormsModule,
+    ViewPriceFixationProductListComponent,
+  ],
+  templateUrl: './price-fixation-product-list.component.html',
+  styleUrls: ['./price-fixation-product-list.component.scss'],
 })
-export class ProductPurchaseListComponent implements OnInit {
+export class PriceFixationProductListComponent implements OnInit {
   data: any[] = [];
   totalCount: number = 0;
   loading: boolean = false;
@@ -71,7 +79,7 @@ export class ProductPurchaseListComponent implements OnInit {
       this.loading = true;
     }
     this._httpService
-      .get(APIEndpoint.GET_PURCHASE_LIST, this.payload)
+      .get(APIEndpoint.GET_PRICE_FIXATION_PRODUCT_LIST, this.payload)
       .pipe(
         takeUntilDestroyed(this._destroyRef),
         finalize(() => (this.loading = false))
@@ -83,6 +91,7 @@ export class ProductPurchaseListComponent implements OnInit {
             if (res.body?.data?.length) {
               this.data = res.body.data;
               this.totalCount = res.body.total;
+              console.log(this.data, this.totalCount);
             } else {
               this.data = [];
             }
@@ -96,34 +105,15 @@ export class ProductPurchaseListComponent implements OnInit {
   }
 
   handleListActions(event: any): any {
-    if (event.action === 'create') {
-      this.handleAdd();
-    } else if (event.action === 'view') {
-      this.handleView(event.value.oid);
-    } else if (event.action === 'edit') {
-      this.handleEdit(event.value.oid);
+    if (event.action === 'view') {
+      console.log(event.value);
+      // this.handleView(event.value.oid);
     }
   }
-
-  handleAdd(): any {
-    this._router.navigate(['../create-purchase'], {
-      relativeTo: this._activatedRoute,
-    });
-  }
-
   handleView(value: any): any {
-    this._router.navigate([`../view-purchase/${value}`], {
+    this._router.navigate([`../view-purchase-order/${value}`], {
       relativeTo: this._activatedRoute,
       state: { edit: false },
     });
   }
-
-  handleEdit(value: any): any {
-    this._router.navigate([`../view-purchase/${value}`], {
-      relativeTo: this._activatedRoute,
-      state: { edit: true },
-    });
-  }
-
 }
-
