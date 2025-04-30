@@ -41,6 +41,10 @@
                               <p>Status</p>
                               <p [class]="getStatusClass(purchaseDetails?.status)">{{ purchaseDetails?.status }}</p>
                         </div>
+                        <div *ngIf="purchaseDetails.status === 'Verified'" class="space-y-1">
+                              <p>Verified By</p>
+                              <p class="font-semibold">{{ purchaseDetails?.verified_by }}</p>
+                        </div>
                   </div>
             </div>
             <div class="border-[0.5px] p-4 rounded-md">
@@ -50,7 +54,7 @@
                         </p>
                   </div>
                   <nz-divider class="my-4"></nz-divider>
-                  <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4">
+                  <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-4">
                         <!-- Loop through all products -->
                         <ng-container *ngFor="let product of products; let i = index">
                               <nz-card [nzTitle]="titleTem" class="shadow-lg">
@@ -74,6 +78,17 @@
                                           <p class="text-sm font-light text-secondary">Warehouse:
                                                 <span class="font-semibold">{{ product?.warehouse_name }}</span>
                                           </p>
+                                          <div
+                                                *ngIf="purchaseDetails.status === 'Verified' && product.intended_use === 'for_sale'">
+                                                <nz-divider></nz-divider>
+                                                <p class="text-sm font-light text-secondary">Selling Price:
+                                                      <span class="font-semibold">{{ product?.selling_price }}</span>
+                                                </p>
+                                                <p class="text-sm font-light text-secondary">Maximum Discount Range:
+                                                      <span class="font-semibold">{{ product?.maximum_discount }}
+                                                            %</span>
+                                                </p>
+                                          </div>
                                     </div>
                               </ng-template>
                         </ng-container>

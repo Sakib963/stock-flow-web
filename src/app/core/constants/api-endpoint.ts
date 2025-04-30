@@ -54,9 +54,6 @@ export class APIEndpoint {
   static VERIFY_PURCHASE = "/api/v1/manager/purchase/verify-purchase";
   static CANCEL_PURCHASE = "/api/v1/manager/purchase/cancel-purchase";
 
-  static GET_PRICE_FIXATION_PRODUCT_LIST = "/api/v1/manager/price-fixation/get-price-fixation-product-list";
-  static GET_PRODUCT_BATCHES_FOR_PRICE_FIXATION = "/api/v1/manager/price-fixation/get-product-baches-for-price-fixation";
-
   static GET_PRODUCT_LIST_FOR_OVERVIEW = "/api/v1/manager/inventory-overview/get-product-list";
   static GET_PRODUCT_DETAILS_FOR_OVERVIEW = "/api/v1/manager/inventory-overview/get-product-details";
 }

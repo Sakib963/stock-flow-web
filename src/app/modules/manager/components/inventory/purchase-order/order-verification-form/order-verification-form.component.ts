@@ -42,8 +42,8 @@ export class OrderVerificationFormComponent implements OnInit {
     this.form = this._fb.group({
       oid: [this.purchaseDetails.oid, Validators.required],
       products: this._fb.array(
-        this.purchaseDetails.products.map((product: any) =>
-          this._fb.group({
+        this.purchaseDetails.products.map((product: any) => {
+          const group = this._fb.group({
             oid: [product.oid],
             product_oid: [product.product_oid],
             verified_quantity: [
@@ -54,9 +54,43 @@ export class OrderVerificationFormComponent implements OnInit {
               product.unit_price,
               [Validators.required, Validators.min(0)],
             ],
-            intended_use: [null, Validators.required]
-          })
-        )
+            intended_use: [null, Validators.required],
+            selling_price: [null], // Conditional
+            maximum_discount: [null], // Conditional
+          });
+
+          const intendedUseCtrl = group.get('intended_use');
+          const sellingPriceCtrl = group.get('selling_price');
+          const discountCtrl = group.get('maximum_discount');
+
+          // Apply conditional validators when intended_use changes
+          intendedUseCtrl?.valueChanges.subscribe((val) => {
+            if (val === 'for_sale') {
+              sellingPriceCtrl?.setValidators([
+                Validators.required,
+                Validators.min(0),
+              ]);
+              discountCtrl?.setValidators([
+                Validators.required,
+                Validators.min(0),
+                Validators.max(100),
+                Validators.pattern(/^(\d{1,2}(\.\d+)?|100(\.0+)?)$/),
+              ]);
+            } else {
+              sellingPriceCtrl?.clearValidators();
+              sellingPriceCtrl?.setValue(null);
+              sellingPriceCtrl?.markAsTouched();
+              discountCtrl?.clearValidators();
+              discountCtrl?.setValue(null);
+              discountCtrl?.markAsTouched();
+            }
+
+            sellingPriceCtrl?.updateValueAndValidity();
+            discountCtrl?.updateValueAndValidity();
+          });
+
+          return group;
+        })
       ),
     });
   }

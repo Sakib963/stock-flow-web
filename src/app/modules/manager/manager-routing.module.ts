@@ -270,37 +270,6 @@ const routes: Routes = [
             ],
           },
           {
-            path: 'price-fixation',
-            children: [
-              {
-                path: '',
-                redirectTo: 'product-list',
-                pathMatch: 'full',
-              },
-              {
-                path: 'product-list',
-                loadComponent: () =>
-                  import(
-                    './pages/inventory/price-fixation/price-fixation-product-list/price-fixation-product-list.component'
-                  ).then((m) => m.PriceFixationProductListComponent),
-              },
-              // {
-              //   path: 'create-purchase-order',
-              //   loadComponent: () =>
-              //     import(
-              //       './pages/inventory/purchase-order/create-purchase-order/create-purchase-order.component'
-              //     ).then((m) => m.CreatePurchaseOrderComponent),
-              // },
-              // {
-              //   path: 'view-purchase-order/:oid',
-              //   loadComponent: () =>
-              //     import(
-              //       './pages/inventory/purchase-order/view-purchase-order/view-purchase-order.component'
-              //     ).then((m) => m.ViewPurchaseOrderComponent),
-              // }
-            ],
-          },
-          {
             path: 'dispatch',
             loadComponent: () =>
               import(
