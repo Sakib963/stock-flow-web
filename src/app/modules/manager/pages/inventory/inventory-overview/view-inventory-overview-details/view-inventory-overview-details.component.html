@@ -1,123 +1,89 @@
 <div class="p-4 space-y-4">
-      <h2 class="text-2xl font-medium mb-4 animate-text">Product Details</h2>
+      <div class="flex gap-2 items-start mb-4 animate-text">
+            <h2 class="text-2xl font-medium">Batch List <span *ngIf="!loading && productDetails">of {{
+                        productDetails?.name }}</span>
+            </h2>
+            <img (click)="redirectToProduct()" class="hover:cursor-pointer" src="assets/icons/export.svg" alt="Redirect to product">
+      </div>
       <app-loader *ngIf="loading" [isVisible]="loading"></app-loader>
-      <div *ngIf="!loading && productDetails" class="grid grid-cols-1 gap-4 md:grid-cols-3">
-            <div class="md:col-span-2 space-y-4  order-2 md:order-1">
-                  <div class="grid grid-cols-1 gap-x-6 gap-y-4 md:grid-cols-3 border-[0.5px] p-4 rounded-md">
-                        <!-- Name -->
-                        <div class="space-y-1">
-                              <p>Product Name</p>
-                              <p class="font-semibold text-secondary">{{ productDetails?.name }}</p>
-                        </div>
-                        <!-- sku -->
-                        <div class="space-y-1">
-                              <p>SKU</p>
-                              <p class="font-semibold text-secondary">{{ productDetails?.sku }}</p>
-                        </div>
-                        <!-- Category -->
-                        <div class="space-y-1">
-                              <p>Category</p>
-                              <p class="font-semibold text-secondary">{{ productDetails?.category_name }}</p>
-                        </div>
-                        <!-- Sub Category -->
-                        <div class="space-y-1">
-                              <p>Sub Category</p>
-                              <p class="font-semibold text-secondary">{{ productDetails?.sub_category_name }}</p>
-                        </div>
-                        <!-- Unit Type -->
-                        <div class="space-y-1">
-                              <p>Unit Type</p>
-                              <p class="font-semibold text-secondary">{{ getLabel(productDetails?.unit_type,
-                                    'unit_type') }}</p>
-                        </div>
-                        <!-- Product Nature -->
-                        <div class="space-y-1">
-                              <p>Product Nature</p>
-                              <p class="font-semibold text-secondary">{{ getLabel(productDetails?.product_nature,
-                                    'product_nature') }}
-                              </p>
-                        </div>
-                        <!-- Restock Threshold -->
-                        <div class="space-y-1">
-                              <p>Restock Threshold</p>
-                              <p class="font-semibold text-secondary">{{ productDetails?.restock_threshold }}</p>
-                        </div>
-                        <!-- Description -->
-                        <div class="space-y-1">
-                              <p>Description</p>
-                              <p class="font-semibold text-secondary">{{ productDetails?.description }}</p>
-                        </div>
-                        <!-- status -->
-                        <div class="space-y-1">
-                              <p>Status</p>
-                              <p class="font-semibold text-secondary">{{ productDetails?.status }}</p>
-                        </div>
-                  </div>
-                  <!-- Batch Details -->
-                  <div class="border-[0.5px] p-4 rounded-md">
-                        <h2 class="text-xl font-medium mb-4 animate-text">Batch List</h2>
-                        <ul *ngIf="batch_data.length" class="divide-y divide-gray-100">
-                              <ng-container *ngFor="let item of batch_data">
-                                    <li class="grid md:grid-cols-3 gap-x-6 py-5">
-                                          <div class="flex min-w-0 gap-x-4">
-                                                <div class="min-w-0 flex-auto">
-                                                      <div class="text-sm/6 text-[#180B26] font-semibold flex gap-2">
-                                                            <p>Batch Code: <span class="font-normal">{{
-                                                                        item?.batch_code }}</span></p>
-                                                      </div>
-                                                      <p class="mt-1 truncate text-xs/5 text-[#180B26] font-semibold">
-                                                            Supplier: <span class="font-normal">{{
-                                                                  item?.supplier_name
-                                                                  }}</span></p>
-                                                      <p class="mt-1 truncate text-xs/5 text-[#180B26] font-semibold">
-                                                            Total Price: <span class="font-normal">{{
-                                                                  item?.total_price
-                                                                  }}</span></p>
+      <div *ngIf="!loading && productDetails" class="p-4 border rounded-md">
+            <ul *ngIf="batch_data.length" class="divide-y divide-gray-100">
+                  <ng-container *ngFor="let item of batch_data">
+                        <li class="grid md:grid-cols-3 gap-x-6 py-5">
+                              <div class="flex min-w-0 gap-x-4">
+                                    <div class="min-w-0 flex-auto">
+                                          <div class="text-sm/6 text-[#180B26] font-semibold flex gap-2">
+                                                <p>Batch Code: <span class="font-normal">{{
+                                                            item?.batch_code }}</span></p>
+                                          </div>
+                                          <p class="mt-1 truncate text-xs/5 text-[#180B26] font-semibold">
+                                                Supplier: <span class="font-normal">{{
+                                                      item?.supplier_name
+                                                      }}</span></p>
+                                          <p *ngIf="item?.selling_price"
+                                                class="mt-1 truncate text-xs/5 text-[#180B26] font-semibold">
+                                                Selling Price: <span class="font-normal">&#2547;{{
+                                                      item?.selling_price
+                                                      }}</span></p>
+                                          <div *ngIf="!item?.selling_price && item?.intended_use === 'for_sale'"
+                                                class="mt-1 bg-[#DF1463] inline-flex justify-center items-center h-5 px-1 rounded gap-2">
+                                                <svg-icon src="assets/icons/warning.svg"
+                                                      class="transition-transform duration-150 ease-in-out"></svg-icon>
+                                                <span class="text-xs font-normal text-white">Price Not Fixed</span>
+                                          </div>
+                                    </div>
+                              </div>
+                              <div>
+                                    <p class="mt-1 truncate text-xs/5 text-[#180B26] font-semibold">
+                                          Unit Price: <span class="font-normal">&#2547;{{
+                                                item?.cost_price }}</span></p>
+                                    <p class="mt-1 truncate text-xs/5 text-[#180B26] font-semibold">
+                                          Purchase Quantity:
+                                          <span class="font-normal">{{ item?.initial_quantity
+                                                }}</span>
+                                    </p>
+                                    <p class="mt-1 truncate text-xs/5 text-[#180B26] font-semibold">
+                                          Available Quantity:
+                                          <span class="font-normal">{{ item?.quantity_available
+                                                }}</span>
+                                    </p>
+                              </div>
+                              <div class="flex justify-between items-center">
+                                    <div>
+                                          <p class="mt-1 truncate text-xs/5 text-gray-500 font-semibold">
+                                                Warehouse: <span class="font-normal">{{
+                                                      item?.warehouse_name }}</span></p>
+                                          <p class="mt-1 truncate text-xs/5 text-gray-500 font-semibold">
+                                                Aisle/Zone:
+                                                <span class="font-normal">{{ item?.aisle_name
+                                                      }}</span>
+                                          </p>
+                                    </div>
+                                    <div class="flex justify-end">
+                                          <div class="shrink-0 sm:flex sm:flex-col sm:items-center">
+                                                <div
+                                                      class="mt-1 text-xs/5 text-black flex justify-center items-center gap-4">
+                                                      <button (click)="handleAction('view', item)">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none"
+                                                                  viewBox="0 0 24 24" stroke-width="1.5"
+                                                                  stroke="currentColor" class="size-6">
+                                                                  <path stroke-linecap="round" stroke-linejoin="round"
+                                                                        d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
+                                                                  <path stroke-linecap="round" stroke-linejoin="round"
+                                                                        d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                                                            </svg>
+                                                      </button>
                                                 </div>
                                           </div>
-                                          <div>
-                                                <p class="mt-1 truncate text-xs/5 text-[#180B26] font-semibold">
-                                                      Unit Price: <span class="font-normal">{{
-                                                            item?.unit_price }}</span></p>
-                                                <p class="mt-1 truncate text-xs/5 text-[#180B26] font-semibold">
-                                                      Purchase Quantity:
-                                                      <span class="font-normal">{{ item?.purchase_quantity
-                                                            }}</span>
-                                                </p>
-                                                <p class="mt-1 truncate text-xs/5 text-[#180B26] font-semibold">
-                                                      Available Quantity:
-                                                      <span class="font-normal">{{ item?.available_quantity
-                                                            }}</span>
-                                                </p>
-                                          </div>
-                                          <div>
-                                                <p class="mt-1 truncate text-xs/5 text-gray-500 font-semibold">
-                                                      Warehouse: <span class="font-normal">{{
-                                                            item?.warehouse_name }}</span></p>
-                                                <p class="mt-1 truncate text-xs/5 text-gray-500 font-semibold">
-                                                      Aisle/Zone:
-                                                      <span class="font-normal">{{ item?.aisle_name
-                                                            }}</span>
-                                                </p>
-                                          </div>
-                                    </li>
-                              </ng-container>
-                        </ul>
-                        <div *ngIf="!batch_data.length"
-                              class="flex flex-col items-center justify-center h-full text-center bg-gray-50 p-8 rounded-md space-y-4">
-                              <img src="assets/icons/no_data.svg" alt="No Data Found">
-                              <h2 class="text-lg font-semibold text-black">No Data Found</h2>
-                        </div>
-                  </div>
-            </div>
-            <div
-                  class="p-4 border-[0.5px] rounded-md shadow-md md:col-span-1 flex flex-col items-center justify-center order-1 md:order-2">
-                  <div class="w-full flex flex-col items-center h-full gap-4">
-                        <div class="flex-1 flex items-center justify-center w-full">
-                              <img class="w-3/4 max-h-full border-[0.5px] border-dashed rounded-md shadow-md object-contain"
-                                    [src]="productDetails.photo" alt="Product Photo">
-                        </div>
-                  </div>
+                                    </div>
+                              </div>
+                        </li>
+                  </ng-container>
+            </ul>
+            <div *ngIf="!batch_data.length"
+                  class="flex flex-col items-center justify-center h-full text-center bg-gray-50 p-8 rounded-md space-y-4">
+                  <img src="assets/icons/no_data.svg" alt="No Data Found">
+                  <h2 class="text-lg font-semibold text-black">No Data Found</h2>
             </div>
       </div>
       <!-- Actions -->

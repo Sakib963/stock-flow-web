@@ -9,11 +9,19 @@ import { LoaderComponent } from '@app/shared/components/loader/loader.component'
 import { SecondaryButton } from '@app/shared/components/buttons/secondary-button/secondary-button.component';
 import { DROPDOWN_OPTIONS } from '@app/core/constants/dropdown-options';
 import { AngularSvgIconModule } from 'angular-svg-icon';
+import { NgZorroCustomModule } from '@app/shared/ng-zorro-custom.module';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-view-inventory-overview-details',
   standalone: true,
-  imports: [CommonModule, LoaderComponent, SecondaryButton, AngularSvgIconModule],
+  imports: [
+    CommonModule,
+    LoaderComponent,
+    SecondaryButton,
+    AngularSvgIconModule,
+    NgZorroCustomModule,
+  ],
   templateUrl: './view-inventory-overview-details.component.html',
   styleUrls: ['./view-inventory-overview-details.component.scss'],
 })
@@ -30,6 +38,7 @@ export class ViewInventoryOverviewDetailsComponent implements OnInit {
     private _destroyRef: DestroyRef,
     private _notificationService: NzNotificationService,
     private _location: Location,
+    private _router: Router
   ) {}
 
   ngOnInit(): void {
@@ -40,9 +49,9 @@ export class ViewInventoryOverviewDetailsComponent implements OnInit {
 
   getRestockThresholdStatus(item: any): boolean {
     if (item?.total_available_quantity < item?.restock_threshold) {
-      return true
+      return true;
     } else {
-      return false
+      return false;
     }
   }
 
@@ -81,8 +90,6 @@ export class ViewInventoryOverviewDetailsComponent implements OnInit {
           if (res.status === 200) {
             this.productDetails = res?.body?.data;
             this.batch_data = res?.body?.data?.batch_data;
-            console.table(this.batch_data);
-            console.info(this.productDetails);
           }
         },
         error: (err: any) => {
@@ -90,5 +97,20 @@ export class ViewInventoryOverviewDetailsComponent implements OnInit {
           this._notificationService.error('Error!', err?.error?.message);
         },
       });
+  }
+
+  handleAction(type: any, item: any): void {
+    console.log('handleAction');
+  }
+
+  redirectToProduct(): void {
+    this._router.navigate(
+      [
+        `/manager/configuration/product/view-product/${this.productDetails.oid}`,
+      ],
+      {
+        state: { edit: false },
+      }
+    );
   }
 }
