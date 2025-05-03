@@ -10,7 +10,9 @@ import { SecondaryButton } from '@app/shared/components/buttons/secondary-button
 import { DROPDOWN_OPTIONS } from '@app/core/constants/dropdown-options';
 import { AngularSvgIconModule } from 'angular-svg-icon';
 import { NgZorroCustomModule } from '@app/shared/ng-zorro-custom.module';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
+import { NzModalService } from 'ng-zorro-antd/modal';
+import { UpdatePricingModalComponent } from '@app/modules/manager/components/inventory/update-pricing-modal/update-pricing-modal.component';
 
 @Component({
   selector: 'app-view-inventory-overview-details',
@@ -38,7 +40,9 @@ export class ViewInventoryOverviewDetailsComponent implements OnInit {
     private _destroyRef: DestroyRef,
     private _notificationService: NzNotificationService,
     private _location: Location,
-    private _router: Router
+    private _router: Router,
+    private _activatedRoute: ActivatedRoute,
+    private _modal: NzModalService
   ) {}
 
   ngOnInit(): void {
@@ -112,5 +116,59 @@ export class ViewInventoryOverviewDetailsComponent implements OnInit {
         state: { edit: false },
       }
     );
+  }
+
+  getPricingStatus(item: any): boolean {
+    if (item.intended_use === 'for_sale') return false;
+    return true;
+  }
+
+  log(data: string): void {
+    console.log(data);
+  }
+
+  displayUpdatePricingModal(item: any): void {
+    const modalData = {
+      formData: {
+        oid: item.inventory_oid,
+        selling_price: item.selling_price,
+        maximum_discount: item.maximum_discount,
+      },
+      batch_code: item.batch_code,
+    };
+    const modal = this._modal.create({
+      nzContent: UpdatePricingModalComponent,
+      nzFooter: null,
+      nzClosable: false,
+      nzData: modalData,
+    });
+
+    // Handle the result after the modal closes
+    modal.afterClose.subscribe((result) => {
+      if (result) {
+        console.log(result);
+        this.updatePricing(result);
+      }
+    });
+  }
+
+  updatePricing(payload: any): void {
+    this.loading = true;
+    this._httpService
+      .post(APIEndpoint.UPDATE_PRICING, payload)
+      .pipe(
+        takeUntilDestroyed(this._destroyRef),
+        finalize(() => (this.loading = false))
+      )
+      .subscribe({
+        next: (res: any) => {
+          this._notificationService.success('Success!', res?.body?.message);
+          this.loadItemDetails();
+        },
+        error: (err: any) => {
+          console.log(err);
+          this._notificationService.error('Error!', err?.error?.message);
+        },
+      });
   }
 }

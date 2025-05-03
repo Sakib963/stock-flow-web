@@ -1,0 +1,37 @@
+<div class="rounded-md bg-white max-w-full w-full">
+      <form nz-form [formGroup]="form" [nzLayout]="'vertical'" (ngSubmit)="handleForm()" class="space-y-4">
+            <div class="border-[0.5px] p-4 rounded-md">
+                  <h2 class="text-xl font-medium mb-4">Update Pricing & Discount - {{ modalData.batch_code }}
+                  </h2>
+                  <div class="grid grid-cols-1">
+                        <!-- Form -->
+                        <!-- selling_price -->
+                        <nz-form-item>
+                              <nz-form-label [nzRequired]="hasRequiredValidator('selling_price')">Selling
+                                    Price</nz-form-label>
+                              <nz-form-control nzErrorTip="Selling Price is Required."
+                                    [nzValidateStatus]="form.get('maximum_discount') || ''" [nzHasFeedback]="true">
+                                    <input formControlName="selling_price" type="number" nz-input
+                                          placeholder="Enter Selling Price" />
+                              </nz-form-control>
+                        </nz-form-item>
+                        <nz-form-item>
+                              <nz-form-label [nzRequired]="hasRequiredValidator('maximum_discount')">Maximum
+                                    Discount</nz-form-label>
+                              <nz-form-control nzErrorTip="Maximum Discount is Required."
+                                    [nzValidateStatus]="form.get('maximum_discount') || ''" [nzHasFeedback]="true">
+                                    <input nz-input type="number" formControlName="maximum_discount"
+                                          placeholder="Max Discount" class="w-full" />
+                              </nz-form-control>
+                        </nz-form-item>
+                  </div>
+            </div>
+            <!-- Actions -->
+            <div class="flex justify-end mt-4">
+                  <div class="flex items-center gap-4">
+                        <secondary-button (click)="closeModal()" [label]="'Cancel'"></secondary-button>
+                        <primary-button [label]="'Submit'" [loading]="loading" [type]="'submit'"></primary-button>
+                  </div>
+            </div>
+      </form>
+</div>
