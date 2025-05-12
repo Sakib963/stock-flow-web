@@ -18,7 +18,10 @@ const routes: Routes = [
       },
       {
         path: 'redirect',
-        loadComponent: () => import('../shared/components/redirect/redirect.component').then((c) => c.RedirectComponent)
+        loadComponent: () =>
+          import('../shared/components/redirect/redirect.component').then(
+            (c) => c.RedirectComponent
+          ),
       },
       {
         path: 'admin',
@@ -35,6 +38,20 @@ const routes: Routes = [
           ),
         canActivate: [RoleGuard],
         data: { roles: [ROLES.MANAGER, ROLES.GUEST] },
+      },
+      {
+        path: 'sales',
+        loadChildren: () =>
+          import('../modules/sales/sales.module').then((m) => m.SalesModule),
+        canActivate: [RoleGuard],
+        data: { roles: [ROLES.SALESMAN] },
+      },
+      {
+        path: 'shared',
+        loadChildren: () =>
+          import('../modules/shared/shared.module').then((m) => m.SharedModule),
+        canActivate: [RoleGuard],
+        data: { roles: [ROLES.SALESMAN] },
       },
     ],
   },

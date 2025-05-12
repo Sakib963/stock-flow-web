@@ -8,8 +8,8 @@
                         <div *ngIf="!form.controls['photo'].value"
                               class=" flex flex-col items-center justify-center w-32 h-32 border-[0.5px] border-dashed rounded-full shadow-md cursor-pointer"
                               (click)="fileInput.click()">
-                              <svg *ngIf="!imgLoading" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                                    stroke="currentColor" class="size-6">
+                              <svg *ngIf="!imgLoading" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                    viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
                                     <path stroke-linecap="round" stroke-linejoin="round"
                                           d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5m-13.5-9L12 3m0 0 4.5 4.5M12 3v13.5" />
                               </svg>
@@ -95,17 +95,8 @@
             <!-- Actions -->
             <div class="flex justify-end mt-4">
                   <div class="flex items-center gap-4">
-                        <button class="secondary-button" type="button" (click)="goBack()">
-                              Cancel
-                        </button>
-                        <button class="primary-button disabled:cursor-wait" type="submit" [disabled]="loading">
-                              <span *ngIf="loading">
-                                    <app-spinner></app-spinner>
-                              </span>
-                              <div *ngIf="!loading" class="flex justify-center items-center gap-2">
-                                    <p>Submit</p>
-                              </div>
-                        </button>
+                        <secondary-button [label]="'Cancel'"  (click)="goBack()"></secondary-button>
+                        <primary-button [loading]="loading" [label]="'Submit'" [type]="'submit'"></primary-button>
                   </div>
             </div>
       </form>

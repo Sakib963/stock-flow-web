@@ -20,12 +20,13 @@ import {
 } from '@app/core/constants/helper';
 import { HttpService } from '@app/core/services/http.service';
 import { NzModalService } from 'ng-zorro-antd/modal';
-import { SpinnerComponent } from '@app/shared/components/spinner/spinner.component';
 import { ConfirmationModalComponent } from '@app/shared/components/confirmation-modal/confirmation-modal.component';
 import { ROLES } from '@app/core/constants/constants';
 import { FileService } from '@app/core/services/file.service';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { LoaderComponent } from '@app/shared/components/loader/loader.component';
+import { PrimaryButton } from '@app/shared/components/buttons/primary-button/primary-button.component';
+import { SecondaryButton } from '@app/shared/components/buttons/secondary-button/secondary-button.component';
 
 @Component({
   selector: 'app-user-form',
@@ -34,8 +35,9 @@ import { LoaderComponent } from '@app/shared/components/loader/loader.component'
     CommonModule,
     NgZorroCustomModule,
     ReactiveFormsModule,
-    SpinnerComponent,
-    LoaderComponent
+    LoaderComponent,
+    PrimaryButton,
+    SecondaryButton
   ],
   templateUrl: './user-form.component.html',
   styleUrls: ['./user-form.component.scss'],

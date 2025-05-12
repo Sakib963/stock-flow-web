@@ -30,6 +30,8 @@ export class SidebarComponent implements OnInit {
       this.menu = Menu.managerPages;
     } else if (this.userRole === ROLES.GUEST) {
       this.menu = Menu.managerPages;
+    } else if (this.userRole === ROLES.SALESMAN) {
+      this.menu = Menu.salesPages;
     }
   }
 

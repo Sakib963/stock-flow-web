@@ -57,4 +57,9 @@ export class APIEndpoint {
   static GET_PRODUCT_LIST_FOR_OVERVIEW = "/api/v1/manager/inventory-overview/get-product-list";
   static GET_PRODUCT_DETAILS_FOR_OVERVIEW = "/api/v1/manager/inventory-overview/get-product-details";
   static UPDATE_PRICING = "/api/v1/manager/inventory-overview/update-pricing";
+
+  
+  static UPDATE_ATTENDANCE = "/api/v1/salesman/attendance/update-attendance";
+  static GET_ATTENDANCE_LIST = "/api/v1/salesman/attendance/get-attendance-list";
+  static CHECK_CURRENT_ATTENDANCE_STATUS = "/api/v1/salesman/attendance/check-current-attendance-status";
 }
