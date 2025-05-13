@@ -9,8 +9,9 @@ import { APIEndpoint } from '@app/core/constants/api-endpoint';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { finalize } from 'rxjs';
 import { Constants } from '@app/core/constants/constants';
-import { ViewSupplierListComponent } from '@app/modules/manager/components/configuration/supplier/view-supplier-list/view-supplier-list.component';
 import { DROPDOWN_OPTIONS } from '@app/core/constants/dropdown-options';
+import { ViewSelfAttendanceListComponent } from '../../components/view-self-attendance-list/view-self-attendance-list.component';
+import { LoaderComponent } from '@app/shared/components/loader/loader.component';
 
 @Component({
   selector: 'app-attendance',
@@ -21,7 +22,8 @@ import { DROPDOWN_OPTIONS } from '@app/core/constants/dropdown-options';
     FormsModule,
     PrimaryButton,
     ReactiveFormsModule,
-    ViewSupplierListComponent,
+    ViewSelfAttendanceListComponent,
+    LoaderComponent
   ],
   templateUrl: './attendance.component.html',
   styleUrls: ['./attendance.component.scss'],
@@ -235,11 +237,12 @@ export class AttendanceComponent implements OnInit {
   }
 
   checkCurrentAttendanceStatus(): void {
+    this.loading = true;
     this._httpService
       .get(APIEndpoint.CHECK_CURRENT_ATTENDANCE_STATUS)
       .pipe(
         takeUntilDestroyed(this._destroyRef),
-        finalize(() => (this.listLoading = false))
+        finalize(() => (this.loading = false))
       )
       .subscribe({
         next: (res: any) => {

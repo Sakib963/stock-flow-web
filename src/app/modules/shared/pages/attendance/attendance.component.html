@@ -10,7 +10,8 @@
                   </div>
             </div>
             <div class="flex justify-center items-center">
-                  <div class="space-y-4">
+                  <app-loader *ngIf="loading" [isVisible]="loading"></app-loader>
+                  <div *ngIf="!loading" class="space-y-4">
                         <p class="text-gray-500">Current Status: <span class="text-secondary">{{
                                     getAttendanceStatusText() }}</span></p>
                         <p class="text-gray-500">{{ getAttendanceTimeText() }}</p>
@@ -25,11 +26,11 @@
       </div>
       <div class="p-4  border-[1px] rounded-md border-[#E5E7EB] shadow-sm">
             <div class="md:flex justify-between items-center mb-4">
-                  <h2 class="text-2xl font-medium mb-4 animate-text">Attendance Record</h2>
-                  <nz-date-picker nzMode="month" [formControl]="dateControl"></nz-date-picker>
+                  <h2 class="text-2xl font-medium mb-4">Attendance Record</h2>
+                  <nz-date-picker nzInputReadOnly nzMode="month" [formControl]="dateControl"></nz-date-picker>
             </div>
-            <app-view-supplier-list [loading]="listLoading" [data]="data" [totalCount]="totalCount"
+            <app-view-self-attendance-list [loading]="listLoading" [data]="data" [totalCount]="totalCount"
                   (actionEmitter)="handleListActions($event)"
-                  (paginationEvent)="handlePaginationEvent($event)"></app-view-supplier-list>
+                  (paginationEvent)="handlePaginationEvent($event)"></app-view-self-attendance-list>
       </div>
 </div>
