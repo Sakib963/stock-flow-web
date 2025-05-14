@@ -85,6 +85,16 @@ export class Menu {
         },
       ],
     },
+    {
+      group: 'Employee',
+      items: [
+        {
+          icon: 'assets/icons/calendar.svg',
+          label: 'Attendance',
+          route: '/manager/employee/attendance',
+        },
+      ],
+    },
   ];
 
   static salesPages: MenuItem[] = [

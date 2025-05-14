@@ -43,8 +43,6 @@ export class AttendanceComponent implements OnInit {
   isFilter: boolean = false;
   dateControl: FormControl = new FormControl('');
 
-  months = DROPDOWN_OPTIONS.MONTHS;
-
   currentAttendanceStatus: any = null;
 
   constructor(

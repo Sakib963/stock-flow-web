@@ -278,6 +278,35 @@ const routes: Routes = [
           },
         ],
       },
+      {
+        path: 'employee',
+        children: [
+          {
+            path: '',
+            redirectTo: 'attendance',
+            pathMatch: 'full',
+          },
+          {
+            path: 'attendance',
+            children: [
+              {
+                path: '',
+                loadComponent: () =>
+                  import(
+                    './pages/employee/attendance/display-employee-attendance-list/display-employee-attendance-list.component'
+                  ).then((m) => m.DisplayEmployeeAttendanceListComponent),
+              },
+              {
+                path: 'view-attendance/:oid',
+                loadComponent: () =>
+                  import(
+                    './pages/employee/attendance/view-employee-attendance-details/view-employee-attendance-details.component'
+                  ).then((m) => m.ViewEmployeeAttendanceDetailsComponent),
+              },
+            ]
+          },
+        ],
+      },
     ],
   },
   {
