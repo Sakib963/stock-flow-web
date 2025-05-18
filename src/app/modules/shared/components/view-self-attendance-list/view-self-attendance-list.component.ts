@@ -58,25 +58,36 @@ export class ViewSelfAttendanceListComponent {
     return null;
   }
 
-  getTotalTime(item: any): string | null {
-    if (!item?.sign_in_time_bd) {
-      return 'Not signed in yet.';
+  getTotalTime(item: any): string {
+    if (!item?.attendance_date) {
+      return 'Invalid data.';
     }
 
-    const signIn = new Date(item.sign_in_time_bd);
+    const today = new Date();
+    const attendanceDate = new Date(item.attendance_date);
+    const isToday =
+      attendanceDate.getFullYear() === today.getFullYear() &&
+      attendanceDate.getMonth() === today.getMonth() &&
+      attendanceDate.getDate() === today.getDate();
+
+    const signIn = item?.sign_in_time_bd
+      ? new Date(item.sign_in_time_bd)
+      : null;
     const signOut = item?.sign_out_time_bd
       ? new Date(item.sign_out_time_bd)
       : null;
-    const today = new Date();
-    const isToday =
-      signIn.getFullYear() === today.getFullYear() &&
-      signIn.getMonth() === today.getMonth() &&
-      signIn.getDate() === today.getDate();
 
+    // Case 1: No sign-in time for today (Absent)
+    if (!signIn) {
+      return isToday ? 'Not signed in yet.' : 'Absent';
+    }
+
+    // Case 2: Signed in but no sign-out
     if (signIn && !signOut) {
       return isToday ? 'Currently signed in.' : 'Missed signing out.';
     }
 
+    // Case 3: Both sign-in and sign-out available
     if (signIn && signOut) {
       const diffMs = signOut.getTime() - signIn.getTime();
       if (diffMs <= 0) {
@@ -85,10 +96,25 @@ export class ViewSelfAttendanceListComponent {
 
       const hours = Math.floor(diffMs / (1000 * 60 * 60));
       const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
-
       return `Total Time: ${hours}h ${minutes}m`;
     }
 
     return 'Invalid data.';
+  }
+
+  getTotalTimeClass(item: any): string {
+    const statusText = this.getTotalTime(item);
+
+    switch (statusText) {
+      case 'Absent':
+      case 'Missed signing out.':
+        return 'text-red-500';
+      case 'Not signed in yet.':
+        return 'text-yellow-500';
+      case 'Currently signed in.':
+        return 'text-green-500';
+      default:
+        return 'text-gray-500';
+    }
   }
 }

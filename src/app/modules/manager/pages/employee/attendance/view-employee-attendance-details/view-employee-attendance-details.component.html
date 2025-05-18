@@ -1,0 +1,67 @@
+<div class="p-4 space-y-3">
+      <h2 class="text-2xl font-medium mb-4 animate-text">Attendance Details</h2>
+      <app-loader *ngIf="loading" [isVisible]="loading"></app-loader>
+      <div *ngIf="!loading && itemDetails">
+            <!-- Edit mode On -->
+            <div *ngIf="editMode">
+                  <app-employee-attendance-form [formData]="itemDetails"
+                        (actionEmitter)="handleActions($event)"></app-employee-attendance-form>
+            </div>
+            <div *ngIf="!editMode" class="space-y-4">
+                  <div class="grid grid-cols-1 gap-x-6 gap-y-4 md:grid-cols-3 border-[0.5px] p-4 rounded-md text-base">
+                        <div class="space-y-1">
+                              <p>Employee Name</p>
+                              <p class="font-semibold text-secondary">{{ itemDetails?.employee_name }}</p>
+                        </div>
+                        <div class="space-y-1">
+                              <p>Date</p>
+                              <p class="font-semibold text-secondary">{{ itemDetails?.parsed_attendance_date }}</p>
+                        </div>
+                        <div class="space-y-1">
+                              <p>Total Time</p>
+                              <p class="font-semibold text-secondary" [ngClass]="getTotalTimeClass(itemDetails)">{{ getTotalTime(itemDetails) }}</p>
+                        </div>
+                  </div>
+                  <div class="grid grid-cols-1 gap-x-6 gap-y-4 md:grid-cols-2">
+                        <div class="space-y-4 border-[0.5px] p-4 rounded-md">
+                              <h2 class="font-semibold text-base">Sign In</h2>
+                              <nz-divider></nz-divider>
+                              <div class="grid grid-cols-1 gap-x-6 gap-y-4 md:grid-cols-2">
+                                    <div class="space-y-1">
+                                          <p>Sign In Time</p>
+                                          <p class="font-semibold text-secondary">{{
+                                                convertToBangladeshTime(itemDetails?.sign_in_time) }}</p>
+                                    </div>
+                                    <div class="space-y-1">
+                                          <p>Sign In Location</p>
+                                          <p class="font-semibold text-secondary">{{ itemDetails?.sign_in_location }}
+                                          </p>
+                                    </div>
+                              </div>
+                        </div>
+                        <div class="space-y-4 border-[0.5px] p-4 rounded-md">
+                              <h2 class="font-semibold text-base">Sign Out</h2>
+                              <nz-divider></nz-divider>
+                              <div class="grid grid-cols-1 gap-x-6 gap-y-4 md:grid-cols-2">
+                                    <div class="space-y-1">
+                                          <p>Sign Out Time</p>
+                                          <p class="font-semibold text-secondary">{{
+                                                convertToBangladeshTime(itemDetails?.sign_out_time) }}</p>
+                                    </div>
+                                    <div class="space-y-1">
+                                          <p>Sign Out Location</p>
+                                          <p class="font-semibold text-secondary">{{ itemDetails?.sign_out_location }}
+                                          </p>
+                                    </div>
+                              </div>
+                        </div>
+                  </div>
+                  <!-- Actions -->
+                  <div class="flex justify-end mt-4">
+                        <div class="flex items-center gap-4">
+                              <secondary-button [label]="'Go Back'" (click)="goBack()"></secondary-button>
+                        </div>
+                  </div>
+            </div>
+      </div>
+</div>

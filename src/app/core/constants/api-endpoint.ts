@@ -63,4 +63,6 @@ export class APIEndpoint {
   static CHECK_CURRENT_ATTENDANCE_STATUS = "/api/v1/salesman/attendance/check-current-attendance-status";
   
   static GET_EMPLOYEE_ATTENDANCE_LIST = "/api/v1/manager/attendance/get-employee-attendance-list";
+  static GET_EMPLOYEE_ATTENDANCE_DETAILS = "/api/v1/manager/attendance/get-employee-attendance-details";
+  static UPDATE_EMPLOYEE_ATTENDANCE = "/api/v1/manager/attendance/update-employee-attendance";
 }

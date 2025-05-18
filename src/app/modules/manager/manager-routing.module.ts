@@ -236,7 +236,7 @@ const routes: Routes = [
                     './pages/inventory/inventory-overview/view-inventory-overview-details/view-inventory-overview-details.component'
                   ).then((m) => m.ViewInventoryOverviewDetailsComponent),
               },
-            ]
+            ],
           },
           {
             path: 'purchase-order',
@@ -266,7 +266,7 @@ const routes: Routes = [
                   import(
                     './pages/inventory/purchase-order/view-purchase-order/view-purchase-order.component'
                   ).then((m) => m.ViewPurchaseOrderComponent),
-              }
+              },
             ],
           },
           {
@@ -282,28 +282,28 @@ const routes: Routes = [
         path: 'employee',
         children: [
           {
-            path: '',
-            redirectTo: 'attendance',
-            pathMatch: 'full',
-          },
-          {
             path: 'attendance',
             children: [
               {
                 path: '',
+                redirectTo: 'attendance-list',
+                pathMatch: 'full',
+              },
+              {
+                path: 'attendance-list',
                 loadComponent: () =>
                   import(
                     './pages/employee/attendance/display-employee-attendance-list/display-employee-attendance-list.component'
                   ).then((m) => m.DisplayEmployeeAttendanceListComponent),
               },
               {
-                path: 'view-attendance/:oid',
+                path: 'view-attendance-details/:oid',
                 loadComponent: () =>
                   import(
                     './pages/employee/attendance/view-employee-attendance-details/view-employee-attendance-details.component'
                   ).then((m) => m.ViewEmployeeAttendanceDetailsComponent),
               },
-            ]
+            ],
           },
         ],
       },

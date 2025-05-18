@@ -1,8 +1,6 @@
 import { Component, DestroyRef, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import { ViewAisleListComponent } from '@app/modules/manager/components/configuration/aisle/view-aisle-list/view-aisle-list.component';
-import { PrimaryButtonWithPlusIcon } from '@app/shared/components/buttons/primary-button-with-plus-icon/primary-button-with-plus-icon.component';
 import { NgZorroCustomModule } from '@app/shared/ng-zorro-custom.module';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router, ActivatedRoute } from '@angular/router';
@@ -21,7 +19,6 @@ import { ViewEmployeeAttendanceListComponent } from '@app/modules/manager/compon
     NgZorroCustomModule,
     ReactiveFormsModule,
     ViewEmployeeAttendanceListComponent,
-    PrimaryButtonWithPlusIcon,
   ],
   templateUrl: './display-employee-attendance-list.component.html',
   styleUrls: ['./display-employee-attendance-list.component.scss'],
@@ -122,20 +119,20 @@ export class DisplayEmployeeAttendanceListComponent {
   }
 
   handleAdd(): any {
-    this._router.navigate(['../create-aisle'], {
+    this._router.navigate(['../create-attendance'], {
       relativeTo: this._activatedRoute,
     });
   }
 
   handleView(value: any): any {
-    this._router.navigate([`../view-aisle/${value}`], {
+    this._router.navigate([`../view-attendance-details/${value}`], {
       relativeTo: this._activatedRoute,
       state: { edit: false },
     });
   }
 
   handleEdit(value: any): any {
-    this._router.navigate([`../view-aisle/${value}`], {
+    this._router.navigate([`../view-attendance-details/${value}`], {
       relativeTo: this._activatedRoute,
       state: { edit: true },
     });

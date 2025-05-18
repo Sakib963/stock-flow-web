@@ -7,7 +7,7 @@
                         <nz-date-picker nzInputReadOnly nzMode="month" [formControl]="dateControl"></nz-date-picker>
                   </div>
             </div>
-            <app-view-employee-attendance-list [loading]="loading" [data]="data" [totalCount]="totalCount"
+            <app-view-employee-attendance-list [isEmployeeAttendance]="true" [loading]="loading" [data]="data" [totalCount]="totalCount"
                   (actionEmitter)="handleListActions($event)"
                   (paginationEvent)="handlePaginationEvent($event)"></app-view-employee-attendance-list>
       </div>
