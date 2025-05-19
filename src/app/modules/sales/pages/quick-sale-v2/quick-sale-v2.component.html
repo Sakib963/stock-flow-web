@@ -1,0 +1,103 @@
+<nz-card nzTitle="Customer Information" class="mb-4">
+      <form [formGroup]="customerForm">
+            <div nz-row nzGutter="16">
+                  <div nz-col nzSpan="8">
+                        <nz-form-item>
+                              <nz-form-label [nzRequired]="true">Name</nz-form-label>
+                              <nz-form-control>
+                                    <input nz-input formControlName="name" placeholder="Enter Customer Name" />
+                              </nz-form-control>
+                        </nz-form-item>
+                  </div>
+                  <div nz-col nzSpan="8">
+                        <nz-form-item>
+                              <nz-form-label>Phone</nz-form-label>
+                              <nz-form-control>
+                                    <input nz-input formControlName="phone" placeholder="Enter Phone Number" />
+                              </nz-form-control>
+                        </nz-form-item>
+                  </div>
+            </div>
+      </form>
+</nz-card>
+
+<nz-card nzTitle="Product Selection" class="mb-4">
+      <form [formGroup]="productForm" nz-form [nzLayout]="'vertical'">
+            <div nz-row nzGutter="16" class="mb-2">
+                  <div nz-col nzSpan="6">
+                        <nz-form-item>
+                              <nz-form-control>
+                                    <nz-autocomplete #auto>
+                                          <nz-auto-option *ngFor="let product of filteredProducts"
+                                                [nzValue]="product.name">
+                                                {{ product.name }}
+                                          </nz-auto-option>
+                                    </nz-autocomplete>
+                                    <input nz-input formControlName="productName" [nzAutocomplete]="auto"
+                                          (input)="onProductSearch($event)" placeholder="Search Product" />
+
+                              </nz-form-control>
+                        </nz-form-item>
+                  </div>
+                  <div nz-col nzSpan="4">
+                        <nz-form-item>
+                              <nz-form-control>
+                                    <input nz-input formControlName="quantity" placeholder="Quantity" type="number" />
+                              </nz-form-control>
+                        </nz-form-item>
+                  </div>
+                  <div nz-col nzSpan="4">
+                        <nz-form-item>
+                              <nz-form-control>
+                                    <input nz-input formControlName="unitPrice" placeholder="Unit Price" readonly />
+                              </nz-form-control>
+                        </nz-form-item>
+                  </div>
+                  <div nz-col nzSpan="4">
+                        <nz-form-item>
+                              <nz-form-control>
+                                    <input nz-input formControlName="discount" placeholder="Discount (%)"
+                                          type="number" />
+                              </nz-form-control>
+                        </nz-form-item>
+                  </div>
+                  <div nz-col nzSpan="4">
+                        <nz-form-item>
+                              <nz-form-control>
+                                    <input nz-input formControlName="totalPrice" placeholder="Total" readonly />
+                              </nz-form-control>
+                        </nz-form-item>
+                  </div>
+                  <div nz-col nzSpan="2">
+                        <button nz-button nzType="primary" (click)="addToList()">Add</button>
+                  </div>
+            </div>
+      </form>
+</nz-card>
+
+<nz-card nzTitle="Selected Products">
+      <nz-table #selectedTable [nzData]="selectedProducts" nzBordered>
+            <thead>
+                  <tr>
+                        <th>Product</th>
+                        <th>Quantity</th>
+                        <th>Unit Price</th>
+                        <th>Discount</th>
+                        <th>Total</th>
+                        <th>Action</th>
+                  </tr>
+            </thead>
+            <tbody>
+                  <tr *ngFor="let item of selectedProducts">
+                        <td>{{ item.name }}</td>
+                        <td>{{ item.quantity }}</td>
+                        <td>{{ item.unitPrice }}</td>
+                        <td>{{ item.discount }}%</td>
+                        <td>{{ item.totalPrice }}</td>
+                        <td>
+                              <button nz-button nzType="text" (click)="removeProduct(item)">Remove</button>
+                        </td>
+                  </tr>
+            </tbody>
+      </nz-table>
+</nz-card>

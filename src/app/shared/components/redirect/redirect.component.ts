@@ -22,7 +22,7 @@ export class RedirectComponent implements OnInit {
       } else if (this._authService.currentUserRole === ROLES.MANAGER || this._authService.currentUserRole === ROLES.GUEST) {
         this._router.navigate(['/manager/dashboard']);
       } else if (this._authService.currentUserRole === ROLES.SALESMAN) {
-        this._router.navigate(['/sales/dashboard']);
+        this._router.navigate(['/sales/quick-sale']);
       }
     }
   }

@@ -102,6 +102,16 @@ export class Menu {
       group: '',
       items: [
         {
+          icon: 'assets/icons/purchase.svg',
+          label: 'Quick Sale',
+          route: '/sales/quick-sale',
+        },
+        {
+          icon: 'assets/icons/purchase.svg',
+          label: 'Quick Sale',
+          route: '/sales/quick-sale-v2',
+        },
+        {
           icon: 'assets/icons/dashboard.svg',
           label: 'Dashboard',
           route: '/sales/dashboard',
@@ -109,8 +119,8 @@ export class Menu {
         {
           icon: 'assets/icons/calendar.svg',
           label: 'Attendance',
-          route: '/shared/attendance'
-        }
+          route: '/shared/attendance',
+        },
       ],
     },
   ];

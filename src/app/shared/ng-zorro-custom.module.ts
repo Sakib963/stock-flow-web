@@ -43,6 +43,7 @@ import { NzUploadModule } from 'ng-zorro-antd/upload';
 import { NzLayoutModule } from 'ng-zorro-antd/layout';
 import { NzDrawerModule } from 'ng-zorro-antd/drawer';
 import { NzTreeViewModule } from 'ng-zorro-antd/tree-view';
+import { NzAutocompleteModule } from 'ng-zorro-antd/auto-complete';
 
 const NG_ZORRO_MODULES = [
   NzGridModule,
@@ -87,7 +88,8 @@ const NG_ZORRO_MODULES = [
   NzPopoverModule,
   NzLayoutModule,
   NzDrawerModule,
-  NzTreeViewModule
+  NzTreeViewModule,
+  NzAutocompleteModule
 ];
 
 @NgModule({

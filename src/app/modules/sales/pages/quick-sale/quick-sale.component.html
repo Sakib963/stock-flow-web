@@ -1,0 +1,55 @@
+<div class="p-4 space-y-4">
+      <h2 class="text-2xl font-bold">Quick Sale</h2>
+
+      <nz-input-group nzSuffixIcon="search">
+            <input nz-input placeholder="Search Product (Name, Code, Barcode)" class="w-full" />
+      </nz-input-group>
+
+      <div class="space-y-2">
+            <h3 class="font-semibold">Selected Products</h3>
+            <nz-table #productTable [nzData]="selectedProducts" [nzBordered]="true">
+                  <thead>
+                        <tr>
+                              <th>Product Name</th>
+                              <th>Quantity</th>
+                              <th>Price</th>
+                              <th>Discount</th>
+                              <th>Total</th>
+                              <th>Actions</th>
+                        </tr>
+                  </thead>
+                  <tbody>
+                        <tr *ngFor="let product of selectedProducts">
+                              <td>{{ product.name }}</td>
+                              <td>
+                                    <nz-input-number [(ngModel)]="product.quantity" [nzMin]="1"></nz-input-number>
+                              </td>
+                              <td>{{ product.price | currency }}</td>
+                              <td>
+                                    <nz-input-number [(ngModel)]="product.discount" [nzMin]="0"
+                                          [nzMax]="product.price"></nz-input-number>
+                              </td>
+                              <td>{{ (product.price - product.discount) * product.quantity | currency }}</td>
+                              <td>
+                                    <button nz-button nzType="link" (click)="removeProduct(product)">Remove</button>
+                              </td>
+                        </tr>
+                  </tbody>
+            </nz-table>
+      </div>
+
+      <div class="space-y-2">
+            <h3 class="font-semibold">Customer Info (Optional)</h3>
+            <nz-input-group nzPrefixIcon="user">
+                  <input nz-input placeholder="Customer Name" [(ngModel)]="customerName" />
+            </nz-input-group>
+            <nz-input-group nzPrefixIcon="phone">
+                  <input nz-input placeholder="Customer Phone" [(ngModel)]="customerPhone" />
+            </nz-input-group>
+      </div>
+
+      <div class="flex justify-between items-center">
+            <div class="text-lg font-bold">Total: {{ calculateTotal() | currency }}</div>
+            <button nz-button nzType="primary" (click)="generateInvoice()">Generate Invoice</button>
+      </div>
+</div>
