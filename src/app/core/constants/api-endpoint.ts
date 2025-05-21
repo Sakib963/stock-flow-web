@@ -65,4 +65,6 @@ export class APIEndpoint {
   static GET_EMPLOYEE_ATTENDANCE_LIST = "/api/v1/manager/attendance/get-employee-attendance-list";
   static GET_EMPLOYEE_ATTENDANCE_DETAILS = "/api/v1/manager/attendance/get-employee-attendance-details";
   static UPDATE_EMPLOYEE_ATTENDANCE = "/api/v1/manager/attendance/update-employee-attendance";
+
+  static GET_PRODUCT_LIST_FOR_SALE = "/api/v1/salesman/sale/get-product-list";
 }
