@@ -1,112 +1,70 @@
-<div class="p-4 space-y-4" [formGroup]="saleForm">
-      <h2 class="text-2xl font-bold">Quick Sale</h2>
-
-      <!-- Autocomplete Search -->
-      <nz-input-group nzSize="large" [nzSuffix]="suffixIcon">
-            <input placeholder="Search product" nz-input formControlName="searchInput"
-                  (ngModelChange)="onChange($event)" [nzAutocomplete]="auto" />
-      </nz-input-group>
-      <ng-template #suffixIcon>
-            <span nz-icon nzType="search"></span>
-      </ng-template>
-
-      <nz-autocomplete #auto>
-            <ng-container *ngFor="let group of filteredProductList">
-                  <nz-auto-option [nzValue]="'__group__'" [nzDisabled]="true">
-                        <strong>{{ group.sub_category }} - {{ group.parent_category }}</strong>
-                  </nz-auto-option>
-
-                  <nz-auto-option *ngFor="let item of group.children" [nzValue]="item.product_name"
-                        (click)="onProductSelected(item)">
-                        <div class="flex items-center gap-2">
-                              <img [src]="item.image_url" alt="{{ item.product_name }}"
-                                    class="w-8 h-8 object-cover rounded" (error)="onImageError($event)" />
-                              <div>
-                                    <div class="font-medium">{{ getProductDisplayLabel(item) }}</div>
-                                    <div class="text-xs text-gray-500">
-                                          {{ item.quantity }} pcs - ৳{{ item.unit_price }}
-                                    </div>
-                              </div>
-                        </div>
-                  </nz-auto-option>
-            </ng-container>
-      </nz-autocomplete>
-
-      <!-- Product Details Form -->
-      <div class="space-y-2 border p-4 rounded-md">
-            <h3 class="font-semibold">Product Details</h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <nz-form-item>
-                        <nz-form-label>Product</nz-form-label>
-                        <nz-form-control>
-                              <input nz-input [value]="getProductDisplayLabel(selectedProduct)" disabled />
-                        </nz-form-control>
-                  </nz-form-item>
-
-                  <nz-form-item>
-                        <nz-form-label>Quantity</nz-form-label>
-                        <nz-form-control>
-                              <nz-input-number formControlName="quantity" [nzMin]="1"></nz-input-number>
-                        </nz-form-control>
-                  </nz-form-item>
-
-                  <nz-form-item>
-                        <nz-form-label>Price</nz-form-label>
-                        <nz-form-control>
-                              <input nz-input formControlName="unit_price" nzDisabled />
-                        </nz-form-control>
-                  </nz-form-item>
-
-                  <nz-form-item>
-                        <nz-form-label>Discount</nz-form-label>
-                        <nz-form-control>
-                              <nz-input-number formControlName="discount" [nzMin]="0"
-                                    [nzMax]="selectedProduct?.max_discount_range"></nz-input-number>
-                        </nz-form-control>
-                  </nz-form-item>
-            </div>
-            <button nz-button nzType="primary" (click)="addToInvoice()">Add to Invoice</button>
-      </div>
-
-      <!-- Invoice Table -->
-      <nz-table [nzData]="selectedProducts" [nzBordered]="true">
-            <thead>
-                  <tr>
-                        <th>Product Name</th>
-                        <th>Quantity</th>
-                        <th>Price</th>
-                        <th>Discount</th>
-                        <th>Total</th>
-                        <th>Actions</th>
-                  </tr>
-            </thead>
-            <tbody>
-                  <tr *ngFor="let product of selectedProducts">
-                        <td>{{ product.name }}</td>
-                        <td>{{ product.quantity }}</td>
-                        <td>{{ product.price | currency }}</td>
-                        <td>{{ product.discount }}</td>
-                        <td>{{ (product.price - product.discount) * product.quantity | currency }}</td>
-                        <td>
-                              <button nz-button nzType="link" (click)="removeProduct(product)">Remove</button>
-                        </td>
-                  </tr>
-            </tbody>
-      </nz-table>
-
-      <!-- Customer Info -->
-      <div class="space-y-2">
-            <h3 class="font-semibold">Customer Info (Optional)</h3>
-            <nz-input-group nzPrefixIcon="user">
-                  <input nz-input placeholder="Customer Name" formControlName="customerName" />
-            </nz-input-group>
-            <nz-input-group nzPrefixIcon="phone">
-                  <input nz-input placeholder="Customer Phone" formControlName="customerPhone" />
-            </nz-input-group>
-      </div>
-
+<div class="p-4 space-y-4" [formGroup]="form">
       <div class="flex justify-between items-center">
+            <h2 class="text-2xl font-bold">Quick Sale</h2>
             <div class="text-lg font-bold">Total: {{ calculateTotal() | currency }}</div>
-            <button nz-button nzType="primary" (click)="generateInvoice()">Generate Invoice</button>
+      </div>
+      <app-loader *ngIf="loading" [isVisible]="loading"></app-loader>
+      <div *ngIf="!loading" class=" space-y-4">
+            <!-- Product Select -->
+            <app-select-product (actionEmitter)="handleProductSelect($event)"></app-select-product>
+            <!-- Invoice Table -->
+            <!-- Invoice Table -->
+            <nz-table [nzData]="productRows" [nzBordered]="true" [nzShowPagination]="false" [nzSize]="'small'"
+                  [nzNoResult]="noProducts">
+                  <thead>
+                        <tr>
+                              <th>Product Name</th>
+                              <th>Quantity</th>
+                              <th>Unit Price</th>
+                              <th>Discount (%)</th>
+                              <th>Total</th>
+                              <th>Actions</th>
+                        </tr>
+                  </thead>
+                  <tbody formArrayName="products">
+                        <tr *ngFor="let product of products.controls; let i = index" [formGroupName]="i">
+                              <td>{{ product.get('product_name')?.value }}</td>
+                              <td>{{ product.get('quantity')?.value }}</td>
+                              <td>{{ product.get('unit_price')?.value | currency }}</td>
+                              <td>{{ product.get('discount')?.value }}</td>
+                              <td>{{ product.get('total')?.value | currency }}</td>
+                              <td>
+                                    <!-- Edit Button -->
+                                    <button nz-button nzType="text" nzShape="circle" (click)="editProduct(i)" nz-tooltip
+                                          nzTooltipTitle="Edit">
+                                          <i nz-icon nzType="edit"></i>
+                                    </button>
+
+                                    <!-- Delete Button -->
+                                    <button nz-button nzType="text" nzShape="circle" (click)="removeProduct(i)"
+                                          nz-tooltip nzTooltipTitle="Remove" nzDanger>
+                                          <i nz-icon nzType="delete"></i>
+                                    </button>
+                              </td>
+                        </tr>
+                  </tbody>
+            </nz-table>
+
+
+            <ng-template #noProducts>
+                  <nz-empty [nzNotFoundContent]="'No products added yet.'"></nz-empty>
+            </ng-template>
+
+
+            <!-- Customer Info -->
+            <div class="space-y-2">
+                  <h3 class="font-semibold">Customer Info (Optional)</h3>
+                  <nz-input-group nzPrefixIcon="user">
+                        <input nz-input placeholder="Customer Name" formControlName="customer_name" />
+                  </nz-input-group>
+                  <nz-input-group nzPrefixIcon="phone">
+                        <input nz-input placeholder="Customer Phone" formControlName="customer_phone" />
+                  </nz-input-group>
+            </div>
+
+            <div class="flex justify-between items-center">
+                  <button nz-button nzType="primary" (click)="generateInvoice()">Generate Invoice</button>
+            </div>
+
       </div>
 </div>

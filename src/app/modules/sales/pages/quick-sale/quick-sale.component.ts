@@ -2,10 +2,12 @@ import { Component, DestroyRef, OnInit } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { NgZorroCustomModule } from '@app/shared/ng-zorro-custom.module';
 import {
+  FormArray,
   FormBuilder,
   FormGroup,
   FormsModule,
   ReactiveFormsModule,
+  Validators,
 } from '@angular/forms';
 import { NzAutocompleteModule } from 'ng-zorro-antd/auto-complete';
 import { HttpService } from '@app/core/services/http.service';
@@ -13,6 +15,8 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { APIEndpoint } from '@app/core/constants/api-endpoint';
 import { finalize } from 'rxjs';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
+import { LoaderComponent } from '@app/shared/components/loader/loader.component';
+import { SelectProductComponent } from '../../components/select-product/select-product.component';
 
 @Component({
   selector: 'app-quick-sale',
@@ -23,15 +27,15 @@ import { NzNotificationService } from 'ng-zorro-antd/notification';
     FormsModule,
     NzAutocompleteModule,
     ReactiveFormsModule,
+    LoaderComponent,
+    SelectProductComponent,
   ],
   templateUrl: './quick-sale.component.html',
   styleUrls: ['./quick-sale.component.scss'],
 })
 export class QuickSaleComponent implements OnInit {
-  saleForm!: FormGroup;
+  form!: FormGroup;
   productList: any = [];
-  filteredProductList: any = [];
-  selectedProduct: any = null;
   selectedProducts: any[] = [];
 
   loading: boolean = false;
@@ -46,121 +50,135 @@ export class QuickSaleComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.saleForm = this.createForm();
-    this.loadProductList();
+    this.form = this.createForm();
   }
 
   createForm(): FormGroup {
     return this._fb.group({
-      searchInput: [''],
-      quantity: [1],
-      unit_price: [0],
-      discount: [0],
-      customerName: [''],
-      customerPhone: [''],
+      customer_name: [null],
+      customer_phone: [null],
+      customer_address: [null],
+      customer_email: [null],
+      status: ['draft'],
+      total_amount: [0, [Validators.required, Validators.min(0)]],
+      products: this._fb.array([]),
     });
   }
 
-  loadProductList(payload: any = null): any {
-    if (!this.isFilter) {
-      this.loading = true;
+  createProductGroup(product: any = null): FormGroup {
+    return this._fb.group({
+      inventory_oid: [product?.inventory_oid ?? null, Validators.required],
+      product_name: [product?.product_name ?? null, Validators.required],
+      product_oid: [product?.product_oid ?? null, Validators.required],
+      quantity_available: [product?.quantity_available ?? null],
+      quantity: [
+        product?.quantity ?? 1,
+        [Validators.required, Validators.min(1)],
+      ],
+      unit_price: [
+        product?.unit_price ?? null,
+        [Validators.required, Validators.min(0)],
+      ],
+      discount: [product?.discount ?? 0],
+      total: [product?.total ?? 0, Validators.required],
+    });
+  }
+
+  get products(): FormArray {
+    return this.form.get('products') as FormArray;
+  }
+
+  get productRows(): any[] {
+    return this.products.value;
+  }
+
+  addProduct(): void {
+    this.products.push(this.createProductGroup());
+  }
+
+  removeProduct(index: number): void {
+    this.products.removeAt(index);
+
+    console.log(this.products.value);
+  }
+
+  generateInvoice(): void {
+    // Todo!
+    console.log('Invoice:', this.form.value);
+  }
+
+  handleProductSelect(event: { action: string; value: any }): void {
+    const { action, value } = event;
+
+    switch (action) {
+      case 'add':
+        this.addProductToInvoice(value);
+        break;
+
+      case 'update':
+        this.updateProductInInvoice(value);
+        break;
+
+      default:
+        console.warn(`Unhandled action: ${action}`);
     }
-    this._httpService
-      .get(APIEndpoint.GET_PRODUCT_LIST_FOR_SALE, payload)
-      .pipe(
-        takeUntilDestroyed(this._destroyRef),
-        finalize(() => (this.loading = false))
-      )
-      .subscribe({
-        next: (res: any) => {
-          if (res.status === 200) {
-            this.productList = [];
-            if (res.body?.data?.length) {
-              this.productList = res.body?.data;
-              this.filteredProductList = this.groupProductsBySubCategory(
-                this.productList
-              );
-              console.log('Product List:', this.filteredProductList);
-            } else {
-              this.productList = [];
-              this.filteredProductList = [];
-            }
-          }
-        },
-        error: (err: any) => {
-          console.log(err);
-          this._notificationService.error('Error!', err?.error?.message);
-        },
+  }
+
+  addProductToInvoice(product: any): void {
+    const exists = this.products.controls.some(
+      (ctrl) => ctrl.get('inventory_oid')?.value === product.inventory_oid
+    );
+    if (!exists) {
+      this.products.push(this.createProductGroup(product));
+      this.updateTotalAmount();
+    } else {
+      this._notificationService.warning(
+        'Product already exists',
+        'This product is already added to the invoice.'
+      );
+    }
+  }
+
+  updateTotalAmount(): void {
+    const total = this.products.controls.reduce((sum, productGroup) => {
+      const itemTotal = Number(productGroup.get('total')?.value) || 0;
+      return sum + itemTotal;
+    }, 0);
+
+    this.form.get('total_amount')?.setValue(total);
+  }
+
+  removeProductFromInvoice(index: any): void {
+    if (index !== -1) {
+      this.products.removeAt(index);
+      this.updateTotalAmount();
+    }
+  }
+
+  updateProductInInvoice(updatedProduct: any): void {
+    const index = this.products.controls.findIndex(
+      (item) =>
+        item.get('inventory_oid')?.value === updatedProduct.inventory_oid
+    );
+
+    if (index !== -1) {
+      const item = this.products.at(index);
+
+      item.patchValue({
+        quantity: updatedProduct.quantity,
+        unit_price: updatedProduct.unit_price,
+        discount: updatedProduct.discount,
+        total: updatedProduct.total,
+        quantity_available: updatedProduct.quantity_available,
+        inventory_oid: updatedProduct.inventory_oid,
       });
-  }
 
-  groupProductsBySubCategory(rawList: any[]): any[] {
-    const groupedMap = new Map<string, any>();
-
-    rawList.forEach((item) => {
-      const subCategoryKey = item.sub_category_oid;
-
-      if (!groupedMap.has(subCategoryKey)) {
-        groupedMap.set(subCategoryKey, {
-          sub_category: item.sub_category_name,
-          parent_category: item.category_name,
-          children: [],
-        });
-      }
-
-      const group = groupedMap.get(subCategoryKey);
-
-      group.children.push({
-        inventory_oid: item.inventory_oid,
-        product_oid: item.product_oid,
-        product_name: item.product_name,
-        image_url: item.image_url,
-        sku: item.sku,
-        batch_code: item.batch_code,
-        quantity: Number(item.quantity_available),
-        unit_price: Number(item.selling_price),
-        max_discount_range: Number(item.maximum_discount),
-      });
-    });
-
-    return Array.from(groupedMap.values());
-  }
-
-  onChange(value: string): void {
-    // Call API or filter product list here
-  }
-
-  onProductSelected(product: any): void {
-    this.selectedProduct = product;
-    this.saleForm.patchValue({
-      quantity: 1,
-      unit_price: product.unit_price,
-      discount: 0,
-    });
-  }
-
-  getProductDisplayLabel(product: any): string {
-    return  product ? `${product?.product_name} (${product?.batch_code})` : '';
-  }
-
-  onImageError(event: Event): void {
-    (event.target as HTMLImageElement).src = 'assets/fallback.png';
-  }
-
-  addToInvoice(): void {
-    const { quantity, unit_price, discount } = this.saleForm.value;
-    this.selectedProducts.push({
-      name: this.getProductDisplayLabel(this.selectedProduct),
-      quantity,
-      price: unit_price,
-      discount,
-    });
-    this.selectedProduct = null;
-    this.saleForm.get('searchInput')?.reset();
-  }
-
-  removeProduct(product: any): void {
-    this.selectedProducts = this.selectedProducts.filter((p) => p !== product);
+      this.updateTotalAmount();
+    } else {
+      console.warn(
+        `Product with OID ${updatedProduct.inventory_oid} not found for update.`
+      );
+    }
   }
 
   calculateTotal(): number {
@@ -170,16 +188,12 @@ export class QuickSaleComponent implements OnInit {
     );
   }
 
-  generateInvoice(): void {
-    const invoice = {
-      customer: {
-        name: this.saleForm.value.customerName,
-        phone: this.saleForm.value.customerPhone,
-      },
-      items: this.selectedProducts,
-      total: this.calculateTotal(),
-    };
-    console.log('Invoice:', invoice);
-    // Further logic here
+  editProduct(index: number): void {
+    const product = this.products.at(index).value;
+    this._notificationService.info(
+      'Edit Product',
+      `Editing product: ${product.product_name}`
+    );
+    // Logic to open a modal or navigate to an edit page can be added here
   }
 }
