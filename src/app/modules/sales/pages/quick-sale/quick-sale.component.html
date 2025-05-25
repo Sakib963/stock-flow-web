@@ -1,70 +1,91 @@
 <div class="p-4 space-y-4" [formGroup]="form">
       <div class="flex justify-between items-center">
             <h2 class="text-2xl font-bold">Quick Sale</h2>
-            <div class="text-lg font-bold">Total: {{ calculateTotal() | currency }}</div>
+            <div class="text-lg font-bold">
+                  Total: {{ form.controls['total_amount'].value | currency:'৳':'symbol' }}
+            </div>
+
       </div>
       <app-loader *ngIf="loading" [isVisible]="loading"></app-loader>
-      <div *ngIf="!loading" class=" space-y-4">
-            <!-- Product Select -->
-            <app-select-product (actionEmitter)="handleProductSelect($event)"></app-select-product>
-            <!-- Invoice Table -->
-            <!-- Invoice Table -->
-            <nz-table [nzData]="productRows" [nzBordered]="true" [nzShowPagination]="false" [nzSize]="'small'"
-                  [nzNoResult]="noProducts">
-                  <thead>
-                        <tr>
-                              <th>Product Name</th>
-                              <th>Quantity</th>
-                              <th>Unit Price</th>
-                              <th>Discount (%)</th>
-                              <th>Total</th>
-                              <th>Actions</th>
-                        </tr>
-                  </thead>
-                  <tbody formArrayName="products">
-                        <tr *ngFor="let product of products.controls; let i = index" [formGroupName]="i">
-                              <td>{{ product.get('product_name')?.value }}</td>
-                              <td>{{ product.get('quantity')?.value }}</td>
-                              <td>{{ product.get('unit_price')?.value | currency }}</td>
-                              <td>{{ product.get('discount')?.value }}</td>
-                              <td>{{ product.get('total')?.value | currency }}</td>
-                              <td>
-                                    <!-- Edit Button -->
-                                    <button nz-button nzType="text" nzShape="circle" (click)="editProduct(i)" nz-tooltip
-                                          nzTooltipTitle="Edit">
-                                          <i nz-icon nzType="edit"></i>
-                                    </button>
+      <div *ngIf="!loading">
+            <form nz-form [formGroup]="form" class="space-y-4" [nzLayout]="'vertical'" (ngSubmit)="generateInvoice()">
+                  <!-- Product Select -->
+                  <app-select-product (actionEmitter)="handleProductSelect($event)"></app-select-product>
+                  <!-- Invoice Table -->
+                  <nz-table [nzData]="productRows" [nzBordered]="true" [nzShowPagination]="false" [nzSize]="'small'"
+                        [nzNoResult]="noProducts">
+                        <thead>
+                              <tr>
+                                    <th>Product Name</th>
+                                    <th>Quantity</th>
+                                    <th>Unit Price</th>
+                                    <th>Discount (%)</th>
+                                    <th>Total</th>
+                                    <th>Actions</th>
+                              </tr>
+                        </thead>
+                        <tbody formArrayName="products">
+                              <tr *ngFor="let product of products.controls; let i = index" [formGroupName]="i">
+                                    <td>{{ product.get('product_name')?.value }}</td>
+                                    <td>{{ product.get('quantity')?.value }}</td>
+                                    <td>{{ product.get('unit_price')?.value | currency:'৳':'symbol'}}</td>
+                                    <td>{{ product.get('discount')?.value }}</td>
+                                    <td>{{ product.get('total')?.value | currency:'৳':'symbol'}}</td>
+                                    <td>
+                                          <!-- Edit Button -->
+                                          <button nz-button nzType="text" nzShape="circle" (click)="editProduct(i)"
+                                                nz-tooltip nzTooltipTitle="Edit">
+                                                <i nz-icon nzType="edit"></i>
+                                          </button>
 
-                                    <!-- Delete Button -->
-                                    <button nz-button nzType="text" nzShape="circle" (click)="removeProduct(i)"
-                                          nz-tooltip nzTooltipTitle="Remove" nzDanger>
-                                          <i nz-icon nzType="delete"></i>
-                                    </button>
-                              </td>
-                        </tr>
-                  </tbody>
-            </nz-table>
+                                          <!-- Delete Button -->
+                                          <button nz-button nzType="text" nzShape="circle" (click)="removeProduct(i)"
+                                                nz-tooltip nzTooltipTitle="Remove" nzDanger>
+                                                <i nz-icon nzType="delete"></i>
+                                          </button>
+                                    </td>
+                              </tr>
+                        </tbody>
+                  </nz-table>
 
+                  <ng-template #noProducts>
+                        <nz-empty [nzNotFoundContent]="'No products added yet.'"></nz-empty>
+                  </ng-template>
 
-            <ng-template #noProducts>
-                  <nz-empty [nzNotFoundContent]="'No products added yet.'"></nz-empty>
-            </ng-template>
+                  <!-- Customer Info -->
+                  <div class="space-y-2">
+                        <h3 class="font-semibold">Customer Info (Optional)</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                              <nz-input-group nzPrefixIcon="user">
+                                    <input nz-input placeholder="Customer Name" formControlName="customer_name" />
+                              </nz-input-group>
 
+                              <nz-input-group nzPrefixIcon="phone">
+                                    <input nz-input placeholder="Customer Phone" formControlName="customer_phone" />
+                              </nz-input-group>
 
-            <!-- Customer Info -->
-            <div class="space-y-2">
-                  <h3 class="font-semibold">Customer Info (Optional)</h3>
-                  <nz-input-group nzPrefixIcon="user">
-                        <input nz-input placeholder="Customer Name" formControlName="customer_name" />
-                  </nz-input-group>
-                  <nz-input-group nzPrefixIcon="phone">
-                        <input nz-input placeholder="Customer Phone" formControlName="customer_phone" />
-                  </nz-input-group>
-            </div>
+                              <nz-input-group nzPrefixIcon="home">
+                                    <input nz-input placeholder="Customer Address" formControlName="customer_address" />
+                              </nz-input-group>
 
-            <div class="flex justify-between items-center">
-                  <button nz-button nzType="primary" (click)="generateInvoice()">Generate Invoice</button>
-            </div>
+                              <nz-input-group nzPrefixIcon="mail">
+                                    <input nz-input placeholder="Customer Email" formControlName="customer_email" />
+                              </nz-input-group>
+                        </div>
+                  </div>
+                  <div class="flex justify-end items-center">
+                        <div class="flex space-x-2">
+                              <button nz-button nzType="default" type="button" (click)="saveAsDraft()"
+                                    [disabled]="products.length === 0">
+                                    Save as Draft
+                              </button>
 
+                              <button nz-button nzType="primary" type="submit"
+                                    [disabled]="form.invalid || products.length === 0">
+                                    Generate Invoice
+                              </button>
+                        </div>
+                  </div>
+            </form>
       </div>
 </div>

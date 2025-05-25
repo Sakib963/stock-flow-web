@@ -59,7 +59,7 @@
                         <nz-form-item>
                               <nz-form-label [nzRequired]="hasRequiredValidator('total')">Total Price</nz-form-label>
                               <nz-form-control>
-                                    <input nz-input [value]="getTotalPrice() | currency" disabled />
+                                    <input nz-input [value]="getTotalPrice() | currency:'৳':'symbol'" disabled />
                               </nz-form-control>
                         </nz-form-item>
                   </div>

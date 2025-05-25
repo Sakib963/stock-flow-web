@@ -11,9 +11,6 @@ import {
 } from '@angular/forms';
 import { NzAutocompleteModule } from 'ng-zorro-antd/auto-complete';
 import { HttpService } from '@app/core/services/http.service';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { APIEndpoint } from '@app/core/constants/api-endpoint';
-import { finalize } from 'rxjs';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { LoaderComponent } from '@app/shared/components/loader/loader.component';
 import { SelectProductComponent } from '../../components/select-product/select-product.component';
@@ -181,13 +178,6 @@ export class QuickSaleComponent implements OnInit {
     }
   }
 
-  calculateTotal(): number {
-    return this.selectedProducts.reduce(
-      (acc, item) => acc + (item.price - item.discount) * item.quantity,
-      0
-    );
-  }
-
   editProduct(index: number): void {
     const product = this.products.at(index).value;
     this._notificationService.info(
@@ -195,5 +185,24 @@ export class QuickSaleComponent implements OnInit {
       `Editing product: ${product.product_name}`
     );
     // Logic to open a modal or navigate to an edit page can be added here
+  }
+
+  saveAsDraft(): void {
+    if (this.form) {
+      this.form.patchValue({ status: 'draft' });
+
+      // Optional: allow saving with no products
+      if (this.form.valid || this.products.length === 0) {
+        const draftData = this.form.getRawValue();
+        // Send to backend or handle accordingly
+        console.log('Saving draft:', draftData);
+        this._notificationService.success('Saved', 'Invoice saved as draft');
+      } else {
+        this._notificationService.error(
+          'Error',
+          'Cannot save draft due to invalid data'
+        );
+      }
+    }
   }
 }
