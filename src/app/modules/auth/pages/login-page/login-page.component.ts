@@ -114,7 +114,7 @@ export class LoginPageComponent implements OnInit {
                 this.authService.setGuestUser(false);
                 this._router.navigate(['/manager/dashboard']);
               } else if (res.data.role === ROLES.SALESMAN) {
-                this.authService.setGuestUser(true);
+                this.authService.setGuestUser(false);
                 this._router.navigate(['/sales/quick-sale']);
               } else if (res.data.role === ROLES.GUEST) {
                 this.authService.setGuestUser(true);

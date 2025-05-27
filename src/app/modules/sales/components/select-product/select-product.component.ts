@@ -3,8 +3,10 @@ import {
   DestroyRef,
   EventEmitter,
   Input,
+  OnChanges,
   OnInit,
   Output,
+  SimpleChanges,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { LoaderComponent } from '@app/shared/components/loader/loader.component';
@@ -20,7 +22,7 @@ import { HttpService } from '@app/core/services/http.service';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { APIEndpoint } from '@app/core/constants/api-endpoint';
-import { finalize } from 'rxjs';
+import { debounceTime, distinctUntilChanged, finalize, Subject } from 'rxjs';
 import { checkRequiredValidator } from '@app/core/constants/helper';
 
 @Component({
@@ -36,7 +38,7 @@ import { checkRequiredValidator } from '@app/core/constants/helper';
   templateUrl: './select-product.component.html',
   styleUrls: ['./select-product.component.scss'],
 })
-export class SelectProductComponent implements OnInit {
+export class SelectProductComponent implements OnInit, OnChanges {
   @Output() readonly actionEmitter: EventEmitter<{
     action: string;
     value: any;
@@ -52,6 +54,8 @@ export class SelectProductComponent implements OnInit {
 
   selectedProduct: any = null;
 
+  private $searchSubject = new Subject<string>();
+
   constructor(
     private _fb: FormBuilder,
     private _httpService: HttpService,
@@ -63,19 +67,33 @@ export class SelectProductComponent implements OnInit {
     this.form = this.createForm();
     this.loadProductList();
 
-    // handle formdata if provided and patch values
-    if (this.formData) {
-      this.form.patchValue({
-        inventory_oid: this.formData.inventory_oid,
-        product_name: this.formData.product_name,
-        product_oid: this.formData.product_oid,
-        quantity_available: this.formData.quantity_available,
-        quantity: this.formData.quantity,
-        unit_price: this.formData.unit_price,
-        discount: this.formData.discount,
-        total: this.formData.total,
+    this.$searchSubject
+      .pipe(debounceTime(300), distinctUntilChanged())
+      .subscribe((value: string) => {
+        this.isFilter = true;
+        this.loadProductList({ search_text: value });
       });
-      this.onProductSelectedById(this.formData.inventory_oid);
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['formData'] && changes['formData'].currentValue) {
+      this.form.reset();
+      this.selectedProduct = null;
+
+      const data = changes['formData'].currentValue;
+
+      this.form.patchValue({
+        inventory_oid: data.inventory_oid,
+        product_name: data.product_name,
+        product_oid: data.product_oid,
+        quantity_available: data.quantity_available,
+        quantity: data.quantity,
+        unit_price: data.unit_price,
+        discount: data.discount,
+        total: data.total,
+      });
+
+      this.onProductSelectedById(data.inventory_oid);
     }
   }
 
@@ -163,22 +181,21 @@ export class SelectProductComponent implements OnInit {
   }
 
   onChange(value: string): void {
-    if (value.length) {
-      this.isFilter = true;
-      this.loadProductList({ search_text: value });
-    }
+    if (!value || value.length < 2) return;
+    this.$searchSubject.next(value); // debounce triggers loadProductList
   }
 
   onProductSelected(product: any): void {
     this.selectedProduct = product;
+
     this.form.patchValue({
       inventory_oid: product.inventory_oid,
       product_name: this.getProductDisplayLabel(product),
       product_oid: product.product_oid,
       quantity_available: product.quantity_available,
-      quantity: 1,
+      quantity: this.formData ? this.form.value.quantity : 1,
       unit_price: product.unit_price,
-      discount: 0,
+      discount: this.formData ? this.form.value.discount : 0,
       total: product.unit_price,
     });
   }
@@ -196,9 +213,16 @@ export class SelectProductComponent implements OnInit {
   }
 
   addToInvoice(): void {
-    this.actionEmitter.emit({ action: 'add', value: this.form.getRawValue() });
+    const actionType = this.formData ? 'update' : 'add';
+
+    this.actionEmitter.emit({
+      action: actionType,
+      value: this.form.getRawValue(),
+    });
+
     this.form.reset();
     this.selectedProduct = null;
+    this.formData = null;
   }
 
   onProductSelectedById(inventoryOid: string) {

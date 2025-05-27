@@ -38,6 +38,9 @@ export class QuickSaleComponent implements OnInit {
   loading: boolean = false;
   isFilter: boolean = false;
 
+  editingProduct: any = null;
+  selectedProductIndex: number | null = null;
+
   constructor(
     private _httpService: HttpService,
     private _destroyRef: DestroyRef,
@@ -171,6 +174,8 @@ export class QuickSaleComponent implements OnInit {
       });
 
       this.updateTotalAmount();
+      this.selectedProductIndex = null; // Reset selected product index
+      this.editingProduct = null; // Reset editing state
     } else {
       console.warn(
         `Product with OID ${updatedProduct.inventory_oid} not found for update.`
@@ -180,11 +185,8 @@ export class QuickSaleComponent implements OnInit {
 
   editProduct(index: number): void {
     const product = this.products.at(index).value;
-    this._notificationService.info(
-      'Edit Product',
-      `Editing product: ${product.product_name}`
-    );
-    // Logic to open a modal or navigate to an edit page can be added here
+    this.selectedProductIndex = index;
+    this.editingProduct = product;
   }
 
   saveAsDraft(): void {

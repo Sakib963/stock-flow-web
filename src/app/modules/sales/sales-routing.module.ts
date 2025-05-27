@@ -27,13 +27,6 @@ const routes: Routes = [
             (m) => m.QuickSaleComponent
           ),
       },
-      {
-        path: 'quick-sale-v2',
-        loadComponent: () =>
-          import('./pages/quick-sale-v2/quick-sale-v2.component').then(
-            (m) => m.QuickSaleV2Component
-          ),
-      },
     ]
   },
   {

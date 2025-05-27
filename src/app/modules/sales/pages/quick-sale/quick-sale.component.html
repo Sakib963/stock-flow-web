@@ -10,7 +10,7 @@
       <div *ngIf="!loading">
             <form nz-form [formGroup]="form" class="space-y-4" [nzLayout]="'vertical'" (ngSubmit)="generateInvoice()">
                   <!-- Product Select -->
-                  <app-select-product (actionEmitter)="handleProductSelect($event)"></app-select-product>
+                  <app-select-product [formData]="editingProduct" (actionEmitter)="handleProductSelect($event)"></app-select-product>
                   <!-- Invoice Table -->
                   <nz-table [nzData]="productRows" [nzBordered]="true" [nzShowPagination]="false" [nzSize]="'small'"
                         [nzNoResult]="noProducts">
@@ -33,13 +33,13 @@
                                     <td>{{ product.get('total')?.value | currency:'৳':'symbol'}}</td>
                                     <td>
                                           <!-- Edit Button -->
-                                          <button nz-button nzType="text" nzShape="circle" (click)="editProduct(i)"
+                                          <button nz-button nzType="text" nzShape="circle" type="button" (click)="editProduct(i)"
                                                 nz-tooltip nzTooltipTitle="Edit">
                                                 <i nz-icon nzType="edit"></i>
                                           </button>
 
                                           <!-- Delete Button -->
-                                          <button nz-button nzType="text" nzShape="circle" (click)="removeProduct(i)"
+                                          <button nz-button nzType="text" nzShape="circle" type="button" (click)="removeProduct(i)"
                                                 nz-tooltip nzTooltipTitle="Remove" nzDanger>
                                                 <i nz-icon nzType="delete"></i>
                                           </button>

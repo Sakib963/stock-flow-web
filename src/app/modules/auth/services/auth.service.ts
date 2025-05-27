@@ -18,7 +18,7 @@ export class AuthService {
     email: '',
     photo: '',
     mobile_number: '',
-    designation: ''
+    designation: '',
   });
   loading = signal(false);
   private isGuestUser = false;
@@ -52,8 +52,12 @@ export class AuthService {
   }
 
   getUserInfo(): Observable<any> {
-    this.loading.set(true);
-    return this._httpClient.get<any>(`${environment.baseUrl + APIEndpoint.GET_USER_INFO}`);
+    if (!this.loading()) {
+      this.loading.set(true);
+    }
+    return this._httpClient.get<any>(
+      `${environment.baseUrl + APIEndpoint.GET_USER_INFO}`
+    );
   }
 
   login(data: any): Observable<any> {
@@ -67,7 +71,6 @@ export class AuthService {
           return res;
         }),
         catchError((error) => {
-          this.loading.set(false);
           this._notificationService.error('Error!', error?.error?.message);
           return throwError(() => new Error(error));
         })

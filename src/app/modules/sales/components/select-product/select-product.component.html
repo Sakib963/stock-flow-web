@@ -6,7 +6,8 @@
                         Product</nz-form-label>
                   <nz-form-control>
                         <nz-select nzShowSearch nzPlaceHolder="Select a product" formControlName="search_input"
-                              (ngModelChange)="onProductSelectedById($event)" [nzSize]="'large'">
+                              (ngModelChange)="onProductSelectedById($event)" [nzSize]="'large'"
+                              (nzOnSearch)="onChange($event)">
                               <nz-option-group *ngFor="let group of filteredProductList"
                                     [nzLabel]="group.sub_category + ' - ' + group.parent_category">
                                     <nz-option *ngFor="let item of group.children" [nzValue]="item.inventory_oid"
@@ -33,8 +34,8 @@
                         </nz-form-item>
 
                         <nz-form-item>
-                              <nz-form-label [nzRequired]="hasRequiredValidator('quantity_available')">Quantity
-                                    Available</nz-form-label>
+                              <nz-form-label
+                                    [nzRequired]="hasRequiredValidator('quantity_available')">Available</nz-form-label>
                               <nz-form-control>
                                     <input nz-input [value]="selectedProduct?.quantity_available" disabled />
                               </nz-form-control>
