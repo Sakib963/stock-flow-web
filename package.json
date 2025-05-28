@@ -21,6 +21,8 @@
     "@cloudinary/angular-5.x": "^1.5.4",
     "@cloudinary/ng": "^2.1.1",
     "@cloudinary/url-gen": "^1.21.0",
+    "@ngx-translate/core": "^16.0.4",
+    "@ngx-translate/http-loader": "^16.0.1",
     "angular-svg-icon": "^13.0.0",
     "ng-zorro-antd": "^16.2.2",
     "rxjs": "~7.8.0",

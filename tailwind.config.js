@@ -7,6 +7,8 @@ module.exports = {
     extend: {
       fontFamily: {
         tenor: ['"Tenor Sans"', 'sans-serif'],
+        roboto: ['Roboto', 'sans-serif'],
+        bangla: ['"Noto Sans Bengali"', 'sans-serif'],
       },
       colors: {
         primary: {

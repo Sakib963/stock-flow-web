@@ -16,8 +16,16 @@
   }
 }
 
-body {
+/* body {
   @apply font-tenor text-sm;
+} */
+
+body.lang-en {
+  font-family: "Roboto", sans-serif !important;
+}
+
+body.lang-bn {
+  font-family: "Noto Sans Bengali", sans-serif !important;
 }
 
 .custom-input {
@@ -95,7 +103,7 @@ body {
   content: "";
   position: absolute;
   border-radius: 50px;
-  box-shadow: 0 0 0 3px inset #180B26;
+  box-shadow: 0 0 0 3px inset #180b26;
   animation: l5 2.5s infinite;
 }
 .home_loader:after {
