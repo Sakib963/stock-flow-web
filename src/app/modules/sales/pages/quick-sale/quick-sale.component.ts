@@ -14,6 +14,9 @@ import { HttpService } from '@app/core/services/http.service';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { LoaderComponent } from '@app/shared/components/loader/loader.component';
 import { SelectProductComponent } from '../../components/select-product/select-product.component';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { APIEndpoint } from '@app/core/constants/api-endpoint';
+import { finalize } from 'rxjs';
 
 @Component({
   selector: 'app-quick-sale',
@@ -51,14 +54,32 @@ export class QuickSaleComponent implements OnInit {
 
   ngOnInit(): void {
     this.form = this.createForm();
+    this.loadInvoiceNumber();
+
+    // Conditional validator for payment_reference
+    this.form.get('payment_method')?.valueChanges.subscribe((method) => {
+      const refCtrl = this.form.get('payment_reference');
+      if (method === 'bkash') {
+        refCtrl?.setValidators([Validators.required]);
+      } else {
+        refCtrl?.clearValidators();
+        refCtrl?.setValue(null);
+      }
+      refCtrl?.updateValueAndValidity();
+    });
   }
 
   createForm(): FormGroup {
     return this._fb.group({
+      invoice_no: [null, [Validators.required]],
       customer_name: [null],
       customer_phone: [null],
       customer_address: [null],
       customer_email: [null],
+      payment_method: ['cash', Validators.required],
+      payment_reference: [''],
+      payment_status: ['paid', Validators.required],
+      notes: [null],
       status: ['draft'],
       total_amount: [0, [Validators.required, Validators.min(0)]],
       products: this._fb.array([]),
@@ -206,5 +227,33 @@ export class QuickSaleComponent implements OnInit {
         );
       }
     }
+  }
+
+  loadInvoiceNumber(): void {
+    this.loading = true;
+    this._httpService
+      .get(APIEndpoint.GET_INVOICE_NUMBER_FOR_SALE)
+      .pipe(
+        takeUntilDestroyed(this._destroyRef),
+        finalize(() => (this.loading = false))
+      )
+      .subscribe({
+        next: (res: any) => {
+          if (res.status === 200) {
+            if (res.body?.data && res.body?.data.invoice_no) {
+              this.form.get('invoice_no')?.setValue(res.body.data.invoice_no);
+            } else {
+              this._notificationService.error(
+                'Error',
+                'Invoice number not found in response'
+              );
+            }
+          }
+        },
+        error: (err: any) => {
+          console.log(err);
+          this._notificationService.error('Error!', err?.error?.message);
+        },
+      });
   }
 }
