@@ -20,12 +20,20 @@
   @apply font-tenor text-sm;
 } */
 
-body.lang-en {
+/* body.lang-en {
   font-family: "Roboto", sans-serif !important;
+} */
+
+/* body.lang-bn {
+  font-family: "Noto Sans Bengali", sans-serif !important;
+} */
+
+body.lang-en {
+  font-family: "Mulish", sans-serif !important;
 }
 
 body.lang-bn {
-  font-family: "Noto Sans Bengali", sans-serif !important;
+  font-family: "Hind Siliguri", sans-serif !important;
 }
 
 .custom-input {

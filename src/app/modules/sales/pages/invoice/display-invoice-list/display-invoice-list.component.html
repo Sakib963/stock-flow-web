@@ -1,0 +1,22 @@
+<div class="p-4 space-y-3">
+      <h2 class="text-2xl font-medium mb-4 animate-text">Invoice List</h2>
+      <div>
+            <div class="md:flex justify-between items-center mb-4">
+                  <!-- Search Text -->
+                  <div class="md:w-2/3 grid lg:grid-cols-3 gap-x-4">
+                        <nz-date-picker [formControl]="dateControl" nzInputReadOnly
+                              nzPlaceHolder="Select Date"></nz-date-picker>
+                        <nz-select [formControl]="statusControl">
+                              <nz-option nzValue="Draft" nzLabel="Draft"></nz-option>
+                              <nz-option nzValue="Purchased" nzLabel="Purchased"></nz-option>
+                              <nz-option nzValue="Returned" nzLabel="Returned"></nz-option>
+                              <nz-option nzValue="Cancelled" nzLabel="Cancelled"></nz-option>
+                              <nz-option nzValue="Refunded" nzLabel="Refunded"></nz-option>
+                        </nz-select>
+                  </div>
+            </div>
+            <app-view-invoice-list [loading]="loading" [data]="data" [totalCount]="totalCount"
+                  (actionEmitter)="handleListActions($event)"
+                  (paginationEvent)="handlePaginationEvent($event)"></app-view-invoice-list>
+      </div>
+</div>

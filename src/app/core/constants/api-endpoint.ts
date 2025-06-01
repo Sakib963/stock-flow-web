@@ -68,4 +68,10 @@ export class APIEndpoint {
 
   static GET_PRODUCT_LIST_FOR_SALE = "/api/v1/salesman/sale/get-product-list";
   static GET_INVOICE_NUMBER_FOR_SALE = "/api/v1/salesman/sale/get-invoice-number";
+  static SAVE_INVOICE_IN_DRAFT = "/api/v1/salesman/sale/save-invoice-in-draft";
+  static GET_INVOICE_DETAILS = "/api/v1/salesman/sale/get-invoice-details";
+  static CONFIRM_SALES_INVOICE = "/api/v1/salesman/sale/confirm-sales-invoice";
+  
+  static GET_INVOICE_LIST = "/api/v1/salesman/invoice/get-invoice-list";
+  static DELETE_INVOICE = "/api/v1/salesman/invoice/delete-invoice";
 }

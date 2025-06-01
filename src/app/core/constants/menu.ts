@@ -107,9 +107,9 @@ export class Menu {
           route: '/sales/quick-sale',
         },
         {
-          icon: 'assets/icons/purchase.svg',
-          label: 'Quick Sale',
-          route: '/sales/quick-sale-v2',
+          icon: 'assets/icons/invoice.svg',
+          label: 'Invoice',
+          route: '/sales/invoice',
         },
         {
           icon: 'assets/icons/dashboard.svg',

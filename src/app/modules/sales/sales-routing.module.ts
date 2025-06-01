@@ -27,7 +27,31 @@ const routes: Routes = [
             (m) => m.QuickSaleComponent
           ),
       },
-    ]
+      {
+        path: 'quick-sale/:invoiceId',
+        loadComponent: () =>
+          import('./pages/quick-sale/quick-sale.component').then(
+            (m) => m.QuickSaleComponent
+          ),
+      },
+      {
+        path: 'invoice',
+        children: [
+          {
+            path: '',
+            redirectTo: 'list',
+            pathMatch: 'full',
+          },
+          {
+            path: 'list',
+            loadComponent: () =>
+              import(
+                './pages/invoice/display-invoice-list/display-invoice-list.component'
+              ).then((m) => m.DisplayInvoiceListComponent),
+          },
+        ],
+      },
+    ],
   },
   {
     path: 'not-found',
@@ -41,6 +65,6 @@ const routes: Routes = [
 
 @NgModule({
   imports: [RouterModule.forChild(routes)],
-  exports: [RouterModule]
+  exports: [RouterModule],
 })
-export class SalesRoutingModule { }
+export class SalesRoutingModule {}

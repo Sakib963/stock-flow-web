@@ -9,6 +9,8 @@ module.exports = {
         tenor: ['"Tenor Sans"', 'sans-serif'],
         roboto: ['Roboto', 'sans-serif'],
         bangla: ['"Noto Sans Bengali"', 'sans-serif'],
+        siliguri: ['"Hind Siliguri"', 'sans-serif'],
+        mulish: ['"Mulish"', 'sans-serif'],
       },
       colors: {
         primary: {
