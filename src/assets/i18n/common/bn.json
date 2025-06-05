@@ -1,4 +1,9 @@
 {
-  "HELLO": "হ্যালো",
-  "WELCOME": "অ্যাপে স্বাগতম"
+  "common": {
+    "action": {
+      "reset": "রিসেট",
+      "save_as_draft": "খসড়া সংরক্ষণ করুন",
+      "generate_invoice": "ইনভয়েস তৈরি করুন"
+    }
+  }
 }

@@ -279,7 +279,21 @@ export class QuickSaleComponent implements OnInit {
   }
 
   resetForm(): void {
-    this.form.reset();
+    this.form.reset({
+      oid: null,
+      invoice_no: null,
+      customer_name: null,
+      customer_phone: null,
+      customer_address: null,
+      customer_email: null,
+      payment_method: 'cash',
+      payment_reference: null,
+      payment_status: 'paid',
+      notes: null,
+      status: 'Draft',
+      total_amount: 0,
+      products: [],
+    });
     this.products.clear();
     this.loadInvoiceNumber();
     this.updateTotalAmount();

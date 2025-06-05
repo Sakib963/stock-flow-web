@@ -1,6 +1,103 @@
 {
   "sales": {
     "HELLO": "হ্যালো",
-    "WELCOME": "অ্যাপে স্বাগতম"
+    "WELCOME": "অ্যাপে স্বাগতম",
+    "quick_sale": {
+      "title": "দ্রুত বিক্রি",
+      "select_product": {
+        "form": {
+          "card_title": "পণ্য নির্বাচন করুন",
+          "add_to_invoice": "ইনভয়েসে যোগ করুন",
+          "search_input": {
+            "label": "পণ্য নির্বাচন করুন",
+            "placeholder": "নাম বা ব্যাচ কোড দ্বারা অনুসন্ধান করুন"
+          },
+          "product_name": {
+            "label": "পণ্য",
+            "placeholder": "পণ্য নির্বাচন করুন"
+          },
+          "unit_price": {
+            "label": "দাম (প্রতি ইউনিট)",
+            "placeholder": "দাম (প্রতি ইউনিট)"
+          },
+          "quantity_available": {
+            "label": "মজুত পরিমাণ",
+            "placeholder": "মজুত পরিমাণ"
+          },
+          "quantity": {
+            "label": "পরিমাণ",
+            "placeholder": "পরিমাণ লিখুন"
+          },
+          "total_price": {
+            "label": "মোট দাম",
+            "placeholder": "মোট দাম"
+          },
+          "discount": {
+            "label": "ডিসকাউন্ট",
+            "placeholder": "ডিসকাউন্ট লিখুন"
+          }
+        }
+      },
+      "invoice_table": {
+        "product_name": "পণ্যের নাম",
+        "quantity": "পরিমাণ",
+        "unit_price": "দাম (প্রতি ইউনিট)",
+        "discount": "ডিসকাউন্ট (%)",
+        "total_price": "মোট",
+        "actions": "অ্যাকশন",
+        "no_product_added": "কোন পণ্য যোগ করা হয়নি"
+      },
+      "customer_info": {
+        "title": "গ্রাহকের তথ্য (ঐচ্ছিক)",
+        "customer_name": {
+          "label": "গ্রাহকের নাম",
+          "placeholder": "গ্রাহকের নাম লিখুন",
+          "error_msg": "অনুগ্রহ করে গ্রাহকের নাম লিখুন"
+        },
+        "customer_phone": {
+          "label": "গ্রাহকের ফোন",
+          "placeholder": "গ্রাহকের ফোন লিখুন",
+          "error_msg": "অনুগ্রহ করে গ্রাহকের ফোন লিখুন"
+        },
+        "customer_email": {
+          "label": "গ্রাহকের ইমেইল",
+          "placeholder": "গ্রাহকের ইমেইল লিখুন",
+          "error_msg": "ইমেইল ইনভ্যালিড ফরম্যাট"
+        },
+        "customer_address": {
+          "label": "গ্রাহকের ঠিকানা",
+          "placeholder": "গ্রাহকের ঠিকানা লিখুন",
+          "error_msg": "অনুগ্রহ করে গ্রাহকের ঠিকানা লিখুন"
+        }
+      },
+      "payment_info": {
+        "title": "পেমেন্টের তথ্য",
+        "payment_method": {
+          "label": "পেমেন্ট পদ্ধতি",
+          "placeholder": "পেমেন্ট পদ্ধতি নির্বাচন করুন",
+          "options": {
+            "cash": "ক্যাশ",
+            "bkash": "বিকাশ"
+          }
+        },
+        "note": {
+          "label": "নোট",
+          "placeholder": "নোট লিখুন (যদি থাকে)"
+        },
+        "payment_reference": {
+          "label": "পেমেন্ট রেফারেন্স",
+          "placeholder": "পেমেন্ট রেফারেন্স লিখুন (যদি থাকে)"
+        },
+        "payment_status": {
+          "label": "পেমেন্টের স্ট্যাটাস",
+          "placeholder": "পেমেন্টের স্ট্যাটাস নির্বাচন করুন",
+          "options": {
+            "paid": "পেইড",
+            "unpaid": "আনপেইড",
+            "partially_paid": "আংশিক পেইড"
+          }
+        }
+      }
+    }
   }
 }

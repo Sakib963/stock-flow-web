@@ -24,6 +24,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { APIEndpoint } from '@app/core/constants/api-endpoint';
 import { debounceTime, distinctUntilChanged, finalize, Subject } from 'rxjs';
 import { checkRequiredValidator } from '@app/core/constants/helper';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-select-product',
@@ -34,6 +35,7 @@ import { checkRequiredValidator } from '@app/core/constants/helper';
     NgZorroCustomModule,
     ReactiveFormsModule,
     FormsModule,
+    TranslateModule
   ],
   templateUrl: './select-product.component.html',
   styleUrls: ['./select-product.component.scss'],

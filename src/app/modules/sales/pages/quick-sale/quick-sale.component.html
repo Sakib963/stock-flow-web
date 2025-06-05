@@ -2,12 +2,13 @@
       <div class="flex justify-between items-center">
             <div class="flex items-center space-x-2">
                   <i nz-icon nzType="shopping-cart" class="text-2xl"></i>
-                  <h2 class="text-2xl font-bold">Quick Sale - {{ 'WELCOME' | translate }}</h2>
+                  <h2 class="text-2xl font-bold">{{ 'sales.quick_sale.title' | translate }}</h2>
                   <span *ngIf="form.controls['invoice_no'].value" class="text-base text-gray-500">#{{
                         form.controls['invoice_no'].value }}</span>
             </div>
             <div class="flex items-center space-x-2">
-                  <button nz-button nzType="default" nzDanger nzSize="small" (click)="resetForm()">Reset</button>
+                  <button nz-button nzType="default" nzDanger nzSize="small" (click)="resetForm()">{{
+                        'common.action.reset' | translate }}</button>
                   <p class="text-lg font-bold">Total: {{ form.controls['total_amount'].value | currency:'৳':'symbol' }}
                   </p>
             </div>
@@ -15,7 +16,8 @@
       </div>
       <app-loader *ngIf="loading" [isVisible]="loading"></app-loader>
       <div *ngIf="!loading">
-            <form nz-form [formGroup]="form" class="space-y-4" [nzLayout]="'vertical'" (ngSubmit)="confirmSalesInvoice()">
+            <form nz-form [formGroup]="form" class="space-y-4" [nzLayout]="'vertical'"
+                  (ngSubmit)="confirmSalesInvoice()">
                   <!-- Product Select -->
                   <app-select-product [formData]="editingProduct"
                         (actionEmitter)="handleProductSelect($event)"></app-select-product>
@@ -24,12 +26,12 @@
                         [nzNoResult]="noProducts">
                         <thead>
                               <tr>
-                                    <th>Product Name</th>
-                                    <th>Quantity</th>
-                                    <th>Unit Price</th>
-                                    <th>Discount (%)</th>
-                                    <th>Total</th>
-                                    <th>Actions</th>
+                                    <th>{{ 'sales.quick_sale.invoice_table.product_name' | translate }}</th>
+                                    <th>{{ 'sales.quick_sale.invoice_table.quantity' | translate }}</th>
+                                    <th>{{ 'sales.quick_sale.invoice_table.unit_price' | translate }}</th>
+                                    <th>{{ 'sales.quick_sale.invoice_table.discount' | translate }}</th>
+                                    <th>{{ 'sales.quick_sale.invoice_table.total_price' | translate }}</th>
+                                    <th>{{ 'sales.quick_sale.invoice_table.actions' | translate }}</th>
                               </tr>
                         </thead>
                         <tbody formArrayName="products">
@@ -57,20 +59,25 @@
                   </nz-table>
 
                   <ng-template #noProducts>
-                        <nz-empty [nzNotFoundContent]="'No products added yet.'"></nz-empty>
+                        <nz-empty
+                              nzNotFoundContent="{{ 'sales.quick_sale.invoice_table.no_product_added' | translate }}"></nz-empty>
                   </ng-template>
 
 
                   <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <!-- Customer Info Card -->
-                        <nz-card nzTitle="Customer Info (Optional)">
+                        <nz-card nzTitle="{{ 'sales.quick_sale.customer_info.title' | translate }}">
                               <div class="grid grid-cols-2 gap-x-4">
                                     <!-- Customer Name -->
                                     <nz-form-item>
-                                          <nz-form-label [nzRequired]="true">Customer Name</nz-form-label>
-                                          <nz-form-control [nzErrorTip]="'Please enter customer name'">
+                                          <nz-form-label [nzRequired]="true">{{
+                                                'sales.quick_sale.customer_info.customer_name.label' | translate
+                                                }}</nz-form-label>
+                                          <nz-form-control
+                                                nzErrorTip="{{ 'sales.quick_sale.customer_info.customer_name.error_msg' | translate }}">
                                                 <nz-input-group nzPrefixIcon="user">
-                                                      <input nz-input placeholder="Customer Name"
+                                                      <input nz-input
+                                                            placeholder="{{ 'sales.quick_sale.customer_info.customer_name.placeholder' | translate }}"
                                                             formControlName="customer_name" />
                                                 </nz-input-group>
                                           </nz-form-control>
@@ -78,10 +85,13 @@
 
                                     <!-- Customer Phone -->
                                     <nz-form-item>
-                                          <nz-form-label>Customer Phone</nz-form-label>
-                                          <nz-form-control [nzErrorTip]="'Invalid phone number'">
+                                          <nz-form-label>{{ 'sales.quick_sale.customer_info.customer_phone.label' |
+                                                translate }}</nz-form-label>
+                                          <nz-form-control
+                                                nzErrorTip="{{ 'sales.quick_sale.customer_info.customer_phone.error_msg' | translate }}">
                                                 <nz-input-group nzPrefixIcon="phone">
-                                                      <input nz-input placeholder="Customer Phone"
+                                                      <input nz-input
+                                                            placeholder="{{ 'sales.quick_sale.customer_info.customer_phone.placeholder' | translate }}"
                                                             formControlName="customer_phone" />
                                                 </nz-input-group>
                                           </nz-form-control>
@@ -89,10 +99,12 @@
 
                                     <!-- Customer Address -->
                                     <nz-form-item>
-                                          <nz-form-label>Customer Address</nz-form-label>
+                                          <nz-form-label>{{ 'sales.quick_sale.customer_info.customer_address.label' |
+                                                translate }}</nz-form-label>
                                           <nz-form-control>
                                                 <nz-input-group nzPrefixIcon="home">
-                                                      <input nz-input placeholder="Customer Address"
+                                                      <input nz-input
+                                                            placeholder="{{ 'sales.quick_sale.customer_info.customer_address.placeholder' | translate }}"
                                                             formControlName="customer_address" />
                                                 </nz-input-group>
                                           </nz-form-control>
@@ -100,10 +112,13 @@
 
                                     <!-- Customer Email -->
                                     <nz-form-item>
-                                          <nz-form-label>Customer Email</nz-form-label>
-                                          <nz-form-control [nzErrorTip]="'Invalid email format'">
+                                          <nz-form-label>{{ 'sales.quick_sale.customer_info.customer_email.label' |
+                                                translate }}</nz-form-label>
+                                          <nz-form-control
+                                                nzErrorTip="{{ 'sales.quick_sale.customer_info.customer_email.error_msg' | translate }}">
                                                 <nz-input-group nzPrefixIcon="mail">
-                                                      <input nz-input placeholder="Customer Email"
+                                                      <input nz-input
+                                                            placeholder="{{ 'sales.quick_sale.customer_info.customer_email.placeholder' | translate }}"
                                                             formControlName="customer_email" />
                                                 </nz-input-group>
                                           </nz-form-control>
@@ -114,41 +129,60 @@
                         <nz-card [nzTitle]="paymentTitle" [nzBordered]="true">
                               <div class="grid grid-cols-2 gap-x-4">
                                     <nz-form-item>
-                                          <nz-form-label [nzRequired]="true">Payment Method</nz-form-label>
+                                          <nz-form-label [nzRequired]="true">{{
+                                                'sales.quick_sale.payment_info.payment_method.label' | translate
+                                                }}</nz-form-label>
                                           <nz-form-control>
                                                 <nz-radio-group class="w-full" formControlName="payment_method"
                                                       nzButtonStyle="solid">
+                                                      <label class="w-1/2 text-center" nz-radio-button nzValue="cash">{{
+                                                            'sales.quick_sale.payment_info.payment_method.options.cash'
+                                                            | translate }}</label>
                                                       <label class="w-1/2 text-center" nz-radio-button
-                                                            nzValue="cash">Cash</label>
-                                                      <label class="w-1/2 text-center" nz-radio-button
-                                                            nzValue="bkash">Bkash</label>
+                                                            nzValue="bkash">{{
+                                                            'sales.quick_sale.payment_info.payment_method.options.bkash'
+                                                            | translate }}</label>
                                                 </nz-radio-group>
                                           </nz-form-control>
                                     </nz-form-item>
                                     <nz-form-item *ngIf="form.get('payment_method')?.value !== 'bkash'">
-                                          <nz-form-label [nzRequired]="false">Note</nz-form-label>
+                                          <nz-form-label [nzRequired]="false">{{
+                                                'sales.quick_sale.payment_info.note.label' | translate
+                                                }}</nz-form-label>
                                           <nz-form-control>
-                                                <input nz-input placeholder="Notes (if any)" formControlName="notes" />
+                                                <input nz-input
+                                                      placeholder="{{ 'sales.quick_sale.payment_info.note.placeholder' | translate }}"
+                                                      formControlName="notes" />
                                           </nz-form-control>
                                     </nz-form-item>
                                     <nz-form-item *ngIf="form.get('payment_method')?.value === 'bkash'">
-                                          <nz-form-label [nzRequired]="true">Payment Reference</nz-form-label>
+                                          <nz-form-label [nzRequired]="true">{{
+                                                'sales.quick_sale.payment_info.payment_reference.label' | translate
+                                                }}</nz-form-label>
                                           <nz-form-control>
-                                                <input nz-input placeholder="Bkash Reference"
+                                                <input nz-input
+                                                      placeholder="{{ 'sales.quick_sale.payment_info.payment_reference.placeholder' | translate }}"
                                                       formControlName="payment_reference" required />
                                           </nz-form-control>
                                     </nz-form-item>
                                     <nz-form-item class="col-span-2">
-                                          <nz-form-label [nzRequired]="true">Payment Status</nz-form-label>
+                                          <nz-form-label [nzRequired]="true">{{
+                                                'sales.quick_sale.payment_info.payment_status.label' | translate
+                                                }}</nz-form-label>
                                           <nz-form-control>
                                                 <nz-radio-group class="w-full" formControlName="payment_status"
                                                       nzButtonStyle="solid">
                                                       <label class="w-1/3 text-center" nz-radio-button
-                                                            nzValue="unpaid">Unpaid</label>
+                                                            nzValue="unpaid">{{
+                                                            'sales.quick_sale.payment_info.payment_status.options.unpaid'
+                                                            | translate }}</label>
                                                       <label class="w-1/3 text-center" nz-radio-button
-                                                            nzValue="partially_paid">Partially Paid</label>
-                                                      <label class="w-1/3 text-center" nz-radio-button
-                                                            nzValue="paid">Paid</label>
+                                                            nzValue="partially_paid">{{
+                                                            'sales.quick_sale.payment_info.payment_status.options.partially_paid'
+                                                            | translate }}</label>
+                                                      <label class="w-1/3 text-center" nz-radio-button nzValue="paid">{{
+                                                            'sales.quick_sale.payment_info.payment_status.options.paid'
+                                                            | translate }}</label>
                                                 </nz-radio-group>
                                           </nz-form-control>
                                     </nz-form-item>
@@ -156,7 +190,8 @@
                         </nz-card>
                         <ng-template #paymentTitle>
                               <h3 class="text-lg font-semibold flex gap-2 items-center"><span
-                                          class="text-red-500">*</span>Payment Information
+                                          class="text-red-500">*</span>{{ 'sales.quick_sale.payment_info.title' |
+                                    translate }}
                               </h3>
                         </ng-template>
                   </div>
@@ -164,12 +199,12 @@
                         <div class="flex space-x-2">
                               <button nz-button nzType="default" type="button" (click)="saveAsDraft()"
                                     [disabled]="products.length === 0">
-                                    Save as Draft
+                                    {{ 'common.action.save_as_draft' | translate }}
                               </button>
 
                               <button nz-button nzType="primary" type="submit"
                                     [disabled]="form.invalid || products.length === 0">
-                                    Generate Invoice
+                                    {{ 'common.action.generate_invoice' | translate }}
                               </button>
                         </div>
                   </div>
