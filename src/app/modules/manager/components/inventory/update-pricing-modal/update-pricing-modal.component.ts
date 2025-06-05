@@ -19,6 +19,7 @@ import {
 export interface ModalData {
   formData: any;
   batch_code: string;
+  cost_price: string;
 }
 
 @Component({
@@ -80,5 +81,16 @@ export class UpdatePricingModalComponent {
   hasRequiredValidator(controlName: string): boolean {
     const control = this.form.get(controlName);
     return control ? checkRequiredValidator(control) : false;
+  }
+
+  getPerUnitPriceText(): string {
+    const costPrice = this.modalData?.cost_price;
+    const batchCode = this.modalData?.batch_code;
+
+    if (costPrice && batchCode) {
+      return `Per unit cost for batch <strong>${batchCode}</strong> is <strong>${costPrice} BDT</strong>.`;
+    } else {
+      return 'Cost information for this batch is currently unavailable.';
+    }
   }
 }

@@ -13,6 +13,11 @@ import { NgZorroCustomModule } from '@app/shared/ng-zorro-custom.module';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NzModalService } from 'ng-zorro-antd/modal';
 import { UpdatePricingModalComponent } from '@app/modules/manager/components/inventory/update-pricing-modal/update-pricing-modal.component';
+import { FormsModule } from '@angular/forms';
+import { NgxBarcode6Module } from 'ngx-barcode6';
+import { PrimaryButton } from '@app/shared/components/buttons/primary-button/primary-button.component';
+import { PrintService } from '@app/core/services/print.service';
+import { COMPANY_INFO } from '@app/core/constants/company-info';
 
 @Component({
   selector: 'app-view-inventory-overview-details',
@@ -23,6 +28,9 @@ import { UpdatePricingModalComponent } from '@app/modules/manager/components/inv
     SecondaryButton,
     AngularSvgIconModule,
     NgZorroCustomModule,
+    FormsModule,
+    NgxBarcode6Module,
+    PrimaryButton,
   ],
   templateUrl: './view-inventory-overview-details.component.html',
   styleUrls: ['./view-inventory-overview-details.component.scss'],
@@ -35,6 +43,16 @@ export class ViewInventoryOverviewDetailsComponent implements OnInit {
   productNatureList: any = [];
   unitTypes: any = [];
 
+  isBarcodeDrawerVisible = false;
+  barcodePreviewData: {
+    productName: string;
+    batchCode: string;
+    companyName: string;
+    price: number | null;
+    quantityAvailable: number;
+  } | null = null;
+  printQuantity = 1;
+
   constructor(
     private _httpService: HttpService,
     private _destroyRef: DestroyRef,
@@ -42,7 +60,8 @@ export class ViewInventoryOverviewDetailsComponent implements OnInit {
     private _location: Location,
     private _router: Router,
     private _activatedRoute: ActivatedRoute,
-    private _modal: NzModalService
+    private _modal: NzModalService,
+    private _printService: PrintService
   ) {}
 
   ngOnInit(): void {
@@ -112,19 +131,13 @@ export class ViewInventoryOverviewDetailsComponent implements OnInit {
       [
         `/manager/configuration/product/view-product/${this.productDetails.oid}`,
       ],
-      {
-        state: { edit: false },
-      }
+      { state: { edit: false } }
     );
   }
 
   getPricingStatus(item: any): boolean {
     if (item.intended_use === 'for_sale') return false;
     return true;
-  }
-
-  log(data: string): void {
-    console.log(data);
   }
 
   displayUpdatePricingModal(item: any): void {
@@ -134,6 +147,7 @@ export class ViewInventoryOverviewDetailsComponent implements OnInit {
         selling_price: item.selling_price,
         maximum_discount: item.maximum_discount,
       },
+      cost_price: item.cost_price,
       batch_code: item.batch_code,
     };
     const modal = this._modal.create({
@@ -150,6 +164,35 @@ export class ViewInventoryOverviewDetailsComponent implements OnInit {
         this.updatePricing(result);
       }
     });
+  }
+
+  generateBarcode(item: any): void {
+    const showPrice = item.intended_use === 'for_sale';
+
+    if (showPrice && !item.selling_price) {
+      this._notificationService.warning(
+        'Missing Price',
+        'Cannot generate barcode: Selling price is missing.'
+      );
+      return;
+    }
+
+    this.barcodePreviewData = {
+      productName: this.productDetails?.name,
+      batchCode: item.batch_code,
+      companyName: COMPANY_INFO.name,
+      price: showPrice ? item.selling_price : null,
+      quantityAvailable: item.quantity_available,
+    };
+    console.log('Barcode preview data:', this.barcodePreviewData);
+    this.printQuantity = 1;
+
+    this.isBarcodeDrawerVisible = true;
+  }
+
+  printBarcode(count: number): void {
+    if (!this.barcodePreviewData) return;
+    this._printService.printBarcodes(this.barcodePreviewData);
   }
 
   updatePricing(payload: any): void {
@@ -170,5 +213,30 @@ export class ViewInventoryOverviewDetailsComponent implements OnInit {
           this._notificationService.error('Error!', err?.error?.message);
         },
       });
+  }
+
+  getRibbonColor(item: any): any {
+    if (item.status === 'internal_use') {
+      return '';
+    } else if (item.status === 'ready_for_sale') {
+      return 'green';
+    } else if (item.status === 'pending_pricing') {
+      return 'purple';
+    }
+  }
+
+  getStatusText(status: string | null): string {
+    if (status === 'internal_use') {
+      return 'Internal Use';
+    } else if (status === 'ready_for_sale') {
+      return 'Ready for Sale';
+    } else if (status === 'pending_pricing') {
+      return 'Pending Pricing';
+    }
+    return 'Unknown Status';
+  }
+
+  closeDrawer(): void {
+    this.isBarcodeDrawerVisible = false;
   }
 }

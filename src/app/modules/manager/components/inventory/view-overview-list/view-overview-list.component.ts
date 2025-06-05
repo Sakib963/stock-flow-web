@@ -8,9 +8,14 @@ import { AngularSvgIconModule } from 'angular-svg-icon';
 @Component({
   selector: 'app-view-overview-list',
   standalone: true,
-  imports: [CommonModule, NgZorroCustomModule, LoaderComponent, AngularSvgIconModule],
+  imports: [
+    CommonModule,
+    NgZorroCustomModule,
+    LoaderComponent,
+    AngularSvgIconModule,
+  ],
   templateUrl: './view-overview-list.component.html',
-  styleUrls: ['./view-overview-list.component.scss']
+  styleUrls: ['./view-overview-list.component.scss'],
 })
 export class ViewOverviewListComponent {
   @Input() data: any[] = [];
@@ -46,10 +51,28 @@ export class ViewOverviewListComponent {
 
   getRestockThresholdStatus(item: any): boolean {
     if (item?.total_available_quantity < item?.restock_threshold) {
-      return true
+      return true;
     } else {
-      return false
+      return false;
     }
   }
-}
 
+  getRibbonColor(item: any): any {
+    if (item.has_pending_pricing) {
+      return 'purple';
+    }
+    return 'green';
+  }
+
+  getStatusText(hasPendingPricing: boolean, hasForSaleBatch: boolean): string {
+    if (!hasForSaleBatch) {
+      return 'Internal Use';
+    }
+
+    if (hasPendingPricing) {
+      return 'Pending Pricing';
+    }
+
+    return 'Ready for Sale';
+  }
+}

@@ -6,11 +6,12 @@ import { Menu } from '@app/core/constants/menu';
 import { Router, RouterLink } from '@angular/router';
 import { ROLES } from '@app/core/constants/constants';
 import { AngularSvgIconModule } from 'angular-svg-icon';
+import { SmartTranslatePipe } from '@app/shared/pipe/smart-translate.pipe';
 
 @Component({
   selector: 'app-sidebar',
   standalone: true,
-  imports: [CommonModule, RouterLink, AngularSvgIconModule],
+  imports: [CommonModule, RouterLink, AngularSvgIconModule, SmartTranslatePipe],
   templateUrl: './sidebar.component.html',
   styleUrls: ['./sidebar.component.scss'],
 })

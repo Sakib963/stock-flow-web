@@ -12,6 +12,7 @@ import { NgZorroCustomModule } from '@app/shared/ng-zorro-custom.module';
 import { ViewInvoiceListComponent } from '@app/modules/sales/components/invoice/view-invoice-list/view-invoice-list.component';
 import { NzModalService } from 'ng-zorro-antd/modal';
 import { ConfirmationModalComponent } from '@app/shared/components/confirmation-modal/confirmation-modal.component';
+import { PrintService } from '@app/core/services/print.service';
 
 @Component({
   selector: 'app-display-invoice-list',
@@ -45,7 +46,8 @@ export class DisplayInvoiceListComponent implements OnInit {
     private _notificationService: NzNotificationService,
     private _router: Router,
     private _activatedRoute: ActivatedRoute,
-    private _modal: NzModalService
+    private _modal: NzModalService,
+    private _printService: PrintService
   ) {}
 
   ngOnInit(): void {
@@ -62,9 +64,9 @@ export class DisplayInvoiceListComponent implements OnInit {
   constructDefaultPayload(): void {
     const currentDate = new Date().toISOString().split('T')[0];
     this.dateControl.setValue(currentDate);
-    this.statusControl.setValue('Draft');
+    // this.statusControl.setValue('Draft');
     this.payload.selected_date = currentDate;
-    this.payload.status = 'Draft';
+    // this.payload.status = 'Draft';
   }
 
   onDateChange(value: string): void {
@@ -122,6 +124,8 @@ export class DisplayInvoiceListComponent implements OnInit {
       this.handleDelete(event.value.oid);
     } else if (event.action === 'edit') {
       this.handleEdit(event.value.oid);
+    } else if (event.action === 'print') {
+      this.handlePrint(event.value.oid);
     }
   }
 
@@ -168,5 +172,27 @@ export class DisplayInvoiceListComponent implements OnInit {
     this._router.navigate(['/sales/quick-sale', value], {
       state: { edit: true },
     });
+  }
+
+  handlePrint(value: any): any {
+    this.loading = true;
+    this._httpService
+      .get(APIEndpoint.GET_INVOICE_DETAILS, { oid: value })
+      .pipe(
+        takeUntilDestroyed(this._destroyRef),
+        finalize(() => (this.loading = false))
+      )
+      .subscribe({
+        next: (res: any) => {
+          if (res.status === 200) {
+            const invoiceDetails = res.body.data;
+            this._printService.printReceipt(invoiceDetails);
+          }
+        },
+        error: (err: any) => {
+          console.log(err);
+          this._notificationService.error('Error!', err?.error?.message);
+        },
+      });
   }
 }

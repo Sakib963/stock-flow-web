@@ -79,9 +79,9 @@ export class Menu {
           route: '/manager/inventory/purchase-order',
         },
         {
-          icon: 'assets/icons/dispatch.svg',
-          label: 'Dispatch',
-          route: '/manager/inventory/dispatch',
+          icon: 'assets/icons/invoice.svg',
+          label: 'Invoice',
+          route: '/manager/inventory/invoice',
         },
       ],
     },

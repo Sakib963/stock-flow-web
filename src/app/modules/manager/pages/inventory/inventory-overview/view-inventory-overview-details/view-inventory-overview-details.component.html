@@ -1,92 +1,96 @@
 <div class="p-4 space-y-4">
       <div class="flex gap-2 items-start mb-4 animate-text">
-            <h2 class="text-2xl font-medium">Batch List <span *ngIf="!loading && productDetails">of {{
-                        productDetails?.name }}</span>
+            <h2 class="text-2xl font-medium">Batch List <span *ngIf="!loading && productDetails">of
+                        <span (click)="redirectToProduct()"
+                              class="text-gray-800 hover:text-blue-600 hover:underline hover:underline-offset-4 transition-colors duration-200 cursor-pointer">{{
+                              productDetails?.name }}</span></span>
             </h2>
-            <img (click)="redirectToProduct()" class="hover:cursor-pointer" src="assets/icons/export.svg"
-                  alt="Redirect to product">
+            <img *ngIf="!loading && productDetails" (click)="redirectToProduct()" class="hover:cursor-pointer"
+                  src="assets/icons/export.svg" alt="Redirect to product">
       </div>
       <app-loader *ngIf="loading" [isVisible]="loading"></app-loader>
       <div *ngIf="!loading && productDetails" class="p-4 border rounded-md">
-            <ul *ngIf="batch_data.length" class="divide-y divide-gray-100">
+            <ul *ngIf="batch_data.length" class="divide-y divide-gray-100 space-y-4">
                   <ng-container *ngFor="let item of batch_data">
-                        <li class="grid md:grid-cols-3 gap-x-6 py-5">
-                              <div class="flex min-w-0 gap-x-4">
-                                    <div class="min-w-0 flex-auto">
-                                          <div class="text-sm/6 text-[#180B26] font-semibold flex gap-2">
-                                                <p>Batch Code: <span class="font-normal">{{
-                                                            item?.batch_code }}</span></p>
+                        <nz-ribbon [nzText]="getStatusText(item.status)" [nzColor]="getRibbonColor(item)">
+                              <li class="grid md:grid-cols-3 gap-x-6 py-5 shadow-sm border p-4 rounded-md">
+                                    <div class="flex min-w-0 gap-x-4">
+                                          <div class="min-w-0 flex-auto">
+                                                <div class="text-sm/6 text-[#180B26] font-semibold flex gap-2">
+                                                      <p>Batch Code: <span class="font-normal">{{
+                                                                  item?.batch_code }}</span></p>
+                                                </div>
+                                                <p class="mt-1 truncate text-xs/5 text-[#180B26] font-semibold">
+                                                      Unit Price: <span class="font-normal">&#2547;{{
+                                                            item?.cost_price
+                                                            }}</span></p>
+                                                <p *ngIf="item?.selling_price"
+                                                      class="mt-1 truncate text-xs/5 text-[#180B26] font-semibold">
+                                                      Selling Price: <span class="font-normal">&#2547;{{
+                                                            item?.selling_price
+                                                            }}</span></p>
+                                                <div *ngIf="!item?.selling_price && item?.intended_use === 'for_sale'"
+                                                      class="mt-1 bg-[#DF1463] inline-flex justify-center items-center h-5 px-1 rounded gap-2">
+                                                      <svg-icon src="assets/icons/warning.svg"
+                                                            class="transition-transform duration-150 ease-in-out"></svg-icon>
+                                                      <span class="text-xs font-normal text-white">Price Not
+                                                            Fixed</span>
+                                                </div>
                                           </div>
-                                          <p class="mt-1 truncate text-xs/5 text-[#180B26] font-semibold">
-                                                Unit Price: <span class="font-normal">&#2547;{{
-                                                      item?.cost_price
-                                                      }}</span></p>
-                                          <p *ngIf="item?.selling_price"
+                                    </div>
+                                    <div>
+                                          <p *ngIf="item?.maximum_discount"
                                                 class="mt-1 truncate text-xs/5 text-[#180B26] font-semibold">
-                                                Selling Price: <span class="font-normal">&#2547;{{
-                                                      item?.selling_price
-                                                      }}</span></p>
-                                          <div *ngIf="!item?.selling_price && item?.intended_use === 'for_sale'"
+                                                Maximum Discount: <span class="font-normal">{{
+                                                      item?.maximum_discount }}</span> %</p>
+                                          <div *ngIf="!item?.maximum_discount && item?.intended_use === 'for_sale'"
                                                 class="mt-1 bg-[#DF1463] inline-flex justify-center items-center h-5 px-1 rounded gap-2">
                                                 <svg-icon src="assets/icons/warning.svg"
                                                       class="transition-transform duration-150 ease-in-out"></svg-icon>
-                                                <span class="text-xs font-normal text-white">Price Not Fixed</span>
+                                                <span class="text-xs font-normal text-white">Discount Not Fixed</span>
                                           </div>
-                                    </div>
-                              </div>
-                              <div>
-                                    <p *ngIf="item?.maximum_discount"
-                                          class="mt-1 truncate text-xs/5 text-[#180B26] font-semibold">
-                                          Maximum Discount: <span class="font-normal">{{
-                                                item?.maximum_discount }}</span> %</p>
-                                    <div *ngIf="!item?.maximum_discount && item?.intended_use === 'for_sale'"
-                                          class="mt-1 bg-[#DF1463] inline-flex justify-center items-center h-5 px-1 rounded gap-2">
-                                          <svg-icon src="assets/icons/warning.svg"
-                                                class="transition-transform duration-150 ease-in-out"></svg-icon>
-                                          <span class="text-xs font-normal text-white">Discount Not Fixed</span>
-                                    </div>
-                                    <p class="mt-1 truncate text-xs/5 text-[#180B26] font-semibold">
-                                          Purchase Quantity:
-                                          <span class="font-normal">{{ item?.initial_quantity
-                                                }}</span>
-                                    </p>
-                                    <p class="mt-1 truncate text-xs/5 text-[#180B26] font-semibold">
-                                          Available Quantity:
-                                          <span class="font-normal">{{ item?.quantity_available
-                                                }}</span>
-                                    </p>
-                              </div>
-                              <div class="flex justify-between items-center">
-                                    <div>
-                                          <p class="mt-1 truncate text-xs/5 text-gray-500 font-semibold">
-                                                Supplier: <span class="font-normal">{{
-                                                      item?.supplier_name }}</span></p>
-                                          <p class="mt-1 truncate text-xs/5 text-gray-500 font-semibold">
-                                                Warehouse: <span class="font-normal">{{
-                                                      item?.warehouse_name }}</span></p>
-                                          <p class="mt-1 truncate text-xs/5 text-gray-500 font-semibold">
-                                                Aisle/Zone:
-                                                <span class="font-normal">{{ item?.aisle_name
+                                          <p class="mt-1 truncate text-xs/5 text-[#180B26] font-semibold">
+                                                Purchase Quantity:
+                                                <span class="font-normal">{{ item?.initial_quantity
+                                                      }}</span>
+                                          </p>
+                                          <p class="mt-1 truncate text-xs/5 text-[#180B26] font-semibold">
+                                                Available Quantity:
+                                                <span class="font-normal">{{ item?.quantity_available
                                                       }}</span>
                                           </p>
                                     </div>
-                                    <div class="flex justify-end">
-                                          <span nz-dropdown [nzDropdownMenu]="menu">
-                                                Actions
-                                                <span nzType="down" nz-icon></span>
-                                          </span>
-                                          <nz-dropdown-menu #menu="nzDropdownMenu">
-                                                <ul nz-menu>
-                                                      <li [nzDisabled]="getPricingStatus(item)" nz-menu-item
-                                                            (click)="displayUpdatePricingModal(item)">Pricing</li>
-                                                      <li nz-menu-item>Generate Barcode</li>
-                                                      <li nz-menu-item>3rd menu item</li>
-                                                      <li nz-menu-item nzDanger>4th danger item</li>
-                                                </ul>
-                                          </nz-dropdown-menu>
+                                    <div class="flex justify-between items-center">
+                                          <div>
+                                                <p class="mt-1 truncate text-xs/5 text-gray-500 font-semibold">
+                                                      Supplier: <span class="font-normal">{{
+                                                            item?.supplier_name }}</span></p>
+                                                <p class="mt-1 truncate text-xs/5 text-gray-500 font-semibold">
+                                                      Warehouse: <span class="font-normal">{{
+                                                            item?.warehouse_name }}</span></p>
+                                                <p class="mt-1 truncate text-xs/5 text-gray-500 font-semibold">
+                                                      Aisle/Zone:
+                                                      <span class="font-normal">{{ item?.aisle_name
+                                                            }}</span>
+                                                </p>
+                                          </div>
+                                          <div class="flex justify-end">
+                                                <span nz-dropdown [nzDropdownMenu]="menu" class="hover:cursor-pointer">
+                                                      Actions
+                                                      <span nzType="down" nz-icon></span>
+                                                </span>
+                                                <nz-dropdown-menu #menu="nzDropdownMenu">
+                                                      <ul nz-menu>
+                                                            <li [nzDisabled]="getPricingStatus(item)" nz-menu-item
+                                                                  (click)="displayUpdatePricingModal(item)">Pricing</li>
+                                                            <li nz-menu-item (click)="generateBarcode(item)">Generate
+                                                                  Barcode</li>
+                                                      </ul>
+                                                </nz-dropdown-menu>
+                                          </div>
                                     </div>
-                              </div>
-                        </li>
+                              </li>
+                        </nz-ribbon>
                   </ng-container>
             </ul>
             <div *ngIf="!batch_data.length"
@@ -102,3 +106,63 @@
             </div>
       </div>
 </div>
+
+<nz-drawer [nzBodyStyle]="{ overflow: 'auto' }" [nzMaskClosable]="false" [nzVisible]="isBarcodeDrawerVisible"
+      nzTitle="Barcode" (nzOnClose)="closeDrawer()" nzSize="default" [nzFooter]="footerTpl">
+      <div *nzDrawerContent>
+            <ng-container *ngIf="barcodePreviewData as data">
+                  <!-- Details Block -->
+                  <div class="border p-4 rounded mb-4 space-y-1">
+                        <p><strong>Product:</strong> {{ data.productName }}</p>
+                        <p><strong>Batch:</strong> {{ data.batchCode }}</p>
+                        <p *ngIf="data.price !== null">
+                              <strong>Price:</strong> <span class="font-semibold">{{ data.price | currency:'৳':'symbol'
+                                    }}</span>
+                        </p>
+                        <p><strong>Company:</strong> {{ data.companyName }}</p>
+                  </div>
+                  <!-- Preview Block -->
+                  <div class="border p-4 rounded mb-4">
+                        <div id="barcode-label-content"
+                              class="border border-dashed p-2 rounded text-center text-sm w-[70mm] mx-auto uppercase space-y-1">
+                              <div>
+                                    <p>{{ barcodePreviewData.companyName }}</p>
+                                    <div class="font-bold text-base">{{ barcodePreviewData.productName }}</div>
+                              </div>
+
+                              <ngx-barcode6 [bc-format]="'CODE128'" [bc-value]="barcodePreviewData.batchCode"
+                                    [bc-width]="1.2" [bc-height]="40" [bc-display-value]="true"></ngx-barcode6>
+
+                              <div class="mt-1 font-semibold text-base">
+                                    {{ barcodePreviewData.price | currency:'৳':'symbol':'1.2-2' }}
+                              </div>
+                        </div>
+                  </div>
+
+
+                  <!-- Quantity & Actions -->
+                  <!-- <label class="block mb-1 font-medium">Select Quantity to Print</label>
+                  <nz-input-number [(ngModel)]="printQuantity" [nzMin]="1" [nzMax]="data.quantityAvailable" [nzStep]="1"
+                        class="mb-4 w-full"></nz-input-number>
+
+                  <div class="flex gap-2">
+                        <button nz-button nzType="default" (click)="printBarcode(data.quantityAvailable)">
+                              Print All ({{ data.quantityAvailable }})
+                        </button>
+                        <button nz-button nzType="default" (click)="printBarcode(printQuantity)">
+                              Print {{ printQuantity }}
+                        </button>
+                        <button nz-button nzType="primary" (click)="printBarcode(1)">Print 1</button>
+                  </div> -->
+            </ng-container>
+      </div>
+</nz-drawer>
+
+<ng-template #footerTpl>
+      <div style="float: right">
+            <div class="flex items-center gap-4">
+                  <secondary-button (click)="closeDrawer()" [label]="'Cancel'"></secondary-button>
+                  <primary-button [label]="'Print Barcode'" (click)="printBarcode(printQuantity)"></primary-button>
+            </div>
+      </div>
+</ng-template>

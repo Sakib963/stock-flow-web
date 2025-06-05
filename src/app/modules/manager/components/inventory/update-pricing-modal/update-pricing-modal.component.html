@@ -3,6 +3,10 @@
             <div class="border-[0.5px] p-4 rounded-md">
                   <h2 class="text-xl font-medium mb-4">Update Pricing & Discount - {{ modalData.batch_code }}
                   </h2>
+                  <nz-alert class="mb-4" nzType="info" [nzDescription]="null" [nzMessage]="null"
+                        [innerHTML]="getPerUnitPriceText()">
+                  </nz-alert>
+
                   <div class="grid grid-cols-1">
                         <!-- Form -->
                         <!-- selling_price -->

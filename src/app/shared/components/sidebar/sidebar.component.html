@@ -7,11 +7,11 @@
       <div *ngFor="let item of group.items" class="my-2">
         <div
           class="flex items-center gap-4 p-1 rounded cursor-pointer duration-150 ease-in-out transition-all hover:bg-[#E7EAEF]  hover:border-l-8 hover:border-l-[#594ED1] tracking-wide font-medium"
-          [routerLink]="item.route"
-          [ngClass]="{ 'border-l-8 border-l-[#594ED1] bg-[#E7EAEF]': isActive(item.route) }">
-          <svg-icon *ngIf="item.icon" [src]="item.icon" class="transition-transform duration-150 ease-in-out"></svg-icon>
+          [routerLink]="item.route" [ngClass]="{ 'border-l-8 border-l-[#594ED1] bg-[#E7EAEF]': isActive(item.route) }">
+          <svg-icon *ngIf="item.icon" [src]="item.icon"
+            class="transition-transform duration-150 ease-in-out"></svg-icon>
           <span class="text-balance text-base text-[#1C1C1D] transition-colors duration-150 ease-in-out">
-            {{ item.label }}
+            {{ item.label | smartTranslate }}
           </span>
         </div>
       </div>
