@@ -1,6 +1,103 @@
 {
   "sales": {
     "HELLO": "Hello",
-    "WELCOME": "Welcome to the app"
+    "WELCOME": "Welcome to the app",
+    "quick_sale": {
+      "title": "Quick Sale",
+      "select_product": {
+        "form": {
+          "card_title": "Select Product",
+          "add_to_invoice": "Add to Invoice",
+          "search_input": {
+            "label": "Select A Product",
+            "placeholder": "Search by name or batch code"
+          },
+          "product_name": {
+            "label": "Product",
+            "placeholder": "Select Product"
+          },
+          "unit_price": {
+            "label": "Price",
+            "placeholder": "Unit Price"
+          },
+          "quantity_available": {
+            "label": "Available Quantity",
+            "placeholder": "Available Quantity"
+          },
+          "quantity": {
+            "label": "Quantity",
+            "placeholder": "Enter Quantity"
+          },
+          "total_price": {
+            "label": "Total Price",
+            "placeholder": "Total Price"
+          },
+          "discount": {
+            "label": "Discount",
+            "placeholder": "Enter Discount"
+          }
+        }
+      },
+      "invoice_table": {
+        "product_name": "Product Name",
+        "quantity": "Quantity",
+        "unit_price": "Unit Price",
+        "discount": "Discount (%)",
+        "total_price": "Total",
+        "actions": "Actions",
+        "no_product_added": "No product added yet."
+      },
+      "customer_info": {
+        "title": "Customer Information (Optional)",
+        "customer_name": {
+          "label": "Customer Name",
+          "placeholder": "Enter Customer Name",
+          "error_msg": "Please Enter Customer Name"
+        },
+        "customer_phone": {
+          "label": "Customer Phone",
+          "placeholder": "Enter Customer Phone",
+          "error_msg": "Please Enter Customer Phone"
+        },
+        "customer_email": {
+          "label": "Customer Email",
+          "placeholder": "Enter Customer Email",
+          "error_msg": "Invalid Email Format"
+        },
+        "customer_address": {
+          "label": "Customer Address",
+          "placeholder": "Enter Customer Address",
+          "error_msg": "Please Enter Customer Address"
+        }
+      },
+      "payment_info": {
+        "title": "Payment Information",
+        "payment_method": {
+          "label": "Payment Method",
+          "placeholder": "Select Payment Method",
+          "options": {
+            "cash": "Cash",
+            "bkash": "Bkash"
+          }
+        },
+        "note": {
+          "label": "Note",
+          "placeholder": "Enter Note (if any)"
+        },
+        "payment_reference": {
+          "label": "Payment Reference",
+          "placeholder": "Enter Payment Reference (if any)"
+        },
+        "payment_status": {
+          "label": "Payment Status",
+          "placeholder": "Select Payment Status",
+          "options": {
+            "paid": "Paid",
+            "unpaid": "Unpaid",
+            "partially_paid": "Partially Paid"
+          }
+        }
+      }
+    }
   }
 }

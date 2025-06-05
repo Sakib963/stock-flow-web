@@ -1,4 +1,9 @@
 {
-  "HELLO": "Hello",
-  "WELCOME": "Welcome to the app"
+  "common": {
+    "action": {
+      "reset": "Reset",
+      "save_as_draft": "Save as Draft",
+      "generate_invoice": "Generate Invoice"
+    }
+  }
 }
