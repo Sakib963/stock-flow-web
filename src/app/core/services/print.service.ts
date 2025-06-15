@@ -174,40 +174,43 @@ export class PrintService {
             margin: 0;
             padding: 0;
             font-family: Arial, Helvetica, sans-serif;
-            width: 80mm;
+            width: 58mm;
             text-align: center;
             text-transform: uppercase;
-            font-size: 12px;
+            font-size: 9px;
           }
 
           .label {
-            width: 70mm;
-            margin: auto;
-            padding-top: 4mm;
-            padding-bottom: 4mm;
+            width: 50mm;
+            margin: 0 auto;
+            padding-left: 4mm;
+          }
+
+          .company, .product, .price {
+            margin: 1px 0;
+            line-height: 1.3;
+            text-align: center;
           }
 
           .company {
             font-weight: bold;
-            margin-bottom: 4px;
-            font-size: 11px;
+            font-size: 8px;
           }
 
           .product {
-            font-size: 14px;
+            font-size: 10px;
             font-weight: bold;
-            margin: 2px 0 6px 0;
           }
 
           .price {
             font-weight: bold;
-            margin-top: 4px;
-            font-size: 13px;
+            font-size: 10px;
           }
 
           svg {
             display: block;
-            margin: auto;
+            margin: 0 auto;
+            padding: 0;
           }
         </style>
         <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
@@ -223,12 +226,12 @@ export class PrintService {
         <script>
           JsBarcode("#barcode", "${data.batchCode}", {
             format: "CODE128",
-            width: 1.2,
-            height: 40,
+            width: 0.9,
+            height: 25,
             displayValue: true,
-            fontSize: 14,
-            textAlign: "center",
-            textMargin: 4,
+            fontSize: 10,
+            margin: 0,
+            textMargin: 0,
             fontOptions: "bold"
           });
         </script>
