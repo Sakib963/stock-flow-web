@@ -1,0 +1,29 @@
+<div class="p-4 space-y-3">
+      <h2 class="text-2xl font-medium mb-4 animate-text">Invoice List</h2>
+      <div>
+            <div class="md:flex justify-between items-center">
+                  <!-- Search Text -->
+                  <div class="md:w-2/3 grid lg:grid-cols-3 gap-4">
+                        <nz-date-picker [formControl]="dateControl" nzInputReadOnly
+                              nzPlaceHolder="Select Date"></nz-date-picker>
+                        <nz-select [formControl]="statusControl" nzPlaceHolder="Select Status">
+                              <nz-option nzValue="Purchased" nzLabel="Purchased"></nz-option>
+                              <nz-option nzValue="Returned" nzLabel="Returned"></nz-option>
+                              <nz-option nzValue="Cancelled" nzLabel="Cancelled"></nz-option>
+                              <nz-option nzValue="Refunded" nzLabel="Refunded"></nz-option>
+                        </nz-select>
+                        <nz-input-group [nzSuffix]="suffixIconSearch">
+                              <input type="text" [formControl]="searchControl" nz-input
+                                    placeholder="Enter Search Text Here" />
+                        </nz-input-group>
+                        <ng-template #suffixIconSearch>
+                              <span nzType="search" nz-icon></span>
+                        </ng-template>
+                  </div>
+            </div>
+            <nz-divider></nz-divider>
+            <view-invoice-list [loading]="loading" [data]="data" [totalCount]="totalCount"
+                  (actionEmitter)="handleListActions($event)"
+                  (paginationEvent)="handlePaginationEvent($event)"></view-invoice-list>
+      </div>
+</div>

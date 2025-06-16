@@ -270,11 +270,21 @@ const routes: Routes = [
             ],
           },
           {
-            path: 'dispatch',
-            loadComponent: () =>
-              import(
-                './pages/inventory/dispatch-products/dispatch-products.component'
-              ).then((m) => m.DispatchProductsComponent),
+            path: 'invoice',
+            children: [
+              {
+                path: '',
+                redirectTo: 'invoice-list',
+                pathMatch: 'full',
+              },
+              {
+                path: 'invoice-list',
+                loadComponent: () =>
+                  import(
+                    './pages/inventory/invoice/invoice-list/invoice-list.component'
+                  ).then((m) => m.InvoiceListComponent),
+              }
+            ],
           },
         ],
       },

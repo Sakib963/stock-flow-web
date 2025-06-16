@@ -1,0 +1,69 @@
+<app-loader *ngIf="loading" [isVisible]="loading"></app-loader>
+<div *ngIf="!loading" class="p-4 border rounded-md">
+      <ul *ngIf="data.length" class="divide-y divide-gray-100 space-y-4">
+            <ng-container *ngFor="let item of data">
+                  <nz-ribbon [nzText]="item.status" [nzColor]="getRibbonColor(item)">
+                        <li class="grid md:grid-cols-3 gap-x-6 py-5 shadow-sm border p-4 rounded-md">
+                              <div class="min-w-0 flex-auto">
+                                    <p class="text-sm/6 text-[#180B26] font-semibold">Invoice No: <span
+                                                class="font-normal">{{ item?.invoice_no }}</span></p>
+                                    <p class="text-sm/6 text-[#180B26] font-semibold">Total Amount: <span
+                                                class="font-normal">{{ item?.total_amount | currency:'৳':'symbol'
+                                                }}</span></p>
+                                    <p class="text-sm/6 text-[#180B26] font-semibold">Payment Status: <span
+                                                class="font-normal">{{ item?.payment_status }}</span></p>
+                              </div>
+                              <div>
+                                    <p class="mt-1 truncate text-xs/5 text-gray-500 font-semibold">Total Item: <span
+                                                class="font-normal">{{ item?.product_count }}</span></p>
+                                    <p class="mt-1 truncate text-xs/5 text-gray-500 font-semibold">Customer Name: <span
+                                                class="font-normal">{{ item?.customer_name }}</span></p>
+                                    <p class="mt-1 truncate text-xs/5 text-gray-500 font-semibold">Sold By: <span
+                                                class="font-normal">{{ item?.created_by }}</span></p>
+                              </div>
+                              <div class="flex justify-end">
+                                    <div class="shrink-0 sm:flex sm:flex-col sm:items-center">
+                                          <div
+                                                class="mt-1 text-xs/5 text-black flex justify-center items-center gap-4 h-full">
+                                                <button class="mt-1" nz-tooltip [nzTooltipTitle]="'View This Invoice'"
+                                                      [nzTooltipColor]="'blue'" (click)="handleAction('view', item)">
+                                                      <svg xmlns="http://www.w3.org/2000/svg" fill="none"
+                                                            viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+                                                            class="size-6">
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                  d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                  d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                                                      </svg>
+                                                </button>
+                                                <button (click)="handleAction('print', item)" nz-tooltip
+                                                      [nzTooltipTitle]="'Print This Invoice'" [nzTooltipColor]="'blue'">
+                                                      <i class="text-xl" nz-icon nzType="printer" nzTheme="outline"></i>
+                                                </button>
+                                          </div>
+                                    </div>
+                              </div>
+                        </li>
+                  </nz-ribbon>
+
+            </ng-container>
+      </ul>
+      <div *ngIf="!data.length"
+            class="flex flex-col items-center justify-center h-full text-center bg-gray-50 p-8 rounded-md space-y-4">
+            <img src="assets/icons/no_data.svg" alt="No Data Found">
+            <h2 class="text-lg font-semibold text-black">No Data Found</h2>
+            <p class="text-black">Try refining your search or adding new data.</p>
+      </div>
+      <div class="bg-white grid grid-cols-1 h-16">
+            <div class="flex items-center justify-end mr-6">
+                  <nz-pagination [(nzPageIndex)]="currentIndex" [(nzPageSize)]="pageSize" [nzShowSizeChanger]="true"
+                        [nzShowTotal]="rangeTemplate" [nzTotal]="totalCount"
+                        (nzPageIndexChange)="onPageIndexChange($event)" (nzPageSizeChange)="onPageSizeChange($event)">
+                  </nz-pagination>
+                  <ng-template #rangeTemplate let-range="range" let-total>
+                        {{ range[0] }} - {{ range[1] }} of {{ total }} items
+                  </ng-template>
+
+            </div>
+      </div>
+</div>
