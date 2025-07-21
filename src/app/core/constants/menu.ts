@@ -99,7 +99,7 @@ export class Menu {
 
   static salesPages: MenuItem[] = [
     {
-      group: '',
+      group: 'Sales',
       items: [
         {
           icon: 'assets/icons/purchase.svg',
@@ -116,6 +116,16 @@ export class Menu {
           label: 'Dashboard',
           route: '/sales/dashboard',
         },
+        {
+          icon: 'assets/icons/product-return.svg',
+          label: 'Product Return',
+          route: '/sales/product-return',
+        },
+      ],
+    },
+    {
+      group: 'Shared',
+      items: [
         {
           icon: 'assets/icons/calendar.svg',
           label: 'Attendance',

@@ -4,6 +4,7 @@
     "WELCOME": "অ্যাপে স্বাগতম",
     "quick_sale": {
       "title": "দ্রুত বিক্রি",
+      "invoice_title": "ইনভয়েস",
       "select_product": {
         "form": {
           "card_title": "পণ্য নির্বাচন করুন",

@@ -1,0 +1,4 @@
+<app-loader *ngIf="loading" [isVisible]="loading"></app-loader>
+<div *ngIf="!loading && invoiceDetails">
+      <view-invoice [invoiceDetails]="invoiceDetails" (actionEmitter)="handleActions($event)"></view-invoice>
+</div>

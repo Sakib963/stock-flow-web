@@ -4,6 +4,7 @@
     "WELCOME": "Welcome to the app",
     "quick_sale": {
       "title": "Quick Sale",
+      "invoice_title": "Invoice",
       "select_product": {
         "form": {
           "card_title": "Select Product",

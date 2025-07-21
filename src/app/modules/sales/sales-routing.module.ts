@@ -49,8 +49,39 @@ const routes: Routes = [
                 './pages/invoice/display-invoice-list/display-invoice-list.component'
               ).then((m) => m.DisplayInvoiceListComponent),
           },
+          {
+            path: 'view-invoice/:invoiceId',
+            loadComponent: () =>
+              import(
+                './pages/invoice/view-invoice-details/view-invoice-details.component'
+              ).then((m) => m.ViewInvoiceDetailsComponent)
+          }
         ],
       },
+      {
+        path: 'product-return',
+        children: [
+          {
+            path: '',
+            redirectTo: 'list',
+            pathMatch: 'full',
+          },
+          {
+            path: 'list',
+            loadComponent: () =>
+              import(
+                './pages/product-return/display-product-return-list/display-product-return-list.component'
+              ).then((m) => m.DisplayProductReturnListComponent),
+          },
+          {
+            path: 'create-product-return',
+            loadComponent: () =>
+              import(
+                './pages/product-return/add-product-return/add-product-return.component'
+              ).then((m) => m.AddProductReturnComponent),
+          }
+        ]
+      }
     ],
   },
   {

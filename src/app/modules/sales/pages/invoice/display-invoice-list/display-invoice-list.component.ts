@@ -126,6 +126,8 @@ export class DisplayInvoiceListComponent implements OnInit {
       this.handleEdit(event.value.oid);
     } else if (event.action === 'print') {
       this.handlePrint(event.value.oid);
+    } else if (event.action === 'view') {
+      this.handleView(event.value.oid);
     }
   }
 
@@ -171,6 +173,13 @@ export class DisplayInvoiceListComponent implements OnInit {
   handleEdit(value: any): any {
     this._router.navigate(['/sales/quick-sale', value], {
       state: { edit: true },
+    });
+  }
+
+  handleView(value: any): any {
+    this._router.navigate([`../view-invoice/${value}`], {
+      relativeTo: this._activatedRoute,
+      state: { edit: false },
     });
   }
 
