@@ -34,6 +34,8 @@ export class ViewInvoiceDetailsComponent implements OnInit {
   handleActions(event: any): void {
     if (event.action === 'back') {
       this._location.back();
+    } else if (event.action === 'return') {
+      this.saveProductReturn(event.value);
     }
   }
 
@@ -49,7 +51,33 @@ export class ViewInvoiceDetailsComponent implements OnInit {
         next: (res: any) => {
           if (res.status === 200) {
             this.invoiceDetails = res?.body?.data;
-            console.log(this.invoiceDetails);
+          }
+        },
+        error: (err: any) => {
+          console.log(err);
+          this._notificationService.error('Error!', err?.error?.message);
+        },
+      });
+  }
+
+  saveProductReturn(data: any): void {
+    this.loading = true;
+    this._httpService
+      .post(APIEndpoint.SAVE_PRODUCT_RETURN, data)
+      .pipe(
+        takeUntilDestroyed(this._destroyRef),
+        finalize(() => (this.loading = false))
+      )
+      .subscribe({
+        next: (res: any) => {
+          if (res.status === 200) {
+            this._notificationService.success(
+              'Success!',
+              'Product return saved successfully.'
+            );
+            this._location.back();
+          } else {
+            this._notificationService.error('Error!', res?.body?.message);
           }
         },
         error: (err: any) => {

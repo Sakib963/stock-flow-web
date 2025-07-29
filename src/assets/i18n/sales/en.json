@@ -99,6 +99,45 @@
           }
         }
       }
+    },
+    "invoice": {
+      "product_return": {
+        "title": "Product Return",
+        "form": {
+          "invoice_no": {
+            "label": "Invoice Number",
+            "placeholder": "Enter Invoice Number",
+            "required_error_message": "Invoice Number is required"
+          },
+          "refund_amount": {
+            "label": "Refund Amount",
+            "placeholder": "Enter Refund Amount",
+            "required_error_message": "Refund Amount is required"
+          },
+          "return_reason": {
+            "label": "Return Reason (optional)",
+            "placeholder": "Select Return Reason",
+            "required_error_message": "Return Reason is required"
+          },
+          "products": {
+            "title": "Returned Products",
+            "product_name": {
+              "label": "Product Name",
+              "placeholder": "Select Product",
+              "required_error_message": "Product Name is required"
+            },
+            "quantity": {
+              "label": "Quantity",
+              "placeholder": "Enter Quantity",
+              "required_error_message": "Quantity is required"
+            },
+            "actions": "Actions",
+            "supplier": "Supplier",
+            "batch_code": "Batch Code",
+            "returned_quantity": "Returned Quantity"
+          }
+        }
+      }
     }
   }
 }

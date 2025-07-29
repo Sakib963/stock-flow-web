@@ -3,7 +3,10 @@
     "action": {
       "reset": "রিসেট",
       "save_as_draft": "খসড়া সংরক্ষণ করুন",
-      "generate_invoice": "ইনভয়েস তৈরি করুন"
+      "generate_invoice": "ইনভয়েস তৈরি করুন",
+      "product_return": "পণ্য ফেরত",
+      "cancel": "বাতিল",
+      "submit": "সাবমিট"
     }
   }
 }

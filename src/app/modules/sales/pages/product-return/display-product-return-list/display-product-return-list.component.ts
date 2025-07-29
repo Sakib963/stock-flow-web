@@ -8,9 +8,9 @@ import { Constants } from '@app/core/constants/constants';
 import { HttpService } from '@app/core/services/http.service';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { finalize } from 'rxjs';
-import { ViewAisleListComponent } from '@app/modules/manager/components/configuration/aisle/view-aisle-list/view-aisle-list.component';
 import { PrimaryButtonWithPlusIcon } from '@app/shared/components/buttons/primary-button-with-plus-icon/primary-button-with-plus-icon.component';
 import { NgZorroCustomModule } from '@app/shared/ng-zorro-custom.module';
+import { ViewProductReturnListComponent } from '@app/modules/sales/components/view-product-return-list/view-product-return-list.component';
 
 @Component({
   selector: 'display-product-return-list',
@@ -19,7 +19,7 @@ import { NgZorroCustomModule } from '@app/shared/ng-zorro-custom.module';
     CommonModule,
     NgZorroCustomModule,
     ReactiveFormsModule,
-    ViewAisleListComponent,
+    ViewProductReturnListComponent,
     PrimaryButtonWithPlusIcon,
   ],
   templateUrl: './display-product-return-list.component.html',
@@ -73,7 +73,7 @@ export class DisplayProductReturnListComponent implements OnInit {
       this.loading = true;
     }
     this._httpService
-      .get(APIEndpoint.GET_AISLE_LIST, this.payload)
+      .get(APIEndpoint.GET_PRODUCT_RETURN_LIST, this.payload)
       .pipe(
         takeUntilDestroyed(this._destroyRef),
         finalize(() => (this.loading = false))

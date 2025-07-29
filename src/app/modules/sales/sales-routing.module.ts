@@ -74,11 +74,11 @@ const routes: Routes = [
               ).then((m) => m.DisplayProductReturnListComponent),
           },
           {
-            path: 'create-product-return',
+            path: 'view-product-return/:oid',
             loadComponent: () =>
               import(
-                './pages/product-return/add-product-return/add-product-return.component'
-              ).then((m) => m.AddProductReturnComponent),
+                './pages/product-return/view-product-return-details/view-product-return-details.component'
+              ).then((m) => m.ViewProductReturnDetailsComponent),
           }
         ]
       }

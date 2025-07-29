@@ -76,4 +76,8 @@ export class APIEndpoint {
   static DELETE_INVOICE = "/api/v1/salesman/invoice/delete-invoice";
 
   static GET_INVOICE_LIST_FOR_MANAGER = "/api/v1/manager/invoice/get-invoice-list";
+
+  static SAVE_PRODUCT_RETURN = "/api/v1/salesman/product-return/save-product-return";
+  static GET_PRODUCT_RETURN_LIST = "/api/v1/salesman/product-return/get-product-return-list";
+  static GET_PRODUCT_RETURN_DETAILS = "/api/v1/salesman/product-return/get-product-return-details";
 }

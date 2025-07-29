@@ -74,4 +74,17 @@ export const DROPDOWN_OPTIONS = {
     { label: 'November', value: 'november' },
     { label: 'December', value: 'december' },
   ],
+  PRODUCT_RETURN_REASONS: [
+    { label: 'Item is broken or cracked', value: 'broken' },
+    { label: 'Damaged product (before use)', value: 'damaged_before_use' },
+    { label: 'Stopped working after short use', value: 'damaged_after_use' },
+    { label: 'Wrong size or fit', value: 'wrong_size' },
+    { label: 'Wrong product given', value: 'wrong_product' },
+    { label: 'Product quality not satisfactory', value: 'poor_quality' },
+    { label: 'Customer didn’t like the product', value: 'not_liked' },
+    { label: 'Product differs from description', value: 'not_as_expected' },
+    { label: 'Duplicate item purchased', value: 'duplicate_purchase' },
+    { label: 'Item was part of an exchange', value: 'exchange' },
+    { label: 'Other (please specify)', value: 'other' },
+  ],
 };
