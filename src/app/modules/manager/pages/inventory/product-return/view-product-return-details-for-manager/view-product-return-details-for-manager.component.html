@@ -1,0 +1,115 @@
+<div class="p-4 space-y-3">
+      <h2 class="text-2xl font-medium mb-4 animate-text">Product Return Details</h2>
+      <app-loader *ngIf="loading" [isVisible]="loading"></app-loader>
+      <div *ngIf="!loading && returnDetails">
+            <div *ngIf="!editMode" class="space-y-4">
+                  <nz-card [nzTitle]="salesHeader" [nzExtra]="salesExtraInfo">
+                        <div class="grid grid-cols-1 gap-x-6 gap-y-4 md:grid-cols-3">
+                              <!-- Invoice No -->
+                              <div class="space-y-1">
+                                    <p>Invoice No</p>
+                                    <p class="font-semibold text-secondary">{{ returnDetails?.invoice_no | safeText }}
+                                    </p>
+                              </div>
+                              <!-- Customer Name -->
+                              <div class="space-y-1">
+                                    <p>Customer Name</p>
+                                    <p class="font-semibold text-secondary">{{ returnDetails?.customer_name | safeText
+                                          }}</p>
+                              </div>
+                              <!-- Customer Phone -->
+                              <div class="space-y-1">
+                                    <p>Customer Phone</p>
+                                    <p class="font-semibold text-secondary">{{ returnDetails?.customer_phone | safeText
+                                          }}</p>
+                              </div>
+                              <!-- Date Of Sale -->
+                              <div class="space-y-1">
+                                    <p>Date Of Sale</p>
+                                    <p class="font-semibold text-secondary">{{ returnDetails?.sales_date | safeText }}
+                                    </p>
+                              </div>
+                              <!-- Sold By -->
+                              <div class="space-y-1">
+                                    <p>Sold By</p>
+                                    <p class="font-semibold text-secondary">{{ returnDetails?.sold_by | safeText }}</p>
+                              </div>
+                        </div>
+                        <ng-template #salesExtraInfo>
+                              <p class="font-bold">Total: {{ returnDetails.sales_total |
+                                    currency:'৳':'symbol' }}
+                              </p>
+                        </ng-template>
+                        <ng-template #salesHeader>
+                              <div class="flex items-center justify-start gap-2">
+                                    <p>Sales Information</p>
+                                    <img (click)="redirectToSale()" class="hover:cursor-pointer"
+                                          src="assets/icons/export.svg" alt="Redirect to Sales Invoice">
+                              </div>
+                        </ng-template>
+                  </nz-card>
+                  <nz-card nzTitle="Return Information" [nzExtra]="returnExtraInfo">
+                        <div class="grid grid-cols-1 gap-x-6 gap-y-4 md:grid-cols-3">
+                              <!-- Return Reason -->
+                              <div class="space-y-1">
+                                    <p>Return Reason</p>
+                                    <p class="font-semibold text-secondary">{{
+                                          getReturnReasonLabel(returnDetails?.return_reason) | safeText }}
+                                    </p>
+                              </div>
+                              <!-- Return Issued On -->
+                              <div class="space-y-1">
+                                    <p>Return Issued On</p>
+                                    <p class="font-semibold text-secondary">{{ returnDetails?.created_on | safeText }}
+                                    </p>
+                              </div>
+                              <!-- Return Issued By -->
+                              <div class="space-y-1">
+                                    <p>Return Issued By</p>
+                                    <p class="font-semibold text-secondary">{{ returnDetails?.created_by | safeText }}
+                                    </p>
+                              </div>
+                        </div>
+                        <ng-template #returnExtraInfo>
+                              <p class="font-bold">Refunded: {{ returnDetails.refund_amount |
+                                    currency:'৳':'symbol' }}
+                              </p>
+                        </ng-template>
+                  </nz-card>
+                  <nz-table [nzData]="returnDetails.products"
+                        [nzBordered]="true" [nzShowPagination]="false"  [nzNoResult]="noProducts">
+                        <thead>
+                              <tr>
+                                    <th>{{ 'sales.quick_sale.invoice_table.product_name' | translate }}</th>
+                                    <th>{{ 'sales.invoice.product_return.form.products.returned_quantity' | translate }}</th>
+                                    <th>{{ 'sales.invoice.product_return.form.products.batch_code' | translate }}</th>
+                                    <th>{{ 'sales.invoice.product_return.form.products.supplier' | translate }}</th>
+                              </tr>
+                        </thead>
+                        <tbody>
+                              <tr *ngFor="let product of returnDetails.products; let i = index">
+                                    <td>{{ product.product_name | safeText }}</td>
+                                    <td>{{ product.return_quantity | safeText }}</td>
+                                    <td>{{ product.batch_code | safeText }}</td>
+                                    <td (click)="redirectToSupplier(product)" class="hover:cursor-pointer hover:underline hover:underline-offset-2 decoration-blue-500">{{ product.supplier | safeText }}</td>
+                              </tr>
+                        </tbody>
+                  </nz-table>
+                  <!-- Actions -->
+                  <div class="flex justify-end mt-4">
+                        <div class="flex items-center gap-4">
+                              <secondary-button [label]="'Go Back'" (click)="goBack()"></secondary-button>
+                        </div>
+                  </div>
+            </div>
+      </div>
+      <div *ngIf="!loading && !returnDetails"
+            class="flex flex-col items-center justify-center h-full text-center bg-gray-50 p-8 rounded-md space-y-4">
+            <img src="assets/icons/no_data.svg" alt="No Data Found">
+            <h2 class="text-lg font-semibold text-black">No Data Found</h2>
+      </div>
+
+      <ng-template #noProducts>
+            <nz-empty nzNotFoundContent="No Data Found"></nz-empty>
+      </ng-template>
+</div>

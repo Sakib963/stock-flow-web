@@ -8,7 +8,6 @@ import { Constants } from '@app/core/constants/constants';
 import { HttpService } from '@app/core/services/http.service';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { finalize } from 'rxjs';
-import { PrimaryButtonWithPlusIcon } from '@app/shared/components/buttons/primary-button-with-plus-icon/primary-button-with-plus-icon.component';
 import { NgZorroCustomModule } from '@app/shared/ng-zorro-custom.module';
 import { ViewProductReturnListComponent } from '@app/modules/sales/components/view-product-return-list/view-product-return-list.component';
 
@@ -20,7 +19,6 @@ import { ViewProductReturnListComponent } from '@app/modules/sales/components/vi
     NgZorroCustomModule,
     ReactiveFormsModule,
     ViewProductReturnListComponent,
-    PrimaryButtonWithPlusIcon,
   ],
   templateUrl: './display-product-return-list.component.html',
   styleUrls: ['./display-product-return-list.component.scss'],
@@ -54,7 +52,7 @@ export class DisplayProductReturnListComponent implements OnInit {
   }
 
   onSearchChange(value: string): void {
-    this.payload.search_text = value;
+    this.payload = {offset: 0, limit: Constants.PAGE_SIZE, search_text: value, status: ''};
     this.isFilter = true;
     this.loadList();
   }
@@ -88,7 +86,6 @@ export class DisplayProductReturnListComponent implements OnInit {
             } else {
               this.data = [];
             }
-            console.log(this.data);
           }
         },
         error: (err: any) => {

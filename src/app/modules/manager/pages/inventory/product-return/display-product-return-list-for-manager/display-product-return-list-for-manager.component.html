@@ -14,8 +14,8 @@
                         </div>
                   </div>
             </div>
-            <view-product-return-list [loading]="loading" [data]="data" [totalCount]="totalCount"
+            <view-product-return-list-for-manager [loading]="loading" [data]="data" [totalCount]="totalCount"
                   (actionEmitter)="handleListActions($event)"
-                  (paginationEvent)="handlePaginationEvent($event)"></view-product-return-list>
+                  (paginationEvent)="handlePaginationEvent($event)"></view-product-return-list-for-manager>
       </div>
 </div>

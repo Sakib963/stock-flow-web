@@ -83,6 +83,11 @@ export class Menu {
           label: 'Invoice',
           route: '/manager/inventory/invoice',
         },
+        {
+          icon: 'assets/icons/product-return.svg',
+          label: 'Product Return',
+          route: '/manager/inventory/product-return',
+        },
       ],
     },
     {

@@ -1,0 +1,125 @@
+<app-loader *ngIf="loading" [isVisible]="loading"></app-loader>
+<div *ngIf="!loading && invoiceDetails">
+      <div class="p-4 space-y-4">
+            <div class="flex justify-between items-center">
+                  <div class="flex items-center space-x-2 text-2xl font-medium mb-4">
+                        <i nz-icon nzType="shopping-cart" class="text-2xl"></i>
+                        <h2 class="text-2xl font-bold">{{ 'sales.quick_sale.invoice_title' | translate }}</h2>
+                        <span class="text-base text-gray-500">#{{
+                              invoiceDetails.invoice_no }}</span>
+                  </div>
+                  <div class="flex items-center space-x-2">
+                        <p class="text-lg font-bold">Total: {{ invoiceDetails.total_amount | currency:'৳':'symbol' }}
+                        </p>
+                  </div>
+
+            </div>
+            <!-- Invoice Table -->
+            <nz-table [nzData]="invoiceDetails.products" [nzBordered]="true" [nzShowPagination]="false"
+                  [nzSize]="'small'" [nzNoResult]="noProducts">
+                  <thead>
+                        <tr>
+                              <th>{{ 'sales.quick_sale.invoice_table.product_name' | translate }}</th>
+                              <th>{{ 'sales.quick_sale.invoice_table.quantity' | translate }}</th>
+                              <th>{{ 'sales.quick_sale.invoice_table.unit_price' | translate }}</th>
+                              <th>{{ 'sales.quick_sale.invoice_table.discount' | translate }}</th>
+                              <th>{{ 'sales.quick_sale.invoice_table.total_price' | translate }}</th>
+                        </tr>
+                  </thead>
+                  <tbody>
+                        <tr *ngFor="let product of invoiceDetails.products; let i = index">
+                              <td>{{ product.product_name }}</td>
+                              <td>{{ product.quantity }}</td>
+                              <td>{{ product.unit_price | currency:'৳':'symbol'}}</td>
+                              <td>{{ product.discount }}</td>
+                              <td>{{ product.total | currency:'৳':'symbol'}}</td>
+                        </tr>
+                  </tbody>
+            </nz-table>
+
+            <ng-template #noProducts>
+                  <nz-empty
+                        nzNotFoundContent="{{ 'sales.quick_sale.invoice_table.no_product_added' | translate }}"></nz-empty>
+            </ng-template>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <!-- Customer Info Card -->
+                  <nz-card nzTitle="{{ 'sales.quick_sale.customer_info.title' | translate }}">
+                        <div class="grid grid-cols-2 gap-4">
+                              <!-- Customer Name -->
+                              <div class="space-y-1">
+                                    <p>{{
+                                          'sales.quick_sale.customer_info.customer_name.label' | translate
+                                          }}</p>
+                                    <p>{{ invoiceDetails.customer_name ?? '-' }}</p>
+                              </div>
+
+                              <!-- Customer Phone -->
+                              <div class="space-y-1">
+                                    <p>{{
+                                          'sales.quick_sale.customer_info.customer_phone.label' | translate
+                                          }}</p>
+                                    <p>{{ invoiceDetails.customer_phone ?? '-' }}</p>
+                              </div>
+
+                              <!-- Customer Address -->
+                              <div class="space-y-1">
+                                    <p>{{
+                                          'sales.quick_sale.customer_info.customer_address.label' | translate
+                                          }}</p>
+                                    <p>{{ invoiceDetails.customer_address ?? '-' }}</p>
+                              </div>
+                              <!-- Customer Email -->
+                              <div class="space-y-1">
+                                    <p>{{
+                                          'sales.quick_sale.customer_info.customer_email.label' | translate
+                                          }}</p>
+                                    <p>{{ invoiceDetails.customer_email ?? '-' }}</p>
+                              </div>
+                              <div class="space-y-1">
+                                    <p>{{
+                                          'sales.quick_sale.customer_info.customer_address.label' | translate
+                                          }}</p>
+                                    <p>{{ invoiceDetails.customer_address ?? '-' }}</p>
+                              </div>
+                        </div>
+                  </nz-card>
+                  <!-- Payment Info Card -->
+                  <nz-card [nzTitle]="paymentTitle" [nzBordered]="true">
+                        <div class="grid grid-cols-2 gap-4">
+                              <div class="space-y-1">
+                                    <p>{{ 'sales.quick_sale.payment_info.payment_method.label' | translate }}</p>
+                                    <p>{{ getPaymentMethod(invoiceDetails.payment_method) | translate }}</p>
+                              </div>
+                              <div *ngIf="invoiceDetails.payment_method !== 'bkash'" class="space-y-1">
+                                    <p>{{ 'sales.quick_sale.payment_info.note.label' | translate }}</p>
+                                    <p>{{ invoiceDetails.note ?? '-' }}</p>
+                              </div>
+                              <div *ngIf="invoiceDetails.payment_method === 'bkash'" class="space-y-1">
+                                    <p>{{ 'sales.quick_sale.payment_info.payment_reference.label' | translate }}
+                                    </p>
+                                    <p>{{ invoiceDetails.payment_reference ?? '-' }}</p>
+                              </div>
+                              <div class="col-span-2 space-y-1">
+                                    <p>{{
+                                          'sales.quick_sale.payment_info.payment_status.label' | translate
+                                          }}</p>
+                                    <p>{{ getPaymentStatus(invoiceDetails.payment_status) | translate }}</p>
+                              </div>
+                        </div>
+                  </nz-card>
+                  <ng-template #paymentTitle>
+                        <h3 class="text-lg font-semibold flex gap-2 items-center"><span class="text-red-500">*</span>{{
+                              'sales.quick_sale.payment_info.title' |
+                              translate }}
+                        </h3>
+                  </ng-template>
+            </div>
+
+            <div class="flex justify-end items-center">
+                  <div class="flex space-x-2">
+                        <secondary-button [label]="'Go Back'" (click)="goBack()"></secondary-button>
+                  </div>
+            </div>
+      </div>
+</div>

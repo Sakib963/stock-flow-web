@@ -50,7 +50,7 @@ export class DisplayUserListComponent implements OnInit {
   }
 
   onSearchChange(value: string): void {
-    this.payload.search_text = value;
+    this.payload = {offset: 0, limit: Constants.PAGE_SIZE, search_text: value, status: ''};
     this.isFilter = true;
     this.loadUserList();
   }

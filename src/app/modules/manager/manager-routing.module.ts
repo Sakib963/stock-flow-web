@@ -283,9 +283,40 @@ const routes: Routes = [
                   import(
                     './pages/inventory/invoice/invoice-list/invoice-list.component'
                   ).then((m) => m.InvoiceListComponent),
+              },
+              {
+                path: 'view-invoice/:oid',
+                loadComponent: () =>
+                  import(
+                    './pages/inventory/invoice/view-invoice-details-for-manager/view-invoice-details-for-manager.component'
+                  ).then((m) => m.ViewInvoiceDetailsForManagerComponent),
               }
             ],
           },
+           {
+        path: 'product-return',
+        children: [
+          {
+            path: '',
+            redirectTo: 'list',
+            pathMatch: 'full',
+          },
+          {
+            path: 'list',
+            loadComponent: () =>
+              import(
+                './pages/inventory/product-return/display-product-return-list-for-manager/display-product-return-list-for-manager.component'
+              ).then((m) => m.DisplayProductReturnListForManagerComponent),
+          },
+          {
+            path: 'view-product-return/:oid',
+            loadComponent: () =>
+              import(
+                './pages/inventory/product-return/view-product-return-details-for-manager/view-product-return-details-for-manager.component'
+              ).then((m) => m.ViewProductReturnDetailsForManagerComponent),
+          }
+        ]
+      }
         ],
       },
       {

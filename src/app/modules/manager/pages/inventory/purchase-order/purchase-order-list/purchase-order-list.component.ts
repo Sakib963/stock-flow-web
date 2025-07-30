@@ -63,14 +63,14 @@ export class PurchaseOrderListComponent implements OnInit {
   }
 
   onSearchChange(value: string): void {
-    this.payload.search_text = value;
+    this.payload = {offset: 0, limit: Constants.PAGE_SIZE, search_text: value, status: ''};
     this.isFilter = true;
     this.loadList();
   }
 
   onSelectChange(value: string): void {
-    if (value) this.payload.status = value;
-    else this.payload.status = '';
+    if (value) this.payload = { ...this.payload, offset: 0, limit: Constants.PAGE_SIZE, status: value };
+    else this.payload = { ...this.payload, offset: 0, limit: Constants.PAGE_SIZE, status: '' };
     this.isFilter = true;
     this.loadList();
   }

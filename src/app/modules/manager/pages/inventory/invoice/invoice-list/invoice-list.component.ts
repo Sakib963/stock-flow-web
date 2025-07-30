@@ -71,22 +71,22 @@ export class InvoiceListComponent implements OnInit {
 
   onDateChange(value: string): void {
     if (value) {
-      this.payload.selected_date = value;
+    this.payload = { ...this.payload, offset: 0, limit: Constants.PAGE_SIZE, selected_date: value};
       this.isFilter = true;
     } else {
-      this.payload.selected_date = null;
+      this.payload = { ...this.payload, offset: 0, limit: Constants.PAGE_SIZE, selected_date: null};
     }
     this.loadList();
   }
 
   onSearchChange(value: string): void {
-    this.payload.search_text = value;
+    this.payload = { ...this.payload, offset: 0, limit: Constants.PAGE_SIZE, search_text: value, status: '' };
     this.isFilter = true;
     this.loadList();
   }
 
   onStatusChange(value: string): void {
-    this.payload.status = value;
+    this.payload = { ...this.payload, offset: 0, limit: Constants.PAGE_SIZE, search_text: '', status: value};
     this.isFilter = true;
     this.loadList();
   }
@@ -138,7 +138,7 @@ export class InvoiceListComponent implements OnInit {
   }
 
   handleView(value: any): any {
-    this._router.navigate([`../view-purchase-order/${value}`], {
+    this._router.navigate([`../view-invoice/${value}`], {
       relativeTo: this._activatedRoute,
       state: { edit: false },
     });
