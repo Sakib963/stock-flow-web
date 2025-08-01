@@ -4,6 +4,7 @@
     "WELCOME": "অ্যাপে স্বাগতম",
     "quick_sale": {
       "title": "দ্রুত বিক্রি",
+      "invoice_title": "ইনভয়েস",
       "select_product": {
         "form": {
           "card_title": "পণ্য নির্বাচন করুন",
@@ -95,6 +96,45 @@
             "paid": "পেইড",
             "unpaid": "আনপেইড",
             "partially_paid": "আংশিক পেইড"
+          }
+        }
+      }
+    },
+    "invoice": {
+      "product_return": {
+        "title": "পণ্য ফেরত",
+        "form": {
+          "invoice_no": {
+            "label": "ইনভয়েস নম্বর",
+            "placeholder": "ইনভয়েস নম্বর লিখুন",
+            "required_error_message": "ইনভয়েস নম্বর আবশ্যক"
+          },
+          "refund_amount": {
+            "label": "ফেরত পরিমাণ",
+            "placeholder": "ফেরত পরিমাণ লিখুন",
+            "required_error_message": "ফেরত পরিমাণ আবশ্যক"
+          },
+          "return_reason": {
+            "label": "ফেরতের কারণ (ঐচ্ছিক)",
+            "placeholder": "ফেরতের কারণ লিখুন",
+            "required_error_message": "ফেরতের কারণ আবশ্যক"
+          },
+          "products": {
+            "title": "ফেরত পণ্যসমূহ",
+            "product_name": {
+              "label": "পণ্যের নাম",
+              "placeholder": "পণ্য নির্বাচন করুন",
+              "required_error_message": "পণ্যের নাম আবশ্যক"
+            },
+            "quantity": {
+              "label": "পরিমাণ",
+              "placeholder": "পরিমাণ লিখুন",
+              "required_error_message": "পরিমাণ আবশ্যক"
+            },
+            "actions": "অ্যাকশন",
+            "supplier": "সরবরাহকারী",
+            "batch_code": "ব্যাচ কোড",
+            "returned_quantity": "ফেরতের পরিমাণ"
           }
         }
       }
