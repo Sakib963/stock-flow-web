@@ -87,4 +87,11 @@ export const DROPDOWN_OPTIONS = {
     { label: 'Item was part of an exchange', value: 'exchange' },
     { label: 'Other (please specify)', value: 'other' },
   ],
+  DISPOSAL_REASONS: [
+    { label: 'Expired', value: 'expired' },
+    { label: 'Damaged in store', value: 'damaged' },
+    { label: 'Customer Return - Unsellable', value: 'customer_unsellable' },
+    { label: 'Opened Packaging', value: 'opened' },
+    { label: 'Others', value: 'others' },
+  ],
 };

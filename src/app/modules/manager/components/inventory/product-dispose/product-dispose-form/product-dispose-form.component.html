@@ -1,0 +1,62 @@
+<div class="rounded-md bg-white">
+      <!-- Form -->
+      <form nz-form [formGroup]="form" [nzLayout]="'vertical'" (ngSubmit)="handleForm()">
+            <div class="grid grid-cols-1 md:gap-x-6 md:grid-cols-2 lg:grid-cols-3 border-[0.5px] p-4 rounded-md">
+                  <!-- product_oid -->
+                  <nz-form-item>
+                        <nz-form-label [nzRequired]="hasRequiredValidator('product_oid')">Product</nz-form-label>
+                        <nz-form-control nzErrorTip="Product is required.">
+                              <nz-select class="w-full" formControlName="product_oid" nz-input nzAllowClear
+                                    nzPlaceHolder="Select Product">
+                                    <ng-container *ngFor="let item of productList">
+                                          <nz-option [nzLabel]="item.label" [nzValue]="item.product_oid"></nz-option>
+                                    </ng-container>
+                              </nz-select>
+                        </nz-form-control>
+                  </nz-form-item>
+                  <!-- available_quantity -->
+                  <nz-form-item>
+                        <nz-form-label [nzRequired]="hasRequiredValidator('available_quantity')">Available Quantity</nz-form-label>
+                        <nz-form-control nzErrorTip="Quantity is Required.">
+                              <input formControlName="available_quantity" nz-input placeholder="Enter Quantity" />
+                        </nz-form-control>
+                  </nz-form-item>
+                  <!-- dispose_quantity -->
+                  <nz-form-item>
+                        <nz-form-label [nzRequired]="hasRequiredValidator('dispose_quantity')">Dispose Quantity</nz-form-label>
+                        <nz-form-control>
+                              <nz-input-number class="w-full" formControlName="dispose_quantity" [nzMin]="1" nzPlaceHolder="Enter Dispose Quantity"
+                                    [nzMax]="selectedProduct?.quantity_available"></nz-input-number>
+                        </nz-form-control>
+                  </nz-form-item>
+                  <!-- reason -->
+                  <nz-form-item>
+                        <nz-form-label [nzRequired]="hasRequiredValidator('reason')">Reason For Disposal</nz-form-label>
+                        <nz-form-control nzErrorTip="Reason For Disposal is required.">
+                              <nz-select class="w-full" formControlName="reason" nz-input nzAllowClear
+                                    nzPlaceHolder="Select Reason For Disposal">
+                                    <ng-container *ngFor="let item of disposeReasons">
+                                          <nz-option [nzLabel]="item.label" [nzValue]="item.value"></nz-option>
+                                    </ng-container>
+                              </nz-select>
+                        </nz-form-control>
+                  </nz-form-item>
+                  <!-- notes -->
+                  <nz-form-item>
+                        <nz-form-label [nzRequired]="hasRequiredValidator('notes')">Special
+                              Notes</nz-form-label>
+                        <nz-form-control nzErrorTip="Special Notes is Required.">
+                              <textarea rows="2" formControlName="notes" nz-input placeholder="Special Note (if any)"
+                                    nzAutosize></textarea>
+                        </nz-form-control>
+                  </nz-form-item>
+            </div>
+            <!-- Actions -->
+            <div class="flex justify-end mt-4">
+                  <div class="flex items-center gap-4">
+                        <secondary-button (click)="goBack()" [label]="'Cancel'"></secondary-button>
+                        <primary-button [label]="'Submit'" [loading]="loading" [type]="'submit'"></primary-button>
+                  </div>
+            </div>
+      </form>
+</div>

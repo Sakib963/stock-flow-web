@@ -88,6 +88,11 @@ export class Menu {
           label: 'Product Return',
           route: '/manager/inventory/product-return',
         },
+        {
+          icon: 'assets/icons/dispose.svg',
+          label: 'Dispose',
+          route: '/manager/inventory/product-dispose',
+        },
       ],
     },
     {

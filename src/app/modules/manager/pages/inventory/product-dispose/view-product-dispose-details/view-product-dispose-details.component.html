@@ -1,0 +1,90 @@
+<div class="p-4 space-y-3">
+      <h2 class="text-2xl font-medium mb-4 animate-text">Product Disposal Details</h2>
+      <app-loader *ngIf="loading" [isVisible]="loading"></app-loader>
+      <div *ngIf="!loading && disposeDetails">
+            <div *ngIf="!editMode" class="space-y-4">
+                  <nz-card nzTitle="Dispose Information">
+                        <div class="grid grid-cols-1 gap-x-6 gap-y-4 md:grid-cols-3">
+                              <!-- Product Name -->
+                              <div class="space-y-1">
+                                    <p>Product Name</p>
+                                    <p class="font-semibold text-secondary">{{ disposeDetails?.product_name | safeText
+                                          }}
+                                    </p>
+                              </div>
+                              <!-- Batch Code -->
+                              <div class="space-y-1">
+                                    <p>Batch Code</p>
+                                    <p class="font-semibold text-secondary">{{ disposeDetails?.batch_code | safeText
+                                          }}</p>
+                              </div>
+                              <!-- Disposed Quantity -->
+                              <div class="space-y-1">
+                                    <p>Disposed Quantity</p>
+                                    <p class="font-semibold text-secondary">{{ disposeDetails?.dispose_quantity |
+                                          safeText
+                                          }}</p>
+                              </div>
+                              <!-- Date Of Disposal -->
+                              <div class="space-y-1">
+                                    <p>Date Of Disposal</p>
+                                    <p class="font-semibold text-secondary">{{ disposeDetails?.created_on | safeText }}
+                                    </p>
+                              </div>
+                              <!-- Disposed By -->
+                              <div class="space-y-1">
+                                    <p>Disposed By</p>
+                                    <p class="font-semibold text-secondary">{{ disposeDetails?.created_by | safeText }}
+                                    </p>
+                              </div>
+                        </div>
+                  </nz-card>
+                  <nz-card nzTitle="Purchase Information">
+                        <div class="grid grid-cols-1 gap-x-6 gap-y-4 md:grid-cols-3">
+                              <!-- Date Of Purchase -->
+                              <div class="space-y-1">
+                                    <p>Date Of Purchase</p>
+                                    <p class="font-semibold text-secondary">{{ disposeDetails?.purchase_date | safeText
+                                          }}
+                                    </p>
+                              </div>
+                              <!-- Purchased Quantity -->
+                              <div class="space-y-1">
+                                    <p>Purchased Quantity</p>
+                                    <p class="font-semibold text-secondary">{{ disposeDetails?.purchase_quantity |
+                                          safeText }}
+                                    </p>
+                              </div>
+                              <!-- Purchased Price -->
+                              <div class="space-y-1">
+                                    <p>Purchased Price</p>
+                                    <p class="font-semibold text-secondary">{{ disposeDetails?.purchase_unit_price |
+                                          safeText
+                                          }}</p>
+                              </div>
+                              <!-- Supplier Name -->
+                              <div class="space-y-1">
+                                    <p>Supplier Name</p>
+                                    <p class="font-semibold text-secondary">{{ disposeDetails?.supplier_name | safeText
+                                          }}</p>
+                              </div>
+                        </div>
+                  </nz-card>
+                  <!-- Actions -->
+                  <div class="flex justify-end mt-4">
+                        <div class="flex items-center gap-4">
+                              <secondary-button [label]="'Go Back'" (click)="goBack()"></secondary-button>
+                        </div>
+                  </div>
+            </div>
+      </div>
+      <div *ngIf="!loading && !disposeDetails"
+            class="flex flex-col items-center justify-center h-full text-center bg-gray-50 p-8 rounded-md space-y-4">
+            <img src="assets/icons/no_data.svg" alt="No Data Found">
+            <h2 class="text-lg font-semibold text-black">No Data Found</h2>
+      </div>
+
+      <ng-template #noProducts>
+            <nz-empty nzNotFoundContent="No Data Found"></nz-empty>
+      </ng-template>
+</div>

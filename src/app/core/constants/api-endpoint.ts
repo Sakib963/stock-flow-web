@@ -83,4 +83,9 @@ export class APIEndpoint {
 
   static GET_PRODUCT_RETURN_LIST_FOR_MANAGER = "/api/v1/manager/product-return/get-product-return-list";
   static GET_PRODUCT_RETURN_DETAILS_FOR_MANAGER = "/api/v1/manager/product-return/get-product-return-details";
+
+  static GET_PRODUCT_LIST_FOR_DISPOSE_DROPDOWN = "/api/v1/manager/product-dispose/get-product-list-for-dispose-dropdown";
+  static CREATE_PRODUCT_DISPOSE = "/api/v1/manager/product-dispose/create-product-dispose";
+  static GET_PRODUCT_DISPOSE_LIST = "/api/v1/manager/product-dispose/get-product-dispose-list";
+  static GET_PRODUCT_DISPOSE_DETAILS = "/api/v1/manager/product-dispose/get-product-dispose-details";
 }

@@ -290,33 +290,64 @@ const routes: Routes = [
                   import(
                     './pages/inventory/invoice/view-invoice-details-for-manager/view-invoice-details-for-manager.component'
                   ).then((m) => m.ViewInvoiceDetailsForManagerComponent),
-              }
+              },
             ],
           },
-           {
-        path: 'product-return',
-        children: [
           {
-            path: '',
-            redirectTo: 'list',
-            pathMatch: 'full',
+            path: 'product-return',
+            children: [
+              {
+                path: '',
+                redirectTo: 'list',
+                pathMatch: 'full',
+              },
+              {
+                path: 'list',
+                loadComponent: () =>
+                  import(
+                    './pages/inventory/product-return/display-product-return-list-for-manager/display-product-return-list-for-manager.component'
+                  ).then((m) => m.DisplayProductReturnListForManagerComponent),
+              },
+              {
+                path: 'view-product-return/:oid',
+                loadComponent: () =>
+                  import(
+                    './pages/inventory/product-return/view-product-return-details-for-manager/view-product-return-details-for-manager.component'
+                  ).then((m) => m.ViewProductReturnDetailsForManagerComponent),
+              },
+            ],
           },
           {
-            path: 'list',
-            loadComponent: () =>
-              import(
-                './pages/inventory/product-return/display-product-return-list-for-manager/display-product-return-list-for-manager.component'
-              ).then((m) => m.DisplayProductReturnListForManagerComponent),
-          },
-          {
-            path: 'view-product-return/:oid',
-            loadComponent: () =>
-              import(
-                './pages/inventory/product-return/view-product-return-details-for-manager/view-product-return-details-for-manager.component'
-              ).then((m) => m.ViewProductReturnDetailsForManagerComponent),
+            path: 'product-dispose',
+            children: [
+              {
+                path: '',
+                redirectTo: 'list',
+                pathMatch: 'full',
+              },
+              {
+                path: 'list',
+                loadComponent: () =>
+                  import(
+                    './pages/inventory/product-dispose/display-product-dispose-list/display-product-dispose-list.component'
+                  ).then((m) => m.DisplayProductDisposeListComponent),
+              },
+              {
+                path: 'create-product-dispose',
+                loadComponent: () =>
+                  import(
+                    './pages/inventory/product-dispose/create-product-dispose/create-product-dispose.component'
+                  ).then((m) => m.CreateProductDisposeComponent),
+              },
+              {
+                path: 'view-product-dispose/:oid',
+                loadComponent: () =>
+                  import(
+                    './pages/inventory/product-dispose/view-product-dispose-details/view-product-dispose-details.component'
+                  ).then((m) => m.ViewProductDisposeDetailsComponent),
+              }
+            ]
           }
-        ]
-      }
         ],
       },
       {
