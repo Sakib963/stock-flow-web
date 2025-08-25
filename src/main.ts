@@ -61,7 +61,6 @@ bootstrapApplication(AppComponent, {
     importProvidersFrom(
       BrowserModule,
       BrowserAnimationsModule,
-      HttpClientModule,
       AppRoutingModule,
       CloudinaryModule,
       NgZorroCustomModule,

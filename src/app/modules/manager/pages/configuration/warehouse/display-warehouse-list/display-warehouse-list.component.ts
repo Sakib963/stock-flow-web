@@ -8,8 +8,6 @@ import { Constants } from '@app/core/constants/constants';
 import { HttpService } from '@app/core/services/http.service';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { finalize } from 'rxjs';
-import { ViewProductListComponent } from '@app/modules/manager/components/configuration/product/view-product-list/view-product-list.component';
-import { LoaderComponent } from '@app/shared/components/loader/loader.component';
 import { NgZorroCustomModule } from '@app/shared/ng-zorro-custom.module';
 import { PrimaryButtonWithPlusIcon } from '@app/shared/components/buttons/primary-button-with-plus-icon/primary-button-with-plus-icon.component';
 import { ViewWarehouseListComponent } from '@app/modules/manager/components/configuration/warehouse/view-warehouse-list/view-warehouse-list.component';
@@ -18,7 +16,6 @@ import { ViewWarehouseListComponent } from '@app/modules/manager/components/conf
     selector: 'app-display-warehouse-list',
     imports: [
         CommonModule,
-        LoaderComponent,
         NgZorroCustomModule,
         ReactiveFormsModule,
         PrimaryButtonWithPlusIcon,
