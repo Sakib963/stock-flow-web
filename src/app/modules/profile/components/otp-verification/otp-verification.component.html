@@ -29,14 +29,15 @@
 
     <nz-divider></nz-divider>
 
-    <div class="p-4 border rounded-sm">
-      <!-- <nz-input-otp></nz-input-otp> -->
+    <div class="p-4 border rounded-sm flex justify-center items-center">
+      <nz-input-otp [nzSize]="'large'"  [(ngModel)]="otp" [nzLength]="6">
+      </nz-input-otp>
     </div>
 
     <!-- Action Buttons -->
     <div class="flex justify-between">
       <button disableForGuest [disabled]="isOtpExpired || loading" [type]="'button'" (click)="submitOtp()"
-        class="min-w-min group relative flex items-center gap-4 overflow-hidden rounded-sm bg-white px-6 py-2 shadow font-medium disabled:cursor-not-allowed">
+        class="w-full group relative flex justify-center items-center gap-4 overflow-hidden rounded-sm bg-white px-6 py-2 shadow font-medium disabled:cursor-wait">
         <div [ngClass]="loading ? 'w-full': ''"
           class="absolute inset-0 w-2 bg-primary transition-all duration-300 ease-in-out group-hover:w-full">
         </div>

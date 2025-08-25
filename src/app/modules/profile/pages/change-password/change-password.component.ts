@@ -12,19 +12,20 @@ import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { LoaderComponent } from '@app/shared/components/loader/loader.component';
 import { NzModalService } from 'ng-zorro-antd/modal';
 import { ConfirmationModalComponent } from '@app/shared/components/confirmation-modal/confirmation-modal.component';
+import { AuthService } from '@app/modules/auth/services/auth.service';
 
 @Component({
-    selector: 'change-password',
-    imports: [
-        CommonModule,
-        FormsModule,
-        OtpVerificationComponent,
-        NgZorroCustomModule,
-        PasswordChangeFormComponent,
-        LoaderComponent,
-    ],
-    templateUrl: './change-password.component.html',
-    styleUrls: ['./change-password.component.scss']
+  selector: 'change-password',
+  imports: [
+    CommonModule,
+    FormsModule,
+    OtpVerificationComponent,
+    NgZorroCustomModule,
+    PasswordChangeFormComponent,
+    LoaderComponent,
+  ],
+  templateUrl: './change-password.component.html',
+  styleUrls: ['./change-password.component.scss'],
 })
 export class ChangePasswordComponent {
   showOtp: boolean = false;
@@ -38,10 +39,17 @@ export class ChangePasswordComponent {
     private _httpService: HttpService,
     private _destroyRef: DestroyRef,
     private _notificationService: NzNotificationService,
-    private _modal: NzModalService
+    private _modal: NzModalService,
+    private _authService: AuthService
   ) {}
 
-  handleOtpVerified(event: any): void {}
+  handleOtpVerified(event: any): void {
+    if (event.action === 'otp_verified') {
+      this.currentStep = 2;
+    } else if (event.action === 'try_again') {
+      this.currentStep = 0;
+    }
+  }
 
   handlePasswordSubmit(event: any): void {
     let message = 'Do you want to change your password?';
@@ -75,5 +83,9 @@ export class ChangePasswordComponent {
           this._notificationService.error('Error!', err?.error?.message);
         },
       });
+  }
+
+  logout(): void {
+    this._authService.logout();
   }
 }

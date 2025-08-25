@@ -90,4 +90,5 @@ export class APIEndpoint {
   static GET_PRODUCT_DISPOSE_DETAILS = "/api/v1/manager/product-dispose/get-product-dispose-details";
 
   static CHANGE_PASSWORD = "/api/v1/profile/change-password/change-user-password";
+  static VERIFY_OTP_FOR_PASSWORD_CHANGE = "/api/v1/profile/change-password/verify-otp-for-password-change";
 }
