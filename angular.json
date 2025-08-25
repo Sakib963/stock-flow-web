@@ -78,10 +78,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "browserTarget": "stock-flow-web:build:production"
+              "buildTarget": "stock-flow-web:build:production"
             },
             "development": {
-              "browserTarget": "stock-flow-web:build:development"
+              "buildTarget": "stock-flow-web:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -89,7 +89,7 @@
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "stock-flow-web:build"
+            "buildTarget": "stock-flow-web:build"
           }
         },
         "test": {
