@@ -11,11 +11,10 @@ import { LoaderComponent } from '@app/shared/components/loader/loader.component'
 import { WarehouseFormComponent } from '@app/modules/manager/components/configuration/warehouse/warehouse-form/warehouse-form.component';
 
 @Component({
-  selector: 'app-view-warehouse-details',
-  standalone: true,
-  imports: [CommonModule, LoaderComponent, WarehouseFormComponent, SecondaryButton],
-  templateUrl: './view-warehouse-details.component.html',
-  styleUrls: ['./view-warehouse-details.component.scss'],
+    selector: 'app-view-warehouse-details',
+    imports: [CommonModule, LoaderComponent, WarehouseFormComponent, SecondaryButton],
+    templateUrl: './view-warehouse-details.component.html',
+    styleUrls: ['./view-warehouse-details.component.scss']
 })
 export class ViewWarehouseDetailsComponent implements OnInit {
   @Input() oid: any;

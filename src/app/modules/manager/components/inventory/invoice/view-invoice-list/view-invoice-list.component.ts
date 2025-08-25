@@ -6,11 +6,10 @@ import { Constants } from '@app/core/constants/constants';
 import { DROPDOWN_OPTIONS } from '@app/core/constants/dropdown-options';
 
 @Component({
-  selector: 'view-invoice-list',
-  standalone: true,
-  imports: [CommonModule, NgZorroCustomModule, LoaderComponent],
-  templateUrl: './view-invoice-list.component.html',
-  styleUrls: ['./view-invoice-list.component.scss'],
+    selector: 'view-invoice-list',
+    imports: [CommonModule, NgZorroCustomModule, LoaderComponent],
+    templateUrl: './view-invoice-list.component.html',
+    styleUrls: ['./view-invoice-list.component.scss']
 })
 export class ViewInvoiceListComponent {
   @Input() data: any[] = [];

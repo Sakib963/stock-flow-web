@@ -17,17 +17,16 @@ import { ConfirmationModalComponent } from '@app/shared/components/confirmation-
 import { NzModalService } from 'ng-zorro-antd/modal';
 
 @Component({
-  selector: 'app-supplier-form',
-  standalone: true,
-  imports: [
-    CommonModule,
-    NgZorroCustomModule,
-    ReactiveFormsModule,
-    PrimaryButton,
-    SecondaryButton,
-  ],
-  templateUrl: './supplier-form.component.html',
-  styleUrls: ['./supplier-form.component.scss'],
+    selector: 'app-supplier-form',
+    imports: [
+        CommonModule,
+        NgZorroCustomModule,
+        ReactiveFormsModule,
+        PrimaryButton,
+        SecondaryButton,
+    ],
+    templateUrl: './supplier-form.component.html',
+    styleUrls: ['./supplier-form.component.scss']
 })
 export class SupplierFormComponent implements OnInit {
   @Output() readonly actionEmitter: EventEmitter<object> = new EventEmitter();

@@ -19,20 +19,19 @@ import { NzModalService } from 'ng-zorro-antd/modal';
 import { ConfirmationModalComponent } from '@app/shared/components/confirmation-modal/confirmation-modal.component';
 
 @Component({
-  selector: 'app-view-purchase-order',
-  standalone: true,
-  imports: [
-    CommonModule,
-    LoaderComponent,
-    PurchaseOrderFormComponent,
-    SecondaryButton,
-    NgZorroCustomModule,
-    PrimaryButton,
-    DangerButton,
-    OrderVerificationFormComponent,
-  ],
-  templateUrl: './view-purchase-order.component.html',
-  styleUrls: ['./view-purchase-order.component.scss'],
+    selector: 'app-view-purchase-order',
+    imports: [
+        CommonModule,
+        LoaderComponent,
+        PurchaseOrderFormComponent,
+        SecondaryButton,
+        NgZorroCustomModule,
+        PrimaryButton,
+        DangerButton,
+        OrderVerificationFormComponent,
+    ],
+    templateUrl: './view-purchase-order.component.html',
+    styleUrls: ['./view-purchase-order.component.scss']
 })
 export class ViewPurchaseOrderComponent implements OnInit {
   @Input() oid: any;

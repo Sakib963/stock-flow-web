@@ -23,17 +23,16 @@ export interface ModalData {
 }
 
 @Component({
-  selector: 'app-update-pricing-modal',
-  standalone: true,
-  imports: [
-    CommonModule,
-    ReactiveFormsModule,
-    NgZorroCustomModule,
-    PrimaryButton,
-    SecondaryButton,
-  ],
-  templateUrl: './update-pricing-modal.component.html',
-  styleUrls: ['./update-pricing-modal.component.scss'],
+    selector: 'app-update-pricing-modal',
+    imports: [
+        CommonModule,
+        ReactiveFormsModule,
+        NgZorroCustomModule,
+        PrimaryButton,
+        SecondaryButton,
+    ],
+    templateUrl: './update-pricing-modal.component.html',
+    styleUrls: ['./update-pricing-modal.component.scss']
 })
 export class UpdatePricingModalComponent {
   form!: FormGroup;

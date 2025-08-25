@@ -8,11 +8,10 @@ import { finalize } from 'rxjs';
 import { CategoryFormComponent } from '@app/modules/manager/components/configuration/category/category-form/category-form.component';
 
 @Component({
-  selector: 'app-create-category',
-  standalone: true,
-  imports: [CommonModule, CategoryFormComponent],
-  templateUrl: './create-category.component.html',
-  styleUrls: ['./create-category.component.scss']
+    selector: 'app-create-category',
+    imports: [CommonModule, CategoryFormComponent],
+    templateUrl: './create-category.component.html',
+    styleUrls: ['./create-category.component.scss']
 })
 export class CreateCategoryComponent {
   loading: boolean = false;

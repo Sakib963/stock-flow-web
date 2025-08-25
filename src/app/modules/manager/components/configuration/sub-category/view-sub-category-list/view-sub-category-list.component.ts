@@ -5,11 +5,10 @@ import { Constants } from '@app/core/constants/constants';
 import { LoaderComponent } from '@app/shared/components/loader/loader.component';
 
 @Component({
-  selector: 'app-view-sub-category-list',
-  standalone: true,
-  imports: [CommonModule, NgZorroCustomModule, LoaderComponent],
-  templateUrl: './view-sub-category-list.component.html',
-  styleUrls: ['./view-sub-category-list.component.scss'],
+    selector: 'app-view-sub-category-list',
+    imports: [CommonModule, NgZorroCustomModule, LoaderComponent],
+    templateUrl: './view-sub-category-list.component.html',
+    styleUrls: ['./view-sub-category-list.component.scss']
 })
 export class ViewSubCategoryListComponent {
   @Input() data: any[] = [];

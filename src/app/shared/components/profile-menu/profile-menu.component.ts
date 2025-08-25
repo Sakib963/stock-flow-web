@@ -9,16 +9,15 @@ import { TranslateService } from '@ngx-translate/core';
 import { Router } from '@angular/router';
 
 @Component({
-  selector: 'app-profile-menu',
-  standalone: true,
-  imports: [
-    CommonModule,
-    NgZorroCustomModule,
-    AngularSvgIconModule,
-    FormsModule,
-  ],
-  templateUrl: './profile-menu.component.html',
-  styleUrls: ['./profile-menu.component.scss'],
+    selector: 'app-profile-menu',
+    imports: [
+        CommonModule,
+        NgZorroCustomModule,
+        AngularSvgIconModule,
+        FormsModule,
+    ],
+    templateUrl: './profile-menu.component.html',
+    styleUrls: ['./profile-menu.component.scss']
 })
 export class ProfileMenuComponent implements OnInit {
   @Output() readonly actionEmitter: EventEmitter<object> = new EventEmitter();

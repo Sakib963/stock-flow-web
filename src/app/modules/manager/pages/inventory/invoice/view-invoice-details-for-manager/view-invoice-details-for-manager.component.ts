@@ -12,17 +12,16 @@ import { TranslateModule } from '@ngx-translate/core';
 import { SecondaryButton } from '@app/shared/components/buttons/secondary-button/secondary-button.component';
 
 @Component({
-  selector: 'view-invoice-details-for-manager',
-  standalone: true,
-  imports: [
-    CommonModule,
-    TranslateModule,
-    NgZorroCustomModule,
-    LoaderComponent,
-    SecondaryButton,
-  ],
-  templateUrl: './view-invoice-details-for-manager.component.html',
-  styleUrls: ['./view-invoice-details-for-manager.component.scss'],
+    selector: 'view-invoice-details-for-manager',
+    imports: [
+        CommonModule,
+        TranslateModule,
+        NgZorroCustomModule,
+        LoaderComponent,
+        SecondaryButton,
+    ],
+    templateUrl: './view-invoice-details-for-manager.component.html',
+    styleUrls: ['./view-invoice-details-for-manager.component.scss']
 })
 export class ViewInvoiceDetailsForManagerComponent implements OnInit {
   @Input() oid: any;

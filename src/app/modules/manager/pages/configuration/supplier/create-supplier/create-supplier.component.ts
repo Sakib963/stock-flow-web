@@ -8,11 +8,10 @@ import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { finalize } from 'rxjs';
 
 @Component({
-  selector: 'app-create-supplier',
-  standalone: true,
-  imports: [CommonModule, SupplierFormComponent],
-  templateUrl: './create-supplier.component.html',
-  styleUrls: ['./create-supplier.component.scss']
+    selector: 'app-create-supplier',
+    imports: [CommonModule, SupplierFormComponent],
+    templateUrl: './create-supplier.component.html',
+    styleUrls: ['./create-supplier.component.scss']
 })
 export class CreateSupplierComponent {
   loading: boolean = false;

@@ -30,18 +30,17 @@ import { DROPDOWN_OPTIONS } from '@app/core/constants/dropdown-options';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
 
 @Component({
-  selector: 'app-purchase-order-form',
-  standalone: true,
-  imports: [
-    CommonModule,
-    NgZorroCustomModule,
-    ReactiveFormsModule,
-    PrimaryButton,
-    SecondaryButton,
-    AngularSvgIconModule,
-  ],
-  templateUrl: './purchase-order-form.component.html',
-  styleUrls: ['./purchase-order-form.component.scss'],
+    selector: 'app-purchase-order-form',
+    imports: [
+        CommonModule,
+        NgZorroCustomModule,
+        ReactiveFormsModule,
+        PrimaryButton,
+        SecondaryButton,
+        AngularSvgIconModule,
+    ],
+    templateUrl: './purchase-order-form.component.html',
+    styleUrls: ['./purchase-order-form.component.scss']
 })
 export class PurchaseOrderFormComponent implements OnInit {
   @Output() readonly actionEmitter: EventEmitter<object> = new EventEmitter();

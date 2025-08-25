@@ -16,17 +16,16 @@ import { markFormGroupTouched } from '@app/core/constants/helper';
 import { DROPDOWN_OPTIONS } from '@app/core/constants/dropdown-options';
 
 @Component({
-  selector: 'app-order-verification-form',
-  standalone: true,
-  imports: [
-    CommonModule,
-    NgZorroCustomModule,
-    ReactiveFormsModule,
-    PrimaryButton,
-    SecondaryButton,
-  ],
-  templateUrl: './order-verification-form.component.html',
-  styleUrls: ['./order-verification-form.component.scss'],
+    selector: 'app-order-verification-form',
+    imports: [
+        CommonModule,
+        NgZorroCustomModule,
+        ReactiveFormsModule,
+        PrimaryButton,
+        SecondaryButton,
+    ],
+    templateUrl: './order-verification-form.component.html',
+    styleUrls: ['./order-verification-form.component.scss']
 })
 export class OrderVerificationFormComponent implements OnInit {
   @Input() purchaseDetails: any;

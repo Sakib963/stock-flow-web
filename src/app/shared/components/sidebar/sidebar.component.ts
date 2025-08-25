@@ -9,11 +9,10 @@ import { AngularSvgIconModule } from 'angular-svg-icon';
 import { SmartTranslatePipe } from '@app/shared/pipe/smart-translate.pipe';
 
 @Component({
-  selector: 'app-sidebar',
-  standalone: true,
-  imports: [CommonModule, RouterLink, AngularSvgIconModule, SmartTranslatePipe],
-  templateUrl: './sidebar.component.html',
-  styleUrls: ['./sidebar.component.scss'],
+    selector: 'app-sidebar',
+    imports: [CommonModule, RouterLink, AngularSvgIconModule, SmartTranslatePipe],
+    templateUrl: './sidebar.component.html',
+    styleUrls: ['./sidebar.component.scss']
 })
 export class SidebarComponent implements OnInit {
   @Output() readonly actionEmitter: EventEmitter<object> = new EventEmitter();

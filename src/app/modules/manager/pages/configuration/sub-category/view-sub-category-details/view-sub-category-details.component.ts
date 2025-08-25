@@ -11,16 +11,15 @@ import { map, finalize } from 'rxjs';
 import { SubCategoryFormComponent } from '@app/modules/manager/components/configuration/sub-category/sub-category-form/sub-category-form.component';
 
 @Component({
-  selector: 'app-view-sub-category-details',
-  standalone: true,
-  imports: [
-    CommonModule,
-    LoaderComponent,
-    SubCategoryFormComponent,
-    SecondaryButton,
-  ],
-  templateUrl: './view-sub-category-details.component.html',
-  styleUrls: ['./view-sub-category-details.component.scss'],
+    selector: 'app-view-sub-category-details',
+    imports: [
+        CommonModule,
+        LoaderComponent,
+        SubCategoryFormComponent,
+        SecondaryButton,
+    ],
+    templateUrl: './view-sub-category-details.component.html',
+    styleUrls: ['./view-sub-category-details.component.scss']
 })
 export class ViewSubCategoryDetailsComponent implements OnInit {
   @Input() oid: any;

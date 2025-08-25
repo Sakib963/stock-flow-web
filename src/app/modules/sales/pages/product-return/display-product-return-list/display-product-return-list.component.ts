@@ -12,16 +12,15 @@ import { NgZorroCustomModule } from '@app/shared/ng-zorro-custom.module';
 import { ViewProductReturnListComponent } from '@app/modules/sales/components/view-product-return-list/view-product-return-list.component';
 
 @Component({
-  selector: 'display-product-return-list',
-  standalone: true,
-  imports: [
-    CommonModule,
-    NgZorroCustomModule,
-    ReactiveFormsModule,
-    ViewProductReturnListComponent,
-  ],
-  templateUrl: './display-product-return-list.component.html',
-  styleUrls: ['./display-product-return-list.component.scss'],
+    selector: 'display-product-return-list',
+    imports: [
+        CommonModule,
+        NgZorroCustomModule,
+        ReactiveFormsModule,
+        ViewProductReturnListComponent,
+    ],
+    templateUrl: './display-product-return-list.component.html',
+    styleUrls: ['./display-product-return-list.component.scss']
 })
 export class DisplayProductReturnListComponent implements OnInit {
   data: any[] = [];

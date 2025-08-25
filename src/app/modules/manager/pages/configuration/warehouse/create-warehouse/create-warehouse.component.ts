@@ -8,11 +8,10 @@ import { finalize } from 'rxjs';
 import { WarehouseFormComponent } from '@app/modules/manager/components/configuration/warehouse/warehouse-form/warehouse-form.component';
 
 @Component({
-  selector: 'app-create-warehouse',
-  standalone: true,
-  imports: [CommonModule, WarehouseFormComponent],
-  templateUrl: './create-warehouse.component.html',
-  styleUrls: ['./create-warehouse.component.scss']
+    selector: 'app-create-warehouse',
+    imports: [CommonModule, WarehouseFormComponent],
+    templateUrl: './create-warehouse.component.html',
+    styleUrls: ['./create-warehouse.component.scss']
 })
 export class CreateWarehouseComponent {
   loading: boolean = false;

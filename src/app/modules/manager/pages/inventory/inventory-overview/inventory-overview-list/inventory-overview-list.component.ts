@@ -12,14 +12,13 @@ import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { finalize } from 'rxjs';
 
 @Component({
-  selector: 'app-inventory-overview-list',
-  standalone: true,
-  imports: [CommonModule,
-    NgZorroCustomModule,
-    ReactiveFormsModule,
-    ViewOverviewListComponent,],
-  templateUrl: './inventory-overview-list.component.html',
-  styleUrls: ['./inventory-overview-list.component.scss']
+    selector: 'app-inventory-overview-list',
+    imports: [CommonModule,
+        NgZorroCustomModule,
+        ReactiveFormsModule,
+        ViewOverviewListComponent,],
+    templateUrl: './inventory-overview-list.component.html',
+    styleUrls: ['./inventory-overview-list.component.scss']
 })
 export class InventoryOverviewListComponent  implements OnInit {
   data: any[] = [];

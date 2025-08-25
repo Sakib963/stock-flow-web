@@ -8,11 +8,10 @@ import { finalize } from 'rxjs';
 import { ProductFormComponent } from '@app/modules/manager/components/configuration/product/product-form/product-form.component';
 
 @Component({
-  selector: 'app-create-product',
-  standalone: true,
-  imports: [CommonModule, ProductFormComponent],
-  templateUrl: './create-product.component.html',
-  styleUrls: ['./create-product.component.scss'],
+    selector: 'app-create-product',
+    imports: [CommonModule, ProductFormComponent],
+    templateUrl: './create-product.component.html',
+    styleUrls: ['./create-product.component.scss']
 })
 export class CreateProductComponent {
   loading: boolean = false;

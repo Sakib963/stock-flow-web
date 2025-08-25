@@ -6,11 +6,10 @@ import { Constants } from '@app/core/constants/constants';
 import { SafeTextPipe } from '@app/shared/pipe/safe-text.pipe';
 
 @Component({
-  selector: 'view-product-return-list',
-  standalone: true,
-  imports: [CommonModule, NgZorroCustomModule, LoaderComponent, SafeTextPipe],
-  templateUrl: './view-product-return-list.component.html',
-  styleUrls: ['./view-product-return-list.component.scss'],
+    selector: 'view-product-return-list',
+    imports: [CommonModule, NgZorroCustomModule, LoaderComponent, SafeTextPipe],
+    templateUrl: './view-product-return-list.component.html',
+    styleUrls: ['./view-product-return-list.component.scss']
 })
 export class ViewProductReturnListComponent {
   @Input() data: any[] = [];

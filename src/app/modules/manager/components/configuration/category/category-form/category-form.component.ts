@@ -18,17 +18,16 @@ import { PrimaryButton } from '@app/shared/components/buttons/primary-button/pri
 import { SecondaryButton } from '@app/shared/components/buttons/secondary-button/secondary-button.component';
 
 @Component({
-  selector: 'app-category-form',
-  standalone: true,
-  imports: [
-    CommonModule,
-    NgZorroCustomModule,
-    ReactiveFormsModule,
-    PrimaryButton,
-    SecondaryButton,
-  ],
-  templateUrl: './category-form.component.html',
-  styleUrls: ['./category-form.component.scss'],
+    selector: 'app-category-form',
+    imports: [
+        CommonModule,
+        NgZorroCustomModule,
+        ReactiveFormsModule,
+        PrimaryButton,
+        SecondaryButton,
+    ],
+    templateUrl: './category-form.component.html',
+    styleUrls: ['./category-form.component.scss']
 })
 export class CategoryFormComponent implements OnInit {
   @Output() readonly actionEmitter: EventEmitter<object> = new EventEmitter();

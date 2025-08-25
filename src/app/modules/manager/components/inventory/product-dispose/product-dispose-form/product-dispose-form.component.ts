@@ -29,17 +29,16 @@ import { NzModalService } from 'ng-zorro-antd/modal';
 import { finalize } from 'rxjs';
 
 @Component({
-  selector: 'product-dispose-form',
-  standalone: true,
-  imports: [
-    CommonModule,
-    NgZorroCustomModule,
-    ReactiveFormsModule,
-    PrimaryButton,
-    SecondaryButton,
-  ],
-  templateUrl: './product-dispose-form.component.html',
-  styleUrls: ['./product-dispose-form.component.scss'],
+    selector: 'product-dispose-form',
+    imports: [
+        CommonModule,
+        NgZorroCustomModule,
+        ReactiveFormsModule,
+        PrimaryButton,
+        SecondaryButton,
+    ],
+    templateUrl: './product-dispose-form.component.html',
+    styleUrls: ['./product-dispose-form.component.scss']
 })
 export class ProductDisposeFormComponent implements OnInit {
   @Output() readonly actionEmitter: EventEmitter<object> = new EventEmitter();

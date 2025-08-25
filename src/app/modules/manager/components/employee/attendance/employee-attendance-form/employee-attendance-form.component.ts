@@ -31,17 +31,16 @@ import { NzModalService } from 'ng-zorro-antd/modal';
 import { finalize } from 'rxjs';
 
 @Component({
-  selector: 'app-employee-attendance-form',
-  standalone: true,
-  imports: [
-    CommonModule,
-    NgZorroCustomModule,
-    ReactiveFormsModule,
-    PrimaryButton,
-    SecondaryButton,
-  ],
-  templateUrl: './employee-attendance-form.component.html',
-  styleUrls: ['./employee-attendance-form.component.scss'],
+    selector: 'app-employee-attendance-form',
+    imports: [
+        CommonModule,
+        NgZorroCustomModule,
+        ReactiveFormsModule,
+        PrimaryButton,
+        SecondaryButton,
+    ],
+    templateUrl: './employee-attendance-form.component.html',
+    styleUrls: ['./employee-attendance-form.component.scss']
 })
 export class EmployeeAttendanceFormComponent implements OnInit {
   @Output() readonly actionEmitter: EventEmitter<object> = new EventEmitter();

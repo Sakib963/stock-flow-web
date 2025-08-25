@@ -11,14 +11,13 @@ import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { map, finalize } from 'rxjs';
 
 @Component({
-  selector: 'app-view-supplier-details',
-  standalone: true,
-  imports: [CommonModule,
-    LoaderComponent,
-    SupplierFormComponent,
-    SecondaryButton,],
-  templateUrl: './view-supplier-details.component.html',
-  styleUrls: ['./view-supplier-details.component.scss']
+    selector: 'app-view-supplier-details',
+    imports: [CommonModule,
+        LoaderComponent,
+        SupplierFormComponent,
+        SecondaryButton,],
+    templateUrl: './view-supplier-details.component.html',
+    styleUrls: ['./view-supplier-details.component.scss']
 })
 export class ViewSupplierDetailsComponent implements OnInit {
   @Input() oid: any;

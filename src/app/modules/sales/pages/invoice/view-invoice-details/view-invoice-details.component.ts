@@ -9,11 +9,10 @@ import { ViewInvoiceComponent } from '@app/modules/sales/components/invoice/view
 import { LoaderComponent } from '@app/shared/components/loader/loader.component';
 
 @Component({
-  selector: 'view-invoice-details',
-  standalone: true,
-  imports: [CommonModule, ViewInvoiceComponent, LoaderComponent],
-  templateUrl: './view-invoice-details.component.html',
-  styleUrls: ['./view-invoice-details.component.scss'],
+    selector: 'view-invoice-details',
+    imports: [CommonModule, ViewInvoiceComponent, LoaderComponent],
+    templateUrl: './view-invoice-details.component.html',
+    styleUrls: ['./view-invoice-details.component.scss']
 })
 export class ViewInvoiceDetailsComponent implements OnInit {
   @Input() invoiceId: any;

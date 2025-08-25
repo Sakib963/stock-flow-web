@@ -12,17 +12,16 @@ import { SecondaryButton } from '@app/shared/components/buttons/secondary-button
 import { markFormGroupTouched } from '@app/core/constants/helper';
 
 @Component({
-  selector: 'password-change-form',
-  standalone: true,
-  imports: [
-    CommonModule,
-    ReactiveFormsModule,
-    NgZorroCustomModule,
-    PrimaryButton,
-    SecondaryButton,
-  ],
-  templateUrl: './password-change-form.component.html',
-  styleUrls: ['./password-change-form.component.scss'],
+    selector: 'password-change-form',
+    imports: [
+        CommonModule,
+        ReactiveFormsModule,
+        NgZorroCustomModule,
+        PrimaryButton,
+        SecondaryButton,
+    ],
+    templateUrl: './password-change-form.component.html',
+    styleUrls: ['./password-change-form.component.scss']
 })
 export class PasswordChangeFormComponent implements OnInit {
   @Output() actionEmitter = new EventEmitter<any>();

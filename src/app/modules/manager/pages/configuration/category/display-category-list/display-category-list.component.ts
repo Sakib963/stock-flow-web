@@ -13,17 +13,16 @@ import { ViewCategoryListComponent } from '@app/modules/manager/components/confi
 import { PrimaryButtonWithPlusIcon } from '@app/shared/components/buttons/primary-button-with-plus-icon/primary-button-with-plus-icon.component';
 
 @Component({
-  selector: 'app-display-category-list',
-  standalone: true,
-  imports: [
-    CommonModule,
-    NgZorroCustomModule,
-    ReactiveFormsModule,
-    ViewCategoryListComponent,
-    PrimaryButtonWithPlusIcon
-  ],
-  templateUrl: './display-category-list.component.html',
-  styleUrls: ['./display-category-list.component.scss'],
+    selector: 'app-display-category-list',
+    imports: [
+        CommonModule,
+        NgZorroCustomModule,
+        ReactiveFormsModule,
+        ViewCategoryListComponent,
+        PrimaryButtonWithPlusIcon
+    ],
+    templateUrl: './display-category-list.component.html',
+    styleUrls: ['./display-category-list.component.scss']
 })
 export class DisplayCategoryListComponent implements OnInit {
   data: any[] = [];

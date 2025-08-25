@@ -10,11 +10,10 @@ import { LoaderComponent } from '@app/shared/components/loader/loader.component'
 import { UserFormComponent } from '@app/modules/admin/components/user/user-form/user-form.component';
 
 @Component({
-  selector: 'app-view-user-details',
-  standalone: true,
-  imports: [CommonModule, LoaderComponent, UserFormComponent],
-  templateUrl: './view-user-details.component.html',
-  styleUrls: ['./view-user-details.component.scss'],
+    selector: 'app-view-user-details',
+    imports: [CommonModule, LoaderComponent, UserFormComponent],
+    templateUrl: './view-user-details.component.html',
+    styleUrls: ['./view-user-details.component.scss']
 })
 export class ViewUserDetailsComponent implements OnInit {
   @Input() oid: any;

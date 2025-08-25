@@ -13,16 +13,15 @@ import { finalize } from 'rxjs';
 import { ViewInvoiceListComponent } from '@app/modules/manager/components/inventory/invoice/view-invoice-list/view-invoice-list.component';
 
 @Component({
-  selector: 'app-invoice-list',
-  standalone: true,
-  imports: [
-    CommonModule,
-    NgZorroCustomModule,
-    ReactiveFormsModule,
-    ViewInvoiceListComponent,
-  ],
-  templateUrl: './invoice-list.component.html',
-  styleUrls: ['./invoice-list.component.scss'],
+    selector: 'app-invoice-list',
+    imports: [
+        CommonModule,
+        NgZorroCustomModule,
+        ReactiveFormsModule,
+        ViewInvoiceListComponent,
+    ],
+    templateUrl: './invoice-list.component.html',
+    styleUrls: ['./invoice-list.component.scss']
 })
 export class InvoiceListComponent implements OnInit {
   data: any[] = [];

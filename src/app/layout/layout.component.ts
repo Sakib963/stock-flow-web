@@ -8,18 +8,17 @@ import { SidebarComponent } from '@app/shared/components/sidebar/sidebar.compone
 import { FooterComponent } from '@app/shared/components/footer/footer.component';
 
 @Component({
-  selector: 'app-layout',
-  standalone: true,
-  imports: [
-    CommonModule,
-    RouterOutlet,
-    NgZorroCustomModule,
-    NavbarComponent,
-    SidebarComponent,
-    FooterComponent,
-  ],
-  templateUrl: './layout.component.html',
-  styleUrls: ['./layout.component.scss'],
+    selector: 'app-layout',
+    imports: [
+        CommonModule,
+        RouterOutlet,
+        NgZorroCustomModule,
+        NavbarComponent,
+        SidebarComponent,
+        FooterComponent,
+    ],
+    templateUrl: './layout.component.html',
+    styleUrls: ['./layout.component.scss']
 })
 export class LayoutComponent {
   isMenuOpen: boolean = false;

@@ -7,11 +7,10 @@ import { DROPDOWN_OPTIONS } from '@app/core/constants/dropdown-options';
 import { AuthService } from '@app/modules/auth/services/auth.service';
 
 @Component({
-  selector: 'view-product-dispose-list',
-  standalone: true,
-  imports: [CommonModule, NgZorroCustomModule, LoaderComponent],
-  templateUrl: './view-product-dispose-list.component.html',
-  styleUrls: ['./view-product-dispose-list.component.scss']
+    selector: 'view-product-dispose-list',
+    imports: [CommonModule, NgZorroCustomModule, LoaderComponent],
+    templateUrl: './view-product-dispose-list.component.html',
+    styleUrls: ['./view-product-dispose-list.component.scss']
 })
 export class ViewProductDisposeListComponent {
   @Input() data: any[] = [];

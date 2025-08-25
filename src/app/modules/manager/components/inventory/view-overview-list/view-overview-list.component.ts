@@ -6,16 +6,15 @@ import { NgZorroCustomModule } from '@app/shared/ng-zorro-custom.module';
 import { AngularSvgIconModule } from 'angular-svg-icon';
 
 @Component({
-  selector: 'app-view-overview-list',
-  standalone: true,
-  imports: [
-    CommonModule,
-    NgZorroCustomModule,
-    LoaderComponent,
-    AngularSvgIconModule,
-  ],
-  templateUrl: './view-overview-list.component.html',
-  styleUrls: ['./view-overview-list.component.scss'],
+    selector: 'app-view-overview-list',
+    imports: [
+        CommonModule,
+        NgZorroCustomModule,
+        LoaderComponent,
+        AngularSvgIconModule,
+    ],
+    templateUrl: './view-overview-list.component.html',
+    styleUrls: ['./view-overview-list.component.scss']
 })
 export class ViewOverviewListComponent {
   @Input() data: any[] = [];

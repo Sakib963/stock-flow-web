@@ -7,11 +7,10 @@ import { DROPDOWN_OPTIONS } from '@app/core/constants/dropdown-options';
 import { AuthService } from '@app/modules/auth/services/auth.service';
 
 @Component({
-  selector: 'app-view-purchase-order-list',
-  standalone: true,
-  imports: [CommonModule, NgZorroCustomModule, LoaderComponent],
-  templateUrl: './view-purchase-order-list.component.html',
-  styleUrls: ['./view-purchase-order-list.component.scss'],
+    selector: 'app-view-purchase-order-list',
+    imports: [CommonModule, NgZorroCustomModule, LoaderComponent],
+    templateUrl: './view-purchase-order-list.component.html',
+    styleUrls: ['./view-purchase-order-list.component.scss']
 })
 export class ViewPurchaseOrderListComponent {
   @Input() data: any[] = [];

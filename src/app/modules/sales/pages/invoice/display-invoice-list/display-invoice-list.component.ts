@@ -15,16 +15,15 @@ import { ConfirmationModalComponent } from '@app/shared/components/confirmation-
 import { PrintService } from '@app/core/services/print.service';
 
 @Component({
-  selector: 'app-display-invoice-list',
-  standalone: true,
-  imports: [
-    CommonModule,
-    NgZorroCustomModule,
-    ReactiveFormsModule,
-    ViewInvoiceListComponent,
-  ],
-  templateUrl: './display-invoice-list.component.html',
-  styleUrls: ['./display-invoice-list.component.scss'],
+    selector: 'app-display-invoice-list',
+    imports: [
+        CommonModule,
+        NgZorroCustomModule,
+        ReactiveFormsModule,
+        ViewInvoiceListComponent,
+    ],
+    templateUrl: './display-invoice-list.component.html',
+    styleUrls: ['./display-invoice-list.component.scss']
 })
 export class DisplayInvoiceListComponent implements OnInit {
   data: any[] = [];

@@ -14,18 +14,17 @@ import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { map, finalize } from 'rxjs';
 
 @Component({
-  selector: 'view-product-return-details-for-manager',
-  standalone: true,
-  imports: [
-    CommonModule,
-    LoaderComponent,
-    SecondaryButton,
-    SafeTextPipe,
-    NgZorroCustomModule,
-    TranslateModule,
-  ],
-  templateUrl: './view-product-return-details-for-manager.component.html',
-  styleUrls: ['./view-product-return-details-for-manager.component.scss'],
+    selector: 'view-product-return-details-for-manager',
+    imports: [
+        CommonModule,
+        LoaderComponent,
+        SecondaryButton,
+        SafeTextPipe,
+        NgZorroCustomModule,
+        TranslateModule,
+    ],
+    templateUrl: './view-product-return-details-for-manager.component.html',
+    styleUrls: ['./view-product-return-details-for-manager.component.scss']
 })
 export class ViewProductReturnDetailsForManagerComponent implements OnInit {
   @Input() oid: any;

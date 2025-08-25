@@ -15,18 +15,17 @@ import { PrimaryButtonWithPlusIcon } from '@app/shared/components/buttons/primar
 import { ViewWarehouseListComponent } from '@app/modules/manager/components/configuration/warehouse/view-warehouse-list/view-warehouse-list.component';
 
 @Component({
-  selector: 'app-display-warehouse-list',
-  standalone: true,
-  imports: [
-    CommonModule,
-    LoaderComponent,
-    NgZorroCustomModule,
-    ReactiveFormsModule,
-    PrimaryButtonWithPlusIcon,
-    ViewWarehouseListComponent,
-  ],
-  templateUrl: './display-warehouse-list.component.html',
-  styleUrls: ['./display-warehouse-list.component.scss'],
+    selector: 'app-display-warehouse-list',
+    imports: [
+        CommonModule,
+        LoaderComponent,
+        NgZorroCustomModule,
+        ReactiveFormsModule,
+        PrimaryButtonWithPlusIcon,
+        ViewWarehouseListComponent,
+    ],
+    templateUrl: './display-warehouse-list.component.html',
+    styleUrls: ['./display-warehouse-list.component.scss']
 })
 export class DisplayWarehouseListComponent implements OnInit {
   data: any[] = [];

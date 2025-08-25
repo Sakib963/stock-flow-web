@@ -12,16 +12,15 @@ import { finalize } from 'rxjs';
 import { ViewEmployeeAttendanceListComponent } from '@app/modules/manager/components/employee/attendance/view-employee-attendance-list/view-employee-attendance-list.component';
 
 @Component({
-  selector: 'app-display-employee-attendance-list',
-  standalone: true,
-  imports: [
-    CommonModule,
-    NgZorroCustomModule,
-    ReactiveFormsModule,
-    ViewEmployeeAttendanceListComponent,
-  ],
-  templateUrl: './display-employee-attendance-list.component.html',
-  styleUrls: ['./display-employee-attendance-list.component.scss'],
+    selector: 'app-display-employee-attendance-list',
+    imports: [
+        CommonModule,
+        NgZorroCustomModule,
+        ReactiveFormsModule,
+        ViewEmployeeAttendanceListComponent,
+    ],
+    templateUrl: './display-employee-attendance-list.component.html',
+    styleUrls: ['./display-employee-attendance-list.component.scss']
 })
 export class DisplayEmployeeAttendanceListComponent {
   data: any[] = [];

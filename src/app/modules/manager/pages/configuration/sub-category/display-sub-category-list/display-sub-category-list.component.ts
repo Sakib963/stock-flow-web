@@ -13,17 +13,16 @@ import { NgZorroCustomModule } from '@app/shared/ng-zorro-custom.module';
 import { ViewSubCategoryListComponent } from '@app/modules/manager/components/configuration/sub-category/view-sub-category-list/view-sub-category-list.component';
 
 @Component({
-  selector: 'app-display-sub-category-list',
-  standalone: true,
-  imports: [
-    CommonModule,
-    NgZorroCustomModule,
-    ReactiveFormsModule,
-    ViewSubCategoryListComponent,
-    PrimaryButtonWithPlusIcon,
-  ],
-  templateUrl: './display-sub-category-list.component.html',
-  styleUrls: ['./display-sub-category-list.component.scss'],
+    selector: 'app-display-sub-category-list',
+    imports: [
+        CommonModule,
+        NgZorroCustomModule,
+        ReactiveFormsModule,
+        ViewSubCategoryListComponent,
+        PrimaryButtonWithPlusIcon,
+    ],
+    templateUrl: './display-sub-category-list.component.html',
+    styleUrls: ['./display-sub-category-list.component.scss']
 })
 export class DisplaySubCategoryListComponent implements OnInit {
   data: any[] = [];

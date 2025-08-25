@@ -12,16 +12,15 @@ import { SecondaryButton } from '@app/shared/components/buttons/secondary-button
 import { DROPDOWN_OPTIONS } from '@app/core/constants/dropdown-options';
 
 @Component({
-  selector: 'app-view-product-details',
-  standalone: true,
-  imports: [
-    CommonModule,
-    LoaderComponent,
-    ProductFormComponent,
-    SecondaryButton,
-  ],
-  templateUrl: './view-product-details.component.html',
-  styleUrls: ['./view-product-details.component.scss'],
+    selector: 'app-view-product-details',
+    imports: [
+        CommonModule,
+        LoaderComponent,
+        ProductFormComponent,
+        SecondaryButton,
+    ],
+    templateUrl: './view-product-details.component.html',
+    styleUrls: ['./view-product-details.component.scss']
 })
 export class ViewProductDetailsComponent implements OnInit {
   @Input() oid: any;

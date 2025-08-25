@@ -19,18 +19,17 @@ import { NgZorroCustomModule } from '@app/shared/ng-zorro-custom.module';
 import { AngularSvgIconModule } from 'angular-svg-icon';
 
 @Component({
-  selector: 'app-login-page-secondary',
-  standalone: true,
-  imports: [
-    CommonModule,
-    NgZorroCustomModule,
-    ReactiveFormsModule,
-    AngularSvgIconModule,
-    RouterLink,
-    SpinnerComponent,
-  ],
-  templateUrl: './login-page-secondary.component.html',
-  styleUrls: ['./login-page-secondary.component.scss'],
+    selector: 'app-login-page-secondary',
+    imports: [
+        CommonModule,
+        NgZorroCustomModule,
+        ReactiveFormsModule,
+        AngularSvgIconModule,
+        RouterLink,
+        SpinnerComponent,
+    ],
+    templateUrl: './login-page-secondary.component.html',
+    styleUrls: ['./login-page-secondary.component.scss']
 })
 export class LoginPageSecondaryComponent implements OnInit {
   form!: FormGroup;

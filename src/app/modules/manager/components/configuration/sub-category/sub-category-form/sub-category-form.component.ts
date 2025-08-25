@@ -29,17 +29,16 @@ import { finalize } from 'rxjs';
 import { HttpService } from '@app/core/services/http.service';
 
 @Component({
-  selector: 'app-sub-category-form',
-  standalone: true,
-  imports: [
-    CommonModule,
-    NgZorroCustomModule,
-    ReactiveFormsModule,
-    PrimaryButton,
-    SecondaryButton,
-  ],
-  templateUrl: './sub-category-form.component.html',
-  styleUrls: ['./sub-category-form.component.scss'],
+    selector: 'app-sub-category-form',
+    imports: [
+        CommonModule,
+        NgZorroCustomModule,
+        ReactiveFormsModule,
+        PrimaryButton,
+        SecondaryButton,
+    ],
+    templateUrl: './sub-category-form.component.html',
+    styleUrls: ['./sub-category-form.component.scss']
 })
 export class SubCategoryFormComponent implements OnInit {
   @Output() readonly actionEmitter: EventEmitter<object> = new EventEmitter();

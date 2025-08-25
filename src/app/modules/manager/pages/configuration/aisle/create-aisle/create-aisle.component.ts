@@ -8,11 +8,10 @@ import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { finalize } from 'rxjs';
 
 @Component({
-  selector: 'app-create-aisle',
-  standalone: true,
-  imports: [CommonModule, AisleFormComponent],
-  templateUrl: './create-aisle.component.html',
-  styleUrls: ['./create-aisle.component.scss'],
+    selector: 'app-create-aisle',
+    imports: [CommonModule, AisleFormComponent],
+    templateUrl: './create-aisle.component.html',
+    styleUrls: ['./create-aisle.component.scss']
 })
 export class CreateAisleComponent {
   loading: boolean = false;

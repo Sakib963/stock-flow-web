@@ -5,11 +5,10 @@ import { LoaderComponent } from '@app/shared/components/loader/loader.component'
 import { NgZorroCustomModule } from '@app/shared/ng-zorro-custom.module';
 
 @Component({
-  selector: 'app-view-warehouse-list',
-  standalone: true,
-  imports: [CommonModule, NgZorroCustomModule, LoaderComponent],
-  templateUrl: './view-warehouse-list.component.html',
-  styleUrls: ['./view-warehouse-list.component.scss'],
+    selector: 'app-view-warehouse-list',
+    imports: [CommonModule, NgZorroCustomModule, LoaderComponent],
+    templateUrl: './view-warehouse-list.component.html',
+    styleUrls: ['./view-warehouse-list.component.scss']
 })
 export class ViewWarehouseListComponent {
   @Input() data: any[] = [];

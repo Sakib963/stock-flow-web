@@ -8,11 +8,10 @@ import { finalize } from 'rxjs';
 import { ProductDisposeFormComponent } from '@app/modules/manager/components/inventory/product-dispose/product-dispose-form/product-dispose-form.component';
 
 @Component({
-  selector: 'create-product-dispose',
-  standalone: true,
-  imports: [CommonModule, ProductDisposeFormComponent],
-  templateUrl: './create-product-dispose.component.html',
-  styleUrls: ['./create-product-dispose.component.scss'],
+    selector: 'create-product-dispose',
+    imports: [CommonModule, ProductDisposeFormComponent],
+    templateUrl: './create-product-dispose.component.html',
+    styleUrls: ['./create-product-dispose.component.scss']
 })
 export class CreateProductDisposeComponent {
   loading: boolean = false;

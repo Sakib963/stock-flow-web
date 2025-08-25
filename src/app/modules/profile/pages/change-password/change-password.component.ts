@@ -14,18 +14,17 @@ import { NzModalService } from 'ng-zorro-antd/modal';
 import { ConfirmationModalComponent } from '@app/shared/components/confirmation-modal/confirmation-modal.component';
 
 @Component({
-  selector: 'change-password',
-  standalone: true,
-  imports: [
-    CommonModule,
-    FormsModule,
-    OtpVerificationComponent,
-    NgZorroCustomModule,
-    PasswordChangeFormComponent,
-    LoaderComponent,
-  ],
-  templateUrl: './change-password.component.html',
-  styleUrls: ['./change-password.component.scss'],
+    selector: 'change-password',
+    imports: [
+        CommonModule,
+        FormsModule,
+        OtpVerificationComponent,
+        NgZorroCustomModule,
+        PasswordChangeFormComponent,
+        LoaderComponent,
+    ],
+    templateUrl: './change-password.component.html',
+    styleUrls: ['./change-password.component.scss']
 })
 export class ChangePasswordComponent {
   showOtp: boolean = false;

@@ -5,11 +5,10 @@ import { LoaderComponent } from '@app/shared/components/loader/loader.component'
 import { NgZorroCustomModule } from '@app/shared/ng-zorro-custom.module';
 
 @Component({
-  selector: 'app-view-invoice-list',
-  standalone: true,
-  imports: [CommonModule, NgZorroCustomModule, LoaderComponent],
-  templateUrl: './view-invoice-list.component.html',
-  styleUrls: ['./view-invoice-list.component.scss'],
+    selector: 'app-view-invoice-list',
+    imports: [CommonModule, NgZorroCustomModule, LoaderComponent],
+    templateUrl: './view-invoice-list.component.html',
+    styleUrls: ['./view-invoice-list.component.scss']
 })
 export class ViewInvoiceListComponent {
   @Input() data: any[] = [];

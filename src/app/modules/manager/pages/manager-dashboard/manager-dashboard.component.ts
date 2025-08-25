@@ -4,11 +4,10 @@ import { Router } from '@angular/router';
 import { AngularSvgIconModule } from 'angular-svg-icon';
 
 @Component({
-  selector: 'app-manager-dashboard',
-  standalone: true,
-  imports: [CommonModule, AngularSvgIconModule],
-  templateUrl: './manager-dashboard.component.html',
-  styleUrls: ['./manager-dashboard.component.scss'],
+    selector: 'app-manager-dashboard',
+    imports: [CommonModule, AngularSvgIconModule],
+    templateUrl: './manager-dashboard.component.html',
+    styleUrls: ['./manager-dashboard.component.scss']
 })
 export class ManagerDashboardComponent {
   constructor(private _router: Router) {}

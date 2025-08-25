@@ -8,11 +8,10 @@ import { APIEndpoint } from '@app/core/constants/api-endpoint';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
 
 @Component({
-  selector: 'app-create-user',
-  standalone: true,
-  imports: [CommonModule, UserFormComponent],
-  templateUrl: './create-user.component.html',
-  styleUrls: ['./create-user.component.scss'],
+    selector: 'app-create-user',
+    imports: [CommonModule, UserFormComponent],
+    templateUrl: './create-user.component.html',
+    styleUrls: ['./create-user.component.scss']
 })
 export class CreateUserComponent {
   loading: boolean = false;

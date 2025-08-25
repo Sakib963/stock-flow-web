@@ -3,11 +3,10 @@ import { CommonModule } from '@angular/common';
 import { ProfileMenuComponent } from '../profile-menu/profile-menu.component';
 
 @Component({
-  selector: 'app-navbar',
-  standalone: true,
-  imports: [CommonModule, ProfileMenuComponent],
-  templateUrl: './navbar.component.html',
-  styleUrls: ['./navbar.component.scss'],
+    selector: 'app-navbar',
+    imports: [CommonModule, ProfileMenuComponent],
+    templateUrl: './navbar.component.html',
+    styleUrls: ['./navbar.component.scss']
 })
 export class NavbarComponent {
   @Output() readonly actionEmitter: EventEmitter<object> = new EventEmitter();

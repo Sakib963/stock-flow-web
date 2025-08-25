@@ -11,11 +11,10 @@ import { CategoryFormComponent } from '@app/modules/manager/components/configura
 import { SecondaryButton } from '@app/shared/components/buttons/secondary-button/secondary-button.component';
 
 @Component({
-  selector: 'app-view-category-details',
-  standalone: true,
-  imports: [CommonModule, LoaderComponent, CategoryFormComponent, SecondaryButton],
-  templateUrl: './view-category-details.component.html',
-  styleUrls: ['./view-category-details.component.scss'],
+    selector: 'app-view-category-details',
+    imports: [CommonModule, LoaderComponent, CategoryFormComponent, SecondaryButton],
+    templateUrl: './view-category-details.component.html',
+    styleUrls: ['./view-category-details.component.scss']
 })
 export class ViewCategoryDetailsComponent implements OnInit {
   @Input() oid: any;

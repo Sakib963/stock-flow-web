@@ -13,17 +13,16 @@ import { NgZorroCustomModule } from '@app/shared/ng-zorro-custom.module';
 import { ViewAisleListComponent } from '@app/modules/manager/components/configuration/aisle/view-aisle-list/view-aisle-list.component';
 
 @Component({
-  selector: 'app-display-aisle-list',
-  standalone: true,
-  imports: [
-    CommonModule,
-    NgZorroCustomModule,
-    ReactiveFormsModule,
-    ViewAisleListComponent,
-    PrimaryButtonWithPlusIcon,
-  ],
-  templateUrl: './display-aisle-list.component.html',
-  styleUrls: ['./display-aisle-list.component.scss'],
+    selector: 'app-display-aisle-list',
+    imports: [
+        CommonModule,
+        NgZorroCustomModule,
+        ReactiveFormsModule,
+        ViewAisleListComponent,
+        PrimaryButtonWithPlusIcon,
+    ],
+    templateUrl: './display-aisle-list.component.html',
+    styleUrls: ['./display-aisle-list.component.scss']
 })
 export class DisplayAisleListComponent implements OnInit {
   data: any[] = [];

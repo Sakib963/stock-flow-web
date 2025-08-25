@@ -29,17 +29,16 @@ import { NzModalService } from 'ng-zorro-antd/modal';
 import { finalize } from 'rxjs';
 
 @Component({
-  selector: 'app-aisle-form',
-  standalone: true,
-  imports: [
-    CommonModule,
-    NgZorroCustomModule,
-    ReactiveFormsModule,
-    PrimaryButton,
-    SecondaryButton,
-  ],
-  templateUrl: './aisle-form.component.html',
-  styleUrls: ['./aisle-form.component.scss'],
+    selector: 'app-aisle-form',
+    imports: [
+        CommonModule,
+        NgZorroCustomModule,
+        ReactiveFormsModule,
+        PrimaryButton,
+        SecondaryButton,
+    ],
+    templateUrl: './aisle-form.component.html',
+    styleUrls: ['./aisle-form.component.scss']
 })
 export class AisleFormComponent implements OnInit {
   @Output() readonly actionEmitter: EventEmitter<object> = new EventEmitter();

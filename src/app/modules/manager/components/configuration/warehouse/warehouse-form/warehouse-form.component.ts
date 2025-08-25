@@ -9,15 +9,14 @@ import { ConfirmationModalComponent } from '@app/shared/components/confirmation-
 import { NzModalService } from 'ng-zorro-antd/modal';
 
 @Component({
-  selector: 'app-warehouse-form',
-  standalone: true,
-  imports: [CommonModule,
-    NgZorroCustomModule,
-    ReactiveFormsModule,
-    PrimaryButton,
-    SecondaryButton],
-  templateUrl: './warehouse-form.component.html',
-  styleUrls: ['./warehouse-form.component.scss']
+    selector: 'app-warehouse-form',
+    imports: [CommonModule,
+        NgZorroCustomModule,
+        ReactiveFormsModule,
+        PrimaryButton,
+        SecondaryButton],
+    templateUrl: './warehouse-form.component.html',
+    styleUrls: ['./warehouse-form.component.scss']
 })
 export class WarehouseFormComponent  implements OnInit {
   @Output() readonly actionEmitter: EventEmitter<object> = new EventEmitter();

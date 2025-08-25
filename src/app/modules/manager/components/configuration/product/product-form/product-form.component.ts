@@ -35,20 +35,19 @@ import { LoaderComponent } from '@app/shared/components/loader/loader.component'
 import { DisableForGuestDirective } from '@app/shared/directives/guest-user.directive';
 
 @Component({
-  selector: 'app-product-form',
-  standalone: true,
-  imports: [
-    CommonModule,
-    NgZorroCustomModule,
-    ReactiveFormsModule,
-    PrimaryButton,
-    SecondaryButton,
-    DangerButton,
-    LoaderComponent,
-    DisableForGuestDirective
-  ],
-  templateUrl: './product-form.component.html',
-  styleUrls: ['./product-form.component.scss'],
+    selector: 'app-product-form',
+    imports: [
+        CommonModule,
+        NgZorroCustomModule,
+        ReactiveFormsModule,
+        PrimaryButton,
+        SecondaryButton,
+        DangerButton,
+        LoaderComponent,
+        DisableForGuestDirective
+    ],
+    templateUrl: './product-form.component.html',
+    styleUrls: ['./product-form.component.scss']
 })
 export class ProductFormComponent implements OnInit {
   @Output() readonly actionEmitter: EventEmitter<object> = new EventEmitter();

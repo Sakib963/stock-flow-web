@@ -14,19 +14,18 @@ import { ViewSelfAttendanceListComponent } from '../../components/view-self-atte
 import { LoaderComponent } from '@app/shared/components/loader/loader.component';
 
 @Component({
-  selector: 'app-attendance',
-  standalone: true,
-  imports: [
-    CommonModule,
-    NgZorroCustomModule,
-    FormsModule,
-    PrimaryButton,
-    ReactiveFormsModule,
-    ViewSelfAttendanceListComponent,
-    LoaderComponent
-  ],
-  templateUrl: './attendance.component.html',
-  styleUrls: ['./attendance.component.scss'],
+    selector: 'app-attendance',
+    imports: [
+        CommonModule,
+        NgZorroCustomModule,
+        FormsModule,
+        PrimaryButton,
+        ReactiveFormsModule,
+        ViewSelfAttendanceListComponent,
+        LoaderComponent
+    ],
+    templateUrl: './attendance.component.html',
+    styleUrls: ['./attendance.component.scss']
 })
 export class AttendanceComponent implements OnInit {
   isSignedIn = false;

@@ -14,18 +14,17 @@ import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { map, finalize } from 'rxjs';
 
 @Component({
-  selector: 'view-product-dispose-details',
-  standalone: true,
-  imports: [
-    CommonModule,
-    LoaderComponent,
-    SecondaryButton,
-    SafeTextPipe,
-    NgZorroCustomModule,
-    TranslateModule,
-  ],
-  templateUrl: './view-product-dispose-details.component.html',
-  styleUrls: ['./view-product-dispose-details.component.scss'],
+    selector: 'view-product-dispose-details',
+    imports: [
+        CommonModule,
+        LoaderComponent,
+        SecondaryButton,
+        SafeTextPipe,
+        NgZorroCustomModule,
+        TranslateModule,
+    ],
+    templateUrl: './view-product-dispose-details.component.html',
+    styleUrls: ['./view-product-dispose-details.component.scss']
 })
 export class ViewProductDisposeDetailsComponent implements OnInit {
   @Input() oid: any;

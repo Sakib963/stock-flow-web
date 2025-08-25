@@ -6,11 +6,10 @@ import { Constants, ROLES } from '@app/core/constants/constants';
 import { AuthService } from '@app/modules/auth/services/auth.service';
 
 @Component({
-  selector: 'app-view-employee-attendance-list',
-  standalone: true,
-  imports: [CommonModule, NgZorroCustomModule, LoaderComponent],
-  templateUrl: './view-employee-attendance-list.component.html',
-  styleUrls: ['./view-employee-attendance-list.component.scss'],
+    selector: 'app-view-employee-attendance-list',
+    imports: [CommonModule, NgZorroCustomModule, LoaderComponent],
+    templateUrl: './view-employee-attendance-list.component.html',
+    styleUrls: ['./view-employee-attendance-list.component.scss']
 })
 export class ViewEmployeeAttendanceListComponent {
   @Input() isEmployeeAttendance: boolean = false;

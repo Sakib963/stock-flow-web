@@ -5,11 +5,10 @@ import { NgZorroCustomModule } from '@app/shared/ng-zorro-custom.module';
 import { SpinnerComponent } from '@app/shared/components/spinner/spinner.component';
 
 @Component({
-  selector: 'otp-verification',
-  standalone: true,
-  imports: [CommonModule, FormsModule, NgZorroCustomModule, SpinnerComponent],
-  templateUrl: './otp-verification.component.html',
-  styleUrls: ['./otp-verification.component.scss'],
+    selector: 'otp-verification',
+    imports: [CommonModule, FormsModule, NgZorroCustomModule, SpinnerComponent],
+    templateUrl: './otp-verification.component.html',
+    styleUrls: ['./otp-verification.component.scss']
 })
 export class OtpVerificationComponent implements OnInit {
   @Output() actionEmitter = new EventEmitter<void>();

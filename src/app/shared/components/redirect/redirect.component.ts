@@ -6,11 +6,10 @@ import { ROLES } from '@app/core/constants/constants';
 import { LoaderComponent } from '../loader/loader.component';
 
 @Component({
-  selector: 'app-redirect',
-  standalone: true,
-  imports: [CommonModule, LoaderComponent],
-  templateUrl: './redirect.component.html',
-  styleUrls: ['./redirect.component.scss'],
+    selector: 'app-redirect',
+    imports: [CommonModule, LoaderComponent],
+    templateUrl: './redirect.component.html',
+    styleUrls: ['./redirect.component.scss']
 })
 export class RedirectComponent implements OnInit {
   constructor(private _authService: AuthService, private _router: Router) {}

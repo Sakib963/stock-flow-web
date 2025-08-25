@@ -20,20 +20,19 @@ import { PrintService } from '@app/core/services/print.service';
 import { COMPANY_INFO } from '@app/core/constants/company-info';
 
 @Component({
-  selector: 'app-view-inventory-overview-details',
-  standalone: true,
-  imports: [
-    CommonModule,
-    LoaderComponent,
-    SecondaryButton,
-    AngularSvgIconModule,
-    NgZorroCustomModule,
-    FormsModule,
-    NgxBarcode6Module,
-    PrimaryButton,
-  ],
-  templateUrl: './view-inventory-overview-details.component.html',
-  styleUrls: ['./view-inventory-overview-details.component.scss'],
+    selector: 'app-view-inventory-overview-details',
+    imports: [
+        CommonModule,
+        LoaderComponent,
+        SecondaryButton,
+        AngularSvgIconModule,
+        NgZorroCustomModule,
+        FormsModule,
+        NgxBarcode6Module,
+        PrimaryButton,
+    ],
+    templateUrl: './view-inventory-overview-details.component.html',
+    styleUrls: ['./view-inventory-overview-details.component.scss']
 })
 export class ViewInventoryOverviewDetailsComponent implements OnInit {
   @Input() oid: any;

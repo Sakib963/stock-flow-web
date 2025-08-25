@@ -27,18 +27,17 @@ import { checkRequiredValidator } from '@app/core/constants/helper';
 import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
-  selector: 'app-select-product',
-  standalone: true,
-  imports: [
-    CommonModule,
-    LoaderComponent,
-    NgZorroCustomModule,
-    ReactiveFormsModule,
-    FormsModule,
-    TranslateModule
-  ],
-  templateUrl: './select-product.component.html',
-  styleUrls: ['./select-product.component.scss'],
+    selector: 'app-select-product',
+    imports: [
+        CommonModule,
+        LoaderComponent,
+        NgZorroCustomModule,
+        ReactiveFormsModule,
+        FormsModule,
+        TranslateModule
+    ],
+    templateUrl: './select-product.component.html',
+    styleUrls: ['./select-product.component.scss']
 })
 export class SelectProductComponent implements OnInit, OnChanges {
   @Output() readonly actionEmitter: EventEmitter<{

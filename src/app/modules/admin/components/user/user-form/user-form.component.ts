@@ -29,18 +29,17 @@ import { PrimaryButton } from '@app/shared/components/buttons/primary-button/pri
 import { SecondaryButton } from '@app/shared/components/buttons/secondary-button/secondary-button.component';
 
 @Component({
-  selector: 'app-user-form',
-  standalone: true,
-  imports: [
-    CommonModule,
-    NgZorroCustomModule,
-    ReactiveFormsModule,
-    LoaderComponent,
-    PrimaryButton,
-    SecondaryButton
-  ],
-  templateUrl: './user-form.component.html',
-  styleUrls: ['./user-form.component.scss'],
+    selector: 'app-user-form',
+    imports: [
+        CommonModule,
+        NgZorroCustomModule,
+        ReactiveFormsModule,
+        LoaderComponent,
+        PrimaryButton,
+        SecondaryButton
+    ],
+    templateUrl: './user-form.component.html',
+    styleUrls: ['./user-form.component.scss']
 })
 export class UserFormComponent implements OnInit {
   @Output() readonly actionEmitter: EventEmitter<object> = new EventEmitter();

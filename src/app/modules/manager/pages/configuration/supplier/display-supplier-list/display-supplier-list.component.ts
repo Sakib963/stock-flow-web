@@ -13,17 +13,16 @@ import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { finalize } from 'rxjs';
 
 @Component({
-  selector: 'app-display-supplier-list',
-  standalone: true,
-  imports: [
-    CommonModule,
-    NgZorroCustomModule,
-    ReactiveFormsModule,
-    ViewSupplierListComponent,
-    PrimaryButtonWithPlusIcon,
-  ],
-  templateUrl: './display-supplier-list.component.html',
-  styleUrls: ['./display-supplier-list.component.scss'],
+    selector: 'app-display-supplier-list',
+    imports: [
+        CommonModule,
+        NgZorroCustomModule,
+        ReactiveFormsModule,
+        ViewSupplierListComponent,
+        PrimaryButtonWithPlusIcon,
+    ],
+    templateUrl: './display-supplier-list.component.html',
+    styleUrls: ['./display-supplier-list.component.scss']
 })
 export class DisplaySupplierListComponent implements OnInit {
   data: any[] = [];

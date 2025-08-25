@@ -5,11 +5,10 @@ import { LoaderComponent } from '@app/shared/components/loader/loader.component'
 import { NgZorroCustomModule } from '@app/shared/ng-zorro-custom.module';
 
 @Component({
-  selector: 'app-view-aisle-list',
-  standalone: true,
-  imports: [CommonModule, NgZorroCustomModule, LoaderComponent],
-  templateUrl: './view-aisle-list.component.html',
-  styleUrls: ['./view-aisle-list.component.scss']
+    selector: 'app-view-aisle-list',
+    imports: [CommonModule, NgZorroCustomModule, LoaderComponent],
+    templateUrl: './view-aisle-list.component.html',
+    styleUrls: ['./view-aisle-list.component.scss']
 })
 export class ViewAisleListComponent {
   @Input() data: any[] = [];

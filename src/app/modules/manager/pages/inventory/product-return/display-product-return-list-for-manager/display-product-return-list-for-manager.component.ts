@@ -12,16 +12,15 @@ import { finalize } from 'rxjs';
 import { ViewProductReturnListForManagerComponent } from '@app/modules/manager/components/inventory/view-product-return-list-for-manager/view-product-return-list-for-manager.component';
 
 @Component({
-  selector: 'display-product-return-list-for-manager',
-  standalone: true,
-  imports: [
-    CommonModule,
-    NgZorroCustomModule,
-    ReactiveFormsModule,
-    ViewProductReturnListForManagerComponent,
-  ],
-  templateUrl: './display-product-return-list-for-manager.component.html',
-  styleUrls: ['./display-product-return-list-for-manager.component.scss'],
+    selector: 'display-product-return-list-for-manager',
+    imports: [
+        CommonModule,
+        NgZorroCustomModule,
+        ReactiveFormsModule,
+        ViewProductReturnListForManagerComponent,
+    ],
+    templateUrl: './display-product-return-list-for-manager.component.html',
+    styleUrls: ['./display-product-return-list-for-manager.component.scss']
 })
 export class DisplayProductReturnListForManagerComponent implements OnInit {
   data: any[] = [];

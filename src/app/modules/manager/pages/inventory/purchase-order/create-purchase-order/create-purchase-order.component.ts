@@ -8,11 +8,10 @@ import { finalize } from 'rxjs';
 import { PurchaseOrderFormComponent } from '@app/modules/manager/components/inventory/purchase-order/purchase-order-form/purchase-order-form.component';
 
 @Component({
-  selector: 'app-create-purchase-order',
-  standalone: true,
-  imports: [CommonModule, PurchaseOrderFormComponent],
-  templateUrl: './create-purchase-order.component.html',
-  styleUrls: ['./create-purchase-order.component.scss'],
+    selector: 'app-create-purchase-order',
+    imports: [CommonModule, PurchaseOrderFormComponent],
+    templateUrl: './create-purchase-order.component.html',
+    styleUrls: ['./create-purchase-order.component.scss']
 })
 export class CreatePurchaseOrderComponent {
   loading: boolean = false;

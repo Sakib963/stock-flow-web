@@ -18,17 +18,16 @@ import { AuthService } from '../../services/auth.service';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
 
 @Component({
-  selector: 'app-login-page',
-  standalone: true,
-  imports: [
-    CommonModule,
-    NgZorroCustomModule,
-    ReactiveFormsModule,
-    AngularSvgIconModule,
-    RouterLink,
-  ],
-  templateUrl: './login-page.component.html',
-  styleUrls: ['./login-page.component.scss'],
+    selector: 'app-login-page',
+    imports: [
+        CommonModule,
+        NgZorroCustomModule,
+        ReactiveFormsModule,
+        AngularSvgIconModule,
+        RouterLink,
+    ],
+    templateUrl: './login-page.component.html',
+    styleUrls: ['./login-page.component.scss']
 })
 export class LoginPageComponent implements OnInit {
   form!: FormGroup;

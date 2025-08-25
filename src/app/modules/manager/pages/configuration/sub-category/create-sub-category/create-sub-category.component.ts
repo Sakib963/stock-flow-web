@@ -8,11 +8,10 @@ import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { finalize } from 'rxjs';
 
 @Component({
-  selector: 'app-create-sub-category',
-  standalone: true,
-  imports: [CommonModule, SubCategoryFormComponent],
-  templateUrl: './create-sub-category.component.html',
-  styleUrls: ['./create-sub-category.component.scss'],
+    selector: 'app-create-sub-category',
+    imports: [CommonModule, SubCategoryFormComponent],
+    templateUrl: './create-sub-category.component.html',
+    styleUrls: ['./create-sub-category.component.scss']
 })
 export class CreateSubCategoryComponent {
   loading: boolean = false;

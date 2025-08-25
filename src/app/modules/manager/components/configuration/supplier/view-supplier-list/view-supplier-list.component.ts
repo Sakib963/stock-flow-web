@@ -5,11 +5,10 @@ import { NgZorroCustomModule } from '@app/shared/ng-zorro-custom.module';
 import { Constants } from '@app/core/constants/constants';
 
 @Component({
-  selector: 'app-view-supplier-list',
-  standalone: true,
-  imports: [CommonModule, NgZorroCustomModule, LoaderComponent],
-  templateUrl: './view-supplier-list.component.html',
-  styleUrls: ['./view-supplier-list.component.scss']
+    selector: 'app-view-supplier-list',
+    imports: [CommonModule, NgZorroCustomModule, LoaderComponent],
+    templateUrl: './view-supplier-list.component.html',
+    styleUrls: ['./view-supplier-list.component.scss']
 })
 export class ViewSupplierListComponent {
   @Input() data: any[] = [];

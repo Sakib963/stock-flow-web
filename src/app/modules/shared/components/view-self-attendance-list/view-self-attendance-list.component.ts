@@ -5,11 +5,10 @@ import { LoaderComponent } from '@app/shared/components/loader/loader.component'
 import { NgZorroCustomModule } from '@app/shared/ng-zorro-custom.module';
 
 @Component({
-  selector: 'app-view-self-attendance-list',
-  standalone: true,
-  imports: [CommonModule, NgZorroCustomModule, LoaderComponent],
-  templateUrl: './view-self-attendance-list.component.html',
-  styleUrls: ['./view-self-attendance-list.component.scss'],
+    selector: 'app-view-self-attendance-list',
+    imports: [CommonModule, NgZorroCustomModule, LoaderComponent],
+    templateUrl: './view-self-attendance-list.component.html',
+    styleUrls: ['./view-self-attendance-list.component.scss']
 })
 export class ViewSelfAttendanceListComponent {
   @Input() data: any[] = [];

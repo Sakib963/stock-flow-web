@@ -12,11 +12,10 @@ import { map, finalize } from 'rxjs';
 import { DROPDOWN_OPTIONS } from '@app/core/constants/dropdown-options';
 
 @Component({
-  selector: 'app-view-aisle-details',
-  standalone: true,
-  imports: [CommonModule, LoaderComponent, AisleFormComponent, SecondaryButton],
-  templateUrl: './view-aisle-details.component.html',
-  styleUrls: ['./view-aisle-details.component.scss'],
+    selector: 'app-view-aisle-details',
+    imports: [CommonModule, LoaderComponent, AisleFormComponent, SecondaryButton],
+    templateUrl: './view-aisle-details.component.html',
+    styleUrls: ['./view-aisle-details.component.scss']
 })
 export class ViewAisleDetailsComponent implements OnInit {
   @Input() oid: any;

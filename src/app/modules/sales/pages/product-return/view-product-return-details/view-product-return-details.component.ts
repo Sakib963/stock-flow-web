@@ -14,18 +14,17 @@ import { NgZorroCustomModule } from '@app/shared/ng-zorro-custom.module';
 import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
-  selector: 'view-product-return-details',
-  standalone: true,
-  imports: [
-    CommonModule,
-    LoaderComponent,
-    SecondaryButton,
-    SafeTextPipe,
-    NgZorroCustomModule,
-    TranslateModule,
-  ],
-  templateUrl: './view-product-return-details.component.html',
-  styleUrls: ['./view-product-return-details.component.scss'],
+    selector: 'view-product-return-details',
+    imports: [
+        CommonModule,
+        LoaderComponent,
+        SecondaryButton,
+        SafeTextPipe,
+        NgZorroCustomModule,
+        TranslateModule,
+    ],
+    templateUrl: './view-product-return-details.component.html',
+    styleUrls: ['./view-product-return-details.component.scss']
 })
 export class ViewProductReturnDetailsComponent implements OnInit {
   @Input() oid: any;

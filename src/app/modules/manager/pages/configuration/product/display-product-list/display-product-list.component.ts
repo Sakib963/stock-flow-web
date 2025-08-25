@@ -13,16 +13,15 @@ import { ViewProductListComponent } from '@app/modules/manager/components/config
 import { PrimaryButtonWithPlusIcon } from '@app/shared/components/buttons/primary-button-with-plus-icon/primary-button-with-plus-icon.component';
 
 @Component({
-  selector: 'app-display-product-list',
-  standalone: true,
-  imports: [CommonModule,
-      NgZorroCustomModule,
-      ReactiveFormsModule,
-      ViewProductListComponent,
-      PrimaryButtonWithPlusIcon
-      ],
-  templateUrl: './display-product-list.component.html',
-  styleUrls: ['./display-product-list.component.scss']
+    selector: 'app-display-product-list',
+    imports: [CommonModule,
+        NgZorroCustomModule,
+        ReactiveFormsModule,
+        ViewProductListComponent,
+        PrimaryButtonWithPlusIcon
+    ],
+    templateUrl: './display-product-list.component.html',
+    styleUrls: ['./display-product-list.component.scss']
 })
 export class DisplayProductListComponent implements OnInit {
   data: any[] = [];

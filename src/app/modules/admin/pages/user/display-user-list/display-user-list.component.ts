@@ -14,18 +14,17 @@ import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { PrimaryButtonWithPlusIcon } from '@app/shared/components/buttons/primary-button-with-plus-icon/primary-button-with-plus-icon.component';
 
 @Component({
-  selector: 'app-display-user-list',
-  standalone: true,
-  imports: [
-    CommonModule,
-    ViewUserListComponent,
-    LoaderComponent,
-    NgZorroCustomModule,
-    ReactiveFormsModule,
-    PrimaryButtonWithPlusIcon
-  ],
-  templateUrl: './display-user-list.component.html',
-  styleUrls: ['./display-user-list.component.scss'],
+    selector: 'app-display-user-list',
+    imports: [
+        CommonModule,
+        ViewUserListComponent,
+        LoaderComponent,
+        NgZorroCustomModule,
+        ReactiveFormsModule,
+        PrimaryButtonWithPlusIcon
+    ],
+    templateUrl: './display-user-list.component.html',
+    styleUrls: ['./display-user-list.component.scss']
 })
 export class DisplayUserListComponent implements OnInit {
   data: any[] = [];

@@ -13,17 +13,16 @@ import { finalize } from 'rxjs';
 import { ViewProductDisposeListComponent } from '@app/modules/manager/components/inventory/product-dispose/view-product-dispose-list/view-product-dispose-list.component';
 
 @Component({
-  selector: 'display-product-dispose-list',
-  standalone: true,
-  imports: [
-    CommonModule,
-    NgZorroCustomModule,
-    ReactiveFormsModule,
-    ViewProductDisposeListComponent,
-    PrimaryButtonWithPlusIcon,
-  ],
-  templateUrl: './display-product-dispose-list.component.html',
-  styleUrls: ['./display-product-dispose-list.component.scss'],
+    selector: 'display-product-dispose-list',
+    imports: [
+        CommonModule,
+        NgZorroCustomModule,
+        ReactiveFormsModule,
+        ViewProductDisposeListComponent,
+        PrimaryButtonWithPlusIcon,
+    ],
+    templateUrl: './display-product-dispose-list.component.html',
+    styleUrls: ['./display-product-dispose-list.component.scss']
 })
 export class DisplayProductDisposeListComponent implements OnInit {
   data: any[] = [];

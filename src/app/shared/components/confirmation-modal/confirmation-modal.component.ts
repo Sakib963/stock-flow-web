@@ -11,11 +11,10 @@ export interface ModalData {
 }
 
 @Component({
-  selector: 'app-confirmation-modal',
-  standalone: true,
-  imports: [CommonModule, NgZorroCustomModule, AngularSvgIconModule, PrimaryButton, SecondaryButton],
-  templateUrl: './confirmation-modal.component.html',
-  styleUrls: ['./confirmation-modal.component.scss'],
+    selector: 'app-confirmation-modal',
+    imports: [CommonModule, NgZorroCustomModule, AngularSvgIconModule, PrimaryButton, SecondaryButton],
+    templateUrl: './confirmation-modal.component.html',
+    styleUrls: ['./confirmation-modal.component.scss']
 })
 export class ConfirmationModalComponent {
   constructor(

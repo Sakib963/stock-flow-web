@@ -18,19 +18,18 @@ import { NzModalService } from 'ng-zorro-antd/modal';
 import { DROPDOWN_OPTIONS } from '@app/core/constants/dropdown-options';
 
 @Component({
-  selector: 'view-invoice',
-  standalone: true,
-  imports: [
-    CommonModule,
-    TranslateModule,
-    NgZorroCustomModule,
-    SecondaryButton,
-    DangerButton,
-    ReactiveFormsModule,
-    PrimaryButton,
-  ],
-  templateUrl: './view-invoice.component.html',
-  styleUrls: ['./view-invoice.component.scss'],
+    selector: 'view-invoice',
+    imports: [
+        CommonModule,
+        TranslateModule,
+        NgZorroCustomModule,
+        SecondaryButton,
+        DangerButton,
+        ReactiveFormsModule,
+        PrimaryButton,
+    ],
+    templateUrl: './view-invoice.component.html',
+    styleUrls: ['./view-invoice.component.scss']
 })
 export class ViewInvoiceComponent implements OnInit {
   @Input() invoiceDetails: any;

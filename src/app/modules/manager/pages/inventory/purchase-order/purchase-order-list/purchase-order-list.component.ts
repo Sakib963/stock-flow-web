@@ -13,17 +13,16 @@ import { finalize } from 'rxjs';
 import { ViewPurchaseOrderListComponent } from '@app/modules/manager/components/inventory/purchase-order/view-purchase-order-list/view-purchase-order-list.component';
 
 @Component({
-  selector: 'app-purchase-order-list',
-  standalone: true,
-  imports: [
-    CommonModule,
-    NgZorroCustomModule,
-    ReactiveFormsModule,
-    ViewPurchaseOrderListComponent,
-    PrimaryButtonWithPlusIcon,
-  ],
-  templateUrl: './purchase-order-list.component.html',
-  styleUrls: ['./purchase-order-list.component.scss'],
+    selector: 'app-purchase-order-list',
+    imports: [
+        CommonModule,
+        NgZorroCustomModule,
+        ReactiveFormsModule,
+        ViewPurchaseOrderListComponent,
+        PrimaryButtonWithPlusIcon,
+    ],
+    templateUrl: './purchase-order-list.component.html',
+    styleUrls: ['./purchase-order-list.component.scss']
 })
 export class PurchaseOrderListComponent implements OnInit {
   data: any[] = [];

@@ -11,17 +11,16 @@ import { SecondaryButton } from '@app/shared/components/buttons/secondary-button
 import { NgZorroCustomModule } from '@app/shared/ng-zorro-custom.module';
 import { EmployeeAttendanceFormComponent } from '@app/modules/manager/components/employee/attendance/employee-attendance-form/employee-attendance-form.component';
 @Component({
-  selector: 'app-view-employee-attendance-details',
-  standalone: true,
-  imports: [
-    CommonModule,
-    LoaderComponent,
-    SecondaryButton,
-    NgZorroCustomModule,
-    EmployeeAttendanceFormComponent,
-  ],
-  templateUrl: './view-employee-attendance-details.component.html',
-  styleUrls: ['./view-employee-attendance-details.component.scss'],
+    selector: 'app-view-employee-attendance-details',
+    imports: [
+        CommonModule,
+        LoaderComponent,
+        SecondaryButton,
+        NgZorroCustomModule,
+        EmployeeAttendanceFormComponent,
+    ],
+    templateUrl: './view-employee-attendance-details.component.html',
+    styleUrls: ['./view-employee-attendance-details.component.scss']
 })
 export class ViewEmployeeAttendanceDetailsComponent implements OnInit {
   @Input() oid: any;
