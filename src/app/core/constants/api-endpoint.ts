@@ -88,4 +88,6 @@ export class APIEndpoint {
   static CREATE_PRODUCT_DISPOSE = "/api/v1/manager/product-dispose/create-product-dispose";
   static GET_PRODUCT_DISPOSE_LIST = "/api/v1/manager/product-dispose/get-product-dispose-list";
   static GET_PRODUCT_DISPOSE_DETAILS = "/api/v1/manager/product-dispose/get-product-dispose-details";
+
+  static CHANGE_PASSWORD = "/api/v1/profile/change-password/change-user-password";
 }

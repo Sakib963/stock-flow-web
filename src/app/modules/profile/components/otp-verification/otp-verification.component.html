@@ -1,0 +1,76 @@
+<div class="mt-20 w-full max-w-lg mx-auto border rounded-lg p-8 space-y-6 shadow-lg bg-white">
+
+  <!-- OTP Available -->
+  <ng-container *ngIf="!isOtpError && !isOtpExpired; else errorOrExpiredTemplate">
+
+    <!-- Icon -->
+    <div class="flex justify-center">
+      <img class="w-1/3" src="assets/icons/two-factor-authentication.svg" alt="OTP Verification">
+    </div>
+
+    <!-- Title -->
+    <h2 class="text-center text-2xl font-bold text-gray-800">OTP Verification</h2>
+
+    <!-- Message -->
+    <p class="text-center text-gray-600">
+      We've sent an OTP to your registered email address.
+      <br>
+      Please verify within <span class="font-semibold text-red-500">{{ countdown }} seconds</span>.
+    </p>
+
+    <!-- Warning -->
+    <nz-alert nzType="warning" nzMessage="Do not refresh or close this page until verification is complete." nzShowIcon>
+    </nz-alert>
+
+    <!-- Loader -->
+    <div *ngIf="loading" class="flex justify-center">
+      <div class="animate-spin h-8 w-8 border-4 border-blue-500 border-t-transparent rounded-full"></div>
+    </div>
+
+    <nz-divider></nz-divider>
+
+    <div class="p-4 border rounded-sm">
+      <!-- <nz-input-otp></nz-input-otp> -->
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="flex justify-between">
+      <button disableForGuest [disabled]="isOtpExpired || loading" [type]="'button'" (click)="submitOtp()"
+        class="min-w-min group relative flex items-center gap-4 overflow-hidden rounded-sm bg-white px-6 py-2 shadow font-medium disabled:cursor-not-allowed">
+        <div [ngClass]="loading ? 'w-full': ''"
+          class="absolute inset-0 w-2 bg-primary transition-all duration-300 ease-in-out group-hover:w-full">
+        </div>
+        <span *ngIf="loading">
+          <app-spinner></app-spinner>
+        </span>
+        <span *ngIf="!loading"
+          class="relative z-10 whitespace-nowrap text-black transition-all duration-300 group-hover:text-white">
+          Submit OTP
+        </span>
+      </button>
+    </div>
+  </ng-container>
+
+  <!-- Error or Expired OTP -->
+  <ng-template #errorOrExpiredTemplate>
+    <div class="text-center space-y-4">
+      <nz-result *ngIf="isOtpError" nzStatus="error" nzTitle="OTP Generation Failed"
+        nzSubTitle="We couldn't generate your OTP. Please try again.">
+        <div nz-result-extra>
+          <button nz-button nzType="primary" (click)="tryAgain()">Try Again</button>
+        </div>
+      </nz-result>
+
+      <nz-result *ngIf="isOtpExpired && !isOtpError" nzStatus="warning" nzTitle="OTP Expired"
+        nzSubTitle="Your OTP has expired. Please request a new one.">
+      </nz-result>
+
+      <div class="flex justify-center">
+        <button nz-button nzType="primary" (click)="tryAgain()" *ngIf="isOtpExpired">
+          Try Again
+        </button>
+      </div>
+    </div>
+  </ng-template>
+
+</div>

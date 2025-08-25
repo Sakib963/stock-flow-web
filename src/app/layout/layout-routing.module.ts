@@ -53,6 +53,11 @@ const routes: Routes = [
         canActivate: [RoleGuard],
         data: { roles: [ROLES.SALESMAN] },
       },
+      {
+        path: 'profile',
+        loadChildren: () =>
+          import('../modules/profile/profile.module').then((m) => m.ProfileModule),
+      },
     ],
   },
 ];

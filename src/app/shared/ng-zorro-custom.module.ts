@@ -44,6 +44,8 @@ import { NzLayoutModule } from 'ng-zorro-antd/layout';
 import { NzDrawerModule } from 'ng-zorro-antd/drawer';
 import { NzTreeViewModule } from 'ng-zorro-antd/tree-view';
 import { NzAutocompleteModule } from 'ng-zorro-antd/auto-complete';
+import { NzStepsModule } from 'ng-zorro-antd/steps';
+import { NzProgressModule } from 'ng-zorro-antd/progress';
 
 const NG_ZORRO_MODULES = [
   NzGridModule,
@@ -89,7 +91,10 @@ const NG_ZORRO_MODULES = [
   NzLayoutModule,
   NzDrawerModule,
   NzTreeViewModule,
-  NzAutocompleteModule
+  NzAutocompleteModule,
+  NzStepsModule,
+  NzProgressModule,
+  NzInputModule
 ];
 
 @NgModule({
