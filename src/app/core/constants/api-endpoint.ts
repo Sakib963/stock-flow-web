@@ -91,4 +91,6 @@ export class APIEndpoint {
 
   static CHANGE_PASSWORD = "/api/v1/profile/change-password/change-user-password";
   static VERIFY_OTP_FOR_PASSWORD_CHANGE = "/api/v1/profile/change-password/verify-otp-for-password-change";
+
+  static GET_PROFILE_INFO = "/api/v1/profile/profile-info/get-profile-info";
 }

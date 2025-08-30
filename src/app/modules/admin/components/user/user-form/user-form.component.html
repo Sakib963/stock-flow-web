@@ -53,7 +53,7 @@
                               </nz-form-control>
                         </nz-form-item>
                         <!-- Role -->
-                        <nz-form-item>
+                        <nz-form-item *ngIf="!isUser">
                               <nz-form-label [nzRequired]="hasRequiredValidator('role')">Role</nz-form-label>
                               <nz-form-control nzErrorTip="Role is Required.">
                                     <nz-select class="w-full" formControlName="role" nz-input nzAllowClear
@@ -80,7 +80,7 @@
                               </nz-form-control>
                         </nz-form-item>
                         <!-- Status -->
-                        <nz-form-item>
+                        <nz-form-item *ngIf="!isUser">
                               <nz-form-label [nzRequired]="hasRequiredValidator('status')">Status</nz-form-label>
                               <nz-form-control nzErrorTip="Status is required.">
                                     <nz-select class="w-full" formControlName="status" nz-input nzAllowClear

@@ -29,22 +29,23 @@ import { PrimaryButton } from '@app/shared/components/buttons/primary-button/pri
 import { SecondaryButton } from '@app/shared/components/buttons/secondary-button/secondary-button.component';
 
 @Component({
-    selector: 'app-user-form',
-    imports: [
-        CommonModule,
-        NgZorroCustomModule,
-        ReactiveFormsModule,
-        LoaderComponent,
-        PrimaryButton,
-        SecondaryButton
-    ],
-    templateUrl: './user-form.component.html',
-    styleUrls: ['./user-form.component.scss']
+  selector: 'app-user-form',
+  imports: [
+    CommonModule,
+    NgZorroCustomModule,
+    ReactiveFormsModule,
+    LoaderComponent,
+    PrimaryButton,
+    SecondaryButton,
+  ],
+  templateUrl: './user-form.component.html',
+  styleUrls: ['./user-form.component.scss'],
 })
 export class UserFormComponent implements OnInit {
   @Output() readonly actionEmitter: EventEmitter<object> = new EventEmitter();
   @Input() formData: any;
   @Input() loading: boolean = false;
+  @Input() isUser: boolean = false;
   form!: FormGroup;
   imgLoading: boolean = false;
 
@@ -69,6 +70,12 @@ export class UserFormComponent implements OnInit {
       // Remove password control if formData exists
       this.form.removeControl('password');
     }
+
+    if (this.isUser) {
+      this.form.removeControl('password');
+      this.form.get('email')?.disable();
+      this.form.get('role')?.disable();
+    }
   }
 
   createForm(): FormGroup {
@@ -90,6 +97,10 @@ export class UserFormComponent implements OnInit {
     if (this.formData) {
       message = 'Do you want to update this user?';
     }
+
+    if (this.isUser) {
+      message = 'Do you want to update your profile?';
+    }
     this._modal.create({
       nzContent: ConfirmationModalComponent,
       nzData: {
@@ -98,7 +109,7 @@ export class UserFormComponent implements OnInit {
       nzFooter: null,
       nzClosable: false,
       nzOnOk: () =>
-        this.actionEmitter.emit({ action: 'submit', value: this.form.value }),
+        this.actionEmitter.emit({ action: 'submit', value: this.form.getRawValue() }),
     });
   }
 

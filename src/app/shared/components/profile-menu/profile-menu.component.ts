@@ -91,8 +91,8 @@ export class ProfileMenuComponent implements OnInit {
   }
   
     updateProfile(): void {
-      // TODO: Implement navigation or modal for editing profile
-      this._notificationService.info('Edit Profile', 'Edit Profile clicked!');
+      this.toggleDropdown();
+      this._router.navigate(['../profile/update-profile']);
     }
     
     changePassword(): void {

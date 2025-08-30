@@ -18,16 +18,16 @@ import { AuthService } from '../../services/auth.service';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
 
 @Component({
-    selector: 'app-login-page',
-    imports: [
-        CommonModule,
-        NgZorroCustomModule,
-        ReactiveFormsModule,
-        AngularSvgIconModule,
-        RouterLink,
-    ],
-    templateUrl: './login-page.component.html',
-    styleUrls: ['./login-page.component.scss']
+  selector: 'app-login-page',
+  imports: [
+    CommonModule,
+    NgZorroCustomModule,
+    ReactiveFormsModule,
+    AngularSvgIconModule,
+    RouterLink,
+  ],
+  templateUrl: './login-page.component.html',
+  styleUrls: ['./login-page.component.scss'],
 })
 export class LoginPageComponent implements OnInit {
   form!: FormGroup;
@@ -72,16 +72,16 @@ export class LoginPageComponent implements OnInit {
 
   copyToClipboard(button: HTMLButtonElement): void {
     const password = 'stockflow123';
-    navigator.clipboard.writeText(password).then(() => {
-      button.innerText = 'Copied! ✅';
-      button.classList.add('text-green-600');
+    const email = 'guest@stockflow.com';
 
-      // Reset text after 2 seconds
-      setTimeout(() => {
-        button.innerText = 'Click to Copy';
-        button.classList.remove('text-green-600');
-      }, 2000);
-    });
+    this.form.patchValue({ email, password });
+    this.handleForm();
+
+    // Reset text after 2 seconds
+    setTimeout(() => {
+      button.innerText = 'Click to Apply';
+      button.classList.remove('text-green-600');
+    }, 2000);
   }
 
   handleForm(): any {

@@ -1,0 +1,5 @@
+<app-loader *ngIf="loading" [isVisible]="loading"></app-loader>
+<div *ngIf="!loading" class="p-4 space-y-3">
+      <h2 class="text-2xl font-medium mb-4 animate-text">Profile Details</h2>
+      <app-user-form [isUser]="true" [formData]="profileDetails" (actionEmitter)="handleActions($event)"></app-user-form>
+</div>
