@@ -19,9 +19,7 @@
         "build": {
           "builder": "@angular/build:application",
           "options": {
-            "outputPath": {
-              "base": "dist/stock-flow-web"
-            },
+           "outputPath": "dist/stock-flow-web",
             "baseHref": "/stock-flow-web/",
             "index": "src/index.html",
             "polyfills": ["zone.js"],
