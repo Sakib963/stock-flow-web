@@ -134,7 +134,7 @@ export class Menu {
       ],
     },
     {
-      group: 'Shared',
+      group: 'Employee',
       items: [
         {
           icon: 'assets/icons/calendar.svg',

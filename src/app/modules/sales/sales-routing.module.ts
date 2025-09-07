@@ -10,16 +10,16 @@ const routes: Routes = [
     children: [
       {
         path: '',
-        redirectTo: 'dashboard',
+        redirectTo: 'quick-sale',
         pathMatch: 'full',
       },
-      {
+      /* {
         path: 'dashboard',
         loadComponent: () =>
           import('./pages/sales-dashboard/sales-dashboard.component').then(
             (m) => m.SalesDashboardComponent
           ),
-      },
+      }, */
       {
         path: 'quick-sale',
         loadComponent: () =>

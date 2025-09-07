@@ -36,9 +36,9 @@ export class PasswordChangeFormComponent implements OnInit {
   ngOnInit(): void {
     this.form = this.fb.group(
       {
-        current_password: ['asdfgh', Validators.required],
+        current_password: [null, Validators.required],
         new_password: [
-          'Sa@123123',
+          null,
           [
             Validators.required,
             Validators.minLength(8),
@@ -47,7 +47,7 @@ export class PasswordChangeFormComponent implements OnInit {
             ),
           ],
         ],
-        confirm_password: ['Sa@123123', Validators.required],
+        confirm_password: [null, Validators.required],
       },
       { validators: this.passwordMatchValidator }
     );
