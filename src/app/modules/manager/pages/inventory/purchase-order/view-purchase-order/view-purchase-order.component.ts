@@ -153,8 +153,8 @@ export class ViewPurchaseOrderComponent implements OnInit {
 
   getVerificationButtonStatus(): boolean {
     if (
-      this.purchaseDetails.status === 'Submitted' &&
-      this._authService._userInfo().email !== this.purchaseDetails?.created_by
+      this.purchaseDetails.status === 'Submitted'
+      //  && this._authService._userInfo().email !== this.purchaseDetails?.created_by
     )
       return true;
     return false;

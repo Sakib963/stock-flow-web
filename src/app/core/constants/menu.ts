@@ -121,11 +121,11 @@ export class Menu {
           label: 'Invoice',
           route: '/sales/invoice',
         },
-        {
-          icon: 'assets/icons/dashboard.svg',
-          label: 'Dashboard',
-          route: '/sales/dashboard',
-        },
+        // {
+        //   icon: 'assets/icons/dashboard.svg',
+        //   label: 'Dashboard',
+        //   route: '/sales/dashboard',
+        // },
         {
           icon: 'assets/icons/product-return.svg',
           label: 'Product Return',
