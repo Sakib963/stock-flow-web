@@ -95,7 +95,7 @@
                   </div>
             </div>
             <app-order-verification-form class="" *ngIf="displayFormType === 'Verify'"
-                  [purchaseDetails]="purchaseDetails"
+                  [purchaseDetails]="purchaseDetails" [loading]="loading"
                   (actionEmitter)="handleVerificationFormActions($event)"></app-order-verification-form>
             <!-- Actions -->
             <div *ngIf="displayFormType === ''" class="flex justify-end mt-4">

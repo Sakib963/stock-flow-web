@@ -10,7 +10,7 @@
                               <nz-form-label
                                     [nzRequired]="hasRequiredValidator('supplier_oid')">Supplier</nz-form-label>
                               <nz-form-control nzErrorTip="Supplier is required.">
-                                    <nz-select class="w-full" formControlName="supplier_oid" nz-input nzAllowClear
+                                    <nz-select class="w-full" formControlName="supplier_oid" nzShowSearch nz-input nzAllowClear
                                           nzPlaceHolder="Select Supplier">
                                           <ng-container *ngFor="let item of supplierList">
                                                 <nz-option [nzLabel]="item.label" [nzValue]="item.value"></nz-option>
@@ -153,7 +153,7 @@
                         <nz-form-label
                               [nzRequired]="hasRequiredValidatorDrawerForm('product_oid')">Product</nz-form-label>
                         <nz-form-control nzErrorTip="Product is required.">
-                              <nz-select class="w-full" formControlName="product_oid" nz-input nzAllowClear
+                              <nz-select class="w-full" formControlName="product_oid" nzShowSearch nz-input nzAllowClear
                                     nzPlaceHolder="Select Product">
                                     <ng-container *ngFor="let item of productList">
                                           <nz-option [nzDisabled]="checkDisabledStatus(item.value)"
@@ -167,7 +167,7 @@
                         <nz-form-label
                               [nzRequired]="hasRequiredValidatorDrawerForm('warehouse_oid')">Warehouse</nz-form-label>
                         <nz-form-control nzErrorTip="Warehouse is required.">
-                              <nz-select class="w-full" formControlName="warehouse_oid" nz-input nzAllowClear
+                              <nz-select class="w-full" formControlName="warehouse_oid" nzShowSearch nz-input nzAllowClear
                                     nzPlaceHolder="Select Warehouse">
                                     <ng-container *ngFor="let item of warehouseList">
                                           <nz-option [nzLabel]="item.label" [nzValue]="item.value"></nz-option>
@@ -179,7 +179,7 @@
                   <nz-form-item>
                         <nz-form-label [nzRequired]="hasRequiredValidatorDrawerForm('aisle_oid')">Aisle</nz-form-label>
                         <nz-form-control nzErrorTip="Aisle is required.">
-                              <nz-select class="w-full" formControlName="aisle_oid" nz-input nzAllowClear
+                              <nz-select class="w-full" formControlName="aisle_oid" nzShowSearch nz-input nzAllowClear
                                     nzPlaceHolder="Select Aisle">
                                     <ng-container *ngFor="let item of aisleList">
                                           <nz-option [nzLabel]="item.label" [nzValue]="item.value"></nz-option>

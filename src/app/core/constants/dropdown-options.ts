@@ -58,7 +58,7 @@ export const DROPDOWN_OPTIONS = {
   ],
   INTENDED_USE_OPTIONS: [
     { label: 'For Sale', value: 'for_sale' },
-    { label: 'For Internal Use', value: 'for_internal_use' },
+    { label: 'For Internal Use', value: 'internal_use' },
   ],
   MONTHS: [
     { label: 'January', value: 'january' },

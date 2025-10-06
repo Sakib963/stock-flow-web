@@ -51,7 +51,7 @@
                               <nz-form-label [nzRequired]="hasRequiredValidator('product_nature')">Product
                                     Nature</nz-form-label>
                               <nz-form-control nzErrorTip="Product Nature is required.">
-                                    <nz-select class="w-full" formControlName="product_nature" nz-input nzAllowClear
+                                    <nz-select class="w-full" formControlName="product_nature" nzShowSearch nz-input nzAllowClear
                                           nzPlaceHolder="Select Product Nature">
                                           <ng-container *ngFor="let item of productNatureList">
                                                 <nz-option [nzLabel]="item.label" [nzValue]="item.value"></nz-option>
@@ -64,7 +64,7 @@
                               <nz-form-label
                                     [nzRequired]="hasRequiredValidator('category_oid')">Category</nz-form-label>
                               <nz-form-control nzErrorTip="Category is required.">
-                                    <nz-select class="w-full" formControlName="category_oid" nz-input nzAllowClear
+                                    <nz-select class="w-full" formControlName="category_oid" nzShowSearch nz-input nzAllowClear
                                           nzPlaceHolder="Select Category">
                                           <ng-container *ngFor="let item of categoryList">
                                                 <nz-option [nzLabel]="item.label" [nzValue]="item.value"></nz-option>
@@ -77,7 +77,7 @@
                               <nz-form-label [nzRequired]="hasRequiredValidator('category_oid')">Sub
                                     Category</nz-form-label>
                               <nz-form-control nzErrorTip="Sub Category is required.">
-                                    <nz-select class="w-full" formControlName="sub_category_oid" nz-input nzAllowClear
+                                    <nz-select class="w-full" formControlName="sub_category_oid" nzShowSearch nz-input nzAllowClear
                                           nzPlaceHolder="Select Sub Category">
                                           <ng-container *ngFor="let item of subCategoryList">
                                                 <nz-option [nzLabel]="item.label" [nzValue]="item.value"></nz-option>
@@ -98,7 +98,7 @@
                         <nz-form-item>
                               <nz-form-label [nzRequired]="hasRequiredValidator('unit_type')">Unit Type</nz-form-label>
                               <nz-form-control nzErrorTip="Unit Type is required.">
-                                    <nz-select class="w-full" formControlName="unit_type" nz-input nzAllowClear
+                                    <nz-select class="w-full" formControlName="unit_type" nzShowSearch nz-input nzAllowClear
                                           nzPlaceHolder="Select Unit Type">
                                           <ng-container *ngFor="let item of unitTypes">
                                                 <nz-option [nzLabel]="item.label" [nzValue]="item.value"></nz-option>

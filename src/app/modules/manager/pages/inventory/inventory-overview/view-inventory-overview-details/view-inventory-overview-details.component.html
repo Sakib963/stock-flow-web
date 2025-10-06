@@ -82,7 +82,7 @@
                                                 <nz-dropdown-menu #menu="nzDropdownMenu">
                                                       <ul nz-menu>
                                                             <li [nzDisabled]="getPricingStatus(item)" nz-menu-item
-                                                                  (click)="displayUpdatePricingModal(item)">Pricing</li>
+                                                                  (click)="!getPricingStatus(item) && displayUpdatePricingModal(item)">Pricing</li>
                                                             <li nz-menu-item (click)="generateBarcode(item)">Generate
                                                                   Barcode</li>
                                                       </ul>

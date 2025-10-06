@@ -28,6 +28,7 @@ import { DROPDOWN_OPTIONS } from '@app/core/constants/dropdown-options';
     styleUrls: ['./order-verification-form.component.scss']
 })
 export class OrderVerificationFormComponent implements OnInit {
+  @Input() loading: boolean = false;
   @Input() purchaseDetails: any;
   @Output() readonly actionEmitter: EventEmitter<object> = new EventEmitter();
 

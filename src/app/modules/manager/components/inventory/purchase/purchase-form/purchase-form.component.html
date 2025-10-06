@@ -25,7 +25,7 @@
                               <nz-form-label
                                     [nzRequired]="hasRequiredValidator('supplier_oid')">Supplier</nz-form-label>
                               <nz-form-control nzErrorTip="Supplier is required.">
-                                    <nz-select class="w-full" formControlName="supplier_oid" nz-input nzAllowClear
+                                    <nz-select class="w-full" formControlName="supplier_oid" nzShowSearch nz-input nzAllowClear
                                           nzPlaceHolder="Select Supplier">
                                           <ng-container *ngFor="let item of supplierList">
                                                 <nz-option [nzLabel]="item.label" [nzValue]="item.value"></nz-option>

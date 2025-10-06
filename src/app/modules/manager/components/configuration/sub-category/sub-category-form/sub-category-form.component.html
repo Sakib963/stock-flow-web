@@ -7,7 +7,7 @@
                         <nz-form-label [nzRequired]="hasRequiredValidator('category_oid')">Parent
                               Category</nz-form-label>
                         <nz-form-control nzErrorTip="Category is required.">
-                              <nz-select class="w-full" formControlName="category_oid" nz-input nzAllowClear
+                              <nz-select class="w-full" formControlName="category_oid" nzShowSearch nz-input nzAllowClear
                                     nzPlaceHolder="Select Category">
                                     <ng-container *ngFor="let item of categoryList">
                                           <nz-option [nzLabel]="item.label" [nzValue]="item.value"></nz-option>

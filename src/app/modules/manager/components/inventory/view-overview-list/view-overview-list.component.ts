@@ -60,6 +60,9 @@ export class ViewOverviewListComponent {
     if (item.has_pending_pricing) {
       return 'purple';
     }
+    if (!item.has_pending_pricing && !item.has_for_sale_batch) {
+      return '';
+    }
     return 'green';
   }
 

@@ -159,7 +159,6 @@ export class ViewInventoryOverviewDetailsComponent implements OnInit {
     // Handle the result after the modal closes
     modal.afterClose.subscribe((result) => {
       if (result) {
-        console.log(result);
         this.updatePricing(result);
       }
     });
@@ -183,7 +182,6 @@ export class ViewInventoryOverviewDetailsComponent implements OnInit {
       price: showPrice ? item.selling_price : null,
       quantityAvailable: item.quantity_available,
     };
-    console.log('Barcode preview data:', this.barcodePreviewData);
     this.printQuantity = 1;
 
     this.isBarcodeDrawerVisible = true;
