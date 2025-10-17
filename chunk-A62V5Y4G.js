@@ -1,0 +1,1 @@
+import{Jb as i}from"./chunk-A724KJ3H.js";var f=(()=>{class e{transform(t,r="--"){return t==null||t===""?r:t}static{this.\u0275fac=function(r){return new(r||e)}}static{this.\u0275pipe=i({name:"safeText",type:e,pure:!0})}}return e})();export{f as a};
