@@ -23,16 +23,16 @@ export interface ModalData {
 }
 
 @Component({
-    selector: 'app-update-pricing-modal',
-    imports: [
-        CommonModule,
-        ReactiveFormsModule,
-        NgZorroCustomModule,
-        PrimaryButton,
-        SecondaryButton,
-    ],
-    templateUrl: './update-pricing-modal.component.html',
-    styleUrls: ['./update-pricing-modal.component.scss']
+  selector: 'app-update-pricing-modal',
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    NgZorroCustomModule,
+    PrimaryButton,
+    SecondaryButton,
+  ],
+  templateUrl: './update-pricing-modal.component.html',
+  styleUrls: ['./update-pricing-modal.component.scss'],
 })
 export class UpdatePricingModalComponent {
   form!: FormGroup;
@@ -91,5 +91,17 @@ export class UpdatePricingModalComponent {
     } else {
       return 'Cost information for this batch is currently unavailable.';
     }
+  }
+
+  getMaximumDiscountText(): string {
+    const sellingPrice = this.form.get('selling_price')?.value;
+    const maxDiscount = this.form.get('maximum_discount')?.value;
+
+    if (sellingPrice && maxDiscount) {
+      const discountedPrice = sellingPrice - maxDiscount;
+      return `Maximum discount: ${maxDiscount} ৳ – Price after discount: ${discountedPrice} ৳`;
+    }
+
+    return 'Enter Selling Price and Maximum Discount to see the calculated price.';
   }
 }

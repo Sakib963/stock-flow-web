@@ -9,6 +9,7 @@
         "form": {
           "card_title": "Select Product",
           "add_to_invoice": "Add to Invoice",
+          "clear_invoice": "Clear Selection",
           "search_input": {
             "label": "Select A Product",
             "placeholder": "Search by name or batch code"
@@ -43,7 +44,7 @@
         "product_name": "Product Name",
         "quantity": "Quantity",
         "unit_price": "Unit Price",
-        "discount": "Discount (%)",
+        "discount": "Discount (BDT)",
         "total_price": "Total",
         "actions": "Actions",
         "no_product_added": "No product added yet."

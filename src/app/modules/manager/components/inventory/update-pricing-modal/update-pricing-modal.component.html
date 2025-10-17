@@ -1,33 +1,43 @@
 <div class="rounded-md bg-white max-w-full w-full">
       <form nz-form [formGroup]="form" [nzLayout]="'vertical'" (ngSubmit)="handleForm()" class="space-y-4">
-            <div class="border-[0.5px] p-4 rounded-md">
+            <div class="border-[0.5px] p-4 rounded-sm">
                   <h2 class="text-xl font-medium mb-4">Update Pricing & Discount - {{ modalData.batch_code }}
                   </h2>
-                  <nz-alert class="mb-4" nzType="info" [nzDescription]="null" [nzMessage]="null"
-                        [innerHTML]="getPerUnitPriceText()">
+                  <nz-alert nzType="info" nzShowIcon class="text-sm text-blue-800 mb-3 px-3 py-2 rounded-md bg-blue-50"
+                        [nzMessage]="null" [innerHTML]="getPerUnitPriceText()">
                   </nz-alert>
 
-                  <div class="grid grid-cols-1">
-                        <!-- Form -->
-                        <!-- selling_price -->
+                  <!-- Form -->
+                  <div class="grid grid-cols-1 gap-4">
+                        <!-- Selling Price -->
                         <nz-form-item>
-                              <nz-form-label [nzRequired]="hasRequiredValidator('selling_price')">Selling
-                                    Price</nz-form-label>
+                              <nz-form-label [nzRequired]="hasRequiredValidator('selling_price')">
+                                    Selling Price
+                              </nz-form-label>
                               <nz-form-control nzErrorTip="Selling Price is Required."
-                                    [nzValidateStatus]="form.get('maximum_discount') || ''" [nzHasFeedback]="true">
+                                    [nzValidateStatus]="form.get('selling_price') || ''" [nzHasFeedback]="true">
                                     <input formControlName="selling_price" type="number" nz-input
                                           placeholder="Enter Selling Price" />
                               </nz-form-control>
                         </nz-form-item>
+
+                        <!-- Maximum Discount (Percentage) -->
                         <nz-form-item>
-                              <nz-form-label [nzRequired]="hasRequiredValidator('maximum_discount')">Maximum
-                                    Discount</nz-form-label>
+                              <nz-form-label [nzRequired]="hasRequiredValidator('maximum_discount')">
+                                    Maximum Discount (BDT)
+                              </nz-form-label>
                               <nz-form-control nzErrorTip="Maximum Discount is Required."
                                     [nzValidateStatus]="form.get('maximum_discount') || ''" [nzHasFeedback]="true">
                                     <input nz-input type="number" formControlName="maximum_discount"
-                                          placeholder="Max Discount" class="w-full" />
+                                          placeholder="Max Discount in BDT" class="w-full" />
                               </nz-form-control>
                         </nz-form-item>
+
+
+                        <!-- Maximum discount info -->
+                        <nz-alert nzType="warning" [nzMessage]="getMaximumDiscountText()" nzShowIcon nzBorderless
+                              class="text-sm text-yellow-800 mb-4 rounded-md bg-yellow-50">
+                        </nz-alert>
                   </div>
             </div>
             <!-- Actions -->

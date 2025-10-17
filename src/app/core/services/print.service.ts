@@ -8,6 +8,23 @@ export class PrintService {
   isPrinting = signal(false);
   companyInfo = COMPANY_INFO;
 
+  formatLocalTime(createdOn?: string): string {
+    if (createdOn) {
+      return createdOn.substring(0, 16).replace('T', ' ');
+    } else {
+      const now = new Date();
+      const day = String(now.getDate()).padStart(2, '0');
+      const month = String(now.getMonth() + 1).padStart(2, '0');
+      const year = now.getFullYear();
+
+      let hours = now.getHours();
+      const minutes = String(now.getMinutes()).padStart(2, '0');
+      hours = hours % 12 || 12;
+
+      return `${day}/${month}/${year} ${hours}:${minutes}`;
+    }
+  }
+
   printReceipt(data: any): Promise<void> {
     if (this.isPrinting()) return Promise.resolve();
 
@@ -85,11 +102,9 @@ export class PrintService {
       <body>
         <div class="center bold">${company_info.name}</div>
         <div class="center">Invoice No: ${data.invoice_no}</div>
-        <div class="center">Date: ${
-          data.created_on
-            ? new Date(data.created_on).toLocaleString()
-            : new Date(data.created_on).toLocaleString()
-        }</div>
+        <div class="center">
+          Date: ${this.formatLocalTime(data.created_on)}
+        </div>
         <div class="line"></div>
 
         ${data.products

@@ -25,19 +25,20 @@ import { markFormGroupTouched } from '@app/core/constants/helper';
 import { PrintService } from '@app/core/services/print.service';
 
 @Component({
-    selector: 'app-quick-sale',
-    imports: [
-        CommonModule,
-        NgZorroCustomModule,
-        FormsModule,
-        NzAutocompleteModule,
-        ReactiveFormsModule,
-        LoaderComponent,
-        SelectProductComponent,
-        TranslateModule,
-    ],
-    templateUrl: './quick-sale.component.html',
-    styleUrls: ['./quick-sale.component.scss']
+  selector: 'app-quick-sale',
+  standalone: true,
+  imports: [
+    CommonModule,
+    NgZorroCustomModule,
+    FormsModule,
+    NzAutocompleteModule,
+    ReactiveFormsModule,
+    LoaderComponent,
+    SelectProductComponent,
+    TranslateModule,
+  ],
+  templateUrl: './quick-sale.component.html',
+  styleUrls: ['./quick-sale.component.scss'],
 })
 export class QuickSaleComponent implements OnInit {
   @Input() invoiceId: string | null = null;
@@ -274,7 +275,7 @@ export class QuickSaleComponent implements OnInit {
   editProduct(index: number): void {
     const product = this.products.at(index).value;
     this.selectedProductIndex = index;
-    this.editingProduct = product;
+    this.editingProduct = { ...product };
   }
 
   resetForm(): void {

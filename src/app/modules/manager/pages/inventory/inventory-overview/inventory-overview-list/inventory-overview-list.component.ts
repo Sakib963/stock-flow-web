@@ -1,6 +1,11 @@
-import { Component, DestroyRef, OnInit } from '@angular/core';
+import { Component, DestroyRef, EventEmitter, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormControl, ReactiveFormsModule } from '@angular/forms';
+import {
+  FormBuilder,
+  FormControl,
+  FormGroup,
+  ReactiveFormsModule,
+} from '@angular/forms';
 import { ViewOverviewListComponent } from '@app/modules/manager/components/inventory/view-overview-list/view-overview-list.component';
 import { NgZorroCustomModule } from '@app/shared/ng-zorro-custom.module';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -9,18 +14,21 @@ import { APIEndpoint } from '@app/core/constants/api-endpoint';
 import { Constants } from '@app/core/constants/constants';
 import { HttpService } from '@app/core/services/http.service';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
-import { finalize } from 'rxjs';
+import { debounceTime, distinctUntilChanged, finalize } from 'rxjs';
 
 @Component({
-    selector: 'app-inventory-overview-list',
-    imports: [CommonModule,
-        NgZorroCustomModule,
-        ReactiveFormsModule,
-        ViewOverviewListComponent,],
-    templateUrl: './inventory-overview-list.component.html',
-    styleUrls: ['./inventory-overview-list.component.scss']
+  selector: 'app-inventory-overview-list',
+  standalone: true,
+  imports: [
+    CommonModule,
+    NgZorroCustomModule,
+    ReactiveFormsModule,
+    ViewOverviewListComponent,
+  ],
+  templateUrl: './inventory-overview-list.component.html',
+  styleUrls: ['./inventory-overview-list.component.scss'],
 })
-export class InventoryOverviewListComponent  implements OnInit {
+export class InventoryOverviewListComponent implements OnInit {
   data: any[] = [];
   totalCount: number = 0;
   loading: boolean = false;
@@ -29,29 +37,82 @@ export class InventoryOverviewListComponent  implements OnInit {
     limit: Constants.PAGE_SIZE,
     search_text: '',
     status: '',
+    category_oid: '',
+    sub_category_oid: '',
   };
   isFilter: boolean = false;
-  searchControl: FormControl = new FormControl('');
+  filterForm!: FormGroup;
+  previousCategory: any = null;
+
+  categoryList: any[] = [];
+  subCategoryList: any[] = [];
+  statusList: any[] = [
+    { label: 'Active', value: 'Active' },
+    { label: 'Inactive', value: 'Inactive' },
+  ];
+
+  resetChildPageEvent: EventEmitter<void> = new EventEmitter();
 
   constructor(
     private _httpService: HttpService,
     private _destroyRef: DestroyRef,
     private _notificationService: NzNotificationService,
     private _router: Router,
-    private _activatedRoute: ActivatedRoute
+    private _activatedRoute: ActivatedRoute,
+    private _fb: FormBuilder
   ) {}
 
   ngOnInit(): void {
-    this.loadList();
-    this.searchControl.valueChanges.subscribe((value) => {
-      this.onSearchChange(value);
+    this.filterForm = this._fb.group({
+      search_text: [''],
+      category_oid: [null],
+      sub_category_oid: [null],
+      status: [null],
     });
+
+    this.loadList();
+    this.loadCategoryList();
+
+    this.filterForm.valueChanges
+      .pipe(
+        debounceTime(300),
+        distinctUntilChanged(
+          (prev, curr) => JSON.stringify(prev) === JSON.stringify(curr)
+        )
+      )
+      .subscribe((filters) => {
+        // If category changed, reset subcategory
+        if (filters.category_oid !== this.previousCategory) {
+          this.filterForm.patchValue(
+            { sub_category_oid: null },
+            { emitEvent: false }
+          );
+          this.loadSubCategoryList(filters.category_oid);
+          this.previousCategory = filters.category_oid;
+        }
+
+        this.payload = { ...this.payload, ...filters, offset: 0 };
+        this.isFilter = true;
+        this.loadList();
+      });
   }
 
-  onSearchChange(value: string): void {
-    this.payload = {offset: 0, limit: Constants.PAGE_SIZE, search_text: value, status: ''};
-    this.isFilter = true;
+  resetFilters(): void {
+    this.filterForm.reset(
+      {
+        search_text: '',
+        category_oid: null,
+        sub_category_oid: null,
+        status: null,
+      },
+      { emitEvent: false }
+    );
+
+    this.subCategoryList = [];
+    this.payload = { offset: 0, limit: Constants.PAGE_SIZE };
     this.loadList();
+
+    this.resetChildPageEvent.emit();
   }
 
   handlePaginationEvent(event: any) {
@@ -104,5 +165,52 @@ export class InventoryOverviewListComponent  implements OnInit {
       state: { edit: false },
     });
   }
-}
 
+  loadCategoryList(): any {
+    this._httpService
+      .get(APIEndpoint.GET_CATEGORY_LIST_FOR_DROPDOWN)
+      .pipe(
+        takeUntilDestroyed(this._destroyRef),
+        finalize(() => (this.loading = false))
+      )
+      .subscribe({
+        next: (res: any) => {
+          if (res.status === 200) {
+            this.categoryList = [];
+            if (res.body?.data?.length) {
+              this.categoryList = res.body.data;
+            } else {
+              this.categoryList = [];
+            }
+          }
+        },
+        error: (err: any) => {
+          console.log(err);
+        },
+      });
+  }
+
+  loadSubCategoryList(category_oid: any): any {
+    this._httpService
+      .get(APIEndpoint.GET_SUB_CATEGORY_LIST_FOR_DROPDOWN, { category_oid })
+      .pipe(
+        takeUntilDestroyed(this._destroyRef),
+        finalize(() => (this.loading = false))
+      )
+      .subscribe({
+        next: (res: any) => {
+          if (res.status === 200) {
+            this.subCategoryList = [];
+            if (res.body?.data?.length) {
+              this.subCategoryList = res.body.data;
+            } else {
+              this.subCategoryList = [];
+            }
+          }
+        },
+        error: (err: any) => {
+          console.log(err);
+        },
+      });
+  }
+}

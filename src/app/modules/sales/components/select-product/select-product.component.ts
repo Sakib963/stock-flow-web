@@ -22,22 +22,30 @@ import { HttpService } from '@app/core/services/http.service';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { APIEndpoint } from '@app/core/constants/api-endpoint';
-import { debounceTime, distinctUntilChanged, finalize, Subject } from 'rxjs';
+import {
+  debounceTime,
+  distinctUntilChanged,
+  finalize,
+  skip,
+  Subject,
+} from 'rxjs';
 import { checkRequiredValidator } from '@app/core/constants/helper';
 import { TranslateModule } from '@ngx-translate/core';
+import { NzFormTooltipIcon } from 'ng-zorro-antd/form';
 
 @Component({
-    selector: 'app-select-product',
-    imports: [
-        CommonModule,
-        LoaderComponent,
-        NgZorroCustomModule,
-        ReactiveFormsModule,
-        FormsModule,
-        TranslateModule
-    ],
-    templateUrl: './select-product.component.html',
-    styleUrls: ['./select-product.component.scss']
+  selector: 'app-select-product',
+  standalone: true,
+  imports: [
+    CommonModule,
+    LoaderComponent,
+    NgZorroCustomModule,
+    ReactiveFormsModule,
+    FormsModule,
+    TranslateModule,
+  ],
+  templateUrl: './select-product.component.html',
+  styleUrls: ['./select-product.component.scss'],
 })
 export class SelectProductComponent implements OnInit, OnChanges {
   @Output() readonly actionEmitter: EventEmitter<{
@@ -57,6 +65,11 @@ export class SelectProductComponent implements OnInit, OnChanges {
 
   private $searchSubject = new Subject<string>();
 
+  discountTooltipIcon: NzFormTooltipIcon = {
+    type: 'info-circle',
+    theme: 'twotone',
+  };
+
   constructor(
     private _fb: FormBuilder,
     private _httpService: HttpService,
@@ -69,7 +82,11 @@ export class SelectProductComponent implements OnInit, OnChanges {
     this.loadProductList();
 
     this.$searchSubject
-      .pipe(debounceTime(300), distinctUntilChanged())
+      .pipe(
+        skip(1), // 👈 ignores the first value (usually empty)
+        debounceTime(300),
+        distinctUntilChanged()
+      )
       .subscribe((value: string) => {
         this.isFilter = true;
         this.loadProductList({ search_text: value });
@@ -182,8 +199,13 @@ export class SelectProductComponent implements OnInit, OnChanges {
   }
 
   onChange(value: string): void {
-    if (!value || value.length < 2) return;
-    this.$searchSubject.next(value); // debounce triggers loadProductList
+    this.$searchSubject.next(value);
+  }
+
+  clearSelection(): void {
+    this.form.reset();
+    this.selectedProduct = null;
+    this.formData = null;
   }
 
   onProductSelected(product: any): void {
@@ -238,18 +260,31 @@ export class SelectProductComponent implements OnInit, OnChanges {
     }
   }
 
+  getDiscountTooltip(): string {
+    if (!this.selectedProduct) {
+      return 'Please select a product to view the available discount range.';
+    }
+
+    const maxDiscount = this.getMaxDiscountAmount();
+    return `Maximum discount allowed: ৳${maxDiscount.toFixed(2)}`;
+  }
+
+  getMaxDiscountAmount(): number {
+    if (!this.selectedProduct) return 0;
+
+    const maxDiscountAmount =
+      Number(this.selectedProduct.max_discount_range) || 0;
+    return maxDiscountAmount;
+  }
+
   getTotalPrice(): number {
     const quantity = Number(this.form.get('quantity')?.value) || 0;
     const unitPrice = Number(this.form.get('unit_price')?.value) || 0;
-    const discountPercent = Number(this.form.get('discount')?.value) || 0;
+    const discountAmount = Number(this.form.get('discount')?.value) || 0;
 
-    const discountAmount = (unitPrice * discountPercent) / 100;
-    const discountedUnitPrice = unitPrice - discountAmount;
-
-    const total = Number((discountedUnitPrice * quantity).toFixed(2));
+    const total = Math.max(0, (unitPrice - discountAmount) * quantity);
 
     this.form.get('total')?.setValue(total, { emitEvent: false });
-
-    return Number(this.form.get('total')?.value) || 0;
+    return total;
   }
 }

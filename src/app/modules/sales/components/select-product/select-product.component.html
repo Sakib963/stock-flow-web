@@ -2,11 +2,13 @@
 <div *ngIf="!loading" class="space-y-4">
       <form nz-form [formGroup]="form" [nzLayout]="'vertical'" (ngSubmit)="addToInvoice()">
             <nz-form-item>
-                  <nz-form-label [nzRequired]="hasRequiredValidator('search_input')" class="font-semibold">{{ 'sales.quick_sale.select_product.form.search_input.label' | translate }}</nz-form-label>
+                  <nz-form-label [nzRequired]="hasRequiredValidator('search_input')" class="font-semibold">{{
+                        'sales.quick_sale.select_product.form.search_input.label' | translate }}</nz-form-label>
                   <nz-form-control>
-                        <nz-select nzShowSearch [nzPlaceHolder]="'sales.quick_sale.select_product.form.search_input.placeholder' | translate" formControlName="search_input"
-                              (ngModelChange)="onProductSelectedById($event)" [nzSize]="'large'"
-                              (nzOnSearch)="onChange($event)">
+                        <nz-select nzShowSearch nzAllowClear
+                              [nzPlaceHolder]="'sales.quick_sale.select_product.form.search_input.placeholder' | translate"
+                              formControlName="search_input" (ngModelChange)="onProductSelectedById($event)"
+                              [nzSize]="'large'" (nzOnSearch)="onChange($event)">
                               <nz-option-group *ngFor="let group of filteredProductList"
                                     [nzLabel]="group.sub_category + ' - ' + group.parent_category">
                                     <nz-option *ngFor="let item of group.children" [nzValue]="item.inventory_oid"
@@ -19,29 +21,35 @@
             <nz-card [nzTitle]="cardTitle">
                   <div class="grid grid-cols-1 md:gap-x-6 md:grid-cols-2 lg:grid-cols-7">
                         <nz-form-item class="col-span-2">
-                              <nz-form-label [nzRequired]="hasRequiredValidator('product_oid')">{{ 'sales.quick_sale.select_product.form.product_name.label' | translate }}</nz-form-label>
+                              <nz-form-label [nzRequired]="hasRequiredValidator('product_oid')">{{
+                                    'sales.quick_sale.select_product.form.product_name.label' | translate
+                                    }}</nz-form-label>
                               <nz-form-control>
                                     <input nz-input [value]="getProductDisplayLabel(selectedProduct)" disabled />
                               </nz-form-control>
                         </nz-form-item>
 
                         <nz-form-item>
-                              <nz-form-label [nzRequired]="hasRequiredValidator('unit_price')">{{ 'sales.quick_sale.select_product.form.unit_price.label' | translate }}</nz-form-label>
+                              <nz-form-label [nzRequired]="hasRequiredValidator('unit_price')">{{
+                                    'sales.quick_sale.select_product.form.unit_price.label' | translate
+                                    }}</nz-form-label>
                               <nz-form-control>
                                     <input nz-input [value]="getProductUnitPriceLabel(selectedProduct)" disabled />
                               </nz-form-control>
                         </nz-form-item>
 
                         <nz-form-item>
-                              <nz-form-label
-                                    [nzRequired]="hasRequiredValidator('quantity_available')">{{ 'sales.quick_sale.select_product.form.quantity_available.label' | translate }}</nz-form-label>
+                              <nz-form-label [nzRequired]="hasRequiredValidator('quantity_available')">{{
+                                    'sales.quick_sale.select_product.form.quantity_available.label' | translate
+                                    }}</nz-form-label>
                               <nz-form-control>
                                     <input nz-input [value]="selectedProduct?.quantity_available" disabled />
                               </nz-form-control>
                         </nz-form-item>
 
                         <nz-form-item>
-                              <nz-form-label [nzRequired]="hasRequiredValidator('quantity')">{{ 'sales.quick_sale.select_product.form.quantity.label' | translate }}</nz-form-label>
+                              <nz-form-label [nzRequired]="hasRequiredValidator('quantity')">{{
+                                    'sales.quick_sale.select_product.form.quantity.label' | translate }}</nz-form-label>
                               <nz-form-control>
                                     <nz-input-number class="w-full" formControlName="quantity" [nzMin]="1"
                                           [nzMax]="selectedProduct?.quantity"></nz-input-number>
@@ -49,15 +57,20 @@
                         </nz-form-item>
 
                         <nz-form-item>
-                              <nz-form-label [nzRequired]="hasRequiredValidator('discount')">{{ 'sales.quick_sale.select_product.form.discount.label' | translate }}</nz-form-label>
+                              <nz-form-label [nzTooltipTitle]="getDiscountTooltip()"
+                                    [nzTooltipIcon]="discountTooltipIcon"
+                                    [nzRequired]="hasRequiredValidator('discount')">{{
+                                    'sales.quick_sale.select_product.form.discount.label' | translate }}</nz-form-label>
                               <nz-form-control>
                                     <nz-input-number class="w-full" formControlName="discount" [nzMin]="0"
-                                          [nzMax]="selectedProduct?.max_discount_range"></nz-input-number>
+                                          [nzMax]="selectedProduct ? getMaxDiscountAmount() : 0"></nz-input-number>
                               </nz-form-control>
                         </nz-form-item>
 
                         <nz-form-item>
-                              <nz-form-label [nzRequired]="hasRequiredValidator('total')">{{ 'sales.quick_sale.select_product.form.total_price.label' | translate }}</nz-form-label>
+                              <nz-form-label [nzRequired]="hasRequiredValidator('total')">{{
+                                    'sales.quick_sale.select_product.form.total_price.label' | translate
+                                    }}</nz-form-label>
                               <nz-form-control>
                                     <input nz-input [value]="getTotalPrice() | currency:'৳':'symbol'" disabled />
                               </nz-form-control>
@@ -65,8 +78,15 @@
                   </div>
                   <ng-template #cardTitle>
                         <div class="flex justify-between items-center">
-                              <span class="text-lg font-semibold">{{ 'sales.quick_sale.select_product.form.card_title' | translate }}</span>
-                              <button [disabled]="form.invalid" nz-button nzType="primary">{{ 'sales.quick_sale.select_product.form.add_to_invoice' | translate }}</button>
+                              <span class="text-lg font-semibold">{{ 'sales.quick_sale.select_product.form.card_title' |
+                                    translate }}</span>
+                              <div class="flex items-center gap-2">
+                                    <button [disabled]="form.invalid" type="button" (click)="clearSelection()" nz-button
+                                          nzDanger>{{
+                                          'sales.quick_sale.select_product.form.clear_invoice' | translate }}</button>
+                                    <button [disabled]="form.invalid" nz-button nzType="primary">{{
+                                          'sales.quick_sale.select_product.form.add_to_invoice' | translate }}</button>
+                              </div>
                         </div>
                   </ng-template>
             </nz-card>

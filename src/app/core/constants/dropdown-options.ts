@@ -10,6 +10,11 @@ export const DROPDOWN_OPTIONS = {
     { label: 'Gram (g)', value: 'g' },
     { label: 'Ton (t)', value: 't' },
     { label: 'Barrel (bbl)', value: 'bbl' },
+    { label: 'Pair (pr)', value: 'pr' },
+    { label: 'Set (set)', value: 'set' },
+    { label: 'Tube (tube)', value: 'tube' },
+    { label: 'Jar (jar)', value: 'jar' },
+    { label: 'Bottle (btl)', value: 'btl' },
   ],
   PRODUCT_NATURE: [
     { label: 'For Sale', value: 'for_sale' },

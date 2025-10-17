@@ -82,11 +82,10 @@
                                                 *ngIf="purchaseDetails.status === 'Verified' && product.intended_use === 'for_sale'">
                                                 <nz-divider></nz-divider>
                                                 <p class="text-sm font-light text-secondary">Selling Price:
-                                                      <span class="font-semibold">{{ product?.selling_price }}</span>
+                                                      <span class="font-semibold">&#2547;{{ product?.selling_price }}</span>
                                                 </p>
-                                                <p class="text-sm font-light text-secondary">Maximum Discount Range:
-                                                      <span class="font-semibold">{{ product?.maximum_discount }}
-                                                            %</span>
+                                                <p class="text-sm font-light text-secondary">Maximum Discount Amount:
+                                                      <span class="font-semibold">&#2547;{{ product?.maximum_discount }}</span>
                                                 </p>
                                           </div>
                                     </div>
