@@ -26,6 +26,7 @@ import { SafeTextPipe } from '@app/shared/pipe/safe-text.pipe';
 export class ManagerDashboardComponent implements OnInit {
   data: any;
   recent_sales: any[] = [];
+  trending_products: any[] = [];
   loading: boolean = false;
 
   constructor(
@@ -60,7 +61,7 @@ export class ManagerDashboardComponent implements OnInit {
           if (res.body.code === 200) {
             this.data = res.body.data;
             this.recent_sales = res.body?.data?.recent_sales ?? [];
-            console.log(this.data);
+            this.trending_products = res.body?.data?.trending_products_this_month ?? [];
           }
         },
         error: (err: any) => {

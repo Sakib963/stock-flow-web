@@ -1,0 +1,92 @@
+<form class="space-y-4 mt-2" nz-form [formGroup]="form" [nzLayout]="'vertical'" (ngSubmit)="onSubmit()">
+      @if (hasFormControls()) {
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 border-[0.5px] border-[#D8E5F8] p-4">
+            @if (form.get('warehouse_oid')) {
+            <nz-form-item>
+                  <nz-form-label>{{ 'manager.report.filter.warehouse_oid.label' | translate
+                        }}</nz-form-label>
+                  <nz-form-control
+                        nzErrorTip="{{ 'manager.report.filter.warehouse_oid.required_error_message' | translate }}">
+                        <nz-select class="w-full" formControlName="warehouse_oid" nz-input nzAllowClear
+                              nzPlaceHolder="{{ 'manager.report.filter.warehouse_oid.placeholder' | translate }}"
+                              nzServerSearch nzShowSearch (nzOnSearch)="filterList($event, 'warehouse')">
+                              <nz-option *ngFor="let warehouse of filteredWarehouses" [nzLabel]="warehouse.label"
+                                    [nzValue]="warehouse.value"></nz-option>
+                        </nz-select>
+                  </nz-form-control>
+            </nz-form-item>
+            }
+            @if (form.get('supplier_oid')) {
+            <nz-form-item>
+                  <nz-form-label>{{ 'manager.report.filter.supplier_oid.label' | translate }}</nz-form-label>
+                  <nz-form-control
+                        nzErrorTip="{{ 'manager.report.filter.supplier_oid.required_error_message' | translate }}">
+                        <nz-select class="w-full" formControlName="supplier_oid" nz-input nzAllowClear
+                              nzPlaceHolder="{{ 'manager.report.filter.supplier_oid.placeholder' | translate }}"
+                              nzServerSearch nzShowSearch (nzOnSearch)="filterList($event, 'supplier')">
+                              <nz-option *ngFor="let supplier of filteredSuppliers" [nzLabel]="supplier.label"
+                                    [nzValue]="supplier.value"></nz-option>
+                        </nz-select>
+                  </nz-form-control>
+            </nz-form-item>
+            }
+            @if (form.get('product_oid')) {
+            <nz-form-item>
+                  <nz-form-label>{{ 'manager.report.filter.product_oid.label' | translate }}</nz-form-label>
+                  <nz-form-control
+                        nzErrorTip="{{ 'manager.report.filter.product_oid.required_error_message' | translate }}">
+                        <nz-select class="w-full" formControlName="product_oid" nz-input nzAllowClear
+                              nzPlaceHolder="{{ 'manager.report.filter.product_oid.placeholder' | translate }}"
+                              nzServerSearch nzShowSearch (nzOnSearch)="filterList($event, 'product')">
+                              <nz-option *ngFor="let product of filteredProducts" [nzLabel]="product.label"
+                                    [nzValue]="product.value"></nz-option>
+                        </nz-select>
+                  </nz-form-control>
+            </nz-form-item>
+            }
+            @if (form.get('category_oid')) {
+            <nz-form-item>
+                  <nz-form-label>{{ 'manager.report.filter.category_oid.label' | translate }}</nz-form-label>
+                  <nz-form-control
+                        nzErrorTip="{{ 'manager.report.filter.category_oid.required_error_message' | translate }}">
+                        <nz-select class="w-full" formControlName="category_oid" nz-input nzAllowClear
+                              nzPlaceHolder="{{ 'manager.report.filter.category_oid.placeholder' | translate }}"
+                              nzServerSearch nzShowSearch (nzOnSearch)="filterList($event, 'category')">
+                              <nz-option *ngFor="let category of filteredCategories" [nzLabel]="category.label"
+                                    [nzValue]="category.value"></nz-option>
+                        </nz-select>
+                  </nz-form-control>
+            </nz-form-item>
+            }
+            @if (form.get('sub_category_oid')) {
+            <nz-form-item>
+                  <nz-form-label>{{ 'manager.report.filter.sub_category_oid.label' | translate }}</nz-form-label>
+                  <nz-form-control
+                        nzErrorTip="{{ 'manager.report.filter.sub_category_oid.required_error_message' | translate }}">
+                        <nz-select class="w-full" formControlName="sub_category_oid" nz-input nzAllowClear
+                              nzPlaceHolder="{{ 'manager.report.filter.sub_category_oid.placeholder' | translate }}"
+                              nzServerSearch nzShowSearch (nzOnSearch)="filterList($event, 'subcategory')">
+                              <nz-option *ngFor="let subcategory of filteredSubcategories" [nzLabel]="subcategory.label"
+                                    [nzValue]="subcategory.value"></nz-option>
+                        </nz-select>
+                  </nz-form-control>
+            </nz-form-item>
+            }
+            @if (form.get('date_range')) {
+            <nz-form-item>
+                  <nz-form-label>{{ 'manager.report.filter.date_range.label' | translate }}</nz-form-label>
+                  <nz-form-control
+                        nzErrorTip="{{ 'manager.report.filter.date_range.required_error_message' | translate }}">
+                        <nz-range-picker formControlName="date_range"
+                              [nzPlaceHolder]="['manager.report.filter.date_range.start_date_placeholder' | translate, 'manager.report.filter.date_range.end_date_placeholder' | translate]"></nz-range-picker>
+                  </nz-form-control>
+            </nz-form-item>
+            }
+      </div>
+      }
+
+      <div class="flex justify-end gap-4">
+            <secondary-button type="button" (click)="handleCancel()" [label]="'Cancel'"></secondary-button>
+            <primary-button [label]="'Generate'" [loading]="isLoading" [type]="'submit'"></primary-button>
+      </div>
+</form>

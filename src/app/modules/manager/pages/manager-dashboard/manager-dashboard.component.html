@@ -79,5 +79,18 @@
                         <h2 class="font-bold">Recent Sales</h2>
                   </ng-template>
             </nz-card>
+            <nz-card [nzTitle]="trendingTitle" nzBordered="true" style="margin-top: 16px;">
+                  <nz-list [nzDataSource]="trending_products" [nzRenderItem]="trendingItem" nzBordered="false" nzSize="small">
+                        <ng-template #trendingItem let-product>
+                              <nz-list-item>
+                                    <p>Product Name: <span class="font-semibold">{{ product.product_name }}</span></p>
+                                    <p>Total Sold: <span>{{ product.total_sold | safeText }}</span></p>
+                              </nz-list-item>
+                        </ng-template>
+                  </nz-list>
+                  <ng-template #trendingTitle>
+                        <h2 class="font-bold">Trending Products <span class="text-xs font-normal">(This Month)</span></h2>
+                  </ng-template>
+            </nz-card>
       </div>
 </div>

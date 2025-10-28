@@ -379,6 +379,10 @@ const routes: Routes = [
           },
         ],
       },
+      {
+        path: 'reports',
+        loadComponent: () => import('./pages/report/report.component').then(m => m.ReportComponent),
+      }
     ],
   },
   {

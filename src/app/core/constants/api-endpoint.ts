@@ -95,4 +95,8 @@ export class APIEndpoint {
   static GET_PROFILE_INFO = "/api/v1/profile/profile-info/get-profile-info";
 
   static GET_DASHBOARD_DATA_FOR_MANAGER = "/api/v1/manager/dashboard/get-dashboard-data-for-manager";
+
+  static GET_CURRENT_STOCK_REPORT = "/api/v1/manager/reports/get-current-stock-report";
+  static GET_LOW_STOCK_REPORT = "/api/v1/manager/reports/get-low-stock-report";
+  static GET_PRODUCT_WISE_STOCK_REPORT = "/api/v1/manager/reports/get-product-wise-stock-report";
 }

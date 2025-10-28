@@ -56,4 +56,12 @@ export class HttpService {
 
     return this._httpClient.get(`${url}`, { params: httpParams });
   }
+
+  downloadFile(apiUrl: string, payload: any): any {
+    return this._httpClient.post(`${environment.baseUrl}${apiUrl}`, payload, {
+      headers: this._headers,
+      responseType: 'blob',
+      observe: 'response',
+    });
+  }
 }

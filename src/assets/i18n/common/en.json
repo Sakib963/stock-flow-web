@@ -7,6 +7,16 @@
       "product_return": "Return Product",
       "cancel": "Cancel",
       "submit": "Submit"
+    },
+    "notification": {
+      "no_content_found_for_report": "No content found for the selected report.",
+      "something_went_wrong": "Something went wrong. Please try again later.",
+      "title": {
+        "success": "Success",
+        "error": "Error",
+        "warning": "Warning",
+        "info": "Info"
+      }
     }
   }
 }
