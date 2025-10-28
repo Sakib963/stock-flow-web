@@ -1,6 +1,143 @@
 {
   "manager": {
     "HELLO": "Hello",
-    "WELCOME": "Welcome to the app"
+    "WELCOME": "Welcome to the app",
+    "report": {
+      "inventory": {
+        "title": "Inventory Report",
+        "sub_reports": {
+          "current_stock_report": {
+            "title": "Current Stock Report",
+            "description": "This report shows the current stock of all products in the inventory."
+          },
+          "product_wise_stock_value": {
+            "title": "Product Wise Stock Value Report",
+            "description": "This report shows the stock value of each product in the inventory."
+          },
+          "expiring_product": {
+            "title": "Expiring Product Report",
+            "description": "This report shows the products that are expiring soon."
+          },
+          "batch_wise_stock": {
+            "title": "Batch Wise Stock Report",
+            "description": "This report shows the stock details of each batch."
+          },
+          "low_stock_report": {
+            "title": "Low Stock Report",
+            "description": "This report shows the products that are low in stock or out of stock."
+          }
+        }
+      },
+      "purchase": {
+        "title": "Purchase Report",
+        "sub_reports": {
+          "purchase_report": {
+            "title": "Purchase Report",
+            "description": "This report shows the purchase history of products."
+          },
+          "product_wise_purchase": {
+            "title": "Product Wise Purchase Report",
+            "description": "This report shows the purchase details of each product."
+          }
+        }
+      },
+      "allocation": {
+        "title": "Allocation Report",
+        "sub_reports": {
+          "allocation_report": {
+            "title": "Allocation Report",
+            "description": "This report shows the allocation history of products."
+          },
+          "product_wise_allocation": {
+            "title": "Product Wise Allocation Report",
+            "description": "This report shows the allocation details of each product."
+          }
+        }
+      },
+      "stock_adjustment": {
+        "title": "Stock Adjustment Report",
+        "sub_reports": {
+          "stock_adjustment_report": {
+            "title": "Stock Adjustment Report",
+            "description": "This report shows the stock adjustment history."
+          }
+        }
+      },
+      "product_return": {
+        "title": "Product Return Report",
+        "sub_reports": {
+          "product_return_report": {
+            "title": "Product Return Report",
+            "description": "This report shows the product return history."
+          },
+          "product_wise_return": {
+            "title": "Product Wise Return Report",
+            "description": "This report shows the return details of each product."
+          }
+        }
+      },
+      "dispose": {
+        "title": "Dispose Report",
+        "sub_reports": {
+          "dispose_report": {
+            "title": "Dispose Report",
+            "description": "This report shows the dispose history of products."
+          },
+          "product_wise_dispose": {
+            "title": "Product Wise Dispose Report",
+            "description": "This report shows the dispose details of each product."
+          }
+        }
+      },
+      "sales": {
+        "title": "Sales Reports",
+        "sub_reports": {
+          "sales_summary": {
+            "title": "Sales Summary Report",
+            "description": "View overall sales performance within a selected date range."
+          },
+          "product_wise_sales": {
+            "title": "Product-wise Sales Report",
+            "description": "Analyze sales performance by individual products."
+          },
+          "sales_return_analysis": {
+            "title": "Sales Return Analysis",
+            "description": "Review and analyze returned items and refund activities."
+          }
+        }
+      },
+      "filter": {
+        "date_range": {
+          "label": "Date",
+          "start_date_placeholder": "Start Date",
+          "end_date_placeholder": "End Date"
+        },
+        "warehouse_oid": {
+          "label": "Warehouse",
+          "placeholder": "Select Warehouse",
+          "required_error_message": "Warehouse is required."
+        },
+        "supplier_oid": {
+          "label": "Supplier",
+          "placeholder": "Select Supplier",
+          "required_error_message": "Supplier is required."
+        },
+        "product_oid": {
+          "label": "Product",
+          "placeholder": "Select Product",
+          "required_error_message": "Product is required."
+        },
+        "category_oid": {
+          "label": "Category",
+          "placeholder": "Select Category",
+          "required_error_message": "Category is required."
+        },
+        "sub_category_oid": {
+          "label": "Subcategory",
+          "placeholder": "Select Subcategory",
+          "required_error_message": "Subcategory is required."
+        }
+      }
+    }
   }
 }
