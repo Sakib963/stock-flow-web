@@ -35,19 +35,19 @@ import { LoaderComponent } from '@app/shared/components/loader/loader.component'
 import { DisableForGuestDirective } from '@app/shared/directives/guest-user.directive';
 
 @Component({
-    selector: 'app-product-form',
-    imports: [
-        CommonModule,
-        NgZorroCustomModule,
-        ReactiveFormsModule,
-        PrimaryButton,
-        SecondaryButton,
-        DangerButton,
-        LoaderComponent,
-        DisableForGuestDirective
-    ],
-    templateUrl: './product-form.component.html',
-    styleUrls: ['./product-form.component.scss']
+  selector: 'app-product-form',
+  imports: [
+    CommonModule,
+    NgZorroCustomModule,
+    ReactiveFormsModule,
+    PrimaryButton,
+    SecondaryButton,
+    DangerButton,
+    LoaderComponent,
+    DisableForGuestDirective,
+  ],
+  templateUrl: './product-form.component.html',
+  styleUrls: ['./product-form.component.scss'],
 })
 export class ProductFormComponent implements OnInit {
   @Output() readonly actionEmitter: EventEmitter<object> = new EventEmitter();
@@ -59,6 +59,7 @@ export class ProductFormComponent implements OnInit {
 
   categoryList: any = [];
   subCategoryList: any = [];
+  brandList: any = [];
   productNatureList: any = [];
   unitTypes: any = [];
 
@@ -76,9 +77,13 @@ export class ProductFormComponent implements OnInit {
 
     if (this.formData) {
       this.form.patchValue(this.formData);
+      if (this.formData.category_oid) {
+        this.loadSubCategoryList(this.formData.category_oid);
+      }
     }
 
     this.loadCategoryList();
+    this.loadBrandList();
     this.productNatureList = DROPDOWN_OPTIONS.PRODUCT_NATURE;
     this.unitTypes = DROPDOWN_OPTIONS.MEASUREMENT_UNITS;
 
@@ -97,6 +102,7 @@ export class ProductFormComponent implements OnInit {
       sku: [null],
       category_oid: [null, [Validators.required]],
       sub_category_oid: [null, [Validators.required]],
+      brand_oid: [null],
       unit_type: [null],
       description: [null],
       photo: [null],
@@ -155,6 +161,30 @@ export class ProductFormComponent implements OnInit {
               this.categoryList = res.body.data;
             } else {
               this.categoryList = [];
+            }
+          }
+        },
+        error: (err: any) => {
+          console.log(err);
+        },
+      });
+  }
+
+  loadBrandList(): any {
+    this._httpService
+      .get(APIEndpoint.GET_BRAND_LIST_FOR_DROPDOWN)
+      .pipe(
+        takeUntilDestroyed(this._destroyRef),
+        finalize(() => (this.loading = false))
+      )
+      .subscribe({
+        next: (res: any) => {
+          if (res.status === 200) {
+            this.brandList = [];
+            if (res.body?.data?.length) {
+              this.brandList = res.body.data;
+            } else {
+              this.brandList = [];
             }
           }
         },

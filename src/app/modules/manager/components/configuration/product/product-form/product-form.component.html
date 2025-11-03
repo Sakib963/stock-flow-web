@@ -85,6 +85,18 @@
                                     </nz-select>
                               </nz-form-control>
                         </nz-form-item>
+                        <!-- brand_oid -->
+                        <nz-form-item>
+                              <nz-form-label [nzRequired]="hasRequiredValidator('brand_oid')">Brand</nz-form-label>
+                              <nz-form-control nzErrorTip="Brand is required.">
+                                    <nz-select class="w-full" formControlName="brand_oid" nzShowSearch nz-input nzAllowClear
+                                          nzPlaceHolder="Select Brand">
+                                          <ng-container *ngFor="let item of brandList">
+                                                <nz-option [nzLabel]="item.label" [nzValue]="item.value"></nz-option>
+                                          </ng-container>
+                                    </nz-select>
+                              </nz-form-control>
+                        </nz-form-item>
                         <!-- restock_threshold -->
                         <nz-form-item>
                               <nz-form-label [nzRequired]="hasRequiredValidator('restock_threshold')">Restock

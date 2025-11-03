@@ -44,6 +44,11 @@ export class Menu {
           route: '/manager/configuration/sub-category',
         },
         {
+          icon: 'assets/icons/brands.svg',
+          label: 'Brands',
+          route: '/manager/configuration/brands',
+        },
+        {
           icon: 'assets/icons/source.svg',
           label: 'Supplier',
           route: '/manager/configuration/supplier',

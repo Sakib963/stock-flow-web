@@ -3,7 +3,7 @@
       <div>
             <div class="md:flex justify-between items-start mb-4 gap-4">
                   <!-- Left side: Category, Subcategory, Status, Search -->
-                  <form [formGroup]="filterForm" class="md:w-3/4 grid lg:grid-cols-5 gap-4">
+                  <form [formGroup]="filterForm" class="md:w-3/4 grid md:grid-cols-3 lg:grid-cols-6 gap-4">
                         <!-- Category Dropdown -->
                         <nz-form-item>
                               <nz-form-control>
@@ -23,6 +23,17 @@
                                           [nzDisabled]="!filterForm.get('category_oid')?.value">
                                           <nz-option *ngFor="let sub of subCategoryList" [nzLabel]="sub.label"
                                                 [nzValue]="sub.value"></nz-option>
+                                    </nz-select>
+                              </nz-form-control>
+                        </nz-form-item>
+
+                        <!-- Brand Dropdown -->
+                        <nz-form-item>
+                              <nz-form-control>
+                                    <nz-select nz-input nzSize="large" [nzPlaceHolder]="'Select Brand'" nzAllowClear
+                                          nzShowSearch formControlName="brand_oid">
+                                          <nz-option *ngFor="let brand of brandList" [nzLabel]="brand.label"
+                                                [nzValue]="brand.value"></nz-option>
                                     </nz-select>
                               </nz-form-control>
                         </nz-form-item>

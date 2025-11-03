@@ -40,6 +40,7 @@ export class DisplayProductListComponent implements OnInit {
     status: '',
     category_oid: '',
     sub_category_oid: '',
+    brand_oid: '',
   };
   isFilter: boolean = false;
   filterForm!: FormGroup;
@@ -47,6 +48,7 @@ export class DisplayProductListComponent implements OnInit {
 
   categoryList: any[] = [];
   subCategoryList: any[] = [];
+  brandList: any[] = [];
   statusList: any[] = [
     { label: 'Active', value: 'Active' },
     { label: 'Inactive', value: 'Inactive' },
@@ -68,11 +70,13 @@ export class DisplayProductListComponent implements OnInit {
       search_text: [''],
       category_oid: [null],
       sub_category_oid: [null],
+      brand_oid: [null],
       status: [null],
     });
 
     this.loadList();
     this.loadCategoryList();
+    this.loadBrandList();
 
     this.filterForm.valueChanges
       .pipe(
@@ -104,6 +108,7 @@ export class DisplayProductListComponent implements OnInit {
         search_text: '',
         category_oid: null,
         sub_category_oid: null,
+        brand_oid: null,
         status: null,
       },
       { emitEvent: false }
@@ -223,6 +228,30 @@ export class DisplayProductListComponent implements OnInit {
               this.subCategoryList = res.body.data;
             } else {
               this.subCategoryList = [];
+            }
+          }
+        },
+        error: (err: any) => {
+          console.log(err);
+        },
+      });
+  }
+
+  loadBrandList(): any {
+    this._httpService
+      .get(APIEndpoint.GET_BRAND_LIST_FOR_DROPDOWN)
+      .pipe(
+        takeUntilDestroyed(this._destroyRef),
+        finalize(() => (this.loading = false))
+      )
+      .subscribe({
+        next: (res: any) => {
+          if (res.status === 200) {
+            this.brandList = [];
+            if (res.body?.data?.length) {
+              this.brandList = res.body.data;
+            } else {
+              this.brandList = [];
             }
           }
         },

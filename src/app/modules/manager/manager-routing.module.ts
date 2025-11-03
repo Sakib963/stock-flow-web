@@ -55,6 +55,37 @@ const routes: Routes = [
             ],
           },
           {
+            path: 'brands',
+            children: [
+              {
+                path: '',
+                redirectTo: 'brand-list',
+                pathMatch: 'full',
+              },
+              {
+                path: 'brand-list',
+                loadComponent: () =>
+                  import(
+                    './pages/configuration/brands/display-brand-list/display-brand-list.component'
+                  ).then((m) => m.DisplayBrandListComponent),
+              },
+              {
+                path: 'create-brand',
+                loadComponent: () =>
+                  import(
+                    './pages/configuration/brands/create-brand/create-brand.component'
+                  ).then((m) => m.CreateBrandComponent),
+              },
+              {
+                path: 'view-brand/:oid',
+                loadComponent: () =>
+                  import(
+                    './pages/configuration/brands/view-brand-details/view-brand-details.component'
+                  ).then((m) => m.ViewBrandDetailsComponent),
+              },
+            ],
+          },
+          {
             path: 'sub-category',
             children: [
               {
