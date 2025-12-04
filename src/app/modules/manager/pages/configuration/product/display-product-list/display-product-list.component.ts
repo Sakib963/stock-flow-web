@@ -15,6 +15,8 @@ import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { debounceTime, distinctUntilChanged, finalize, take } from 'rxjs';
 import { ViewProductListComponent } from '@app/modules/manager/components/configuration/product/view-product-list/view-product-list.component';
 import { PrimaryButtonWithPlusIcon } from '@app/shared/components/buttons/primary-button-with-plus-icon/primary-button-with-plus-icon.component';
+import { NzModalService } from 'ng-zorro-antd/modal';
+import { ConfirmationModalComponent } from '@app/shared/components/confirmation-modal/confirmation-modal.component';
 
 @Component({
   selector: 'app-display-product-list',
@@ -62,7 +64,8 @@ export class DisplayProductListComponent implements OnInit {
     private _notificationService: NzNotificationService,
     private _router: Router,
     private _activatedRoute: ActivatedRoute,
-    private _fb: FormBuilder
+    private _fb: FormBuilder,
+    private _modalService: NzModalService
   ) {}
 
   ngOnInit(): void {
@@ -166,6 +169,8 @@ export class DisplayProductListComponent implements OnInit {
       this.handleView(event.value.oid);
     } else if (event.action === 'edit') {
       this.handleEdit(event.value.oid);
+    } else if (event.action === 'delete') {
+      this.showConfirmationModal(event.value.oid);
     }
   }
 
@@ -186,6 +191,41 @@ export class DisplayProductListComponent implements OnInit {
     this._router.navigate([`../view-product/${value}`], {
       relativeTo: this._activatedRoute,
       state: { edit: true },
+    });
+  }
+
+  handleDelete(value: any): any {
+    this.loading = true;
+    this._httpService
+      .get(APIEndpoint.DELETE_PRODUCT, { oid: value })
+      .pipe(
+        takeUntilDestroyed(this._destroyRef),
+        finalize(() => (this.loading = false))
+      )
+      .subscribe({
+        next: (res: any) => {
+          if (res.status === 200) {
+            this._notificationService.success('Success!', 'Product deleted successfully.');
+            this.loadList();
+          }
+        },
+        error: (err: any) => {
+          console.log(err);
+          this._notificationService.error('Error!', err?.error?.message);
+        },
+      });
+  }
+
+  showConfirmationModal(value: any): any {
+    this._modalService.create({
+      nzContent: ConfirmationModalComponent,
+      nzData: {
+        message: 'Are you sure you want to delete this product? This action cannot be undone.',
+      },
+      nzFooter: null,
+      nzClosable: false,
+      nzOnOk: () =>
+        this.handleDelete(value)
     });
   }
 

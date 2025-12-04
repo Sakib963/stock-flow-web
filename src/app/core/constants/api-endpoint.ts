@@ -38,7 +38,7 @@ export class APIEndpoint {
   static UPDATE_PRODUCT_DETAILS = "/api/v1/manager/product/update-product-details";
   static GET_PRODUCT_DETAILS = "/api/v1/manager/product/get-product-details";
   static GET_PRODUCT_LIST_FOR_DROPDOWN = "/api/v1/manager/product/get-product-list-for-dropdown";
-
+  static DELETE_PRODUCT = "/api/v1/manager/product/delete-product";
   
   static GET_WAREHOUSE_LIST = "/api/v1/manager/warehouse/get-warehouse-list";
   static CREATE_WAREHOUSE = "/api/v1/manager/warehouse/create-warehouse";
