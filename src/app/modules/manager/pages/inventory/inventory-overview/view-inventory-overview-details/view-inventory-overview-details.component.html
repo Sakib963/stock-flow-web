@@ -13,7 +13,7 @@
             <ul *ngIf="batch_data.length" class="divide-y divide-gray-100 space-y-4">
                   <ng-container *ngFor="let item of batch_data">
                         <nz-ribbon [nzText]="getStatusText(item.status)" [nzColor]="getRibbonColor(item)">
-                              <li class="grid md:grid-cols-3 gap-x-6 py-5 shadow-sm border p-4 rounded-md">
+                              <li class="grid md:grid-cols-4 gap-x-6 py-5 shadow-sm border p-4 rounded-md">
                                     <div class="flex min-w-0 gap-x-4">
                                           <div class="min-w-0 flex-auto">
                                                 <div class="text-sm/6 text-[#180B26] font-semibold flex gap-2">
@@ -60,7 +60,19 @@
                                                       }}</span>
                                           </p>
                                     </div>
-                                    <div class="flex justify-between items-center">
+                                    <div>
+                                          <p class="mt-1 truncate text-xs/5 text-gray-500 font-semibold">
+                                                Total Stock Cost: <span class="font-normal text-[#180B26]">&#2547;{{
+                                                      item?.total_stock_cost }}</span></p>
+                                          <p class="mt-1 truncate text-xs/5 text-gray-500 font-semibold">
+                                                Expected Revenue: <span class="font-normal text-[#180B26]">&#2547;{{
+                                                      item?.expected_revenue }}</span></p>
+                                          <p class="mt-1 truncate text-xs/5 text-gray-500 font-semibold">
+                                                Potential Profit: <span class="font-normal text-[#180B26]">&#2547;{{
+                                                      item?.potential_profit }}</span></p>
+
+                                    </div>
+                                    <div class="flex justify-between items-start">
                                           <div>
                                                 <p class="mt-1 truncate text-xs/5 text-gray-500 font-semibold">
                                                       Supplier: <span class="font-normal">{{
@@ -74,19 +86,28 @@
                                                             }}</span>
                                                 </p>
                                           </div>
-                                          <div class="flex justify-end">
-                                                <span nz-dropdown [nzDropdownMenu]="menu" class="hover:cursor-pointer">
-                                                      Actions
-                                                      <span nzType="down" nz-icon></span>
-                                                </span>
-                                                <nz-dropdown-menu #menu="nzDropdownMenu">
-                                                      <ul nz-menu>
-                                                            <li [nzDisabled]="getPricingStatus(item)" nz-menu-item
-                                                                  (click)="!getPricingStatus(item) && displayUpdatePricingModal(item)">Pricing</li>
-                                                            <li nz-menu-item (click)="generateBarcode(item)">Generate
-                                                                  Barcode</li>
-                                                      </ul>
-                                                </nz-dropdown-menu>
+                                          <div class="flex justify-end items-center h-full">
+                                                <div class="shrink-0 sm:flex sm:flex-col sm:items-center">
+                                                      <div
+                                                            class="mt-1 text-xs/5 text-black flex justify-center items-center gap-4 h-full">
+                                                            <span nz-dropdown [nzDropdownMenu]="menu"
+                                                                  class="hover:cursor-pointer">
+                                                                  Actions
+                                                                  <span nzType="down" nz-icon></span>
+                                                            </span>
+                                                            <nz-dropdown-menu #menu="nzDropdownMenu">
+                                                                  <ul nz-menu>
+                                                                        <li [nzDisabled]="getPricingStatus(item)"
+                                                                              nz-menu-item
+                                                                              (click)="!getPricingStatus(item) && displayUpdatePricingModal(item)">
+                                                                              Pricing</li>
+                                                                        <li nz-menu-item
+                                                                              (click)="generateBarcode(item)">Generate
+                                                                              Barcode</li>
+                                                                  </ul>
+                                                            </nz-dropdown-menu>
+                                                      </div>
+                                                </div>
                                           </div>
                                     </div>
                               </li>
