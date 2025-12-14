@@ -32,6 +32,7 @@ export class Menu {
     },
     {
       group: 'Configuration',
+      icon: 'assets/icons/configuration-group.svg',
       items: [
         {
           icon: 'assets/icons/category.svg',
@@ -72,6 +73,7 @@ export class Menu {
     },
     {
       group: 'Inventory',
+      icon: 'assets/icons/inventory-group.svg',
       items: [
         {
           icon: 'assets/icons/inventory.svg',
@@ -125,6 +127,7 @@ export class Menu {
   static salesPages: MenuItem[] = [
     {
       group: 'Sales',
+      icon: 'assets/icons/sales-group.svg',
       items: [
         {
           icon: 'assets/icons/purchase.svg',

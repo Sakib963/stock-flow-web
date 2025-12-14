@@ -1,5 +1,6 @@
 export interface MenuItem {
   group?: string;
+  icon?: string;
   separator?: boolean;
   selected?: boolean;
   active?: boolean;
