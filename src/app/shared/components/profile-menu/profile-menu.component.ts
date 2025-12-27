@@ -1,4 +1,4 @@
-import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, inject, OnInit, Output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '@app/modules/auth/services/auth.service';
 import { NgZorroCustomModule } from '@app/shared/ng-zorro-custom.module';
@@ -7,17 +7,20 @@ import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { FormsModule } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
 import { Router } from '@angular/router';
+import { UserNotesComponent } from '../user-notes/user-notes.component';
+import { NoteService } from '@app/core/services/note.service';
 
 @Component({
-    selector: 'app-profile-menu',
-    imports: [
-        CommonModule,
-        NgZorroCustomModule,
-        AngularSvgIconModule,
-        FormsModule,
-    ],
-    templateUrl: './profile-menu.component.html',
-    styleUrls: ['./profile-menu.component.scss']
+  selector: 'app-profile-menu',
+  imports: [
+    CommonModule,
+    NgZorroCustomModule,
+    AngularSvgIconModule,
+    FormsModule,
+    UserNotesComponent
+  ],
+  templateUrl: './profile-menu.component.html',
+  styleUrls: ['./profile-menu.component.scss'],
 })
 export class ProfileMenuComponent implements OnInit {
   @Output() readonly actionEmitter: EventEmitter<object> = new EventEmitter();
@@ -26,6 +29,9 @@ export class ProfileMenuComponent implements OnInit {
   isDropdownOpen: boolean = false;
 
   selectedLang = 'en';
+
+  isNoteOpen = signal(false);
+  noteService = inject(NoteService);
 
   constructor(
     private _authService: AuthService,
@@ -89,14 +95,23 @@ export class ProfileMenuComponent implements OnInit {
       'Sorry! This feature is not available right now!'
     );
   }
-  
-    updateProfile(): void {
-      this.toggleDropdown();
-      this._router.navigate(['../profile/update-profile']);
-    }
-    
-    changePassword(): void {
-      this.toggleDropdown();
-      this._router.navigate(['../profile/change-password']);
-    }
+
+  updateProfile(): void {
+    this.toggleDropdown();
+    this._router.navigate(['../profile/update-profile']);
+  }
+
+  changePassword(): void {
+    this.toggleDropdown();
+    this._router.navigate(['../profile/change-password']);
+  }
+
+  // Open/Close note drawer
+  openNoteDrawer(): void {
+    this.isNoteOpen.set(true);
+  }
+
+  closeNoteDrawer(): void {
+    this.isNoteOpen.set(false);
+  }
 }

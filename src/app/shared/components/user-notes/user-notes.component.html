@@ -1,0 +1,104 @@
+<nz-drawer nzTitle="My Notes" [nzClosable]="true" [nzExtra]="drawerExtra" [nzHeight]="drawerHeight()"
+      [nzPlacement]="drawerPlacement()" [nzVisible]="isOpen()" [nzWidth]="drawerWidth()" (nzOnClose)="closeDrawer()">
+      <ng-template #drawerExtra>
+            @if (!showNoteForm()) {
+            <button nz-button size="small" nzType="primary" (click)="showNewNoteForm()">
+                  <span nz-icon nzTheme="outline" nzType="plus"></span>
+                  New Note
+            </button>
+            }
+      </ng-template>
+      <ng-container *nzDrawerContent>
+            <div class="flex flex-col h-full">
+                  <!-- Note Form (conditionally shown) -->
+                  @if (showNoteForm()) {
+                  <div class="p-4 bg-white border rounded-md shadow-sm">
+                        <h3 class="text-lg font-semibold mb-3">{{ isEditMode() ? 'Edit Note' : 'Create New Note' }}</h3>
+                        <div class="space-y-3">
+                              <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Title</label>
+                                    <input class="w-full" nz-input placeholder="Enter note title" [value]="noteTitle()"
+                                          [(ngModel)]="noteTitle" (ngModelChange)="noteTitle.set($event)" />
+                              </div>
+                              <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Content</label>
+                                    <textarea class="w-full" nz-input placeholder="Enter note content" rows="4"
+                                          [value]="noteContent()" [(ngModel)]="noteContent"
+                                          (ngModelChange)="noteContent.set($event)"></textarea>
+                              </div>
+                              <div class="flex gap-2">
+                                    <button nz-button size="small" nzType="primary" [nzLoading]="isSubmitting()"
+                                          (click)="saveNote()">
+                                          <span nz-icon nzTheme="outline" nzType="save"></span>
+                                          {{ isEditMode() ? 'Update' : 'Save' }}
+                                    </button>
+                                    <button nz-button size="small" nzType="default" (click)="cancelEdit()">
+                                          <span nz-icon nzTheme="outline" nzType="close"></span>
+                                          Cancel
+                                    </button>
+                              </div>
+                        </div>
+                  </div>
+                  <nz-divider></nz-divider>
+                  }
+
+                  <!-- Notes List -->
+                  <div class="flex-1 overflow-y-auto">
+                        @if (noteService.isLoading()) {
+                        <div class="flex justify-center items-center py-8">
+                              <nz-spin nzSimple></nz-spin>
+                        </div>
+                        } @else if (noteService.notes().length === 0) {
+                        <div class="flex flex-col items-center justify-center px-6 py-14">
+                              <!-- Icon Badge -->
+                              <div class="relative mb-8">
+                                    <!-- Neutral badge -->
+                                    <div
+                                          class="relative flex items-center justify-center w-20 h-20 rounded-xl bg-[#D4DCFF] shadow-md">
+                                          <nz-icon class="text-3xl text-[#000807]" nzType="file-text"
+                                                nzTheme="outline" />
+                                    </div>
+                              </div>
+
+                              <!-- Text -->
+                              <div class="text-center mb-8 max-w-sm">
+                                    <h3 class="text-lg font-semibold text-gray-900 mb-2">No notes yet</h3>
+                                    <p class="text-sm text-gray-500 leading-relaxed">Capture ideas, todos, or reminders.
+                                          Create your first note and keep everything in one place.</p>
+                              </div>
+
+                              <!-- CTA -->
+                              @if (!showNoteForm()) {
+                              <button class="shadow-md" nz-button size="large" nzType="primary"
+                                    (click)="showNewNoteForm()">
+                                    <span nz-icon nzTheme="outline" nzType="plus"></span>
+                                    Create Note
+                              </button>
+                              }
+                        </div>
+                        } @else {
+                        <div class="space-y-2">
+                              @for (note of noteService.notes(); track note.oid) {
+                              <div class="p-3 bg-white border rounded-md shadow-sm hover:shadow-md transition-shadow cursor-pointer"
+                                    [class.border-primary]="selectedNoteOid() === note.oid" (click)="viewNote(note)">
+                                    <div class="flex justify-between items-start">
+                                          <div class="flex-1 min-w-0">
+                                                <h4 class="font-semibold text-gray-800 truncate">{{ note.title }}</h4>
+                                                <p class="text-sm text-gray-600 line-clamp-2 mt-1">{{ note.content ||
+                                                      'No content' }}</p>
+                                                <span class="text-xs text-gray-400 mt-2 block">{{ note.created_on |
+                                                      date: 'MMM d, y h:mm a' }}</span>
+                                          </div>
+                                          <button class="ml-2" nz-button nzDanger size="small"
+                                                (click)="deleteNote(note.oid, $event)">
+                                                <span nz-icon nzTheme="outline" nzType="delete"></span>
+                                          </button>
+                                    </div>
+                              </div>
+                              }
+                        </div>
+                        }
+                  </div>
+            </div>
+      </ng-container>
+</nz-drawer>

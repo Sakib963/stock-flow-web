@@ -1,5 +1,15 @@
 <div class="relative pr-2">
       <div class="relative flex items-center gap-6 text-sm">
+            <!-- Note Button -->
+            <div class="relative group">
+                  <button class="relative" type="button" aria-haspopup="true" [attr.aria-expanded]="isNoteOpen()"
+                        (click)="openNoteDrawer()">
+                        <nz-icon class="text-lg text-gray-600" nzType="file-text" nzTheme="outline" />
+                        <nz-badge class="absolute top-1 right-0" nzSize="small" [nzCount]="noteService.notes().length">
+                              <a></a>
+                        </nz-badge>
+                  </button>
+            </div>
             <!-- Language Radio Group -->
             <!-- <nz-radio-group [(ngModel)]="selectedLang" (ngModelChange)="switchLang($event)" nzSize="small" class="w-24"
                   nzButtonStyle="solid">
@@ -7,7 +17,7 @@
                   <label nz-radio-button nzValue="bn" class="w-1/2 text-center">bn</label>
             </nz-radio-group> -->
             <!-- Notification Button -->
-            <button class="relative" type="button" (click)="handleNotificationClick()">
+            <!-- <button class="relative" type="button" (click)="handleNotificationClick()">
                   <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" stroke-width="2"
                         viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round"
@@ -16,7 +26,7 @@
                   <span *ngIf="notifications.length"
                         class="absolute -top-2 -right-2 bg-red-500 text-white text-xs px-1.5 py-0.5 rounded-full">{{
                         notifications.length }}</span>
-            </button>
+            </button> -->
             <!-- Profile Button -->
             <button (click)="toggleDropdown()" type="button">
                   <img *ngIf="userInfo.photo" [src]="userInfo.photo" alt="User Avatar"
@@ -104,4 +114,7 @@
       <ng-template #profileDropdownHeader>
             <h2 class="text-2xl font-medium animate-text">Profile</h2>
       </ng-template>
+
+      <!-- User Notes Component -->
+      <user-notes [isOpen]="isNoteOpen()" (onClose)="closeNoteDrawer()"></user-notes>
 </div>

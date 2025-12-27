@@ -47,6 +47,7 @@ import { NzAutocompleteModule } from 'ng-zorro-antd/auto-complete';
 import { NzStepsModule } from 'ng-zorro-antd/steps';
 import { NzProgressModule } from 'ng-zorro-antd/progress';
 import { NzListModule } from 'ng-zorro-antd/list';
+import { NzSpinModule } from 'ng-zorro-antd/spin';
 
 const NG_ZORRO_MODULES = [
   NzGridModule,
@@ -96,7 +97,8 @@ const NG_ZORRO_MODULES = [
   NzStepsModule,
   NzProgressModule,
   NzInputModule,
-  NzListModule
+  NzListModule,
+  NzSpinModule
 ];
 
 @NgModule({

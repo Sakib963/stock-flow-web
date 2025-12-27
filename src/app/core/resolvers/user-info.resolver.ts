@@ -7,11 +7,13 @@ import {
 import { Observable, catchError, finalize, tap, throwError } from 'rxjs';
 import { AuthService } from 'src/app/modules/auth/services/auth.service';
 import { ROLES } from '../constants/constants';
+import { NoteService } from '../services/note.service';
 
 export const UserInfoResolver: ResolveFn<any> = (
   route: ActivatedRouteSnapshot,
   state: RouterStateSnapshot,
-  authService: AuthService = inject(AuthService)
+  authService: AuthService = inject(AuthService),
+  _noteService = inject(NoteService)
 ): Observable<any> =>
   authService.getUserInfo().pipe(
     tap((res: any) => {
@@ -26,6 +28,8 @@ export const UserInfoResolver: ResolveFn<any> = (
       if (res.data.role === ROLES.GUEST) {
         authService.setGuestUser(true);
       }
+      // Load user notes after successful login
+      _noteService.loadNotes();
     }),
     finalize(() => {
       authService.loading.set(false);

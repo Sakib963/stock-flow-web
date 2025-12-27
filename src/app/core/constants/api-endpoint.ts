@@ -105,4 +105,11 @@ export class APIEndpoint {
   static GET_CURRENT_STOCK_REPORT = "/api/v1/manager/reports/get-current-stock-report";
   static GET_LOW_STOCK_REPORT = "/api/v1/manager/reports/get-low-stock-report";
   static GET_PRODUCT_WISE_STOCK_REPORT = "/api/v1/manager/reports/get-product-wise-stock-report";
+
+  static GET_USER_NOTES = '/api/v1/profile/notes/get-note-list';
+  static GET_NOTE_BY_ID = '/api/v1/profile/notes/get-note-details';
+  static CREATE_NOTE = '/api/v1/profile/notes/create-note';
+  static UPDATE_NOTE = '/api/v1/profile/notes/update-note';
+  static DELETE_NOTE = '/api/v1/profile/notes/delete-note';
+
 }
