@@ -3,7 +3,11 @@
       <app-loader *ngIf="loading" [isVisible]="loading"></app-loader>
       <div *ngIf="!editMode && purchaseDetails" class="space-y-4">
             <div class="border-[0.5px] p-4 rounded-md">
-                  <h2 class="text-xl font-medium">Purchase Details</h2>
+                  <div class="flex justify-between items-center">
+                        <h2 class="text-xl font-medium">Purchase Details</h2>
+                        <primary-button [label]="'Generate Report'" [type]="'button'" [loading]="reportLoading"
+                              [prefixIcon]="'file-pdf'" (click)="generatePurchaseReport()"></primary-button>
+                  </div>
                   <nz-divider class="my-4"></nz-divider>
                   <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
                         <!-- supplier_oid -->
@@ -82,10 +86,12 @@
                                                 *ngIf="purchaseDetails.status === 'Verified' && product.intended_use === 'for_sale'">
                                                 <nz-divider></nz-divider>
                                                 <p class="text-sm font-light text-secondary">Selling Price:
-                                                      <span class="font-semibold">&#2547;{{ product?.selling_price }}</span>
+                                                      <span class="font-semibold">&#2547;{{ product?.selling_price
+                                                            }}</span>
                                                 </p>
                                                 <p class="text-sm font-light text-secondary">Maximum Discount Amount:
-                                                      <span class="font-semibold">&#2547;{{ product?.maximum_discount }}</span>
+                                                      <span class="font-semibold">&#2547;{{ product?.maximum_discount
+                                                            }}</span>
                                                 </p>
                                           </div>
                                     </div>

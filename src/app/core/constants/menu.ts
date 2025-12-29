@@ -4,12 +4,18 @@ export class Menu {
   static adminPages: MenuItem[] = [
     {
       group: 'Admin',
+      icon: 'assets/icons/dashboard.svg',
       items: [
         {
           icon: 'assets/icons/dashboard.svg',
           label: 'Dashboard',
           route: '/admin/dashboard',
         },
+      ],
+    },
+    {
+      group: 'User Management',
+      items: [
         {
           icon: 'assets/icons/user.svg',
           label: 'User',
@@ -127,23 +133,27 @@ export class Menu {
   static salesPages: MenuItem[] = [
     {
       group: 'Sales',
-      icon: 'assets/icons/sales-group.svg',
       items: [
         {
           icon: 'assets/icons/purchase.svg',
           label: 'Quick Sale',
           route: '/sales/quick-sale',
         },
+      ],
+    },
+    {
+      group: 'Invoice',
+      items: [
         {
           icon: 'assets/icons/invoice.svg',
           label: 'Invoice',
           route: '/sales/invoice',
         },
-        // {
-        //   icon: 'assets/icons/dashboard.svg',
-        //   label: 'Dashboard',
-        //   route: '/sales/dashboard',
-        // },
+      ],
+    },
+    {
+      group: 'Product Return',
+      items: [
         {
           icon: 'assets/icons/product-return.svg',
           label: 'Product Return',

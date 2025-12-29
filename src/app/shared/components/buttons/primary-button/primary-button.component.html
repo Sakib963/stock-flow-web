@@ -6,8 +6,14 @@
       <span *ngIf="loading">
             <app-spinner></app-spinner>
       </span>
-      <span *ngIf="!loading"
-            class="relative z-10 whitespace-nowrap text-black transition-all duration-300 group-hover:text-white">
-            {{label}}
+      <span *ngIf="!loading" class="relative z-10 flex items-center gap-2">
+            <span *ngIf="prefixIcon" nz-icon [nzType]="prefixIcon" 
+               class="text-black transition-all duration-300 group-hover:text-white"></span>
+            <span *ngIf="!iconOnly"
+                  class="whitespace-nowrap text-black transition-all duration-300 group-hover:text-white">
+                  {{label}}
+            </span>
+            <span *ngIf="suffixIcon" nz-icon [nzType]="suffixIcon" 
+               class="text-black transition-all duration-300 group-hover:text-white"></span>
       </span>
 </button>

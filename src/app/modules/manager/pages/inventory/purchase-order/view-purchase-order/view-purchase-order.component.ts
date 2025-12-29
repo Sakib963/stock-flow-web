@@ -17,26 +17,29 @@ import { AuthService } from '@app/modules/auth/services/auth.service';
 import { OrderVerificationFormComponent } from '@app/modules/manager/components/inventory/purchase-order/order-verification-form/order-verification-form.component';
 import { NzModalService } from 'ng-zorro-antd/modal';
 import { ConfirmationModalComponent } from '@app/shared/components/confirmation-modal/confirmation-modal.component';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
-    selector: 'app-view-purchase-order',
-    imports: [
-        CommonModule,
-        LoaderComponent,
-        PurchaseOrderFormComponent,
-        SecondaryButton,
-        NgZorroCustomModule,
-        PrimaryButton,
-        DangerButton,
-        OrderVerificationFormComponent,
-    ],
-    templateUrl: './view-purchase-order.component.html',
-    styleUrls: ['./view-purchase-order.component.scss']
+  selector: 'app-view-purchase-order',
+  imports: [
+    CommonModule,
+    LoaderComponent,
+    PurchaseOrderFormComponent,
+    SecondaryButton,
+    NgZorroCustomModule,
+    PrimaryButton,
+    DangerButton,
+    OrderVerificationFormComponent,
+  ],
+  templateUrl: './view-purchase-order.component.html',
+  styleUrls: ['./view-purchase-order.component.scss'],
 })
 export class ViewPurchaseOrderComponent implements OnInit {
   @Input() oid: any;
   editMode: boolean = false;
   loading: boolean = false;
+
+  reportLoading: boolean = false;
 
   purchaseDetails: any;
   products: any[] = [];
@@ -55,7 +58,8 @@ export class ViewPurchaseOrderComponent implements OnInit {
     private _router: Router,
     private _location: Location,
     private _authService: AuthService,
-    private _modal: NzModalService
+    private _modal: NzModalService,
+    private _translateService: TranslateService
   ) {
     const state$ = this._activatedRoute.paramMap.pipe(
       map(() => window.history.state)
@@ -237,5 +241,64 @@ export class ViewPurchaseOrderComponent implements OnInit {
     if (status === 'Verified') return 'font-semibold text-green-600';
     if (status === 'Cancelled') return 'font-semibold text-red-600';
     return 'font-semibold';
+  }
+
+  generatePurchaseReport(): void {
+    this.reportLoading = true;
+
+    this._httpService
+      .downloadFile(APIEndpoint.GET_PURCHASE_ORDER_REPORT, { oid: this.oid })
+      .pipe(
+        takeUntilDestroyed(this._destroyRef),
+        finalize(() => (this.reportLoading = false))
+      )
+      .subscribe({
+        next: (res: any) => {
+          const blob: Blob = res.body;
+          if (!blob) {
+            this._notificationService.info(
+              this._translateService.instant('common.notification.title.info'),
+              this._translateService.instant(
+                'common.notification.no_data_found'
+              )
+            );
+            return;
+          }
+
+          const now = new Date();
+          const pad = (n: number) => n.toString().padStart(2, '0');
+          const timestamp = `${pad(now.getDate())}${pad(
+            now.getMonth() + 1
+          )}${now.getFullYear()}${pad(now.getHours())}${pad(now.getMinutes())}`;
+
+          const fileName = `purchase_order_${timestamp}.xlsx`;
+
+          const url = window.URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = fileName;
+          a.click();
+          window.URL.revokeObjectURL(url);
+        },
+        error: (err: any) => {
+          if (err.status === 404) {
+            this._notificationService.warning(
+              this._translateService.instant(
+                'common.notification.title.warning'
+              ),
+              this._translateService.instant(
+                'common.notification.no_content_found_for_report'
+              )
+            );
+            return;
+          }
+          this._notificationService.error(
+            this._translateService.instant('common.notification.title.error'),
+            this._translateService.instant(
+              'common.notification.something_went_wrong'
+            )
+          );
+        },
+      });
   }
 }
