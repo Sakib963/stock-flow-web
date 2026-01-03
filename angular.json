@@ -19,7 +19,7 @@
         "build": {
           "builder": "@angular/build:application",
           "options": {
-           "outputPath": "dist/stock-flow-web",
+            "outputPath": "dist/stock-flow-web",
             "baseHref": "/stock-flow-web/",
             "index": "src/index.html",
             "polyfills": ["zone.js"],
@@ -35,7 +35,7 @@
               }
             ],
             "styles": [
-              "./node_modules/ng-zorro-antd/ng-zorro-antd.min.css",
+              "src/theme.less",
               "src/styles.scss"
             ],
             "scripts": [],
@@ -98,7 +98,7 @@
             "inlineStyleLanguage": "scss",
             "assets": ["src/favicon.ico", "src/assets"],
             "styles": [
-              "./node_modules/ng-zorro-antd/ng-zorro-antd.min.css",
+              "src/theme.less",
               "src/styles.scss"
             ],
             "scripts": []
@@ -127,9 +127,6 @@
       "typeSeparator": "."
     },
     "@schematics/angular:interceptor": {
-      "typeSeparator": "."
-    },
-    "@schematics/angular:module": {
       "typeSeparator": "."
     },
     "@schematics/angular:pipe": {

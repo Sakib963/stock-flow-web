@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+      <meta charset="UTF-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <title>Stockflow – Order & Sales Core Refactor Plan</title>
+      <style>
+            body {
+                  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+                  margin: 0;
+                  background: #0f172a;
+                  color: #e5e7eb;
+                  line-height: 1.6;
+            }
+
+            header {
+                  background: linear-gradient(135deg, #2563eb, #1e40af);
+                  padding: 48px 32px;
+            }
+
+            header h1 {
+                  margin: 0 0 8px 0;
+                  font-size: 2.4rem;
+            }
+
+            header p {
+                  margin: 0;
+                  max-width: 720px;
+                  font-size: 1.05rem;
+                  color: #dbeafe;
+            }
+
+            section {
+                  padding: 40px 32px;
+                  max-width: 1100px;
+                  margin: auto;
+            }
+
+            h2 {
+                  font-size: 1.8rem;
+                  margin-bottom: 16px;
+                  color: #93c5fd;
+            }
+
+            h3 {
+                  font-size: 1.2rem;
+                  margin-top: 32px;
+                  color: #bfdbfe;
+            }
+
+            .card {
+                  background: #020617;
+                  border: 1px solid #1e293b;
+                  border-radius: 14px;
+                  padding: 24px;
+                  margin: 20px 0;
+            }
+
+            .grid {
+                  display: grid;
+                  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+                  gap: 20px;
+            }
+
+            .tag {
+                  display: inline-block;
+                  padding: 4px 10px;
+                  border-radius: 999px;
+                  font-size: 0.8rem;
+                  background: #1e3a8a;
+                  color: #dbeafe;
+                  margin-bottom: 8px;
+            }
+
+            ul {
+                  padding-left: 20px;
+            }
+
+            li {
+                  margin: 6px 0;
+            }
+
+            .flow {
+                  display: flex;
+                  flex-wrap: wrap;
+                  gap: 12px;
+                  margin-top: 12px;
+            }
+
+            .step {
+                  background: #020617;
+                  border: 1px solid #334155;
+                  padding: 14px 18px;
+                  border-radius: 10px;
+                  font-size: 0.9rem;
+            }
+
+            footer {
+                  padding: 40px 32px;
+                  background: #020617;
+                  border-top: 1px solid #1e293b;
+                  text-align: center;
+                  font-size: 0.9rem;
+                  color: #94a3b8;
+            }
+      </style>
+</head>
+
+<body>
+
+      <header>
+            <h1>Stockflow – Order & Sales Core Refactor</h1>
+            <p>
+                  A frozen, execution-ready plan to refactor the core Order + Sales workflow.
+                  This document is visual-first, scope-controlled, and designed to be followed without debate.
+            </p>
+      </header>
+
+      <section>
+            <h2>1. Why This Refactor Exists</h2>
+            <div class="card">
+                  <ul>
+                        <li>Sales logic was previously tied to roles (salesman vs owner).</li>
+                        <li>This breaks when building a product for multiple business types.</li>
+                        <li>We are resetting the core so Stockflow can support offline + online + hybrid businesses.
+                        </li>
+                  </ul>
+                  <p><strong>Decision:</strong> Sales become role-neutral facts. Orders become first-class intent.</p>
+            </div>
+      </section>
+
+      <section>
+            <h2>2. Core Mental Model (Locked)</h2>
+            <div class="grid">
+                  <div class="card"><span class="tag">Intent</span>
+                        <h3>Orders</h3>
+                        <p>Conversational, editable, operational. Used for packaging, courier, and tracking.</p>
+                  </div>
+                  <div class="card"><span class="tag">Fact</span>
+                        <h3>Sales</h3>
+                        <p>Final invoice. Created only when delivery succeeds.</p>
+                  </div>
+                  <div class="card"><span class="tag">Events</span>
+                        <h3>Payments</h3>
+                        <p>Multiple entries. Partial, advance, COD — all allowed.</p>
+                  </div>
+            </div>
+      </section>
+
+      <section>
+            <h2>3. Identifiers (No Confusion Rule)</h2>
+            <div class="card">
+                  <ul>
+                        <li><strong>Order No</strong> → Operational reference (packaging, courier, calls)</li>
+                        <li><strong>Invoice No</strong> → Accounting reference (sales only)</li>
+                        <li>Once a sale exists, the UI and print must show <strong>both</strong>.</li>
+                  </ul>
+                  <div class="flow">
+                        <div class="step">ORD-260103-001</div>
+                        <div class="step">→</div>
+                        <div class="step">INV-2601030001</div>
+                  </div>
+            </div>
+      </section>
+
+      <section>
+            <h2>4. Order Lifecycle & Delivery States</h2>
+            <div class="card">
+                  <div class="flow">
+                        <div class="step">Draft</div>
+                        <div class="step">Placed</div>
+                        <div class="step">Packaging</div>
+                        <div class="step">Out For Delivery</div>
+                        <div class="step">Delivered</div>
+                        <div class="step">Returned</div>
+                        <div class="step">Cancelled</div>
+                  </div>
+                  <p>All transitions are manual now. Automation can be layered later.</p>
+            </div>
+      </section>
+
+      <section>
+            <h2>5. Real Operator Flow (20 Facebook Orders)</h2>
+            <div class="card">
+                  <ol>
+                        <li>Orders arrive in Facebook messages.</li>
+                        <li>Each confirmed customer → Create Order in Stockflow.</li>
+                        <li>Status → Placed (inventory reserved).</li>
+                        <li>Status → Packaging → Print Order Invoice.</li>
+                        <li>Status → OutForDelivery (hand to courier).</li>
+                        <li>Courier feedback:
+                              <ul>
+                                    <li>Delivered → Serve Order → Sale created.</li>
+                                    <li>Failed → Returned → Inventory released.</li>
+                              </ul>
+                        </li>
+                  </ol>
+            </div>
+      </section>
+
+      <section>
+            <h2>6. Serve Order = Atomic Operation</h2>
+            <div class="card">
+                  <ul>
+                        <li>Create Sale</li>
+                        <li>Generate Invoice No</li>
+                        <li>Create sales_details</li>
+                        <li>Copy payments + add COD if needed</li>
+                        <li>Deduct inventory</li>
+                        <li>Link order → sale</li>
+                  </ul>
+            </div>
+      </section>
+
+      <section>
+            <h2>7. What We Explicitly Do NOT Build</h2>
+            <div class="card">
+                  <ul>
+                        <li>Courier API automation</li>
+                        <li>Settlement & profit accounting</li>
+                        <li>WooCommerce sync</li>
+                        <li>Role & permission system</li>
+                        <li>Multi-tenant platform logic</li>
+                  </ul>
+                  <p>These are future layers. Not part of this refactor.</p>
+            </div>
+      </section>
+
+      <section>
+            <h2>8. Execution Plan (7 Days)</h2>
+            <div class="grid">
+                  <div class="card">
+                        <h3>Day 1</h3>
+                        <p>Schema changes, migrations, base models</p>
+                  </div>
+                  <div class="card">
+                        <h3>Day 2</h3>
+                        <p>Order creation, pricing snapshot</p>
+                  </div>
+                  <div class="card">
+                        <h3>Day 3</h3>
+                        <p>Inventory reservation & status flow</p>
+                  </div>
+                  <div class="card">
+                        <h3>Day 4</h3>
+                        <p>Order payments + trxID</p>
+                  </div>
+                  <div class="card">
+                        <h3>Day 5</h3>
+                        <p>Serve Order → Sale logic</p>
+                  </div>
+                  <div class="card">
+                        <h3>Day 6</h3>
+                        <p>Invoice printing + UI polish</p>
+                  </div>
+                  <div class="card">
+                        <h3>Day 7</h3>
+                        <p>Testing, fixes, demo data</p>
+                  </div>
+            </div>
+      </section>
+
+      <section>
+            <h2>9. Definition of DONE</h2>
+            <div class="card">
+                  <ul>
+                        <li>Orders can be taken from Facebook chats</li>
+                        <li>Packaging + order invoice works</li>
+                        <li>Courier delivery finalizes sale</li>
+                        <li>No role-based logic in sales</li>
+                        <li>Flow explainable to owner in 2 minutes</li>
+                  </ul>
+            </div>
+      </section>
+
+      <footer>
+            <p>
+                  This document is the execution contract.
+                  If a task is not listed here, it is out of scope.
+            </p>
+      </footer>
+
+</body>
+
+</html>

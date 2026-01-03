@@ -2,6 +2,30 @@
 @tailwind components;
 @tailwind utilities;
 
+// Custom CSS Variables for ng-zorro theming
+:root {
+  --primary-color: #594ED1;
+  --primary-color-light: #7E75E5;
+  --primary-color-dark: #4639A8;
+  --secondary-color: #180B26;
+}
+
+// Override ng-zorro primary colors with CSS variables
+.ant-btn-primary {
+  background-color: var(--primary-color) !important;
+  border-color: var(--primary-color) !important;
+  
+  &:hover, &:focus {
+    background-color: var(--primary-color-light) !important;
+    border-color: var(--primary-color-light) !important;
+  }
+  
+  &:active {
+    background-color: var(--primary-color-dark) !important;
+    border-color: var(--primary-color-dark) !important;
+  }
+}
+
 .ant-form-vertical .ant-form-item {
   @apply flex-row;
 }

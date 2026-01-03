@@ -48,6 +48,7 @@ import { NzStepsModule } from 'ng-zorro-antd/steps';
 import { NzProgressModule } from 'ng-zorro-antd/progress';
 import { NzListModule } from 'ng-zorro-antd/list';
 import { NzSpinModule } from 'ng-zorro-antd/spin';
+import { NzSpaceModule } from 'ng-zorro-antd/space';
 
 const NG_ZORRO_MODULES = [
   NzGridModule,
@@ -98,7 +99,8 @@ const NG_ZORRO_MODULES = [
   NzProgressModule,
   NzInputModule,
   NzListModule,
-  NzSpinModule
+  NzSpinModule,
+  NzSpaceModule
 ];
 
 @NgModule({

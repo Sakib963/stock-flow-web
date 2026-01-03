@@ -1,9 +1,9 @@
 {
   "name": "stock-flow-web",
-  "version": "0.0.0",
+  "version": "1.0.2",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
+    "start": "ng serve --open",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"

@@ -31,21 +31,30 @@ const routes: Routes = [
         data: { roles: [ROLES.ADMIN] },
       },
       {
-        path: 'manager',
+        path: 'configuration',
         loadChildren: () =>
-          import('../modules/manager/manager.module').then(
-            (m) => m.ManagerModule
+          import('../modules/configuration/configuration.module').then(
+            (m) => m.ConfigurationModule
           ),
         canActivate: [RoleGuard],
-        data: { roles: [ROLES.MANAGER, ROLES.GUEST] },
+        data: { roles: [ROLES.ADMIN, ROLES.MANAGER] },
       },
-      {
-        path: 'sales',
-        loadChildren: () =>
-          import('../modules/sales/sales.module').then((m) => m.SalesModule),
-        canActivate: [RoleGuard],
-        data: { roles: [ROLES.SALESMAN] },
-      },
+      // {
+      //   path: 'manager',
+      //   loadChildren: () =>
+      //     import('../modules/manager/manager.module').then(
+      //       (m) => m.ManagerModule
+      //     ),
+      //   canActivate: [RoleGuard],
+      //   data: { roles: [ROLES.MANAGER, ROLES.GUEST] },
+      // },
+      // {
+      //   path: 'sales',
+      //   loadChildren: () =>
+      //     import('../modules/sales/sales.module').then((m) => m.SalesModule),
+      //   canActivate: [RoleGuard],
+      //   data: { roles: [ROLES.SALESMAN] },
+      // },
       {
         path: 'shared',
         loadChildren: () =>
@@ -56,7 +65,9 @@ const routes: Routes = [
       {
         path: 'profile',
         loadChildren: () =>
-          import('../modules/profile/profile.module').then((m) => m.ProfileModule),
+          import('../modules/profile/profile.module').then(
+            (m) => m.ProfileModule
+          ),
       },
     ],
   },

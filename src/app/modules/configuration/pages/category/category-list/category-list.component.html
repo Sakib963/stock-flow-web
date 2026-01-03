@@ -1,0 +1,28 @@
+<!-- Page Header with breadcrumbs, title, actions, and filters -->
+<page-header [title]="'Category List'"
+      [description]="'Manage product categories to handle operation smoothly. You can add, edit, or delete categories as needed.'"
+      [pageKey]="'configuration.category.list'" [showBackButton]="false" [extraTemplate]="headerActions"
+      [contentTemplate]="headerFilters">
+</page-header>
+
+<!-- Template for header actions (buttons) -->
+<ng-template #headerActions>
+      <nz-space>
+            <button nz-button nzType="primary" nzSize="large"
+                  (click)="handleListActions({ action: 'create', value: null })">
+                  <nz-icon nzType="plus"></nz-icon>
+                  Add Category
+            </button>
+      </nz-space>
+</ng-template>
+
+<!-- Template for header content (filters, search) -->
+<ng-template #headerFilters>
+      <nz-divider class="mt-0 mb-4"></nz-divider>
+      <nz-input-group [nzPrefix]="prefixTemplateSearch" class="w-full md:w-96">
+            <input type="text" nz-input placeholder="Search categories..." [formControl]="searchControl" />
+      </nz-input-group>
+      <ng-template #prefixTemplateSearch>
+            <span nz-icon nzType="search"></span>
+      </ng-template>
+</ng-template>

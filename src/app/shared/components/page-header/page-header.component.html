@@ -1,0 +1,46 @@
+<nz-page-header [nzBackIcon]="backIcon" [nzGhost]="ghost">
+      <!-- Breadcrumb -->
+      @if (breadcrumbs && breadcrumbs.length) {
+      <nz-breadcrumb nz-page-header-breadcrumb>
+            @for (breadcrumb of breadcrumbs; track breadcrumb) {
+            <nz-breadcrumb-item>
+                  @if (breadcrumb.url) {
+                  <a [routerLink]="breadcrumb.url">
+                        <span nz-icon [nzType]="getBreadCrumbIcon(breadcrumb.icon)"></span>
+                        {{ breadcrumb.label }}
+                  </a>
+                  } @else {
+                  <span nz-icon [nzType]="getBreadCrumbIcon(breadcrumb.icon)"></span>
+                  {{ breadcrumb.label }}
+                  }
+            </nz-breadcrumb-item>
+            }
+      </nz-breadcrumb>
+      }
+
+      <!-- Title -->
+      <nz-page-header-title>
+            {{ title }}
+      </nz-page-header-title>
+
+      <!-- Description: Hidden on mobile, shown on desktop -->
+      <nz-page-header-subtitle *ngIf="description" class="hidden md:block">
+            {{ description }}
+      </nz-page-header-subtitle>
+
+      <!-- Extra actions -->
+      <nz-page-header-extra *ngIf="extraTemplate">
+            <ng-container *ngTemplateOutlet="extraTemplate"></ng-container>
+      </nz-page-header-extra>
+
+      <!-- Content area -->
+      <nz-page-header-content *ngIf="contentTemplate || description">
+            <!-- Mobile: Description at top of content area -->
+            <div *ngIf="description" class="md:hidden mb-4 text-sm text-gray-500">
+                  {{ description }}
+            </div>
+            
+            <!-- Template content -->
+            <ng-container *ngIf="contentTemplate" [ngTemplateOutlet]="contentTemplate"></ng-container>
+      </nz-page-header-content>
+</nz-page-header>
