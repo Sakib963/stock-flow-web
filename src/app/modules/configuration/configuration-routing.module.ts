@@ -4,15 +4,22 @@ import { RouterModule, Routes } from '@angular/router';
 const routes: Routes = [
   {
     path: '',
-    redirectTo: 'dashboard',
+    redirectTo: 'stats',
     pathMatch: 'full',
   },
   {
-    path: 'dashboard',
+    path: 'stats',
     loadComponent: () =>
       import(
         './pages/configuration-dashboard/configuration-dashboard.component'
       ).then((m) => m.ConfigurationDashboardComponent),
+  },
+  {
+    path: 'fix-issues',
+    loadComponent: () =>
+      import('./pages/fix-issues/fix-issues.component').then(
+        (m) => m.FixIssuesComponent
+      ),
   },
   {
     path: 'category',

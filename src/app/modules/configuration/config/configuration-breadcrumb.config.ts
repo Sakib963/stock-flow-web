@@ -20,10 +20,21 @@ export const CONFIGURATION_BREADCRUMBS: ModuleBreadcrumbConfig = {
   dashboard: {
     parent: [
       { label: 'Home', url: '/', icon: 'home' },
-      { label: 'Configuration', url: '/configuration/dashboard' }
+      { label: 'Configuration', url: '/configuration/stats' }
     ],
     pages: {
       main: [], // No additional breadcrumb - stays at 2 levels
+    }
+  },
+
+  // Fix Issues Feature
+  'fix-issues': {
+    parent: [
+      { label: 'Home', url: '/', icon: 'home' },
+      { label: 'Configuration', url: '/configuration/stats' }
+    ],
+    pages: {
+      main: [{ label: 'Fix Issues', url: '/configuration/fix-issues' }],
     }
   },
 
@@ -31,7 +42,7 @@ export const CONFIGURATION_BREADCRUMBS: ModuleBreadcrumbConfig = {
   category: {
     parent: [
       { label: 'Home', url: '/', icon: 'home' },
-      { label: 'Configuration', url: '/configuration/dashboard' },
+      { label: 'Configuration', url: '/configuration/stats' },
       { label: 'Category', url: '/configuration/category/list' }
     ],
     pages: {
@@ -46,7 +57,7 @@ export const CONFIGURATION_BREADCRUMBS: ModuleBreadcrumbConfig = {
   aisle: {
     parent: [
       { label: 'Home', url: '/', icon: 'home' },
-      { label: 'Configuration', url: '/configuration/dashboard' },
+      { label: 'Configuration', url: '/configuration/stats' },
       { label: 'Aisle' }
     ],
     pages: {

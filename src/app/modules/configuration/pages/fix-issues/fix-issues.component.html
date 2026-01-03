@@ -1,0 +1,206 @@
+<page-header [breadcrumbs]="breadcrumbs" [title]="'Data Quality Issues'"
+      [description]="'Identify and fix data quality issues across your configuration'">
+</page-header>
+
+<!-- Loading State -->
+@if (loading()) {
+<div class="flex items-center justify-center py-20">
+      <app-loader [isVisible]="true"></app-loader>
+</div>
+}
+
+<!-- Content -->
+@if (!loading()) {
+<div class="space-y-6">
+      <!-- Summary Cards -->
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <nz-card [nzBordered]="true">
+                  <div class="flex items-center justify-between">
+                        <div>
+                              <p class="text-gray-500 text-sm mb-1">Total Issues</p>
+                              <h3 class="text-3xl font-bold text-gray-800">{{ totalIssues() }}</h3>
+                              <p class="text-xs text-gray-400 mt-1">Across all categories</p>
+                        </div>
+                        <div class="w-14 h-14 rounded-full bg-orange-100 flex items-center justify-center">
+                              <span nz-icon nzType="warning" class="text-2xl text-orange-500"></span>
+                        </div>
+                  </div>
+            </nz-card>
+
+            <nz-card [nzBordered]="true">
+                  <div class="flex items-center justify-between">
+                        <div>
+                              <p class="text-gray-500 text-sm mb-1">Critical Issues</p>
+                              <h3 class="text-3xl font-bold text-red-600">{{ criticalIssues() }}</h3>
+                              <p class="text-xs text-gray-400 mt-1">Require immediate attention</p>
+                        </div>
+                        <div class="w-14 h-14 rounded-full bg-red-100 flex items-center justify-center">
+                              <span nz-icon nzType="exclamation-circle" class="text-2xl text-red-500"></span>
+                        </div>
+                  </div>
+            </nz-card>
+
+            <nz-card [nzBordered]="true">
+                  <div class="flex items-center justify-between">
+                        <div>
+                              <p class="text-gray-500 text-sm mb-1">High Priority</p>
+                              <h3 class="text-3xl font-bold text-orange-600">{{ highIssues() }}</h3>
+                              <p class="text-xs text-gray-400 mt-1">Should be addressed soon</p>
+                        </div>
+                        <div class="w-14 h-14 rounded-full bg-orange-100 flex items-center justify-center">
+                              <span nz-icon nzType="alert" class="text-2xl text-orange-500"></span>
+                        </div>
+                  </div>
+            </nz-card>
+      </div>
+
+      <!-- Filter Tabs -->
+      <nz-card [nzBordered]="true">
+            <div class="flex flex-wrap gap-2 mb-4">
+                  <button nz-button [nzType]="selectedCategory() === 'all' ? 'primary' : 'default'"
+                        (click)="filterByCategory('all')">
+                        All Issues ({{ totalIssues() }})
+                  </button>
+                  @for (category of issueCategories(); track category.type) {
+                  <button nz-button [nzType]="selectedCategory() === category.type ? 'primary' : 'default'"
+                        (click)="filterByCategory(category.type)">
+                        <span nz-icon [nzType]="category.icon"></span>
+                        {{ category.label }} ({{ category.count }})
+                  </button>
+                  }
+            </div>
+
+            <!-- Export Button -->
+            <div class="flex justify-end">
+                  <button nz-button nzType="default" (click)="exportIssues()">
+                        <span nz-icon nzType="download"></span>
+                        Export Issues
+                  </button>
+            </div>
+      </nz-card>
+
+      <!-- Issue Categories -->
+      @for (category of getFilteredCategories(); track category.type) {
+      <nz-card [nzBordered]="true">
+            <div class="flex items-center justify-between mb-4">
+                  <div class="flex items-center gap-3">
+                        <div class="w-12 h-12 rounded-full flex items-center justify-center"
+                              [style.background-color]="category.color + '20'">
+                              <span nz-icon [nzType]="category.icon" class="text-2xl"
+                                    [style.color]="category.color"></span>
+                        </div>
+                        <div>
+                              <h3 class="text-lg font-semibold">{{ category.label }}</h3>
+                              <p class="text-sm text-gray-500">{{ category.count }} issues found</p>
+                        </div>
+                  </div>
+                  <div class="flex items-center gap-3">
+                        <nz-badge [nzCount]="category.count" [nzStyle]="{ backgroundColor: category.color }">
+                        </nz-badge>
+                        <nz-tag [nzColor]="getPriorityColor(category.priority)">
+                              {{ getPriorityLabel(category.priority) }} Priority
+                        </nz-tag>
+                        @if (category.count > 1) {
+                        <button nz-button nzType="primary" nzSize="small" (click)="bulkFixIssues(category.type)">
+                              <span nz-icon nzType="thunderbolt"></span>
+                              Bulk Fix
+                        </button>
+                        }
+                  </div>
+            </div>
+
+            <!-- Issues Table -->
+            <nz-table #issueTable [nzData]="category.issues" [nzPageSize]="10" [nzShowPagination]="category.count > 10"
+                  [nzSize]="'middle'">
+                  <thead>
+                        <tr>
+                              @if (category.type === 'missing_images' || category.type === 'missing_brands' ||
+                              category.type === 'missing_categories' || category.type === 'missing_suppliers') {
+                              <th>SKU</th>
+                              <th>Product Name</th>
+                              <th>Category</th>
+                              <th>Brand</th>
+                              } @else {
+                              <th>Name</th>
+                              }
+                              <th>Issue</th>
+                              <th>Priority</th>
+                              <th nzWidth="150px" nzAlign="right">Action</th>
+                        </tr>
+                  </thead>
+                  <tbody>
+                        @for (issue of issueTable.data; track issue.oid) {
+                        <tr>
+                              @if (category.type === 'missing_images' || category.type === 'missing_brands' ||
+                              category.type === 'missing_categories' || category.type === 'missing_suppliers') {
+                              <td>
+                                    <span class="font-mono text-sm">{{ issue.sku }}</span>
+                              </td>
+                              <td>
+                                    <span class="font-medium">{{ issue.name }}</span>
+                              </td>
+                              <td>
+                                    @if (issue.category) {
+                                    <nz-tag>{{ issue.category }}</nz-tag>
+                                    } @else {
+                                    <span class="text-gray-400">-</span>
+                                    }
+                              </td>
+                              <td>
+                                    @if (issue.brand) {
+                                    <nz-tag>{{ issue.brand }}</nz-tag>
+                                    } @else {
+                                    <span class="text-gray-400">-</span>
+                                    }
+                              </td>
+                              } @else {
+                              <td>
+                                    <span class="font-medium">{{ issue.name }}</span>
+                              </td>
+                              }
+                              <td>
+                                    <span class="text-sm text-gray-600">{{ issue.description }}</span>
+                              </td>
+                              <td>
+                                    <nz-tag [nzColor]="getPriorityColor(issue.priority)">
+                                          {{ getPriorityLabel(issue.priority) }}
+                                    </nz-tag>
+                              </td>
+                              <td nzAlign="right">
+                                    <button nz-button nzType="primary" nzSize="small" [routerLink]="issue.actionUrl">
+                                          <span nz-icon nzType="edit"></span>
+                                          Fix Now
+                                    </button>
+                              </td>
+                        </tr>
+                        }
+                  </tbody>
+            </nz-table>
+      </nz-card>
+      }
+
+      <!-- Help Section -->
+      <nz-card nzTitle="Need Help?" [nzBordered]="true">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div class="text-center p-4">
+                        <span nz-icon nzType="question-circle" class="text-4xl text-blue-500 mb-3"></span>
+                        <h4 class="font-semibold mb-2">Why Fix These Issues?</h4>
+                        <p class="text-sm text-gray-600">Data quality issues affect inventory accuracy, reporting, and
+                              customer experience. Fixing them ensures smooth operations.</p>
+                  </div>
+                  <div class="text-center p-4">
+                        <span nz-icon nzType="bulb" class="text-4xl text-yellow-500 mb-3"></span>
+                        <h4 class="font-semibold mb-2">Priority Guide</h4>
+                        <p class="text-sm text-gray-600">Critical = Fix immediately | High = Fix within 24h | Medium =
+                              Fix within a week | Low = Fix when convenient</p>
+                  </div>
+                  <div class="text-center p-4">
+                        <span nz-icon nzType="rocket" class="text-4xl text-purple-500 mb-3"></span>
+                        <h4 class="font-semibold mb-2">Bulk Operations</h4>
+                        <p class="text-sm text-gray-600">Use bulk fix options to resolve multiple issues at once. This
+                              saves time and ensures consistency across your data.</p>
+                  </div>
+            </div>
+      </nz-card>
+</div>
+}

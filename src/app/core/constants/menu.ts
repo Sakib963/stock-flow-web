@@ -8,7 +8,7 @@ export class Menu {
       items: [
         {
           icon: 'assets/icons/dashboard.svg',
-          label: 'Home',
+          label: 'Dashboard',
           route: '/admin/dashboard',
         },
       ],
@@ -31,7 +31,7 @@ export class Menu {
       items: [
         {
           icon: 'assets/icons/dashboard.svg',
-          label: 'Home',
+          label: 'Dashboard',
           route: '/manager/dashboard',
         },
       ],
@@ -41,9 +41,9 @@ export class Menu {
       icon: 'assets/icons/configuration-group.svg',
       items: [
         {
-          icon: 'dashboard',
-          label: 'Dashboard',
-          route: '/configuration/dashboard',
+          icon: 'assets/icons/stats.svg',
+          label: 'Stats',
+          route: '/configuration/stats',
         },
         {
           icon: 'assets/icons/category.svg',

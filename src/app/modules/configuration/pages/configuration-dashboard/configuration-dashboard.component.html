@@ -5,7 +5,7 @@
 <!-- Loading State -->
 @if (loading()) {
 <div class="flex items-center justify-center py-20">
-      <nz-spin [nzSize]="'large'" nzTip="Loading dashboard..."></nz-spin>
+      <app-loader [isVisible]="true"></app-loader>
 </div>
 }
 
@@ -48,12 +48,12 @@
 
       <!-- Quick Actions Section -->
       <nz-card nzTitle="Quick Actions" [nzBordered]="true">
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-3">
                   @for (action of quickActions(); track action.label) {
                   <button nz-button nzType="default" nzSize="large" [routerLink]="action.route"
                         class="h-auto py-4 flex flex-col items-center justify-center gap-2 hover:border-primary hover:text-primary transition-all">
                         <span nz-icon [nzType]="action.icon" class="text-2xl"></span>
-                        <span>{{ action.label }}</span>
+                        <span class="text-xs text-center">{{ action.label }}</span>
                   </button>
                   }
             </div>
@@ -105,104 +105,253 @@
 
       <!-- Three Column Layout: Supplier Distribution, System Health, Quick Stats -->
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <!-- Suppliers by Region -->
-            <nz-card nzTitle="Suppliers by Region" [nzBordered]="true">
+            <!-- Top Suppliers by Product Count -->
+            <nz-card nzTitle="Top Suppliers by Product Count" [nzBordered]="true">
                   <div class="space-y-3">
-                        @for (region of suppliersByRegion(); track region.name) {
+                        @for (supplier of suppliersByRegion(); track supplier.name) {
                         <div>
                               <div class="flex justify-between items-center mb-1">
-                                    <span class="text-sm text-gray-600">{{ region.name }}</span>
-                                    <span class="text-sm font-semibold text-gray-800">{{ region.value }}</span>
+                                    <span class="text-sm text-gray-600">{{ supplier.name }}</span>
+                                    <span class="text-sm font-semibold text-gray-800">{{ supplier.value }}</span>
                               </div>
-                              <nz-progress [nzPercent]="getPercentage(region.value, 34)" [nzShowInfo]="false"
+                              <nz-progress [nzPercent]="getPercentage(supplier.value, 487)" [nzShowInfo]="false"
                                     [nzStrokeColor]="'#1890FF'"></nz-progress>
                         </div>
                         }
                   </div>
+                  <div class="mt-4 text-center">
+                        <a nz-button nzType="link" [routerLink]="['/configuration/supplier/list']">View All Suppliers</a>
+                  </div>
             </nz-card>
 
             <!-- Configuration Health -->
-            <nz-card nzTitle="Configuration Health" [nzBordered]="true">
+            <nz-card nzTitle="Data Quality Health" [nzBordered]="true">
                   <div class="space-y-4">
                         <div>
                               <div class="flex justify-between items-center mb-2">
-                                    <span class="text-sm text-gray-600">Data Completeness</span>
-                                    <span class="text-sm font-semibold text-green-600">94%</span>
-                              </div>
-                              <nz-progress [nzPercent]="94" [nzShowInfo]="false"
-                                    [nzStrokeColor]="'#52C41A'"></nz-progress>
-                        </div>
-                        <div>
-                              <div class="flex justify-between items-center mb-2">
-                                    <span class="text-sm text-gray-600">Active Categories</span>
-                                    <span class="text-sm font-semibold text-blue-600">46/48</span>
-                              </div>
-                              <nz-progress [nzPercent]="96" [nzShowInfo]="false"
-                                    [nzStrokeColor]="'#1890FF'"></nz-progress>
-                        </div>
-                        <div>
-                              <div class="flex justify-between items-center mb-2">
                                     <span class="text-sm text-gray-600">Products with Images</span>
-                                    <span class="text-sm font-semibold text-orange-600">487/523</span>
+                                    <span class="text-sm font-semibold text-green-600">463/487</span>
+                              </div>
+                              <nz-progress [nzPercent]="95" [nzShowInfo]="false"
+                                    [nzStrokeColor]="'#52C41A'"></nz-progress>
+                              <p class="text-xs text-gray-400 mt-1">24 products need images (photo field empty)</p>
+                        </div>
+                        <div>
+                              <div class="flex justify-between items-center mb-2">
+                                    <span class="text-sm text-gray-600">Products with Brands</span>
+                                    <span class="text-sm font-semibold text-blue-600">451/487</span>
                               </div>
                               <nz-progress [nzPercent]="93" [nzShowInfo]="false"
+                                    [nzStrokeColor]="'#1890FF'"></nz-progress>
+                              <p class="text-xs text-gray-400 mt-1">36 products missing brand_oid</p>
+                        </div>
+                        <div>
+                              <div class="flex justify-between items-center mb-2">
+                                    <span class="text-sm text-gray-600">Complete Product Data</span>
+                                    <span class="text-sm font-semibold text-orange-600">425/487</span>
+                              </div>
+                              <nz-progress [nzPercent]="87" [nzShowInfo]="false"
                                     [nzStrokeColor]="'#FA8C16'"></nz-progress>
+                              <p class="text-xs text-gray-400 mt-1">All fields populated (category, brand, image, SKU)</p>
                         </div>
                   </div>
             </nz-card>
 
-            <!-- Quick Statistics -->
-            <nz-card nzTitle="Quick Statistics" [nzBordered]="true">
+            <!-- Configuration Insights -->
+            <nz-card nzTitle="Configuration Insights" [nzBordered]="true">
                   <div class="space-y-4">
                         <div class="flex items-center justify-between p-3 bg-purple-50 rounded-lg">
-                              <div>
+                              <div class="flex-1">
                                     <p class="text-xs text-gray-500 mb-1">Avg. Products per Category</p>
-                                    <p class="text-lg font-bold text-purple-600">10.9</p>
+                                    <p class="text-lg font-bold text-purple-600">10.6</p>
+                                    <p class="text-xs text-gray-400 mt-1">487 products / 46 categories</p>
                               </div>
                               <span nz-icon nzType="line-chart" class="text-2xl text-purple-400"></span>
                         </div>
                         <div class="flex items-center justify-between p-3 bg-green-50 rounded-lg">
-                              <div>
-                                    <p class="text-xs text-gray-500 mb-1">Active Suppliers</p>
-                                    <p class="text-lg font-bold text-green-600">32/34</p>
+                              <div class="flex-1">
+                                    <p class="text-xs text-gray-500 mb-1">Avg. Sub-Categories per Category</p>
+                                    <p class="text-lg font-bold text-green-600">3.2</p>
+                                    <p class="text-xs text-gray-400 mt-1">148 sub-categories / 46 categories</p>
                               </div>
-                              <span nz-icon nzType="team" class="text-2xl text-green-400"></span>
+                              <span nz-icon nzType="partition" class="text-2xl text-green-400"></span>
                         </div>
                         <div class="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
-                              <div>
-                                    <p class="text-xs text-gray-500 mb-1">Warehouse Capacity</p>
-                                    <p class="text-lg font-bold text-blue-600">78%</p>
+                              <div class="flex-1">
+                                    <p class="text-xs text-gray-500 mb-1">Products per Supplier</p>
+                                    <p class="text-lg font-bold text-blue-600">15.7</p>
+                                    <p class="text-xs text-gray-400 mt-1">487 products / 31 suppliers</p>
                               </div>
-                              <span nz-icon nzType="home" class="text-2xl text-blue-400"></span>
+                              <span nz-icon nzType="shopping" class="text-2xl text-blue-400"></span>
                         </div>
                   </div>
             </nz-card>
       </div>
 
-      <!-- Bottom Action Cards -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <nz-card [nzBordered]="true"
-                  class="text-center cursor-pointer hover:shadow-lg transition-all duration-300 bg-gradient-to-br from-purple-50 to-white"
-                  routerLink="/configuration/reports">
-                  <span nz-icon nzType="file-text" class="text-4xl text-purple-500 mb-3"></span>
-                  <h4 class="text-base font-semibold mb-2">Configuration Reports</h4>
-                  <p class="text-xs text-gray-500">View detailed reports and analytics</p>
+      <!-- New Row: Category Performance & Warehouse Stats -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Top Performing Categories -->
+            <nz-card nzTitle="Most Productive Categories" [nzBordered]="true">
+                  <div class="space-y-3">
+                        <div class="flex justify-between items-center p-2 hover:bg-gray-50 rounded">
+                              <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center">
+                                          <span class="text-purple-600 font-bold">1</span>
+                                    </div>
+                                    <div>
+                                          <p class="text-sm font-medium">Electronics & Gadgets</p>
+                                          <p class="text-xs text-gray-500">142 products • 12 sub-categories</p>
+                                    </div>
+                              </div>
+                              <span class="text-green-600 text-sm font-semibold">29%</span>
+                        </div>
+                        <div class="flex justify-between items-center p-2 hover:bg-gray-50 rounded">
+                              <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center">
+                                          <span class="text-purple-600 font-bold">2</span>
+                                    </div>
+                                    <div>
+                                          <p class="text-sm font-medium">Clothing & Apparel</p>
+                                          <p class="text-xs text-gray-500">98 products • 8 sub-categories</p>
+                                    </div>
+                              </div>
+                              <span class="text-green-600 text-sm font-semibold">20%</span>
+                        </div>
+                        <div class="flex justify-between items-center p-2 hover:bg-gray-50 rounded">
+                              <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center">
+                                          <span class="text-purple-600 font-bold">3</span>
+                                    </div>
+                                    <div>
+                                          <p class="text-sm font-medium">Food & Beverage</p>
+                                          <p class="text-xs text-gray-500">87 products • 15 sub-categories</p>
+                                    </div>
+                              </div>
+                              <span class="text-green-600 text-sm font-semibold">18%</span>
+                        </div>
+                        <div class="flex justify-between items-center p-2 hover:bg-gray-50 rounded">
+                              <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center">
+                                          <span class="text-purple-600 font-bold">4</span>
+                                    </div>
+                                    <div>
+                                          <p class="text-sm font-medium">Home & Kitchen</p>
+                                          <p class="text-xs text-gray-500">76 products • 10 sub-categories</p>
+                                    </div>
+                              </div>
+                              <span class="text-green-600 text-sm font-semibold">16%</span>
+                        </div>
+                  </div>
             </nz-card>
 
-            <nz-card [nzBordered]="true"
-                  class="text-center cursor-pointer hover:shadow-lg transition-all duration-300 bg-gradient-to-br from-blue-50 to-white"
-                  routerLink="/configuration/import">
-                  <span nz-icon nzType="import" class="text-4xl text-blue-500 mb-3"></span>
-                  <h4 class="text-base font-semibold mb-2">Import Data</h4>
-                  <p class="text-xs text-gray-500">Bulk import categories, products & more</p>
+            <!-- Warehouse & Aisle Insights -->
+            <nz-card nzTitle="Warehouse & Storage Insights" [nzBordered]="true">
+                  <div class="space-y-4">
+                        <div class="p-4 border border-gray-200 rounded-lg">
+                              <div class="flex justify-between items-center mb-2">
+                                    <span class="text-sm font-medium text-gray-700">Active Warehouses</span>
+                                    <span class="text-2xl font-bold text-blue-600">12</span>
+                              </div>
+                              <div class="flex items-center gap-2 text-xs text-gray-500">
+                                    <span nz-icon nzType="home"></span>
+                                    <span>Average 7.3 aisles per warehouse</span>
+                              </div>
+                        </div>
+                        <div class="p-4 border border-gray-200 rounded-lg">
+                              <div class="flex justify-between items-center mb-2">
+                                    <span class="text-sm font-medium text-gray-700">Total Aisles/Zones</span>
+                                    <span class="text-2xl font-bold text-purple-600">87</span>
+                              </div>
+                              <div class="flex items-center gap-2 text-xs text-gray-500">
+                                    <span nz-icon nzType="apartment"></span>
+                                    <span>Organized storage locations</span>
+                              </div>
+                        </div>
+                        <div class="p-4 border border-gray-200 rounded-lg">
+                              <div class="flex justify-between items-center mb-2">
+                                    <span class="text-sm font-medium text-gray-700">Products per Warehouse</span>
+                                    <span class="text-2xl font-bold text-orange-600">40.6</span>
+                              </div>
+                              <div class="flex items-center gap-2 text-xs text-gray-500">
+                                    <span nz-icon nzType="database"></span>
+                                    <span>Average distribution across locations</span>
+                              </div>
+                        </div>
+                  </div>
+            </nz-card>
+      </div>
+
+      <!-- Brand & Status Summary -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Brand Distribution -->
+            <nz-card nzTitle="Brand Performance" [nzBordered]="true">
+                  <div class="mb-4 text-center">
+                        <div class="flex items-center justify-center gap-2 mb-2">
+                              <span nz-icon nzType="flag" class="text-3xl text-green-600"></span>
+                        </div>
+                        <p class="text-4xl font-bold text-green-600">82</p>
+                        <p class="text-sm text-gray-500 mt-1">Active Brands</p>
+                  </div>
+                  <nz-divider></nz-divider>
+                  <div class="grid grid-cols-2 gap-4">
+                        <div class="text-center p-3 bg-gray-50 rounded-lg">
+                              <p class="text-2xl font-bold text-gray-800">5.9</p>
+                              <p class="text-xs text-gray-500">Avg products/brand</p>
+                        </div>
+                        <div class="text-center p-3 bg-gray-50 rounded-lg">
+                              <p class="text-2xl font-bold text-gray-800">15</p>
+                              <p class="text-xs text-gray-500">Brands with 10+ products</p>
+                        </div>
+                  </div>
             </nz-card>
 
+            <!-- Status Overview -->
+            <nz-card nzTitle="Configuration Status Overview" [nzBordered]="true">
+                  <div class="space-y-3">
+                        <div class="flex justify-between items-center p-3 border-l-4 border-green-500 bg-green-50">
+                              <div>
+                                    <p class="text-sm font-medium text-gray-700">Active Items</p>
+                                    <p class="text-xs text-gray-500">Ready for use</p>
+                              </div>
+                              <span class="text-2xl font-bold text-green-600">855</span>
+                        </div>
+                        <div class="flex justify-between items-center p-3 border-l-4 border-red-500 bg-red-50">
+                              <div>
+                                    <p class="text-sm font-medium text-gray-700">Inactive Items</p>
+                                    <p class="text-xs text-gray-500">Temporarily disabled</p>
+                              </div>
+                              <span class="text-2xl font-bold text-red-600">15</span>
+                        </div>
+                        <div class="flex justify-between items-center p-3 border-l-4 border-orange-500 bg-orange-50">
+                              <div>
+                                    <p class="text-sm font-medium text-gray-700">Needs Attention</p>
+                                    <p class="text-xs text-gray-500">Missing data or incomplete</p>
+                              </div>
+                              <span class="text-2xl font-bold text-orange-600">62</span>
+                        </div>
+                  </div>
+            </nz-card>
+      </div>
+
+      <!-- Bottom Action Card -->
+      <div class="grid grid-cols-1 gap-4">
             <nz-card [nzBordered]="true"
-                  class="text-center cursor-pointer hover:shadow-lg transition-all duration-300 bg-gradient-to-br from-green-50 to-white"
-                  routerLink="/configuration/settings">
-                  <span nz-icon nzType="setting" class="text-4xl text-green-500 mb-3"></span>
-                  <h4 class="text-base font-semibold mb-2">Configuration Settings</h4>
-                  <p class="text-xs text-gray-500">Manage system preferences</p>
+                  class="cursor-pointer hover:shadow-lg transition-all duration-300 bg-gradient-to-br from-red-50 via-orange-50 to-yellow-50"
+                  [routerLink]="['/configuration/fix-issues']">
+                  <div class="flex items-center justify-between px-6">
+                        <div class="flex items-center gap-4">
+                              <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center">
+                                    <span nz-icon nzType="exclamation-circle" class="text-3xl text-red-500"></span>
+                              </div>
+                              <div class="text-left">
+                                    <h4 class="text-lg font-semibold mb-1">Data Quality Issues Detected</h4>
+                                    <p class="text-sm text-gray-600">62 items need your attention: 24 products missing images, 36 products without brands, 2 inactive suppliers</p>
+                              </div>
+                        </div>
+                        <button nz-button nzType="primary" nzSize="large">
+                              Fix Issues
+                        </button>
+                  </div>
             </nz-card>
       </div>
 </div>
