@@ -1,1 +1,13 @@
-<p>create-category works!</p>
+<!-- Page Header with breadcrumbs, title, actions, and filters -->
+<page-header [title]="'Add Category'"
+      [description]="'Create a new product category to organize your products effectively. Fill in the necessary details and save to add the category.'"
+      [pageKey]="'configuration.category.create'" [showBackButton]="false" [extraTemplate]="headerActions">
+</page-header>
+
+<!-- Template for header actions (buttons) -->
+<ng-template #headerActions>
+      <button nz-button nzType="default" nzSize="large"  (click)="goBack()">
+            <nz-icon nzType="left" nzTheme="outline" />
+            Back
+      </button>
+</ng-template>

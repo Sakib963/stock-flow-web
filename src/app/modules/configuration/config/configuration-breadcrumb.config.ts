@@ -16,11 +16,22 @@ export interface ModuleBreadcrumbConfig {
  * Organized by features with parent-child structure
  */
 export const CONFIGURATION_BREADCRUMBS: ModuleBreadcrumbConfig = {
+  // Dashboard Feature - Module landing page
+  dashboard: {
+    parent: [
+      { label: 'Home', url: '/', icon: 'home' },
+      { label: 'Configuration', url: '/configuration/dashboard' }
+    ],
+    pages: {
+      main: [], // No additional breadcrumb - stays at 2 levels
+    }
+  },
+
   // Category Feature
   category: {
     parent: [
       { label: 'Home', url: '/', icon: 'home' },
-      { label: 'Configuration', url: '/configuration' },
+      { label: 'Configuration', url: '/configuration/dashboard' },
       { label: 'Category', url: '/configuration/category/list' }
     ],
     pages: {
@@ -35,7 +46,7 @@ export const CONFIGURATION_BREADCRUMBS: ModuleBreadcrumbConfig = {
   aisle: {
     parent: [
       { label: 'Home', url: '/', icon: 'home' },
-      { label: 'Configuration', url: '/configuration' },
+      { label: 'Configuration', url: '/configuration/dashboard' },
       { label: 'Aisle' }
     ],
     pages: {

@@ -1,0 +1,209 @@
+<page-header [breadcrumbs]="breadcrumbs" [title]="'Configuration Dashboard'"
+      [description]="'Manage your product categories, brands, suppliers, warehouses and other configuration data'">
+</page-header>
+
+<!-- Loading State -->
+@if (loading()) {
+<div class="flex items-center justify-center py-20">
+      <nz-spin [nzSize]="'large'" nzTip="Loading dashboard..."></nz-spin>
+</div>
+}
+
+<!-- Dashboard Content -->
+@if (!loading()) {
+<div class="space-y-6">
+      <!-- Statistics Cards Grid -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            @for (stat of statsCards(); track stat.title) {
+            <nz-card [nzBordered]="true" class="cursor-pointer hover:shadow-lg transition-all duration-300"
+                  [routerLink]="stat.route">
+                  <div class="flex items-start justify-between">
+                        <div class="flex-1">
+                              <p class="text-gray-500 text-sm mb-1">{{ stat.title }}</p>
+                              <h3 class="text-2xl font-bold text-gray-800 mb-2">{{ stat.count }}</h3>
+                              @if (stat.trend) {
+                              <div class="flex items-center gap-1 text-xs">
+                                    @if (stat.trend.isPositive) {
+                                    <span nz-icon nzType="arrow-up" class="text-green-500"></span>
+                                    <span class="text-green-500">+{{ stat.trend.value }}</span>
+                                    } @else {
+                                    <span nz-icon nzType="arrow-down" class="text-red-500"></span>
+                                    <span class="text-red-500">-{{ stat.trend.value }}</span>
+                                    }
+                                    <span class="text-gray-400 ml-1">this month</span>
+                              </div>
+                              }
+                        </div>
+                        <div class="flex-shrink-0">
+                              <div class="w-12 h-12 rounded-full flex items-center justify-center"
+                                    [style.background-color]="stat.color + '20'">
+                                    <span nz-icon [nzType]="stat.icon" [style.color]="stat.color"
+                                          class="text-xl"></span>
+                              </div>
+                        </div>
+                  </div>
+            </nz-card>
+            }
+      </div>
+
+      <!-- Quick Actions Section -->
+      <nz-card nzTitle="Quick Actions" [nzBordered]="true">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                  @for (action of quickActions(); track action.label) {
+                  <button nz-button nzType="default" nzSize="large" [routerLink]="action.route"
+                        class="h-auto py-4 flex flex-col items-center justify-center gap-2 hover:border-primary hover:text-primary transition-all">
+                        <span nz-icon [nzType]="action.icon" class="text-2xl"></span>
+                        <span>{{ action.label }}</span>
+                  </button>
+                  }
+            </div>
+      </nz-card>
+
+      <!-- Two Column Layout: Distribution & Recent Activities -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Category Distribution -->
+            <nz-card nzTitle="Category Distribution" [nzBordered]="true">
+                  <div class="space-y-3">
+                        @for (item of categoryDistribution(); track item.name) {
+                        <div>
+                              <div class="flex justify-between items-center mb-1">
+                                    <span class="text-sm text-gray-600">{{ item.name }}</span>
+                                    <span class="text-sm font-semibold text-gray-800">{{ item.value }}%</span>
+                              </div>
+                              <nz-progress [nzPercent]="item.value" [nzShowInfo]="false"
+                                    [nzStrokeColor]="'#594ED1'"></nz-progress>
+                        </div>
+                        }
+                  </div>
+            </nz-card>
+
+            <!-- Recent Activities -->
+            <nz-card nzTitle="Recent Activities" [nzBordered]="true">
+                  <nz-timeline>
+                        @for (activity of recentActivities(); track activity.title) {
+                        <nz-timeline-item>
+                              <div class="flex items-start gap-3">
+                                    <div
+                                          class="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center bg-gray-100">
+                                          <span nz-icon [nzType]="activity.icon"
+                                                [class]="getActivityIconColor(activity.type)"></span>
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                          <h4 class="text-sm font-medium text-gray-800 mb-1">{{ activity.title }}</h4>
+                                          <p class="text-xs text-gray-500 mb-1">{{ activity.description }}</p>
+                                          <span class="text-xs text-gray-400">{{ activity.time }}</span>
+                                    </div>
+                              </div>
+                        </nz-timeline-item>
+                        }
+                  </nz-timeline>
+                  <div class="mt-4 text-center">
+                        <a nz-button nzType="link" routerLink="/configuration/activity-log">View All Activities</a>
+                  </div>
+            </nz-card>
+      </div>
+
+      <!-- Three Column Layout: Supplier Distribution, System Health, Quick Stats -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Suppliers by Region -->
+            <nz-card nzTitle="Suppliers by Region" [nzBordered]="true">
+                  <div class="space-y-3">
+                        @for (region of suppliersByRegion(); track region.name) {
+                        <div>
+                              <div class="flex justify-between items-center mb-1">
+                                    <span class="text-sm text-gray-600">{{ region.name }}</span>
+                                    <span class="text-sm font-semibold text-gray-800">{{ region.value }}</span>
+                              </div>
+                              <nz-progress [nzPercent]="getPercentage(region.value, 34)" [nzShowInfo]="false"
+                                    [nzStrokeColor]="'#1890FF'"></nz-progress>
+                        </div>
+                        }
+                  </div>
+            </nz-card>
+
+            <!-- Configuration Health -->
+            <nz-card nzTitle="Configuration Health" [nzBordered]="true">
+                  <div class="space-y-4">
+                        <div>
+                              <div class="flex justify-between items-center mb-2">
+                                    <span class="text-sm text-gray-600">Data Completeness</span>
+                                    <span class="text-sm font-semibold text-green-600">94%</span>
+                              </div>
+                              <nz-progress [nzPercent]="94" [nzShowInfo]="false"
+                                    [nzStrokeColor]="'#52C41A'"></nz-progress>
+                        </div>
+                        <div>
+                              <div class="flex justify-between items-center mb-2">
+                                    <span class="text-sm text-gray-600">Active Categories</span>
+                                    <span class="text-sm font-semibold text-blue-600">46/48</span>
+                              </div>
+                              <nz-progress [nzPercent]="96" [nzShowInfo]="false"
+                                    [nzStrokeColor]="'#1890FF'"></nz-progress>
+                        </div>
+                        <div>
+                              <div class="flex justify-between items-center mb-2">
+                                    <span class="text-sm text-gray-600">Products with Images</span>
+                                    <span class="text-sm font-semibold text-orange-600">487/523</span>
+                              </div>
+                              <nz-progress [nzPercent]="93" [nzShowInfo]="false"
+                                    [nzStrokeColor]="'#FA8C16'"></nz-progress>
+                        </div>
+                  </div>
+            </nz-card>
+
+            <!-- Quick Statistics -->
+            <nz-card nzTitle="Quick Statistics" [nzBordered]="true">
+                  <div class="space-y-4">
+                        <div class="flex items-center justify-between p-3 bg-purple-50 rounded-lg">
+                              <div>
+                                    <p class="text-xs text-gray-500 mb-1">Avg. Products per Category</p>
+                                    <p class="text-lg font-bold text-purple-600">10.9</p>
+                              </div>
+                              <span nz-icon nzType="line-chart" class="text-2xl text-purple-400"></span>
+                        </div>
+                        <div class="flex items-center justify-between p-3 bg-green-50 rounded-lg">
+                              <div>
+                                    <p class="text-xs text-gray-500 mb-1">Active Suppliers</p>
+                                    <p class="text-lg font-bold text-green-600">32/34</p>
+                              </div>
+                              <span nz-icon nzType="team" class="text-2xl text-green-400"></span>
+                        </div>
+                        <div class="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
+                              <div>
+                                    <p class="text-xs text-gray-500 mb-1">Warehouse Capacity</p>
+                                    <p class="text-lg font-bold text-blue-600">78%</p>
+                              </div>
+                              <span nz-icon nzType="home" class="text-2xl text-blue-400"></span>
+                        </div>
+                  </div>
+            </nz-card>
+      </div>
+
+      <!-- Bottom Action Cards -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <nz-card [nzBordered]="true"
+                  class="text-center cursor-pointer hover:shadow-lg transition-all duration-300 bg-gradient-to-br from-purple-50 to-white"
+                  routerLink="/configuration/reports">
+                  <span nz-icon nzType="file-text" class="text-4xl text-purple-500 mb-3"></span>
+                  <h4 class="text-base font-semibold mb-2">Configuration Reports</h4>
+                  <p class="text-xs text-gray-500">View detailed reports and analytics</p>
+            </nz-card>
+
+            <nz-card [nzBordered]="true"
+                  class="text-center cursor-pointer hover:shadow-lg transition-all duration-300 bg-gradient-to-br from-blue-50 to-white"
+                  routerLink="/configuration/import">
+                  <span nz-icon nzType="import" class="text-4xl text-blue-500 mb-3"></span>
+                  <h4 class="text-base font-semibold mb-2">Import Data</h4>
+                  <p class="text-xs text-gray-500">Bulk import categories, products & more</p>
+            </nz-card>
+
+            <nz-card [nzBordered]="true"
+                  class="text-center cursor-pointer hover:shadow-lg transition-all duration-300 bg-gradient-to-br from-green-50 to-white"
+                  routerLink="/configuration/settings">
+                  <span nz-icon nzType="setting" class="text-4xl text-green-500 mb-3"></span>
+                  <h4 class="text-base font-semibold mb-2">Configuration Settings</h4>
+                  <p class="text-xs text-gray-500">Manage system preferences</p>
+            </nz-card>
+      </div>
+</div>
+}

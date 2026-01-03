@@ -26,6 +26,32 @@
   }
 }
 
+// Override ng-zorro default button hover/focus to use primary color
+.ant-btn-default {
+  &:hover, &:focus {
+    color: var(--primary-color) !important;
+    border-color: var(--primary-color) !important;
+  }
+  
+  &:active {
+    color: var(--primary-color-dark) !important;
+    border-color: var(--primary-color-dark) !important;
+  }
+}
+
+// Override link button to use primary color
+.ant-btn-link {
+  color: var(--primary-color) !important;
+  
+  &:hover, &:focus {
+    color: var(--primary-color-light) !important;
+  }
+  
+  &:active {
+    color: var(--primary-color-dark) !important;
+  }
+}
+
 .ant-form-vertical .ant-form-item {
   @apply flex-row;
 }

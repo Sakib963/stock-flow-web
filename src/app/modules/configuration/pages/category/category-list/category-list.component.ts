@@ -10,6 +10,10 @@ import { NgZorroCustomModule } from '@app/shared/ng-zorro-custom.module';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { finalize } from 'rxjs';
 import { PageHeaderComponent } from '@app/shared/components/page-header/page-header.component';
+import { AdaptiveListComponent } from '@app/shared/components/adaptive-list/adaptive-list.component';
+import { TableConfig } from '@app/core/interfaces/table';
+import { CATEGORY_TABLE_CONFIG } from '@app/modules/configuration/config/category.table.config';
+import { LoaderComponent } from '@app/shared/components/loader/loader.component';
 
 @Component({
   selector: 'category-list',
@@ -18,21 +22,24 @@ import { PageHeaderComponent } from '@app/shared/components/page-header/page-hea
     NgZorroCustomModule,
     ReactiveFormsModule,
     PageHeaderComponent,
+    AdaptiveListComponent,
+    LoaderComponent
   ],
   templateUrl: './category-list.component.html',
   styleUrl: './category-list.component.scss',
 })
 export class CategoryListComponent implements OnInit {
+  categoryTableConfig: TableConfig = CATEGORY_TABLE_CONFIG;
   data: any[] = [];
   totalCount: number = 0;
-  loading: boolean = false;
+  pageLoading: boolean = false; // Initial page load
+  tableLoading: boolean = false; // Table data/filter loading
   payload: any = {
     offset: 0,
     limit: Constants.PAGE_SIZE,
     search_text: '',
     status: '',
   };
-  isFilter: boolean = false;
   searchControl: FormControl = new FormControl('');
 
   constructor(
@@ -57,8 +64,7 @@ export class CategoryListComponent implements OnInit {
       search_text: value,
       status: '',
     };
-    this.isFilter = true;
-    this.loadList();
+    this.loadList(true); // Pass true to indicate it's a filter/refresh
   }
 
   handlePaginationEvent(event: any) {
@@ -67,18 +73,25 @@ export class CategoryListComponent implements OnInit {
       offset: event.offset,
       limit: event.limit,
     };
-    this.loadList();
+    this.loadList(true); // Pass true for pagination loading
   }
 
-  loadList(): any {
-    if (!this.isFilter) {
-      this.loading = true;
+  loadList(isRefresh: boolean = false): any {
+    // Set appropriate loading state
+    if (isRefresh) {
+      this.tableLoading = true;
+    } else {
+      this.pageLoading = true;
     }
+
     this._httpService
       .get(APIEndpoint.GET_CATEGORY_LIST, this.payload)
       .pipe(
         takeUntilDestroyed(this._destroyRef),
-        finalize(() => (this.loading = false))
+        finalize(() => {
+          this.pageLoading = false;
+          this.tableLoading = false;
+        })
       )
       .subscribe({
         next: (res: any) => {

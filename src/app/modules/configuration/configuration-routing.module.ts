@@ -3,6 +3,18 @@ import { RouterModule, Routes } from '@angular/router';
 
 const routes: Routes = [
   {
+    path: '',
+    redirectTo: 'dashboard',
+    pathMatch: 'full',
+  },
+  {
+    path: 'dashboard',
+    loadComponent: () =>
+      import(
+        './pages/configuration-dashboard/configuration-dashboard.component'
+      ).then((m) => m.ConfigurationDashboardComponent),
+  },
+  {
     path: 'category',
     children: [
       {
@@ -18,7 +30,7 @@ const routes: Routes = [
           ).then((m) => m.CreateCategoryComponent),
       },
       {
-        path: 'view/:id',
+        path: 'view/:oid',
         loadComponent: () =>
           import(
             './pages/category/view-category-details/view-category-details.component'

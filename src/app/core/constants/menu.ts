@@ -8,7 +8,7 @@ export class Menu {
       items: [
         {
           icon: 'assets/icons/dashboard.svg',
-          label: 'Dashboard',
+          label: 'Home',
           route: '/admin/dashboard',
         },
       ],
@@ -31,7 +31,7 @@ export class Menu {
       items: [
         {
           icon: 'assets/icons/dashboard.svg',
-          label: 'Dashboard',
+          label: 'Home',
           route: '/manager/dashboard',
         },
       ],
@@ -40,6 +40,11 @@ export class Menu {
       group: 'Configuration',
       icon: 'assets/icons/configuration-group.svg',
       items: [
+        {
+          icon: 'dashboard',
+          label: 'Dashboard',
+          route: '/configuration/dashboard',
+        },
         {
           icon: 'assets/icons/category.svg',
           label: 'Category',
