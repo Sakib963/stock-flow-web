@@ -1,8 +1,27 @@
-<div class="w-full flex flex-col items-center p-5">
-      <img class="w-2/3 mx-auto" src="assets/icons/undraw_confirmation.svg" alt="">
-      <p class="text-black mt-6 mb-9 font-semibold text-lg">{{ modalData.message }}</p>
-      <div class="flex items-center gap-8">
-            <secondary-button [label]="'Cancel'" [type]="'button'" (click)="closeModal()"></secondary-button>
-            <primary-button [label]="'Confirm'" [type]="'button'" (click)="handleConfirm()"></primary-button>
+<div class="relative w-full flex flex-col items-center p-6 text-center overflow-hidden">
+      <!-- Decorative bubble background -->
+      <div class="absolute -top-16 -right-16 w-64 h-64 rounded-full bg-primary/10"></div>
+      <div class="absolute -bottom-20 -left-20 w-72 h-72 rounded-full bg-primary/5"></div>
+
+      <!-- Icon -->
+      <div class="flex items-center justify-center rounded-full  text-primary mb-4 z-10">
+            <span nz-icon nzType="exclamation-circle" nzTheme="outline" class="text-4xl"></span>
+      </div>
+
+      <!-- Message -->
+      <p class="text-gray-800 font-medium text-base max-w-sm z-10">
+            {{ modalData.message }}
+      </p>
+
+      <!-- Actions -->
+      <div class="flex items-center gap-6 mt-8 z-10">
+            <button nz-button nzDanger type="button" (click)="closeModal()">
+                  <nz-icon nzType="close-circle" nzTheme="outline" class="mr-2"></nz-icon>
+                  Cancel
+            </button>
+            <button nz-button nzType="primary" type="button" (click)="handleConfirm()">
+                  <nz-icon nzType="check-circle" nzTheme="outline" class="mr-2"></nz-icon>
+                  Confirm
+            </button>
       </div>
 </div>

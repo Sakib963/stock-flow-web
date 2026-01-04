@@ -1,1 +1,58 @@
-<p>category-form works!</p>
+<div class="p-4">
+      <form nz-form [formGroup]="form" [nzLayout]="'vertical'" (ngSubmit)="onSubmit()">
+            <div class="grid grid-cols-1 md:gap-x-6 md:grid-cols-2 lg:grid-cols-3">
+                  <!-- Name -->
+                  <nz-form-item>
+                        <nz-form-label [nzRequired]="hasRequiredValidator('name')">Name</nz-form-label>
+                        <nz-form-control nzErrorTip="Name is Required.">
+                              <input formControlName="name" nz-input placeholder="Enter Name" />
+                        </nz-form-control>
+                  </nz-form-item>
+                  <!-- category_code -->
+                  <nz-form-item>
+                        <nz-form-label [nzRequired]="hasRequiredValidator('category_code')">Category
+                              Code</nz-form-label>
+                        <nz-form-control nzErrorTip="Category Code is Required.">
+                              <input formControlName="category_code" nz-input placeholder="Enter Category Code" />
+                        </nz-form-control>
+                  </nz-form-item>
+                  <!-- Status -->
+                  <nz-form-item>
+                        <nz-form-label [nzRequired]="hasRequiredValidator('status')">Status</nz-form-label>
+                        <nz-form-control nzErrorTip="Status is required.">
+                              <nz-select class="w-full" formControlName="status" nz-input nzAllowClear
+                                    nzPlaceHolder="Select Status">
+                                    <nz-option nzLabel="Active" nzValue="Active"></nz-option>
+                                    <nz-option nzLabel="Inactive" nzValue="Inactive"></nz-option>
+                              </nz-select>
+                        </nz-form-control>
+                  </nz-form-item>
+                  <!-- Description -->
+                  <nz-form-item>
+                        <nz-form-label [nzRequired]="hasRequiredValidator('description')">Description</nz-form-label>
+                        <nz-form-control nzErrorTip="Description is Required.">
+                              <textarea formControlName="description" nz-input placeholder="Enter Description"
+                                    nzAutosize></textarea>
+                        </nz-form-control>
+                  </nz-form-item>
+            </div>
+            <nz-divider class="my-0"></nz-divider>
+            <div class="mt-4 flex justify-end items-center">
+                  <div class="flex items-center gap-4">
+                        @let isEditMode = mode() === 'edit';
+                        @if (!isEditMode) {
+                        <button nz-button type="button" nzType="default" (click)="resetForm()">
+                              <nz-icon nzType="undo" nzTheme="outline" />
+                              Reset</button>
+                        } @else {
+                        <button nz-button type="button" nzType="default" (click)="onCancel()">
+                              <nz-icon nzType="undo" nzTheme="outline" />
+                              Cancel</button>
+                        }
+                        <button nz-button type="submit" nzType="primary" [nzLoading]="buttonLoading()">
+                              <nz-icon nzType="save" nzTheme="outline" />
+                              Submit</button>
+                  </div>
+            </div>
+      </form>
+</div>

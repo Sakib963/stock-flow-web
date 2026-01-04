@@ -8,18 +8,18 @@ export class APIEndpoint {
   static GET_USER_DETAILS = '/api/v1/admin/user/get-user-details';
   static UPDATE_USER_DETAILS = "/api/v1/admin/user/update-user-details";
 
-  static GET_CATEGORY_LIST = '/api/v1/manager/category/get-category-list';
-  static CREATE_CATEGORY = '/api/v1/manager/category/create-category';
-  static GET_CATEGORY_DETAILS = '/api/v1/manager/category/get-category-details';
-  static UPDATE_CATEGORY_DETAILS = "/api/v1/manager/category/update-category-details";
-  static GET_CATEGORY_LIST_FOR_DROPDOWN = "/api/v1/manager/category/get-category-list-for-dropdown";
+  static GET_CATEGORY_LIST = '/api/v1/configuration/category/get-category-list';
+  static CREATE_CATEGORY = '/api/v1/configuration/category/create-category';
+  static GET_CATEGORY_DETAILS = '/api/v1/configuration/category/get-category-details';
+  static UPDATE_CATEGORY_DETAILS = "/api/v1/configuration/category/update-category-details";
+  static GET_CATEGORY_LIST_FOR_DROPDOWN = "/api/v1/configuration/category/get-category-list-for-dropdown";
 
   
-  static GET_SUB_CATEGORY_LIST = "/api/v1/manager/sub-category/get-sub-category-list";
-  static CREATE_SUB_CATEGORY = "/api/v1/manager/sub-category/create-sub-category";
-  static UPDATE_SUB_CATEGORY_DETAILS = "/api/v1/manager/sub-category/update-sub-category-details";
-  static GET_SUB_CATEGORY_DETAILS = "/api/v1/manager/sub-category/get-sub-category-details";
-  static GET_SUB_CATEGORY_LIST_FOR_DROPDOWN = "/api/v1/manager/sub-category/get-sub-category-list-for-dropdown";
+  static GET_SUB_CATEGORY_LIST = "/api/v1/configuration/sub-category/get-sub-category-list";
+  static CREATE_SUB_CATEGORY = "/api/v1/configuration/sub-category/create-sub-category";
+  static UPDATE_SUB_CATEGORY_DETAILS = "/api/v1/configuration/sub-category/update-sub-category-details";
+  static GET_SUB_CATEGORY_DETAILS = "/api/v1/configuration/sub-category/get-sub-category-details";
+  static GET_SUB_CATEGORY_LIST_FOR_DROPDOWN = "/api/v1/configuration/sub-category/get-sub-category-list-for-dropdown";
 
   static GET_BRAND_LIST = '/api/v1/manager/brands/get-brand-list';
   static CREATE_BRAND = '/api/v1/manager/brands/create-brand';

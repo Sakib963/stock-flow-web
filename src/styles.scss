@@ -4,22 +4,23 @@
 
 // Custom CSS Variables for ng-zorro theming
 :root {
-  --primary-color: #594ED1;
-  --primary-color-light: #7E75E5;
-  --primary-color-dark: #4639A8;
-  --secondary-color: #180B26;
+  --primary-color: #594ed1;
+  --primary-color-light: #7e75e5;
+  --primary-color-dark: #4639a8;
+  --secondary-color: #180b26;
 }
 
 // Override ng-zorro primary colors with CSS variables
 .ant-btn-primary {
   background-color: var(--primary-color) !important;
   border-color: var(--primary-color) !important;
-  
-  &:hover, &:focus {
+
+  &:hover,
+  &:focus {
     background-color: var(--primary-color-light) !important;
     border-color: var(--primary-color-light) !important;
   }
-  
+
   &:active {
     background-color: var(--primary-color-dark) !important;
     border-color: var(--primary-color-dark) !important;
@@ -28,11 +29,12 @@
 
 // Override ng-zorro default button hover/focus to use primary color
 .ant-btn-default {
-  &:hover, &:focus {
+  &:hover,
+  &:focus {
     color: var(--primary-color) !important;
     border-color: var(--primary-color) !important;
   }
-  
+
   &:active {
     color: var(--primary-color-dark) !important;
     border-color: var(--primary-color-dark) !important;
@@ -42,11 +44,12 @@
 // Override link button to use primary color
 .ant-btn-link {
   color: var(--primary-color) !important;
-  
-  &:hover, &:focus {
+
+  &:hover,
+  &:focus {
     color: var(--primary-color-light) !important;
   }
-  
+
   &:active {
     color: var(--primary-color-dark) !important;
   }
@@ -196,4 +199,27 @@ body.lang-bn {
   100% {
     inset: 0 35px 35px 0;
   }
+}
+
+.ant-switch-checked {
+  background: #ED9B40 !important;
+  .ant-switch-handle {
+    left: calc(100% - 24px);
+  }
+}
+
+.ant-switch {
+  background: #594ED1;
+  height: 34px;
+  padding: 2px 20px;
+  border-radius: 4px;
+}
+
+.ant-switch-inner {
+  font-size: 16px;
+}
+
+.ant-switch-handle {
+  top: 8px;
+  left: 10px;
 }

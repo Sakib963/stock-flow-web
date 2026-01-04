@@ -1,24 +1,10 @@
 // Custom ng-zorro theme
 // Override primary color to match Tailwind config: #594ED1
 
-@import "~ng-zorro-antd/ng-zorro-antd.less";
+@import "ng-zorro-antd/ng-zorro-antd.less";
 
-// Primary Color
-@primary-color: #594ED1;
-
-// Derived colors from primary
-@primary-1: color(~`colorPalette('@{primary-color}', 1) `); // lighter
-@primary-2: color(~`colorPalette('@{primary-color}', 2) `);
-@primary-3: color(~`colorPalette('@{primary-color}', 3) `);
-@primary-4: color(~`colorPalette('@{primary-color}', 4) `);
-@primary-5: color(~`colorPalette('@{primary-color}', 5) `);
-@primary-6: @primary-color; // base
-@primary-7: color(~`colorPalette('@{primary-color}', 7) `); // darker
-@primary-8: color(~`colorPalette('@{primary-color}', 8) `);
-@primary-9: color(~`colorPalette('@{primary-color}', 9) `);
-@primary-10: color(~`colorPalette('@{primary-color}', 10) `);
-
-// Optional: Customize other theme variables
+// Primary Color - ng-zorro will automatically generate the color palette
+@primary-color: #594ED1;// Optional: Customize other theme variables
 @info-color: @primary-color;
 @link-color: @primary-color;
 @success-color: #52c41a;
@@ -27,4 +13,3 @@
 
 // Font
 @font-size-base: 14px;
-@border-radius-base: 6px;

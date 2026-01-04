@@ -6,4 +6,4 @@ export type ExtendedFormAction<T, Extra = never> = BaseFormAction<T> | Extra;
 // export type AreaFormActions = ExtendedFormAction<AreaForm, { action: 'delete'; id: string }>;
 
 // Product Catalog
-export type CategoryFormActions = BaseFormAction<any>;
+export type FormActions = BaseFormAction<any>;
