@@ -41,10 +41,8 @@ export const CATEGORY_TABLE_CONFIG: TableConfig = {
       filterable: false,
       column_type: 'text',
       text_color: [
-        { name: 'Active', color: 'success' },
-        { name: 'Inactive', color: 'error' },
-        { name: 'Pending', color: 'warning' },
-        { name: 'Draft', color: 'default' },
+        { name: 'Active', color: '#109648', icon: 'check' },
+        { name: 'Inactive', color: '#DF2935', icon: 'close' },
       ],
     },
     {

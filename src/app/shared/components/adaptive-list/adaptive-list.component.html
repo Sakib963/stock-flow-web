@@ -15,7 +15,7 @@
 @if (currentView === 0) {
 <div class="hidden md:block">
       <nz-table #basicTable [nzData]="dataSource()" [nzLoading]="loading()" [nzShowPagination]="false"
-            [nzNoResult]="noDataTemplate">
+            [nzPageSize]="pageSize()" [nzNoResult]="noDataTemplate">
             <thead>
                   <tr>
                         <!-- Index Column -->
@@ -47,6 +47,7 @@
                               <!-- Status with tag and tooltip -->
                               <nz-tag [nzColor]="getTextColor(item, column)" nz-tooltip nzTooltipPlacement="bottom"
                                     [nzTooltipTitle]="getCellValue(item, column)">
+                                    <nz-icon [nzType]="getTextIcon(item, column)" class="mr-1"></nz-icon>
                                     {{ getCellValue(item, column) }}
                               </nz-tag>
                               } @else {

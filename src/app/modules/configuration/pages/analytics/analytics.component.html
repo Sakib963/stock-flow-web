@@ -1,0 +1,194 @@
+<!-- Page Header -->
+<page-header [title]="pageTitle()" [description]="pageDescription()" [pageKey]="'configuration.analytics'" [showBackButton]="false" [extraTemplate]="headerActions"> </page-header>
+
+<!-- Template for header actions -->
+<ng-template #headerActions>
+    @if (entityName()) {
+        <nz-tag nzColor="blue">
+            <nz-icon nzType="filter" nzTheme="outline"></nz-icon>
+            {{ entityName() }}
+        </nz-tag>
+    }
+    <button nz-button nzType="primary" (click)="exportReport()">
+        <nz-icon nzType="download" nzTheme="outline"></nz-icon>
+        Export Report
+    </button>
+</ng-template>
+
+<!-- Content -->
+<div class="p-4 space-y-4">
+    <!-- Filter Section -->
+    <nz-card>
+        <div class="flex flex-wrap gap-4 items-center">
+            <!-- Entity Type Selector -->
+            <nz-select [(ngModel)]="filterType" (ngModelChange)="onFilterTypeChange()" nzPlaceHolder="Analyze by" style="width: 200px">
+                @for (option of filterTypeOptions; track option.value) {
+                    <nz-option [nzValue]="option.value" [nzLabel]="option.label"></nz-option>
+                }
+            </nz-select>
+
+            <!-- Date Range Picker -->
+            <nz-range-picker [(ngModel)]="dateRange" [nzFormat]="'yyyy-MM-dd'" (ngModelChange)="onDateChange()" style="width: 300px"> </nz-range-picker>
+
+            <!-- Quick Date Filters -->
+            <nz-button-group>
+                <button nz-button (click)="setDateRange('today')">Today</button>
+                <button nz-button (click)="setDateRange('week')">This Week</button>
+                <button nz-button (click)="setDateRange('month')">This Month</button>
+                <button nz-button (click)="setDateRange('year')">This Year</button>
+            </nz-button-group>
+        </div>
+    </nz-card>
+
+    <!-- Key Metrics Summary -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <nz-card>
+            <nz-statistic [nzValue]="metrics().totalProducts" nzTitle="Total Products" [nzPrefix]="prefixProducts"> </nz-statistic>
+            <ng-template #prefixProducts>
+                <nz-icon nzType="appstore" nzTheme="outline"></nz-icon>
+            </ng-template>
+        </nz-card>
+
+        <nz-card>
+            <nz-statistic [nzValue]="metrics().totalInventoryValue" nzTitle="Total Value" nzPrefix="$" [nzValueStyle]="{ color: '#3f8600' }"> </nz-statistic>
+        </nz-card>
+
+        <nz-card>
+            <nz-statistic [nzValue]="metrics().totalStock" nzTitle="Total Stock Units" [nzSuffix]="suffixUnits"> </nz-statistic>
+            <ng-template #suffixUnits>
+                <span class="text-sm">units</span>
+            </ng-template>
+        </nz-card>
+
+        <nz-card>
+            <nz-statistic [nzValue]="formattedAvgTurnoverRate()" nzTitle="Avg. Turnover Rate" [nzSuffix]="suffixPercent" [nzValueStyle]="{ color: '#1890ff' }"> </nz-statistic>
+            <ng-template #suffixPercent>
+                <span class="text-sm">%</span>
+            </ng-template>
+        </nz-card>
+    </div>
+
+    <!-- Charts Section -->
+    <nz-card nzTitle="Stock Level Trends" class="mb-4">
+        <canvas #stockTrendCanvas style="height: 400px"></canvas>
+    </nz-card>
+
+    <nz-card nzTitle="Inventory Value Over Time" class="mb-4">
+        <canvas #inventoryValueCanvas style="height: 350px"></canvas>
+    </nz-card>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+        <nz-card nzTitle="Top Products by Stock">
+            <canvas #topProductsCanvas style="height: 300px"></canvas>
+        </nz-card>
+
+        <nz-card nzTitle="Stock Distribution">
+            <nz-empty nzNotFoundContent="Coming soon"></nz-empty>
+        </nz-card>
+    </div>
+
+    <!-- Product Performance Table -->
+    <nz-card nzTitle="Product Performance" [nzExtra]="performanceExtra">
+        <nz-table #performanceTable [nzData]="productPerformance()" [nzLoading]="loading()" [nzPageSize]="pageSize()" [nzSize]="'middle'">
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th nzColumnKey="stock" [nzSortFn]="true">Stock</th>
+                    <th nzColumnKey="value" [nzSortFn]="true">Value</th>
+                    <th nzColumnKey="purchases" [nzSortFn]="true">Purchases</th>
+                    <th nzColumnKey="returns" [nzSortFn]="true">Returns</th>
+                    <th nzColumnKey="disposed" [nzSortFn]="true">Disposed</th>
+                    <th>Turnover Rate</th>
+                    <th nzWidth="100px">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (item of performanceTable.data; track item.oid) {
+                    <tr>
+                        <td>
+                            <div>
+                                <div class="font-medium">{{ item.productName }}</div>
+                                <small class="text-gray-500">{{ item.sku }}</small>
+                            </div>
+                        </td>
+                        <td>
+                            <nz-tag [nzColor]="getStockColor(item.stock, item.minStock)">
+                                {{ item.stock }}
+                            </nz-tag>
+                        </td>
+                        <td>${{ item.value | number: '1.2-2' }}</td>
+                        <td>{{ item.totalPurchases }}</td>
+                        <td>{{ item.totalReturns }}</td>
+                        <td>{{ item.totalDisposed }}</td>
+                        <td>
+                            <nz-progress [nzPercent]="item.turnoverRate" [nzStatus]="getTurnoverStatus(item.turnoverRate)" [nzShowInfo]="true" [nzStrokeWidth]="8"> </nz-progress>
+                        </td>
+                        <td>
+                            <button nz-button nzType="link" nzSize="small" (click)="viewProduct(item.oid)" nz-tooltip nzTooltipTitle="View Product">
+                                <nz-icon nzType="eye" nzTheme="outline"></nz-icon>
+                            </button>
+                        </td>
+                    </tr>
+                } @empty {
+                    <tr>
+                        <td colspan="8" class="text-center py-8">
+                            <nz-empty nzNotFoundContent="No performance data available"></nz-empty>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </nz-table>
+    </nz-card>
+
+    <ng-template #performanceExtra>
+        <span class="text-sm text-gray-500"> Showing {{ productPerformance().length }} products </span>
+    </ng-template>
+
+    <!-- Stock Movement Summary -->
+    <nz-card nzTitle="Stock Movement Summary" [nzExtra]="movementExtra">
+        <nz-table #movementTable [nzData]="stockMovements()" [nzLoading]="loading()" [nzPageSize]="10" [nzSize]="'middle'">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Type</th>
+                    <th>Quantity</th>
+                    <th>Value</th>
+                    <th>Reference</th>
+                    <th>Notes</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (movement of movementTable.data; track movement.referenceId) {
+                    <tr>
+                        <td>{{ movement.date | date: 'short' }}</td>
+                        <td>
+                            <nz-tag [nzColor]="getMovementColor(movement.type)">
+                                {{ movement.type }}
+                            </nz-tag>
+                        </td>
+                        <td [class.text-green-600]="movement.quantity > 0" [class.text-red-600]="movement.quantity < 0">{{ movement.quantity > 0 ? '+' : '' }}{{ movement.quantity }}</td>
+                        <td [class.text-green-600]="movement.value > 0" [class.text-red-600]="movement.value < 0">${{ movement.value | number: '1.2-2' }}</td>
+                        <td>
+                            <a class="text-blue-600 hover:underline cursor-pointer" (click)="viewReference(movement.referenceType, movement.referenceId)">
+                                {{ movement.referenceNo }}
+                            </a>
+                        </td>
+                        <td>
+                            <span class="text-sm text-gray-600">{{ movement.notes }}</span>
+                        </td>
+                    </tr>
+                } @empty {
+                    <tr>
+                        <td colspan="6" class="text-center py-8">
+                            <nz-empty nzNotFoundContent="No stock movements recorded"></nz-empty>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </nz-table>
+    </nz-card>
+
+    <ng-template #movementExtra>
+        <span class="text-sm text-gray-500"> Recent {{ stockMovements().length }} movements </span>
+    </ng-template>
+</div>

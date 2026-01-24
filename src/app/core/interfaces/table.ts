@@ -18,7 +18,7 @@ export interface TableColumn {
     | 'status'
     | 'action'; // Data type
   dateFormat?: string; // Date format if column_type is 'date'
-  text_color?: { name: string; color: string }[]; // Text color mapping based on cell value
+  text_color?: { name: string; color: string, icon?: string }[]; // Text color mapping based on cell value
   actions?: TableAction[]; // Actions for 'action' column type
 }
 

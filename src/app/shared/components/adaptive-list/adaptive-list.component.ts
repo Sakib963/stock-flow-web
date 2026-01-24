@@ -61,6 +61,13 @@ export class AdaptiveListComponent {
     return colorMap ? colorMap.color : '';
   }
 
+  getTextIcon(item: any, column: TableColumn): string {
+    if (!column.text_color || !column.source) return '';
+    const value = item[column.source];
+    const iconMap = column.text_color.find((c) => c.name === value);
+    return iconMap ? iconMap.icon || '' : '';
+  }
+
   // Get row index for display
   getRowIndex(index: number): number {
     return this.pageIndex() * this.pageSize() + index + 1;

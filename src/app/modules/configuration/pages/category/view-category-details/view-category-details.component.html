@@ -1,238 +1,201 @@
 <!-- Page Header with breadcrumbs, title, actions, and filters -->
-<page-header [title]="'View Category Details'"
-      [description]="'View detailed information about the selected product category. Review the details and make any necessary changes.'"
-      [pageKey]="'configuration.category.view'" [showBackButton]="false" [extraTemplate]="headerActions">
-</page-header>
+<page-header [title]="'View Category Details'" [description]="'View detailed information about the selected product category. Review the details and make any necessary changes.'" [pageKey]="'configuration.category.view'" [showBackButton]="false" [extraTemplate]="headerActions"> </page-header>
 
 <!-- Template for header actions (buttons) -->
 <ng-template #headerActions>
-      <!-- Switch between view mode and edit mode -->
-      @if (editable()) {
-      <nz-switch accessControl nzCheckedChildren="View Mode" nzUnCheckedChildren="Edit Mode" [ngModel]="editMode"
-            (ngModelChange)="handleSwitchChange($event)">
-      </nz-switch>
-      }
+    <!-- Switch between view mode and edit mode -->
+    @if (editable()) {
+        <nz-switch accessControl nzCheckedChildren="View Mode" nzUnCheckedChildren="Edit Mode" [ngModel]="editMode" (ngModelChange)="handleSwitchChange($event)"> </nz-switch>
+    }
 </ng-template>
 
 <!-- Content -->
-@if(loading()) {
-<app-loader [isVisible]="true"></app-loader>
+@if (loading()) {
+    <app-loader [isVisible]="true"></app-loader>
 } @else {
-@if (category(); as category) {
-@if (!editMode) {
-<!-- Category Details -->
-<nz-divider class="my-0"></nz-divider>
-<div class="p-4">
-      <nz-descriptions nzBordered [nzColumn]="1" nzSize="small">
-            <nz-descriptions-item nzTitle="Name">
-                  {{ category.name }}
-            </nz-descriptions-item>
-            <nz-descriptions-item nzTitle="Category Code">
-                  {{ category.category_code }}
-            </nz-descriptions-item>
-            <nz-descriptions-item nzTitle="Status">
-                  @if (category.status === 'Active') {
-                  <nz-tag nzColor="success">{{ category.status }}</nz-tag>
-                  } @else {
-                  <nz-tag nzColor="default">{{ category.status }}</nz-tag>
-                  }
-            </nz-descriptions-item>
-            <nz-descriptions-item nzTitle="Description">
-                  {{ category.description || 'N/A' }}
-            </nz-descriptions-item>
-      </nz-descriptions>
-</div>
+    @if (category(); as category) {
+        @if (!editMode) {
+            <!-- Category Details -->
+            <nz-divider class="my-0"></nz-divider>
+            <div class="p-4">
+                <div class="border rounded-sm bg-white p-4">
+                    <h3 class="text-base font-bold text-gray-900 mb-4">Details</h3>
 
-<!-- actions -->
-<nz-divider class="my-0"></nz-divider>
-<div class="flex justify-end p-4">
-      <div class="flex items-center gap-4 form-buttons-container">
-            <button nz-button nzType="default" type="button" (click)="navigateBack()">
-                  <nz-icon nzTheme="outline" nzType="arrow-left"></nz-icon>
-                  Back
-            </button>
-      </div>
-</div>
-
-<!-- Additional Information Sections -->
-<div class="p-4 space-y-4">
-      <!-- Quick Actions Panel -->
-      <nz-card nzTitle="Quick Actions" [nzExtra]="quickActionsExtra">
-            <div class="flex flex-wrap gap-3">
-                  <button nz-button nzType="default" (click)="viewAllProducts()">
-                        <span nz-icon nzType="shopping" nzTheme="outline"></span>
-                        View All Products
-                  </button>
-                  <button nz-button nzType="default" (click)="generateReport()">
-                        <span nz-icon nzType="file-pdf" nzTheme="outline"></span>
-                        Generate Report
-                  </button>
-                  <button nz-button nzType="default" (click)="exportData()">
-                        <span nz-icon nzType="download" nzTheme="outline"></span>
-                        Export Data
-                  </button>
-                  <button nz-button nzType="default" (click)="duplicateCategory()">
-                        <span nz-icon nzType="copy" nzTheme="outline"></span>
-                        Duplicate Category
-                  </button>
-            </div>
-      </nz-card>
-      <ng-template #quickActionsExtra>
-            <span nz-icon nzType="thunderbolt" nzTheme="twotone" class="text-lg"></span>
-      </ng-template>
-
-      <!-- Category Statistics -->
-      @if (categoryStats(); as stats) {
-      <nz-card nzTitle="Category Statistics" [nzExtra]="statsExtra">
-            <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
-                  <div class="text-center">
-                        <nz-statistic 
-                              [nzValue]="stats.totalProducts" 
-                              [nzTitle]="'Total Products'"
-                              [nzPrefix]="prefixTotalProducts">
-                        </nz-statistic>
-                        <ng-template #prefixTotalProducts>
-                              <span nz-icon nzType="appstore" nzTheme="outline"></span>
-                        </ng-template>
-                  </div>
-                  <div class="text-center">
-                        <nz-statistic 
-                              [nzValue]="stats.totalInventoryValue" 
-                              [nzTitle]="'Inventory Value'"
-                              [nzPrefix]="prefixCurrency">
-                        </nz-statistic>
-                        <ng-template #prefixCurrency>
-                              <span nz-icon nzType="dollar" nzTheme="outline"></span>
-                        </ng-template>
-                  </div>
-                  <div class="text-center">
-                        <nz-statistic 
-                              [nzValue]="stats.lowStockItems" 
-                              [nzTitle]="'Low Stock Items'"
-                              [nzValueStyle]="{ color: '#faad14' }"
-                              [nzPrefix]="prefixWarning">
-                        </nz-statistic>
-                        <ng-template #prefixWarning>
-                              <span nz-icon nzType="warning" nzTheme="outline"></span>
-                        </ng-template>
-                  </div>
-                  <div class="text-center">
-                        <nz-statistic 
-                              [nzValue]="stats.outOfStockItems" 
-                              [nzTitle]="'Out of Stock'"
-                              [nzValueStyle]="{ color: '#cf1322' }"
-                              [nzPrefix]="prefixDanger">
-                        </nz-statistic>
-                        <ng-template #prefixDanger>
-                              <span nz-icon nzType="close-circle" nzTheme="outline"></span>
-                        </ng-template>
-                  </div>
-                  <div class="text-center">
-                        <nz-statistic 
-                              [nzValue]="stats.averageProductPrice" 
-                              [nzTitle]="'Avg. Price'"
-                              [nzPrefix]="prefixAvg">
-                        </nz-statistic>
-                        <ng-template #prefixAvg>
-                              <span nz-icon nzType="dollar" nzTheme="outline"></span>
-                        </ng-template>
-                  </div>
-            </div>
-      </nz-card>
-      <ng-template #statsExtra>
-            <span nz-icon nzType="bar-chart" nzTheme="twotone" class="text-lg"></span>
-      </ng-template>
-      }
-
-      <!-- Related Products -->
-      @if (relatedProducts(); as products) {
-      @if (products.length > 0) {
-      <nz-card nzTitle="Related Products" [nzExtra]="productsExtra">
-            <nz-table 
-                  #productsTable 
-                  [nzData]="products" 
-                  [nzSize]="'small'"
-                  [nzPageSize]="5"
-                  [nzShowPagination]="products.length > 5">
-                  <thead>
-                        <tr>
-                              <th>Product Name</th>
-                              <th>SKU</th>
-                              <th>Stock</th>
-                              <th>Price</th>
-                              <th>Status</th>
-                              <th nzWidth="120px">Actions</th>
-                        </tr>
-                  </thead>
-                  <tbody>
-                        @for (product of productsTable.data; track product.oid) {
-                        <tr>
-                              <td>{{ product.name }}</td>
-                              <td><span class="font-mono text-xs">{{ product.sku }}</span></td>
-                              <td>
-                                    @if (product.stock === 0) {
-                                    <nz-tag nzColor="error">{{ product.stock }}</nz-tag>
-                                    } @else if (product.stock < 10) {
-                                    <nz-tag nzColor="warning">{{ product.stock }}</nz-tag>
-                                    } @else {
-                                    <nz-tag nzColor="success">{{ product.stock }}</nz-tag>
-                                    }
-                              </td>
-                              <td>${{ product.price }}</td>
-                              <td>
-                                    @if (product.status === 'Active') {
-                                    <nz-tag nzColor="success">{{ product.status }}</nz-tag>
-                                    } @else {
-                                    <nz-tag nzColor="default">{{ product.status }}</nz-tag>
-                                    }
-                              </td>
-                              <td>
-                                    <button nz-button nzType="link" nzSize="small" (click)="viewProduct(product.oid)">
-                                          <span nz-icon nzType="eye" nzTheme="outline"></span>
-                                    </button>
-                                    <button nz-button nzType="link" nzSize="small" (click)="editProduct(product.oid)">
-                                          <span nz-icon nzType="edit" nzTheme="outline"></span>
-                                    </button>
-                              </td>
-                        </tr>
-                        }
-                  </tbody>
-            </nz-table>
-      </nz-card>
-      <ng-template #productsExtra>
-            <span nz-icon nzType="shopping-cart" nzTheme="twotone" class="text-lg"></span>
-      </ng-template>
-      }
-      }
-
-      <!-- Activity Timeline -->
-      @if (activityTimeline(); as timeline) {
-      @if (timeline.length > 0) {
-      <nz-card nzTitle="Recent Activity" [nzExtra]="timelineExtra">
-            <nz-timeline>
-                  @for (activity of timeline; track activity.date) {
-                  <nz-timeline-item [nzColor]="$index === 0 ? 'green' : 'gray'">
-                        <div class="flex flex-col">
-                              <span class="font-medium text-gray-900">{{ activity.action }}</span>
-                              <span class="text-sm text-gray-500">by {{ activity.user }}</span>
-                              <span class="text-xs text-gray-400">{{ activity.date }}</span>
+                    <dl class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-5">
+                        <div>
+                            <dt class="text-xs text-gray-500">Name</dt>
+                            <dd class="text-sm text-gray-900 font-medium">
+                                {{ category.name }}
+                            </dd>
                         </div>
-                  </nz-timeline-item>
-                  }
-            </nz-timeline>
-      </nz-card>
-      <ng-template #timelineExtra>
-            <span nz-icon nzType="history" nzTheme="twotone" class="text-lg"></span>
-      </ng-template>
-      }
-      }
-</div>
-} @else {
-<nz-divider class="my-0"></nz-divider>
-<category-form [category]="category" [buttonLoading]="buttonLoading()"
-      (actions)="onFormActions($event)"></category-form>
-}
-} @else {
-<app-not-found (refresh)="onRefresh()"></app-not-found>
-}
+
+                        <div>
+                            <dt class="text-xs text-gray-500">Category Code</dt>
+                            <dd class="text-sm text-gray-900">
+                                {{ category.category_code }}
+                            </dd>
+                        </div>
+
+                        <div>
+                            <dt class="text-xs text-gray-500">Status</dt>
+                            <dd>
+                                @if (category.status === 'Active') {
+                                    <nz-tag nzColor="#109648">
+                                        <nz-icon nzType="check" class="mr-1"></nz-icon>
+                                        Active</nz-tag
+                                    >
+                                } @else {
+                                    <nz-tag nzColor="#DF2935">
+                                        <nz-icon nzType="close" class="mr-1"></nz-icon>
+                                        Inactive</nz-tag
+                                    >
+                                }
+                            </dd>
+                        </div>
+
+                        <div class="sm:col-span-2 lg:col-span-3">
+                            <dt class="text-xs text-gray-500">Description</dt>
+                            <dd class="text-sm text-gray-900">
+                                {{ category.description || 'N/A' }}
+                            </dd>
+                        </div>
+                    </dl>
+                </div>
+            </div>
+
+            <!-- actions -->
+            <nz-divider class="my-4"></nz-divider>
+            <div class="flex justify-end px-4">
+                <div class="flex items-center gap-4 form-buttons-container">
+                    <button nz-button nzType="default" type="button" (click)="navigateBack()">
+                        <nz-icon nzTheme="outline" nzType="arrow-left"></nz-icon>
+                        Back
+                    </button>
+                </div>
+            </div>
+
+            <!-- Additional Information Sections -->
+            <nz-divider nzDashed [nzText]="text">
+                <ng-template #text>
+                    <h2 class="text-lg font-semibold text-primary">
+                        <nz-icon nzType="info-circle" nzTheme="outline" class="mr-2"></nz-icon>
+                        Additional Information
+                    </h2>
+                </ng-template>
+            </nz-divider>
+            <div class="p-4 space-y-4">
+                <!-- Quick Actions Panel (Always Visible) -->
+                <div class="mb-4">
+                    <nz-card nzTitle="Quick Actions" [nzExtra]="quickActionsExtra">
+                        <div class="flex flex-wrap gap-3">
+                            <button nz-button nzType="default" (click)="viewAllProducts()" [disabled]="this.categoryStats().totalProducts === 0">
+                                <nz-icon nzType="eye" nzTheme="outline"></nz-icon>
+                                View All Products
+                            </button>
+                            <button nz-button nzType="default" (click)="viewLowStockProducts()" [disabled]="this.categoryStats().totalProducts === 0">
+                                <nz-icon nzType="warning" nzTheme="outline"></nz-icon>
+                                View Low Stock Products
+                            </button>
+                            <button nz-button nzType="default" (click)="viewAnalytics()" [disabled]="this.categoryStats().totalProducts === 0">
+                                <nz-icon nzType="bar-chart" nzTheme="outline"></nz-icon>
+                                View Analytics
+                            </button>
+                            <button nz-button nzType="default" (click)="generateInventoryReport()" [disabled]="this.categoryStats().totalProducts === 0 || loadingReportKey() !== null" [nzLoading]="loadingReportKey() === 'inventory_report'">
+                                <nz-icon nzType="file-excel" nzTheme="outline"></nz-icon>
+                                Generate Inventory Report
+                            </button>
+                            <button nz-button nzType="default" (click)="exportProductsToExcel()" [disabled]="this.categoryStats().totalProducts === 0 || loadingReportKey() !== null" [nzLoading]="loadingReportKey() === 'product_export'">
+                                <nz-icon nzType="download" nzTheme="outline"></nz-icon>
+                                Export Products to Excel
+                            </button>
+                        </div>
+                    </nz-card>
+                    <ng-template #quickActionsExtra>
+                        <nz-icon nzType="thunderbolt" nzTheme="twotone" class="text-lg"></nz-icon>
+                    </ng-template>
+                </div>
+                @if (categoryStats(); as stats) {
+                    <nz-card nzTitle="Category Statistics" [nzExtra]="statsExtra">
+                        <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+                            <div class="text-center">
+                                <nz-statistic [nzValue]="stats.totalProducts" [nzTitle]="'Total Products'" [nzPrefix]="prefixTotalProducts"> </nz-statistic>
+                                <ng-template #prefixTotalProducts>
+                                    <span nz-icon nzType="appstore" nzTheme="outline"></span>
+                                </ng-template>
+                            </div>
+                            <div class="text-center">
+                                <nz-statistic [nzValue]="stats.totalInventoryValue" [nzTitle]="'Inventory Value'" [nzPrefix]="prefixCurrency"> </nz-statistic>
+                                <ng-template #prefixCurrency>
+                                    <span nz-icon nzType="dollar" nzTheme="outline"></span>
+                                </ng-template>
+                            </div>
+                            <div class="text-center">
+                                <nz-statistic [nzValue]="stats.lowStockItems" [nzTitle]="'Low Stock Items'" [nzValueStyle]="{ color: '#faad14' }" [nzPrefix]="prefixWarning"> </nz-statistic>
+                                <ng-template #prefixWarning>
+                                    <span nz-icon nzType="warning" nzTheme="outline"></span>
+                                </ng-template>
+                            </div>
+                            <div class="text-center">
+                                <nz-statistic [nzValue]="stats.outOfStockItems" [nzTitle]="'Out of Stock'" [nzValueStyle]="{ color: '#cf1322' }" [nzPrefix]="prefixDanger"> </nz-statistic>
+                                <ng-template #prefixDanger>
+                                    <span nz-icon nzType="close-circle" nzTheme="outline"></span>
+                                </ng-template>
+                            </div>
+                            <div class="text-center">
+                                <nz-statistic [nzValue]="stats.averageProductPrice" [nzTitle]="'Avg. Price'" [nzPrefix]="prefixAvg"> </nz-statistic>
+                                <ng-template #prefixAvg>
+                                    <span nz-icon nzType="dollar" nzTheme="outline"></span>
+                                </ng-template>
+                            </div>
+                        </div>
+                    </nz-card>
+                    <ng-template #statsExtra>
+                        <nz-icon nzType="highlight" nzTheme="twotone"  class="text-lg"/>
+                    </ng-template>
+                } @else {
+                    <nz-empty nzNotFoundContent="No statistics available"></nz-empty>
+                }
+
+                @if (activityTimeline(); as timeline) {
+                    @if (timeline.length > 0) {
+                        <nz-card nzTitle="Recent Activity" [nzExtra]="timelineExtra">
+                            <nz-timeline>
+                                @for (activity of timeline; track activity.date) {
+                                    <nz-timeline-item [nzColor]="$index === 0 ? 'green' : 'gray'">
+                                        <div class="flex flex-col">
+                                            <span class="font-medium text-gray-900">{{ activity.action }}</span>
+                                            <span class="text-sm text-gray-500">by {{ activity.user }}</span>
+                                            <span class="text-xs text-gray-500">{{ activity.description }}</span>
+                                            <span class="text-xs text-gray-400">{{ activity.date | date: 'MMM d, y, h:mm:ss a' }}</span>
+                                        </div>
+                                    </nz-timeline-item>
+                                }
+                            </nz-timeline>
+                        </nz-card>
+                        <ng-template #timelineExtra>
+                            <span nz-icon nzType="history" nzTheme="outline" class="text-lg"></span>
+                        </ng-template>
+                    }
+                } @else {
+                    <nz-empty nzNotFoundContent="No activity found"></nz-empty>
+                }
+            </div>
+
+            <!-- actions -->
+            <nz-divider class="my-0"></nz-divider>
+            <div class="flex justify-end p-4">
+                <div class="flex items-center gap-4 form-buttons-container">
+                    <button nz-button nzType="default" type="button" (click)="navigateBack()">
+                        <nz-icon nzTheme="outline" nzType="arrow-left"></nz-icon>
+                        Back
+                    </button>
+                </div>
+            </div>
+        } @else {
+            <nz-divider class="my-0"></nz-divider>
+            <category-form [category]="category" [buttonLoading]="buttonLoading()" (actions)="onFormActions($event)"></category-form>
+        }
+    } @else {
+        <app-not-found (refresh)="onRefresh()"></app-not-found>
+    }
 }

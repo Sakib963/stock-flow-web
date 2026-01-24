@@ -7,6 +7,7 @@ import { AppComponent } from '@app/app.component';
 import { tokenInterceptor } from '@app/core/interceptor/token-interceptor.service';
 import { NgZorroCustomModule } from '@app/shared/ng-zorro-custom.module';
 import { NZ_I18N, en_US } from 'ng-zorro-antd/i18n';
+import { NZ_ICONS } from 'ng-zorro-antd/icon';
 import { CloudinaryModule } from '@cloudinary/ng';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';

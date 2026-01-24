@@ -24,6 +24,7 @@
     "@ngx-translate/core": "^17.0.0",
     "@ngx-translate/http-loader": "^16.0.1",
     "angular-svg-icon": "^13.0.0",
+    "chart.js": "^4.5.1",
     "jsbarcode": "^3.11.6",
     "ng-zorro-antd": "^19.2.2",
     "ngx-barcode6": "^1.0.26",

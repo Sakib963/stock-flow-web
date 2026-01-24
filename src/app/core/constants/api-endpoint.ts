@@ -13,6 +13,8 @@ export class APIEndpoint {
   static GET_CATEGORY_DETAILS = '/api/v1/configuration/category/get-category-details';
   static UPDATE_CATEGORY_DETAILS = "/api/v1/configuration/category/update-category-details";
   static GET_CATEGORY_LIST_FOR_DROPDOWN = "/api/v1/configuration/category/get-category-list-for-dropdown";
+  static GENERATE_PRODUCT_LIST_REPORT_BY_CATEGORY = "/api/v1/configuration/category/generate-product-list-report-by-category";
+  static GENERATE_INVENTORY_REPORT_BY_CATEGORY = "/api/v1/configuration/category/generate-inventory-report-by-category";
 
   
   static GET_SUB_CATEGORY_LIST = "/api/v1/configuration/sub-category/get-sub-category-list";
