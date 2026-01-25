@@ -53,6 +53,21 @@ export const CONFIGURATION_BREADCRUMBS: ModuleBreadcrumbConfig = {
     }
   },
 
+  // Sub-Category Feature
+  subCategory: {
+    parent: [
+      { label: 'Home', url: '/', icon: 'home' },
+      { label: 'Configuration', url: '/configuration/stats' },
+      { label: 'Sub-Category', url: '/configuration/sub-category/list' },
+    ],
+    pages: {
+      list: [{ label: 'List', url: '/configuration/sub-category/list' }],
+      create: [{ label: 'Create' }],
+      view: [{ label: 'View' }],
+      edit: [{ label: 'Edit' }]
+    }
+  },
+
   // Aisle Feature
   aisle: {
     parent: [
