@@ -1,0 +1,48 @@
+<!-- Page Header with breadcrumbs, title, actions, and filters -->
+<page-header [title]="'Sub-Category List'"
+      [description]="'Manage product sub-categories to handle operation smoothly. You can add, edit, or delete sub-categories as needed.'"
+      [pageKey]="'configuration.sub-category.list'" [showBackButton]="false" [extraTemplate]="headerActions"
+      [contentTemplate]="headerFilters">
+</page-header>
+
+<!-- Template for header actions (buttons) -->
+<ng-template #headerActions>
+      <nz-space>
+            <button nz-button nzType="primary" (click)="handleListActions({ action: 'create', value: null })">
+                  <nz-icon nzType="plus"></nz-icon>
+                  Add Sub-Category
+            </button>
+      </nz-space>
+</ng-template>
+
+<!-- Template for header content (filters, search) -->
+<ng-template #headerFilters>
+      <nz-divider class="mt-0 mb-4"></nz-divider>
+      <nz-select class="mb-4 md:mb-0 mr-4 w-full md:w-60" nzAllowClear nzPlaceHolder="Filter by Category"
+            [formControl]="categoryControl">
+            <nz-option *ngFor="let category of categoryList" [nzLabel]="category.label" [nzValue]="category.value">
+            </nz-option>
+      </nz-select>
+      <nz-input-group [nzPrefix]="prefixTemplateSearch" class="w-full md:w-96">
+            <input type="text" nz-input placeholder="Search sub-categories..." [formControl]="searchControl" />
+      </nz-input-group>
+      <ng-template #prefixTemplateSearch>
+            <span nz-icon nzType="search"></span>
+      </ng-template>
+</ng-template>
+
+<!-- Page Loading State -->
+@if (pageLoading) {
+<div class="flex justify-center items-center py-20">
+      <app-loader [isVisible]="true"></app-loader>
+</div>
+} @else {
+<nz-divider class="my-0"></nz-divider>
+<div class="p-4">
+      <!-- Adaptive List Component to display sub-categories -->
+      <adaptive-list [dataSource]="data" [tableConfig]="subCategoryTableConfig" [loading]="tableLoading"
+            [totalCount]="totalCount" [pageSize]="payload.limit" [pageIndex]="payload.offset / payload.limit"
+            (actionEvent)="handleListActions($event)" (paginationChange)="handlePaginationEvent($event)">
+      </adaptive-list>
+</div>
+}

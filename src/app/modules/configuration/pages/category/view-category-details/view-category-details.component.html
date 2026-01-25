@@ -56,7 +56,7 @@
                         <div class="sm:col-span-2 lg:col-span-3">
                             <dt class="text-xs text-gray-500">Description</dt>
                             <dd class="text-sm text-gray-900">
-                                {{ category.description || 'N/A' }}
+                                {{ category.description | safeText }}
                             </dd>
                         </div>
                     </dl>

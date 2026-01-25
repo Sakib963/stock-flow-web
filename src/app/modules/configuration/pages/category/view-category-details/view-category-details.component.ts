@@ -13,13 +13,14 @@ import { LoaderComponent } from '@app/shared/components/loader/loader.component'
 import { NotFoundComponent } from '@app/shared/components/not-found/not-found.component';
 import { PageHeaderComponent } from '@app/shared/components/page-header/page-header.component';
 import { NgZorroCustomModule } from '@app/shared/ng-zorro-custom.module';
+import { SafeTextPipe } from '@app/shared/pipe/safe-text.pipe';
 import { TranslateService } from '@ngx-translate/core';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { Subject, combineLatest, startWith, tap, switchMap, map, catchError, EMPTY, finalize } from 'rxjs';
 
 @Component({
     selector: 'view-category-details',
-    imports: [PageHeaderComponent, NgZorroCustomModule, FormsModule, CategoryFormComponent, NotFoundComponent, LoaderComponent, DatePipe],
+    imports: [PageHeaderComponent, NgZorroCustomModule, FormsModule, CategoryFormComponent, NotFoundComponent, LoaderComponent, DatePipe, SafeTextPipe],
     templateUrl: './view-category-details.component.html',
     styleUrl: './view-category-details.component.scss',
 })

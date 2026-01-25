@@ -45,6 +45,28 @@ const routes: Routes = [
             },
         ],
     },
+    {
+        path: 'sub-category',
+        children: [
+            {
+                path: '',
+                redirectTo: 'list',
+                pathMatch: 'full',
+            },
+            {
+                path: 'create',
+                loadComponent: () => import('./pages/sub-category/create-sub-category/create-sub-category.component').then((m) => m.CreateSubCategoryComponent),
+            },
+            {
+                path: 'view/:oid',
+                loadComponent: () => import('./pages/sub-category/view-sub-category-details/view-sub-category-details.component').then((m) => m.ViewSubCategoryDetailsComponent),
+            },
+            {
+                path: 'list',
+                loadComponent: () => import('./pages/sub-category/sub-category-list/sub-category-list.component').then((m) => m.SubCategoryListComponent),
+            },
+        ],
+    }
 ];
 
 @NgModule({
