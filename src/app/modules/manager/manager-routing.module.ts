@@ -24,37 +24,6 @@ const routes: Routes = [
         path: 'configuration',
         children: [
           {
-            path: 'category',
-            children: [
-              {
-                path: '',
-                redirectTo: 'category-list',
-                pathMatch: 'full',
-              },
-              {
-                path: 'category-list',
-                loadComponent: () =>
-                  import(
-                    './pages/configuration/category/display-category-list/display-category-list.component'
-                  ).then((m) => m.DisplayCategoryListComponent),
-              },
-              {
-                path: 'create-category',
-                loadComponent: () =>
-                  import(
-                    './pages/configuration/category/create-category/create-category.component'
-                  ).then((m) => m.CreateCategoryComponent),
-              },
-              {
-                path: 'view-category/:oid',
-                loadComponent: () =>
-                  import(
-                    './pages/configuration/category/view-category-details/view-category-details.component'
-                  ).then((m) => m.ViewCategoryDetailsComponent),
-              },
-            ],
-          },
-          {
             path: 'brands',
             children: [
               {
@@ -82,37 +51,6 @@ const routes: Routes = [
                   import(
                     './pages/configuration/brands/view-brand-details/view-brand-details.component'
                   ).then((m) => m.ViewBrandDetailsComponent),
-              },
-            ],
-          },
-          {
-            path: 'sub-category',
-            children: [
-              {
-                path: '',
-                redirectTo: 'sub-category-list',
-                pathMatch: 'full',
-              },
-              {
-                path: 'sub-category-list',
-                loadComponent: () =>
-                  import(
-                    './pages/configuration/sub-category/display-sub-category-list/display-sub-category-list.component'
-                  ).then((m) => m.DisplaySubCategoryListComponent),
-              },
-              {
-                path: 'create-sub-category',
-                loadComponent: () =>
-                  import(
-                    './pages/configuration/sub-category/create-sub-category/create-sub-category.component'
-                  ).then((m) => m.CreateSubCategoryComponent),
-              },
-              {
-                path: 'view-sub-category/:oid',
-                loadComponent: () =>
-                  import(
-                    './pages/configuration/sub-category/view-sub-category-details/view-sub-category-details.component'
-                  ).then((m) => m.ViewSubCategoryDetailsComponent),
               },
             ],
           },
