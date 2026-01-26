@@ -12,10 +12,6 @@ const routes: Routes = [
         loadComponent: () => import('./pages/configuration-dashboard/configuration-dashboard.component').then((m) => m.ConfigurationDashboardComponent),
     },
     {
-        path: 'fix-issues',
-        loadComponent: () => import('./pages/fix-issues/fix-issues.component').then((m) => m.FixIssuesComponent),
-    },
-    {
         path: 'alerts',
         loadComponent: () => import('./pages/alerts/alerts.component').then((m) => m.AlertsComponent),
     },
@@ -66,7 +62,29 @@ const routes: Routes = [
                 loadComponent: () => import('./pages/sub-category/sub-category-list/sub-category-list.component').then((m) => m.SubCategoryListComponent),
             },
         ],
-    }
+    },
+    {
+        path: 'brands',
+        children: [
+            {
+                path: '',
+                redirectTo: 'list',
+                pathMatch: 'full',
+            },
+            {
+                path: 'create',
+                loadComponent: () => import('./pages/brands/create-brand/create-brand.component').then((m) => m.CreateBrandComponent),
+            },
+            {
+                path: 'view/:oid',
+                loadComponent: () => import('./pages/brands/view-brand-details/view-brand-details.component').then((m) => m.ViewBrandDetailsComponent),
+            },
+            {
+                path: 'list',
+                loadComponent: () => import('./pages/brands/brand-list/brand-list.component').then((m) => m.BrandListComponent),
+            },
+        ],
+    },
 ];
 
 @NgModule({

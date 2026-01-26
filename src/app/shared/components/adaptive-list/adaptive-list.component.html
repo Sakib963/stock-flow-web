@@ -39,7 +39,7 @@
                               @if (column.column_type === 'long-text') {
                               <!-- Long text with popover -->
                               <div class="max-w-md truncate cursor-pointer" nz-popover
-                                    nzPopoverOverlayClassName="max-w-[400px] break-all" nzPopoverPlacement="bottom"
+                                    nzPopoverOverlayClassName="max-w-[400px] break-words" nzPopoverPlacement="bottom"
                                     [nzPopoverContent]="getCellValue(item, column)">
                                     {{ getCellValue(item, column) }}
                               </div>

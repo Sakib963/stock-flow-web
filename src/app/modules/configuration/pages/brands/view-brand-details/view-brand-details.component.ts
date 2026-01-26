@@ -7,7 +7,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { WindowState } from '@app/core/config/window-state.config';
 import { APIEndpoint } from '@app/core/constants/api-endpoint';
 import { FormActions } from '@app/core/interfaces/form-action';
-import { SubCategoryFormComponent } from '@app/modules/configuration/components/sub-category-form/sub-category-form.component';
+import { BrandFormComponent } from '@app/modules/configuration/components/brand-form/brand-form.component';
 import { ConfigurationService } from '@app/modules/configuration/services/configuration.service';
 import { LoaderComponent } from '@app/shared/components/loader/loader.component';
 import { NotFoundComponent } from '@app/shared/components/not-found/not-found.component';
@@ -19,12 +19,12 @@ import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { Subject, combineLatest, startWith, tap, switchMap, map, catchError, EMPTY, finalize } from 'rxjs';
 
 @Component({
-    selector: 'view-sub-category-details',
-    imports: [PageHeaderComponent, NgZorroCustomModule, FormsModule, SubCategoryFormComponent, NotFoundComponent, LoaderComponent, DatePipe, SafeTextPipe],
-    templateUrl: './view-sub-category-details.component.html',
-    styleUrl: './view-sub-category-details.component.scss',
+    selector: 'view-brand-details',
+    imports: [PageHeaderComponent, NgZorroCustomModule, FormsModule, BrandFormComponent, NotFoundComponent, LoaderComponent, DatePipe, SafeTextPipe],
+    templateUrl: './view-brand-details.component.html',
+    styleUrl: './view-brand-details.component.scss',
 })
-export class ViewSubCategoryDetailsComponent {
+export class ViewBrandDetailsComponent {
     itemId = input.required<string>({ alias: 'oid' });
 
     loading = signal<boolean>(false);
@@ -38,17 +38,18 @@ export class ViewSubCategoryDetailsComponent {
     private readonly _location = inject(Location);
     private readonly _router = inject(Router);
     private readonly _destroyRef = inject(DestroyRef);
+    private readonly _activatedRoute = inject(ActivatedRoute);
     private readonly _notificationService = inject(NzNotificationService);
     private readonly _configurationService = inject(ConfigurationService);
     private readonly _translateService = inject(TranslateService);
 
-    detailUrl = computed(() => APIEndpoint.GET_SUB_CATEGORY_DETAILS ?? null);
-    updateUrl = computed(() => APIEndpoint.UPDATE_SUB_CATEGORY_DETAILS ?? null);
+    detailUrl = computed(() => APIEndpoint.GET_BRAND_DETAILS ?? null);
+    updateUrl = computed(() => APIEndpoint.UPDATE_BRAND_DETAILS ?? null);
     buttonLoading = signal(false);
-
+  
     private _reload$ = new Subject<void>();
 
-    private _subCategory$ = combineLatest([this._reload$.pipe(startWith(undefined)), toObservable(this.detailUrl), toObservable(this.itemId)]).pipe(
+    private _brand$ = combineLatest([this._reload$.pipe(startWith(undefined)), toObservable(this.detailUrl), toObservable(this.itemId)]).pipe(
         tap(() => {
             this.loading.set(true);
         }),
@@ -59,7 +60,7 @@ export class ViewSubCategoryDetailsComponent {
 
                     // Set statistics from API response
                     if (data.stats) {
-                        this.subCategoryStats.set({
+                        this.brandStats.set({
                             totalProducts: data.stats.totalProducts || 0,
                             totalInventoryValue: data.stats.totalInventoryValue || 0,
                             lowStockItems: data.stats.lowStockItems || 0,
@@ -68,7 +69,7 @@ export class ViewSubCategoryDetailsComponent {
                         });
                     } else {
                         // Fallback to null if no stats
-                        this.subCategoryStats.set(null);
+                        this.brandStats.set(null);
                     }
 
                     // Set activity timeline from API response
@@ -84,8 +85,8 @@ export class ViewSubCategoryDetailsComponent {
                 }),
                 catchError((error: HttpErrorResponse | Error) => {
                     this.loading.set(false);
-                    const message = error instanceof HttpErrorResponse ? `${error.error?.message || error.message}` : `Sub-Category not found`;
-                    this._notificationService.error('Sub-Category Detail', message);
+                    const message = error instanceof HttpErrorResponse ? `${error.error?.message || error.message}` : `Brand not found`;
+                    this._notificationService.error('Brand Detail', message);
                     return EMPTY;
                 }),
                 finalize(() => {
@@ -95,10 +96,10 @@ export class ViewSubCategoryDetailsComponent {
         )
     );
 
-    subCategory = toSignal(this._subCategory$, { initialValue: null });
+    brand = toSignal(this._brand$, { initialValue: null });
 
     // Data signals - initially null until loaded
-    subCategoryStats = signal<any>(null);
+    brandStats = signal<any>(null);
     activityTimeline = signal<any[]>([]);
 
     async ngOnInit() {
@@ -130,8 +131,8 @@ export class ViewSubCategoryDetailsComponent {
             .updateItem$(this.updateUrl(), $event.data)
             .pipe(
                 catchError((err) => {
-                    const message = err instanceof HttpErrorResponse ? `Failed to update category: ${err.error?.message || err.message}` : `Failed to update category`;
-                    this._notificationService.error('Category Update', message);
+                    const message = err instanceof HttpErrorResponse ? `Failed to update brand: ${err.error?.message || err.message}` : `Failed to update brand`;
+                    this._notificationService.error('Brand Update', message);
                     return EMPTY;
                 }),
                 finalize(() => {
@@ -144,7 +145,7 @@ export class ViewSubCategoryDetailsComponent {
                         this._reload$.next();
                         this.editMode = false;
                     } else {
-                        const notificationRef = this._notificationService.warning('Category Update', response.body?.message || 'Unable To Update Category');
+                        const notificationRef = this._notificationService.warning('Brand Update', response.body?.message || 'Unable To Update Brand');
                         notificationRef.onClose.subscribe(() => {
                             this.buttonLoading.set(false);
                         });
@@ -155,56 +156,56 @@ export class ViewSubCategoryDetailsComponent {
 
     // Quick Actions
     viewAllProducts(): void {
-        // Navigate to products page with category filter
+        // Navigate to products page with brand filter
         this._router.navigate(['/configuration/product'], {
             queryParams: {
-                category: this.itemId(),
-                categoryName: this.subCategory()?.name,
+                brand: this.itemId(),
+                brandName: this.brand()?.name,
             },
         });
     }
 
     viewLowStockProducts(): void {
-        // Navigate to centralized alerts page with category filter
+        // Navigate to centralized alerts page with brand filter
         this._router.navigate(['/configuration/alerts'], {
             queryParams: {
-                type: 'sub-category',
+                type: 'brand',
                 id: this.itemId(),
-                name: this.subCategory()?.name,
+                name: this.brand()?.name,
                 alert: 'low-stock',
             },
         });
     }
 
     viewAnalytics(): void {
-        // Navigate to centralized analytics page with category filter
+        // Navigate to centralized analytics page with brand filter
         this._router.navigate(['/configuration/analytics'], {
             queryParams: {
-                type: 'sub-category',
+                type: 'brand',
                 id: this.itemId(),
-                name: this.subCategory()?.name,
+                name: this.brand()?.name,
             },
         });
     }
 
     generateInventoryReport(): void {
         if (!this.itemId()) {
-            this._notificationService.error('Generate Inventory Report', 'Sub Category ID is missing');
+            this._notificationService.error('Generate Inventory Report', 'Brand ID is missing');
             return;
         }
 
-        const url = APIEndpoint.GENERATE_INVENTORY_REPORT_BY_SUB_CATEGORY;
+        const url = APIEndpoint.GENERATE_INVENTORY_REPORT_BY_BRAND;
         const payload = { oid: this.itemId() };
         this.generateReport(url, payload, 'inventory_report');
     }
 
     exportProductsToExcel(): void {
         if (!this.itemId()) {
-            this._notificationService.error('Export Products', 'Sub Category ID is missing');
+            this._notificationService.error('Export Products', 'Brand ID is missing');
             return;
         }
 
-        const url = APIEndpoint.GENERATE_PRODUCT_LIST_REPORT_BY_SUB_CATEGORY;
+        const url = APIEndpoint.GENERATE_PRODUCT_LIST_REPORT_BY_BRAND;
         const payload = { oid: this.itemId() };
         this.generateReport(url, payload, 'product_export');
     }

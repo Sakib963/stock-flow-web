@@ -25,11 +25,13 @@ export class APIEndpoint {
   static GENERATE_PRODUCT_LIST_REPORT_BY_SUB_CATEGORY = "/api/v1/configuration/sub-category/generate-product-list-report-by-sub-category";
   static GENERATE_INVENTORY_REPORT_BY_SUB_CATEGORY = "/api/v1/configuration/sub-category/generate-inventory-report-by-sub-category";
   
-  static GET_BRAND_LIST = '/api/v1/manager/brands/get-brand-list';
-  static CREATE_BRAND = '/api/v1/manager/brands/create-brand';
-  static GET_BRAND_DETAILS = '/api/v1/manager/brands/get-brand-details';
-  static UPDATE_BRAND_DETAILS = "/api/v1/manager/brands/update-brand-details";
-  static GET_BRAND_LIST_FOR_DROPDOWN = "/api/v1/manager/brands/get-brand-list-for-dropdown";
+  static GET_BRAND_LIST = '/api/v1/configuration/brands/get-brand-list';
+  static CREATE_BRAND = '/api/v1/configuration/brands/create-brand';
+  static GET_BRAND_DETAILS = '/api/v1/configuration/brands/get-brand-details';
+  static UPDATE_BRAND_DETAILS = "/api/v1/configuration/brands/update-brand-details";
+  static GET_BRAND_LIST_FOR_DROPDOWN = "/api/v1/configuration/brands/get-brand-list-for-dropdown";
+  static GENERATE_PRODUCT_LIST_REPORT_BY_BRAND = "/api/v1/configuration/brands/generate-product-list-report-by-brand";
+  static GENERATE_INVENTORY_REPORT_BY_BRAND = "/api/v1/configuration/brands/generate-inventory-report-by-brand";
 
   static GET_SUPPLIER_LIST = '/api/v1/manager/supplier/get-supplier-list';
   static CREATE_SUPPLIER = '/api/v1/manager/supplier/create-supplier';

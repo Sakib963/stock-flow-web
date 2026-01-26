@@ -1,0 +1,17 @@
+<!-- Page Header with breadcrumbs, title, actions, and filters -->
+<page-header [title]="'Add Brand'"
+      [description]="'Create a new product brand to organize your products effectively. Fill in the necessary details and save to add the brand.'"
+      [pageKey]="'configuration.brand.create'" [showBackButton]="false" [extraTemplate]="headerActions">
+</page-header>
+
+<!-- Template for header actions (buttons) -->
+<ng-template #headerActions>
+      <button nz-button nzType="default" (click)="goBack()">
+            <nz-icon nzType="left" nzTheme="outline" />
+            Back
+      </button>
+</ng-template>
+
+<!-- Content Section -->
+<nz-divider class="my-0"></nz-divider>
+<brand-form [buttonLoading]="buttonLoading()" (actions)="onFormActions($event)"></brand-form>
