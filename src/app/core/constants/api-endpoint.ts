@@ -22,7 +22,9 @@ export class APIEndpoint {
   static UPDATE_SUB_CATEGORY_DETAILS = "/api/v1/configuration/sub-category/update-sub-category-details";
   static GET_SUB_CATEGORY_DETAILS = "/api/v1/configuration/sub-category/get-sub-category-details";
   static GET_SUB_CATEGORY_LIST_FOR_DROPDOWN = "/api/v1/configuration/sub-category/get-sub-category-list-for-dropdown";
-
+  static GENERATE_PRODUCT_LIST_REPORT_BY_SUB_CATEGORY = "/api/v1/configuration/sub-category/generate-product-list-report-by-sub-category";
+  static GENERATE_INVENTORY_REPORT_BY_SUB_CATEGORY = "/api/v1/configuration/sub-category/generate-inventory-report-by-sub-category";
+  
   static GET_BRAND_LIST = '/api/v1/manager/brands/get-brand-list';
   static CREATE_BRAND = '/api/v1/manager/brands/create-brand';
   static GET_BRAND_DETAILS = '/api/v1/manager/brands/get-brand-details';

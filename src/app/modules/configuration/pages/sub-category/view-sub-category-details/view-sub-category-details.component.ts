@@ -19,10 +19,10 @@ import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { Subject, combineLatest, startWith, tap, switchMap, map, catchError, EMPTY, finalize } from 'rxjs';
 
 @Component({
-  selector: 'view-sub-category-details',
+    selector: 'view-sub-category-details',
     imports: [PageHeaderComponent, NgZorroCustomModule, FormsModule, SubCategoryFormComponent, NotFoundComponent, LoaderComponent, DatePipe, SafeTextPipe],
-  templateUrl: './view-sub-category-details.component.html',
-  styleUrl: './view-sub-category-details.component.scss'
+    templateUrl: './view-sub-category-details.component.html',
+    styleUrl: './view-sub-category-details.component.scss',
 })
 export class ViewSubCategoryDetailsComponent {
     itemId = input.required<string>({ alias: 'oid' });
@@ -193,7 +193,7 @@ export class ViewSubCategoryDetailsComponent {
             return;
         }
 
-        const url = APIEndpoint.GENERATE_INVENTORY_REPORT_BY_CATEGORY;
+        const url = APIEndpoint.GENERATE_INVENTORY_REPORT_BY_SUB_CATEGORY;
         const payload = { oid: this.itemId() };
         this.generateReport(url, payload, 'inventory_report');
     }
@@ -204,7 +204,7 @@ export class ViewSubCategoryDetailsComponent {
             return;
         }
 
-        const url = APIEndpoint.GENERATE_PRODUCT_LIST_REPORT_BY_CATEGORY;
+        const url = APIEndpoint.GENERATE_PRODUCT_LIST_REPORT_BY_SUB_CATEGORY;
         const payload = { oid: this.itemId() };
         this.generateReport(url, payload, 'product_export');
     }
@@ -225,11 +225,7 @@ export class ViewSubCategoryDetailsComponent {
                         return;
                     }
 
-                    const now = new Date();
-                    const pad = (n: number) => n.toString().padStart(2, '0');
-                    const timestamp = `${pad(now.getDate())}${pad(now.getMonth() + 1)}${now.getFullYear()}${pad(now.getHours())}${pad(now.getMinutes())}`;
-
-                    const fileName = `${report_key}_${timestamp}.xlsx`;
+                    const fileName = res.headers.get('X-Filename') || `${report_key}_${Date.now()}.xlsx`;
 
                     const url = window.URL.createObjectURL(blob);
                     const a = document.createElement('a');

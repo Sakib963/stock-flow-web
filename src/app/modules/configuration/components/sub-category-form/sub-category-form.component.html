@@ -1,6 +1,19 @@
 <div class="p-4">
       <form nz-form [formGroup]="form" [nzLayout]="'vertical'" (ngSubmit)="onSubmit()">
             <div class="grid grid-cols-1 md:gap-x-6 md:grid-cols-2 lg:grid-cols-3">
+                  <!-- category_oid -->
+                  <nz-form-item>
+                        <nz-form-label [nzRequired]="hasRequiredValidator('category_oid')">Parent
+                              Category</nz-form-label>
+                        <nz-form-control nzErrorTip="Category is required.">
+                              <nz-select class="w-full" formControlName="category_oid" nzShowSearch nz-input nzAllowClear
+                                    nzPlaceHolder="Select Category">
+                                    <ng-container *ngFor="let item of categoryList">
+                                          <nz-option [nzLabel]="item.label" [nzValue]="item.value"></nz-option>
+                                    </ng-container>
+                              </nz-select>
+                        </nz-form-control>
+                  </nz-form-item>
                   <!-- Name -->
                   <nz-form-item>
                         <nz-form-label [nzRequired]="hasRequiredValidator('name')">Name</nz-form-label>

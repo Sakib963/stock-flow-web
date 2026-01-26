@@ -226,11 +226,7 @@ export class ViewCategoryDetailsComponent {
                         return;
                     }
 
-                    const now = new Date();
-                    const pad = (n: number) => n.toString().padStart(2, '0');
-                    const timestamp = `${pad(now.getDate())}${pad(now.getMonth() + 1)}${now.getFullYear()}${pad(now.getHours())}${pad(now.getMinutes())}`;
-
-                    const fileName = `${report_key}_${timestamp}.xlsx`;
+                    const fileName = res.headers.get('X-Filename') || `${report_key}_${Date.now()}.xlsx`;
 
                     const url = window.URL.createObjectURL(blob);
                     const a = document.createElement('a');
