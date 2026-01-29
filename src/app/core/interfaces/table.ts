@@ -6,8 +6,8 @@
 export interface TableColumn {
   source?: string; // Data source field
   label: string; // Column header label
-  width?: string; // Column width (e.g., '150px', '20%', 'auto')
-  sortable?: boolean; // Is the column sortable
+  width: string; // Column width (e.g., '150px', '20%', 'auto')
+  alignment: 'left' | 'center' | 'right'; // Text alignment in the column
   filterable?: boolean; // Is the column filterable
   column_type?:
     | 'text'

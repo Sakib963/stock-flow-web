@@ -33,11 +33,11 @@ export class APIEndpoint {
   static GENERATE_PRODUCT_LIST_REPORT_BY_BRAND = "/api/v1/configuration/brands/generate-product-list-report-by-brand";
   static GENERATE_INVENTORY_REPORT_BY_BRAND = "/api/v1/configuration/brands/generate-inventory-report-by-brand";
 
-  static GET_SUPPLIER_LIST = '/api/v1/manager/supplier/get-supplier-list';
-  static CREATE_SUPPLIER = '/api/v1/manager/supplier/create-supplier';
-  static GET_SUPPLIER_DETAILS = '/api/v1/manager/supplier/get-supplier-details';
-  static UPDATE_SUPPLIER_DETAILS = "/api/v1/manager/supplier/update-supplier-details";
-  static GET_SUPPLIER_LIST_FOR_DROPDOWN = "/api/v1/manager/supplier/get-supplier-list-for-dropdown";
+  static GET_SUPPLIER_LIST = '/api/v1/configuration/supplier/get-supplier-list';
+  static CREATE_SUPPLIER = '/api/v1/configuration/supplier/create-supplier';
+  static GET_SUPPLIER_DETAILS = '/api/v1/configuration/supplier/get-supplier-details';
+  static UPDATE_SUPPLIER_DETAILS = "/api/v1/configuration/supplier/update-supplier-details";
+  static GET_SUPPLIER_LIST_FOR_DROPDOWN = "/api/v1/configuration/supplier/get-supplier-list-for-dropdown";
   
   static GET_PRODUCT_LIST = "/api/v1/manager/product/get-product-list";
   static CREATE_PRODUCT = "/api/v1/manager/product/create-product";

@@ -27,17 +27,6 @@ export const CONFIGURATION_BREADCRUMBS: ModuleBreadcrumbConfig = {
     }
   },
 
-  // Fix Issues Feature
-  'fix-issues': {
-    parent: [
-      { label: 'Home', url: '/', icon: 'home' },
-      { label: 'Configuration', url: '/configuration/stats' }
-    ],
-    pages: {
-      main: [{ label: 'Fix Issues', url: '/configuration/fix-issues' }],
-    }
-  },
-
   // Category Feature
   category: {
     parent: [
@@ -54,14 +43,44 @@ export const CONFIGURATION_BREADCRUMBS: ModuleBreadcrumbConfig = {
   },
 
   // Sub-Category Feature
-  subCategory: {
+  'sub-category': {
     parent: [
       { label: 'Home', url: '/', icon: 'home' },
       { label: 'Configuration', url: '/configuration/stats' },
-      { label: 'Sub-Category', url: '/configuration/sub-category/list' },
+      { label: 'Sub Category', url: '/configuration/sub-category/list' },
     ],
     pages: {
       list: [{ label: 'List', url: '/configuration/sub-category/list' }],
+      create: [{ label: 'Create' }],
+      view: [{ label: 'View' }],
+      edit: [{ label: 'Edit' }]
+    }
+  },
+
+  // Brand Feature
+  brand: {
+    parent: [
+      { label: 'Home', url: '/', icon: 'home' },
+      { label: 'Configuration', url: '/configuration/stats' },
+      { label: 'Brand', url: '/configuration/brand/list' },
+    ],
+    pages: {
+      list: [{ label: 'List', url: '/configuration/brand/list' }],
+      create: [{ label: 'Create' }],
+      view: [{ label: 'View' }],
+      edit: [{ label: 'Edit' }]
+    }
+  },
+
+  // Supplier Feature
+  supplier: {
+    parent: [
+      { label: 'Home', url: '/', icon: 'home' },
+      { label: 'Configuration', url: '/configuration/stats' },
+      { label: 'Supplier', url: '/configuration/supplier/list' },
+    ],
+    pages: {
+      list: [{ label: 'List', url: '/configuration/supplier/list' }],
       create: [{ label: 'Create' }],
       view: [{ label: 'View' }],
       edit: [{ label: 'Edit' }]

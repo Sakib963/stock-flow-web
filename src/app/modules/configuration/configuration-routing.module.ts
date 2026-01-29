@@ -85,6 +85,28 @@ const routes: Routes = [
             },
         ],
     },
+    {
+        path: 'supplier',
+        children: [
+            {
+                path: '',
+                redirectTo: 'list',
+                pathMatch: 'full',
+            },
+            {
+                path: 'create',
+                loadComponent: () => import('./pages/supplier/create-supplier/create-supplier.component').then((m) => m.CreateSupplierComponent),
+            },
+            {
+                path: 'view/:oid',
+                loadComponent: () => import('./pages/supplier/view-supplier-details/view-supplier-details.component').then((m) => m.ViewSupplierDetailsComponent),
+            },
+            {
+                path: 'list',
+                loadComponent: () => import('./pages/supplier/supplier-list/supplier-list.component').then((m) => m.SupplierListComponent),
+            },
+        ],
+    }
 ];
 
 @NgModule({

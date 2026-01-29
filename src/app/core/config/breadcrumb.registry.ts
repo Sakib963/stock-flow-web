@@ -55,30 +55,18 @@ export function getGlobalBreadcrumbs(
 
 /**
  * Get breadcrumbs using compound key format
- * @param key - Format: 'module.feature-pageType' (e.g., 'configuration.category-list')
+ * @param key - Format: 'module.feature.pageType' (e.g., 'configuration.category.list', 'configuration.sub-category.view')
  * @returns Complete breadcrumb array
  */
 export function getBreadcrumbsByKey(key: string): Breadcrumb[] {
-  // Support both formats: 'module.feature-pageType' or 'module.feature.pageType'
-  let module: string, feature: string, pageType: string;
-  
-  if (key.includes('-')) {
-    // Format: 'module.feature-pageType'
-    const [moduleFeature, page] = key.split('-');
-    const parts = moduleFeature.split('.');
-    module = parts[0];
-    feature = parts[1];
-    pageType = page || 'list';
-  } else {
-    // Format: 'module.feature.pageType'
-    const parts = key.split('.');
-    module = parts[0];
-    feature = parts[1];
-    pageType = parts[2] || 'list';
-  }
+  // Format: 'module.feature.pageType'
+  const parts = key.split('.');
+  const module = parts[0];
+  const feature = parts.slice(1, -1).join('.'); // Handle multi-part feature names like 'sub-category'
+  const pageType = parts[parts.length - 1] || 'list';
   
   if (!module || !feature) {
-    console.warn(`Invalid breadcrumb key format: '${key}'. Expected format: 'module.feature-pageType' or 'module.feature.pageType'`);
+    console.warn(`Invalid breadcrumb key format: '${key}'. Expected format: 'module.feature.pageType'`);
     return [];
   }
   

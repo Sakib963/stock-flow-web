@@ -1,7 +1,7 @@
 <!-- Page Header with breadcrumbs, title, actions, and filters -->
-<page-header [title]="'Register New Brand'"
-      [description]="'Register a new manufacturer or brand to organize your products'"
-      [pageKey]="'configuration.brand.create'" [showBackButton]="false" [extraTemplate]="headerActions">
+<page-header [title]="'Add New Supplier'"
+      [description]="'Register a new supplier with contact and business information'"
+      [pageKey]="'configuration.supplier.create'" [showBackButton]="false" [extraTemplate]="headerActions">
 </page-header>
 
 <!-- Template for header actions (buttons) -->
@@ -14,4 +14,4 @@
 
 <!-- Content Section -->
 <nz-divider class="my-0"></nz-divider>
-<brand-form [buttonLoading]="buttonLoading()" (actions)="onFormActions($event)"></brand-form>
+<supplier-form [buttonLoading]="buttonLoading()" (actions)="onFormActions($event)"></supplier-form>

@@ -1,7 +1,6 @@
 <!-- Page Header with breadcrumbs, title, actions, and filters -->
-<page-header [title]="'Brand List'"
-      [description]="'View and manage all manufacturers and brands in your inventory'"
-      [pageKey]="'configuration.brand.list'" [showBackButton]="false" [extraTemplate]="headerActions"
+<page-header [title]="'Supplier List'" [description]="'View and manage all suppliers and vendors in your system'"
+      [pageKey]="'configuration.supplier.list'" [showBackButton]="false" [extraTemplate]="headerActions"
       [contentTemplate]="headerFilters">
 </page-header>
 
@@ -10,7 +9,7 @@
       <nz-space>
             <button nz-button nzType="primary" (click)="handleListActions({ action: 'create', value: null })">
                   <nz-icon nzType="plus"></nz-icon>
-                  Add Brand
+                  Add Supplier
             </button>
       </nz-space>
 </ng-template>
@@ -19,7 +18,7 @@
 <ng-template #headerFilters>
       <nz-divider class="mt-0 mb-4"></nz-divider>
       <nz-input-group [nzPrefix]="prefixTemplateSearch" class="w-full md:w-96">
-            <input type="text" nz-input placeholder="Search brands..." [formControl]="searchControl" />
+            <input type="text" nz-input placeholder="Search suppliers..." [formControl]="searchControl" />
       </nz-input-group>
       <ng-template #prefixTemplateSearch>
             <span nz-icon nzType="search"></span>
@@ -34,10 +33,11 @@
 } @else {
 <nz-divider class="my-0"></nz-divider>
 <div class="p-4">
-      <!-- Adaptive List Component to display brands -->
-      <adaptive-list [dataSource]="data" [tableConfig]="brandTableConfig" [loading]="tableLoading"
+      <!-- Adaptive List Component to display suppliers -->
+      <adaptive-list [dataSource]="data" [tableConfig]="supplierTableConfig" [loading]="tableLoading"
             [totalCount]="totalCount" [pageSize]="payload.limit" [pageIndex]="payload.offset / payload.limit"
             (actionEvent)="handleListActions($event)" (paginationChange)="handlePaginationEvent($event)">
       </adaptive-list>
+      
 </div>
 }

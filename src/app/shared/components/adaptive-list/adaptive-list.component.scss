@@ -2,11 +2,6 @@
   display: block;
   
   ::ng-deep {
-    // Table styling
-    .ant-table {
-      @apply bg-white rounded-lg shadow-sm;
-    }
-
     // Card styling for both desktop and mobile
     .ant-card {
       @apply border border-gray-200 transition-all duration-300;

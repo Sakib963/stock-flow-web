@@ -14,14 +14,14 @@
 <!-- Desktop: Table View (when currentView === 0) -->
 @if (currentView === 0) {
 <div class="hidden md:block">
-      <nz-table #basicTable [nzData]="dataSource()" [nzLoading]="loading()" [nzShowPagination]="false"
-            [nzPageSize]="pageSize()" [nzNoResult]="noDataTemplate">
+      <nz-table nzSize="middle" #basicTable [nzData]="dataSource()" [nzLoading]="loading()" [nzShowPagination]="false"
+            [nzPageSize]="pageSize()" [nzNoResult]="noDataTemplate" [nzScroll]="{ x: '100%' }">
             <thead>
                   <tr>
                         <!-- Index Column -->
                         <th [nzWidth]="'60px'">#</th>
                         @for (column of getDataColumns(); track column.label) {
-                        <th [nzWidth]="column.width || 'auto'">{{ column.label }}</th>
+                        <th [nzAlign]="column.alignment" [nzWidth]="column.width || 'auto'">{{ column.label }}</th>
                         }
                         @if (getActionColumn()) {
                         <th nzAlign="center" [nzWidth]="getActionColumn()?.width || '120px'">{{ getActionColumn()?.label
@@ -33,16 +33,14 @@
                   @for (item of basicTable.data; track item; let idx = $index) {
                   <tr>
                         <!-- Index Column -->
-                        <td>{{ getRowIndex(idx) }}</td>
+                        <td [nzEllipsis]="true">{{ getRowIndex(idx) }}</td>
                         @for (column of getDataColumns(); track column.label) {
-                        <td>
+                        <td [nzAlign]="column.alignment" [nzEllipsis]="true">
                               @if (column.column_type === 'long-text') {
                               <!-- Long text with popover -->
-                              <div class="max-w-md truncate cursor-pointer" nz-popover
-                                    nzPopoverOverlayClassName="max-w-[400px] break-words" nzPopoverPlacement="bottom"
-                                    [nzPopoverContent]="getCellValue(item, column)">
-                                    {{ getCellValue(item, column) }}
-                              </div>
+                              <span nz-popover nzPopoverOverlayClassName="max-w-[400px] break-all"
+                                    nzPopoverPlacement="left" [nzPopoverContent]="getCellValue(item, column)">{{
+                                    getCellValue(item, column) }}</span>
                               } @else if (column.text_color) {
                               <!-- Status with tag and tooltip -->
                               <nz-tag [nzColor]="getTextColor(item, column)" nz-tooltip nzTooltipPlacement="bottom"
@@ -103,22 +101,20 @@
       <!-- Grid layout for cards -->
       <div [class]="getCardGridClass()">
             @for (item of dataSource(); track item; let idx = $index) {
-            <nz-card [nzSize]="'small'" [nzTitle]="cardTitle" [nzExtra]="cardExtra" 
-                     class="h-full hover:shadow-xl transition-all duration-300 cursor-pointer border border-gray-200 hover:border-primary">
+            <nz-card [nzSize]="'small'" [nzTitle]="cardTitle" [nzExtra]="cardExtra"
+                  class="h-full hover:shadow-xl transition-all duration-300 cursor-pointer border border-gray-200 hover:border-primary">
                   <ng-template #cardTitle>
                         <div class="font-medium text-sm text-gray-800">
                               <span class="text-gray-400 text-xs mr-1">#{{ getRowIndex(idx) }}</span>
                               {{ getCellValue(item, getDataColumns()[0]) }}
                         </div>
                   </ng-template>
-                  
+
                   <ng-template #cardExtra>
                         <nz-space [nzSize]="4">
                               @for (action of getActionColumn()?.actions; track action.action) {
-                              <button *nzSpaceItem nz-button nzType="text" nzSize="small"
-                                    nz-tooltip
-                                    nzTooltipPlacement="bottom"
-                                    [nzTooltipTitle]="action.label"
+                              <button *nzSpaceItem nz-button nzType="text" nzSize="small" nz-tooltip
+                                    nzTooltipPlacement="bottom" [nzTooltipTitle]="action.label"
                                     (click)="handleAction(action.action, item)">
                                     <span nz-icon [nzType]="action.icon || 'setting'"></span>
                               </button>
@@ -150,10 +146,8 @@
       @if (dataSource().length > 0) {
       <div class="mt-4 flex justify-end">
             <nz-pagination [nzPageIndex]="pageIndex() + 1" [nzTotal]="totalCount()" [nzPageSize]="pageSize()"
-                  [nzPageSizeOptions]="tableConfig().pageSizeOptions" 
-                  [nzShowSizeChanger]="true"
-                  [nzShowTotal]="totalTemplate"
-                  (nzPageIndexChange)="onPageChange($event)"
+                  [nzPageSizeOptions]="tableConfig().pageSizeOptions" [nzShowSizeChanger]="true"
+                  [nzShowTotal]="totalTemplate" (nzPageIndexChange)="onPageChange($event)"
                   (nzPageSizeChange)="onPageSizeChange($event)">
             </nz-pagination>
       </div>
@@ -174,21 +168,19 @@
       <div class="space-y-4">
             @for (item of dataSource(); track item; let idx = $index) {
             <nz-card [nzSize]="'small'" [nzTitle]="cardTitle" [nzExtra]="cardExtra"
-                     class="hover:shadow-xl transition-all duration-300 border border-gray-200 hover:border-primary">
+                  class="hover:shadow-xl transition-all duration-300 border border-gray-200 hover:border-primary">
                   <ng-template #cardTitle>
                         <div class="font-medium text-sm text-gray-800">
                               <span class="text-gray-400 text-xs mr-1">#{{ getRowIndex(idx) }}</span>
                               {{ getCellValue(item, getDataColumns()[0]) }}
                         </div>
                   </ng-template>
-                  
+
                   <ng-template #cardExtra>
                         <nz-space [nzSize]="4">
                               @for (action of getActionColumn()?.actions; track action.action) {
-                              <button *nzSpaceItem nz-button nzType="text" nzSize="small"
-                                    nz-tooltip
-                                    nzTooltipPlacement="bottom"
-                                    [nzTooltipTitle]="action.label"
+                              <button *nzSpaceItem nz-button nzType="text" nzSize="small" nz-tooltip
+                                    nzTooltipPlacement="bottom" [nzTooltipTitle]="action.label"
                                     (click)="handleAction(action.action, item)">
                                     <span nz-icon [nzType]="action.icon || 'setting'"></span>
                               </button>
