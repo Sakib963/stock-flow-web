@@ -24,7 +24,7 @@
                         <th [nzAlign]="column.alignment" [nzWidth]="column.width || 'auto'">{{ column.label }}</th>
                         }
                         @if (getActionColumn()) {
-                        <th nzAlign="center" [nzWidth]="getActionColumn()?.width || '120px'">{{ getActionColumn()?.label
+                        <th [nzAlign]="getActionColumn()?.alignment || 'center'" [nzWidth]="getActionColumn()?.width || '120px'" class="pr-9">{{ getActionColumn()?.label
                               }}</th>
                         }
                   </tr>
@@ -58,7 +58,7 @@
                         </td>
                         }
                         @if (getActionColumn()) {
-                        <td nzAlign="center">
+                        <td [nzAlign]="getActionColumn()?.alignment || 'center'" class="pr-10">
                               <nz-space>
                                     @for (action of getActionColumn()?.actions; track action.action) {
                                     <button *nzSpaceItem nz-button nzType="text" nzSize="small" nz-tooltip

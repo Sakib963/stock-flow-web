@@ -1,1 +1,363 @@
-<p>view-supplier-details works!</p>
+<!-- Page Header with breadcrumbs, title, actions, and filters -->
+<page-header [title]="'Supplier Details'" [description]="'View and manage supplier information, products, and performance'" [pageKey]="'configuration.supplier.view'" [showBackButton]="false" [extraTemplate]="headerActions"> </page-header>
+
+<!-- Template for header actions (buttons) -->
+<ng-template #headerActions>
+    <!-- Switch between view mode and edit mode -->
+    @if (editable()) {
+        <nz-switch accessControl nzCheckedChildren="View Mode" nzUnCheckedChildren="Edit Mode" [ngModel]="editMode" (ngModelChange)="handleSwitchChange($event)"> </nz-switch>
+    }
+</ng-template>
+
+<!-- Content -->
+@if (loading()) {
+    <app-loader [isVisible]="true"></app-loader>
+} @else {
+    @if (supplier(); as supplier) {
+        @if (!editMode) {
+            <!-- Supplier Details -->
+            <nz-divider class="my-0"></nz-divider>
+            <div class="p-4">
+                <div class="border rounded-sm bg-white p-4">
+                    <h3 class="text-base font-bold text-gray-900 mb-4">Details</h3>
+
+                    <dl class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-5">
+                        <div>
+                            <dt class="text-xs text-gray-500">Supplier Name</dt>
+                            <dd class="text-sm text-gray-900 font-medium">
+                                {{ supplier.name }}
+                            </dd>
+                        </div>
+
+                        <div>
+                            <dt class="text-xs text-gray-500">Status</dt>
+                            <dd>
+                                @if (supplier.status === 'Active') {
+                                    <nz-tag nzColor="#109648">
+                                        <nz-icon nzType="check" class="mr-1"></nz-icon>
+                                        Active</nz-tag
+                                    >
+                                } @else {
+                                    <nz-tag nzColor="#DF2935">
+                                        <nz-icon nzType="close" class="mr-1"></nz-icon>
+                                        Inactive</nz-tag
+                                    >
+                                }
+                            </dd>
+                        </div>
+
+                        <div>
+                            <dt class="text-xs text-gray-500">Contact Person</dt>
+                            <dd class="text-sm text-gray-900">
+                                {{ supplier.contact_person || 'N/A' }}
+                            </dd>
+                        </div>
+
+                        <div>
+                            <dt class="text-xs text-gray-500">Email</dt>
+                            <dd class="text-sm text-gray-900">
+                                {{ supplier.email || 'N/A' }}
+                            </dd>
+                        </div>
+
+                        <div>
+                            <dt class="text-xs text-gray-500">Phone</dt>
+                            <dd class="text-sm text-gray-900">
+                                {{ supplier.phone_number || 'N/A' }}
+                            </dd>
+                        </div>
+
+                        <div>
+                            <dt class="text-xs text-gray-500">Address</dt>
+                            <dd class="text-sm text-gray-900">
+                                {{ supplier.address | safeText }}
+                            </dd>
+                        </div>
+                    </dl>
+                </div>
+            </div>
+
+            <!-- actions -->
+            <nz-divider class="my-4"></nz-divider>
+            <div class="flex justify-end px-4">
+                <div class="flex items-center gap-4 form-buttons-container">
+                    <button nz-button nzType="default" type="button" (click)="navigateBack()">
+                        <nz-icon nzTheme="outline" nzType="arrow-left"></nz-icon>
+                        Back
+                    </button>
+                </div>
+            </div>
+
+            <!-- Additional Information Sections -->
+            <nz-divider nzDashed [nzText]="text">
+                <ng-template #text>
+                    <h2 class="text-lg font-semibold text-primary">
+                        <nz-icon nzType="info-circle" nzTheme="outline" class="mr-2"></nz-icon>
+                        Additional Information
+                    </h2>
+                </ng-template>
+            </nz-divider>
+            <div class="p-4 space-y-4">
+                <!-- Quick Actions Panel (Always Visible) -->
+                <div class="mb-4">
+                    <nz-card nzTitle="Quick Actions" [nzExtra]="quickActionsExtra">
+                        <div class="flex flex-wrap gap-3">
+                            <button nz-button nzType="default" (click)="viewSuppliedProducts()" [disabled]="this.supplierStats()?.totalProducts === 0">
+                                <nz-icon nzType="eye" nzTheme="outline"></nz-icon>
+                                View Supplied Products
+                            </button>
+                            <button nz-button nzType="default" (click)="viewPurchaseOrders()" [disabled]="this.supplierStats()?.totalProducts === 0">
+                                <nz-icon nzType="shopping-cart" nzTheme="outline"></nz-icon>
+                                View Purchase Orders
+                            </button>
+                            <button nz-button nzType="default" (click)="viewSupplierPerformance()" [disabled]="this.supplierStats()?.totalProducts === 0">
+                                <nz-icon nzType="line-chart" nzTheme="outline"></nz-icon>
+                                View Performance
+                            </button>
+                            <button nz-button nzType="default" (click)="generateSupplierReport()" [disabled]="this.supplierStats()?.totalProducts === 0 || loadingReportKey() !== null" [nzLoading]="loadingReportKey() === 'supplier_report'">
+                                <nz-icon nzType="file-text" nzTheme="outline"></nz-icon>
+                                Generate Supplier Report
+                            </button>
+                            <button nz-button nzType="default" (click)="exportSupplierDataToExcel()" [disabled]="this.supplierStats()?.totalProducts === 0 || loadingReportKey() !== null" [nzLoading]="loadingReportKey() === 'supplier_export'">
+                                <nz-icon nzType="download" nzTheme="outline"></nz-icon>
+                                Export Supplier Data
+                            </button>
+                        </div>
+                    </nz-card>
+                    <ng-template #quickActionsExtra>
+                        <nz-icon nzType="thunderbolt" nzTheme="twotone" class="text-lg"></nz-icon>
+                    </ng-template>
+                </div>
+                @if (supplierStats(); as stats) {
+                    <nz-card nzTitle="Supplier Statistics" [nzExtra]="statsExtra">
+                        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+                            <div class="text-center">
+                                <nz-statistic [nzValue]="stats.totalProducts" [nzTitle]="'Total Products'" [nzPrefix]="prefixTotalProducts"> </nz-statistic>
+                                <ng-template #prefixTotalProducts>
+                                    <span nz-icon nzType="appstore" nzTheme="outline"></span>
+                                </ng-template>
+                            </div>
+                            <div class="text-center">
+                                <nz-statistic [nzValue]="stats.totalPurchaseValue" [nzTitle]="'Purchase Value'" [nzPrefix]="prefixCurrency"> </nz-statistic>
+                                <ng-template #prefixCurrency>
+                                    <span nz-icon nzType="dollar" nzTheme="outline"></span>
+                                </ng-template>
+                            </div>
+                            <div class="text-center">
+                                <nz-statistic [nzValue]="stats.activePurchaseOrders" [nzTitle]="'Active Orders'" [nzValueStyle]="{ color: '#1890ff' }" [nzPrefix]="prefixActive"> </nz-statistic>
+                                <ng-template #prefixActive>
+                                    <span nz-icon nzType="shopping" nzTheme="outline"></span>
+                                </ng-template>
+                            </div>
+                            <div class="text-center">
+                                <nz-statistic [nzValue]="stats.completedOrders" [nzTitle]="'Completed Orders'" [nzValueStyle]="{ color: '#52c41a' }" [nzPrefix]="prefixCompleted"> </nz-statistic>
+                                <ng-template #prefixCompleted>
+                                    <span nz-icon nzType="check-circle" nzTheme="outline"></span>
+                                </ng-template>
+                            </div>
+                            <div class="text-center">
+                                <nz-statistic [nzValue]="stats.averageLeadTime" [nzTitle]="'Avg. Lead Time'" [nzSuffix]="'days'" [nzPrefix]="prefixTime"> </nz-statistic>
+                                <ng-template #prefixTime>
+                                    <span nz-icon nzType="clock-circle" nzTheme="outline"></span>
+                                </ng-template>
+                            </div>
+                            <div class="text-center">
+                                <nz-statistic [nzValue]="stats.onTimeDeliveryRate" [nzTitle]="'Completion Rate'" [nzSuffix]="'%'" [nzPrefix]="prefixRate"> </nz-statistic>
+                                <ng-template #prefixRate>
+                                    <span nz-icon nzType="rocket" nzTheme="outline"></span>
+                                </ng-template>
+                            </div>
+                        </div>
+                    </nz-card>
+                    <ng-template #statsExtra>
+                        <nz-icon nzType="highlight" nzTheme="twotone" class="text-lg" />
+                    </ng-template>
+                } @else {
+                    <nz-empty nzNotFoundContent="No statistics available"></nz-empty>
+                }
+
+                <!-- Analytics & Business Intelligence -->
+                @if (supplierAnalytics(); as analytics) {
+                    <!-- Verification Analytics -->
+                    <nz-card nzTitle="Verification Analytics" [nzExtra]="verificationExtra" class="mb-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <div class="mb-4">
+                                    <div class="flex justify-between items-center mb-2">
+                                        <span class="text-gray-600">Verification Rate</span>
+                                        <span class="text-lg font-semibold text-blue-600">{{ analytics.verification.verificationRate }}%</span>
+                                    </div>
+                                    <nz-progress [nzPercent]="analytics.verification.verificationRate" [nzStrokeColor]="{ '0%': '#108ee9', '100%': '#87d068' }" [nzStatus]="analytics.verification.verificationRate >= 90 ? 'success' : analytics.verification.verificationRate >= 70 ? 'normal' : 'exception'"></nz-progress>
+                                </div>
+                                <div class="grid grid-cols-2 gap-4 mt-4">
+                                    <div class="bg-blue-50 p-3 rounded-lg">
+                                        <div class="text-xs text-gray-600 mb-1">Ordered Quantity</div>
+                                        <div class="text-xl font-semibold text-blue-600">{{ analytics.verification.totalOrdered | number }}</div>
+                                    </div>
+                                    <div class="bg-green-50 p-3 rounded-lg">
+                                        <div class="text-xs text-gray-600 mb-1">Verified Quantity</div>
+                                        <div class="text-xl font-semibold text-green-600">{{ analytics.verification.totalVerified | number }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="mb-4">
+                                    <div class="flex justify-between items-center mb-2">
+                                        <span class="text-gray-600">Cost Variance</span>
+                                        <span class="text-lg font-semibold" [ngClass]="analytics.verification.costVariance >= 0 ? 'text-red-600' : 'text-green-600'"> ${{ analytics.verification.costVariance | number: '1.2-2' }} </span>
+                                    </div>
+                                    <div class="text-xs text-gray-500 mb-3">
+                                        {{ analytics.verification.costVariance >= 0 ? 'Ordered value exceeds verified value' : 'Saved in verification' }}
+                                    </div>
+                                </div>
+                                <div class="grid grid-cols-2 gap-4 mt-4">
+                                    <div class="bg-orange-50 p-3 rounded-lg">
+                                        <div class="text-xs text-gray-600 mb-1">Ordered Value</div>
+                                        <div class="text-xl font-semibold text-orange-600">${{ analytics.verification.orderedValue | number: '1.2-2' }}</div>
+                                    </div>
+                                    <div class="bg-teal-50 p-3 rounded-lg">
+                                        <div class="text-xs text-gray-600 mb-1">Verified Value</div>
+                                        <div class="text-xl font-semibold text-teal-600">${{ analytics.verification.verifiedValue | number: '1.2-2' }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </nz-card>
+                    <ng-template #verificationExtra>
+                        <nz-icon nzType="check-square" nzTheme="twotone" class="text-lg" />
+                    </ng-template>
+
+                    <!-- Top Performing Products -->
+                    @if (analytics.topProducts && analytics.topProducts.length > 0) {
+                        <nz-card nzTitle="Top Selling Products" [nzExtra]="topProductsExtra" class="mb-4">
+                            <div class="space-y-4">
+                                @for (product of analytics.topProducts; track product.name) {
+                                    <div class="border-b border-gray-100 pb-4 last:border-0">
+                                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-3">
+                                            <span class="font-medium text-gray-900 mb-1 sm:mb-0">{{ product.name }}</span>
+                                            <span class="text-sm font-semibold text-green-600">${{ product.profit | number: '1.2-2' }}</span>
+                                        </div>
+                                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-2 text-xs text-gray-600">
+                                            <div class="flex flex-col sm:block">
+                                                <span class="text-gray-500">Sold:</span>
+                                                <span class="ml-0 sm:ml-1 font-medium">{{ product.soldQty }}</span>
+                                            </div>
+                                            <div class="flex flex-col sm:block">
+                                                <span class="text-gray-500">Revenue:</span>
+                                                <span class="ml-0 sm:ml-1 font-medium">${{ product.revenue | number: '1.2-2' }}</span>
+                                            </div>
+                                            <div class="flex flex-col sm:block">
+                                                <span class="text-gray-500">Sales Rate:</span>
+                                                <span class="ml-0 sm:ml-1 font-medium">{{ product.salesRate }}%</span>
+                                            </div>
+                                            <div class="flex flex-col sm:block">
+                                                <span class="text-gray-500">Profit:</span>
+                                                <span class="ml-0 sm:ml-1 font-medium text-green-600">${{ product.profit | number: '1.2-2' }}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </nz-card>
+                        <ng-template #topProductsExtra>
+                            <nz-icon nzType="trophy" nzTheme="twotone" class="text-lg" />
+                        </ng-template>
+                    }
+
+                    <!-- Profitability Analysis -->
+                    @if (analytics.profitability && analytics.profitability.length > 0) {
+                        <nz-card nzTitle="Profitability Analysis" [nzExtra]="profitExtra" class="mb-4">
+                            <div class="space-y-3">
+                                @for (product of analytics.profitability.slice(0, 5); track product.productName) {
+                                    <div class="flex items-center justify-between">
+                                        <div class="flex-1">
+                                            <div class="font-medium text-gray-900 text-sm mb-1">{{ product.productName }}</div>
+                                            <div class="text-xs text-gray-500">Cost: ${{ product.purchasePrice | number: '1.2-2' }} | Price: ${{ product.sellingPrice | number: '1.2-2' }} | Sold: {{ product.soldQty }}</div>
+                                        </div>
+                                        <div class="text-right ml-4">
+                                            <div class="text-lg font-semibold text-green-600">${{ product.totalProfit | number: '1.2-2' }}</div>
+                                            <div class="text-xs" [ngClass]="product.profitMargin >= 20 ? 'text-green-600' : product.profitMargin >= 10 ? 'text-orange-600' : 'text-red-600'">{{ product.profitMargin }}% margin</div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </nz-card>
+                        <ng-template #profitExtra>
+                            <nz-icon nzType="dollar-circle" nzTheme="twotone" class="text-lg" />
+                        </ng-template>
+                    }
+
+                    <!-- Demand Trend -->
+                    @if (analytics.demandTrend && analytics.demandTrend.length > 0) {
+                        <nz-card nzTitle="Demand Trend (Last 12 Months)" [nzExtra]="demandExtra" class="mb-4">
+                            <div class="space-y-2">
+                                @for (trend of analytics.demandTrend; track trend.month) {
+                                    <div class="flex items-center">
+                                        <div class="w-20 text-sm text-gray-600">{{ trend.month }}</div>
+                                        <div class="flex-1 mx-4">
+                                            <nz-progress [nzPercent]="(trend.soldQty / getMaxSoldQty(analytics.demandTrend)) * 100" [nzShowInfo]="false" [nzStrokeColor]="'#1890ff'"></nz-progress>
+                                        </div>
+                                        <div class="w-32 text-right">
+                                            <span class="text-sm font-medium text-gray-900">{{ trend.soldQty }} units</span>
+                                            <span class="text-xs text-gray-500 ml-2">${{ trend.revenue | number: '1.2-2' }}</span>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </nz-card>
+                        <ng-template #demandExtra>
+                            <nz-icon nzType="fund" nzTheme="twotone" class="text-lg" />
+                        </ng-template>
+                    }
+                } @else {
+                    @if (loadingAnalytics()) {
+                        <nz-card class="mb-4">
+                            <nz-spin nzSimple></nz-spin>
+                            <span class="ml-2">Loading analytics...</span>
+                        </nz-card>
+                    }
+                }
+
+                @if (activityTimeline(); as timeline) {
+                    @if (timeline.length > 0) {
+                        <nz-card nzTitle="Recent Activity" [nzExtra]="timelineExtra">
+                            <nz-timeline>
+                                @for (activity of timeline; track activity.date) {
+                                    <nz-timeline-item [nzColor]="$index === 0 ? 'green' : 'gray'">
+                                        <div class="flex flex-col">
+                                            <span class="font-medium text-gray-900">{{ activity.action }}</span>
+                                            <span class="text-sm text-gray-500">by {{ activity.user }}</span>
+                                            <span class="text-xs text-gray-500">{{ activity.description }}</span>
+                                            <span class="text-xs text-gray-400">{{ activity.date | date: 'MMM d, y, h:mm:ss a' }}</span>
+                                        </div>
+                                    </nz-timeline-item>
+                                }
+                            </nz-timeline>
+                        </nz-card>
+                        <ng-template #timelineExtra>
+                            <nz-icon nzType="filter" nzTheme="twotone" class="text-lg" />
+                        </ng-template>
+                    }
+                } @else {
+                    <nz-empty nzNotFoundContent="No activity found"></nz-empty>
+                }
+            </div>
+
+            <!-- actions -->
+            <nz-divider class="my-0"></nz-divider>
+            <div class="flex justify-end p-4">
+                <div class="flex items-center gap-4 form-buttons-container">
+                    <button nz-button nzType="default" type="button" (click)="navigateBack()">
+                        <nz-icon nzTheme="outline" nzType="arrow-left"></nz-icon>
+                        Back
+                    </button>
+                </div>
+            </div>
+        } @else {
+            <nz-divider class="my-0"></nz-divider>
+            <supplier-form [supplier]="supplier" [buttonLoading]="buttonLoading()" (actions)="onFormActions($event)"></supplier-form>
+        }
+    } @else {
+        <app-not-found (refresh)="onRefresh()"></app-not-found>
+    }
+}

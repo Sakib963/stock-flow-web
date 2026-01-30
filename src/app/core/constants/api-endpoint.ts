@@ -38,6 +38,9 @@ export class APIEndpoint {
   static GET_SUPPLIER_DETAILS = '/api/v1/configuration/supplier/get-supplier-details';
   static UPDATE_SUPPLIER_DETAILS = "/api/v1/configuration/supplier/update-supplier-details";
   static GET_SUPPLIER_LIST_FOR_DROPDOWN = "/api/v1/configuration/supplier/get-supplier-list-for-dropdown";
+  static GET_SUPPLIER_ANALYTICS = "/api/v1/configuration/supplier/get-supplier-analytics";
+  static GENERATE_SUPPLIER_PERFORMANCE_REPORT = "/api/v1/configuration/supplier/generate-supplier-performance-report";
+  static EXPORT_SUPPLIER_DATA = "/api/v1/configuration/supplier/export-supplier-data";
   
   static GET_PRODUCT_LIST = "/api/v1/manager/product/get-product-list";
   static CREATE_PRODUCT = "/api/v1/manager/product/create-product";
