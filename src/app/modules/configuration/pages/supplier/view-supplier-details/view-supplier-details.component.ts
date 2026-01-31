@@ -20,7 +20,7 @@ import { Subject, combineLatest, startWith, tap, switchMap, map, catchError, EMP
 
 @Component({
     selector: 'view-supplier-details',
-    imports: [PageHeaderComponent, NgZorroCustomModule, FormsModule, NotFoundComponent, LoaderComponent, DatePipe, DecimalPipe, SafeTextPipe, CommonModule, SupplierFormComponent],
+    imports: [PageHeaderComponent, NgZorroCustomModule, FormsModule, NotFoundComponent, LoaderComponent, DatePipe, SafeTextPipe, CommonModule, SupplierFormComponent],
     templateUrl: './view-supplier-details.component.html',
     styleUrl: './view-supplier-details.component.scss',
 })
@@ -101,42 +101,11 @@ export class ViewSupplierDetailsComponent {
     // Data signals - initially null until loaded
     supplierStats = signal<any>(null);
     activityTimeline = signal<any[]>([]);
-    supplierAnalytics = signal<any>(null);
     loadingAnalytics = signal<boolean>(false);
 
     async ngOnInit() {
         this.state.set(window.history.state as WindowState);
         this.editMode = typeof window !== 'undefined' && window.history.state?.edit === true;
-        
-        // Load analytics data
-        this.loadAnalytics();
-    }
-
-    loadAnalytics(): void {
-        this.loadingAnalytics.set(true);
-        this._configurationService
-            .getDetail$(APIEndpoint.GET_SUPPLIER_ANALYTICS, this.itemId())
-            .pipe(
-                catchError((error: HttpErrorResponse | Error) => {
-                    console.error('Failed to load analytics:', error);
-                    return EMPTY;
-                }),
-                finalize(() => {
-                    this.loadingAnalytics.set(false);
-                })
-            )
-            .subscribe({
-                next: (response) => {
-                    if (response.status === 200) {
-                        this.supplierAnalytics.set(response.body.data);
-                    }
-                },
-            });
-    }
-
-    getMaxSoldQty(demandTrend: any[]): number {
-        if (!demandTrend || demandTrend.length === 0) return 1;
-        return Math.max(...demandTrend.map(d => d.soldQty || 0));
     }
 
     handleSwitchChange(event: boolean): void {
