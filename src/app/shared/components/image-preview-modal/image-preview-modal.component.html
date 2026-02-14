@@ -1,0 +1,54 @@
+<div class="image-preview-overlay" @fadeIn (click)="close()">
+  <div class="image-preview-container" @zoomIn (click)="onImageClick($event)">
+    <!-- Header -->
+    <div class="preview-header">
+      <h3 class="preview-title">{{ title }}</h3>
+      <button class="close-btn" (click)="close()" aria-label="Close">
+        <nz-icon nzType="close" nzTheme="outline"></nz-icon>
+      </button>
+    </div>
+
+    <!-- Image Container -->
+    <div class="image-wrapper">
+      <img 
+        [src]="imageUrl" 
+        [alt]="title"
+        [style.transform]="getImageTransform()"
+        [style.cursor]="zoomLevel > 1 ? (isDragging ? 'grabbing' : 'grab') : 'default'"
+        (mousedown)="onMouseDown($event)"
+        draggable="false"
+      >
+    </div>
+
+    <!-- Controls -->
+    <div class="preview-controls">
+      <button class="control-btn" (click)="zoomOut()" [disabled]="zoomLevel <= 0.5" title="Zoom Out">
+        <nz-icon nzType="zoom-out" nzTheme="outline"></nz-icon>
+      </button>
+
+      <span class="zoom-level">{{ (zoomLevel * 100).toFixed(0) }}%</span>
+
+      <button class="control-btn" (click)="zoomIn()" [disabled]="zoomLevel >= 3" title="Zoom In">
+        <nz-icon nzType="zoom-in" nzTheme="outline"></nz-icon>
+      </button>
+
+      <button class="control-btn" (click)="rotateLeft()" title="Rotate Left">
+        <nz-icon nzType="undo" nzTheme="outline"></nz-icon>
+      </button>
+
+      <button class="control-btn" (click)="rotateRight()" title="Rotate Right">
+        <nz-icon nzType="redo" nzTheme="outline"></nz-icon>
+      </button>
+
+      <button class="control-btn" (click)="resetZoom()" title="Reset">
+        <nz-icon nzType="sync" nzTheme="outline"></nz-icon>
+      </button>
+
+      <div style="width: 1px; height: 24px; background: rgba(126, 117, 229, 0.3); margin: 0 0.25rem;"></div>
+
+      <button class="control-btn download-btn" (click)="downloadImage()" title="Download Image">
+        <nz-icon nzType="download" nzTheme="outline"></nz-icon>
+      </button>
+    </div>
+  </div>
+</div>

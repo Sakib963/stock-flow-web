@@ -106,7 +106,29 @@ const routes: Routes = [
                 loadComponent: () => import('./pages/supplier/supplier-list/supplier-list.component').then((m) => m.SupplierListComponent),
             },
         ],
-    }
+    },
+    {
+        path: 'product',
+        children: [
+            {
+                path: '',
+                redirectTo: 'list',
+                pathMatch: 'full',
+            },
+            {
+                path: 'create',
+                loadComponent: () => import('./pages/product/create-product/create-product.component').then((m) => m.CreateProductComponent),
+            },
+            {
+                path: 'view/:oid',
+                loadComponent: () => import('./pages/product/view-product-details/view-product-details.component').then((m) => m.ViewProductDetailsComponent),
+            },
+            {
+                path: 'list',
+                loadComponent: () => import('./pages/product/product-list/product-list.component').then((m) => m.ProductListComponent),
+            },
+        ],
+    },
 ];
 
 @NgModule({

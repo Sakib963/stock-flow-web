@@ -1,0 +1,297 @@
+<!-- Page Header with breadcrumbs, title, actions, and filters -->
+<page-header [title]="'Product Details'" [description]="'View and manage product information, inventory, and performance'" [pageKey]="'configuration.product.view'" [showBackButton]="false" [extraTemplate]="headerActions"> </page-header>
+
+<!-- Template for header actions (buttons) -->
+<ng-template #headerActions>
+    <!-- Switch between view mode and edit mode -->
+    @if (editable()) {
+        <nz-switch accessControl nzCheckedChildren="View Mode" nzUnCheckedChildren="Edit Mode" [ngModel]="editMode" (ngModelChange)="handleSwitchChange($event)"> </nz-switch>
+    }
+</ng-template>
+
+<!-- Content -->
+@if (loading()) {
+    <app-loader [isVisible]="true"></app-loader>
+} @else {
+    @if (product(); as product) {
+        @if (!editMode) {
+            <!-- Product Details -->
+            <nz-divider class="my-0"></nz-divider>
+            <div class="p-4">
+                <div class="border rounded-sm bg-white p-4">
+                    <h3 class="text-base font-bold text-gray-900 mb-4">Details</h3>
+
+                    <dl class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-5">
+                        <div>
+                            <dt class="text-xs text-gray-500">Product Name</dt>
+                            <dd class="text-sm text-gray-900 font-medium">
+                                {{ product.name }}
+                            </dd>
+                        </div>
+
+                        <div>
+                            <dt class="text-xs text-gray-500">SKU</dt>
+                            <dd class="text-sm text-gray-900">
+                                {{ product.sku || 'N/A' }}
+                            </dd>
+                        </div>
+
+                        <div>
+                            <dt class="text-xs text-gray-500">Status</dt>
+                            <dd>
+                                @if (product.status === 'Active') {
+                                    <nz-tag nzColor="#109648">
+                                        <nz-icon nzType="check" class="mr-1"></nz-icon>
+                                        Active</nz-tag
+                                    >
+                                } @else {
+                                    <nz-tag nzColor="#DF2935">
+                                        <nz-icon nzType="close" class="mr-1"></nz-icon>
+                                        Inactive</nz-tag
+                                    >
+                                }
+                            </dd>
+                        </div>
+
+                        <div>
+                            <dt class="text-xs text-gray-500">Category</dt>
+                            <dd class="text-sm text-gray-900">
+                                {{ product.category_name || 'N/A' }}
+                            </dd>
+                        </div>
+
+                        <div>
+                            <dt class="text-xs text-gray-500">Sub Category</dt>
+                            <dd class="text-sm text-gray-900">
+                                {{ product.sub_category_name || 'N/A' }}
+                            </dd>
+                        </div>
+
+                        <div>
+                            <dt class="text-xs text-gray-500">Brand</dt>
+                            <dd class="text-sm text-gray-900">
+                                {{ product.brand_name || 'N/A' }}
+                            </dd>
+                        </div>
+
+                        <div>
+                            <dt class="text-xs text-gray-500">Unit Type</dt>
+                            <dd class="text-sm text-gray-900">
+                                {{ product.unit_type || 'N/A' }}
+                            </dd>
+                        </div>
+
+                        <div>
+                            <dt class="text-xs text-gray-500">Product Nature</dt>
+                            <dd class="text-sm text-gray-900">
+                                {{ product.product_nature || 'N/A' }}
+                            </dd>
+                        </div>
+
+                        <div>
+                            <dt class="text-xs text-gray-500">Restock Threshold</dt>
+                            <dd class="text-sm text-gray-900">
+                                {{ product.restock_threshold || 0 }}
+                            </dd>
+                        </div>
+
+                        <nz-divider class="my-0 md:col-span-2 lg:col-span-3"></nz-divider>
+                        <!-- Product Photo -->
+                        <div>
+                            <dt class="text-xs text-gray-500 mb-2">Product Photo</dt>
+                            <dd class="text-sm text-gray-900">
+                                @if (product.photo) {
+                                    <div class="relative w-full h-32 overflow-hidden rounded border border-gray-200 cursor-pointer group transition-all duration-300 hover:shadow-lg hover:border-blue-400" (click)="previewProductPhoto(product.photo)">
+                                        <img class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110" [src]="product.photo" alt="Product Photo" />
+                                        <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all duration-300 flex items-center justify-center">
+                                            <span class="flex items-center gap-2 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-sm font-medium">
+                                                <nz-icon nzType="eye" nzTheme="outline" class="text-xl"></nz-icon>
+                                                <div>Click to preview</div>
+                                            </span>
+                                        </div>
+                                    </div>
+                                } @else {
+                                    <span class="text-gray-500">No photo available</span>
+                                }
+                            </dd>
+                        </div>
+
+                        <div class="sm:col-span-1 lg:col-span-2">
+                            <dt class="text-xs text-gray-500">Description</dt>
+                            <dd class="text-sm text-gray-900">
+                                {{ product.description | safeText }}
+                            </dd>
+                        </div>
+                    </dl>
+                </div>
+            </div>
+
+            <!-- actions -->
+            <nz-divider class="my-4"></nz-divider>
+            <div class="flex justify-end px-4">
+                <div class="flex items-center gap-4 form-buttons-container">
+                    <button nz-button nzType="default" type="button" (click)="navigateBack()">
+                        <nz-icon nzTheme="outline" nzType="arrow-left"></nz-icon>
+                        Back
+                    </button>
+                </div>
+            </div>
+
+            <!-- Additional Information Sections -->
+            <nz-divider nzDashed [nzText]="text">
+                <ng-template #text>
+                    <h2 class="text-lg font-semibold text-primary">
+                        <nz-icon nzType="info-circle" nzTheme="outline" class="mr-2"></nz-icon>
+                        Additional Information
+                    </h2>
+                </ng-template>
+            </nz-divider>
+            <div class="p-4 space-y-4">
+                <!-- Quick Actions Panel (Always Visible) -->
+                <div class="mb-4">
+                    <nz-card nzTitle="Quick Actions" [nzExtra]="quickActionsExtra">
+                        <div class="flex flex-wrap gap-3">
+                            <button nz-button nzType="default" (click)="viewInventory()" [disabled]="(inventorySummary()?.totalQuantity || 0) === 0">
+                                <nz-icon nzType="inbox" nzTheme="outline"></nz-icon>
+                                View Inventory Details
+                            </button>
+                            <button nz-button nzType="default" (click)="viewPurchaseHistory()" [disabled]="(inventorySummary()?.totalQuantity || 0) === 0">
+                                <nz-icon nzType="shopping-cart" nzTheme="outline"></nz-icon>
+                                View Purchase History
+                            </button>
+                            <button nz-button nzType="default" (click)="viewSalesHistory()" [disabled]="(productStats()?.totalSold || 0) === 0">
+                                <nz-icon nzType="line-chart" nzTheme="outline"></nz-icon>
+                                View Sales History
+                            </button>
+                            <button nz-button nzType="default" (click)="generateInventoryReport()" [disabled]="(inventorySummary()?.totalQuantity || 0) === 0 || loadingReportKey() !== null" [nzLoading]="loadingReportKey() === 'inventory_report'">
+                                <nz-icon nzType="file-excel" nzTheme="outline"></nz-icon>
+                                Generate Inventory Report
+                            </button>
+                            <button nz-button nzType="default" (click)="generateMovementReport()" [disabled]="loadingReportKey() !== null" [nzLoading]="loadingReportKey() === 'movement_report'">
+                                <nz-icon nzType="bar-chart" nzTheme="outline"></nz-icon>
+                                Generate Movement Report
+                            </button>
+                        </div>
+                    </nz-card>
+                    <ng-template #quickActionsExtra>
+                        <nz-icon nzType="thunderbolt" nzTheme="twotone" class="text-lg"></nz-icon>
+                    </ng-template>
+                </div>
+                @if (inventorySummary(); as inventory) {
+                    <nz-card nzTitle="Inventory Summary" [nzExtra]="inventoryExtra">
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            <div class="text-center">
+                                <nz-statistic [nzValue]="inventory.availableQuantity" [nzTitle]="'Available Stock'" [nzPrefix]="prefixAvailable"> </nz-statistic>
+                                <ng-template #prefixAvailable>
+                                    <span nz-icon nzType="inbox" nzTheme="outline"></span>
+                                </ng-template>
+                                <div class="text-xs text-gray-500 mt-1">of {{ inventory.totalQuantity }} total</div>
+                            </div>
+                            <div class="text-center">
+                                <nz-statistic [nzValue]="inventory.totalValue" [nzTitle]="'Total Value'" [nzPrefix]="prefixCurrency"> </nz-statistic>
+                                <ng-template #prefixCurrency>
+                                    <span nz-icon nzType="dollar" nzTheme="outline"></span>
+                                </ng-template>
+                            </div>
+                            <div class="text-center">
+                                <nz-statistic [nzValue]="inventory.warehouseCount" [nzTitle]="'Warehouses'" [nzPrefix]="prefixWarehouse"> </nz-statistic>
+                                <ng-template #prefixWarehouse>
+                                    <span nz-icon nzType="home" nzTheme="outline"></span>
+                                </ng-template>
+                                <div class="text-xs text-gray-500 mt-1">{{ inventory.batchCount }} batches</div>
+                            </div>
+                            <div class="text-center">
+                                <nz-statistic [nzValue]="inventory.avgSellingPrice" [nzTitle]="'Avg. Selling Price'" [nzPrefix]="prefixPrice"> </nz-statistic>
+                                <ng-template #prefixPrice>
+                                    <span nz-icon nzType="tag" nzTheme="outline"></span>
+                                </ng-template>
+                                <div class="text-xs text-gray-500 mt-1">Cost: ৳{{ inventory.avgCostPrice | number: '1.2-2' }}</div>
+                            </div>
+                        </div>
+                    </nz-card>
+                    <ng-template #inventoryExtra>
+                        <nz-icon nzType="database" nzTheme="twotone" class="text-lg" />
+                    </ng-template>
+                } @else {
+                    <nz-empty nzNotFoundContent="No inventory data available"></nz-empty>
+                }
+
+                @if (productStats(); as stats) {
+                    <nz-card nzTitle="Sales & Movement Statistics" [nzExtra]="statsExtra">
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            <div class="text-center">
+                                <nz-statistic [nzValue]="stats.totalSold" [nzTitle]="'Total Sold'" [nzPrefix]="prefixSold" [nzValueStyle]="{ color: '#109648' }"> </nz-statistic>
+                                <ng-template #prefixSold>
+                                    <span nz-icon nzType="shopping-cart" nzTheme="outline"></span>
+                                </ng-template>
+                            </div>
+                            <div class="text-center">
+                                <nz-statistic [nzValue]="stats.totalReturned" [nzTitle]="'Total Returned'" [nzPrefix]="prefixReturned" [nzValueStyle]="{ color: '#faad14' }"> </nz-statistic>
+                                <ng-template #prefixReturned>
+                                    <span nz-icon nzType="rollback" nzTheme="outline"></span>
+                                </ng-template>
+                            </div>
+                            <div class="text-center">
+                                <nz-statistic [nzValue]="stats.totalDamaged" [nzTitle]="'Total Damaged'" [nzPrefix]="prefixDamaged" [nzValueStyle]="{ color: '#cf1322' }"> </nz-statistic>
+                                <ng-template #prefixDamaged>
+                                    <span nz-icon nzType="warning" nzTheme="outline"></span>
+                                </ng-template>
+                            </div>
+                            <div class="text-center">
+                                <nz-statistic [nzValue]="stats.totalWasted" [nzTitle]="'Total Wasted'" [nzPrefix]="prefixWasted"> </nz-statistic>
+                                <ng-template #prefixWasted>
+                                    <span nz-icon nzType="delete" nzTheme="outline"></span>
+                                </ng-template>
+                            </div>
+                        </div>
+                    </nz-card>
+                    <ng-template #statsExtra>
+                        <nz-icon nzType="highlight" nzTheme="twotone" class="text-lg" />
+                    </ng-template>
+                } @else {
+                    <nz-empty nzNotFoundContent="No statistics available"></nz-empty>
+                }
+
+                @if (activityTimeline(); as timeline) {
+                    @if (timeline.length > 0) {
+                        <nz-card nzTitle="Recent Activity" [nzExtra]="timelineExtra">
+                            <nz-timeline>
+                                @for (activity of timeline; track activity.performed_on) {
+                                    <nz-timeline-item [nzColor]="$index === 0 ? 'green' : 'gray'">
+                                        <div class="flex flex-col">
+                                            <span class="font-medium text-gray-900">{{ activity.title }}</span>
+                                            <span class="text-sm text-gray-500">by {{ activity.performed_by_name || activity.performed_by }}</span>
+                                            <span class="text-xs text-gray-500">{{ activity.description }}</span>
+                                            <span class="text-xs text-gray-400">{{ activity.performed_on | date: 'MMM d, y, h:mm:ss a' }}</span>
+                                        </div>
+                                    </nz-timeline-item>
+                                }
+                            </nz-timeline>
+                        </nz-card>
+                        <ng-template #timelineExtra>
+                            <nz-icon nzType="filter" nzTheme="twotone" class="text-lg" />
+                        </ng-template>
+                    }
+                } @else {
+                    <nz-empty nzNotFoundContent="No activity found"></nz-empty>
+                }
+            </div>
+
+            <!-- actions -->
+            <nz-divider class="my-0"></nz-divider>
+            <div class="flex justify-end p-4">
+                <div class="flex items-center gap-4 form-buttons-container">
+                    <button nz-button nzType="default" type="button" (click)="navigateBack()">
+                        <nz-icon nzTheme="outline" nzType="arrow-left"></nz-icon>
+                        Back
+                    </button>
+                </div>
+            </div>
+        } @else {
+            <nz-divider class="my-0"></nz-divider>
+            <product-form [product]="product" [buttonLoading]="buttonLoading()" (actions)="onFormActions($event)"></product-form>
+        }
+    } @else {
+        <app-not-found (refresh)="onRefresh()"></app-not-found>
+    }
+}
