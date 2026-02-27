@@ -129,6 +129,50 @@ const routes: Routes = [
             },
         ],
     },
+    {
+        path: 'warehouse',
+        children: [
+            {
+                path: '',
+                redirectTo: 'list',
+                pathMatch: 'full',
+            },
+            {
+                path: 'create',
+                loadComponent: () => import('./pages/warehouse/create-warehouse/create-warehouse.component').then((m) => m.CreateWarehouseComponent),
+            },
+            {
+                path: 'view/:oid',
+                loadComponent: () => import('./pages/warehouse/warehouse-details/warehouse-details.component').then((m) => m.WarehouseDetailsComponent),
+            },
+            {
+                path: 'list',
+                loadComponent: () => import('./pages/warehouse/warehouse-list/warehouse-list.component').then((m) => m.WarehouseListComponent),
+            },
+        ],
+    },
+    {
+        path: 'aisle',
+        children: [
+            {
+                path: '',
+                redirectTo: 'list',
+                pathMatch: 'full',
+            },
+            {
+                path: 'create',
+                loadComponent: () => import('./pages/aisle/create-aisle/create-aisle.component').then((m) => m.CreateAisleComponent),
+            },
+            {
+                path: 'view/:oid',
+                loadComponent: () => import('./pages/aisle/view-aisle-details/view-aisle-details.component').then((m) => m.ViewAisleDetailsComponent),
+            },
+            {
+                path: 'list',
+                loadComponent: () => import('./pages/aisle/display-aisle-list/display-aisle-list.component').then((m) => m.DisplayAisleListComponent),
+            },
+        ],
+    },
 ];
 
 @NgModule({

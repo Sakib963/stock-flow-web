@@ -1,0 +1,175 @@
+<!-- Page Header with breadcrumbs, title, actions, and filters -->
+<page-header [title]="'Warehouse Details'" [description]="'View and manage warehouse information and inventory'" [pageKey]="'configuration.warehouse.view'" [showBackButton]="false" [extraTemplate]="headerActions"> </page-header>
+
+<!-- Template for header actions (buttons) -->
+<ng-template #headerActions>
+    <!-- Switch between view mode and edit mode -->
+    @if (editable()) {
+        <nz-switch accessControl nzCheckedChildren="View Mode" nzUnCheckedChildren="Edit Mode" [ngModel]="editMode" (ngModelChange)="handleSwitchChange($event)"> </nz-switch>
+    }
+</ng-template>
+
+<!-- Content -->
+@if (loading()) {
+    <app-loader [isVisible]="true"></app-loader>
+} @else {
+    @if (warehouse(); as warehouse) {
+        @if (!editMode) {
+            <!-- Warehouse Details -->
+            <nz-divider class="my-0"></nz-divider>
+            <div class="p-4">
+                <div class="border rounded-sm bg-white p-4">
+                    <h3 class="text-base font-bold text-gray-900 mb-4">Details</h3>
+
+                    <dl class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-5">
+                        <div>
+                            <dt class="text-xs text-gray-500">Warehouse Name</dt>
+                            <dd class="text-sm text-gray-900 font-medium">
+                                {{ warehouse.name }}
+                            </dd>
+                        </div>
+
+                        <div>
+                            <dt class="text-xs text-gray-500">Warehouse Code</dt>
+                            <dd class="text-sm text-gray-900">
+                                {{ warehouse.code }}
+                            </dd>
+                        </div>
+
+                        <div>
+                            <dt class="text-xs text-gray-500">Location</dt>
+                            <dd class="text-sm text-gray-900">
+                                {{ warehouse.location | safeText }}
+                            </dd>
+                        </div>
+
+                        <div>
+                            <dt class="text-xs text-gray-500">Capacity</dt>
+                            <dd class="text-sm text-gray-900">
+                                {{ warehouse.capacity | safeText }}
+                            </dd>
+                        </div>
+
+                        <div>
+                            <dt class="text-xs text-gray-500">Status</dt>
+                            <dd>
+                                @if (warehouse.status === 'Active') {
+                                    <nz-tag nzColor="#109648">
+                                        <nz-icon nzType="check" class="mr-1"></nz-icon>
+                                        Active</nz-tag
+                                    >
+                                } @else {
+                                    <nz-tag nzColor="#DF2935">
+                                        <nz-icon nzType="close" class="mr-1"></nz-icon>
+                                        Inactive</nz-tag
+                                    >
+                                }
+                            </dd>
+                        </div>
+                    </dl>
+                </div>
+            </div>
+
+            <!-- actions -->
+            <nz-divider class="my-4"></nz-divider>
+            <div class="flex justify-end px-4">
+                <div class="flex items-center gap-4 form-buttons-container">
+                    <button nz-button nzType="default" type="button" (click)="navigateBack()">
+                        <nz-icon nzTheme="outline" nzType="arrow-left"></nz-icon>
+                        Back
+                    </button>
+                </div>
+            </div>
+
+            <!-- Additional Information Sections -->
+            <nz-divider nzDashed [nzText]="text">
+                <ng-template #text>
+                    <h2 class="text-lg font-semibold text-primary">
+                        <nz-icon nzType="info-circle" nzTheme="outline" class="mr-2"></nz-icon>
+                        Additional Information
+                    </h2>
+                </ng-template>
+            </nz-divider>
+            <div class="p-4 space-y-4">
+                @if (warehouseStats(); as stats) {
+                    <nz-card nzTitle="Warehouse Statistics" [nzExtra]="statsExtra">
+                        <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+                            <div class="text-center">
+                                <nz-statistic [nzValue]="stats.totalProducts" [nzTitle]="'Total Products'" [nzPrefix]="prefixProducts"> </nz-statistic>
+                                <ng-template #prefixProducts>
+                                    <span nz-icon nzType="appstore" nzTheme="outline"></span>
+                                </ng-template>
+                            </div>
+                            <div class="text-center">
+                                <nz-statistic [nzValue]="stats.totalAisles" [nzTitle]="'Total Aisles'" [nzPrefix]="prefixAisles"> </nz-statistic>
+                                <ng-template #prefixAisles>
+                                    <span nz-icon nzType="apartment" nzTheme="outline"></span>
+                                </ng-template>
+                            </div>
+                            <div class="text-center">
+                                <nz-statistic [nzValue]="stats.totalInventoryValue" [nzTitle]="'Inventory Value'" [nzPrefix]="prefixValue"> </nz-statistic>
+                                <ng-template #prefixValue>
+                                    <span nz-icon nzType="dollar" nzTheme="outline"></span>
+                                </ng-template>
+                            </div>
+                            <div class="text-center">
+                                <nz-statistic [nzValue]="stats.totalQuantity" [nzTitle]="'Total Quantity'" [nzPrefix]="prefixQuantity"> </nz-statistic>
+                                <ng-template #prefixQuantity>
+                                    <span nz-icon nzType="inbox" nzTheme="outline"></span>
+                                </ng-template>
+                            </div>
+                            <div class="text-center">
+                                <nz-statistic [nzValue]="stats.utilizationPercentage" [nzSuffix]="'%'" [nzTitle]="'Utilization'" [nzPrefix]="prefixUtilization"> </nz-statistic>
+                                <ng-template #prefixUtilization>
+                                    <span nz-icon nzType="pie-chart" nzTheme="outline"></span>
+                                </ng-template>
+                            </div>
+                        </div>
+                    </nz-card>
+                    <ng-template #statsExtra>
+                        <nz-icon nzType="highlight" nzTheme="twotone" class="text-lg" />
+                    </ng-template>
+                } @else {
+                    <nz-empty nzNotFoundContent="No statistics available"></nz-empty>
+                }
+
+                @if (activityTimeline(); as timeline) {
+                    @if (timeline.length > 0) {
+                        <nz-card nzTitle="Recent Activity" [nzExtra]="timelineExtra">
+                            <nz-timeline>
+                                @for (activity of timeline; track activity.date) {
+                                    <nz-timeline-item>
+                                        <p class="font-medium">{{ activity.action }}</p>
+                                        <p class="text-gray-600">{{ activity.description }}</p>
+                                        <p class="text-xs text-gray-400">{{ activity.date | date: 'short' }}</p>
+                                    </nz-timeline-item>
+                                }
+                            </nz-timeline>
+                        </nz-card>
+                        <ng-template #timelineExtra>
+                            <nz-icon nzType="filter" nzTheme="twotone" class="text-lg" />
+                        </ng-template>
+                    }
+                } @else {
+                    <nz-empty nzNotFoundContent="No activity found"></nz-empty>
+                }
+            </div>
+
+            <!-- actions -->
+            <nz-divider class="my-0"></nz-divider>
+            <div class="flex justify-end p-4">
+                <div class="flex items-center gap-4 form-buttons-container">
+                    <button nz-button nzType="default" type="button" (click)="navigateBack()">
+                        <nz-icon nzTheme="outline" nzType="arrow-left"></nz-icon>
+                        Back
+                    </button>
+                </div>
+            </div>
+        } @else {
+            <nz-divider class="my-0"></nz-divider>
+            <warehouse-form [warehouse]="warehouse" [buttonLoading]="buttonLoading()" (actions)="onFormActions($event)"></warehouse-form>
+        }
+    } @else {
+        <app-not-found (refresh)="onRefresh()"></app-not-found>
+    }
+}

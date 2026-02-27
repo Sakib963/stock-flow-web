@@ -1,0 +1,65 @@
+<div class="p-4">
+    <form nz-form [formGroup]="form" [nzLayout]="'vertical'" (ngSubmit)="onSubmit()">
+        <div class="grid grid-cols-1 md:gap-x-6 md:grid-cols-2 lg:grid-cols-3">
+            <!-- Name -->
+            <nz-form-item>
+                <nz-form-label [nzRequired]="hasRequiredValidator('name')">Warehouse Name</nz-form-label>
+                <nz-form-control nzErrorTip="Warehouse name is required.">
+                    <input formControlName="name" nz-input placeholder="Enter Warehouse Name" />
+                </nz-form-control>
+            </nz-form-item>
+            <!-- Code -->
+            <nz-form-item>
+                <nz-form-label [nzRequired]="hasRequiredValidator('code')">Warehouse Code</nz-form-label>
+                <nz-form-control nzErrorTip="Warehouse code is required.">
+                    <input formControlName="code" nz-input placeholder="Enter Warehouse Code" />
+                </nz-form-control>
+            </nz-form-item>
+            <!-- Location -->
+            <nz-form-item>
+                <nz-form-label [nzRequired]="hasRequiredValidator('location')">Location</nz-form-label>
+                <nz-form-control nzErrorTip="Location is required.">
+                    <input formControlName="location" nz-input placeholder="Enter Location" />
+                </nz-form-control>
+            </nz-form-item>
+            <!-- Capacity -->
+            <nz-form-item>
+                <nz-form-label [nzRequired]="hasRequiredValidator('capacity')">Capacity</nz-form-label>
+                <nz-form-control nzErrorTip="Capacity is required.">
+                    <input formControlName="capacity" nz-input placeholder="Enter Capacity" />
+                </nz-form-control>
+            </nz-form-item>
+            <!-- Status -->
+            <nz-form-item>
+                <nz-form-label [nzRequired]="hasRequiredValidator('status')">Status</nz-form-label>
+                <nz-form-control nzErrorTip="Status is required.">
+                    <nz-select class="w-full" formControlName="status" nz-input nzAllowClear nzPlaceHolder="Select Status">
+                        <nz-option nzLabel="Active" nzValue="Active"></nz-option>
+                        <nz-option nzLabel="Inactive" nzValue="Inactive"></nz-option>
+                    </nz-select>
+                </nz-form-control>
+            </nz-form-item>
+        </div>
+        <nz-divider class="my-0"></nz-divider>
+        <div class="mt-4 flex justify-end items-center">
+            <div class="flex items-center gap-4">
+                @let isEditMode = mode() === 'edit';
+                @if (!isEditMode) {
+                    <button nz-button type="button" nzType="default" (click)="resetForm()">
+                        <nz-icon nzType="undo" nzTheme="outline" />
+                        Reset
+                    </button>
+                } @else {
+                    <button nz-button type="button" nzType="default" (click)="onCancel()">
+                        <nz-icon nzType="undo" nzTheme="outline" />
+                        Cancel
+                    </button>
+                }
+                <button nz-button type="submit" nzType="primary" [nzLoading]="buttonLoading()">
+                    <nz-icon nzType="save" nzTheme="outline" />
+                    Submit
+                </button>
+            </div>
+        </div>
+    </form>
+</div>

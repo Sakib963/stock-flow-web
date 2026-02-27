@@ -51,25 +51,21 @@ export class APIEndpoint {
     static GENERATE_PRODUCT_INVENTORY_REPORT = '/api/v1/configuration/product/generate-product-inventory-report';
     static GENERATE_PRODUCT_MOVEMENT_REPORT = '/api/v1/configuration/product/generate-product-movement-report';
 
-    // Manager Product APIs (Legacy)
-    static GET_PRODUCT_LIST_MANAGER = '/api/v1/manager/product/get-product-list';
-    static CREATE_PRODUCT_MANAGER = '/api/v1/manager/product/create-product';
-    static UPDATE_PRODUCT_DETAILS_MANAGER = '/api/v1/manager/product/update-product-details';
-    static GET_PRODUCT_DETAILS_MANAGER = '/api/v1/manager/product/get-product-details';
-    static GET_PRODUCT_LIST_FOR_DROPDOWN_MANAGER = '/api/v1/manager/product/get-product-list-for-dropdown';
-    static DELETE_PRODUCT_MANAGER = '/api/v1/manager/product/delete-product';
+    static GET_WAREHOUSE_LIST = '/api/v1/configuration/warehouse/get-warehouse-list';
+    static CREATE_WAREHOUSE = '/api/v1/configuration/warehouse/create-warehouse';
+    static UPDATE_WAREHOUSE_DETAILS = '/api/v1/configuration/warehouse/update-warehouse-details';
+    static GET_WAREHOUSE_DETAILS = '/api/v1/configuration/warehouse/get-warehouse-details';
+    static GET_WAREHOUSE_LIST_FOR_DROPDOWN = '/api/v1/configuration/warehouse/get-warehouse-list-for-dropdown';
+    static GENERATE_PRODUCT_LIST_REPORT_BY_WAREHOUSE = '/api/v1/configuration/warehouse/generate-product-list-report-by-warehouse';
+    static GENERATE_INVENTORY_REPORT_BY_WAREHOUSE = '/api/v1/configuration/warehouse/generate-inventory-report-by-warehouse';
 
-    static GET_WAREHOUSE_LIST = '/api/v1/manager/warehouse/get-warehouse-list';
-    static CREATE_WAREHOUSE = '/api/v1/manager/warehouse/create-warehouse';
-    static UPDATE_WAREHOUSE_DETAILS = '/api/v1/manager/warehouse/update-warehouse-details';
-    static GET_WAREHOUSE_DETAILS = '/api/v1/manager/warehouse/get-warehouse-details';
-    static GET_WAREHOUSE_LIST_FOR_DROPDOWN = '/api/v1/manager/warehouse/get-warehouse-list-for-dropdown';
-
-    static GET_AISLE_LIST = '/api/v1/manager/aisle/get-aisle-list';
-    static CREATE_AISLE = '/api/v1/manager/aisle/create-aisle';
-    static UPDATE_AISLE_DETAILS = '/api/v1/manager/aisle/update-aisle-details';
-    static GET_AISLE_DETAILS = '/api/v1/manager/aisle/get-aisle-details';
-    static GET_AISLE_LIST_FOR_DROPDOWN = '/api/v1/manager/aisle/get-aisle-list-for-dropdown';
+    static GET_AISLE_LIST = '/api/v1/configuration/aisle/get-aisle-list';
+    static CREATE_AISLE = '/api/v1/configuration/aisle/create-aisle';
+    static UPDATE_AISLE_DETAILS = '/api/v1/configuration/aisle/update-aisle-details';
+    static GET_AISLE_DETAILS = '/api/v1/configuration/aisle/get-aisle-details';
+    static GET_AISLE_LIST_FOR_DROPDOWN = '/api/v1/configuration/aisle/get-aisle-list-for-dropdown';
+    static GENERATE_PRODUCT_LIST_REPORT_BY_AISLE = '/api/v1/configuration/aisle/generate-product-list-report-by-aisle';
+    static GENERATE_INVENTORY_REPORT_BY_AISLE = '/api/v1/configuration/aisle/generate-inventory-report-by-aisle';
 
     static GET_PURCHASE_LIST = '/api/v1/manager/purchase/get-purchase-list';
     static CREATE_PURCHASE = '/api/v1/manager/purchase/create-purchase';

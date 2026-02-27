@@ -1,0 +1,6 @@
+<div class="px-6 py-4">
+    <page-header [title]="'Create Warehouse'" (backAction)="goBack()"></page-header>
+    <div class="bg-white p-6 rounded-lg">
+        <warehouse-form [buttonLoading]="buttonLoading()" (actions)="onFormActions($event)"> </warehouse-form>
+    </div>
+</div>
