@@ -28,4 +28,29 @@ export class ConfigurationService {
     downloadReport$(url: string, data?: any): Observable<any> {
         return this._http.downloadFile(url, data);
     }
+
+    // Analytics Methods
+    getAnalyticsMetrics$(params: any): Observable<HttpResponse<any>> {
+        return this._http.post(APIEndpoint.GET_ANALYTICS_METRICS, params);
+    }
+
+    getStockTrend$(params: any): Observable<HttpResponse<any>> {
+        return this._http.post(APIEndpoint.GET_STOCK_TREND, params);
+    }
+
+    getInventoryValueTrend$(params: any): Observable<HttpResponse<any>> {
+        return this._http.post(APIEndpoint.GET_INVENTORY_VALUE_TREND, params);
+    }
+
+    getTopProducts$(params: any): Observable<HttpResponse<any>> {
+        return this._http.post(APIEndpoint.GET_TOP_PRODUCTS, params);
+    }
+
+    getProductPerformance$(params: any): Observable<HttpResponse<any>> {
+        return this._http.post(APIEndpoint.GET_PRODUCT_PERFORMANCE, params);
+    }
+
+    getStockMovements$(params: any): Observable<HttpResponse<any>> {
+        return this._http.post(APIEndpoint.GET_STOCK_MOVEMENTS, params);
+    }
 }

@@ -128,4 +128,13 @@ export class APIEndpoint {
     static CREATE_NOTE = '/api/v1/profile/notes/create-note';
     static UPDATE_NOTE = '/api/v1/profile/notes/update-note';
     static DELETE_NOTE = '/api/v1/profile/notes/delete-note';
+
+    // Analytics APIs
+    static GET_ANALYTICS_METRICS = '/api/v1/configuration/analytics/get-analytics-metrics';
+    static GET_STOCK_TREND = '/api/v1/configuration/analytics/get-stock-trend';
+    static GET_INVENTORY_VALUE_TREND = '/api/v1/configuration/analytics/get-inventory-value-trend';
+    static GET_TOP_PRODUCTS = '/api/v1/configuration/analytics/get-top-products';
+    static GET_PRODUCT_PERFORMANCE = '/api/v1/configuration/analytics/get-product-performance';
+    static GET_STOCK_MOVEMENTS = '/api/v1/configuration/analytics/get-stock-movements';
+    static EXPORT_ANALYTICS_REPORT = '/api/v1/configuration/analytics/export-analytics-report';
 }
