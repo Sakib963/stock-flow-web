@@ -13,6 +13,7 @@ import { LoaderComponent } from '@app/shared/components/loader/loader.component'
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { TranslateService } from '@ngx-translate/core';
 import { APIEndpoint } from '@app/core/constants/api-endpoint';
+import { NzTableQueryParams } from 'ng-zorro-antd/table';
 
 // Register Chart.js components
 Chart.register(...registerables);
@@ -107,6 +108,7 @@ export class AnalyticsComponent implements OnInit, AfterViewInit, OnDestroy {
     productPerformance = signal<ProductPerformance[]>([]);
     stockMovements = signal<StockMovement[]>([]);
     stockDistributionData = signal<StockDistributionSegment[]>([]);
+    productPerformanceTotal = signal<number>(0);
 
     // UI State
     pageIndex = signal<number>(1);
@@ -130,16 +132,6 @@ export class AnalyticsComponent implements OnInit, AfterViewInit, OnDestroy {
         return parseFloat(this.metrics().avgTurnoverRate.toFixed(2));
     });
 
-    // Filter options
-    filterTypeOptions = [
-        { label: 'Overall', value: 'all' },
-        { label: 'Category', value: 'category' },
-        { label: 'Sub Category', value: 'sub-category' },
-        { label: 'Brand', value: 'brand' },
-        { label: 'Supplier', value: 'supplier' },
-        { label: 'Warehouse', value: 'warehouse' },
-    ];
-
     ngOnInit(): void {
         // Read query parameters
         this._route.queryParams.subscribe((params) => {
@@ -152,9 +144,7 @@ export class AnalyticsComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     ngAfterViewInit(): void {
-        // Note: Canvas elements may not be available yet if pageLoading is true
-        // Charts will be initialized after data loads and pageLoading becomes false
-        console.log('🎬 ngAfterViewInit called - charts will be initialized after loading');
+        // Charts are initialized after initial data load.
     }
 
     ngOnDestroy(): void {
@@ -182,8 +172,6 @@ export class AnalyticsComponent implements OnInit, AfterViewInit, OnDestroy {
             pageSize: this.pageSize(),
         };
 
-        console.log('🔍 Loading analytics data with params:', params);
-
         // Load all analytics data in parallel
         forkJoin({
             metrics: this._configurationService.getAnalyticsMetrics$(params),
@@ -200,9 +188,7 @@ export class AnalyticsComponent implements OnInit, AfterViewInit, OnDestroy {
 
                     // Initialize charts after loading completes and canvas elements are rendered
                     if (isInitialLoad) {
-                        console.log('🎨 Initial load complete, scheduling chart initialization');
                         setTimeout(() => {
-                            console.log('🖼️ Attempting to initialize charts after DOM render');
                             this.initializeChartsIfNeeded();
                         }, 100);
                     }
@@ -210,42 +196,27 @@ export class AnalyticsComponent implements OnInit, AfterViewInit, OnDestroy {
             )
             .subscribe({
                 next: (data) => {
-                    console.log('📊 Analytics data received:', {
-                        metrics: data.metrics.body?.data,
-                        stockTrend: data.stockTrend.body?.data,
-                        valueTrend: data.valueTrend.body?.data,
-                        topProducts: data.topProducts.body?.data,
-                        performance: data.performance.body?.data,
-                        movements: data.movements.body?.data,
-                    });
-
                     // Update metrics cards
                     if (data.metrics.body?.data) {
                         this.metrics.set(data.metrics.body.data);
-                        console.log('✅ Metrics updated:', this.metrics());
-                    } else {
-                        console.warn('⚠️ No metrics data received');
                     }
 
                     // Update tables
                     const performanceItems = data.performance.body?.data?.items || [];
+                    const performanceTotal = data.performance.body?.data?.total || performanceItems.length;
                     if (performanceItems.length) {
                         this.productPerformance.set(performanceItems);
-                        console.log('✅ Performance updated:', this.productPerformance().length, 'items');
+                        this.productPerformanceTotal.set(performanceTotal);
                     } else {
                         this.productPerformance.set([]);
-                        console.warn('⚠️ No performance data received');
+                        this.productPerformanceTotal.set(0);
                     }
 
                     const distributionSegments = this.buildStockDistributionSegments(performanceItems);
                     this.stockDistributionData.set(distributionSegments);
-                    console.log('📦 Stock distribution segments:', distributionSegments.length);
 
                     if (data.movements.body?.data?.items) {
                         this.stockMovements.set(data.movements.body.data.items);
-                        console.log('✅ Movements updated:', this.stockMovements().length, 'items');
-                    } else {
-                        console.warn('⚠️ No movements data received');
                     }
 
                     // Update charts with real data
@@ -254,38 +225,18 @@ export class AnalyticsComponent implements OnInit, AfterViewInit, OnDestroy {
                     const topProductsData = data.topProducts.body?.data || [];
                     const distributionData = distributionSegments;
 
-                    console.log('📈 Chart data:', {
-                        stockTrend: stockTrendData.length + ' points',
-                        valueTrend: valueTrendData.length + ' points',
-                        topProducts: topProductsData.length + ' products',
-                        distribution: distributionData.length + ' segments',
-                    });
-
                     this.updateCharts(stockTrendData, valueTrendData, topProductsData, distributionData);
                 },
                 error: (err) => {
-                    console.error('❌ Error loading analytics data:', err);
-                    console.error('Error details:', err.error);
                     this._notificationService.error('Analytics', 'Failed to load analytics data: ' + (err.error?.message || err.message));
                 },
             });
     }
 
     initializeChartsIfNeeded(): void {
-        console.log('🔧 initializeChartsIfNeeded called');
-        console.log('📊 Current chart status:', {
-            stockTrendChart: !!this.stockTrendChart,
-            inventoryValueChart: !!this.inventoryValueChart,
-            topProductsChart: !!this.topProductsChart,
-            stockDistributionChart: !!this.stockDistributionChart,
-            pendingData: !!this.pendingChartData,
-        });
-
         // If charts already exist, just apply pending data if any
         if (this.stockTrendChart && this.inventoryValueChart && this.topProductsChart && this.stockDistributionChart) {
-            console.log('✅ Charts already initialized');
             if (this.pendingChartData) {
-                console.log('📊 Applying pending chart data');
                 this.updateCharts(this.pendingChartData.stockTrend, this.pendingChartData.valueTrend, this.pendingChartData.topProducts, this.pendingChartData.distribution);
                 this.pendingChartData = undefined;
             }
@@ -293,34 +244,19 @@ export class AnalyticsComponent implements OnInit, AfterViewInit, OnDestroy {
         }
 
         // Try to initialize charts
-        console.log('🎨 Charts not initialized, attempting to create...');
         this.initializeCharts();
 
         // After initialization, apply pending data if any
         if (this.pendingChartData && this.stockTrendChart && this.inventoryValueChart && this.topProductsChart && this.stockDistributionChart) {
-            console.log('📊 Charts created! Applying pending data');
             this.updateCharts(this.pendingChartData.stockTrend, this.pendingChartData.valueTrend, this.pendingChartData.topProducts, this.pendingChartData.distribution);
             this.pendingChartData = undefined;
-        } else if (this.pendingChartData) {
-            console.warn('⚠️ Charts still not ready after initialization attempt');
         }
     }
 
     initializeCharts(): void {
-        console.log('🎨 initializeCharts called');
-        console.log('📍 Canvas references:', {
-            stockTrendCanvas: !!this.stockTrendCanvas,
-            inventoryValueCanvas: !!this.inventoryValueCanvas,
-            topProductsCanvas: !!this.topProductsCanvas,
-            stockDistributionCanvas: !!this.stockDistributionCanvas,
-        });
-
         if (!this.stockTrendCanvas || !this.inventoryValueCanvas || !this.topProductsCanvas || !this.stockDistributionCanvas) {
-            console.error('❌ Canvas elements not found! Cannot initialize charts.');
             return;
         }
-
-        console.log('🎯 All canvas elements found, creating charts...');
 
         // Stock Trend Chart (Line Chart)
         const stockTrendConfig: ChartConfiguration<'line'> = {
@@ -433,7 +369,14 @@ export class AnalyticsComponent implements OnInit, AfterViewInit, OnDestroy {
                 plugins: {
                     legend: {
                         display: true,
-                        position: 'left',
+                        position: 'bottom',
+                        labels: {
+                            boxWidth: 10,
+                            padding: 10,
+                            font: {
+                                size: 10,
+                            },
+                        },
                     },
                     tooltip: {
                         callbacks: {
@@ -467,6 +410,13 @@ export class AnalyticsComponent implements OnInit, AfterViewInit, OnDestroy {
                 plugins: {
                     legend: {
                         position: 'bottom',
+                        labels: {
+                            boxWidth: 10,
+                            padding: 10,
+                            font: {
+                                size: 10,
+                            },
+                        },
                     },
                 },
                 cutout: '55%',
@@ -478,26 +428,11 @@ export class AnalyticsComponent implements OnInit, AfterViewInit, OnDestroy {
         this.inventoryValueChart = new Chart(this.inventoryValueCanvas.nativeElement, inventoryValueConfig);
         this.topProductsChart = new Chart(this.topProductsCanvas.nativeElement, topProductsConfig);
         this.stockDistributionChart = new Chart(this.stockDistributionCanvas.nativeElement, distributionConfig);
-
-        console.log('✅ All charts created successfully:', {
-            stockTrendChart: !!this.stockTrendChart,
-            inventoryValueChart: !!this.inventoryValueChart,
-            topProductsChart: !!this.topProductsChart,
-            stockDistributionChart: !!this.stockDistributionChart,
-        });
     }
 
     updateCharts(stockTrendData: any[], valueTrendData: any[], topProductsData: any[], distributionData: StockDistributionSegment[]): void {
-        console.log('📊 Updating charts with data:', {
-            stockTrend: stockTrendData,
-            valueTrend: valueTrendData,
-            topProducts: topProductsData,
-            distribution: distributionData,
-        });
-
         // If charts are not initialized yet, store data for later
         if (!this.stockTrendChart || !this.inventoryValueChart || !this.topProductsChart || !this.stockDistributionChart) {
-            console.log('⏳ Charts not ready yet, storing data for later');
             this.pendingChartData = {
                 stockTrend: stockTrendData,
                 valueTrend: valueTrendData,
@@ -513,16 +448,12 @@ export class AnalyticsComponent implements OnInit, AfterViewInit, OnDestroy {
                 this.stockTrendChart.data.labels = stockTrendData.map((d) => d.period);
                 this.stockTrendChart.data.datasets[0].data = stockTrendData.map((d) => d.stock);
                 this.stockTrendChart.update();
-                console.log('✅ Stock trend chart updated with', stockTrendData.length, 'data points');
             } else {
                 // Clear chart to show no data
                 this.stockTrendChart.data.labels = [];
                 this.stockTrendChart.data.datasets[0].data = [];
                 this.stockTrendChart.update();
-                console.warn('⚠️ Stock trend data is empty - chart cleared');
             }
-        } else {
-            console.error('❌ Stock trend chart not initialized');
         }
 
         // Update Inventory Value Bar Chart
@@ -531,16 +462,12 @@ export class AnalyticsComponent implements OnInit, AfterViewInit, OnDestroy {
                 this.inventoryValueChart.data.labels = valueTrendData.map((d) => d.period);
                 this.inventoryValueChart.data.datasets[0].data = valueTrendData.map((d) => d.value);
                 this.inventoryValueChart.update();
-                console.log('✅ Inventory value chart updated with', valueTrendData.length, 'data points');
             } else {
                 // Clear chart to show no data
                 this.inventoryValueChart.data.labels = [];
                 this.inventoryValueChart.data.datasets[0].data = [];
                 this.inventoryValueChart.update();
-                console.warn('⚠️ Inventory value data is empty - chart cleared');
             }
-        } else {
-            console.error('❌ Inventory value chart not initialized');
         }
 
         // Update Top Products Pie Chart
@@ -549,29 +476,18 @@ export class AnalyticsComponent implements OnInit, AfterViewInit, OnDestroy {
                 this.topProductsChart.data.labels = topProductsData.map((d) => d.productName);
                 this.topProductsChart.data.datasets[0].data = topProductsData.map((d) => d.stock);
                 this.topProductsChart.update();
-                console.log('✅ Top products chart updated with', topProductsData.length, 'products');
             } else {
                 // Clear chart to show no data
                 this.topProductsChart.data.labels = [];
                 this.topProductsChart.data.datasets[0].data = [];
                 this.topProductsChart.update();
-                console.warn('⚠️ Top products data is empty - chart cleared');
             }
-        } else {
-            console.error('❌ Top products chart not initialized');
         }
 
         if (this.stockDistributionChart) {
             this.stockDistributionChart.data.labels = distributionData.map((segment) => segment.label);
             this.stockDistributionChart.data.datasets[0].data = distributionData.map((segment) => segment.value);
             this.stockDistributionChart.update();
-            if (distributionData.length) {
-                console.log('✅ Stock distribution chart updated with', distributionData.length, 'segments');
-            } else {
-                console.warn('⚠️ No stock distribution data available');
-            }
-        } else {
-            console.error('❌ Stock distribution chart not initialized');
         }
     }
 
@@ -705,18 +621,18 @@ export class AnalyticsComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     onDateChange(): void {
+        this.pageIndex.set(1);
         this.loadData(false);
     }
 
-    onFilterTypeChange(): void {
-        this._router.navigate([], {
-            relativeTo: this._route,
-            queryParams: {
-                type: this.filterType(),
-                id: null,
-                name: null,
-            },
-            queryParamsHandling: 'merge',
-        });
+    onPerformanceQueryParamsChange(params: NzTableQueryParams): void {
+        const { pageIndex, pageSize } = params;
+        if (pageIndex === this.pageIndex() && pageSize === this.pageSize()) {
+            return;
+        }
+
+        this.pageIndex.set(pageIndex);
+        this.pageSize.set(pageSize);
+        this.loadData(false);
     }
 }
