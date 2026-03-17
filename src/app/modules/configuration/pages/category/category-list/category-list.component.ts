@@ -8,7 +8,7 @@ import { Constants } from '@app/core/constants/constants';
 import { HttpService } from '@app/core/services/http.service';
 import { NgZorroCustomModule } from '@app/shared/ng-zorro-custom.module';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
-import { finalize } from 'rxjs';
+import { debounceTime, distinctUntilChanged, finalize, map } from 'rxjs';
 import { PageHeaderComponent } from '@app/shared/components/page-header/page-header.component';
 import { AdaptiveListComponent } from '@app/shared/components/adaptive-list/adaptive-list.component';
 import { TableConfig } from '@app/core/interfaces/table';
@@ -16,129 +16,128 @@ import { CATEGORY_TABLE_CONFIG } from '@app/modules/configuration/config/categor
 import { LoaderComponent } from '@app/shared/components/loader/loader.component';
 
 @Component({
-  selector: 'category-list',
-  imports: [
-    CommonModule,
-    NgZorroCustomModule,
-    ReactiveFormsModule,
-    PageHeaderComponent,
-    AdaptiveListComponent,
-    LoaderComponent
-  ],
-  templateUrl: './category-list.component.html',
-  styleUrl: './category-list.component.scss',
+    selector: 'category-list',
+    imports: [CommonModule, NgZorroCustomModule, ReactiveFormsModule, PageHeaderComponent, AdaptiveListComponent, LoaderComponent],
+    templateUrl: './category-list.component.html',
+    styleUrl: './category-list.component.scss',
 })
 export class CategoryListComponent implements OnInit {
-  categoryTableConfig: TableConfig = CATEGORY_TABLE_CONFIG;
-  data: any[] = [];
-  totalCount: number = 0;
-  pageLoading: boolean = false; // Initial page load
-  tableLoading: boolean = false; // Table data/filter loading
-  payload: any = {
-    offset: 0,
-    limit: Constants.PAGE_SIZE,
-    search_text: '',
-    status: '',
-  };
-  searchControl: FormControl = new FormControl('');
-
-  constructor(
-    private _httpService: HttpService,
-    private _destroyRef: DestroyRef,
-    private _notificationService: NzNotificationService,
-    private _router: Router,
-    private _activatedRoute: ActivatedRoute
-  ) {}
-
-  ngOnInit(): void {
-    this.loadList();
-    this.searchControl.valueChanges.subscribe((value) => {
-      this.onSearchChange(value);
-    });
-  }
-
-  onSearchChange(value: string): void {
-    this.payload = {
-      offset: 0,
-      limit: Constants.PAGE_SIZE,
-      search_text: value,
-      status: '',
+    categoryTableConfig: TableConfig = CATEGORY_TABLE_CONFIG;
+    data: any[] = [];
+    totalCount: number = 0;
+    pageLoading: boolean = false; // Initial page load
+    tableLoading: boolean = false; // Table data/filter loading
+    payload: any = {
+        offset: 0,
+        limit: Constants.PAGE_SIZE,
+        search_text: '',
+        status: '',
     };
-    this.loadList(true); // Pass true to indicate it's a filter/refresh
-  }
+    searchControl: FormControl = new FormControl('');
 
-  handlePaginationEvent(event: any) {
-    this.payload = {
-      ...this.payload,
-      offset: event.offset,
-      limit: event.limit,
-    };
-    this.loadList(true); // Pass true for pagination loading
-  }
+    constructor(
+        private _httpService: HttpService,
+        private _destroyRef: DestroyRef,
+        private _notificationService: NzNotificationService,
+        private _router: Router,
+        private _activatedRoute: ActivatedRoute
+    ) {}
 
-  loadList(isRefresh: boolean = false): any {
-    // Set appropriate loading state
-    if (isRefresh) {
-      this.tableLoading = true;
-    } else {
-      this.pageLoading = true;
+    ngOnInit(): void {
+        this.loadList();
+        this.searchControl.valueChanges
+            .pipe(
+                map((value: string | null) => (value || '').trim()),
+                debounceTime(300),
+                distinctUntilChanged(),
+                takeUntilDestroyed(this._destroyRef)
+            )
+            .subscribe((value) => {
+                this.onSearchChange(value);
+            });
     }
 
-    this._httpService
-      .get(APIEndpoint.GET_CATEGORY_LIST, this.payload)
-      .pipe(
-        takeUntilDestroyed(this._destroyRef),
-        finalize(() => {
-          this.pageLoading = false;
-          this.tableLoading = false;
-        })
-      )
-      .subscribe({
-        next: (res: any) => {
-          if (res.status === 200) {
-            this.data = [];
-            if (res.body?.data?.length) {
-              this.data = res.body.data;
-              this.totalCount = res.body.total;
-            } else {
-              this.data = [];
-            }
-          }
-        },
-        error: (err: any) => {
-          console.log(err);
-          this._notificationService.error('Error!', err?.error?.message);
-        },
-      });
-  }
-
-  handleListActions(event: any): any {
-    if (event.action === 'create') {
-      this.handleAddCategory();
-    } else if (event.action === 'view') {
-      this.handleViewCategory(event.value.oid);
-    } else if (event.action === 'edit') {
-      this.handleEditCategory(event.value.oid);
+    onSearchChange(value: string): void {
+        this.payload = {
+            ...this.payload,
+            offset: 0,
+            search_text: value,
+        };
+        this.loadList(true); // Pass true to indicate it's a filter/refresh
     }
-  }
 
-  handleAddCategory(): any {
-    this._router.navigate(['../create'], {
-      relativeTo: this._activatedRoute,
-    });
-  }
+    handlePaginationEvent(event: any) {
+        this.payload = {
+            ...this.payload,
+            offset: event.offset,
+            limit: event.limit,
+        };
+        this.loadList(true); // Pass true for pagination loading
+    }
 
-  handleViewCategory(value: any): any {
-    this._router.navigate([`../view/${value}`], {
-      relativeTo: this._activatedRoute,
-      state: { edit: false },
-    });
-  }
+    loadList(isRefresh: boolean = false): any {
+        // Set appropriate loading state
+        if (isRefresh) {
+            this.tableLoading = true;
+        } else {
+            this.pageLoading = true;
+        }
 
-  handleEditCategory(value: any): any {
-    this._router.navigate([`../view/${value}`], {
-      relativeTo: this._activatedRoute,
-      state: { edit: true },
-    });
-  }
+        this._httpService
+            .get(APIEndpoint.GET_CATEGORY_LIST, this.payload)
+            .pipe(
+                takeUntilDestroyed(this._destroyRef),
+                finalize(() => {
+                    this.pageLoading = false;
+                    this.tableLoading = false;
+                })
+            )
+            .subscribe({
+                next: (res: any) => {
+                    if (res.status === 200) {
+                        this.data = [];
+                        if (res.body?.data?.length) {
+                            this.data = res.body.data;
+                            this.totalCount = res.body.total;
+                        } else {
+                            this.data = [];
+                        }
+                    }
+                },
+                error: (err: any) => {
+                    console.log(err);
+                    this._notificationService.error('Error!', err?.error?.message);
+                },
+            });
+    }
+
+    handleListActions(event: any): any {
+        if (event.action === 'create') {
+            this.handleAddCategory();
+        } else if (event.action === 'view') {
+            this.handleViewCategory(event.value.oid);
+        } else if (event.action === 'edit') {
+            this.handleEditCategory(event.value.oid);
+        }
+    }
+
+    handleAddCategory(): any {
+        this._router.navigate(['../create'], {
+            relativeTo: this._activatedRoute,
+        });
+    }
+
+    handleViewCategory(value: any): any {
+        this._router.navigate([`../view/${value}`], {
+            relativeTo: this._activatedRoute,
+            state: { edit: false },
+        });
+    }
+
+    handleEditCategory(value: any): any {
+        this._router.navigate([`../view/${value}`], {
+            relativeTo: this._activatedRoute,
+            state: { edit: true },
+        });
+    }
 }

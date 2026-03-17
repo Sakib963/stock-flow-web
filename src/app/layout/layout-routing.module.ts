@@ -7,74 +7,69 @@ import { ROLES } from '@app/core/constants/constants';
 import { NotFoundComponent } from '@app/shared/components/not-found/not-found.component';
 
 const routes: Routes = [
-  {
-    path: '',
-    component: LayoutComponent,
-    children: [
-      {
+    {
         path: '',
-        redirectTo: 'redirect',
-        pathMatch: 'full',
-      },
-      {
-        path: 'redirect',
-        loadComponent: () =>
-          import('../shared/components/redirect/redirect.component').then(
-            (c) => c.RedirectComponent
-          ),
-      },
-      {
-        path: 'admin',
-        loadChildren: () =>
-          import('../modules/admin/admin.module').then((m) => m.AdminModule),
-        canActivate: [RoleGuard],
-        data: { roles: [ROLES.ADMIN] },
-      },
-      {
-        path: 'configuration',
-        loadChildren: () =>
-          import('../modules/configuration/configuration.module').then(
-            (m) => m.ConfigurationModule
-          ),
-        canActivate: [RoleGuard],
-        data: { roles: [ROLES.ADMIN, ROLES.MANAGER] },
-      },
-      // {
-      //   path: 'manager',
-      //   loadChildren: () =>
-      //     import('../modules/manager/manager.module').then(
-      //       (m) => m.ManagerModule
-      //     ),
-      //   canActivate: [RoleGuard],
-      //   data: { roles: [ROLES.MANAGER, ROLES.GUEST] },
-      // },
-      // {
-      //   path: 'sales',
-      //   loadChildren: () =>
-      //     import('../modules/sales/sales.module').then((m) => m.SalesModule),
-      //   canActivate: [RoleGuard],
-      //   data: { roles: [ROLES.SALESMAN] },
-      // },
-      {
-        path: 'shared',
-        loadChildren: () =>
-          import('../modules/shared/shared.module').then((m) => m.SharedModule),
-        canActivate: [RoleGuard],
-        data: { roles: [ROLES.SALESMAN] },
-      },
-      {
-        path: 'profile',
-        loadChildren: () =>
-          import('../modules/profile/profile.module').then(
-            (m) => m.ProfileModule
-          ),
-      },
-    ],
-  },
+        component: LayoutComponent,
+        children: [
+            {
+                path: '',
+                redirectTo: 'redirect',
+                pathMatch: 'full',
+            },
+            {
+                path: 'redirect',
+                loadComponent: () => import('../shared/components/redirect/redirect.component').then((c) => c.RedirectComponent),
+            },
+            {
+                path: 'admin',
+                loadChildren: () => import('../modules/admin/admin.module').then((m) => m.AdminModule),
+                canActivate: [RoleGuard],
+                data: { roles: [ROLES.ADMIN] },
+            },
+            {
+                path: 'configuration',
+                loadChildren: () => import('../modules/configuration/configuration.module').then((m) => m.ConfigurationModule),
+                canActivate: [RoleGuard],
+                data: { roles: [ROLES.ADMIN, ROLES.MANAGER] },
+            },
+            {
+                path: 'activity_log',
+                loadChildren: () => import('../modules/activity-log/activity-log.module').then((m) => m.ActivityLogModule),
+                canActivate: [RoleGuard],
+                data: { roles: [ROLES.ADMIN, ROLES.MANAGER] },
+            },
+            // {
+            //   path: 'manager',
+            //   loadChildren: () =>
+            //     import('../modules/manager/manager.module').then(
+            //       (m) => m.ManagerModule
+            //     ),
+            //   canActivate: [RoleGuard],
+            //   data: { roles: [ROLES.MANAGER, ROLES.GUEST] },
+            // },
+            // {
+            //   path: 'sales',
+            //   loadChildren: () =>
+            //     import('../modules/sales/sales.module').then((m) => m.SalesModule),
+            //   canActivate: [RoleGuard],
+            //   data: { roles: [ROLES.SALESMAN] },
+            // },
+            {
+                path: 'shared',
+                loadChildren: () => import('../modules/shared/shared.module').then((m) => m.SharedModule),
+                canActivate: [RoleGuard],
+                data: { roles: [ROLES.SALESMAN] },
+            },
+            {
+                path: 'profile',
+                loadChildren: () => import('../modules/profile/profile.module').then((m) => m.ProfileModule),
+            },
+        ],
+    },
 ];
 
 @NgModule({
-  imports: [RouterModule.forChild(routes)],
-  exports: [RouterModule],
+    imports: [RouterModule.forChild(routes)],
+    exports: [RouterModule],
 })
 export class LayoutRoutingModule {}

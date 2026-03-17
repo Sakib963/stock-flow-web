@@ -137,4 +137,6 @@ export class APIEndpoint {
     static GET_PRODUCT_PERFORMANCE = '/api/v1/configuration/analytics/get-product-performance';
     static GET_STOCK_MOVEMENTS = '/api/v1/configuration/analytics/get-stock-movements';
     static EXPORT_ANALYTICS_REPORT = '/api/v1/configuration/analytics/export-analytics-report';
+    static GET_CONFIGURATION_DASHBOARD_SUMMARY = '/api/v1/configuration/analytics/get-configuration-dashboard-summary';
+    static GET_ACTIVITY_LOG_LIST = '/api/v1/activity-log/get-activity-log-list';
 }

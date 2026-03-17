@@ -15,168 +15,171 @@ import { NgZorroCustomModule } from '@app/shared/ng-zorro-custom.module';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { NzModalService } from 'ng-zorro-antd/modal';
 import { ConfirmationModalComponent } from '@app/shared/components/confirmation-modal/confirmation-modal.component';
-import { finalize } from 'rxjs';
+import { debounceTime, distinctUntilChanged, finalize, map } from 'rxjs';
 
 @Component({
-  selector: 'product-list',
-  imports: [CommonModule, NgZorroCustomModule, ReactiveFormsModule, PageHeaderComponent, AdaptiveListComponent, LoaderComponent],
-  templateUrl: './product-list.component.html',
-  styleUrl: './product-list.component.scss'
+    selector: 'product-list',
+    imports: [CommonModule, NgZorroCustomModule, ReactiveFormsModule, PageHeaderComponent, AdaptiveListComponent, LoaderComponent],
+    templateUrl: './product-list.component.html',
+    styleUrl: './product-list.component.scss',
 })
 export class ProductListComponent {
-  productTableConfig: TableConfig = PRODUCT_TABLE_CONFIG;
-  data: any[] = [];
-  totalCount: number = 0;
-  pageLoading: boolean = false; // Initial page load
-  tableLoading: boolean = false; // Table data/filter loading
-  payload: any = {
-    offset: 0,
-    limit: Constants.PAGE_SIZE,
-    search_text: '',
-    status: '',
-    category_oid: '',
-    sub_category_oid: '',
-    brand_oid: '',
-  };
-  searchControl: FormControl = new FormControl('');
-
-  constructor(
-    private _httpService: HttpService,
-    private _destroyRef: DestroyRef,
-    private _notificationService: NzNotificationService,
-    private _router: Router,
-    private _activatedRoute: ActivatedRoute,
-    private _modalService: NzModalService
-  ) {}
-
-  ngOnInit(): void {
-    this.loadList();
-    this.searchControl.valueChanges.subscribe((value) => {
-      this.onSearchChange(value);
-    });
-  }
-
-  onSearchChange(value: string): void {
-    this.payload = {
-      offset: 0,
-      limit: Constants.PAGE_SIZE,
-      search_text: value,
-      status: '',
-      category_oid: '',
-      sub_category_oid: '',
-      brand_oid: '',
+    productTableConfig: TableConfig = PRODUCT_TABLE_CONFIG;
+    data: any[] = [];
+    totalCount: number = 0;
+    pageLoading: boolean = false; // Initial page load
+    tableLoading: boolean = false; // Table data/filter loading
+    payload: any = {
+        offset: 0,
+        limit: Constants.PAGE_SIZE,
+        search_text: '',
+        status: '',
+        category_oid: '',
+        sub_category_oid: '',
+        brand_oid: '',
     };
-    this.loadList(true); // Pass true to indicate it's a filter/refresh
-  }
+    searchControl: FormControl = new FormControl('');
 
-  handlePaginationEvent(event: any) {
-    this.payload = {
-      ...this.payload,
-      offset: event.offset,
-      limit: event.limit,
-    };
-    this.loadList(true); // Pass true for pagination loading
-  }
+    constructor(
+        private _httpService: HttpService,
+        private _destroyRef: DestroyRef,
+        private _notificationService: NzNotificationService,
+        private _router: Router,
+        private _activatedRoute: ActivatedRoute,
+        private _modalService: NzModalService
+    ) {}
 
-  loadList(isRefresh: boolean = false): any {
-    // Set appropriate loading state
-    if (isRefresh) {
-      this.tableLoading = true;
-    } else {
-      this.pageLoading = true;
+    ngOnInit(): void {
+        this.loadList();
+        this.searchControl.valueChanges
+            .pipe(
+                map((value: string | null) => (value || '').trim()),
+                debounceTime(300),
+                distinctUntilChanged(),
+                takeUntilDestroyed(this._destroyRef)
+            )
+            .subscribe((value) => {
+                this.onSearchChange(value);
+            });
     }
 
-    this._httpService
-      .get(APIEndpoint.GET_PRODUCT_LIST, this.payload)
-      .pipe(
-        takeUntilDestroyed(this._destroyRef),
-        finalize(() => {
-          this.pageLoading = false;
-          this.tableLoading = false;
-        })
-      )
-      .subscribe({
-        next: (res: any) => {
-          if (res.status === 200) {
-            this.data = [];
-            if (res.body?.data?.length) {
-              this.data = res.body.data;
-              this.totalCount = res.body.total;
-            } else {
-              this.data = [];
-            }
-          }
-        },
-        error: (err: any) => {
-          console.log(err);
-          this._notificationService.error('Error!', err?.error?.message);
-        },
-      });
-  }
-
-  handleListActions(event: any): any {
-    if (event.action === 'create') {
-      this.handleAddProduct();
-    } else if (event.action === 'view') {
-      this.handleViewProduct(event.value.oid);
-    } else if (event.action === 'edit') {
-      this.handleEditProduct(event.value.oid);
-    } else if (event.action === 'delete') {
-      this.handleDeleteProduct(event.value.oid);
+    onSearchChange(value: string): void {
+        this.payload = {
+            ...this.payload,
+            offset: 0,
+            search_text: value,
+        };
+        this.loadList(true); // Pass true to indicate it's a filter/refresh
     }
-  }
 
-  handleAddProduct(): any {
-    this._router.navigate(['../create'], {
-      relativeTo: this._activatedRoute,
-    });
-  }
+    handlePaginationEvent(event: any) {
+        this.payload = {
+            ...this.payload,
+            offset: event.offset,
+            limit: event.limit,
+        };
+        this.loadList(true); // Pass true for pagination loading
+    }
 
-  handleViewProduct(value: any): any {
-    this._router.navigate([`../view/${value}`], {
-      relativeTo: this._activatedRoute,
-      state: { edit: false },
-    });
-  }
+    loadList(isRefresh: boolean = false): any {
+        // Set appropriate loading state
+        if (isRefresh) {
+            this.tableLoading = true;
+        } else {
+            this.pageLoading = true;
+        }
 
-  handleEditProduct(value: any): any {
-    this._router.navigate([`../view/${value}`], {
-      relativeTo: this._activatedRoute,
-      state: { edit: true },
-    });
-  }
+        this._httpService
+            .get(APIEndpoint.GET_PRODUCT_LIST, this.payload)
+            .pipe(
+                takeUntilDestroyed(this._destroyRef),
+                finalize(() => {
+                    this.pageLoading = false;
+                    this.tableLoading = false;
+                })
+            )
+            .subscribe({
+                next: (res: any) => {
+                    if (res.status === 200) {
+                        this.data = [];
+                        if (res.body?.data?.length) {
+                            this.data = res.body.data;
+                            this.totalCount = res.body.total;
+                        } else {
+                            this.data = [];
+                        }
+                    }
+                },
+                error: (err: any) => {
+                    console.log(err);
+                    this._notificationService.error('Error!', err?.error?.message);
+                },
+            });
+    }
 
-  handleDeleteProduct(oid: string): void {
-    this._modalService.create({
-      nzContent: ConfirmationModalComponent,
-      nzData: {
-        message: 'Are you sure you want to delete this product?',
-      },
-      nzFooter: null,
-      nzClosable: false,
-      nzOnOk: () => this.deleteProduct(oid),
-    });
-  }
+    handleListActions(event: any): any {
+        if (event.action === 'create') {
+            this.handleAddProduct();
+        } else if (event.action === 'view') {
+            this.handleViewProduct(event.value.oid);
+        } else if (event.action === 'edit') {
+            this.handleEditProduct(event.value.oid);
+        } else if (event.action === 'delete') {
+            this.handleDeleteProduct(event.value.oid);
+        }
+    }
 
-  deleteProduct(oid: string): void {
-    this.tableLoading = true;
-    this._httpService
-      .get(APIEndpoint.DELETE_PRODUCT, { oid })
-      .pipe(
-        takeUntilDestroyed(this._destroyRef),
-        finalize(() => (this.tableLoading = false))
-      )
-      .subscribe({
-        next: (res: any) => {
-          if (res.status === 200) {
-            this._notificationService.success('Success!', 'Product deleted successfully.');
-            this.loadList(true);
-          }
-        },
-        error: (err: any) => {
-          console.log(err);
-          this._notificationService.error('Error!', err?.error?.message);
-        },
-      });
-  }
+    handleAddProduct(): any {
+        this._router.navigate(['../create'], {
+            relativeTo: this._activatedRoute,
+        });
+    }
+
+    handleViewProduct(value: any): any {
+        this._router.navigate([`../view/${value}`], {
+            relativeTo: this._activatedRoute,
+            state: { edit: false },
+        });
+    }
+
+    handleEditProduct(value: any): any {
+        this._router.navigate([`../view/${value}`], {
+            relativeTo: this._activatedRoute,
+            state: { edit: true },
+        });
+    }
+
+    handleDeleteProduct(oid: string): void {
+        this._modalService.create({
+            nzContent: ConfirmationModalComponent,
+            nzData: {
+                message: 'Are you sure you want to delete this product?',
+            },
+            nzFooter: null,
+            nzClosable: false,
+            nzOnOk: () => this.deleteProduct(oid),
+        });
+    }
+
+    deleteProduct(oid: string): void {
+        this.tableLoading = true;
+        this._httpService
+            .get(APIEndpoint.DELETE_PRODUCT, { oid })
+            .pipe(
+                takeUntilDestroyed(this._destroyRef),
+                finalize(() => (this.tableLoading = false))
+            )
+            .subscribe({
+                next: (res: any) => {
+                    if (res.status === 200) {
+                        this._notificationService.success('Success!', 'Product deleted successfully.');
+                        this.loadList(true);
+                    }
+                },
+                error: (err: any) => {
+                    console.log(err);
+                    this._notificationService.error('Error!', err?.error?.message);
+                },
+            });
+    }
 }

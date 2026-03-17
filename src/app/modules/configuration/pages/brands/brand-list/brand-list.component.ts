@@ -13,7 +13,7 @@ import { LoaderComponent } from '@app/shared/components/loader/loader.component'
 import { PageHeaderComponent } from '@app/shared/components/page-header/page-header.component';
 import { NgZorroCustomModule } from '@app/shared/ng-zorro-custom.module';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
-import { finalize } from 'rxjs';
+import { debounceTime, distinctUntilChanged, finalize, map } from 'rxjs';
 
 @Component({
     selector: 'brand-list',
@@ -45,17 +45,23 @@ export class BrandListComponent {
 
     ngOnInit(): void {
         this.loadList();
-        this.searchControl.valueChanges.subscribe((value) => {
-            this.onSearchChange(value);
-        });
+        this.searchControl.valueChanges
+            .pipe(
+                map((value: string | null) => (value || '').trim()),
+                debounceTime(300),
+                distinctUntilChanged(),
+                takeUntilDestroyed(this._destroyRef)
+            )
+            .subscribe((value) => {
+                this.onSearchChange(value);
+            });
     }
 
     onSearchChange(value: string): void {
         this.payload = {
+            ...this.payload,
             offset: 0,
-            limit: Constants.PAGE_SIZE,
             search_text: value,
-            status: '',
         };
         this.loadList(true); // Pass true to indicate it's a filter/refresh
     }

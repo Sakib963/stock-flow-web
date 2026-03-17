@@ -23,6 +23,16 @@ export class Menu {
                 },
             ],
         },
+        {
+            group: 'Activity',
+            items: [
+                {
+                    icon: 'assets/icons/report.svg',
+                    label: 'Activity Log',
+                    route: '/activity_log',
+                },
+            ],
+        },
     ];
 
     static managerPages: MenuItem[] = [
@@ -79,6 +89,11 @@ export class Menu {
                     icon: 'assets/icons/shelf.svg',
                     label: 'Aisle/Zone',
                     route: '/configuration/aisle',
+                },
+                {
+                    icon: 'assets/icons/report.svg',
+                    label: 'Activity Log',
+                    route: '/activity_log',
                 },
                 // {
                 //     icon: 'assets/icons/alert.svg',

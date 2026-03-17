@@ -1,320 +1,543 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, DestroyRef, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { NgZorroCustomModule } from '@app/shared/ng-zorro-custom.module';
 import { PageHeaderComponent } from '@app/shared/components/page-header/page-header.component';
 import { getBreadcrumbsByKey } from '@app/core/config/breadcrumb.registry';
 import { LoaderComponent } from '@app/shared/components/loader/loader.component';
+import { ConfigurationService } from '@app/modules/configuration/services/configuration.service';
+import { finalize } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { NzNotificationService } from 'ng-zorro-antd/notification';
 
 interface StatCard {
-  title: string;
-  count: number;
-  icon: string;
-  color: string;
-  trend?: {
-    value: number;
-    isPositive: boolean;
-  };
-  route: string;
+    title: string;
+    count: number;
+    icon: string;
+    color: string;
+    trend?: {
+        value: number;
+        isPositive: boolean;
+    };
+    route: string;
 }
 
 interface QuickAction {
-  label: string;
-  icon: string;
-  route: string;
-  color: string;
+    label: string;
+    icon: string;
+    route: string;
+    color: string;
 }
 
 interface RecentActivity {
-  title: string;
-  description: string;
-  time: string;
-  icon: string;
-  type: 'create' | 'update' | 'delete';
+    title: string;
+    description: string;
+    time: string;
+    icon: string;
+    type: 'create' | 'update' | 'delete';
+}
+
+interface StatSummary {
+    active_categories: number;
+    active_sub_categories: number;
+    active_brands: number;
+    active_suppliers: number;
+    active_products: number;
+    active_warehouses: number;
+    active_aisles: number;
+    total_skus: number;
+}
+
+interface DataQualitySummary {
+    total: number;
+    products_with_images: number;
+    missing_images: number;
+    products_with_brands: number;
+    missing_brands: number;
+    complete_product_data: number;
+}
+
+interface InsightSummary {
+    avg_products_per_category: number;
+    avg_sub_categories_per_category: number;
+    products_per_supplier: number;
+    avg_aisles_per_warehouse: number;
+    products_per_warehouse: number;
+    avg_products_per_brand: number;
+    brands_with_10_plus_products: number;
+}
+
+interface StatusOverview {
+    active_items: number;
+    inactive_items: number;
+}
+
+interface ProductiveCategory {
+    name: string;
+    products: number;
+    sub_categories: number;
+    percent: number;
 }
 
 @Component({
-  selector: 'app-configuration-dashboard',
-  standalone: true,
-  imports: [
-    CommonModule,
-    RouterModule,
-    NgZorroCustomModule,
-    PageHeaderComponent,
-    LoaderComponent,
-  ],
-  templateUrl: './configuration-dashboard.component.html',
-  styleUrls: ['./configuration-dashboard.component.scss'],
+    selector: 'app-configuration-dashboard',
+    standalone: true,
+    imports: [CommonModule, RouterModule, NgZorroCustomModule, PageHeaderComponent, LoaderComponent],
+    templateUrl: './configuration-dashboard.component.html',
+    styleUrls: ['./configuration-dashboard.component.scss'],
 })
 export class ConfigurationDashboardComponent implements OnInit {
-  breadcrumbs = getBreadcrumbsByKey('configuration.dashboard.main');
+    private readonly _configurationService = inject(ConfigurationService);
+    private readonly _destroyRef = inject(DestroyRef);
+    private readonly _notificationService = inject(NzNotificationService);
 
-  // Signals for reactive data
-  loading = signal(true);
-  statsCards = signal<StatCard[]>([]);
-  quickActions = signal<QuickAction[]>([]);
-  recentActivities = signal<RecentActivity[]>([]);
+    breadcrumbs = getBreadcrumbsByKey('configuration.dashboard.main');
 
-  // Distribution data for charts
-  categoryDistribution = signal<any[]>([]);
-  suppliersByRegion = signal<any[]>([]);
+    loading = signal(true);
+    usingFallback = signal(false);
 
-  ngOnInit(): void {
-    this.loadDashboardData();
-  }
+    statsCards = signal<StatCard[]>([]);
+    quickActions = signal<QuickAction[]>([]);
+    recentActivities = signal<RecentActivity[]>([]);
 
-  /**
-   * Load mock dashboard data
-   * TODO: Replace with actual API calls later
-   */
-  private loadDashboardData(): void {
-    // Simulate API call delay
-    setTimeout(() => {
-      this.loadStatCards();
-      this.loadQuickActions();
-      this.loadRecentActivities();
-      this.loadChartData();
-      this.loading.set(false);
-    }, 800);
-  }
+    statSummary = signal<StatSummary>({
+        active_categories: 0,
+        active_sub_categories: 0,
+        active_brands: 0,
+        active_suppliers: 0,
+        active_products: 0,
+        active_warehouses: 0,
+        active_aisles: 0,
+        total_skus: 0,
+    });
 
-  /**
-   * Load statistics cards with configuration data
-   * TODO: Replace with API calls
-   * API: GET /api/configuration/statistics
-   * Response: { 
-   *   categories: number,        // COUNT(*) WHERE status = 'Active'
-   *   subCategories: number,     // COUNT(*) WHERE status = 'Active'
-   *   brands: number,            // COUNT(*) WHERE status = 'Active'
-   *   suppliers: number,         // COUNT(*) WHERE status = 'Active'
-   *   products: number,          // COUNT(*) WHERE status = 'Active' AND is_deleted = false
-   *   warehouses: number,        // COUNT(*) WHERE status = 'Active'
-   *   aisles: number,            // COUNT(*) WHERE status = 'Active'
-   *   totalSKUs: number          // COUNT(DISTINCT sku) FROM product
-   * }
-   */
-  private loadStatCards(): void {
-    this.statsCards.set([
-      {
-        title: 'Active Categories',
-        count: 46, // status = 'Active' only
-        icon: 'appstore',
-        color: '#594ED1',
-        trend: { value: 3, isPositive: true },
-        route: '/configuration/category/list',
-      },
-      {
-        title: 'Sub Categories',
-        count: 148,
-        icon: 'block',
-        color: '#7E75E5',
-        trend: { value: 8, isPositive: true },
-        route: '/configuration/sub-category/list',
-      },
-      {
-        title: 'Active Brands',
-        count: 82, // status = 'Active' only
-        icon: 'flag',
-        color: '#52C41A',
-        trend: { value: 2, isPositive: false },
-        route: '/configuration/brands/list',
-      },
-      {
-        title: 'Active Suppliers',
-        count: 31, // status = 'Active' only
-        icon: 'team',
-        color: '#1890FF',
-        trend: { value: 4, isPositive: true },
-        route: '/configuration/supplier/list',
-      },
-      {
-        title: 'Active Products',
-        count: 487, // status = 'Active' AND is_deleted = false
-        icon: 'shopping',
-        color: '#FA8C16',
-        trend: { value: 18, isPositive: true },
-        route: '/configuration/product/list',
-      },
-      {
-        title: 'Warehouses',
-        count: 12, // status = 'Active'
-        icon: 'home',
-        color: '#13C2C2',
-        trend: { value: 1, isPositive: true },
-        route: '/configuration/warehouse/list',
-      },
-      {
-        title: 'Aisles/Zones',
-        count: 87, // status = 'Active'
-        icon: 'apartment',
-        color: '#EB2F96',
-        trend: { value: 4, isPositive: true },
-        route: '/configuration/aisle/list',
-      },
-      {
-        title: 'Total SKUs',
-        count: 487, // Total unique product SKUs
-        icon: 'barcode',
-        color: '#722ED1',
-        trend: { value: 18, isPositive: true },
-        route: '/configuration/product/list',
-      },
-    ]);
-  }
+    dataQuality = signal<DataQualitySummary>({
+        total: 0,
+        products_with_images: 0,
+        missing_images: 0,
+        products_with_brands: 0,
+        missing_brands: 0,
+        complete_product_data: 0,
+    });
 
-  /**
-   * Load quick action buttons
-   */
-  private loadQuickActions(): void {
-    this.quickActions.set([
-      {
-        label: 'Add Category',
-        icon: 'appstore', // from menu: assets/icons/category.svg
-        route: '/configuration/category/create',
-        color: 'primary',
-      },
-      {
-        label: 'Add Sub Category',
-        icon: 'block', // from menu: assets/icons/sub_category.svg
-        route: '/configuration/sub-category/create',
-        color: 'primary',
-      },
-      {
-        label: 'Add Brand',
-        icon: 'flag', // from menu: assets/icons/brands.svg
-        route: '/configuration/brands/create',
-        color: 'primary',
-      },
-      {
-        label: 'Add Supplier',
-        icon: 'team', // from menu: assets/icons/source.svg
-        route: '/configuration/supplier/create',
-        color: 'primary',
-      },
-      {
-        label: 'Add Product',
-        icon: 'shopping', // from menu: assets/icons/product.svg
-        route: '/configuration/product/create',
-        color: 'primary',
-      },
-      {
-        label: 'Add Warehouse',
-        icon: 'home', // from menu: assets/icons/warehouse.svg
-        route: '/configuration/warehouse/create',
-        color: 'primary',
-      },
-      {
-        label: 'Add Aisle/Zone',
-        icon: 'apartment', // from menu: assets/icons/shelf.svg
-        route: '/configuration/aisle/create',
-        color: 'primary',
-      },
-    ]);
-  }
+    insights = signal<InsightSummary>({
+        avg_products_per_category: 0,
+        avg_sub_categories_per_category: 0,
+        products_per_supplier: 0,
+        avg_aisles_per_warehouse: 0,
+        products_per_warehouse: 0,
+        avg_products_per_brand: 0,
+        brands_with_10_plus_products: 0,
+    });
 
-  /**
-   * Load recent activities
-   * Activities are tracked per module in feature-based tables:
-   * - configuration_activities: category, brand, supplier, warehouse, aisle activities
-   * - sales_activities: sales transactions
-   * - inventory_activities: purchase orders, stock movements
-   * - user_activities: login, permissions, profile updates
-   * 
-   * Schema location: ./activity-log-schema.sql
-   * TODO: Replace with actual API call
-   * API: GET /api/configuration/activities?limit=10
-   * Response: Array<{ title: string, description: string, time: string, icon: string, type: string, created_by: string }>
-   */
-  private loadRecentActivities(): void {
-    // Mock data - Replace with actual API call
-    this.recentActivities.set([
-      {
-        title: 'Category Created',
-        description: 'Electronics & Gadgets category added by John Doe',
-        time: '5 minutes ago',
-        icon: 'check-circle',
-        type: 'create',
-      },
-      {
-        title: 'Product Updated',
-        description: 'Samsung Galaxy S24 - SKU and pricing updated by Sarah Smith',
-        time: '18 minutes ago',
-        icon: 'edit',
-        type: 'update',
-      },
-      {
-        title: 'Supplier Added',
-        description: 'Tech Wholesale Inc. registered as supplier by Admin',
-        time: '1 hour ago',
-        icon: 'check-circle',
-        type: 'create',
-      },
-      {
-        title: 'Brand Updated',
-        description: 'Apple brand description and logo updated by Manager',
-        time: '2 hours ago',
-        icon: 'edit',
-        type: 'update',
-      },
-      {
-        title: 'Warehouse Created',
-        description: 'Warehouse-WH-004 added in North Region by Admin',
-        time: '4 hours ago',
-        icon: 'check-circle',
-        type: 'create',
-      },
-    ]);
-  }
+    statusOverview = signal<StatusOverview>({
+        active_items: 0,
+        inactive_items: 0,
+    });
 
-  /**
-   * Load chart data
-   * TODO: Replace with API calls
-   * API Endpoints:
-   * - GET /api/configuration/charts/category-distribution
-   * - GET /api/configuration/charts/top-suppliers
-   */
-  private loadChartData(): void {
-    // Products distribution by category
-    this.categoryDistribution.set([
-      { name: 'Electronics & Gadgets', value: 142 },
-      { name: 'Clothing & Apparel', value: 98 },
-      { name: 'Food & Beverage', value: 87 },
-      { name: 'Home & Kitchen', value: 76 },
-      { name: 'Health & Beauty', value: 54 },
-      { name: 'Sports & Outdoors', value: 30 },
-    ]);
+    productiveCategories = signal<ProductiveCategory[]>([]);
+    categoryDistribution = signal<any[]>([]);
+    suppliersByRegion = signal<any[]>([]);
 
-    // Top suppliers by product count
-    this.suppliersByRegion.set([
-      { name: 'Tech Wholesale Inc.', value: 142 },
-      { name: 'Global Distributors Ltd.', value: 98 },
-      { name: 'Premium Suppliers Co.', value: 87 },
-      { name: 'Direct Import Partners', value: 60 },
-      { name: 'Local Vendors Group', value: 45 },
-      { name: 'Others', value: 55 },
-    ]);
-  }
-
-  /**
-   * Get icon color class based on activity type
-   */
-  getActivityIconColor(type: 'create' | 'update' | 'delete'): string {
-    switch (type) {
-      case 'create':
-        return 'text-green-500';
-      case 'update':
-        return 'text-blue-500';
-      case 'delete':
-        return 'text-red-500';
-      default:
-        return 'text-gray-500';
+    ngOnInit(): void {
+        this.loadQuickActions();
+        this.loadDashboardData();
     }
-  }
 
-  /**
-   * Calculate percentage for progress bars
-   */
-  getPercentage(value: number, total: number): number {
-    return Math.round((value / total) * 100);
-  }
+    private loadDashboardData(): void {
+        this.loading.set(true);
+        this.usingFallback.set(false);
+
+        this._configurationService
+            .getConfigurationDashboardSummary$({})
+            .pipe(
+                takeUntilDestroyed(this._destroyRef),
+                finalize(() => this.loading.set(false))
+            )
+            .subscribe({
+                next: (response: any) => {
+                    if (response?.body?.code === 200 && response?.body?.data) {
+                        this.applyDashboardData(response.body.data);
+                        return;
+                    }
+
+                    this._notificationService.warning('Configuration Dashboard', response?.body?.message || 'Dashboard response is incomplete. Showing fallback data.');
+                    this.loadFallbackData();
+                },
+                error: (error: any) => {
+                    this._notificationService.error('Configuration Dashboard', error?.error?.message || 'Unable to load dashboard data. Showing fallback data.');
+                    this.loadFallbackData();
+                },
+            });
+    }
+
+    private applyDashboardData(data: any): void {
+        this.statSummary.set({
+            active_categories: Number(data?.stat_cards?.active_categories) || 0,
+            active_sub_categories: Number(data?.stat_cards?.active_sub_categories) || 0,
+            active_brands: Number(data?.stat_cards?.active_brands) || 0,
+            active_suppliers: Number(data?.stat_cards?.active_suppliers) || 0,
+            active_products: Number(data?.stat_cards?.active_products) || 0,
+            active_warehouses: Number(data?.stat_cards?.active_warehouses) || 0,
+            active_aisles: Number(data?.stat_cards?.active_aisles) || 0,
+            total_skus: Number(data?.stat_cards?.total_skus) || 0,
+        });
+
+        this.dataQuality.set({
+            total: Number(data?.data_quality?.total) || 0,
+            products_with_images: Number(data?.data_quality?.products_with_images) || 0,
+            missing_images: Number(data?.data_quality?.missing_images) || 0,
+            products_with_brands: Number(data?.data_quality?.products_with_brands) || 0,
+            missing_brands: Number(data?.data_quality?.missing_brands) || 0,
+            complete_product_data: Number(data?.data_quality?.complete_product_data) || 0,
+        });
+
+        this.insights.set({
+            avg_products_per_category: Number(data?.insights?.avg_products_per_category) || 0,
+            avg_sub_categories_per_category: Number(data?.insights?.avg_sub_categories_per_category) || 0,
+            products_per_supplier: Number(data?.insights?.products_per_supplier) || 0,
+            avg_aisles_per_warehouse: Number(data?.insights?.avg_aisles_per_warehouse) || 0,
+            products_per_warehouse: Number(data?.insights?.products_per_warehouse) || 0,
+            avg_products_per_brand: Number(data?.insights?.avg_products_per_brand) || 0,
+            brands_with_10_plus_products: Number(data?.insights?.brands_with_10_plus_products) || 0,
+        });
+
+        this.statusOverview.set({
+            active_items: Number(data?.status_overview?.active_items) || 0,
+            inactive_items: Number(data?.status_overview?.inactive_items) || 0,
+        });
+
+        this.productiveCategories.set(Array.isArray(data?.productive_categories) ? data.productive_categories : []);
+
+        this.mapStatCards();
+        this.mapRecentActivities(Array.isArray(data?.recent_activities) ? data.recent_activities : []);
+        this.mapChartData(Array.isArray(data?.category_distribution) ? data.category_distribution : [], Array.isArray(data?.top_suppliers) ? data.top_suppliers : []);
+    }
+
+    private mapStatCards(): void {
+        const stats = this.statSummary();
+
+        this.statsCards.set([
+            {
+                title: 'Active Categories',
+                count: stats.active_categories,
+                icon: 'appstore',
+                color: '#594ED1',
+                route: '/configuration/category/list',
+            },
+            {
+                title: 'Sub Categories',
+                count: stats.active_sub_categories,
+                icon: 'block',
+                color: '#7E75E5',
+                route: '/configuration/sub-category/list',
+            },
+            {
+                title: 'Active Brands',
+                count: stats.active_brands,
+                icon: 'flag',
+                color: '#52C41A',
+                route: '/configuration/brands/list',
+            },
+            {
+                title: 'Active Suppliers',
+                count: stats.active_suppliers,
+                icon: 'team',
+                color: '#1890FF',
+                route: '/configuration/supplier/list',
+            },
+            {
+                title: 'Active Products',
+                count: stats.active_products,
+                icon: 'shopping',
+                color: '#FA8C16',
+                route: '/configuration/product/list',
+            },
+            {
+                title: 'Warehouses',
+                count: stats.active_warehouses,
+                icon: 'home',
+                color: '#13C2C2',
+                route: '/configuration/warehouse/list',
+            },
+            {
+                title: 'Aisles/Zones',
+                count: stats.active_aisles,
+                icon: 'apartment',
+                color: '#EB2F96',
+                route: '/configuration/aisle/list',
+            },
+            {
+                title: 'Total SKUs',
+                count: stats.total_skus,
+                icon: 'barcode',
+                color: '#722ED1',
+                route: '/configuration/product/list',
+            },
+        ]);
+    }
+
+    /**
+     * Load quick action buttons
+     */
+    private loadQuickActions(): void {
+        this.quickActions.set([
+            {
+                label: 'Add Category',
+                icon: 'appstore', // from menu: assets/icons/category.svg
+                route: '/configuration/category/create',
+                color: 'primary',
+            },
+            {
+                label: 'Add Sub Category',
+                icon: 'block', // from menu: assets/icons/sub_category.svg
+                route: '/configuration/sub-category/create',
+                color: 'primary',
+            },
+            {
+                label: 'Add Brand',
+                icon: 'flag', // from menu: assets/icons/brands.svg
+                route: '/configuration/brands/create',
+                color: 'primary',
+            },
+            {
+                label: 'Add Supplier',
+                icon: 'team', // from menu: assets/icons/source.svg
+                route: '/configuration/supplier/create',
+                color: 'primary',
+            },
+            {
+                label: 'Add Product',
+                icon: 'shopping', // from menu: assets/icons/product.svg
+                route: '/configuration/product/create',
+                color: 'primary',
+            },
+            {
+                label: 'Add Warehouse',
+                icon: 'home', // from menu: assets/icons/warehouse.svg
+                route: '/configuration/warehouse/create',
+                color: 'primary',
+            },
+            {
+                label: 'Add Aisle/Zone',
+                icon: 'apartment', // from menu: assets/icons/shelf.svg
+                route: '/configuration/aisle/create',
+                color: 'primary',
+            },
+        ]);
+    }
+
+    private mapRecentActivities(activities: any[]): void {
+        this.recentActivities.set(
+            activities.map((activity: any) => {
+                const activityType = this.mapActivityType(activity?.reference_type);
+
+                return {
+                    title: activity?.title || 'Activity',
+                    description: activity?.description || 'No additional details available',
+                    time: this.formatRelativeTime(activity?.performed_on),
+                    icon: activityType === 'update' ? 'edit' : activityType === 'delete' ? 'delete' : 'check-circle',
+                    type: activityType,
+                };
+            })
+        );
+    }
+
+    private mapChartData(categoryDistribution: any[], topSuppliers: any[]): void {
+        this.categoryDistribution.set(
+            categoryDistribution.map((item: any) => ({
+                name: item?.name || 'N/A',
+                value: Number(item?.percent) || 0,
+            }))
+        );
+
+        this.suppliersByRegion.set(
+            topSuppliers.map((item: any) => ({
+                name: item?.name || 'N/A',
+                value: Number(item?.value) || 0,
+            }))
+        );
+    }
+
+    private loadFallbackData(): void {
+        this.usingFallback.set(true);
+
+        this.statSummary.set({
+            active_categories: 46,
+            active_sub_categories: 148,
+            active_brands: 82,
+            active_suppliers: 31,
+            active_products: 487,
+            active_warehouses: 12,
+            active_aisles: 87,
+            total_skus: 487,
+        });
+
+        this.dataQuality.set({
+            total: 487,
+            products_with_images: 463,
+            missing_images: 24,
+            products_with_brands: 451,
+            missing_brands: 36,
+            complete_product_data: 425,
+        });
+
+        this.insights.set({
+            avg_products_per_category: 10.6,
+            avg_sub_categories_per_category: 3.2,
+            products_per_supplier: 15.7,
+            avg_aisles_per_warehouse: 7.3,
+            products_per_warehouse: 40.6,
+            avg_products_per_brand: 5.9,
+            brands_with_10_plus_products: 15,
+        });
+
+        this.statusOverview.set({
+            active_items: 855,
+            inactive_items: 15,
+        });
+
+        this.productiveCategories.set([
+            { name: 'Electronics & Gadgets', products: 142, sub_categories: 12, percent: 29 },
+            { name: 'Clothing & Apparel', products: 98, sub_categories: 8, percent: 20 },
+            { name: 'Food & Beverage', products: 87, sub_categories: 15, percent: 18 },
+            { name: 'Home & Kitchen', products: 76, sub_categories: 10, percent: 16 },
+        ]);
+
+        this.mapStatCards();
+        this.mapRecentActivities([
+            {
+                title: 'Category Created',
+                description: 'Electronics & Gadgets category added by John Doe',
+                performed_on: new Date(Date.now() - 5 * 60 * 1000).toISOString(),
+                reference_type: 'create',
+            },
+            {
+                title: 'Product Updated',
+                description: 'Samsung Galaxy S24 - SKU and pricing updated by Sarah Smith',
+                performed_on: new Date(Date.now() - 18 * 60 * 1000).toISOString(),
+                reference_type: 'update',
+            },
+            {
+                title: 'Supplier Added',
+                description: 'Tech Wholesale Inc. registered as supplier by Admin',
+                performed_on: new Date(Date.now() - 60 * 60 * 1000).toISOString(),
+                reference_type: 'create',
+            },
+            {
+                title: 'Brand Updated',
+                description: 'Apple brand description and logo updated by Manager',
+                performed_on: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
+                reference_type: 'update',
+            },
+            {
+                title: 'Warehouse Created',
+                description: 'Warehouse-WH-004 added in North Region by Admin',
+                performed_on: new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString(),
+                reference_type: 'create',
+            },
+        ]);
+        this.mapChartData(
+            [
+                { name: 'Electronics & Gadgets', percent: 29 },
+                { name: 'Clothing & Apparel', percent: 20 },
+                { name: 'Food & Beverage', percent: 18 },
+                { name: 'Home & Kitchen', percent: 16 },
+                { name: 'Health & Beauty', percent: 11 },
+                { name: 'Sports & Outdoors', percent: 6 },
+            ],
+            [
+                { name: 'Tech Wholesale Inc.', value: 142 },
+                { name: 'Global Distributors Ltd.', value: 98 },
+                { name: 'Premium Suppliers Co.', value: 87 },
+                { name: 'Direct Import Partners', value: 60 },
+                { name: 'Local Vendors Group', value: 45 },
+            ]
+        );
+    }
+
+    private mapActivityType(value: string): 'create' | 'update' | 'delete' {
+        const normalized = (value || '').toLowerCase();
+
+        if (normalized.includes('delete') || normalized.includes('remove')) {
+            return 'delete';
+        }
+
+        if (normalized.includes('update') || normalized.includes('edit')) {
+            return 'update';
+        }
+
+        return 'create';
+    }
+
+    private formatRelativeTime(value: string): string {
+        if (!value) {
+            return 'just now';
+        }
+
+        const date = new Date(value);
+        if (Number.isNaN(date.getTime())) {
+            return 'just now';
+        }
+
+        const diffInMs = Date.now() - date.getTime();
+        const diffInMinutes = Math.floor(diffInMs / (1000 * 60));
+
+        if (diffInMinutes < 1) {
+            return 'just now';
+        }
+
+        if (diffInMinutes < 60) {
+            return `${diffInMinutes} minute${diffInMinutes > 1 ? 's' : ''} ago`;
+        }
+
+        const diffInHours = Math.floor(diffInMinutes / 60);
+        if (diffInHours < 24) {
+            return `${diffInHours} hour${diffInHours > 1 ? 's' : ''} ago`;
+        }
+
+        const diffInDays = Math.floor(diffInHours / 24);
+        return `${diffInDays} day${diffInDays > 1 ? 's' : ''} ago`;
+    }
+
+    getDataQualityPercent(numerator: number): number {
+        const total = this.dataQuality().total;
+
+        if (!total) {
+            return 0;
+        }
+
+        return Math.round((numerator / total) * 100);
+    }
+
+    getProductsTotalForSupplierBar(): number {
+        return this.statSummary().active_products || 1;
+    }
+
+    /**
+     * Get icon color class based on activity type
+     */
+    getActivityIconColor(type: 'create' | 'update' | 'delete'): string {
+        switch (type) {
+            case 'create':
+                return 'text-green-500';
+            case 'update':
+                return 'text-blue-500';
+            case 'delete':
+                return 'text-red-500';
+            default:
+                return 'text-gray-500';
+        }
+    }
+
+    /**
+     * Calculate percentage for progress bars
+     */
+    getPercentage(value: number, total: number): number {
+        if (!total) {
+            return 0;
+        }
+
+        return Math.round((value / total) * 100);
+    }
 }

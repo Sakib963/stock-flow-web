@@ -53,4 +53,8 @@ export class ConfigurationService {
     getStockMovements$(params: any): Observable<HttpResponse<any>> {
         return this._http.post(APIEndpoint.GET_STOCK_MOVEMENTS, params);
     }
+
+    getConfigurationDashboardSummary$(params: any = {}): Observable<HttpResponse<any>> {
+        return this._http.post(APIEndpoint.GET_CONFIGURATION_DASHBOARD_SUMMARY, params);
+    }
 }
