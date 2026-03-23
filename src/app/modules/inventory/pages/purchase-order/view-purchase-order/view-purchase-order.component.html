@@ -1,0 +1,159 @@
+<page-header [title]="'Purchase Order Details'" [description]="'View purchase order information, status, and verification progress'" [showBackButton]="false" [extraTemplate]="headerActions"> </page-header>
+
+<ng-template #headerActions>
+    <div class="flex items-center gap-2 flex-wrap justify-end">
+        <button nz-button nzType="default" (click)="navigateBack()">
+            <nz-icon nzType="arrow-left"></nz-icon>
+            Back
+        </button>
+        @if (!editMode) {
+            <button nz-button nzType="default" [nzLoading]="reportLoading" (click)="generatePurchaseReport()" [disabled]="displayFormType === 'Verify'">
+                <nz-icon nzType="file-excel"></nz-icon>
+                Summary Report
+            </button>
+            <button nz-button nzType="default" [nzLoading]="reportLoading" (click)="exportProductsReport()" [disabled]="displayFormType === 'Verify'">
+                <nz-icon nzType="download"></nz-icon>
+                Products Report
+            </button>
+        }
+        @if (canVerify && displayFormType !== 'Verify' && !editMode) {
+            <button nz-button nzType="primary" [nzLoading]="actionLoading" (click)="verifyOrder()">
+                <nz-icon nzType="check-circle"></nz-icon>
+                Verify
+            </button>
+        }
+        @if (canCancel && displayFormType !== 'Verify' && !editMode) {
+            <button nz-button nzDanger [nzLoading]="actionLoading" (click)="cancelOrder()">
+                <nz-icon nzType="stop"></nz-icon>
+                Cancel
+            </button>
+        }
+    </div>
+</ng-template>
+
+@if (loading) {
+    <app-loader [isVisible]="true"></app-loader>
+} @else {
+    @if (purchaseOrder && editMode) {
+        <div class="p-4">
+            <app-purchase-order-form [buttonLoading]="actionLoading" [purchase]="editFormData" (actions)="handleEditFormActions($event)"></app-purchase-order-form>
+        </div>
+    } @else if (purchaseOrder) {
+        <nz-divider class="my-0"></nz-divider>
+        <div class="p-4 space-y-4">
+            <div class="border rounded-sm bg-white p-4">
+                <h3 class="text-base font-bold text-gray-900 mb-4">Order Details</h3>
+                <dl class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-5">
+                    <div>
+                        <dt class="text-xs text-gray-500">Supplier</dt>
+                        <dd class="text-sm text-gray-900 font-medium">{{ purchaseOrder.supplier_name || '-' }}</dd>
+                    </div>
+                    <div>
+                        <dt class="text-xs text-gray-500">Purchase Type</dt>
+                        <dd class="text-sm text-gray-900">{{ purchaseOrder.purchase_type || '-' }}</dd>
+                    </div>
+                    <div>
+                        <dt class="text-xs text-gray-500">Status</dt>
+                        <dd>
+                            @if (purchaseOrder.status === 'Submitted') {
+                                <nz-tag nzColor="#2563EB">Submitted</nz-tag>
+                            } @else if (purchaseOrder.status === 'Verified') {
+                                <nz-tag nzColor="#109648">Verified</nz-tag>
+                            } @else {
+                                <nz-tag nzColor="#DF2935">Cancelled</nz-tag>
+                            }
+                        </dd>
+                    </div>
+                    <div>
+                        <dt class="text-xs text-gray-500">Total Amount</dt>
+                        <dd class="text-sm text-gray-900">৳{{ purchaseOrder.total_amount || 0 }}</dd>
+                    </div>
+                    <div>
+                        <dt class="text-xs text-gray-500">Paid Amount</dt>
+                        <dd class="text-sm text-gray-900">৳{{ purchaseOrder.paid_amount || 0 }}</dd>
+                    </div>
+                    <div>
+                        <dt class="text-xs text-gray-500">Created On</dt>
+                        <dd class="text-sm text-gray-900">{{ purchaseOrder.created_on || '-' }}</dd>
+                    </div>
+                    <div class="sm:col-span-2 lg:col-span-3">
+                        <dt class="text-xs text-gray-500">Special Notes</dt>
+                        <dd class="text-sm text-gray-900">{{ purchaseOrder.special_notes || '-' }}</dd>
+                    </div>
+                </dl>
+            </div>
+
+            @if (stats) {
+                <nz-card nzTitle="Purchase Statistics">
+                    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+                        <div class="text-center">
+                            <nz-statistic [nzValue]="stats.totalProducts || 0" [nzTitle]="'Total Products'"></nz-statistic>
+                        </div>
+                        <div class="text-center">
+                            <nz-statistic [nzValue]="stats.totalAmount || 0" [nzTitle]="'Total Amount'"></nz-statistic>
+                        </div>
+                        <div class="text-center">
+                            <nz-statistic [nzValue]="stats.paidAmount || 0" [nzTitle]="'Paid Amount'"></nz-statistic>
+                        </div>
+                        <div class="text-center">
+                            <nz-statistic [nzValue]="stats.paymentProgress || 0" [nzTitle]="'Payment %'"></nz-statistic>
+                        </div>
+                        <div class="text-center">
+                            <nz-statistic [nzValue]="stats.verifiedItems || 0" [nzTitle]="'Verified Items'"></nz-statistic>
+                        </div>
+                        <div class="text-center">
+                            <nz-statistic [nzValue]="stats.pendingVerification || 0" [nzTitle]="'Pending Items'"></nz-statistic>
+                        </div>
+                    </div>
+                </nz-card>
+            }
+
+            <nz-card nzTitle="Line Items">
+                <nz-table #basicTable [nzData]="products" [nzFrontPagination]="false" [nzSize]="'small'" [nzScroll]="{ x: '100%' }">
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Warehouse</th>
+                            <th>Aisle</th>
+                            <th>Ordered Qty</th>
+                            <th>Ordered Price</th>
+                            <th>Verified Qty</th>
+                            <th>Verified Price</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (item of basicTable.data; track item.oid) {
+                            <tr>
+                                <td>{{ item.product_name || '-' }}</td>
+                                <td>{{ item.warehouse_name || '-' }}</td>
+                                <td>{{ item.aisle_name || '-' }}</td>
+                                <td>{{ item.quantity || 0 }}</td>
+                                <td>৳{{ item.unit_price || 0 }}</td>
+                                <td>{{ item.verified_quantity || 0 }}</td>
+                                <td>৳{{ item.verified_unit_price || 0 }}</td>
+                            </tr>
+                        }
+                    </tbody>
+                </nz-table>
+            </nz-card>
+
+            @if (displayFormType === 'Verify') {
+                <app-order-verification-form [purchaseDetails]="{ oid: purchaseOrder.oid, products: products }" [buttonLoading]="actionLoading" (actions)="handleVerificationFormActions($event)"></app-order-verification-form>
+            }
+
+            @if (activity.length) {
+                <nz-card nzTitle="Recent Activity">
+                    <nz-timeline>
+                        @for (log of activity; track $index) {
+                            <nz-timeline-item>
+                                <p class="mb-1 font-medium">{{ log.action || '-' }}</p>
+                                <p class="mb-1 text-gray-600">{{ log.description || '-' }}</p>
+                                <p class="mb-0 text-xs text-gray-500">{{ log.date || '-' }} • {{ log.user || '-' }}</p>
+                            </nz-timeline-item>
+                        }
+                    </nz-timeline>
+                </nz-card>
+            }
+        </div>
+    }
+}

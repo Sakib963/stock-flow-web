@@ -87,6 +87,36 @@ export const CONFIGURATION_BREADCRUMBS: ModuleBreadcrumbConfig = {
         },
     },
 
+    // Product Feature
+    product: {
+        parent: [
+            { label: 'Home', url: '/', icon: 'home' },
+            { label: 'Configuration', url: '/configuration/stats' },
+            { label: 'Product', url: '/configuration/product/list' },
+        ],
+        pages: {
+            list: [{ label: 'List', url: '/configuration/product/list' }],
+            create: [{ label: 'Create' }],
+            view: [{ label: 'View' }],
+            edit: [{ label: 'Edit' }],
+        },
+    },
+
+    // Warehouse Feature
+    warehouse: {
+        parent: [
+            { label: 'Home', url: '/', icon: 'home' },
+            { label: 'Configuration', url: '/configuration/stats' },
+            { label: 'Warehouse', url: '/configuration/warehouse/list' },
+        ],
+        pages: {
+            list: [{ label: 'List', url: '/configuration/warehouse/list' }],
+            create: [{ label: 'Create' }],
+            view: [{ label: 'View' }],
+            edit: [{ label: 'Edit' }],
+        },
+    },
+
     // Aisle Feature
     aisle: {
         parent: [{ label: 'Home', url: '/', icon: 'home' }, { label: 'Configuration', url: '/configuration/stats' }, { label: 'Aisle' }],

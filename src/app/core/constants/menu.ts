@@ -29,7 +29,7 @@ export class Menu {
                 {
                     icon: 'assets/icons/report.svg',
                     label: 'Activity Log',
-                    route: '/activity_log',
+                    route: '/activity-log',
                 },
             ],
         },
@@ -90,11 +90,6 @@ export class Menu {
                     label: 'Aisle/Zone',
                     route: '/configuration/aisle',
                 },
-                {
-                    icon: 'assets/icons/report.svg',
-                    label: 'Activity Log',
-                    route: '/activity_log',
-                },
                 // {
                 //     icon: 'assets/icons/alert.svg',
                 //     label: 'Alerts & Low Stock',
@@ -119,7 +114,7 @@ export class Menu {
                 {
                     icon: 'assets/icons/purchase.svg',
                     label: 'Purchase Order',
-                    route: '/manager/inventory/purchase-order',
+                    route: '/inventory/purchase-order',
                 },
                 {
                     icon: 'assets/icons/invoice.svg',
@@ -150,11 +145,17 @@ export class Menu {
         },
         {
             group: 'Analytics',
+            icon: 'assets/icons/analytics.svg',
             items: [
                 {
                     icon: 'assets/icons/report.svg',
                     label: 'Reports',
                     route: '/manager/reports',
+                },
+                {
+                    icon: 'assets/icons/activity-log.svg',
+                    label: 'Activity Log',
+                    route: '/activity-log',
                 },
             ],
         },

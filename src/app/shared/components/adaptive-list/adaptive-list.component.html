@@ -1,239 +1,229 @@
 <!-- Table Title with View Segmented Control -->
 <div class="mb-4 flex items-center justify-start gap-4">
-      <h3 class="text-lg font-semibold text-gray-800">{{ tableConfig().title }}</h3>
+    <h3 class="text-lg font-semibold text-gray-800">{{ tableConfig().title }}</h3>
 
-      <!-- View Toggle (Desktop only) -->
-      <div class="hidden md:block">
-            <nz-segmented [nzOptions]="[
-                  { label: 'Table', value: 0, icon: 'table' },
-                  { label: 'Card', value: 1, icon: 'appstore' }
-            ]" [(ngModel)]="currentView"></nz-segmented>
-      </div>
+    <!-- View Toggle (Desktop only) -->
+    <div class="hidden md:block">
+        <nz-segmented
+            [nzOptions]="[
+                { label: 'Table', value: 0, icon: 'table' },
+                { label: 'Card', value: 1, icon: 'appstore' },
+            ]"
+            [(ngModel)]="currentView"
+        ></nz-segmented>
+    </div>
 </div>
 
 <!-- Desktop: Table View (when currentView === 0) -->
 @if (currentView === 0) {
-<div class="hidden md:block">
-      <nz-table nzSize="middle" #basicTable [nzData]="dataSource()" [nzLoading]="loading()" [nzShowPagination]="false"
-            [nzPageSize]="pageSize()" [nzNoResult]="noDataTemplate" [nzScroll]="{ x: '100%' }">
+    <div class="hidden md:block">
+        <nz-table nzSize="middle" #basicTable [nzData]="dataSource()" [nzLoading]="loading()" [nzShowPagination]="false" [nzPageSize]="pageSize()" [nzNoResult]="noDataTemplate" [nzScroll]="{ x: '100%' }">
             <thead>
-                  <tr>
-                        <!-- Index Column -->
-                        <th [nzWidth]="'60px'">#</th>
-                        @for (column of getDataColumns(); track column.label) {
+                <tr>
+                    <!-- Index Column -->
+                    <th [nzWidth]="'60px'">#</th>
+                    @for (column of getDataColumns(); track column.label) {
                         <th [nzAlign]="column.alignment" [nzWidth]="column.width || 'auto'">{{ column.label }}</th>
-                        }
-                        @if (getActionColumn()) {
-                        <th [nzAlign]="getActionColumn()?.alignment || 'center'" [nzWidth]="getActionColumn()?.width || '120px'" class="pr-9">{{ getActionColumn()?.label
-                              }}</th>
-                        }
-                  </tr>
+                    }
+                    @if (getActionColumn()) {
+                        <th [nzAlign]="getActionColumn()?.alignment || 'center'" [nzWidth]="getActionColumn()?.width || '120px'" class="pr-9">{{ getActionColumn()?.label }}</th>
+                    }
+                </tr>
             </thead>
             <tbody>
-                  @for (item of basicTable.data; track item; let idx = $index) {
-                  <tr>
+                @for (item of basicTable.data; track item; let idx = $index) {
+                    <tr>
                         <!-- Index Column -->
                         <td [nzEllipsis]="true">{{ getRowIndex(idx) }}</td>
                         @for (column of getDataColumns(); track column.label) {
-                        <td [nzAlign]="column.alignment" [nzEllipsis]="true">
-                              @if (column.column_type === 'long-text') {
-                              <!-- Long text with popover -->
-                              <span nz-popover nzPopoverOverlayClassName="max-w-[400px] break-all"
-                                    nzPopoverPlacement="left" [nzPopoverContent]="getCellValue(item, column)">{{
-                                    getCellValue(item, column) }}</span>
-                              } @else if (column.text_color) {
-                              <!-- Status with tag and tooltip -->
-                              <nz-tag [nzColor]="getTextColor(item, column)" nz-tooltip nzTooltipPlacement="bottom"
-                                    [nzTooltipTitle]="getCellValue(item, column)">
-                                    <nz-icon [nzType]="getTextIcon(item, column)" class="mr-1"></nz-icon>
-                                    {{ getCellValue(item, column) }}
-                              </nz-tag>
-                              } @else {
-                              <!-- Regular text with tooltip -->
-                              <span nz-tooltip nzTooltipPlacement="bottom"
-                                    [nzTooltipTitle]="getCellValue(item, column)">
-                                    {{ getCellValue(item, column) }}
-                              </span>
-                              }
-                        </td>
+                            <td [nzAlign]="column.alignment" [nzEllipsis]="true">
+                                @if (column.column_type === 'long-text') {
+                                    <!-- Long text with popover -->
+                                    <span nz-popover nzPopoverOverlayClassName="max-w-[400px] break-all" nzPopoverPlacement="left" [nzPopoverContent]="getCellValue(item, column)">{{ getCellValue(item, column) }}</span>
+                                } @else if (column.text_color) {
+                                    <!-- Status with tag and tooltip -->
+                                    <nz-tag [nzColor]="getTextColor(item, column)" nz-tooltip nzTooltipPlacement="bottom" [nzTooltipTitle]="getCellValue(item, column)">
+                                        <nz-icon [nzType]="getTextIcon(item, column)" class="mr-1"></nz-icon>
+                                        {{ getCellValue(item, column) }}
+                                    </nz-tag>
+                                } @else if (column.column_type === 'currency') {
+                                    @let value = getCellValue(item, column);
+                                    @let formatted = formatCurrency(value, column);
+
+                                    <span nz-tooltip nzTooltipPlacement="bottom" [nzTooltipTitle]="formatted" class="font-medium">
+                                        {{ formatted }}
+                                    </span>
+                                } @else if (column.column_type === 'date') {
+                                    @let value = getCellValue(item, column);
+
+                                    <span nz-tooltip nzTooltipPlacement="bottom" [nzTooltipTitle]="value" class="font-mono text-gray-600">
+                                        {{ value }}
+                                    </span>
+                                } @else {
+                                    <!-- Regular text with tooltip -->
+                                    <span nz-tooltip nzTooltipPlacement="bottom" [nzTooltipTitle]="getCellValue(item, column)">
+                                        {{ getCellValue(item, column) }}
+                                    </span>
+                                }
+                            </td>
                         }
                         @if (getActionColumn()) {
-                        <td [nzAlign]="getActionColumn()?.alignment || 'center'" class="pr-10">
-                              <nz-space>
+                            <td [nzAlign]="getActionColumn()?.alignment || 'center'" class="pr-10">
+                                <nz-space>
                                     @for (action of getActionColumn()?.actions; track action.action) {
-                                    <button *nzSpaceItem nz-button nzType="text" nzSize="small" nz-tooltip
-                                          nzTooltipPlacement="bottom" [nzTooltipTitle]="action.label"
-                                          (click)="handleAction(action.action, item)">
-                                          <span nz-icon [nzType]="action.icon || 'setting'"></span>
-                                    </button>
+                                        <button *nzSpaceItem nz-button nzType="text" nzSize="small" nz-tooltip nzTooltipPlacement="bottom" [nzTooltipTitle]="action.label" (click)="handleAction(action.action, item)">
+                                            <span nz-icon [nzType]="action.icon || 'setting'"></span>
+                                        </button>
                                     }
-                              </nz-space>
-                        </td>
+                                </nz-space>
+                            </td>
                         }
-                  </tr>
-                  }
+                    </tr>
+                }
             </tbody>
-      </nz-table>
+        </nz-table>
 
-      <!-- Pagination -->
-      @if (dataSource().length > 0) {
-      <div class="mt-4 flex justify-end">
-            <nz-pagination [nzPageIndex]="pageIndex() + 1" [nzTotal]="totalCount()" [nzPageSize]="pageSize()"
-                  [nzPageSizeOptions]="tableConfig().pageSizeOptions" [nzShowSizeChanger]="true"
-                  [nzShowTotal]="totalTemplate" (nzPageIndexChange)="onPageChange($event)"
-                  (nzPageSizeChange)="onPageSizeChange($event)">
-            </nz-pagination>
-      </div>
-      }
-</div>
+        <!-- Pagination -->
+        @if (dataSource().length > 0) {
+            <div class="mt-4 flex justify-end">
+                <nz-pagination [nzPageIndex]="pageIndex() + 1" [nzTotal]="totalCount()" [nzPageSize]="pageSize()" [nzPageSizeOptions]="tableConfig().pageSizeOptions" [nzShowSizeChanger]="true" [nzShowTotal]="totalTemplate" (nzPageIndexChange)="onPageChange($event)" (nzPageSizeChange)="onPageSizeChange($event)"> </nz-pagination>
+            </div>
+        }
+    </div>
 }
 
 <!-- Desktop: Card View (when currentView === 1) -->
 @if (currentView === 1) {
-<div class="hidden md:block">
-      @if (loading()) {
-      <div class="text-center py-8">
-            <nz-spin nzSimple [nzSize]="'large'"></nz-spin>
-      </div>
-      } @else if (dataSource().length === 0) {
-      <ng-container *ngTemplateOutlet="noDataTemplate"></ng-container>
-      } @else {
-      <!-- Grid layout for cards -->
-      <div [class]="getCardGridClass()">
-            @for (item of dataSource(); track item; let idx = $index) {
-            <nz-card [nzSize]="'small'" [nzTitle]="cardTitle" [nzExtra]="cardExtra"
-                  class="h-full hover:shadow-xl transition-all duration-300 cursor-pointer border border-gray-200 hover:border-primary">
-                  <ng-template #cardTitle>
-                        <div class="font-medium text-sm text-gray-800">
-                              <span class="text-gray-400 text-xs mr-1">#{{ getRowIndex(idx) }}</span>
-                              {{ getCellValue(item, getDataColumns()[0]) }}
-                        </div>
-                  </ng-template>
+    <div class="hidden md:block">
+        @if (loading()) {
+            <div class="text-center py-8">
+                <nz-spin nzSimple [nzSize]="'large'"></nz-spin>
+            </div>
+        } @else if (dataSource().length === 0) {
+            <ng-container *ngTemplateOutlet="noDataTemplate"></ng-container>
+        } @else {
+            <!-- Grid layout for cards -->
+            <div [class]="getCardGridClass()">
+                @for (item of dataSource(); track item; let idx = $index) {
+                    <nz-card [nzSize]="'small'" [nzTitle]="cardTitle" [nzExtra]="cardExtra" class="h-full hover:shadow-xl transition-all duration-300 cursor-pointer border border-gray-200 hover:border-primary">
+                        <ng-template #cardTitle>
+                            <div class="font-medium text-sm text-gray-800">
+                                <span class="text-gray-400 text-xs mr-1">#{{ getRowIndex(idx) }}</span>
+                                {{ getCellValue(item, getDataColumns()[0]) }}
+                            </div>
+                        </ng-template>
 
-                  <ng-template #cardExtra>
-                        <nz-space [nzSize]="4">
-                              @for (action of getActionColumn()?.actions; track action.action) {
-                              <button *nzSpaceItem nz-button nzType="text" nzSize="small" nz-tooltip
-                                    nzTooltipPlacement="bottom" [nzTooltipTitle]="action.label"
-                                    (click)="handleAction(action.action, item)">
-                                    <span nz-icon [nzType]="action.icon || 'setting'"></span>
-                              </button>
-                              }
-                        </nz-space>
-                  </ng-template>
+                        <ng-template #cardExtra>
+                            <nz-space [nzSize]="4">
+                                @for (action of getActionColumn()?.actions; track action.action) {
+                                    <button *nzSpaceItem nz-button nzType="text" nzSize="small" nz-tooltip nzTooltipPlacement="bottom" [nzTooltipTitle]="action.label" (click)="handleAction(action.action, item)">
+                                        <span nz-icon [nzType]="action.icon || 'setting'"></span>
+                                    </button>
+                                }
+                            </nz-space>
+                        </ng-template>
 
-                  <div class="space-y-2">
-                        @for (column of getDataColumns().slice(1); track column.label) {
-                        <div class="flex flex-col">
-                              <span class="text-xs text-gray-500">{{ column.label }}:</span>
-                              @if (column.column_type === 'long-text') {
-                              <span class="text-sm line-clamp-3">{{ getCellValue(item, column) }}</span>
-                              } @else if (column.text_color) {
-                              <nz-tag [nzColor]="getTextColor(item, column)" class="w-fit">
-                                    {{ getCellValue(item, column) }}
-                              </nz-tag>
-                              } @else {
-                              <span class="text-sm">{{ getCellValue(item, column) }}</span>
-                              }
+                        <div class="space-y-2">
+                            @for (column of getDataColumns().slice(1); track column.label) {
+                                <div class="flex flex-col">
+                                    <span class="text-xs text-gray-500">{{ column.label }}:</span>
+                                    @if (column.column_type === 'long-text') {
+                                        <span class="text-sm line-clamp-3">{{ getCellValue(item, column) }}</span>
+                                    } @else if (column.text_color) {
+                                        <nz-tag [nzColor]="getTextColor(item, column)" class="w-fit">
+                                            {{ getCellValue(item, column) }}
+                                        </nz-tag>
+                                    } @else {
+                                        <span class="text-sm">{{ getCellValue(item, column) }}</span>
+                                    }
+                                </div>
+                            }
                         </div>
-                        }
-                  </div>
-            </nz-card>
+                    </nz-card>
+                }
+            </div>
+
+            <!-- Pagination for Desktop Card View -->
+            @if (dataSource().length > 0) {
+                <div class="mt-4 flex justify-end">
+                    <nz-pagination [nzPageIndex]="pageIndex() + 1" [nzTotal]="totalCount()" [nzPageSize]="pageSize()" [nzPageSizeOptions]="tableConfig().pageSizeOptions" [nzShowSizeChanger]="true" [nzShowTotal]="totalTemplate" (nzPageIndexChange)="onPageChange($event)" (nzPageSizeChange)="onPageSizeChange($event)"> </nz-pagination>
+                </div>
             }
-      </div>
-
-      <!-- Pagination for Desktop Card View -->
-      @if (dataSource().length > 0) {
-      <div class="mt-4 flex justify-end">
-            <nz-pagination [nzPageIndex]="pageIndex() + 1" [nzTotal]="totalCount()" [nzPageSize]="pageSize()"
-                  [nzPageSizeOptions]="tableConfig().pageSizeOptions" [nzShowSizeChanger]="true"
-                  [nzShowTotal]="totalTemplate" (nzPageIndexChange)="onPageChange($event)"
-                  (nzPageSizeChange)="onPageSizeChange($event)">
-            </nz-pagination>
-      </div>
-      }
-      }
-</div>
+        }
+    </div>
 }
 
 <!-- Mobile: Always Card View -->
 <div class="block md:hidden">
-      @if (loading()) {
-      <div class="text-center py-8">
+    @if (loading()) {
+        <div class="text-center py-8">
             <nz-spin nzSimple [nzSize]="'large'"></nz-spin>
-      </div>
-      } @else if (dataSource().length === 0) {
-      <ng-container *ngTemplateOutlet="noDataTemplate"></ng-container>
-      } @else {
-      <div class="space-y-4">
+        </div>
+    } @else if (dataSource().length === 0) {
+        <ng-container *ngTemplateOutlet="noDataTemplate"></ng-container>
+    } @else {
+        <div class="space-y-4">
             @for (item of dataSource(); track item; let idx = $index) {
-            <nz-card [nzSize]="'small'" [nzTitle]="cardTitle" [nzExtra]="cardExtra"
-                  class="hover:shadow-xl transition-all duration-300 border border-gray-200 hover:border-primary">
-                  <ng-template #cardTitle>
+                <nz-card [nzSize]="'small'" [nzTitle]="cardTitle" [nzExtra]="cardExtra" class="hover:shadow-xl transition-all duration-300 border border-gray-200 hover:border-primary">
+                    <ng-template #cardTitle>
                         <div class="font-medium text-sm text-gray-800">
-                              <span class="text-gray-400 text-xs mr-1">#{{ getRowIndex(idx) }}</span>
-                              {{ getCellValue(item, getDataColumns()[0]) }}
+                            <span class="text-gray-400 text-xs mr-1">#{{ getRowIndex(idx) }}</span>
+                            {{ getCellValue(item, getDataColumns()[0]) }}
                         </div>
-                  </ng-template>
+                    </ng-template>
 
-                  <ng-template #cardExtra>
+                    <ng-template #cardExtra>
                         <nz-space [nzSize]="4">
-                              @for (action of getActionColumn()?.actions; track action.action) {
-                              <button *nzSpaceItem nz-button nzType="text" nzSize="small" nz-tooltip
-                                    nzTooltipPlacement="bottom" [nzTooltipTitle]="action.label"
-                                    (click)="handleAction(action.action, item)">
+                            @for (action of getActionColumn()?.actions; track action.action) {
+                                <button *nzSpaceItem nz-button nzType="text" nzSize="small" nz-tooltip nzTooltipPlacement="bottom" [nzTooltipTitle]="action.label" (click)="handleAction(action.action, item)">
                                     <span nz-icon [nzType]="action.icon || 'setting'"></span>
-                              </button>
-                              }
+                                </button>
+                            }
                         </nz-space>
-                  </ng-template>
+                    </ng-template>
 
-                  <div class="space-y-2">
+                    <div class="space-y-2">
                         @for (column of getDataColumns().slice(1); track column.label) {
-                        <div class="flex flex-col">
-                              <span class="text-xs text-gray-500">{{ column.label }}:</span>
-                              @if (column.column_type === 'long-text') {
-                              <span class="text-sm line-clamp-3">{{ getCellValue(item, column) }}</span>
-                              } @else if (column.text_color) {
-                              <nz-tag [nzColor]="getTextColor(item, column)" class="w-fit">
-                                    {{ getCellValue(item, column) }}
-                              </nz-tag>
-                              } @else {
-                              <span class="text-sm">{{ getCellValue(item, column) }}</span>
-                              }
-                        </div>
+                            <div class="flex flex-col">
+                                <span class="text-xs text-gray-500">{{ column.label }}:</span>
+                                @if (column.column_type === 'long-text') {
+                                    <span class="text-sm line-clamp-3">{{ getCellValue(item, column) }}</span>
+                                } @else if (column.text_color) {
+                                    <nz-tag [nzColor]="getTextColor(item, column)" class="w-fit">
+                                        {{ getCellValue(item, column) }}
+                                    </nz-tag>
+                                } @else {
+                                    <span class="text-sm">{{ getCellValue(item, column) }}</span>
+                                }
+                            </div>
                         }
-                  </div>
-            </nz-card>
+                    </div>
+                </nz-card>
             }
-      </div>
+        </div>
 
-      <!-- Mobile Pagination -->
-      @if (dataSource().length > 0) {
-      <div class="mt-4 flex justify-center">
-            <nz-pagination [nzPageIndex]="pageIndex() + 1" [nzTotal]="totalCount()" [nzPageSize]="pageSize()"
-                  [nzSimple]="true" (nzPageIndexChange)="onPageChange($event)">
-            </nz-pagination>
-      </div>
-      }
-      }
+        <!-- Mobile Pagination -->
+        @if (dataSource().length > 0) {
+            <div class="mt-4 flex justify-center">
+                <nz-pagination [nzPageIndex]="pageIndex() + 1" [nzTotal]="totalCount()" [nzPageSize]="pageSize()" [nzSimple]="true" (nzPageIndexChange)="onPageChange($event)"> </nz-pagination>
+            </div>
+        }
+    }
 </div>
 
 <!-- No Data Template -->
 <ng-template #noDataTemplate>
-      <div class="text-center py-12">
-            <span nz-icon nzType="inbox" nzTheme="outline" class="text-6xl text-gray-300"></span>
-            <p class="mt-4 text-gray-500">{{ tableConfig().noData.message || 'No data available' }}</p>
-            @if (tableConfig().noData.addButtonText && tableConfig().noData.addButtonUrl) {
+    <div class="text-center py-12">
+        <span nz-icon nzType="inbox" nzTheme="outline" class="text-6xl text-gray-300"></span>
+        <p class="mt-4 text-gray-500">{{ tableConfig().noData.message || 'No data available' }}</p>
+        @if (tableConfig().noData.addButtonText && tableConfig().noData.addButtonUrl) {
             <button nz-button nzType="primary" class="mt-4" (click)="navigateToAdd()">
-                  <span nz-icon nzType="plus"></span>
-                  {{ tableConfig().noData.addButtonText }}
+                <span nz-icon nzType="plus"></span>
+                {{ tableConfig().noData.addButtonText }}
             </button>
-            }
-      </div>
+        }
+    </div>
 </ng-template>
 
 <!-- Pagination Total Template -->
-<ng-template #totalTemplate let-total let-range="range">
-      {{ range[0] }}-{{ range[1] }} of {{ total }} items
-</ng-template>
+<ng-template #totalTemplate let-total let-range="range"> {{ range[0] }}-{{ range[1] }} of {{ total }} items </ng-template>

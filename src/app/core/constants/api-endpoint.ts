@@ -67,13 +67,15 @@ export class APIEndpoint {
     static GENERATE_PRODUCT_LIST_REPORT_BY_AISLE = '/api/v1/configuration/aisle/generate-product-list-report-by-aisle';
     static GENERATE_INVENTORY_REPORT_BY_AISLE = '/api/v1/configuration/aisle/generate-inventory-report-by-aisle';
 
-    static GET_PURCHASE_LIST = '/api/v1/manager/purchase/get-purchase-list';
-    static CREATE_PURCHASE = '/api/v1/manager/purchase/create-purchase';
-    static UPDATE_PURCHASE_DETAILS = '/api/v1/manager/purchase/update-purchase-details';
-    static GET_PURCHASE_DETAILS = '/api/v1/manager/purchase/get-purchase-details';
-    static GET_PURCHASE_LIST_FOR_DROPDOWN = '/api/v1/manager/purchase/get-purchase-list-for-dropdown';
-    static VERIFY_PURCHASE = '/api/v1/manager/purchase/verify-purchase';
-    static CANCEL_PURCHASE = '/api/v1/manager/purchase/cancel-purchase';
+    static GET_PURCHASE_LIST = '/api/v1/inventory/purchase-order/get-purchase-list';
+    static CREATE_PURCHASE = '/api/v1/inventory/purchase-order/create-purchase';
+    static UPDATE_PURCHASE_DETAILS = '/api/v1/inventory/purchase-order/update-purchase-details';
+    static GET_PURCHASE_DETAILS = '/api/v1/inventory/purchase-order/get-purchase-details';
+    static GET_PURCHASE_LIST_FOR_DROPDOWN = '/api/v1/inventory/purchase-order/get-purchase-list-for-dropdown';
+    static VERIFY_PURCHASE = '/api/v1/inventory/purchase-order/verify-purchase';
+    static CANCEL_PURCHASE = '/api/v1/inventory/purchase-order/cancel-purchase';
+    static GET_PURCHASE_ORDER_REPORT_INVENTORY = '/api/v1/inventory/purchase-order/get-purchase-order-report';
+    static GET_PURCHASE_ORDER_PRODUCTS_REPORT_INVENTORY = '/api/v1/inventory/purchase-order/get-purchase-order-products-report';
 
     static GET_PRODUCT_LIST_FOR_OVERVIEW = '/api/v1/manager/inventory-overview/get-product-list';
     static GET_PRODUCT_DETAILS_FOR_OVERVIEW = '/api/v1/manager/inventory-overview/get-product-details';

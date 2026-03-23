@@ -15,10 +15,10 @@ export const ACTIVITY_LOG_TABLE_CONFIG: TableConfig = {
         {
             source: 'performed_on_display',
             label: 'Time',
-            width: '10%',
+            width: '15%',
             alignment: 'left',
             filterable: false,
-            column_type: 'text',
+            column_type: 'date',
         },
         {
             source: 'feature_label',
@@ -31,7 +31,7 @@ export const ACTIVITY_LOG_TABLE_CONFIG: TableConfig = {
         {
             source: 'description',
             label: 'Description',
-            width: '45%',
+            width: '40%',
             alignment: 'left',
             filterable: false,
             column_type: 'long-text',

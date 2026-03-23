@@ -33,7 +33,13 @@ const routes: Routes = [
                 data: { roles: [ROLES.ADMIN, ROLES.MANAGER] },
             },
             {
-                path: 'activity_log',
+                path: 'inventory',
+                loadChildren: () => import('../modules/inventory/inventory.module').then((m) => m.InventoryModule),
+                canActivate: [RoleGuard],
+                data: { roles: [ROLES.ADMIN, ROLES.MANAGER] },
+            },
+            {
+                path: 'activity-log',
                 loadChildren: () => import('../modules/activity-log/activity-log.module').then((m) => m.ActivityLogModule),
                 canActivate: [RoleGuard],
                 data: { roles: [ROLES.ADMIN, ROLES.MANAGER] },
