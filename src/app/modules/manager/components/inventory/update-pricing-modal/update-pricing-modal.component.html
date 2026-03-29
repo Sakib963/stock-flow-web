@@ -1,51 +1,105 @@
 <div class="rounded-md bg-white max-w-full w-full">
-      <form nz-form [formGroup]="form" [nzLayout]="'vertical'" (ngSubmit)="handleForm()" class="space-y-4">
-            <div class="border-[0.5px] p-4 rounded-sm">
-                  <h2 class="text-xl font-medium mb-4">Update Pricing & Discount - {{ modalData.batch_code }}
-                  </h2>
-                  <nz-alert nzType="info" nzShowIcon class="text-sm text-blue-800 mb-3 px-3 py-2 rounded-md bg-blue-50"
-                        [nzMessage]="null" [innerHTML]="getPerUnitPriceText()">
-                  </nz-alert>
+    <form nz-form [formGroup]="form" [nzLayout]="'vertical'" (ngSubmit)="handleForm()" class="space-y-4">
+        <div class="border-[0.5px] p-4 rounded-sm">
+            <h2 class="text-xl font-medium mb-4">Update Pricing & Discount - {{ modalData.batch_code }}</h2>
+            <nz-alert nzType="info" nzShowIcon class="text-sm text-blue-800 mb-3 px-3 py-2 rounded-md bg-blue-50" [nzMessage]="null" [innerHTML]="getPerUnitPriceText()"> </nz-alert>
 
-                  <!-- Form -->
-                  <div class="grid grid-cols-1 gap-4">
-                        <!-- Selling Price -->
-                        <nz-form-item>
-                              <nz-form-label [nzRequired]="hasRequiredValidator('selling_price')">
-                                    Selling Price
-                              </nz-form-label>
-                              <nz-form-control nzErrorTip="Selling Price is Required."
-                                    [nzValidateStatus]="form.get('selling_price') || ''" [nzHasFeedback]="true">
-                                    <input formControlName="selling_price" type="number" nz-input
-                                          placeholder="Enter Selling Price" />
-                              </nz-form-control>
-                        </nz-form-item>
+            <!-- Form -->
+            <div class="grid grid-cols-1 gap-4">
+                <!-- Selling Price -->
+                <nz-form-item>
+                    <nz-form-label [nzRequired]="hasRequiredValidator('selling_price')">
+                        Selling Price
+                        <nz-icon nzType="question-circle" nzTheme="outline" class="ml-1 text-gray-500" nz-tooltip [nzTooltipTitle]="getTooltipText('selling_price')"></nz-icon>
+                    </nz-form-label>
+                    <nz-form-control nzErrorTip="Selling Price is Required." [nzValidateStatus]="form.get('selling_price') || ''" [nzHasFeedback]="true">
+                        <input formControlName="selling_price" type="number" nz-input placeholder="Enter Selling Price" />
+                    </nz-form-control>
+                </nz-form-item>
 
-                        <!-- Maximum Discount (Percentage) -->
-                        <nz-form-item>
-                              <nz-form-label [nzRequired]="hasRequiredValidator('maximum_discount')">
-                                    Maximum Discount (BDT)
-                              </nz-form-label>
-                              <nz-form-control nzErrorTip="Maximum Discount is Required."
-                                    [nzValidateStatus]="form.get('maximum_discount') || ''" [nzHasFeedback]="true">
-                                    <input nz-input type="number" formControlName="maximum_discount"
-                                          placeholder="Max Discount in BDT" class="w-full" />
-                              </nz-form-control>
-                        </nz-form-item>
+                <!-- Maximum Discount (Percentage) -->
+                <nz-form-item>
+                    <nz-form-label [nzRequired]="hasRequiredValidator('maximum_discount')">
+                        Maximum Discount (BDT)
+                        <nz-icon nzType="question-circle" nzTheme="outline" class="ml-1 text-gray-500" nz-tooltip [nzTooltipTitle]="getTooltipText('maximum_discount')"></nz-icon>
+                    </nz-form-label>
+                    <nz-form-control nzErrorTip="Maximum Discount is Required." [nzValidateStatus]="form.get('maximum_discount') || ''" [nzHasFeedback]="true">
+                        <input nz-input type="number" formControlName="maximum_discount" placeholder="Max Discount in BDT" class="w-full" />
+                    </nz-form-control>
+                </nz-form-item>
 
+                <nz-form-item>
+                    <nz-form-label>
+                        Ad Run Cost
+                        <nz-icon nzType="question-circle" nzTheme="outline" class="ml-1 text-gray-500" nz-tooltip [nzTooltipTitle]="getTooltipText('ad_run_cost')"></nz-icon>
+                    </nz-form-label>
+                    <nz-form-control [nzValidateStatus]="form.get('ad_run_cost') || ''" [nzHasFeedback]="true">
+                        <input nz-input type="number" formControlName="ad_run_cost" placeholder="Ad Run Cost per unit" class="w-full" />
+                    </nz-form-control>
+                </nz-form-item>
 
-                        <!-- Maximum discount info -->
-                        <nz-alert nzType="warning" [nzMessage]="getMaximumDiscountText()" nzShowIcon nzBorderless
-                              class="text-sm text-yellow-800 mb-4 rounded-md bg-yellow-50">
-                        </nz-alert>
-                  </div>
+                <nz-form-item>
+                    <nz-form-label>
+                        Packaging Cost
+                        <nz-icon nzType="question-circle" nzTheme="outline" class="ml-1 text-gray-500" nz-tooltip [nzTooltipTitle]="getTooltipText('packaging_cost')"></nz-icon>
+                    </nz-form-label>
+                    <nz-form-control [nzValidateStatus]="form.get('packaging_cost') || ''" [nzHasFeedback]="true">
+                        <input nz-input type="number" formControlName="packaging_cost" placeholder="Packaging Cost per unit" class="w-full" />
+                    </nz-form-control>
+                </nz-form-item>
+
+                <nz-form-item>
+                    <nz-form-label>
+                        Gift Cost
+                        <nz-icon nzType="question-circle" nzTheme="outline" class="ml-1 text-gray-500" nz-tooltip [nzTooltipTitle]="getTooltipText('gift_cost')"></nz-icon>
+                    </nz-form-label>
+                    <nz-form-control [nzValidateStatus]="form.get('gift_cost') || ''" [nzHasFeedback]="true">
+                        <input nz-input type="number" formControlName="gift_cost" placeholder="Gift Cost per unit" class="w-full" />
+                    </nz-form-control>
+                </nz-form-item>
+
+                <nz-form-item>
+                    <nz-form-label>
+                        Content Creation Cost
+                        <nz-icon nzType="question-circle" nzTheme="outline" class="ml-1 text-gray-500" nz-tooltip [nzTooltipTitle]="getTooltipText('content_creation_cost')"></nz-icon>
+                    </nz-form-label>
+                    <nz-form-control [nzValidateStatus]="form.get('content_creation_cost') || ''" [nzHasFeedback]="true">
+                        <input nz-input type="number" formControlName="content_creation_cost" placeholder="Content Creation Cost per unit" class="w-full" />
+                    </nz-form-control>
+                </nz-form-item>
+
+                <nz-form-item>
+                    <nz-form-label>
+                        Influencer Cost
+                        <nz-icon nzType="question-circle" nzTheme="outline" class="ml-1 text-gray-500" nz-tooltip [nzTooltipTitle]="getTooltipText('influencer_cost')"></nz-icon>
+                    </nz-form-label>
+                    <nz-form-control [nzValidateStatus]="form.get('influencer_cost') || ''" [nzHasFeedback]="true">
+                        <input nz-input type="number" formControlName="influencer_cost" placeholder="Influencer Cost per unit" class="w-full" />
+                    </nz-form-control>
+                </nz-form-item>
+
+                <nz-form-item>
+                    <nz-form-label>
+                        Cost Remarks
+                        <nz-icon nzType="question-circle" nzTheme="outline" class="ml-1 text-gray-500" nz-tooltip [nzTooltipTitle]="getTooltipText('cost_remarks')"></nz-icon>
+                    </nz-form-label>
+                    <nz-form-control [nzValidateStatus]="form.get('cost_remarks') || ''" [nzHasFeedback]="true">
+                        <textarea nz-input formControlName="cost_remarks" nzAutosize [nzAutosize]="{ minRows: 2, maxRows: 4 }" placeholder="Add context notes for these costs"></textarea>
+                    </nz-form-control>
+                </nz-form-item>
+
+                <!-- Maximum discount info -->
+                <nz-alert nzType="warning" [nzMessage]="getMaximumDiscountText()" nzShowIcon nzBorderless class="text-sm text-yellow-800 mb-4 rounded-md bg-yellow-50"> </nz-alert>
+
+                <nz-alert [nzType]="hasNegativeUnitProfit() ? 'error' : 'success'" [nzMessage]="getUnitProfitHintText()" nzShowIcon nzBorderless class="text-sm mb-2" [class.bg-red-50]="hasNegativeUnitProfit()" [class.text-red-700]="hasNegativeUnitProfit()" [class.bg-green-50]="!hasNegativeUnitProfit()" [class.text-green-700]="!hasNegativeUnitProfit()"> </nz-alert>
             </div>
-            <!-- Actions -->
-            <div class="flex justify-end mt-4">
-                  <div class="flex items-center gap-4">
-                        <secondary-button (click)="closeModal()" [label]="'Cancel'"></secondary-button>
-                        <primary-button [label]="'Submit'" [loading]="loading" [type]="'submit'"></primary-button>
-                  </div>
+        </div>
+        <!-- Actions -->
+        <div class="flex justify-end mt-4">
+            <div class="flex items-center gap-4">
+                <secondary-button (click)="closeModal()" [label]="'Cancel'"></secondary-button>
+                <primary-button [label]="'Submit'" [loading]="loading" [type]="'submit'"></primary-button>
             </div>
-      </form>
+        </div>
+    </form>
 </div>

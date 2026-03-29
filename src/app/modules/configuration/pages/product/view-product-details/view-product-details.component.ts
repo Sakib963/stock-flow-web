@@ -1,4 +1,4 @@
-import { DatePipe, DecimalPipe, Location } from '@angular/common';
+import { DatePipe, Location } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, computed, DestroyRef, inject, input, signal } from '@angular/core';
 import { toObservable, toSignal, takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -15,12 +15,13 @@ import { NotFoundComponent } from '@app/shared/components/not-found/not-found.co
 import { PageHeaderComponent } from '@app/shared/components/page-header/page-header.component';
 import { NgZorroCustomModule } from '@app/shared/ng-zorro-custom.module';
 import { SafeTextPipe } from '@app/shared/pipe/safe-text.pipe';
+import { CurrencyFormatPipe } from '@app/shared/pipe/currency-format.pipe';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { Subject, combineLatest, startWith, tap, switchMap, map, catchError, EMPTY, finalize } from 'rxjs';
 
 @Component({
     selector: 'view-product-details',
-    imports: [PageHeaderComponent, NgZorroCustomModule, FormsModule, ProductFormComponent, DatePipe, DecimalPipe, SafeTextPipe, LoaderComponent, NotFoundComponent],
+    imports: [PageHeaderComponent, NgZorroCustomModule, FormsModule, ProductFormComponent, DatePipe, SafeTextPipe, CurrencyFormatPipe, LoaderComponent, NotFoundComponent],
     templateUrl: './view-product-details.component.html',
     styleUrl: './view-product-details.component.scss',
 })

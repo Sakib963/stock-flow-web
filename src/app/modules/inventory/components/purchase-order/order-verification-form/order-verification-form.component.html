@@ -3,104 +3,186 @@
         <h2 class="text-xl font-medium">Verify Purchase Details</h2>
         <nz-divider class="my-4"></nz-divider>
 
-        <div class="hidden lg:block">
-            <nz-table [nzData]="products.controls" [nzBordered]="true" [nzSize]="'middle'" [nzShowPagination]="false">
-                <thead>
+        <nz-table [nzData]="productsFormGroups" [nzBordered]="true" [nzSize]="'middle'" [nzShowPagination]="false" [nzScroll]="{ x: '1000px' }">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Product</th>
+                    <th>Ordered Qty</th>
+                    <th>Ordered Unit Price</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (group of productsFormGroups; track group.get('oid')?.value || $index; let i = $index) {
                     <tr>
-                        <th>#</th>
-                        <th>Product Name</th>
-                        <th>Verified Quantity</th>
-                        <th>Verified Unit Price</th>
-                        <th>Intended Use</th>
-                        <th>Selling Price</th>
-                        <th>Max Discount (%)</th>
+                        <td>{{ i + 1 }}</td>
+                        <td>{{ purchaseDetails()?.products?.[i]?.product_name || '-' }}</td>
+                        <td>{{ purchaseDetails()?.products?.[i]?.quantity || 0 }}</td>
+                        <td>{{ purchaseDetails()?.products?.[i]?.unit_price || 0 }}</td>
+                        <td>
+                            @if (isDraftVerified(i)) {
+                                <nz-tag nzColor="#109648">Verified Draft</nz-tag>
+                            } @else {
+                                <nz-tag nzColor="#DF2935">Not Verified</nz-tag>
+                            }
+                        </td>
+                        <td>
+                            <button nz-button [nzType]="isDraftVerified(i) ? 'default' : 'primary'" nzSize="small" type="button" (click)="openVerification(i)">
+                                <nz-icon [nzType]="isDraftVerified(i) ? 'edit' : 'check-circle'" nzTheme="outline" class="mr-1"></nz-icon>
+                                {{ isDraftVerified(i) ? 'Edit' : 'Verify' }}
+                            </button>
+                        </td>
                     </tr>
-                </thead>
-                <tbody>
-                    @for (group of productsFormGroups; track group.get('oid')?.value || $index; let i = $index) {
-                        <tr [formGroup]="group">
-                            <td>{{ i + 1 }}</td>
-                            <td>{{ purchaseDetails()?.products?.[i]?.product_name || '-' }}</td>
-                            <td>
-                                <nz-form-control [nzValidateStatus]="group.get('verified_quantity') || ''" [nzHasFeedback]="true">
-                                    <input nz-input type="number" formControlName="verified_quantity" />
-                                </nz-form-control>
-                            </td>
-                            <td>
-                                <nz-form-control [nzValidateStatus]="group.get('verified_unit_price') || ''" [nzHasFeedback]="true">
-                                    <input nz-input type="number" formControlName="verified_unit_price" />
-                                </nz-form-control>
-                            </td>
-                            <td>
-                                <nz-form-control [nzValidateStatus]="group.get('intended_use') || ''" [nzHasFeedback]="true">
-                                    <nz-select formControlName="intended_use" [nzOptions]="INTENDED_USE_OPTIONS" nzPlaceHolder="Select Intended Use" class="w-full"></nz-select>
-                                </nz-form-control>
-                            </td>
-                            <td>
-                                @if (group.get('intended_use')?.value === 'for_sale') {
-                                    <nz-form-control [nzValidateStatus]="group.get('selling_price') || ''" [nzHasFeedback]="true">
-                                        <input nz-input type="number" formControlName="selling_price" placeholder="Selling Price" class="w-full" />
-                                    </nz-form-control>
-                                }
-                            </td>
-                            <td>
-                                @if (group.get('intended_use')?.value === 'for_sale') {
-                                    <nz-form-control [nzValidateStatus]="group.get('maximum_discount') || ''" [nzHasFeedback]="true">
-                                        <input nz-input type="number" formControlName="maximum_discount" placeholder="Max Discount (%)" class="w-full" />
-                                    </nz-form-control>
-                                }
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </nz-table>
-        </div>
+                }
+            </tbody>
+        </nz-table>
 
-        <div class="block lg:hidden space-y-4 mt-4">
-            @for (group of productsFormGroups; track group.get('oid')?.value || $index; let i = $index) {
-                <div [formGroup]="group" class="border rounded-md p-4 shadow-sm space-y-3">
-                    <div class="font-semibold text-base">{{ purchaseDetails()?.products?.[i]?.product_name || '-' }}</div>
-                    <div>
-                        <label class="block text-sm">Verified Quantity</label>
-                        <nz-form-control [nzValidateStatus]="group.get('verified_quantity') || ''" [nzHasFeedback]="true">
-                            <input nz-input type="number" formControlName="verified_quantity" class="w-full" />
-                        </nz-form-control>
-                    </div>
-                    <div>
-                        <label class="block text-sm">Verified Unit Price</label>
-                        <nz-form-control [nzValidateStatus]="group.get('verified_unit_price') || ''" [nzHasFeedback]="true">
-                            <input nz-input type="number" formControlName="verified_unit_price" class="w-full" />
-                        </nz-form-control>
-                    </div>
-                    <div>
-                        <label class="block text-sm">Intended Use</label>
+        @if (activeProductGroup; as group) {
+            <div class="mt-4 border rounded-md p-4 bg-white" [formGroup]="group">
+                <div class="bg-blue-50 border border-blue-200 rounded-md p-4 mb-6 text-center">
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">Verification Inputs</h3>
+                    <p class="text-sm text-gray-600 mb-0">
+                        {{ activeProductName }} <nz-tag nzColor="#2563EB">Product #{{ (activeProductIndex ?? 0) + 1 }}</nz-tag>
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <nz-form-item>
+                        <nz-form-label>Intended Use</nz-form-label>
                         <nz-form-control [nzValidateStatus]="group.get('intended_use') || ''" [nzHasFeedback]="true">
                             <nz-select formControlName="intended_use" [nzOptions]="INTENDED_USE_OPTIONS" nzPlaceHolder="Select Intended Use" class="w-full"></nz-select>
                         </nz-form-control>
-                    </div>
-                    @if (group.get('intended_use')?.value === 'for_sale') {
-                        <div>
-                            <label class="block text-sm">Selling Price</label>
-                            <nz-form-control [nzValidateStatus]="group.get('selling_price') || ''" [nzHasFeedback]="true">
-                                <input nz-input type="number" formControlName="selling_price" class="w-full" />
-                            </nz-form-control>
-                        </div>
-                        <div>
-                            <label class="block text-sm">Max Discount (%)</label>
-                            <nz-form-control [nzValidateStatus]="group.get('maximum_discount') || ''" [nzHasFeedback]="true">
-                                <input nz-input type="number" formControlName="maximum_discount" class="w-full" />
-                            </nz-form-control>
-                        </div>
-                    }
+                    </nz-form-item>
+
+                    <nz-form-item>
+                        <nz-form-label>Verified Quantity</nz-form-label>
+                        <nz-form-control [nzValidateStatus]="group.get('verified_quantity') || ''" [nzHasFeedback]="true">
+                            <input nz-input type="number" formControlName="verified_quantity" />
+                        </nz-form-control>
+                    </nz-form-item>
+
+                    <nz-form-item>
+                        <nz-form-label>Verified Unit Price</nz-form-label>
+                        <nz-form-control [nzValidateStatus]="group.get('verified_unit_price') || ''" [nzHasFeedback]="true">
+                            <input nz-input type="number" formControlName="verified_unit_price" />
+                        </nz-form-control>
+                    </nz-form-item>
                 </div>
-            }
-        </div>
+
+                @if (group.get('intended_use')?.value === 'for_sale') {
+                    <nz-divider nzText="Sale Pricing"></nz-divider>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <nz-form-item>
+                            <nz-form-label>
+                                Selling Price
+                                <nz-icon nzType="question-circle" nzTheme="outline" class="ml-1 text-gray-500" nz-tooltip nzTooltipTitle="Required for For Sale items. Used in unit profit calculation and sales display."></nz-icon>
+                            </nz-form-label>
+                            <nz-form-control [nzValidateStatus]="group.get('selling_price') || ''" [nzHasFeedback]="true">
+                                <input nz-input type="number" formControlName="selling_price" />
+                            </nz-form-control>
+                        </nz-form-item>
+
+                        <nz-form-item>
+                            <nz-form-label>
+                                Max Discount (BDT)
+                                <nz-icon nzType="question-circle" nzTheme="outline" class="ml-1 text-gray-500" nz-tooltip nzTooltipTitle="Required for For Sale items. Discount cap in BDT during sale."></nz-icon>
+                            </nz-form-label>
+                            <nz-form-control [nzValidateStatus]="group.get('maximum_discount') || ''" [nzHasFeedback]="true">
+                                <input nz-input type="number" formControlName="maximum_discount" />
+                            </nz-form-control>
+                        </nz-form-item>
+                    </div>
+
+                    <nz-divider nzText="Optional Cost Inputs"></nz-divider>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <nz-form-item>
+                            <nz-form-label>
+                                Ad Run Cost
+                                <nz-icon nzType="question-circle" nzTheme="outline" class="ml-1 text-gray-500" nz-tooltip nzTooltipTitle="Optional per-unit ad spend allocation."></nz-icon>
+                            </nz-form-label>
+                            <nz-form-control [nzValidateStatus]="group.get('ad_run_cost') || ''" [nzHasFeedback]="true">
+                                <input nz-input type="number" formControlName="ad_run_cost" />
+                            </nz-form-control>
+                        </nz-form-item>
+
+                        <nz-form-item>
+                            <nz-form-label>
+                                Packaging Cost
+                                <nz-icon nzType="question-circle" nzTheme="outline" class="ml-1 text-gray-500" nz-tooltip nzTooltipTitle="Optional per-unit packaging cost."></nz-icon>
+                            </nz-form-label>
+                            <nz-form-control [nzValidateStatus]="group.get('packaging_cost') || ''" [nzHasFeedback]="true">
+                                <input nz-input type="number" formControlName="packaging_cost" />
+                            </nz-form-control>
+                        </nz-form-item>
+
+                        <nz-form-item>
+                            <nz-form-label>
+                                Gift Cost
+                                <nz-icon nzType="question-circle" nzTheme="outline" class="ml-1 text-gray-500" nz-tooltip nzTooltipTitle="Optional per-unit promotional gift cost."></nz-icon>
+                            </nz-form-label>
+                            <nz-form-control [nzValidateStatus]="group.get('gift_cost') || ''" [nzHasFeedback]="true">
+                                <input nz-input type="number" formControlName="gift_cost" />
+                            </nz-form-control>
+                        </nz-form-item>
+
+                        <nz-form-item>
+                            <nz-form-label>
+                                Content Creation Cost
+                                <nz-icon nzType="question-circle" nzTheme="outline" class="ml-1 text-gray-500" nz-tooltip nzTooltipTitle="Optional per-unit content creation allocation."></nz-icon>
+                            </nz-form-label>
+                            <nz-form-control [nzValidateStatus]="group.get('content_creation_cost') || ''" [nzHasFeedback]="true">
+                                <input nz-input type="number" formControlName="content_creation_cost" />
+                            </nz-form-control>
+                        </nz-form-item>
+
+                        <nz-form-item>
+                            <nz-form-label>
+                                Influencer Cost
+                                <nz-icon nzType="question-circle" nzTheme="outline" class="ml-1 text-gray-500" nz-tooltip nzTooltipTitle="Optional per-unit influencer marketing allocation."></nz-icon>
+                            </nz-form-label>
+                            <nz-form-control [nzValidateStatus]="group.get('influencer_cost') || ''" [nzHasFeedback]="true">
+                                <input nz-input type="number" formControlName="influencer_cost" />
+                            </nz-form-control>
+                        </nz-form-item>
+                    </div>
+
+                    <nz-form-item>
+                        <nz-form-label>
+                            Cost Remarks
+                            <nz-icon nzType="question-circle" nzTheme="outline" class="ml-1 text-gray-500" nz-tooltip nzTooltipTitle="Optional context about budget, expectations, or negotiation notes."></nz-icon>
+                        </nz-form-label>
+                        <nz-form-control [nzValidateStatus]="group.get('cost_remarks') || ''" [nzHasFeedback]="true">
+                            <textarea nz-input formControlName="cost_remarks" nzAutosize [nzAutosize]="{ minRows: 2, maxRows: 4 }"></textarea>
+                        </nz-form-control>
+                    </nz-form-item>
+
+                    @let unitProfit = getUnitProfit(group);
+                    <div class="rounded-sm p-3" [class.bg-red-50]="unitProfit < 0" [class.bg-green-50]="unitProfit >= 0">
+                        <p class="mb-1 text-xs text-gray-500">Unit Profit Hint</p>
+                        <p class="mb-0 font-semibold" [class.text-red-600]="unitProfit < 0" [class.text-green-700]="unitProfit >= 0">{{ unitProfit }}</p>
+                    </div>
+                }
+
+                <div class="flex justify-end gap-3 mt-4">
+                    <button nz-button nzType="default" type="button" (click)="closeVerificationPanel()">Cancel</button>
+                    <button nz-button nzType="primary" type="button" (click)="saveProductVerification()">Save Product Verification</button>
+                </div>
+            </div>
+        }
+
+        @if (hasNegativeUnitProfit()) {
+            <div class="mt-4 rounded-sm border border-amber-300 bg-amber-50 p-3 text-amber-800 text-sm">Some products currently show negative unit profit. You will need to confirm this before verification.</div>
+        }
     </div>
 
     <div class="flex justify-end mt-4">
         <div class="flex items-center gap-4">
-            <secondary-button [label]="'Cancel'" (click)="onCancel()"></secondary-button>
-            <primary-button [label]="'Verify Order'" [loading]="buttonLoading()" [type]="'submit'"></primary-button>
+            <button nz-button nzType="default" type="button" (click)="onCancel()">Cancel</button>
+            <button nz-button nzType="primary" type="submit" [nzLoading]="buttonLoading()">Verify Order</button>
         </div>
     </div>
 </form>

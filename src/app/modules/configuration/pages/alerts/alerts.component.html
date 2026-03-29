@@ -66,7 +66,7 @@
         <nz-card>
             <nz-statistic [nzValue]="stats().totalValue" nzTitle="Total Value at Risk" [nzPrefix]="prefixCurrency" [nzValueStyle]="{ color: '#3f8600' }"> </nz-statistic>
             <ng-template #prefixCurrency>
-                <span>$</span>
+                <span>৳</span>
             </ng-template>
         </nz-card>
     </div>
@@ -108,7 +108,7 @@
                                 {{ getStockStatus(product.stock, product.minStock) }}
                             </nz-tag>
                         </td>
-                        <td>${{ product.value | number: '1.2-2' }}</td>
+                        <td>{{ product.value | currencyFormat }}</td>
                         <td>
                             <button nz-button nzType="link" nzSize="small" (click)="viewProduct(product.oid)" nz-tooltip nzTooltipTitle="View Product">
                                 <nz-icon nzType="eye" nzTheme="outline"></nz-icon>

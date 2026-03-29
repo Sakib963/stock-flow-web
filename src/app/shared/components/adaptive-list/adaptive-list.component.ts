@@ -4,11 +4,12 @@ import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { NgZorroCustomModule } from '@app/shared/ng-zorro-custom.module';
 import { TableConfig, TableColumn, TableAction } from '@app/core/interfaces/table';
+import { CurrencyFormatPipe } from '@app/shared/pipe/currency-format.pipe';
 
 @Component({
     selector: 'adaptive-list',
     standalone: true,
-    imports: [CommonModule, FormsModule, RouterModule, NgZorroCustomModule],
+    imports: [CommonModule, FormsModule, RouterModule, NgZorroCustomModule, CurrencyFormatPipe],
     templateUrl: './adaptive-list.component.html',
     styleUrl: './adaptive-list.component.scss',
 })
@@ -104,27 +105,5 @@ export class AdaptiveListComponent {
         if (this.tableConfig().noData?.addButtonUrl) {
             this._router.navigate([this.tableConfig().noData.addButtonUrl]);
         }
-    }
-
-    CURRENCY_SYMBOL_MAP: Record<string, string> = {
-        BDT: '৳',
-        USD: '$',
-        SGD: '$', // can refine later to S$
-    };
-
-    formatCurrency(value: any, column: TableColumn): string {
-        if (value === null || value === undefined) return '';
-
-        const number = Number(value);
-        if (isNaN(number)) return value;
-
-        const currency = column.currency || 'BDT';
-        const locale = column.locale || 'en-IN';
-
-        const symbol = this.CURRENCY_SYMBOL_MAP[currency] || currency;
-
-        return `${symbol} ${new Intl.NumberFormat(locale, {
-            maximumFractionDigits: 0,
-        }).format(number)}`;
     }
 }

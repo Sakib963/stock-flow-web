@@ -1,7 +1,9 @@
 import { CommonModule, Location } from '@angular/common';
-import { Component, DestroyRef, OnInit, inject } from '@angular/core';
+import { Component, DestroyRef, OnInit, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
+import { WindowState } from '@app/core/config/window-state.config';
 import { APIEndpoint } from '@app/core/constants/api-endpoint';
 import { FormActions } from '@app/core/interfaces/form-action';
 import { HttpService } from '@app/core/services/http.service';
@@ -10,13 +12,14 @@ import { PurchaseOrderFormComponent } from '@app/modules/inventory/components/pu
 import { LoaderComponent } from '@app/shared/components/loader/loader.component';
 import { PageHeaderComponent } from '@app/shared/components/page-header/page-header.component';
 import { NgZorroCustomModule } from '@app/shared/ng-zorro-custom.module';
+import { CurrencyFormatPipe } from '@app/shared/pipe/currency-format.pipe';
 import { NzModalService } from 'ng-zorro-antd/modal';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { finalize } from 'rxjs';
 
 @Component({
     selector: 'view-purchase-order',
-    imports: [CommonModule, NgZorroCustomModule, PageHeaderComponent, LoaderComponent, OrderVerificationFormComponent, PurchaseOrderFormComponent],
+    imports: [CommonModule, NgZorroCustomModule, PageHeaderComponent, LoaderComponent, OrderVerificationFormComponent, PurchaseOrderFormComponent, CurrencyFormatPipe, FormsModule],
     templateUrl: './view-purchase-order.component.html',
     styleUrl: './view-purchase-order.component.scss',
 })
@@ -26,11 +29,18 @@ export class ViewPurchaseOrderComponent implements OnInit {
     reportLoading = false;
     editMode = false;
     displayFormType = '';
+    currentProductsView = 0;
 
-    purchaseOrder: any = null;
+    purchaseOrder = signal<any | null>(null);
     products: any[] = [];
     stats: any = null;
     activity: any[] = [];
+    productsWithCostData: any[] = [];
+
+    state = signal<WindowState | null>(null);
+    action = computed(() => this.state()?.action || 'view');
+    editable = computed(() => this.action() === 'view' && this.canEdit);
+    private readonly _verificationSectionId = 'purchase-order-verification-form';
 
     private readonly _httpService = inject(HttpService);
     private readonly _destroyRef = inject(DestroyRef);
@@ -40,29 +50,39 @@ export class ViewPurchaseOrderComponent implements OnInit {
     private readonly _location = inject(Location);
 
     ngOnInit(): void {
+        this.state.set(window.history.state as WindowState);
         this.editMode = typeof window !== 'undefined' && window.history.state?.edit === true;
         this.loadDetails();
     }
 
+    handleSwitchChange(event: boolean): void {
+        if (!this.canEdit) {
+            this.editMode = false;
+            return;
+        }
+        this.editMode = event;
+    }
+
     get canEdit(): boolean {
-        return this.purchaseOrder?.status === 'Submitted';
+        return this.purchaseOrder()?.status === 'Submitted';
     }
 
     get canVerify(): boolean {
-        return this.purchaseOrder?.status === 'Submitted';
+        return this.purchaseOrder()?.status === 'Submitted';
     }
 
     get canCancel(): boolean {
-        return this.purchaseOrder?.status === 'Submitted';
+        return this.purchaseOrder()?.status === 'Submitted';
     }
 
     get editFormData(): any {
-        if (!this.purchaseOrder) {
+        const purchaseOrder = this.purchaseOrder();
+        if (!purchaseOrder) {
             return null;
         }
 
         return {
-            ...this.purchaseOrder,
+            ...purchaseOrder,
             products: this.products,
         };
     }
@@ -88,8 +108,9 @@ export class ViewPurchaseOrderComponent implements OnInit {
                     if (res?.status === 200 && res?.body?.code === 200) {
                         const bodyData = res.body.data || {};
 
-                        this.purchaseOrder = bodyData.details || bodyData;
+                        this.purchaseOrder.set(bodyData.details || bodyData);
                         this.products = bodyData.products || bodyData?.products || [];
+                        this.productsWithCostData = this.products.filter((p) => this.hasCostData(p));
                         this.stats = bodyData.stats || null;
                         this.activity = bodyData.activity || [];
                         this.displayFormType = '';
@@ -99,6 +120,7 @@ export class ViewPurchaseOrderComponent implements OnInit {
                         }
 
                         if (this.editMode && !this.canEdit) {
+                            this.editMode = false;
                             this._notificationService.warning('Purchase Order', 'Only submitted purchase orders can be edited.');
                         }
                         return;
@@ -113,11 +135,29 @@ export class ViewPurchaseOrderComponent implements OnInit {
     }
 
     verifyOrder(): void {
-        if (!this.canVerify || !this.purchaseOrder?.oid) {
+        if (!this.canVerify || !this.purchaseOrder()?.oid) {
             return;
         }
 
         this.displayFormType = 'Verify';
+        this.scrollToVerificationForm();
+    }
+
+    private scrollToVerificationForm(attempt = 0): void {
+        if (typeof window === 'undefined') {
+            return;
+        }
+
+        const section = document.getElementById(this._verificationSectionId);
+        if (section) {
+            section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            return;
+        }
+
+        // The form is rendered conditionally; retry briefly until it appears in DOM.
+        if (attempt < 6) {
+            window.setTimeout(() => this.scrollToVerificationForm(attempt + 1), 70);
+        }
     }
 
     handleVerificationFormActions(event: FormActions): void {
@@ -152,7 +192,7 @@ export class ViewPurchaseOrderComponent implements OnInit {
     }
 
     cancelOrder(): void {
-        if (!this.canCancel || !this.purchaseOrder?.oid) {
+        if (!this.canCancel || !this.purchaseOrder()?.oid) {
             return;
         }
 
@@ -167,8 +207,9 @@ export class ViewPurchaseOrderComponent implements OnInit {
 
     private confirmCancelOrder(): void {
         this.actionLoading = true;
+        const purchaseOrder = this.purchaseOrder();
         this._httpService
-            .get(APIEndpoint.CANCEL_PURCHASE, { oid: this.purchaseOrder.oid })
+            .get(APIEndpoint.CANCEL_PURCHASE, { oid: purchaseOrder?.oid })
             .pipe(
                 takeUntilDestroyed(this._destroyRef),
                 finalize(() => {
@@ -232,13 +273,13 @@ export class ViewPurchaseOrderComponent implements OnInit {
     }
 
     generatePurchaseReport(): void {
-        if (!this.purchaseOrder?.oid) {
+        if (!this.purchaseOrder()?.oid) {
             return;
         }
 
         this.reportLoading = true;
         this._httpService
-            .downloadFile(APIEndpoint.GET_PURCHASE_ORDER_REPORT_INVENTORY, { oid: this.purchaseOrder.oid })
+            .downloadFile(APIEndpoint.GET_PURCHASE_ORDER_REPORT_INVENTORY, { oid: this.purchaseOrder()?.oid })
             .pipe(
                 takeUntilDestroyed(this._destroyRef),
                 finalize(() => {
@@ -254,13 +295,13 @@ export class ViewPurchaseOrderComponent implements OnInit {
     }
 
     exportProductsReport(): void {
-        if (!this.purchaseOrder?.oid) {
+        if (!this.purchaseOrder()?.oid) {
             return;
         }
 
         this.reportLoading = true;
         this._httpService
-            .downloadFile(APIEndpoint.GET_PURCHASE_ORDER_PRODUCTS_REPORT_INVENTORY, { oid: this.purchaseOrder.oid })
+            .downloadFile(APIEndpoint.GET_PURCHASE_ORDER_PRODUCTS_REPORT_INVENTORY, { oid: this.purchaseOrder()?.oid })
             .pipe(
                 takeUntilDestroyed(this._destroyRef),
                 finalize(() => {
@@ -273,6 +314,48 @@ export class ViewPurchaseOrderComponent implements OnInit {
                     this._notificationService.error('Products Report', err?.error?.message || 'Failed to export product report');
                 },
             });
+    }
+
+    getTotalExtraCost(item: any): number {
+        const adRunCost = Number(item?.ad_run_cost || 0);
+        const packagingCost = Number(item?.packaging_cost || 0);
+        const giftCost = Number(item?.gift_cost || 0);
+        const contentCreationCost = Number(item?.content_creation_cost || 0);
+        const influencerCost = Number(item?.influencer_cost || 0);
+
+        return adRunCost + packagingCost + giftCost + contentCreationCost + influencerCost;
+    }
+
+    getUnitProfit(item: any): number {
+        if (item?.intended_use !== 'for_sale') {
+            return 0;
+        }
+
+        const sellingPrice = Number(item?.selling_price || 0);
+        const verifiedUnitPrice = Number(item?.verified_unit_price || 0);
+        return sellingPrice - verifiedUnitPrice - this.getTotalExtraCost(item);
+    }
+
+    hasCostData(item: any): boolean {
+        const adRunCost = Number(item?.ad_run_cost || 0);
+        const packagingCost = Number(item?.packaging_cost || 0);
+        const giftCost = Number(item?.gift_cost || 0);
+        const contentCreationCost = Number(item?.content_creation_cost || 0);
+        const influencerCost = Number(item?.influencer_cost || 0);
+
+        return adRunCost > 0 || packagingCost > 0 || giftCost > 0 || contentCreationCost > 0 || influencerCost > 0;
+    }
+
+    get hasAnyCostData(): boolean {
+        return this.products.some((product) => this.hasCostData(product));
+    }
+
+    costFieldExists(value: any): boolean {
+        return Number(value || 0) > 0;
+    }
+
+    hasForSaleProductsWithCost(): boolean {
+        return this.products.some((p) => p.intended_use === 'for_sale' && this.hasCostData(p));
     }
 
     private downloadBlob(blob: Blob, filePrefix: string): void {

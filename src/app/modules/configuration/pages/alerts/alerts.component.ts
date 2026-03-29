@@ -6,6 +6,7 @@ import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { ConfigurationService } from '@app/modules/configuration/services/configuration.service';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
+import { CurrencyFormatPipe } from '@app/shared/pipe/currency-format.pipe';
 
 interface AlertProduct {
     oid: string;
@@ -35,7 +36,7 @@ interface AlertStats {
 @Component({
     selector: 'app-alerts',
     standalone: true,
-    imports: [CommonModule, FormsModule, PageHeaderComponent, NgZorroCustomModule],
+    imports: [CommonModule, FormsModule, PageHeaderComponent, NgZorroCustomModule, CurrencyFormatPipe],
     templateUrl: './alerts.component.html',
     styleUrl: './alerts.component.scss',
 })

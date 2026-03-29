@@ -1,4 +1,4 @@
-import { Component, computed, DestroyRef, inject, input, OnInit, output, signal } from '@angular/core';
+import { Component, computed, DestroyRef, HostListener, inject, input, OnInit, output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { PrimaryButton } from '@app/shared/components/buttons/primary-button/primary-button.component';
@@ -15,10 +15,11 @@ import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { FormActions } from '@app/core/interfaces/form-action';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { finalize } from 'rxjs';
+import { CurrencyFormatPipe } from '@app/shared/pipe/currency-format.pipe';
 
 @Component({
     selector: 'app-purchase-order-form',
-    imports: [CommonModule, NgZorroCustomModule, ReactiveFormsModule, PrimaryButton, SecondaryButton, AngularSvgIconModule],
+    imports: [CommonModule, NgZorroCustomModule, ReactiveFormsModule, PrimaryButton, SecondaryButton, AngularSvgIconModule, CurrencyFormatPipe],
     templateUrl: './purchase-order-form.component.html',
     styleUrl: './purchase-order-form.component.scss',
 })
@@ -48,6 +49,7 @@ export class PurchaseOrderFormComponent implements OnInit {
 
     supplierList: any[] = [];
     productList: any[] = [];
+    groupedProductList: any[] = [];
     warehouseList: any[] = [];
     aisleList: any[] = [];
     supplierListLoading = signal(false);
@@ -61,6 +63,7 @@ export class PurchaseOrderFormComponent implements OnInit {
     visible = false;
     editIndex: number | null = null;
     currentTotalPrice = 0;
+    drawerWidth = signal<string>('900px');
 
     mode = computed(() => {
         return this.purchase() ? 'edit' : 'create';
@@ -71,9 +74,8 @@ export class PurchaseOrderFormComponent implements OnInit {
     });
 
     ngOnInit(): void {
+        this._setDrawerWidth();
         this.loadSupplierList();
-        this.loadProductList();
-        this.loadWarehouseList();
 
         const purchase = this.purchase();
         if (purchase) {
@@ -109,6 +111,16 @@ export class PurchaseOrderFormComponent implements OnInit {
         this.products.valueChanges.pipe(takeUntilDestroyed(this._destroyRef)).subscribe(() => {
             this.calculateTotalPriceFromProducts();
         });
+    }
+
+    @HostListener('window:resize')
+    onWindowResize(): void {
+        this._setDrawerWidth();
+    }
+
+    private _setDrawerWidth(): void {
+        if (typeof window === 'undefined') return;
+        this.drawerWidth.set(window.innerWidth < 768 ? '100vw' : '700px');
     }
 
     private _createProductGroup(product: any = {}): FormGroup {
@@ -163,6 +175,8 @@ export class PurchaseOrderFormComponent implements OnInit {
 
     handleAdd(): void {
         this.visible = true;
+        this.loadProductList();
+        this.loadWarehouseList();
     }
 
     onSubmit(): void {
@@ -279,11 +293,19 @@ export class PurchaseOrderFormComponent implements OnInit {
     loadProductList(): void {
         this.productListLoading.set(true);
         this._httpService
-            .get(APIEndpoint.GET_PRODUCT_LIST_FOR_DROPDOWN)
+            .get(APIEndpoint.GET_PRODUCT_LIST_FOR_DROPDOWN, { grouped: true })
             .pipe(finalize(() => this.productListLoading.set(false)))
             .subscribe({
                 next: (res: any) => {
-                    this.productList = res?.body?.code === 200 ? res.body.data || [] : [];
+                    if (res?.body?.code === 200) {
+                        const groupedData = res.body.data || [];
+                        this.groupedProductList = groupedData;
+                        this.productList = groupedData.flatMap((group: any) => group.options || []);
+                        return;
+                    }
+
+                    this.groupedProductList = [];
+                    this.productList = [];
                 },
             });
     }

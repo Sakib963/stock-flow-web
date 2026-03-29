@@ -48,7 +48,7 @@
                                     </nz-tag>
                                 } @else if (column.column_type === 'currency') {
                                     @let value = getCellValue(item, column);
-                                    @let formatted = formatCurrency(value, column);
+                                    @let formatted = value | currencyFormat: column.currency : column.locale;
 
                                     <span nz-tooltip nzTooltipPlacement="bottom" [nzTooltipTitle]="formatted" class="font-medium">
                                         {{ formatted }}
@@ -129,6 +129,8 @@
                                     <span class="text-xs text-gray-500">{{ column.label }}:</span>
                                     @if (column.column_type === 'long-text') {
                                         <span class="text-sm line-clamp-3">{{ getCellValue(item, column) }}</span>
+                                    } @else if (column.column_type === 'currency') {
+                                        <span class="text-sm font-medium">{{ getCellValue(item, column) | currencyFormat: column.currency : column.locale }}</span>
                                     } @else if (column.text_color) {
                                         <nz-tag [nzColor]="getTextColor(item, column)" class="w-fit">
                                             {{ getCellValue(item, column) }}
@@ -188,6 +190,8 @@
                                 <span class="text-xs text-gray-500">{{ column.label }}:</span>
                                 @if (column.column_type === 'long-text') {
                                     <span class="text-sm line-clamp-3">{{ getCellValue(item, column) }}</span>
+                                } @else if (column.column_type === 'currency') {
+                                    <span class="text-sm font-medium">{{ getCellValue(item, column) | currencyFormat: column.currency : column.locale }}</span>
                                 } @else if (column.text_color) {
                                     <nz-tag [nzColor]="getTextColor(item, column)" class="w-fit">
                                         {{ getCellValue(item, column) }}

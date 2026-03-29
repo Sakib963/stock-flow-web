@@ -205,7 +205,7 @@
                                 <ng-template #prefixPrice>
                                     <span nz-icon nzType="tag" nzTheme="outline"></span>
                                 </ng-template>
-                                <div class="text-xs text-gray-500 mt-1">Cost: ৳{{ inventory.avgCostPrice | number: '1.2-2' }}</div>
+                                <div class="text-xs text-gray-500 mt-1">Cost: {{ inventory.avgCostPrice | currencyFormat }}</div>
                             </div>
                         </div>
                     </nz-card>

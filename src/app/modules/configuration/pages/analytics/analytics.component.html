@@ -74,7 +74,7 @@
                     </span>
                     <nz-icon nzType="dollar" nzTheme="outline" class="text-xl text-gray-300"></nz-icon>
                 </div>
-                <div class="text-3xl font-semibold text-green-700">${{ metrics().totalInventoryValue | number: '1.2-2' }}</div>
+                <div class="text-3xl font-semibold text-green-700">{{ metrics().totalInventoryValue | currencyFormat }}</div>
             </div>
 
             <!-- Total Stock Units -->
@@ -174,7 +174,7 @@
                                         {{ item.stock }}
                                     </nz-tag>
                                 </td>
-                                <td>${{ item.value | number: '1.2-2' }}</td>
+                                <td>{{ item.value | currencyFormat }}</td>
                                 <td>{{ item.totalPurchases }}</td>
                                 <td>{{ item.totalReturns }}</td>
                                 <td>{{ item.totalDisposed }}</td>
@@ -226,7 +226,7 @@
                                     </nz-tag>
                                 </td>
                                 <td [class.text-green-600]="movement.quantity > 0" [class.text-red-600]="movement.quantity < 0">{{ movement.quantity > 0 ? '+' : '' }}{{ movement.quantity }}</td>
-                                <td [class.text-green-600]="movement.value > 0" [class.text-red-600]="movement.value < 0">${{ movement.value | number: '1.2-2' }}</td>
+                                <td [class.text-green-600]="movement.value > 0" [class.text-red-600]="movement.value < 0">{{ movement.value | currencyFormat }}</td>
                                 <td>
                                     <a class="text-blue-600 hover:underline cursor-pointer" (click)="viewReference(movement.referenceType, movement.referenceId)">
                                         {{ movement.referenceNo }}

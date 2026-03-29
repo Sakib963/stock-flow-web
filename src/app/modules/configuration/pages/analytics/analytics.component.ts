@@ -14,6 +14,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { TranslateService } from '@ngx-translate/core';
 import { APIEndpoint } from '@app/core/constants/api-endpoint';
 import { NzTableQueryParams } from 'ng-zorro-antd/table';
+import { CurrencyFormatPipe } from '@app/shared/pipe/currency-format.pipe';
 
 // Register Chart.js components
 Chart.register(...registerables);
@@ -57,7 +58,7 @@ interface StockDistributionSegment {
 @Component({
     selector: 'app-analytics',
     standalone: true,
-    imports: [CommonModule, FormsModule, PageHeaderComponent, NgZorroCustomModule, LoaderComponent],
+    imports: [CommonModule, FormsModule, PageHeaderComponent, NgZorroCustomModule, LoaderComponent, CurrencyFormatPipe],
     templateUrl: './analytics.component.html',
     styleUrl: './analytics.component.scss',
 })
