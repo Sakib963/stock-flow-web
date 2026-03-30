@@ -64,6 +64,8 @@ export class PurchaseOrderFormComponent implements OnInit {
     editIndex: number | null = null;
     currentTotalPrice = 0;
     drawerWidth = signal<string>('900px');
+    private readonly _productNameByOid = new Map<string, string>();
+    private readonly _warehouseNameByOid = new Map<string, string>();
 
     mode = computed(() => {
         return this.purchase() ? 'edit' : 'create';
@@ -76,6 +78,8 @@ export class PurchaseOrderFormComponent implements OnInit {
     ngOnInit(): void {
         this._setDrawerWidth();
         this.loadSupplierList();
+        this.loadProductList();
+        this.loadWarehouseList();
 
         const purchase = this.purchase();
         if (purchase) {
@@ -125,7 +129,7 @@ export class PurchaseOrderFormComponent implements OnInit {
 
     private _createProductGroup(product: any = {}): FormGroup {
         return this._formBuilder.group({
-            oid: [null],
+            oid: [product.oid ?? null],
             product_oid: [product.product_oid ?? null, Validators.required],
             warehouse_oid: [product.warehouse_oid ?? null, Validators.required],
             aisle_oid: [product.aisle_oid ?? null],
@@ -136,6 +140,9 @@ export class PurchaseOrderFormComponent implements OnInit {
 
     private _patchForm(purchase: any): void {
         if (!purchase) return;
+
+        this._productNameByOid.clear();
+        this._warehouseNameByOid.clear();
 
         this.form.patchValue({
             oid: purchase.oid ?? null,
@@ -149,6 +156,12 @@ export class PurchaseOrderFormComponent implements OnInit {
 
         this.products.clear();
         (purchase.products || []).forEach((product: any) => {
+            if (product?.product_oid && product?.product_name) {
+                this._productNameByOid.set(product.product_oid, product.product_name);
+            }
+            if (product?.warehouse_oid && product?.warehouse_name) {
+                this._warehouseNameByOid.set(product.warehouse_oid, product.warehouse_name);
+            }
             this.products.push(this._createProductGroup(product));
         });
 
@@ -174,6 +187,9 @@ export class PurchaseOrderFormComponent implements OnInit {
     }
 
     handleAdd(): void {
+        this.editIndex = null;
+        this.drawerForm.reset();
+        this.drawerForm.get('product_oid')?.enable({ emitEvent: false });
         this.visible = true;
         this.loadProductList();
         this.loadWarehouseList();
@@ -218,6 +234,9 @@ export class PurchaseOrderFormComponent implements OnInit {
     }
 
     close(): void {
+        this.editIndex = null;
+        this.drawerForm.reset();
+        this.drawerForm.get('product_oid')?.enable({ emitEvent: false });
         this.visible = false;
     }
 
@@ -239,7 +258,7 @@ export class PurchaseOrderFormComponent implements OnInit {
 
     handleDrawerForm(): void {
         if (this.drawerForm.valid) {
-            const productData = this.drawerForm.value;
+            const productData = this.drawerForm.getRawValue();
             if (this.editIndex !== null) {
                 this.products.at(this.editIndex).patchValue(productData);
                 this.editIndex = null;
@@ -247,6 +266,7 @@ export class PurchaseOrderFormComponent implements OnInit {
                 this.products.push(this._createProductGroup(productData));
             }
             this.drawerForm.reset();
+            this.drawerForm.get('product_oid')?.enable({ emitEvent: false });
             this.visible = false;
         } else {
             markFormGroupTouched(this.drawerForm);
@@ -256,7 +276,19 @@ export class PurchaseOrderFormComponent implements OnInit {
     handleItemEdit(index: number): void {
         this.editIndex = index;
         const product = this.products.at(index).value;
+        this.drawerForm.reset();
         this.drawerForm.patchValue(product);
+        console.log('Editing product:', product);
+        if (product?.product_oid) {
+            this.drawerForm.get('product_oid')?.disable({ emitEvent: false });
+        } else {
+            this.drawerForm.get('product_oid')?.enable({ emitEvent: false });
+        }
+        this.loadProductList();
+        this.loadWarehouseList();
+        if (product?.warehouse_oid) {
+            this.loadAisleList(product.warehouse_oid);
+        }
         this.visible = true;
     }
 
@@ -266,12 +298,20 @@ export class PurchaseOrderFormComponent implements OnInit {
 
     getProductName(product_oid: string): string {
         const product = this.productList.find((item: any) => item.value === product_oid);
-        return product ? product.label : 'Unknown Product';
+        if (product) {
+            return product.label;
+        }
+
+        return this._productNameByOid.get(product_oid) || 'Unknown Product';
     }
 
     getWarehouseName(warehouse_oid: string): string {
         const warehouse = this.warehouseList.find((item: any) => item.value === warehouse_oid);
-        return warehouse ? warehouse.label : 'Unknown Warehouse';
+        if (warehouse) {
+            return warehouse.label;
+        }
+
+        return this._warehouseNameByOid.get(warehouse_oid) || 'Unknown Warehouse';
     }
 
     calculateTotalPrice(product: any): number {
