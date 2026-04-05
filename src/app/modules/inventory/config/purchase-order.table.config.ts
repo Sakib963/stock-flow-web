@@ -89,7 +89,7 @@ export const PURCHASE_ORDER_TABLE_CONFIG: TableConfig = {
         },
         {
             label: 'Actions',
-            width: '5%',
+            width: '10%',
             alignment: 'right',
             column_type: 'action',
             actions: [

@@ -227,51 +227,137 @@
                 <!-- Cost Details Section (Only if cost data exists) -->
                 @if (hasAnyCostData) {
                     <div class="border rounded-sm bg-white p-4">
-                        <h3 class="text-base font-bold text-gray-900 mb-4">Cost Breakdown Details</h3>
-                        <div class="hidden md:block">
-                            <nz-table [nzData]="productsWithCostData" [nzFrontPagination]="false" [nzSize]="'small'" [nzScroll]="{ x: '100%' }">
-                                <thead>
-                                    <tr>
-                                        <th>Product</th>
-                                        <th>Ad Run Cost</th>
-                                        <th>Packaging Cost</th>
-                                        <th>Gift Cost</th>
-                                        <th>Content Creation Cost</th>
-                                        <th>Influencer Cost</th>
-                                        <th>Total Extra Cost</th>
-                                        @if (hasForSaleProductsWithCost()) {
-                                            <th>Unit Profit</th>
-                                        }
-                                        <th>Remarks</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @for (item of productsWithCostData; track item.oid) {
+                        <div class="mb-4 flex items-center justify-start gap-4">
+                            <h3 class="text-base font-bold text-gray-900 mb-0">Cost Breakdown Details</h3>
+                            <div class="hidden md:block">
+                                <nz-segmented
+                                    [nzOptions]="[
+                                        { label: 'List', value: 0, icon: 'table' },
+                                        { label: 'Card', value: 1, icon: 'appstore' },
+                                    ]"
+                                    [(ngModel)]="currentCostBreakdownView"
+                                ></nz-segmented>
+                            </div>
+                        </div>
+
+                        @if (currentCostBreakdownView === 0) {
+                            <div class="hidden md:block">
+                                <nz-table [nzData]="productsWithCostData" [nzFrontPagination]="false" [nzSize]="'small'" [nzScroll]="{ x: '100%' }">
+                                    <thead>
                                         <tr>
-                                            <td class="font-medium">{{ item.product_name || '-' }}</td>
-                                            <td>{{ item.ad_run_cost || 0 | currencyFormat }}</td>
-                                            <td>{{ item.packaging_cost || 0 | currencyFormat }}</td>
-                                            <td>{{ item.gift_cost || 0 | currencyFormat }}</td>
-                                            <td>{{ item.content_creation_cost || 0 | currencyFormat }}</td>
-                                            <td>{{ item.influencer_cost || 0 | currencyFormat }}</td>
-                                            <td class="font-semibold">{{ getTotalExtraCost(item) | currencyFormat }}</td>
+                                            <th>Product</th>
+                                            <th>Ad Run Cost</th>
+                                            <th>Packaging Cost</th>
+                                            <th>Gift Cost</th>
+                                            <th>Content Creation Cost</th>
+                                            <th>Influencer Cost</th>
+                                            <th>Total Extra Cost</th>
                                             @if (hasForSaleProductsWithCost()) {
-                                                <td>
-                                                    @if (item.intended_use === 'for_sale') {
+                                                <th>Unit Profit</th>
+                                            }
+                                            <th>Remarks</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @for (item of productsWithCostData; track item.oid) {
+                                            <tr>
+                                                <td class="font-medium">{{ item.product_name || '-' }}</td>
+                                                <td>{{ item.ad_run_cost || 0 | currencyFormat }}</td>
+                                                <td>{{ item.packaging_cost || 0 | currencyFormat }}</td>
+                                                <td>{{ item.gift_cost || 0 | currencyFormat }}</td>
+                                                <td>{{ item.content_creation_cost || 0 | currencyFormat }}</td>
+                                                <td>{{ item.influencer_cost || 0 | currencyFormat }}</td>
+                                                <td class="font-semibold">{{ getTotalExtraCost(item) | currencyFormat }}</td>
+                                                @if (hasForSaleProductsWithCost()) {
+                                                    <td>
+                                                        @if (item.intended_use === 'for_sale') {
+                                                            <span class="font-semibold" [class.text-red-600]="getUnitProfit(item) < 0" [class.text-green-700]="getUnitProfit(item) >= 0">
+                                                                {{ getUnitProfit(item) | currencyFormat }}
+                                                            </span>
+                                                        } @else {
+                                                            -
+                                                        }
+                                                    </td>
+                                                }
+                                                <td>{{ item.cost_remarks || '-' }}</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </nz-table>
+                            </div>
+                        }
+
+                        @if (currentCostBreakdownView === 1) {
+                            <div class="hidden md:block">
+                                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                    @for (item of productsWithCostData; track item.oid || $index; let i = $index) {
+                                        <nz-card [nzTitle]="costCardTitleDesktopTem" class="border border-gray-200 rounded-md">
+                                            <nz-card-meta [nzDescription]="costCardDescriptionDesktopTem"></nz-card-meta>
+                                        </nz-card>
+
+                                        <ng-template #costCardTitleDesktopTem>
+                                            <div class="flex items-center justify-between gap-2">
+                                                <p class="font-semibold text-secondary mb-0 truncate">{{ i + 1 }}. {{ item.product_name || '-' }}</p>
+                                                <p class="text-xs text-gray-700 mb-0 font-semibold">{{ getTotalExtraCost(item) | currencyFormat }}</p>
+                                            </div>
+                                        </ng-template>
+
+                                        <ng-template #costCardDescriptionDesktopTem>
+                                            <div class="space-y-2 text-sm">
+                                                @if (costFieldExists(item.ad_run_cost)) {
+                                                    <div class="flex items-center justify-between">
+                                                        <span class="text-gray-500">Ad Run Cost</span>
+                                                        <span class="font-semibold">{{ item.ad_run_cost | currencyFormat }}</span>
+                                                    </div>
+                                                }
+                                                @if (costFieldExists(item.packaging_cost)) {
+                                                    <div class="flex items-center justify-between">
+                                                        <span class="text-gray-500">Packaging Cost</span>
+                                                        <span class="font-semibold">{{ item.packaging_cost | currencyFormat }}</span>
+                                                    </div>
+                                                }
+                                                @if (costFieldExists(item.gift_cost)) {
+                                                    <div class="flex items-center justify-between">
+                                                        <span class="text-gray-500">Gift Cost</span>
+                                                        <span class="font-semibold">{{ item.gift_cost | currencyFormat }}</span>
+                                                    </div>
+                                                }
+                                                @if (costFieldExists(item.content_creation_cost)) {
+                                                    <div class="flex items-center justify-between">
+                                                        <span class="text-gray-500">Content Creation Cost</span>
+                                                        <span class="font-semibold">{{ item.content_creation_cost | currencyFormat }}</span>
+                                                    </div>
+                                                }
+                                                @if (costFieldExists(item.influencer_cost)) {
+                                                    <div class="flex items-center justify-between">
+                                                        <span class="text-gray-500">Influencer Cost</span>
+                                                        <span class="font-semibold">{{ item.influencer_cost | currencyFormat }}</span>
+                                                    </div>
+                                                }
+                                                <div class="pt-1 border-t border-gray-100 flex items-center justify-between font-semibold">
+                                                    <span class="text-gray-800">Total Extra Cost</span>
+                                                    <span>{{ getTotalExtraCost(item) | currencyFormat }}</span>
+                                                </div>
+                                                @if (item.intended_use === 'for_sale') {
+                                                    <div class="flex items-center justify-between">
+                                                        <span class="text-gray-500">Unit Profit</span>
                                                         <span class="font-semibold" [class.text-red-600]="getUnitProfit(item) < 0" [class.text-green-700]="getUnitProfit(item) >= 0">
                                                             {{ getUnitProfit(item) | currencyFormat }}
                                                         </span>
-                                                    } @else {
-                                                        -
-                                                    }
-                                                </td>
-                                            }
-                                            <td>{{ item.cost_remarks || '-' }}</td>
-                                        </tr>
+                                                    </div>
+                                                }
+                                                @if (item.cost_remarks) {
+                                                    <div class="pt-1 border-t border-gray-100">
+                                                        <span class="text-xs text-gray-500">Remarks</span>
+                                                        <p class="font-medium mb-0 mt-1">{{ item.cost_remarks }}</p>
+                                                    </div>
+                                                }
+                                            </div>
+                                        </ng-template>
                                     }
-                                </tbody>
-                            </nz-table>
-                        </div>
+                                </div>
+                            </div>
+                        }
 
                         <div class="block md:hidden space-y-3">
                             @for (item of productsWithCostData; track item.oid || $index; let i = $index) {
@@ -405,7 +491,7 @@
 
                 @if (displayFormType === 'Verify') {
                     <div id="purchase-order-verification-form">
-                        <app-order-verification-form [purchaseDetails]="{ oid: purchaseOrder.oid, products: products }" [buttonLoading]="actionLoading" (actions)="handleVerificationFormActions($event)"></app-order-verification-form>
+                        <app-order-verification-form [purchaseDetails]="{ oid: purchaseOrder.oid, products: verificationFormProducts }" [buttonLoading]="actionLoading" (actions)="handleVerificationFormActions($event)"></app-order-verification-form>
                     </div>
                 }
 

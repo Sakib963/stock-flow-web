@@ -30,11 +30,13 @@ export class ViewPurchaseOrderComponent implements OnInit {
     editMode = false;
     displayFormType = '';
     currentProductsView = 0;
+    currentCostBreakdownView = 0;
 
     purchaseOrder = signal<any | null>(null);
     products: any[] = [];
     stats: any = null;
     activity: any[] = [];
+    costDetails: any[] = [];
     productsWithCostData: any[] = [];
 
     state = signal<WindowState | null>(null);
@@ -110,7 +112,8 @@ export class ViewPurchaseOrderComponent implements OnInit {
 
                         this.purchaseOrder.set(bodyData.details || bodyData);
                         this.products = bodyData.products || bodyData?.products || [];
-                        this.productsWithCostData = this.products.filter((p) => this.hasCostData(p));
+                        this.costDetails = (bodyData.cost_details || []).filter((item: any) => this.hasCostData(item));
+                        this.productsWithCostData = this.costDetails.length ? this.costDetails : this.products.filter((p) => this.hasCostData(p));
                         this.stats = bodyData.stats || null;
                         this.activity = bodyData.activity || [];
                         this.displayFormType = '';
@@ -342,20 +345,56 @@ export class ViewPurchaseOrderComponent implements OnInit {
         const giftCost = Number(item?.gift_cost || 0);
         const contentCreationCost = Number(item?.content_creation_cost || 0);
         const influencerCost = Number(item?.influencer_cost || 0);
+        const costRemarks = `${item?.cost_remarks || ''}`.trim();
 
-        return adRunCost > 0 || packagingCost > 0 || giftCost > 0 || contentCreationCost > 0 || influencerCost > 0;
+        return adRunCost > 0 || packagingCost > 0 || giftCost > 0 || contentCreationCost > 0 || influencerCost > 0 || !!costRemarks;
     }
 
     get hasAnyCostData(): boolean {
-        return this.products.some((product) => this.hasCostData(product));
+        return this.productsWithCostData.length > 0;
     }
 
     costFieldExists(value: any): boolean {
+        if (value === null || value === undefined || value === '') {
+            return false;
+        }
         return Number(value || 0) > 0;
     }
 
     hasForSaleProductsWithCost(): boolean {
-        return this.products.some((p) => p.intended_use === 'for_sale' && this.hasCostData(p));
+        return this.productsWithCostData.some((p) => p.intended_use === 'for_sale');
+    }
+
+    get verificationFormProducts(): any[] {
+        if (!this.products?.length) {
+            return [];
+        }
+
+        if (!this.costDetails?.length) {
+            return this.products;
+        }
+
+        const costByPurchaseDetailOid = new Map(this.costDetails.map((item) => [item.oid, item]));
+
+        return this.products.map((product) => {
+            const cost = costByPurchaseDetailOid.get(product.oid);
+            if (!cost) {
+                return product;
+            }
+
+            return {
+                ...product,
+                ad_run_cost: cost.ad_run_cost ?? null,
+                packaging_cost: cost.packaging_cost ?? null,
+                gift_cost: cost.gift_cost ?? null,
+                content_creation_cost: cost.content_creation_cost ?? null,
+                influencer_cost: cost.influencer_cost ?? null,
+                cost_remarks: cost.cost_remarks ?? null,
+                intended_use: product.intended_use ?? cost.intended_use ?? null,
+                selling_price: product.selling_price ?? cost.selling_price ?? null,
+                maximum_discount: product.maximum_discount ?? cost.maximum_discount ?? null,
+            };
+        });
     }
 
     private downloadBlob(blob: Blob, filePrefix: string): void {
