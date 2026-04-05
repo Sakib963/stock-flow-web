@@ -11,7 +11,7 @@ export class Constants {
     static MOBILE_NO_REGEX = /^((01[3-9]{1})[0-9]{8})$/;
     static ONLY_NUMERIC_REGEX = /^\d+(\.\d+)?$/;
     static PAGE_SIZE = 10;
-    static AUTH_STORE_KEY = 'stockflow.auth.session.v1';
+    static AUTH_STORE_KEY = '__x9f4c2e8a1b7d6f3c0a5e9b2d4f8a11__';
 }
 
 export class HttpStatus {

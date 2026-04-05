@@ -1,7 +1,7 @@
 import { inject } from '@angular/core';
 import { ActivatedRouteSnapshot, ResolveFn, RouterStateSnapshot } from '@angular/router';
 import { Observable, catchError, finalize, tap, throwError, of } from 'rxjs';
-import { AuthService } from 'src/app/modules/auth/services/auth.service';
+import { AuthService } from '@app/modules/auth/services/auth.service';
 import { ROLES } from '../constants/constants';
 import { NoteService } from '../services/note.service';
 

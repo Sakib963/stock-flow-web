@@ -317,7 +317,14 @@ export class OrderVerificationFormComponent implements OnInit {
             },
             nzFooter: null,
             nzClosable: false,
-            nzOnOk: () => this.actions.emit({ action: 'save', data: this.form.getRawValue() }),
+            nzOnOk: () =>
+                this.actions.emit({
+                    action: 'save',
+                    data: {
+                        ...this.form.getRawValue(),
+                        draftStorageKey: this._getDraftStorageKey(),
+                    },
+                }),
         });
     }
 

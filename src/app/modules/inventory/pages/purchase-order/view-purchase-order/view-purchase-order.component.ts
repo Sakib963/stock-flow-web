@@ -43,6 +43,7 @@ export class ViewPurchaseOrderComponent implements OnInit {
     action = computed(() => this.state()?.action || 'view');
     editable = computed(() => this.action() === 'view' && this.canEdit);
     private readonly _verificationSectionId = 'purchase-order-verification-form';
+    private readonly _verificationDraftStoragePrefix = 'purchase-verification-draft';
 
     private readonly _httpService = inject(HttpService);
     private readonly _destroyRef = inject(DestroyRef);
@@ -169,9 +170,14 @@ export class ViewPurchaseOrderComponent implements OnInit {
             return;
         }
 
+        const actionData = ((event as any)?.data || {}) as Record<string, any>;
+        const draftStorageKey = typeof actionData['draftStorageKey'] === 'string' ? actionData['draftStorageKey'] : null;
+        const verifyPayload = { ...actionData };
+        delete verifyPayload['draftStorageKey'];
+
         this.actionLoading = true;
         this._httpService
-            .post(APIEndpoint.VERIFY_PURCHASE, event.data)
+            .post(APIEndpoint.VERIFY_PURCHASE, verifyPayload)
             .pipe(
                 takeUntilDestroyed(this._destroyRef),
                 finalize(() => {
@@ -181,6 +187,7 @@ export class ViewPurchaseOrderComponent implements OnInit {
             .subscribe({
                 next: (res: any) => {
                     if (res?.status === 200 && res?.body?.code === 200) {
+                        this.clearVerificationDraftState(draftStorageKey);
                         this._notificationService.success('Purchase Order', res?.body?.message || 'Purchase order verified successfully');
                         this.loadDetails();
                         return;
@@ -192,6 +199,14 @@ export class ViewPurchaseOrderComponent implements OnInit {
                     this._notificationService.error('Purchase Order', err?.error?.message || 'Failed to verify purchase order');
                 },
             });
+    }
+
+    private clearVerificationDraftState(storageKey?: string | null): void {
+        if (typeof window === 'undefined' || !storageKey) {
+            return;
+        }
+
+        window.localStorage.removeItem(storageKey);
     }
 
     cancelOrder(): void {

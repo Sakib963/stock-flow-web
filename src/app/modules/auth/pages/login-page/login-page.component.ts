@@ -11,6 +11,7 @@ import { HttpService } from '@app/core/services/http.service';
 import { finalize } from 'rxjs';
 import { AuthService } from '../../services/auth.service';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
+import { COMPANY_INFO } from '@app/core/constants/company-info';
 
 @Component({
     selector: 'app-login-page',
@@ -23,6 +24,7 @@ export class LoginPageComponent implements OnInit {
     submitted = false;
     passwordTextType!: boolean;
     queryParamValue: any;
+    readonly demoCredentials = COMPANY_INFO.demoCredentials;
 
     constructor(
         private _fb: FormBuilder,
@@ -58,8 +60,8 @@ export class LoginPageComponent implements OnInit {
     }
 
     copyToClipboard(button: HTMLButtonElement): void {
-        const password = 'stockflow123';
-        const email = 'guest@stockflow.com';
+        const password = this.demoCredentials.password;
+        const email = this.demoCredentials.email;
 
         this.form.patchValue({ email, password });
         this.handleForm();
