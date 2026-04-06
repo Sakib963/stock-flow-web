@@ -112,9 +112,9 @@ export class ViewPurchaseOrderComponent implements OnInit {
                         const bodyData = res.body.data || {};
 
                         this.purchaseOrder.set(bodyData.details || bodyData);
-                        this.products = bodyData.products || bodyData?.products || [];
-                        this.costDetails = (bodyData.cost_details || []).filter((item: any) => this.hasCostData(item));
-                        this.productsWithCostData = this.costDetails.length ? this.costDetails : this.products.filter((p) => this.hasCostData(p));
+                        this.products = bodyData.products || [];
+                        this.costDetails = bodyData.cost_details || [];
+                        this.productsWithCostData = this.costDetails;
                         this.stats = bodyData.stats || null;
                         this.activity = bodyData.activity || [];
                         this.displayFormType = '';
@@ -354,17 +354,6 @@ export class ViewPurchaseOrderComponent implements OnInit {
         return sellingPrice - verifiedUnitPrice - this.getTotalExtraCost(item);
     }
 
-    hasCostData(item: any): boolean {
-        const adRunCost = Number(item?.ad_run_cost || 0);
-        const packagingCost = Number(item?.packaging_cost || 0);
-        const giftCost = Number(item?.gift_cost || 0);
-        const contentCreationCost = Number(item?.content_creation_cost || 0);
-        const influencerCost = Number(item?.influencer_cost || 0);
-        const costRemarks = `${item?.cost_remarks || ''}`.trim();
-
-        return adRunCost > 0 || packagingCost > 0 || giftCost > 0 || contentCreationCost > 0 || influencerCost > 0 || !!costRemarks;
-    }
-
     get hasAnyCostData(): boolean {
         return this.productsWithCostData.length > 0;
     }
@@ -381,35 +370,7 @@ export class ViewPurchaseOrderComponent implements OnInit {
     }
 
     get verificationFormProducts(): any[] {
-        if (!this.products?.length) {
-            return [];
-        }
-
-        if (!this.costDetails?.length) {
-            return this.products;
-        }
-
-        const costByPurchaseDetailOid = new Map(this.costDetails.map((item) => [item.oid, item]));
-
-        return this.products.map((product) => {
-            const cost = costByPurchaseDetailOid.get(product.oid);
-            if (!cost) {
-                return product;
-            }
-
-            return {
-                ...product,
-                ad_run_cost: cost.ad_run_cost ?? null,
-                packaging_cost: cost.packaging_cost ?? null,
-                gift_cost: cost.gift_cost ?? null,
-                content_creation_cost: cost.content_creation_cost ?? null,
-                influencer_cost: cost.influencer_cost ?? null,
-                cost_remarks: cost.cost_remarks ?? null,
-                intended_use: product.intended_use ?? cost.intended_use ?? null,
-                selling_price: product.selling_price ?? cost.selling_price ?? null,
-                maximum_discount: product.maximum_discount ?? cost.maximum_discount ?? null,
-            };
-        });
+        return this.products ?? [];
     }
 
     private downloadBlob(blob: Blob, filePrefix: string): void {
