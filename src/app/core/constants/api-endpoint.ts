@@ -77,6 +77,10 @@ export class APIEndpoint {
     static GET_PURCHASE_ORDER_REPORT_INVENTORY = '/api/v1/inventory/purchase-order/get-purchase-order-report';
     static GET_PURCHASE_ORDER_PRODUCTS_REPORT_INVENTORY = '/api/v1/inventory/purchase-order/get-purchase-order-products-report';
 
+    static GET_INVENTORY_OVERVIEW_PRODUCT_LIST = '/api/v1/inventory/inventory-overview/get-product-list';
+    static GET_INVENTORY_OVERVIEW_PRODUCT_DETAILS = '/api/v1/inventory/inventory-overview/get-product-details';
+    static UPDATE_INVENTORY_OVERVIEW_PRICING = '/api/v1/inventory/inventory-overview/update-pricing';
+
     static GET_PRODUCT_LIST_FOR_OVERVIEW = '/api/v1/manager/inventory-overview/get-product-list';
     static GET_PRODUCT_DETAILS_FOR_OVERVIEW = '/api/v1/manager/inventory-overview/get-product-details';
     static UPDATE_PRICING = '/api/v1/manager/inventory-overview/update-pricing';

@@ -24,6 +24,24 @@ const routes: Routes = [
             },
         ],
     },
+    {
+        path: 'overview',
+        children: [
+            {
+                path: 'list',
+                loadComponent: () => import('./pages/overview/overview-list/overview-list.component').then((m) => m.OverviewListComponent),
+            },
+            {
+                path: ':oid',
+                loadComponent: () => import('./pages/overview/view-overview-details/view-overview-details.component').then((m) => m.ViewOverviewDetailsComponent),
+            },
+            {
+                path: '',
+                redirectTo: 'list',
+                pathMatch: 'full',
+            },
+        ],
+    },
 ];
 
 @NgModule({

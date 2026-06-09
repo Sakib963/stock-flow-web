@@ -24,11 +24,24 @@ export const INVENTORY_BREADCRUMBS: ModuleBreadcrumbConfig = {
         },
     },
 
+    // Inventory Overview Feature
+    overview: {
+        parent: [
+            { label: 'Home', url: '/', icon: 'home' },
+            { label: 'Inventory', url: '/inventory/overview' },
+            { label: 'Inventory Overview', url: '/inventory/overview/list' },
+        ],
+        pages: {
+            list: [{ label: 'List', url: '/inventory/overview/list' }],
+            view: [{ label: 'View' }],
+        },
+    },
+
     // Purchase Order Feature
     'purchase-order': {
         parent: [
             { label: 'Home', url: '/', icon: 'home' },
-            { label: 'Inventory', url: '/inventory/stats' },
+            { label: 'Inventory', url: '/inventory/overview' },
             { label: 'Purchase Orders', url: '/inventory/purchase-order/list' },
         ],
         pages: {

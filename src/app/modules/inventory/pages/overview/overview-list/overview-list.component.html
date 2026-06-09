@@ -1,0 +1,55 @@
+<page-header [title]="'Inventory Overview'" [description]="'Monitor stock levels, batch status, and financial insights across all products'" [pageKey]="'inventory.overview.list'" [showBackButton]="false" [contentTemplate]="headerFilters"> </page-header>
+
+<ng-template #headerFilters>
+    <nz-divider class="mt-0 mb-4"></nz-divider>
+    <div class="flex flex-wrap gap-4 items-center">
+        <nz-select class="mb-4 md:mb-0 w-full md:w-60" nzAllowClear nzPlaceHolder="Filter by Category" [nzLoading]="categoryLoading()" [formControl]="categoryControl">
+            @for (category of categoryList; track category.value) {
+                <nz-option [nzLabel]="category.label" [nzValue]="category.value"> </nz-option>
+            }
+        </nz-select>
+        <nz-select class="mb-4 md:mb-0 w-full md:w-60" nzAllowClear nzPlaceHolder="Filter by Sub-Category" [nzLoading]="subCategoryLoading()" [formControl]="subCategoryControl" [nzNotFoundContent]="subCategoryList.length === 0 ? 'Please select a category first' : 'No sub-categories found'">
+            @for (subCategory of subCategoryList; track subCategory.value) {
+                <nz-option [nzLabel]="subCategory.label" [nzValue]="subCategory.value"> </nz-option>
+            }
+        </nz-select>
+        <nz-select class="w-full md:w-60" nzAllowClear nzPlaceHolder="Filter by Brand" [nzLoading]="brandLoading()" [formControl]="brandControl">
+            @for (brand of brandList; track brand.value) {
+                <nz-option [nzLabel]="brand.label" [nzValue]="brand.value"> </nz-option>
+            }
+        </nz-select>
+        <!-- <nz-select class="w-full md:w-44" nzAllowClear nzPlaceHolder="Category" nzShowSearch [formControl]="categoryControl">
+            <nz-option *ngFor="let cat of categoryList" [nzLabel]="cat.label" [nzValue]="cat.value"></nz-option>
+        </nz-select>
+        <nz-select class="w-full md:w-44" nzAllowClear nzPlaceHolder="Sub-Category" nzShowSearch [formControl]="subCategoryControl">
+            <nz-option *ngFor="let sub of subCategoryList" [nzLabel]="sub.label" [nzValue]="sub.value"></nz-option>
+        </nz-select>
+        <nz-select class="w-full md:w-44" nzAllowClear nzPlaceHolder="Brand" nzShowSearch [formControl]="brandControl">
+            <nz-option *ngFor="let brand of brandList" [nzLabel]="brand.label" [nzValue]="brand.value"></nz-option>
+        </nz-select>
+        <nz-select class="w-full md:w-36" nzAllowClear nzPlaceHolder="Status" [formControl]="statusControl">
+            <nz-option *ngFor="let s of statusList" [nzLabel]="s.label" [nzValue]="s.value"></nz-option>
+        </nz-select>
+        <nz-input-group [nzPrefix]="prefixSearch" class="w-full md:w-72">
+            <input type="text" nz-input placeholder="Search by product name or batch code..." [formControl]="searchControl" />
+        </nz-input-group>
+        <ng-template #prefixSearch>
+            <span nz-icon nzType="search"></span>
+        </ng-template>
+        <button nz-button nzType="default" nzDanger (click)="resetFilters()">
+            <nz-icon nzType="redo"></nz-icon>
+            Reset
+        </button> -->
+    </div>
+</ng-template>
+
+@if (pageLoading) {
+    <div class="flex justify-center items-center py-20">
+        <app-loader [isVisible]="true"></app-loader>
+    </div>
+} @else {
+    <nz-divider class="my-0"></nz-divider>
+    <div class="p-4">
+        <adaptive-list [dataSource]="data" [tableConfig]="tableConfig" [loading]="tableLoading" [totalCount]="totalCount" [pageSize]="payload.limit" [pageIndex]="payload.offset / payload.limit" (actionEvent)="handleListActions($event)" (paginationChange)="handlePaginationEvent($event)"> </adaptive-list>
+    </div>
+}

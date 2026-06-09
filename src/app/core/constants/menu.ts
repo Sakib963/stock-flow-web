@@ -109,7 +109,7 @@ export class Menu {
                 {
                     icon: 'assets/icons/inventory.svg',
                     label: 'Overview',
-                    route: '/manager/inventory/overview',
+                    route: '/inventory/overview/list',
                 },
                 {
                     icon: 'assets/icons/purchase.svg',
