@@ -235,7 +235,7 @@ export class PrintService {
           <div class="company">${data.companyName}</div>
           <div class="product">${data.productName}</div>
           <svg id="barcode"></svg>
-          <div class="price">৳ ${data.price?.toFixed(2)}</div>
+          ${data.price != null ? `<div class="price">৳ ${data.price.toFixed(2)}</div>` : ''}
         </div>
 
         <script>

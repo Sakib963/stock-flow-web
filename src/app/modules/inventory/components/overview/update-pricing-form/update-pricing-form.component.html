@@ -1,10 +1,9 @@
 <div class="rounded-md bg-white max-w-full w-full">
     <form nz-form [formGroup]="form" [nzLayout]="'vertical'" (ngSubmit)="handleSubmit()" class="space-y-4">
-        <div class="border-[0.5px] p-4 rounded-sm">
-            <h2 class="text-xl font-medium mb-4">Update Pricing — {{ modalData.batch_code }}</h2>
+        <div class="">
             <nz-alert nzType="info" nzShowIcon class="mb-4" [nzMessage]="null" [innerHTML]="getPerUnitPriceText()"> </nz-alert>
 
-            <div class="grid grid-cols-1 gap-4">
+            <div class="grid grid-cols-1">
                 <nz-form-item>
                     <nz-form-label [nzRequired]="hasRequiredValidator('selling_price')">
                         Selling Price
@@ -67,19 +66,16 @@
                     </nz-form-control>
                 </nz-form-item>
 
-                <nz-alert nzType="warning" [nzMessage]="getMaximumDiscountText()" nzShowIcon nzBorderless></nz-alert>
+                <div class="flex flex-col gap-4">
+                    <nz-alert nzType="warning" [nzMessage]="getMaximumDiscountText()" nzShowIcon nzBorderless></nz-alert>
 
-                <nz-alert
-                    [nzType]="hasNegativeUnitProfit() ? 'error' : 'success'"
-                    [nzMessage]="getUnitProfitHintText()"
-                    nzShowIcon
-                    nzBorderless
-                ></nz-alert>
+                    <nz-alert [nzType]="hasNegativeUnitProfit() ? 'error' : 'success'" [nzMessage]="getUnitProfitHintText()" nzShowIcon nzBorderless></nz-alert>
+                </div>
             </div>
         </div>
 
         <div class="flex justify-end gap-3">
-            <button nz-button nzType="default" type="button" (click)="closeModal()">Cancel</button>
+            <button nz-button nzType="default" type="button" (click)="closeDrawer()"><nz-icon nzType="close"></nz-icon> Cancel</button>
             <button nz-button nzType="primary" type="submit">Submit</button>
         </div>
     </form>

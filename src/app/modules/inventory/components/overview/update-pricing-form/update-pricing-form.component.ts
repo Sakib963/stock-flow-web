@@ -2,10 +2,11 @@ import { Component, Inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { NgZorroCustomModule } from '@app/shared/ng-zorro-custom.module';
-import { NZ_MODAL_DATA, NzModalRef, NzModalService } from 'ng-zorro-antd/modal';
+import { NZ_DRAWER_DATA, NzDrawerRef } from 'ng-zorro-antd/drawer';
+import { NzModalService } from 'ng-zorro-antd/modal';
 import { checkRequiredValidator, markFormGroupTouched } from '@app/core/constants/helper';
 
-export interface UpdatePricingModalData {
+export interface UpdatePricingDrawerData {
     formData: {
         oid: string;
         selling_price: number | null;
@@ -31,8 +32,8 @@ export class UpdatePricingFormComponent implements OnInit {
     form!: FormGroup;
 
     constructor(
-        @Inject(NZ_MODAL_DATA) public modalData: UpdatePricingModalData,
-        private _modalRef: NzModalRef,
+        @Inject(NZ_DRAWER_DATA) public drawerData: UpdatePricingDrawerData,
+        private _drawerRef: NzDrawerRef,
         private _fb: FormBuilder,
         private _modal: NzModalService
     ) {}
@@ -50,10 +51,10 @@ export class UpdatePricingFormComponent implements OnInit {
             cost_remarks: [null, [Validators.maxLength(500)]],
         });
 
-        if (this.modalData?.formData) {
-            this.form.patchValue(this.modalData.formData);
+        if (this.drawerData?.formData) {
+            this.form.patchValue(this.drawerData.formData);
         } else {
-            this.closeModal();
+            this.closeDrawer();
         }
     }
 
@@ -69,16 +70,16 @@ export class UpdatePricingFormComponent implements OnInit {
                 nzContent: 'Current inputs indicate a negative unit profit. Do you still want to continue?',
                 nzOkText: 'Continue',
                 nzCancelText: 'Review Values',
-                nzOnOk: () => this._modalRef.destroy(this.form.value),
+                nzOnOk: () => this._drawerRef.close(this.form.value),
             });
             return;
         }
 
-        this._modalRef.destroy(this.form.value);
+        this._drawerRef.close(this.form.value);
     }
 
-    closeModal(): void {
-        this._modalRef.destroy();
+    closeDrawer(): void {
+        this._drawerRef.close();
     }
 
     hasRequiredValidator(controlName: string): boolean {
@@ -87,7 +88,7 @@ export class UpdatePricingFormComponent implements OnInit {
     }
 
     getPerUnitPriceText(): string {
-        const { cost_price, batch_code } = this.modalData;
+        const { cost_price, batch_code } = this.drawerData;
         if (cost_price && batch_code) {
             return `Per unit cost for batch <strong>${batch_code}</strong> is <strong>${cost_price} BDT</strong>.`;
         }
@@ -98,7 +99,7 @@ export class UpdatePricingFormComponent implements OnInit {
         const sellingPrice = Number(this.form.get('selling_price')?.value || 0);
         const maxDiscount = Number(this.form.get('maximum_discount')?.value || 0);
         if (sellingPrice && maxDiscount) {
-            return `Maximum discount: ${maxDiscount} ৳ – Price after max discount: ${sellingPrice - maxDiscount} ৳`;
+            return `Maximum discount: ${maxDiscount} ৳. Price after max discount: ${sellingPrice - maxDiscount} ৳`;
         }
         return 'Enter Selling Price and Maximum Discount to see the calculated price.';
     }
@@ -115,7 +116,7 @@ export class UpdatePricingFormComponent implements OnInit {
 
     getUnitProfit(): number {
         const sellingPrice = Number(this.form.get('selling_price')?.value || 0);
-        return sellingPrice - Number(this.modalData?.cost_price || 0) - this.getTotalExtraCostPerUnit();
+        return sellingPrice - Number(this.drawerData?.cost_price || 0) - this.getTotalExtraCostPerUnit();
     }
 
     hasNegativeUnitProfit(): boolean {
@@ -125,7 +126,7 @@ export class UpdatePricingFormComponent implements OnInit {
     getUnitProfitHintText(): string {
         const unitProfit = this.getUnitProfit();
         const extraCost = this.getTotalExtraCostPerUnit();
-        return `Unit Profit = Selling Price − Purchase Cost − Extra Costs = ${unitProfit} BDT (extra costs: ${extraCost} BDT)`;
+        return `Unit Profit = Selling Price - Purchase Cost - Extra Costs = ${unitProfit} BDT (extra costs: ${extraCost} BDT)`;
     }
 
     getTooltipText(field: string): string {

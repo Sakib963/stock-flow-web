@@ -8,12 +8,12 @@ import { COMPANY_INFO } from '@app/core/constants/company-info';
 import { DROPDOWN_OPTIONS } from '@app/core/constants/dropdown-options';
 import { HttpService } from '@app/core/services/http.service';
 import { PrintService } from '@app/core/services/print.service';
-import { UpdatePricingFormComponent, UpdatePricingModalData } from '@app/modules/inventory/components/overview/update-pricing-form/update-pricing-form.component';
+import { UpdatePricingDrawerData, UpdatePricingFormComponent } from '@app/modules/inventory/components/overview/update-pricing-form/update-pricing-form.component';
 import { LoaderComponent } from '@app/shared/components/loader/loader.component';
 import { PageHeaderComponent } from '@app/shared/components/page-header/page-header.component';
 import { NgZorroCustomModule } from '@app/shared/ng-zorro-custom.module';
 import { CurrencyFormatPipe } from '@app/shared/pipe/currency-format.pipe';
-import { NzModalService } from 'ng-zorro-antd/modal';
+import { NzDrawerService } from 'ng-zorro-antd/drawer';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { NgxBarcode6Module } from 'ngx-barcode6';
 import { finalize } from 'rxjs';
@@ -39,12 +39,11 @@ export class ViewOverviewDetailsComponent implements OnInit {
         price: number | null;
         quantityAvailable: number;
     } | null = null;
-    printQuantity = 1;
 
     private readonly _httpService = inject(HttpService);
     private readonly _destroyRef = inject(DestroyRef);
     private readonly _notificationService = inject(NzNotificationService);
-    private readonly _modalService = inject(NzModalService);
+    private readonly _drawerService = inject(NzDrawerService);
     private readonly _printService = inject(PrintService);
     private readonly _activatedRoute = inject(ActivatedRoute);
     private readonly _router = inject(Router);
@@ -93,7 +92,7 @@ export class ViewOverviewDetailsComponent implements OnInit {
     redirectToProduct(): void {
         const oid = this.productDetails()?.oid;
         if (oid) {
-            this._router.navigate([`/configuration/product/${oid}`], { state: { edit: false } });
+            this._router.navigate([`/configuration/product/view/${oid}`], { state: { edit: false } });
         }
     }
 
@@ -120,8 +119,8 @@ export class ViewOverviewDetailsComponent implements OnInit {
         return item.intended_use === 'for_sale';
     }
 
-    displayUpdatePricingModal(item: any): void {
-        const modalData: UpdatePricingModalData = {
+    displayUpdatePricingDrawer(item: any): void {
+        const drawerData: UpdatePricingDrawerData = {
             formData: {
                 oid: item.inventory_oid,
                 selling_price: item.selling_price,
@@ -137,14 +136,15 @@ export class ViewOverviewDetailsComponent implements OnInit {
             batch_code: item.batch_code,
         };
 
-        const modal = this._modalService.create({
+        const drawerRef = this._drawerService.create<UpdatePricingFormComponent, UpdatePricingDrawerData, any>({
+            nzTitle: `Update Pricing - ${item.batch_code}`,
             nzContent: UpdatePricingFormComponent,
-            nzFooter: null,
-            nzClosable: false,
-            nzData: modalData,
+            nzData: drawerData,
+            nzWidth: 480,
+            nzMaskClosable: false,
         });
 
-        modal.afterClose.subscribe((result) => {
+        drawerRef.afterClose.subscribe((result) => {
             if (result) {
                 this.updatePricing(result);
             }
@@ -188,7 +188,6 @@ export class ViewOverviewDetailsComponent implements OnInit {
             price: showPrice ? item.selling_price : null,
             quantityAvailable: item.quantity_available,
         };
-        this.printQuantity = 1;
         this.isBarcodeDrawerVisible = true;
     }
 

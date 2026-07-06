@@ -142,11 +142,11 @@
                                                 Aisle: <span class="font-medium">{{ item.aisle_name || '-' }}</span>
                                             </p>
                                         </div>
-                                        <div>
-                                            <span nz-dropdown [nzDropdownMenu]="batchMenu" class="text-xs text-gray-700 hover:text-primary cursor-pointer"> Actions <nz-icon nzType="down"></nz-icon> </span>
+                                        <div class="flex items-center gap-2 h-full">
+                                            <span nz-dropdown [nzDropdownMenu]="batchMenu" class="text-xs text-gray-700 hover:text-primary cursor-pointer font-bold flex items-center gap-1"> Actions <nz-icon nzType="down"></nz-icon> </span>
                                             <nz-dropdown-menu #batchMenu="nzDropdownMenu">
                                                 <ul nz-menu>
-                                                    <li nz-menu-item [nzDisabled]="!canUpdatePricing(item)" (click)="canUpdatePricing(item) && displayUpdatePricingModal(item)"><nz-icon nzType="dollar"></nz-icon> Update Pricing</li>
+                                                    <li nz-menu-item [nzDisabled]="!canUpdatePricing(item)" (click)="canUpdatePricing(item) && displayUpdatePricingDrawer(item)"><nz-icon nzType="dollar"></nz-icon> Update Pricing</li>
                                                     <li nz-menu-item (click)="generateBarcode(item)"><nz-icon nzType="barcode"></nz-icon> Generate Barcode</li>
                                                 </ul>
                                             </nz-dropdown-menu>
@@ -204,7 +204,7 @@
 
 <ng-template #drawerFooter>
     <div class="flex justify-end gap-3">
-        <button nz-button nzType="default" (click)="closeDrawer()">Cancel</button>
-        <button nz-button nzType="primary" (click)="printBarcode()" [nzLoading]="false">Print Barcode</button>
+        <button nz-button nzType="default" (click)="closeDrawer()"><nz-icon nzType="close"></nz-icon> Cancel</button>
+        <button nz-button nzType="primary" (click)="printBarcode()" [nzLoading]="false"><nz-icon nzType="barcode"></nz-icon> Print Barcode</button>
     </div>
 </ng-template>
