@@ -543,7 +543,7 @@ export class AnalyticsComponent implements OnInit, AfterViewInit, OnDestroy {
         const routes: Record<string, string> = {
             'purchase-order': '/manager/inventory/purchase-order/view',
             'product-return': '/manager/inventory/product-return/view',
-            'product-dispose': '/manager/inventory/product-dispose/view',
+            'product-dispose': '/inventory/product-dispose',
         };
         const route = routes[type];
         if (route) {

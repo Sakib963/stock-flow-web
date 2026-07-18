@@ -1,0 +1,11 @@
+<page-header [title]="'Create Disposal'" [description]="'Write off unsellable stock across one or more batches'" [pageKey]="'inventory.product-dispose.create'" [showBackButton]="false" [extraTemplate]="headerActions"> </page-header>
+
+<ng-template #headerActions>
+    <button nz-button nzType="default" (click)="goBack()">
+        <nz-icon nzType="left" nzTheme="outline"></nz-icon>
+        Back
+    </button>
+</ng-template>
+
+<nz-divider class="my-0"></nz-divider>
+<product-dispose-form (actions)="onFormActions($event)" [buttonLoading]="buttonLoading()"></product-dispose-form>

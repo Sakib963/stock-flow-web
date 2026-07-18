@@ -111,10 +111,16 @@ export class APIEndpoint {
     static GET_PRODUCT_RETURN_LIST_FOR_MANAGER = '/api/v1/manager/product-return/get-product-return-list';
     static GET_PRODUCT_RETURN_DETAILS_FOR_MANAGER = '/api/v1/manager/product-return/get-product-return-details';
 
-    static GET_PRODUCT_LIST_FOR_DISPOSE_DROPDOWN = '/api/v1/manager/product-dispose/get-product-list-for-dispose-dropdown';
-    static CREATE_PRODUCT_DISPOSE = '/api/v1/manager/product-dispose/create-product-dispose';
-    static GET_PRODUCT_DISPOSE_LIST = '/api/v1/manager/product-dispose/get-product-dispose-list';
-    static GET_PRODUCT_DISPOSE_DETAILS = '/api/v1/manager/product-dispose/get-product-dispose-details';
+    // Inventory Product Dispose APIs (revamp)
+    static GET_PRODUCT_DISPOSE_LIST = '/api/v1/inventory/product-dispose/get-product-dispose-list';
+    static CREATE_PRODUCT_DISPOSE = '/api/v1/inventory/product-dispose/create-product-dispose';
+    static UPDATE_PRODUCT_DISPOSE_DETAILS = '/api/v1/inventory/product-dispose/update-product-dispose-details';
+    static GET_PRODUCT_DISPOSE_DETAILS = '/api/v1/inventory/product-dispose/get-product-dispose-details';
+    static APPROVE_PRODUCT_DISPOSE = '/api/v1/inventory/product-dispose/approve-product-dispose';
+    static REJECT_PRODUCT_DISPOSE = '/api/v1/inventory/product-dispose/reject-product-dispose';
+    static CANCEL_PRODUCT_DISPOSE = '/api/v1/inventory/product-dispose/cancel-product-dispose';
+    static REVERSE_PRODUCT_DISPOSE = '/api/v1/inventory/product-dispose/reverse-product-dispose';
+    static GET_PRODUCT_LIST_FOR_DISPOSE_DROPDOWN = '/api/v1/inventory/product-dispose/get-product-list-for-dispose-dropdown';
 
     static CHANGE_PASSWORD = '/api/v1/profile/change-password/change-user-password';
     static VERIFY_OTP_FOR_PASSWORD_CHANGE = '/api/v1/profile/change-password/verify-otp-for-password-change';

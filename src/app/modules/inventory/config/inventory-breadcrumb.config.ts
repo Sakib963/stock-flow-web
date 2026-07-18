@@ -51,4 +51,19 @@ export const INVENTORY_BREADCRUMBS: ModuleBreadcrumbConfig = {
             edit: [{ label: 'Edit' }],
         },
     },
+
+    // Product Dispose Feature
+    'product-dispose': {
+        parent: [
+            { label: 'Home', url: '/', icon: 'home' },
+            { label: 'Inventory', url: '/inventory/overview' },
+            { label: 'Product Dispose', url: '/inventory/product-dispose/list' },
+        ],
+        pages: {
+            list: [{ label: 'List', url: '/inventory/product-dispose/list' }],
+            create: [{ label: 'Create' }],
+            view: [{ label: 'View' }],
+            edit: [{ label: 'Edit' }],
+        },
+    },
 };

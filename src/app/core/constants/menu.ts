@@ -129,20 +129,20 @@ export class Menu {
                 {
                     icon: 'assets/icons/dispose.svg',
                     label: 'Dispose',
-                    route: '/manager/inventory/product-dispose',
+                    route: '/inventory/product-dispose/list',
                 },
             ],
         },
-        {
-            group: 'Employee',
-            items: [
-                {
-                    icon: 'assets/icons/calendar.svg',
-                    label: 'Attendance',
-                    route: '/manager/employee/attendance',
-                },
-            ],
-        },
+        // {
+        //     group: 'Employee',
+        //     items: [
+        //         {
+        //             icon: 'assets/icons/calendar.svg',
+        //             label: 'Attendance',
+        //             route: '/manager/employee/attendance',
+        //         },
+        //     ],
+        // },
         {
             group: 'Analytics',
             icon: 'assets/icons/analytics.svg',
@@ -192,15 +192,15 @@ export class Menu {
                 },
             ],
         },
-        {
-            group: 'Employee',
-            items: [
-                {
-                    icon: 'assets/icons/calendar.svg',
-                    label: 'Attendance',
-                    route: '/shared/attendance',
-                },
-            ],
-        },
+        // {
+        //     group: 'Employee',
+        //     items: [
+        //         {
+        //             icon: 'assets/icons/calendar.svg',
+        //             label: 'Attendance',
+        //             route: '/shared/attendance',
+        //         },
+        //     ],
+        // },
     ];
 }

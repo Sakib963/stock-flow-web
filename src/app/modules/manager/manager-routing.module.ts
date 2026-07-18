@@ -96,28 +96,6 @@ const routes: Routes = [
                             },
                         ],
                     },
-                    {
-                        path: 'product-dispose',
-                        children: [
-                            {
-                                path: '',
-                                redirectTo: 'list',
-                                pathMatch: 'full',
-                            },
-                            {
-                                path: 'list',
-                                loadComponent: () => import('./pages/inventory/product-dispose/display-product-dispose-list/display-product-dispose-list.component').then((m) => m.DisplayProductDisposeListComponent),
-                            },
-                            {
-                                path: 'create-product-dispose',
-                                loadComponent: () => import('./pages/inventory/product-dispose/create-product-dispose/create-product-dispose.component').then((m) => m.CreateProductDisposeComponent),
-                            },
-                            {
-                                path: 'view-product-dispose/:oid',
-                                loadComponent: () => import('./pages/inventory/product-dispose/view-product-dispose-details/view-product-dispose-details.component').then((m) => m.ViewProductDisposeDetailsComponent),
-                            },
-                        ],
-                    },
                 ],
             },
             {

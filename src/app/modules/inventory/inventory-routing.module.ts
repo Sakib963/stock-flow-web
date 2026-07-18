@@ -25,6 +25,28 @@ const routes: Routes = [
         ],
     },
     {
+        path: 'product-dispose',
+        children: [
+            {
+                path: 'list',
+                loadComponent: () => import('./pages/product-dispose/product-dispose-list/product-dispose-list.component').then((m) => m.ProductDisposeListComponent),
+            },
+            {
+                path: 'create',
+                loadComponent: () => import('./pages/product-dispose/create-product-dispose/create-product-dispose.component').then((m) => m.CreateProductDisposeComponent),
+            },
+            {
+                path: ':oid',
+                loadComponent: () => import('./pages/product-dispose/view-product-dispose/view-product-dispose.component').then((m) => m.ViewProductDisposeComponent),
+            },
+            {
+                path: '',
+                redirectTo: 'list',
+                pathMatch: 'full',
+            },
+        ],
+    },
+    {
         path: 'overview',
         children: [
             {

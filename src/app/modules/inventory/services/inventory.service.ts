@@ -23,6 +23,11 @@ export class InventoryService {
         return this._http.post(url, data);
     }
 
+    // Generic POST for workflow transitions (approve / reject / cancel / reverse)
+    action$(url: string, data: any): Observable<HttpResponse<any>> {
+        return this._http.post(url, data);
+    }
+
     downloadReport$(url: string, data?: any): Observable<any> {
         return this._http.downloadFile(url, data);
     }
