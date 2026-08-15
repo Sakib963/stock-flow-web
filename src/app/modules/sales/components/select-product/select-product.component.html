@@ -1,0 +1,79 @@
+<app-loader *ngIf="loading" [isVisible]="loading"></app-loader>
+<div *ngIf="!loading" class="space-y-4">
+      <form nz-form [formGroup]="form" [nzLayout]="'vertical'" (ngSubmit)="addToInvoice()">
+            <nz-form-item>
+                  <nz-form-label [nzRequired]="hasRequiredValidator('search_input')" class="font-semibold">Search Product</nz-form-label>
+                  <nz-form-control>
+                        <nz-select nzShowSearch nzAllowClear nzPlaceHolder="Search by product name, SKU, batch or category"
+                              formControlName="search_input" (ngModelChange)="onProductSelectedById($event)"
+                              [nzSize]="'large'" (nzOnSearch)="onChange($event)">
+                              <nz-option-group *ngFor="let group of filteredProductList"
+                                    [nzLabel]="group.sub_category + ' - ' + group.parent_category">
+                                    <nz-option *ngFor="let item of group.children" [nzValue]="item.inventory_oid"
+                                          [nzLabel]="getProductDisplayLabel(item)">
+                                    </nz-option>
+                              </nz-option-group>
+                        </nz-select>
+                  </nz-form-control>
+            </nz-form-item>
+            <nz-card [nzTitle]="cardTitle">
+                  <div class="grid grid-cols-1 md:gap-x-6 md:grid-cols-2 lg:grid-cols-7">
+                        <nz-form-item class="col-span-2">
+                              <nz-form-label [nzRequired]="hasRequiredValidator('product_oid')">Product</nz-form-label>
+                              <nz-form-control>
+                                    <input nz-input [value]="getProductDisplayLabel(selectedProduct)" disabled />
+                              </nz-form-control>
+                        </nz-form-item>
+
+                        <nz-form-item>
+                              <nz-form-label [nzRequired]="hasRequiredValidator('unit_price')">Unit Price</nz-form-label>
+                              <nz-form-control>
+                                    <input nz-input [value]="getProductUnitPriceLabel(selectedProduct)" disabled />
+                              </nz-form-control>
+                        </nz-form-item>
+
+                        <nz-form-item>
+                              <nz-form-label [nzRequired]="hasRequiredValidator('quantity_available')">Available</nz-form-label>
+                              <nz-form-control>
+                                    <input nz-input [value]="selectedProduct?.quantity_available" disabled />
+                              </nz-form-control>
+                        </nz-form-item>
+
+                        <nz-form-item>
+                              <nz-form-label [nzRequired]="hasRequiredValidator('quantity')">Quantity</nz-form-label>
+                              <nz-form-control>
+                                    <nz-input-number class="w-full" formControlName="quantity" [nzMin]="1"
+                                          [nzMax]="selectedProduct?.quantity_available"></nz-input-number>
+                              </nz-form-control>
+                        </nz-form-item>
+
+                        <nz-form-item>
+                              <nz-form-label [nzTooltipTitle]="getDiscountTooltip()"
+                                    [nzTooltipIcon]="discountTooltipIcon"
+                                    [nzRequired]="hasRequiredValidator('discount')">Discount</nz-form-label>
+                              <nz-form-control>
+                                    <nz-input-number class="w-full" formControlName="discount" [nzMin]="0"
+                                          [nzMax]="selectedProduct ? getMaxDiscountAmount() : 0"></nz-input-number>
+                              </nz-form-control>
+                        </nz-form-item>
+
+                        <nz-form-item>
+                              <nz-form-label [nzRequired]="hasRequiredValidator('total')">Total</nz-form-label>
+                              <nz-form-control>
+                                    <input nz-input [value]="getTotalPrice() | currency:'৳':'symbol'" disabled />
+                              </nz-form-control>
+                        </nz-form-item>
+                  </div>
+                  <ng-template #cardTitle>
+                        <div class="flex justify-between items-center">
+                              <span class="text-lg font-semibold">Add Product</span>
+                              <div class="flex items-center gap-2">
+                                    <button [disabled]="form.invalid" type="button" (click)="clearSelection()" nz-button
+                                          nzDanger>Clear</button>
+                                    <button [disabled]="form.invalid" nz-button nzType="primary">Add to Invoice</button>
+                              </div>
+                        </div>
+                  </ng-template>
+            </nz-card>
+      </form>
+</div>

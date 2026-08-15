@@ -1,4 +1,5 @@
 import { MenuItem } from '../models/menu.model';
+import { isOnlineEnabled, isPosEnabled } from './company-info';
 
 export class Menu {
     static adminPages: MenuItem[] = [
@@ -143,6 +144,36 @@ export class Menu {
         //         },
         //     ],
         // },
+        {
+            group: 'Sales & Orders',
+            icon: 'assets/icons/purchase.svg',
+            // Intake links depend on the shop's order system (company-info). Orders list is always shown.
+            items: [
+                ...(isPosEnabled()
+                    ? [
+                          {
+                              icon: 'assets/icons/purchase.svg',
+                              label: 'POS Sale',
+                              route: '/sales/pos',
+                          },
+                      ]
+                    : []),
+                ...(isOnlineEnabled()
+                    ? [
+                          {
+                              icon: 'assets/icons/invoice.svg',
+                              label: 'Online Order',
+                              route: '/sales/online',
+                          },
+                      ]
+                    : []),
+                {
+                    icon: 'assets/icons/report.svg',
+                    label: 'Orders',
+                    route: '/sales/orders/list',
+                },
+            ],
+        },
         {
             group: 'Analytics',
             icon: 'assets/icons/analytics.svg',

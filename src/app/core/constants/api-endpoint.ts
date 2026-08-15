@@ -122,6 +122,26 @@ export class APIEndpoint {
     static REVERSE_PRODUCT_DISPOSE = '/api/v1/inventory/product-dispose/reverse-product-dispose';
     static GET_PRODUCT_LIST_FOR_DISPOSE_DROPDOWN = '/api/v1/inventory/product-dispose/get-product-list-for-dispose-dropdown';
 
+    // Sales & Orders module (revamp) — POS + online on the `orders` spine
+    static POS_GET_PRODUCT_LIST = '/api/v1/sales/pos/get-product-list';
+    static POS_GET_INVOICE_NUMBER = '/api/v1/sales/pos/get-invoice-number';
+    static POS_CHECKOUT = '/api/v1/sales/pos/checkout';
+    static POS_SAVE_DRAFT = '/api/v1/sales/pos/save-draft';
+    static ONLINE_SMART_FILL = '/api/v1/sales/online/smart-fill';
+    static ONLINE_CREATE_ORDER = '/api/v1/sales/online/create-online-order';
+    static ONLINE_SAVE_DRAFT = '/api/v1/sales/online/save-draft';
+    static ONLINE_CREATE_PREORDER = '/api/v1/sales/online/create-preorder';
+    static ONLINE_CONVERT_PREORDER = '/api/v1/sales/online/convert-preorder';
+    static ONLINE_PREORDERS_FOR_PRODUCT = '/api/v1/sales/online/get-preorders-for-product';
+    static ORDER_LIST = '/api/v1/sales/order/get-order-list';
+    static ORDER_DETAILS = '/api/v1/sales/order/get-order-details';
+    static ORDER_CONFIRM = '/api/v1/sales/order/confirm';
+    static ORDER_CANCEL = '/api/v1/sales/order/cancel';
+    static ORDER_DELIVER = '/api/v1/sales/order/deliver';
+    static ORDER_EDIT_PENDING = '/api/v1/sales/order/edit-pending';
+    static ORDER_CREATE_RETURN = '/api/v1/sales/order/create-return';
+    static DELIVERY_SEND_FOR_DELIVERY = '/api/v1/sales/delivery/send-for-delivery';
+
     static CHANGE_PASSWORD = '/api/v1/profile/change-password/change-user-password';
     static VERIFY_OTP_FOR_PASSWORD_CHANGE = '/api/v1/profile/change-password/verify-otp-for-password-change';
 
