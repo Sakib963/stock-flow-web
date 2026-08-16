@@ -206,16 +206,15 @@ export class OrderDetailComponent {
         this._router.navigate(['/sales/online'], { state: { editOid: this.oid } });
     }
 
-    // Report/export: print an invoice receipt for this order.
+    // Print / export: three documents, all branded from Settings.
+    printReceipt(): void {
+        if (this.order()) this._print.printReceipt(this.order());
+    }
     printInvoice(): void {
-        const o = this.order();
-        if (!o) return;
-        this._print.printReceipt({
-            invoice_no: o.invoice_no,
-            created_on: o.created_on,
-            total_amount: Number(o.total_amount) || 0,
-            products: (o.items || []).map((i: any) => ({ product_name: i.product_name, quantity: Number(i.quantity) || 0, total: Number(i.total) || 0 })),
-        });
+        if (this.order()) this._print.printInvoice(this.order());
+    }
+    printLabel(): void {
+        if (this.order()) this._print.printLabel(this.order());
     }
 
     goBack(): void {

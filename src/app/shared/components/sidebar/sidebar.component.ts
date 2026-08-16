@@ -2,6 +2,7 @@ import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '@app/modules/auth/services/auth.service';
 import { SessionService } from '@app/core/services/session.service';
+import { SettingsService } from '@app/core/services/settings.service';
 import { Menu } from '@app/core/constants/menu';
 import { Router, RouterLink } from '@angular/router';
 import { ROLES } from '@app/core/constants/constants';
@@ -19,11 +20,16 @@ export class SidebarComponent implements OnInit {
   userRole: string = '';
   menu: any = [];
 
-  constructor(private _authService: AuthService, private _router: Router) {}
+  constructor(private _authService: AuthService, private _router: Router, private _settings: SettingsService) {}
 
   ngOnInit(): void {
+    // Capture role now (synchronous), then build the menu once settings are loaded
+    // so the channel-dependent items reflect the shop's order_system.
     this.userRole = this._authService.currentUserRole;
+    this._settings.ensureLoaded().finally(() => this.buildMenu());
+  }
 
+  private buildMenu(): void {
     if (this.userRole === ROLES.ADMIN) {
       this.menu = Menu.adminPages;
     } else if (this.userRole === ROLES.MANAGER) {

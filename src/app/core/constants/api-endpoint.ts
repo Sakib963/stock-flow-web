@@ -111,6 +111,10 @@ export class APIEndpoint {
     static GET_PRODUCT_RETURN_LIST_FOR_MANAGER = '/api/v1/manager/product-return/get-product-return-list';
     static GET_PRODUCT_RETURN_DETAILS_FOR_MANAGER = '/api/v1/manager/product-return/get-product-return-details';
 
+    // Settings (business profile + delivery defaults)
+    static GET_SETTINGS = '/api/v1/configuration/settings/get-settings';
+    static UPDATE_SETTINGS = '/api/v1/configuration/settings/update-settings';
+
     // Inventory Product Dispose APIs (revamp)
     static GET_PRODUCT_DISPOSE_LIST = '/api/v1/inventory/product-dispose/get-product-dispose-list';
     static CREATE_PRODUCT_DISPOSE = '/api/v1/inventory/product-dispose/create-product-dispose';

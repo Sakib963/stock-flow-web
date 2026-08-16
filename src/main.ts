@@ -1,5 +1,7 @@
 import { HttpClient, HttpClientModule } from '@angular/common/http';
-import { importProvidersFrom } from '@angular/core';
+import { importProvidersFrom, provideAppInitializer, inject } from '@angular/core';
+import { AuthService } from '@app/modules/auth/services/auth.service';
+import { SettingsService } from '@app/core/services/settings.service';
 import { bootstrapApplication, BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AppRoutingModule } from '@app/app-routing.module';
@@ -76,5 +78,13 @@ bootstrapApplication(AppComponent, {
     ),
     tokenInterceptor,
     { provide: NZ_I18N, useValue: en_US },
+    // Preload shop settings before the app builds routes/menu, but only for an
+    // already-authenticated user (the settings API needs a token). Fresh logins
+    // load it via the sidebar before rendering the menu.
+    provideAppInitializer(() => {
+      const auth = inject(AuthService);
+      const settings = inject(SettingsService);
+      return auth.getJwtToken() ? settings.load() : Promise.resolve();
+    }),
   ],
 }).catch((err) => console.error(err));

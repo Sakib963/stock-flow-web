@@ -2,41 +2,57 @@ import { MenuItem } from '../models/menu.model';
 import { isOnlineEnabled, isPosEnabled } from './company-info';
 
 export class Menu {
-    static adminPages: MenuItem[] = [
-        {
-            group: 'Admin',
-            icon: 'assets/icons/dashboard.svg',
-            items: [
-                {
-                    icon: 'assets/icons/dashboard.svg',
-                    label: 'Dashboard',
-                    route: '/admin/dashboard',
-                },
-            ],
-        },
-        {
-            group: 'User Management',
-            items: [
-                {
-                    icon: 'assets/icons/user.svg',
-                    label: 'User',
-                    route: '/admin/user',
-                },
-            ],
-        },
-        {
-            group: 'Activity',
-            items: [
-                {
-                    icon: 'assets/icons/report.svg',
-                    label: 'Activity Log',
-                    route: '/activity-log',
-                },
-            ],
-        },
-    ];
+    // Getter so channel-dependent items (Sales & Orders) re-evaluate against the
+    // runtime settings (order_system) each time the sidebar reads the menu.
+    static get adminPages(): MenuItem[] {
+        return [
+            {
+                group: 'Admin',
+                icon: 'assets/icons/dashboard.svg',
+                items: [
+                    {
+                        icon: 'assets/icons/dashboard.svg',
+                        label: 'Dashboard',
+                        route: '/admin/dashboard',
+                    },
+                ],
+            },
+            {
+                group: 'User Management',
+                items: [
+                    {
+                        icon: 'assets/icons/user.svg',
+                        label: 'User',
+                        route: '/admin/user',
+                    },
+                ],
+            },
+            {
+                group: 'Settings',
+                icon: 'assets/icons/configuration-group.svg',
+                items: [
+                    {
+                        icon: 'assets/icons/configuration-group.svg',
+                        label: 'Settings',
+                        route: '/settings',
+                    },
+                ],
+            },
+            {
+                group: 'Activity',
+                items: [
+                    {
+                        icon: 'assets/icons/report.svg',
+                        label: 'Activity Log',
+                        route: '/activity-log',
+                    },
+                ],
+            },
+        ];
+    }
 
-    static managerPages: MenuItem[] = [
+    static get managerPages(): MenuItem[] {
+        return [
         {
             group: '',
             items: [
@@ -162,7 +178,7 @@ export class Menu {
                     ? [
                           {
                               icon: 'assets/icons/invoice.svg',
-                              label: 'Online Order',
+                              label: 'Order Entry',
                               route: '/sales/online',
                           },
                       ]
@@ -190,7 +206,19 @@ export class Menu {
                 },
             ],
         },
-    ];
+        {
+            group: 'Settings',
+            icon: 'assets/icons/configuration-group.svg',
+            items: [
+                {
+                    icon: 'assets/icons/configuration-group.svg',
+                    label: 'Settings',
+                    route: '/settings',
+                },
+            ],
+        },
+        ];
+    }
 
     static salesPages: MenuItem[] = [
         {

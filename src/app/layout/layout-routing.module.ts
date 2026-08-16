@@ -60,6 +60,12 @@ const routes: Routes = [
                 data: { roles: [ROLES.ADMIN, ROLES.MANAGER, ROLES.SALESMAN] },
             },
             {
+                path: 'settings',
+                loadComponent: () => import('../modules/settings/settings.component').then((m) => m.SettingsComponent),
+                canActivate: [RoleGuard],
+                data: { roles: [ROLES.ADMIN, ROLES.MANAGER] },
+            },
+            {
                 path: 'shared',
                 loadChildren: () => import('../modules/shared/shared.module').then((m) => m.SharedModule),
                 canActivate: [RoleGuard],

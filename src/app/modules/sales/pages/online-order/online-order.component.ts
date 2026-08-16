@@ -6,7 +6,7 @@ import { Router } from '@angular/router';
 import { APIEndpoint } from '@app/core/constants/api-endpoint';
 import { HttpService } from '@app/core/services/http.service';
 import { markFormGroupTouched } from '@app/core/constants/helper';
-import { COMPANY_INFO } from '@app/core/constants/company-info';
+import { getDefaultDeliveryCharge } from '@app/core/constants/settings-state';
 import { LoaderComponent } from '@app/shared/components/loader/loader.component';
 import { ConfirmationModalComponent } from '@app/shared/components/confirmation-modal/confirmation-modal.component';
 import { NgZorroCustomModule } from '@app/shared/ng-zorro-custom.module';
@@ -68,7 +68,7 @@ export class OnlineOrderComponent implements OnInit {
             payment_type: ['COD', [Validators.required]],
             payment_status: ['unpaid', [Validators.required]],
             amount_paid: [0, [Validators.min(0)]],
-            delivery_charge: [COMPANY_INFO.defaultDeliveryCharge, [Validators.min(0)]],
+            delivery_charge: [getDefaultDeliveryCharge(), [Validators.min(0)]],
             discount_total: [0, [Validators.min(0)]],
             notes: [null],
             products: this._fb.array([]),
@@ -284,7 +284,7 @@ export class OnlineOrderComponent implements OnInit {
             payment_type: 'COD',
             payment_status: 'unpaid',
             amount_paid: 0,
-            delivery_charge: COMPANY_INFO.defaultDeliveryCharge,
+            delivery_charge: getDefaultDeliveryCharge(),
             discount_total: 0,
             notes: null,
             products: [],

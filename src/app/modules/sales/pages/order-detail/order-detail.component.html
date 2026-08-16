@@ -10,7 +10,18 @@
         <nz-tag>{{ order().channel }}</nz-tag>
         @if (order().order_type && order().order_type !== 'Standard') { <nz-tag nzColor="purple">{{ order().order_type }}</nz-tag> }
         <span class="flex-1"></span>
-        <button nz-button [disabled]="busy()" (click)="printInvoice()"><nz-icon nzType="printer"></nz-icon>Print</button>
+        <button nz-button nz-dropdown [nzDropdownMenu]="printMenu" nzTrigger="click" [disabled]="busy()">
+            <nz-icon nzType="printer"></nz-icon>Print<nz-icon nzType="down"></nz-icon>
+        </button>
+        <nz-dropdown-menu #printMenu="nzDropdownMenu">
+            <ul nz-menu>
+                <li nz-menu-item (click)="printReceipt()"><nz-icon nzType="printer" class="mr-2"></nz-icon>Thermal Receipt</li>
+                <li nz-menu-item (click)="printInvoice()"><nz-icon nzType="file-text" class="mr-2"></nz-icon>A4 Invoice</li>
+                @if (order().channel === 'ONLINE') {
+                <li nz-menu-item (click)="printLabel()"><nz-icon nzType="tag" class="mr-2"></nz-icon>Shipping Label</li>
+                }
+            </ul>
+        </nz-dropdown-menu>
         @if (canConfirm()) { <button nz-button nzType="primary" [disabled]="busy()" [nzLoading]="busy()" (click)="confirm()"><nz-icon nzType="check"></nz-icon>Confirm</button> }
         @if (canConvert()) { <button nz-button nzType="primary" [disabled]="busy()" [nzLoading]="busy()" (click)="openConvert()"><nz-icon nzType="sync"></nz-icon>Convert to in-stock</button> }
         @if (canEdit()) { <button nz-button [disabled]="busy()" (click)="editOrder()"><nz-icon nzType="edit"></nz-icon>Edit</button> }
