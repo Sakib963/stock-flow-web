@@ -1,191 +1,256 @@
 <page-header [title]="'Order ' + (order()?.invoice_no || '')" [description]="'Order summary, delivery details and lifecycle actions'" [pageKey]="'sales.orders.view'" [showBackButton]="true"></page-header>
 
 @if (loading()) {
-<div class="flex justify-center items-center py-20"><app-loader [isVisible]="true"></app-loader></div>
+    <div class="flex justify-center items-center py-20"><app-loader [isVisible]="true"></app-loader></div>
 } @else if (order()) {
-<div class="p-4 flex flex-col gap-4">
-    <!-- Status + quick actions -->
-    <div class="flex flex-wrap gap-2 items-center">
-        <nz-tag [nzColor]="statusColor(order().status)">{{ order().status }}</nz-tag>
-        <nz-tag>{{ order().channel }}</nz-tag>
-        @if (order().order_type && order().order_type !== 'Standard') { <nz-tag nzColor="purple">{{ order().order_type }}</nz-tag> }
-        <span class="flex-1"></span>
-        <button nz-button nz-dropdown [nzDropdownMenu]="printMenu" nzTrigger="click" [disabled]="busy()">
-            <nz-icon nzType="printer"></nz-icon>Print<nz-icon nzType="down"></nz-icon>
-        </button>
-        <nz-dropdown-menu #printMenu="nzDropdownMenu">
-            <ul nz-menu>
-                <li nz-menu-item (click)="printReceipt()"><nz-icon nzType="printer" class="mr-2"></nz-icon>Thermal Receipt</li>
-                <li nz-menu-item (click)="printInvoice()"><nz-icon nzType="file-text" class="mr-2"></nz-icon>A4 Invoice</li>
-                @if (order().channel === 'ONLINE') {
-                <li nz-menu-item (click)="printLabel()"><nz-icon nzType="tag" class="mr-2"></nz-icon>Shipping Label</li>
-                }
-            </ul>
-        </nz-dropdown-menu>
-        @if (canConfirm()) { <button nz-button nzType="primary" [disabled]="busy()" [nzLoading]="busy()" (click)="confirm()"><nz-icon nzType="check"></nz-icon>Confirm</button> }
-        @if (canConvert()) { <button nz-button nzType="primary" [disabled]="busy()" [nzLoading]="busy()" (click)="openConvert()"><nz-icon nzType="sync"></nz-icon>Convert to in-stock</button> }
-        @if (canEdit()) { <button nz-button [disabled]="busy()" (click)="editOrder()"><nz-icon nzType="edit"></nz-icon>Edit</button> }
-        @if (canDispatch()) { <button nz-button nzType="primary" [disabled]="busy()" [nzLoading]="busy()" (click)="sendForDelivery()"><nz-icon nzType="car"></nz-icon>Send for Delivery</button> }
-        @if (canDeliver()) { <button nz-button nzType="primary" [disabled]="busy()" [nzLoading]="busy()" (click)="openDeliver()"><nz-icon nzType="check-circle"></nz-icon>Mark Delivered</button> }
-        @if (canReturn()) { <button nz-button [disabled]="busy()" (click)="openReturn()"><nz-icon nzType="rollback"></nz-icon>Return</button> }
-        @if (canCancel()) { <button nz-button nzDanger [disabled]="busy()" (click)="openCancel()"><nz-icon nzType="close"></nz-icon>Cancel</button> }
-    </div>
-
-    @if (order().cancel_reason) { <nz-alert nzType="error" [nzMessage]="'Cancelled: ' + order().cancel_reason" nzShowIcon></nz-alert> }
-
-    <!-- Stat cards -->
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <nz-card nzSize="small"><nz-statistic [nzTitle]="'Grand Total'" [nzValue]="order().total_amount" [nzPrefix]="'৳'"></nz-statistic></nz-card>
-        <nz-card nzSize="small"><nz-statistic [nzTitle]="'Items'" [nzValue]="(order().items || []).length"></nz-statistic></nz-card>
-        <nz-card nzSize="small"><nz-statistic [nzTitle]="'Payment'" [nzValue]="(order().payment_status || '—') + (order().payment_type ? ' · ' + order().payment_type : '')"></nz-statistic></nz-card>
-        <nz-card nzSize="small"><nz-statistic [nzTitle]="'Order Date'" [nzValue]="(order().created_on | date: dateFormat) || '—'"></nz-statistic></nz-card>
-    </div>
-
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        <!-- Left: customer/delivery + items -->
-        <div class="lg:col-span-2 flex flex-col gap-4">
-            <nz-card nzSize="small" nzTitle="Customer &amp; Delivery">
-                <nz-descriptions nzSize="small" [nzColumn]="2">
-                    <nz-descriptions-item nzTitle="Customer">{{ order().customer_name || '—' }}</nz-descriptions-item>
-                    <nz-descriptions-item nzTitle="Phone">{{ order().customer_phone || '—' }}</nz-descriptions-item>
-                    @if (order().customer_email) { <nz-descriptions-item nzTitle="Email">{{ order().customer_email }}</nz-descriptions-item> }
-                    @if (hasDeliveryInfo()) {
-                    <nz-descriptions-item nzTitle="Delivery Address" [nzSpan]="2">{{ fullDelivery() || '—' }}</nz-descriptions-item>
-                    @if (order().delivery_area) { <nz-descriptions-item nzTitle="Area">{{ order().delivery_area }}</nz-descriptions-item> }
-                    @if (order().delivery_zone) { <nz-descriptions-item nzTitle="Zone / Region">{{ order().delivery_zone }}</nz-descriptions-item> }
-                    @if (order().delivery_city) { <nz-descriptions-item nzTitle="City">{{ order().delivery_city }}</nz-descriptions-item> }
-                    @if (order().delivery_postcode) { <nz-descriptions-item nzTitle="Postcode">{{ order().delivery_postcode }}</nz-descriptions-item> }
+    <div class="p-4 flex flex-col gap-4">
+        <!-- Status + quick actions -->
+        <div class="flex flex-wrap gap-2 items-center">
+            <nz-tag [nzColor]="statusColor(order().status)">{{ order().status }}</nz-tag>
+            <nz-tag>{{ order().channel }}</nz-tag>
+            @if (order().order_type && order().order_type !== 'Standard') {
+                <nz-tag nzColor="purple">{{ order().order_type }}</nz-tag>
+            }
+            <span class="flex-1"></span>
+            <button nz-button nz-dropdown [nzDropdownMenu]="printMenu" nzTrigger="click" [disabled]="busy()"><nz-icon nzType="printer"></nz-icon>Print<nz-icon nzType="down"></nz-icon></button>
+            <nz-dropdown-menu #printMenu="nzDropdownMenu">
+                <ul nz-menu>
+                    <li nz-menu-item (click)="printReceipt()"><nz-icon nzType="printer" class="mr-2"></nz-icon>Thermal Receipt</li>
+                    <li nz-menu-item (click)="printInvoice()"><nz-icon nzType="file-text" class="mr-2"></nz-icon>A4 Invoice</li>
+                    @if (order().channel === 'ONLINE') {
+                        <li nz-menu-item (click)="printLabel()"><nz-icon nzType="tag" class="mr-2"></nz-icon>Shipping Label</li>
                     }
-                </nz-descriptions>
-            </nz-card>
+                </ul>
+            </nz-dropdown-menu>
+            @if (canConfirm()) {
+                <button nz-button nzType="primary" [disabled]="busy()" [nzLoading]="busy()" (click)="confirm()"><nz-icon nzType="check"></nz-icon>Confirm</button>
+            }
+            @if (canConvert()) {
+                <button nz-button nzType="primary" [disabled]="busy()" [nzLoading]="busy()" (click)="openConvert()"><nz-icon nzType="sync"></nz-icon>Convert to in-stock</button>
+            }
+            @if (canEdit()) {
+                <button nz-button [disabled]="busy()" (click)="editOrder()"><nz-icon nzType="edit"></nz-icon>Edit</button>
+            }
+            @if (canDispatch()) {
+                <button nz-button nzType="primary" [disabled]="busy()" [nzLoading]="busy()" (click)="sendForDelivery()"><nz-icon nzType="car"></nz-icon>Send for Delivery</button>
+            }
+            @if (canDeliver()) {
+                <button nz-button nzType="primary" [disabled]="busy()" [nzLoading]="busy()" (click)="openDeliver()"><nz-icon nzType="check-circle"></nz-icon>Mark Delivered</button>
+            }
+            @if (canReturn()) {
+                <button nz-button [disabled]="busy()" (click)="openReturn()"><nz-icon nzType="rollback"></nz-icon>Return</button>
+            }
+            @if (canCancel()) {
+                <button nz-button nzDanger [disabled]="busy()" (click)="openCancel()"><nz-icon nzType="close"></nz-icon>Cancel</button>
+            }
+        </div>
 
-            <nz-card nzSize="small" nzTitle="Items">
-                <nz-table #t [nzData]="order().items || []" nzSize="small" [nzShowPagination]="false">
-                    <thead>
-                        <tr>
-                            <th>Product</th>
-                            <th nzAlign="center">Qty</th>
-                            <th nzAlign="right">Unit Price</th>
-                            <th nzAlign="right">Discount</th>
-                            <th nzAlign="right">Total</th>
-                            <th nzAlign="center">Returned</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @for (i of t.data; track i.oid) {
-                        <tr>
-                            <td>{{ i.product_name }}</td>
-                            <td nzAlign="center">{{ i.quantity }}</td>
-                            <td nzAlign="right">{{ i.unit_price | currency:'৳':'symbol' }}</td>
-                            <td nzAlign="right">{{ i.discount || 0 | currency:'৳':'symbol' }}</td>
-                            <td nzAlign="right">{{ i.total | currency:'৳':'symbol' }}</td>
-                            <td nzAlign="center">{{ i.returned_qty || 0 }}</td>
-                        </tr>
+        @if (order().cancel_reason) {
+            <nz-alert nzType="error" [nzMessage]="'Cancelled: ' + order().cancel_reason" nzShowIcon></nz-alert>
+        }
+
+        <!-- Stat cards -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <nz-card nzSize="small"><nz-statistic [nzTitle]="'Grand Total'" [nzValue]="order().total_amount" [nzPrefix]="'৳'"></nz-statistic></nz-card>
+            <nz-card nzSize="small"><nz-statistic [nzTitle]="'Items'" [nzValue]="(order().items || []).length"></nz-statistic></nz-card>
+            <nz-card nzSize="small"><nz-statistic [nzTitle]="'Payment'" [nzValue]="(order().payment_status || '—') + (order().payment_type ? ' · ' + order().payment_type : '')"></nz-statistic></nz-card>
+            <nz-card nzSize="small"><nz-statistic [nzTitle]="'Order Date'" [nzValue]="(order().created_on | date: dateFormat) || '—'"></nz-statistic></nz-card>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+            <!-- Left: customer/delivery + items -->
+            <div class="lg:col-span-2 flex flex-col gap-4">
+                <nz-card nzSize="small" nzTitle="Customer &amp; Delivery">
+                    <nz-descriptions nzSize="small" [nzColumn]="2">
+                        <nz-descriptions-item nzTitle="Customer">{{ order().customer_name || '—' }}</nz-descriptions-item>
+                        <nz-descriptions-item nzTitle="Phone">{{ order().customer_phone || '—' }}</nz-descriptions-item>
+                        @if (order().customer_email) {
+                            <nz-descriptions-item nzTitle="Email">{{ order().customer_email }}</nz-descriptions-item>
                         }
-                    </tbody>
-                </nz-table>
-            </nz-card>
-        </div>
+                        @if (hasDeliveryInfo()) {
+                            <nz-descriptions-item nzTitle="Delivery Address" [nzSpan]="2">{{ fullDelivery() || '—' }}</nz-descriptions-item>
+                            @if (order().delivery_area) {
+                                <nz-descriptions-item nzTitle="Area">{{ order().delivery_area }}</nz-descriptions-item>
+                            }
+                            @if (order().delivery_zone) {
+                                <nz-descriptions-item nzTitle="Zone / Region">{{ order().delivery_zone }}</nz-descriptions-item>
+                            }
+                            @if (order().delivery_city) {
+                                <nz-descriptions-item nzTitle="City">{{ order().delivery_city }}</nz-descriptions-item>
+                            }
+                            @if (order().delivery_postcode) {
+                                <nz-descriptions-item nzTitle="Postcode">{{ order().delivery_postcode }}</nz-descriptions-item>
+                            }
+                        }
+                    </nz-descriptions>
+                </nz-card>
 
-        <!-- Right: payment summary + timeline -->
-        <div class="flex flex-col gap-4">
-            <nz-card nzSize="small" nzTitle="Payment Summary">
-                <div class="flex justify-between text-sm mb-1"><span class="text-gray-500">Subtotal</span><span>{{ order().subtotal | currency:'৳':'symbol' }}</span></div>
-                <div class="flex justify-between text-sm mb-1"><span class="text-gray-500">Discount</span><span>- {{ order().discount_total | currency:'৳':'symbol' }}</span></div>
-                <div class="flex justify-between text-sm mb-1"><span class="text-gray-500">Delivery Charge</span><span>+ {{ order().delivery_charge | currency:'৳':'symbol' }}</span></div>
-                <nz-divider class="my-2"></nz-divider>
-                <div class="flex justify-between text-base font-semibold"><span>Grand Total</span><span>{{ order().total_amount | currency:'৳':'symbol' }}</span></div>
-                <nz-divider class="my-2"></nz-divider>
-                <div class="flex justify-between text-sm mb-1"><span class="text-gray-500">Payment Type</span><span>{{ order().payment_type || '—' }}</span></div>
-                <div class="flex justify-between text-sm"><span class="text-gray-500">Payment Status</span><span>{{ order().payment_status || '—' }}</span></div>
-                @if (order().payment_status === 'partially_paid') {
-                <div class="flex justify-between text-sm mt-1"><span class="text-gray-500">Paid</span><span>{{ order().amount_paid | currency:'৳':'symbol' }}</span></div>
-                <div class="flex justify-between text-sm font-medium"><span class="text-gray-500">Due</span><span>{{ (order().total_amount - (order().amount_paid || 0)) | currency:'৳':'symbol' }}</span></div>
-                }
-                @if (order().dispatched_on) { <div class="flex justify-between text-sm mt-1"><span class="text-gray-500">Dispatched</span><span>{{ order().dispatched_on | date: dateFormat }}</span></div> }
-                @if (order().delivered_on) { <div class="flex justify-between text-sm"><span class="text-gray-500">Delivered</span><span>{{ order().delivered_on | date: dateFormat }}</span></div> }
-            </nz-card>
+                <nz-card nzSize="small" nzTitle="Items">
+                    <nz-table #t [nzData]="order().items || []" nzSize="small" [nzShowPagination]="false">
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th nzAlign="center">Qty</th>
+                                <th nzAlign="right">Unit Price</th>
+                                <th nzAlign="right">Discount</th>
+                                <th nzAlign="right">Total</th>
+                                <th nzAlign="center">Returned</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for (i of t.data; track i.oid) {
+                                <tr>
+                                    <td>{{ i.product_name }}</td>
+                                    <td nzAlign="center">{{ i.quantity }}</td>
+                                    <td nzAlign="right">{{ i.unit_price | currency: '৳' : 'symbol' }}</td>
+                                    <td nzAlign="right">{{ i.discount || 0 | currency: '৳' : 'symbol' }}</td>
+                                    <td nzAlign="right">{{ i.total | currency: '৳' : 'symbol' }}</td>
+                                    <td nzAlign="center">{{ i.returned_qty || 0 }}</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </nz-table>
+                </nz-card>
+            </div>
 
-            <nz-card nzSize="small" nzTitle="Order Timeline">
-                <nz-timeline>
-                    @for (h of order().status_history || []; track $index) {
-                    <nz-timeline-item [nzColor]="statusColor(h.to_status) === 'default' ? 'gray' : statusColor(h.to_status)">
-                        <div class="font-medium">{{ h.to_status }}</div>
-                        <div class="text-xs text-gray-500">{{ h.reason }}</div>
-                        <div class="text-xs text-gray-400">{{ h.performed_on | date: dateFormat }} · {{ h.performed_by }}</div>
-                    </nz-timeline-item>
-                    } @empty {
-                    <nz-timeline-item><div class="text-xs text-gray-400">No history yet</div></nz-timeline-item>
+            <!-- Right: payment summary + timeline -->
+            <div class="flex flex-col gap-4">
+                <nz-card nzSize="small" nzTitle="Payment Summary">
+                    <div class="flex justify-between text-sm mb-1">
+                        <span class="text-gray-500">Subtotal</span><span>{{ order().subtotal | currency: '৳' : 'symbol' }}</span>
+                    </div>
+                    <div class="flex justify-between text-sm mb-1">
+                        <span class="text-gray-500">Discount</span><span>- {{ order().discount_total | currency: '৳' : 'symbol' }}</span>
+                    </div>
+                    <div class="flex justify-between text-sm mb-1">
+                        <span class="text-gray-500">Delivery Charge</span><span>+ {{ order().delivery_charge | currency: '৳' : 'symbol' }}</span>
+                    </div>
+                    <nz-divider class="my-2"></nz-divider>
+                    <div class="flex justify-between text-base font-semibold">
+                        <span>Grand Total</span><span>{{ order().total_amount | currency: '৳' : 'symbol' }}</span>
+                    </div>
+                    <nz-divider class="my-2"></nz-divider>
+                    <div class="flex justify-between text-sm mb-1">
+                        <span class="text-gray-500">Payment Type</span><span>{{ order().payment_type || '—' }}</span>
+                    </div>
+                    <div class="flex justify-between text-sm">
+                        <span class="text-gray-500">Payment Status</span><span>{{ order().payment_status || '—' }}</span>
+                    </div>
+                    @if (order().payment_status === 'partially_paid') {
+                        <div class="flex justify-between text-sm mt-1">
+                            <span class="text-gray-500">Paid</span><span>{{ order().amount_paid | currency: '৳' : 'symbol' }}</span>
+                        </div>
+                        <div class="flex justify-between text-sm font-medium">
+                            <span class="text-gray-500">Due</span><span>{{ order().total_amount - (order().amount_paid || 0) | currency: '৳' : 'symbol' }}</span>
+                        </div>
                     }
-                </nz-timeline>
-            </nz-card>
+                    @if (order().dispatched_on) {
+                        <div class="flex justify-between text-sm mt-1">
+                            <span class="text-gray-500">Dispatched</span><span>{{ order().dispatched_on | date: dateFormat }}</span>
+                        </div>
+                    }
+                    @if (order().delivered_on) {
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-500">Delivered</span><span>{{ order().delivered_on | date: dateFormat }}</span>
+                        </div>
+                    }
+                </nz-card>
+
+                <nz-card nzSize="small" nzTitle="Order Timeline">
+                    <nz-timeline>
+                        @for (h of order().status_history || []; track $index) {
+                            <nz-timeline-item [nzColor]="statusColor(h.to_status) === 'default' ? 'gray' : statusColor(h.to_status)">
+                                <div class="font-medium">{{ h.to_status }}</div>
+                                <div class="text-xs text-gray-500">{{ h.reason }}</div>
+                                <div class="text-xs text-gray-400">{{ h.performed_on | date: dateFormat }} · {{ h.performed_by }}</div>
+                            </nz-timeline-item>
+                        } @empty {
+                            <nz-timeline-item><div class="text-xs text-gray-400">No history yet</div></nz-timeline-item>
+                        }
+                    </nz-timeline>
+                </nz-card>
+            </div>
         </div>
     </div>
-</div>
 
-<!-- Cancel modal -->
-<nz-modal [(nzVisible)]="cancelVisible" nzTitle="Cancel order" (nzOnCancel)="cancelVisible = false" [nzFooter]="null">
-    <ng-container *nzModalContent>
-        <p class="mb-2">Releasing the hold. A reason is required.</p>
-        <textarea nz-input [(ngModel)]="cancelReason" rows="3" placeholder="Why is this being cancelled?"></textarea>
-        <div class="text-right mt-4"><button nz-button class="mr-2" (click)="cancelVisible = false">Close</button><button nz-button nzDanger nzType="primary" [nzLoading]="busy()" (click)="submitCancel()">Cancel order</button></div>
-    </ng-container>
-</nz-modal>
+    <!-- Cancel modal -->
+    <nz-modal [(nzVisible)]="cancelVisible" nzTitle="Cancel order" (nzOnCancel)="cancelVisible = false" [nzFooter]="null">
+        <ng-container *nzModalContent>
+            <p class="mb-2">Releasing the hold. A reason is required.</p>
+            <textarea nz-input [(ngModel)]="cancelReason" rows="3" placeholder="Why is this being cancelled?"></textarea>
+            <div class="text-right mt-4"><button nz-button class="mr-2" (click)="cancelVisible = false">Close</button><button nz-button nzDanger nzType="primary" [nzLoading]="busy()" (click)="submitCancel()">Cancel order</button></div>
+        </ng-container>
+    </nz-modal>
 
-<!-- Deliver modal -->
-<nz-modal [(nzVisible)]="deliverVisible" nzTitle="Mark delivered" (nzOnCancel)="deliverVisible = false" [nzFooter]="null">
-    <ng-container *nzModalContent>
-        <label nz-checkbox [(ngModel)]="paymentCollected">Payment collected (COD)</label>
-        <div class="text-right mt-4"><button nz-button class="mr-2" (click)="deliverVisible = false">Close</button><button nz-button nzType="primary" [nzLoading]="busy()" (click)="submitDeliver()">Mark delivered</button></div>
-    </ng-container>
-</nz-modal>
+    <!-- Deliver modal -->
+    <nz-modal [(nzVisible)]="deliverVisible" nzTitle="Mark delivered" (nzOnCancel)="deliverVisible = false" [nzFooter]="null">
+        <ng-container *nzModalContent>
+            <label nz-checkbox [(ngModel)]="paymentCollected">Payment collected (COD)</label>
+            <div class="text-right mt-4"><button nz-button class="mr-2" (click)="deliverVisible = false">Close</button><button nz-button nzType="primary" [nzLoading]="busy()" (click)="submitDeliver()">Mark delivered</button></div>
+        </ng-container>
+    </nz-modal>
 
-<!-- Return modal -->
-<nz-modal [(nzVisible)]="returnVisible" nzTitle="Process return" (nzOnCancel)="returnVisible = false" [nzFooter]="null" nzWidth="640px">
-    <ng-container *nzModalContent>
-        <nz-table [nzData]="returnLines" nzSize="small" [nzShowPagination]="false">
-            <thead><tr><th>Product</th><th nzAlign="center">Remaining</th><th nzAlign="center">Return qty</th><th>Condition</th></tr></thead>
-            <tbody>
-                @for (l of returnLines; track l.order_item_oid) {
-                <tr>
-                    <td>{{ l.product_name }}</td>
-                    <td nzAlign="center">{{ l.remaining }}</td>
-                    <td nzAlign="center"><nz-input-number [(ngModel)]="l.quantity" [nzMin]="0" [nzMax]="l.remaining" [nzStep]="1"></nz-input-number></td>
-                    <td><nz-select [(ngModel)]="l.condition" class="w-32"><nz-option nzValue="Good" nzLabel="Good (restock)"></nz-option><nz-option nzValue="Damaged" nzLabel="Damaged (dispose)"></nz-option></nz-select></td>
-                </tr>
-                }
-            </tbody>
-        </nz-table>
-        <label nz-checkbox class="mt-3" [(ngModel)]="refundDelivery">Also refund the delivery charge</label>
-        <div class="text-right mt-4"><button nz-button class="mr-2" (click)="returnVisible = false">Close</button><button nz-button nzType="primary" [nzLoading]="busy()" (click)="submitReturn()">Process return</button></div>
-    </ng-container>
-</nz-modal>
+    <!-- Return modal -->
+    <nz-modal [(nzVisible)]="returnVisible" nzTitle="Process return" (nzOnCancel)="returnVisible = false" [nzFooter]="null" nzWidth="640px">
+        <ng-container *nzModalContent>
+            <nz-table [nzData]="returnLines" nzSize="small" [nzShowPagination]="false">
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th nzAlign="center">Remaining</th>
+                        <th nzAlign="center">Return qty</th>
+                        <th>Condition</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (l of returnLines; track l.order_item_oid) {
+                        <tr>
+                            <td>{{ l.product_name }}</td>
+                            <td nzAlign="center">{{ l.remaining }}</td>
+                            <td nzAlign="center"><nz-input-number [(ngModel)]="l.quantity" [nzMin]="0" [nzMax]="l.remaining" [nzStep]="1"></nz-input-number></td>
+                            <td>
+                                <nz-select [(ngModel)]="l.condition" class="w-32"><nz-option nzValue="Good" nzLabel="Good (restock)"></nz-option><nz-option nzValue="Damaged" nzLabel="Damaged (dispose)"></nz-option></nz-select>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </nz-table>
+            <label nz-checkbox class="mt-3" [(ngModel)]="refundDelivery">Also refund the delivery charge</label>
+            <div class="text-right mt-4"><button nz-button class="mr-2" (click)="returnVisible = false">Close</button><button nz-button nzType="primary" [nzLoading]="busy()" (click)="submitReturn()">Process return</button></div>
+        </ng-container>
+    </nz-modal>
 
-<!-- Convert pre-order modal -->
-<nz-modal [(nzVisible)]="convertVisible" nzTitle="Convert pre-order to in-stock" (nzOnCancel)="convertVisible = false" [nzFooter]="null" nzWidth="640px">
-    <ng-container *nzModalContent>
-        <p class="mb-2 text-sm text-gray-500">Assign a now-available batch to each line. Stock will be held on convert.</p>
-        <nz-table [nzData]="convertLines" nzSize="small" [nzShowPagination]="false">
-            <thead><tr><th>Product</th><th nzAlign="center">Qty</th><th>Batch</th></tr></thead>
-            <tbody>
-                @for (l of convertLines; track l.order_item_oid) {
-                <tr>
-                    <td>{{ l.product_name }}</td>
-                    <td nzAlign="center">{{ l.quantity }}</td>
-                    <td>
-                        <nz-select [(ngModel)]="l.inventory_oid" class="w-full" nzPlaceHolder="Select batch">
-                            @for (b of batchOptions[l.product_oid] || []; track b.inventory_oid) {
-                            <nz-option [nzValue]="b.inventory_oid" [nzLabel]="b.batch_code + ' · ' + b.sellable_quantity + ' sellable'"></nz-option>
-                            }
-                        </nz-select>
-                    </td>
-                </tr>
-                }
-            </tbody>
-        </nz-table>
-        <div class="text-right mt-4"><button nz-button class="mr-2" (click)="convertVisible = false">Close</button><button nz-button nzType="primary" [nzLoading]="busy()" (click)="submitConvert()">Convert</button></div>
-    </ng-container>
-</nz-modal>
+    <!-- Convert pre-order modal -->
+    <nz-modal [(nzVisible)]="convertVisible" nzTitle="Convert pre-order to in-stock" (nzOnCancel)="convertVisible = false" [nzFooter]="null" nzWidth="640px">
+        <ng-container *nzModalContent>
+            <p class="mb-2 text-sm text-gray-500">Assign a now-available batch to each line. Stock will be held on convert.</p>
+            <nz-table [nzData]="convertLines" nzSize="small" [nzShowPagination]="false">
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th nzAlign="center">Qty</th>
+                        <th>Batch</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (l of convertLines; track l.order_item_oid) {
+                        <tr>
+                            <td>{{ l.product_name }}</td>
+                            <td nzAlign="center">{{ l.quantity }}</td>
+                            <td>
+                                <nz-select [(ngModel)]="l.inventory_oid" class="w-full" nzPlaceHolder="Select batch">
+                                    @for (b of batchOptions[l.product_oid] || []; track b.inventory_oid) {
+                                        <nz-option [nzValue]="b.inventory_oid" [nzLabel]="b.batch_code + ' · ' + b.sellable_quantity + ' sellable'"></nz-option>
+                                    }
+                                </nz-select>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </nz-table>
+            <div class="text-right mt-4"><button nz-button class="mr-2" (click)="convertVisible = false">Close</button><button nz-button nzType="primary" [nzLoading]="busy()" (click)="submitConvert()">Convert</button></div>
+        </ng-container>
+    </nz-modal>
 } @else {
-<nz-empty class="py-20" nzNotFoundContent="Order not found"></nz-empty>
+    <nz-empty class="py-20" nzNotFoundContent="Order not found"></nz-empty>
 }

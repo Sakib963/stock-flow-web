@@ -113,8 +113,39 @@
 
                         <!-- Branding -->
                         <nz-tab nzTitle="Branding">
-                              <p class="text-xs text-gray-400 pt-2 mb-2">Social links and the note printed at the bottom of invoices.</p>
+                              <p class="text-xs text-gray-400 pt-2 mb-2">Brand color, social links, and the note printed at the bottom of invoices.</p>
                               <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 max-w-3xl">
+                                    <nz-form-item class="sm:col-span-2">
+                                          <nz-form-label>Brand Color</nz-form-label>
+                                          <nz-form-control nzExtra="Accent used on the order tracking page.">
+                                                <div class="flex items-center gap-3">
+                                                      <input type="color" formControlName="brand_color" class="cursor-pointer" style="width:44px;height:34px;padding:0;border:1px solid #d9d9d9;border-radius:6px;background:none" />
+                                                      <span class="text-sm text-gray-500">{{ form.get('brand_color')?.value }}</span>
+                                                </div>
+                                          </nz-form-control>
+                                    </nz-form-item>
+
+                                    <nz-form-item class="sm:col-span-2">
+                                          <nz-form-label>Invoice Background</nz-form-label>
+                                          <nz-form-control nzExtra="Large full-width watermark printed behind every A4 invoice page. Best as a light/transparent PNG. If empty, the logo is used.">
+                                                <div class="flex items-center gap-4 border rounded-lg p-3">
+                                                      @if (form.get('invoice_bg_url')?.value) {
+                                                      <img [src]="form.get('invoice_bg_url')?.value" alt="Invoice background" class="max-h-20 object-contain" />
+                                                      } @else {
+                                                      <div class="w-24 h-20 flex items-center justify-center text-gray-300"><i nz-icon nzType="picture" class="text-3xl"></i></div>
+                                                      }
+                                                      <div class="flex gap-2">
+                                                            <button nz-button type="button" nzType="default" nzSize="small" (click)="bgInput.click()" [nzLoading]="uploadingBg">
+                                                                  <i nz-icon nzType="upload"></i>{{ uploadingBg ? 'Uploading...' : 'Upload' }}
+                                                            </button>
+                                                            @if (form.get('invoice_bg_url')?.value) {
+                                                            <button nz-button type="button" nzDanger nzSize="small" (click)="removeInvoiceBg()">Remove</button>
+                                                            }
+                                                      </div>
+                                                      <input #bgInput type="file" accept="image/*" (change)="onInvoiceBgSelected($event)" hidden />
+                                                </div>
+                                          </nz-form-control>
+                                    </nz-form-item>
                                     <nz-form-item>
                                           <nz-form-label>Facebook</nz-form-label>
                                           <nz-form-control><input nz-input placeholder="Facebook page URL" formControlName="facebook_url" /></nz-form-control>

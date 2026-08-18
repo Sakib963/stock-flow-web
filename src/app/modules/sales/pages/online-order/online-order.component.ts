@@ -39,11 +39,23 @@ export class OnlineOrderComponent implements OnInit {
     selectedProductIndex: number | null = null;
 
     editOid: string | null = null;
+    private _skipPaymentSync = false;
 
     constructor(private _http: HttpService, private _notify: NzNotificationService, private _router: Router, private _fb: FormBuilder, private _modal: NzModalService, private _destroyRef: DestroyRef) {}
 
     ngOnInit(): void {
         this.form = this.createForm();
+
+        // Keep payment status consistent with the type: Prepaid -> paid, COD -> unpaid.
+        // (Prevents the "Prepaid but Unpaid" contradiction.) Skipped while loading an edit.
+        this.form
+            .get('payment_type')
+            ?.valueChanges.pipe(takeUntilDestroyed(this._destroyRef))
+            .subscribe((t) => {
+                if (this._skipPaymentSync) return;
+                this.form.get('payment_status')?.setValue(t === 'PREPAID' ? 'paid' : 'unpaid');
+            });
+
         this.editOid = (history.state && history.state.editOid) || null;
         if (this.editOid) {
             this.loadForEdit(this.editOid);
@@ -330,6 +342,8 @@ export class OnlineOrderComponent implements OnInit {
                 next: (res: any) => {
                     if (res.status !== 200 || !res.body?.data) return;
                     const o = res.body.data;
+                    // Don't let the payment_type auto-link overwrite the loaded status.
+                    this._skipPaymentSync = true;
                     this.form.patchValue({
                         oid: o.oid,
                         invoice_no: o.invoice_no,
@@ -348,6 +362,7 @@ export class OnlineOrderComponent implements OnInit {
                         discount_total: Number(o.discount_total || 0),
                         notes: o.notes,
                     });
+                    this._skipPaymentSync = false;
                     this.products.clear();
                     (o.items || []).forEach((i: any) =>
                         this.products.push(

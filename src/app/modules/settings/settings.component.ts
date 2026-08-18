@@ -30,6 +30,7 @@ export class SettingsComponent implements OnInit {
     loading = false;
     saving = false;
     uploadingLogo = false;
+    uploadingBg = false;
 
     constructor(
         private _fb: FormBuilder,
@@ -66,6 +67,8 @@ export class SettingsComponent implements OnInit {
             facebook_url: [null],
             instagram_url: [null],
             invoice_footer: [null],
+            brand_color: ['#1677ff'],
+            invoice_bg_url: [null],
             // Delivery Details
             default_delivery_charge: [0, [Validators.min(0)]],
             order_system: ['both', [Validators.required]],
@@ -107,6 +110,8 @@ export class SettingsComponent implements OnInit {
             facebook_url: d.facebook_url,
             instagram_url: d.instagram_url,
             invoice_footer: d.invoice_footer,
+            brand_color: d.brand_color || '#1677ff',
+            invoice_bg_url: d.invoice_bg_url,
             default_delivery_charge: Number(d.default_delivery_charge ?? 0),
             order_system: d.order_system || 'both',
         });
@@ -137,6 +142,33 @@ export class SettingsComponent implements OnInit {
 
     removeLogo(): void {
         this.form.get('logo_url')?.setValue(null);
+    }
+
+    onInvoiceBgSelected(event: Event): void {
+        const input = event.target as HTMLInputElement;
+        const file = input.files?.[0];
+        if (!file) return;
+        if (file.size > 500 * 1024) {
+            this._notify.error('Error', 'File size exceeds 500 KB. Please upload a smaller image.');
+            return;
+        }
+        this.uploadingBg = true;
+        this._fileService.uploadImage(file).subscribe({
+            next: (res: any) => {
+                this.uploadingBg = false;
+                if (res?.secure_url) this.form.get('invoice_bg_url')?.setValue(res.secure_url);
+                else this._notify.error('Error', 'Failed to upload image');
+            },
+            error: () => {
+                this.uploadingBg = false;
+                this._notify.error('Error', 'Failed to upload image');
+            },
+        });
+        input.value = '';
+    }
+
+    removeInvoiceBg(): void {
+        this.form.get('invoice_bg_url')?.setValue(null);
     }
 
     // Confirm before saving (settings apply across the app and the order prints).
