@@ -25,9 +25,7 @@
             @if (canConfirm()) {
                 <button nz-button nzType="primary" [disabled]="busy()" [nzLoading]="busy()" (click)="confirm()"><nz-icon nzType="check"></nz-icon>Confirm</button>
             }
-            @if (canConvert()) {
-                <button nz-button nzType="primary" [disabled]="busy()" [nzLoading]="busy()" (click)="openConvert()"><nz-icon nzType="sync"></nz-icon>Convert to in-stock</button>
-            }
+
             @if (canEdit()) {
                 <button nz-button [disabled]="busy()" (click)="editOrder()"><nz-icon nzType="edit"></nz-icon>Edit</button>
             }
@@ -220,37 +218,6 @@
         </ng-container>
     </nz-modal>
 
-    <!-- Convert pre-order modal -->
-    <nz-modal [(nzVisible)]="convertVisible" nzTitle="Convert pre-order to in-stock" (nzOnCancel)="convertVisible = false" [nzFooter]="null" nzWidth="640px">
-        <ng-container *nzModalContent>
-            <p class="mb-2 text-sm text-gray-500">Assign a now-available batch to each line. Stock will be held on convert.</p>
-            <nz-table [nzData]="convertLines" nzSize="small" [nzShowPagination]="false">
-                <thead>
-                    <tr>
-                        <th>Product</th>
-                        <th nzAlign="center">Qty</th>
-                        <th>Batch</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @for (l of convertLines; track l.order_item_oid) {
-                        <tr>
-                            <td>{{ l.product_name }}</td>
-                            <td nzAlign="center">{{ l.quantity }}</td>
-                            <td>
-                                <nz-select [(ngModel)]="l.inventory_oid" class="w-full" nzPlaceHolder="Select batch">
-                                    @for (b of batchOptions[l.product_oid] || []; track b.inventory_oid) {
-                                        <nz-option [nzValue]="b.inventory_oid" [nzLabel]="b.batch_code + ' · ' + b.sellable_quantity + ' sellable'"></nz-option>
-                                    }
-                                </nz-select>
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </nz-table>
-            <div class="text-right mt-4"><button nz-button class="mr-2" (click)="convertVisible = false">Close</button><button nz-button nzType="primary" [nzLoading]="busy()" (click)="submitConvert()">Convert</button></div>
-        </ng-container>
-    </nz-modal>
 } @else {
     <nz-empty class="py-20" nzNotFoundContent="Order not found"></nz-empty>
 }

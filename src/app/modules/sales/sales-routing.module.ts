@@ -23,6 +23,26 @@ const routes: Routes = [
                   path: 'online',
                   loadComponent: () => import('./pages/online-order/online-order.component').then((m) => m.OnlineOrderComponent),
               },
+              // Pre-orders are an online-only flow, so they are registered with the
+              // rest of the online channel rather than unconditionally.
+              {
+                  path: 'pre-order',
+                  children: [
+                      { path: '', redirectTo: 'list', pathMatch: 'full' as const },
+                      {
+                          path: 'list',
+                          loadComponent: () => import('./pages/pre-order/pre-order-list/pre-order-list.component').then((m) => m.PreOrderListComponent),
+                      },
+                      {
+                          path: 'create',
+                          loadComponent: () => import('./pages/pre-order/create-pre-order/create-pre-order.component').then((m) => m.CreatePreOrderComponent),
+                      },
+                      {
+                          path: 'view/:oid',
+                          loadComponent: () => import('./pages/pre-order/view-pre-order-details/view-pre-order-details.component').then((m) => m.ViewPreOrderDetailsComponent),
+                      },
+                  ],
+              },
           ]
         : []),
     {

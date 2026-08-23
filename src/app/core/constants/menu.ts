@@ -163,7 +163,8 @@ export class Menu {
         {
             group: 'Sales & Orders',
             icon: 'assets/icons/purchase.svg',
-            // Intake links depend on the shop's order system (company-info). Orders list is always shown.
+            // POS link depends on the shop's order system (company-info). New online orders
+            // are created from the Orders page ("New Order"), so there is no separate menu item.
             items: [
                 ...(isPosEnabled()
                     ? [
@@ -174,20 +175,22 @@ export class Menu {
                           },
                       ]
                     : []),
-                ...(isOnlineEnabled()
-                    ? [
-                          {
-                              icon: 'assets/icons/invoice.svg',
-                              label: 'Order Entry',
-                              route: '/sales/online',
-                          },
-                      ]
-                    : []),
                 {
                     icon: 'assets/icons/report.svg',
                     label: 'Orders',
                     route: '/sales/orders/list',
                 },
+                // Pre-orders are bookings, not orders, so they get their own entry
+                // rather than a filter on the Orders list. Online-only for now.
+                ...(isOnlineEnabled()
+                    ? [
+                          {
+                              icon: 'assets/icons/report.svg',
+                              label: 'Pre-Orders',
+                              route: '/sales/pre-order/list',
+                          },
+                      ]
+                    : []),
             ],
         },
         {

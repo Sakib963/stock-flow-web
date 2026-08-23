@@ -1,0 +1,84 @@
+@if (loading) {
+    <div class="flex justify-center items-center py-10">
+        <app-loader [isVisible]="true"></app-loader>
+    </div>
+} @else {
+    <form nz-form [formGroup]="form" [nzLayout]="'vertical'">
+        <div class="grid grid-cols-1 md:gap-x-6 md:grid-cols-2 lg:grid-cols-3">
+            <!-- Product: every active product, in stock or not -->
+            <nz-form-item class="lg:col-span-2">
+                <nz-form-label [nzRequired]="hasRequiredValidator('product_oid')">Product</nz-form-label>
+                <nz-form-control nzErrorTip="Product is required.">
+                    <nz-select class="w-full" nzShowSearch nzAllowClear nzServerSearch nzPlaceHolder="Search any product, stocked or not" formControlName="product_oid" (nzOnSearch)="onSearch($event)">
+                        @for (product of productList; track product.product_oid) {
+                            <nz-option [nzValue]="product.product_oid" [nzLabel]="product.product_name + (product.sku ? ' (' + product.sku + ')' : '')"></nz-option>
+                        }
+                    </nz-select>
+                </nz-form-control>
+            </nz-form-item>
+
+            <!-- Stock shown as context, never as a limit -->
+            <nz-form-item>
+                <nz-form-label>In Stock Now</nz-form-label>
+                <nz-form-control>
+                    @if (selectedProduct) {
+                        @if (selectedProduct.sellable_quantity > 0) {
+                            <nz-tag nzColor="#109648">
+                                <nz-icon nzType="check" class="mr-1"></nz-icon>
+                                {{ selectedProduct.sellable_quantity }} sellable
+                            </nz-tag>
+                        } @else {
+                            <nz-tag nzColor="#FA8C16">
+                                <nz-icon nzType="clock-circle" class="mr-1"></nz-icon>
+                                Out of stock, which is what pre-orders are for
+                            </nz-tag>
+                        }
+                    } @else {
+                        <span class="text-sm text-gray-500">Select a product</span>
+                    }
+                </nz-form-control>
+            </nz-form-item>
+
+            <nz-form-item>
+                <nz-form-label [nzRequired]="hasRequiredValidator('quantity')">Quantity</nz-form-label>
+                <nz-form-control nzErrorTip="Quantity must be at least 1.">
+                    <nz-input-number class="w-full" formControlName="quantity" [nzMin]="1" [nzStep]="1"></nz-input-number>
+                </nz-form-control>
+            </nz-form-item>
+
+            <nz-form-item>
+                <nz-form-label [nzRequired]="hasRequiredValidator('unit_price')">Unit Price</nz-form-label>
+                <nz-form-control nzErrorTip="Unit price is required.">
+                    <nz-input-number class="w-full" formControlName="unit_price" [nzMin]="0" [nzStep]="1"></nz-input-number>
+                </nz-form-control>
+            </nz-form-item>
+
+            <nz-form-item>
+                <nz-form-label [nzRequired]="hasRequiredValidator('discount')">Discount</nz-form-label>
+                <nz-form-control nzErrorTip="Discount is required.">
+                    <nz-input-number class="w-full" formControlName="discount" [nzMin]="0" [nzStep]="1"></nz-input-number>
+                </nz-form-control>
+            </nz-form-item>
+
+            <nz-form-item>
+                <nz-form-label>Line Total</nz-form-label>
+                <nz-form-control>
+                    <nz-input-number class="w-full" formControlName="total" [nzDisabled]="true"></nz-input-number>
+                </nz-form-control>
+            </nz-form-item>
+        </div>
+
+        <div class="flex justify-end items-center gap-3">
+            @if (formData) {
+                <button nz-button type="button" nzType="default" (click)="onCancelEdit()">
+                    <nz-icon nzType="undo" nzTheme="outline" />
+                    Cancel
+                </button>
+            }
+            <button nz-button type="button" nzType="dashed" (click)="onAdd()">
+                <nz-icon [nzType]="formData ? 'save' : 'plus'" nzTheme="outline" />
+                {{ formData ? 'Update Item' : 'Add Item' }}
+            </button>
+        </div>
+    </form>
+}

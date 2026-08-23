@@ -252,6 +252,40 @@
                     <nz-empty nzNotFoundContent="No statistics available"></nz-empty>
                 }
 
+                <!-- Pre-order demand: customers have already committed to these
+                     units, so this is what to reorder. Bookings are not sales and
+                     are counted separately from every revenue figure above. -->
+                @if (preOrderDemand(); as demand) {
+                    @if (demand.bookingCount > 0) {
+                        <nz-card nzTitle="Pre-Order Demand" [nzExtra]="preOrderExtra">
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
+                                <div class="text-center">
+                                    <nz-statistic [nzValue]="demand.totalUnits" [nzTitle]="'Units Pre-Ordered'" [nzValueStyle]="{ color: '#FA8C16' }" [nzPrefix]="prefixUnits"></nz-statistic>
+                                    <ng-template #prefixUnits>
+                                        <span nz-icon nzType="shopping-cart" nzTheme="outline"></span>
+                                    </ng-template>
+                                </div>
+                                <div class="text-center">
+                                    <nz-statistic [nzValue]="demand.bookingCount" [nzTitle]="'Open Bookings'" [nzPrefix]="prefixBookings"></nz-statistic>
+                                    <ng-template #prefixBookings>
+                                        <span nz-icon nzType="clock-circle" nzTheme="outline"></span>
+                                    </ng-template>
+                                </div>
+                                <div class="text-center">
+                                    <button nz-button nzType="default" (click)="viewPreOrders()">
+                                        <nz-icon nzType="eye" nzTheme="outline"></nz-icon>
+                                        View Pre-Orders
+                                    </button>
+                                </div>
+                            </div>
+                            <nz-alert class="mt-4" nzType="info" nzShowIcon nzMessage="Committed demand, not a forecast" nzDescription="Customers have already booked these units. They are not sales and are not counted in any revenue figure until each pre-order is converted into an order."></nz-alert>
+                        </nz-card>
+                        <ng-template #preOrderExtra>
+                            <nz-icon nzType="shopping" nzTheme="twotone" class="text-lg" />
+                        </ng-template>
+                    }
+                }
+
                 @if (activityTimeline(); as timeline) {
                     @if (timeline.length > 0) {
                         <nz-card nzTitle="Recent Activity" [nzExtra]="timelineExtra">

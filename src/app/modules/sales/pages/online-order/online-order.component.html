@@ -30,13 +30,29 @@
       </div>
 
       <form nz-form [formGroup]="form" class="space-y-4" [nzLayout]="'vertical'" (ngSubmit)="promptCreate()">
-            <!-- 1) Products first (same as POS) -->
+            <!-- Converting a pre-order: everything is patched in, but each booked
+                 line still needs a batch chosen explicitly. -->
+            @if (fromPreOrderOid) {
+                  @if (awaitingBatchCount > 0) {
+                        <nz-alert nzType="warning" nzShowIcon [nzMessage]="'Converting pre-order ' + preOrderNo"
+                              [nzDescription]="awaitingBatchCount + ' booked item(s) still need a batch. Choose one for each, then save to create the order.'"></nz-alert>
+                  } @else {
+                        <nz-alert nzType="success" nzShowIcon [nzMessage]="'Converting pre-order ' + preOrderNo"
+                              nzDescription="Every booked item has a batch. Saving will create the order, hold stock, and mark the pre-order Converted."></nz-alert>
+                  }
+            }
+
+            <!-- 1) Products first (same as POS). Extra products can be added here
+                 during a conversion; they are ordinary lines with no booking link. -->
             <select-product [formData]="editingProduct" (actionEmitter)="handleProductSelect($event)"></select-product>
 
             <nz-table [nzData]="productRows" [nzBordered]="true" [nzShowPagination]="false" [nzSize]="'small'" [nzNoResult]="noProducts">
                   <thead>
                         <tr>
                               <th>Product</th>
+                              @if (fromPreOrderOid) {
+                                    <th>Line</th>
+                              }
                               <th>Quantity</th>
                               <th>Unit Price</th>
                               <th>Discount</th>
@@ -47,21 +63,57 @@
                   <tbody formArrayName="products">
                         <tr *ngFor="let product of products.controls; let i = index" [formGroupName]="i">
                               <td>{{ product.get('product_name')?.value }}</td>
+                              @if (fromPreOrderOid) {
+                                    <td>
+                                          @if (lineState(i) === 'awaiting_batch') {
+                                                <nz-tag nzColor="#FA8C16">
+                                                      <i nz-icon nzType="clock-circle" class="mr-1"></i>
+                                                      Awaiting batch
+                                                </nz-tag>
+                                          } @else if (isBookedLine(i)) {
+                                                <nz-tag nzColor="#109648">
+                                                      <i nz-icon nzType="check" class="mr-1"></i>
+                                                      Confirmed
+                                                </nz-tag>
+                                          } @else {
+                                                <nz-tag nzColor="#1677FF">
+                                                      <i nz-icon nzType="plus" class="mr-1"></i>
+                                                      Added at conversion
+                                                </nz-tag>
+                                          }
+                                    </td>
+                              }
                               <td>{{ product.get('quantity')?.value }}</td>
                               <td>{{ product.get('unit_price')?.value | currency:'৳':'symbol' }}</td>
                               <td>{{ product.get('discount')?.value }}</td>
                               <td>{{ product.get('total')?.value | currency:'৳':'symbol' }}</td>
                               <td>
-                                    <button nz-button nzType="text" nzShape="circle" type="button" (click)="editProduct(i)" nz-tooltip nzTooltipTitle="Edit">
-                                          <i nz-icon nzType="edit"></i>
-                                    </button>
-                                    <button nz-button nzType="text" nzShape="circle" type="button" (click)="removeProduct(i)" nz-tooltip nzTooltipTitle="Remove" nzDanger>
-                                          <i nz-icon nzType="delete"></i>
-                                    </button>
+                                    @if (lineState(i) === 'awaiting_batch') {
+                                          <button nz-button nzType="primary" nzSize="small" type="button" (click)="openBatchPicker(i)">
+                                                <i nz-icon nzType="select"></i>
+                                                Choose Batch
+                                          </button>
+                                    } @else {
+                                          <button nz-button nzType="text" nzShape="circle" type="button" (click)="editProduct(i)" nz-tooltip nzTooltipTitle="Edit">
+                                                <i nz-icon nzType="edit"></i>
+                                          </button>
+                                          @if (isBookedLine(i)) {
+                                                <button nz-button nzType="text" nzShape="circle" type="button" (click)="openBatchPicker(i)" nz-tooltip nzTooltipTitle="Change batch">
+                                                      <i nz-icon nzType="swap"></i>
+                                                </button>
+                                          } @else {
+                                                <button nz-button nzType="text" nzShape="circle" type="button" (click)="removeProduct(i)" nz-tooltip nzTooltipTitle="Remove" nzDanger>
+                                                      <i nz-icon nzType="delete"></i>
+                                                </button>
+                                          }
+                                    }
                               </td>
                         </tr>
                   </tbody>
             </nz-table>
+
+            <!-- Per-line batch picker, scoped to one product -->
+            <select-batch-for-line [line]="batchLine" [visible]="batchPickerVisible" (confirmed)="onBatchConfirmed($event)" (closed)="closeBatchPicker()"></select-batch-for-line>
             <ng-template #noProducts>
                   <nz-empty nzNotFoundContent="No product added yet"></nz-empty>
             </ng-template>

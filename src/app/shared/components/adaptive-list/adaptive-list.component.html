@@ -55,7 +55,9 @@
                                     </span>
                                 } @else if (column.column_type === 'date') {
                                     @let value = getCellValue(item, column);
-                                    @let formattedDate = value ? (value | date: (column.dateFormat || 'MMM d, y')) : '';
+                                    <!-- getCellValue substitutes '-' for an empty cell, which is truthy and
+                                         crashes the date pipe on a nullable date column. Guard on it. -->
+                                    @let formattedDate = value && value !== '-' ? (value | date: (column.dateFormat || 'MMM d, y')) : '-';
 
                                     <span nz-tooltip nzTooltipPlacement="bottom" [nzTooltipTitle]="formattedDate" class="text-gray-600">
                                         {{ formattedDate }}
@@ -134,7 +136,7 @@
                                         <span class="text-sm font-medium">{{ getCellValue(item, column) | currencyFormat: column.currency : column.locale }}</span>
                                     } @else if (column.column_type === 'date') {
                                         @let dateVal = getCellValue(item, column);
-                                        <span class="text-sm text-gray-600">{{ dateVal ? (dateVal | date: (column.dateFormat || 'MMM d, y')) : '' }}</span>
+                                        <span class="text-sm text-gray-600">{{ dateVal && dateVal !== '-' ? (dateVal | date: (column.dateFormat || 'MMM d, y')) : '-' }}</span>
                                     } @else if (column.text_color) {
                                         <nz-tag [nzColor]="getTextColor(item, column)" class="w-fit">
                                             {{ getCellValue(item, column) }}

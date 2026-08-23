@@ -6,6 +6,7 @@ import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { WindowState } from '@app/core/config/window-state.config';
 import { APIEndpoint } from '@app/core/constants/api-endpoint';
+import { HttpService } from '@app/core/services/http.service';
 import { FormActions } from '@app/core/interfaces/form-action';
 import { ImagePreviewService } from '@app/core/services/image-preview.service';
 import { ProductFormComponent } from '@app/modules/configuration/components/product-form/product-form.component';
@@ -41,6 +42,7 @@ export class ViewProductDetailsComponent {
     private readonly _activatedRoute = inject(ActivatedRoute);
     private readonly _notificationService = inject(NzNotificationService);
     private readonly _configurationService = inject(ConfigurationService);
+    private readonly _httpService = inject(HttpService);
     private readonly _imagePreviewService = inject(ImagePreviewService);
 
     detailUrl = computed(() => APIEndpoint.GET_PRODUCT_DETAILS ?? null);
@@ -116,9 +118,36 @@ export class ViewProductDetailsComponent {
     inventorySummary = signal<any>(null);
     activityTimeline = signal<any[]>([]);
 
+    // Open pre-order demand for this product: the reorder signal. Customers have
+    // already committed to these units, so this is real demand rather than a
+    // forecast. Bookings are not sales, so this never touches revenue figures.
+    preOrderDemand = signal<any>(null);
+
     async ngOnInit() {
         this.state.set(window.history.state as WindowState);
         this.editMode = typeof window !== 'undefined' && window.history.state?.edit === true;
+        this.loadPreOrderDemand();
+    }
+
+    loadPreOrderDemand(): void {
+        this._httpService
+            .get(APIEndpoint.GET_PRE_ORDERS_BY_PRODUCT, { product_oid: this.itemId() })
+            .pipe(takeUntilDestroyed(this._destroyRef))
+            .subscribe({
+                next: (res: any) => {
+                    if (res.status === 200 && res.body?.code === 200) {
+                        this.preOrderDemand.set(res.body.data);
+                    }
+                },
+                error: () => {
+                    // Non-fatal: the product page is still useful without it.
+                    this.preOrderDemand.set(null);
+                },
+            });
+    }
+
+    viewPreOrders(): void {
+        this._router.navigate(['/sales/pre-order/list']);
     }
 
     handleSwitchChange(event: boolean): void {

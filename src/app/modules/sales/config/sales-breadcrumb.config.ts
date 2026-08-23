@@ -47,4 +47,19 @@ export const SALES_BREADCRUMBS: ModuleBreadcrumbConfig = {
             main: [],
         },
     },
+
+    // Pre-orders are bookings, not orders, so they get their own trail rather
+    // than hanging off Orders.
+    'pre-order': {
+        parent: [
+            { label: 'Home', url: '/', icon: 'home' },
+            { label: 'Pre-Orders', url: '/sales/pre-order/list' },
+        ],
+        pages: {
+            list: [{ label: 'List' }],
+            create: [{ label: 'New Pre-Order' }],
+            view: [{ label: 'Details' }],
+            edit: [{ label: 'Edit' }],
+        },
+    },
 };

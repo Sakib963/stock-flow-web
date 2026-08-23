@@ -13,6 +13,7 @@ import { NgZorroCustomModule } from '@app/shared/ng-zorro-custom.module';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { NzModalService } from 'ng-zorro-antd/modal';
 import { SelectProductComponent } from '../../components/select-product/select-product.component';
+import { SelectBatchForLineComponent } from '../../components/select-batch-for-line/select-batch-for-line.component';
 import { finalize } from 'rxjs';
 
 // New Online Order. Same product-first flow as POS (select-product -> line table,
@@ -23,7 +24,7 @@ import { finalize } from 'rxjs';
 @Component({
     selector: 'online-order',
     standalone: true,
-    imports: [CommonModule, FormsModule, ReactiveFormsModule, NgZorroCustomModule, LoaderComponent, SelectProductComponent],
+    imports: [CommonModule, FormsModule, ReactiveFormsModule, NgZorroCustomModule, LoaderComponent, SelectProductComponent, SelectBatchForLineComponent],
     templateUrl: './online-order.component.html',
     styleUrl: './online-order.component.scss',
 })
@@ -41,6 +42,15 @@ export class OnlineOrderComponent implements OnInit {
     editOid: string | null = null;
     private _skipPaymentSync = false;
 
+    // Pre-order conversion state. Set when the page is opened from a pre-order's
+    // "Create Order" action; the booking is patched in whole, but each booked
+    // line still needs a batch chosen explicitly.
+    fromPreOrderOid: string | null = null;
+    preOrderNo: string | null = null;
+    batchPickerVisible = false;
+    batchLineIndex: number | null = null;
+    batchLine: any = null;
+
     constructor(private _http: HttpService, private _notify: NzNotificationService, private _router: Router, private _fb: FormBuilder, private _modal: NzModalService, private _destroyRef: DestroyRef) {}
 
     ngOnInit(): void {
@@ -57,8 +67,13 @@ export class OnlineOrderComponent implements OnInit {
             });
 
         this.editOid = (history.state && history.state.editOid) || null;
+        this.fromPreOrderOid = (history.state && history.state.fromPreOrderOid) || null;
+
         if (this.editOid) {
             this.loadForEdit(this.editOid);
+        } else if (this.fromPreOrderOid) {
+            this.loadInvoiceNumber();
+            this.loadFromPreOrder(this.fromPreOrderOid);
         } else {
             this.loadInvoiceNumber();
         }
@@ -120,7 +135,61 @@ export class OnlineOrderComponent implements OnInit {
             unit_price: [product?.unit_price ?? null, [Validators.required, Validators.min(0)]],
             discount: [product?.discount ?? 0],
             total: [product?.total ?? 0, Validators.required],
+            // --- Pre-order conversion only; never sent to the server ---
+            // A booked line arrives with no batch, so it starts 'awaiting_batch'
+            // and blocks save until the admin picks a batch and confirms it.
+            pre_order_item_oid: [product?.pre_order_item_oid ?? null],
+            booked_quantity: [product?.booked_quantity ?? null],
+            line_state: [product?.line_state ?? 'confirmed'],
         });
+    }
+
+    // --- Pre-order conversion helpers ---
+    get awaitingBatchCount(): number {
+        return this.products.controls.filter((c) => c.get('line_state')?.value === 'awaiting_batch').length;
+    }
+
+    isBookedLine(i: number): boolean {
+        return !!this.products.at(i).get('pre_order_item_oid')?.value;
+    }
+
+    lineState(i: number): string {
+        return this.products.at(i).get('line_state')?.value;
+    }
+
+    // A booked line is a commitment: it cannot be dropped and cannot go below the
+    // booked quantity, because either would quietly turn an all-or-nothing
+    // conversion into a partial one.
+    minQuantityFor(i: number): number {
+        return Number(this.products.at(i).get('booked_quantity')?.value || 1);
+    }
+
+    openBatchPicker(i: number): void {
+        const group = this.products.at(i);
+        this.batchLineIndex = i;
+        this.batchLine = {
+            product_oid: group.get('product_oid')?.value,
+            product_name: group.get('product_name')?.value,
+            quantity: Number(group.get('quantity')?.value || 0),
+        };
+        this.batchPickerVisible = true;
+    }
+
+    onBatchConfirmed(event: { inventory_oid: string; batch: any }): void {
+        if (this.batchLineIndex === null) return;
+        const group = this.products.at(this.batchLineIndex);
+        group.patchValue({
+            inventory_oid: event.inventory_oid,
+            quantity_available: event.batch.sellable_quantity,
+            line_state: 'confirmed',
+        });
+        this.closeBatchPicker();
+    }
+
+    closeBatchPicker(): void {
+        this.batchPickerVisible = false;
+        this.batchLineIndex = null;
+        this.batchLine = null;
     }
 
     get products(): FormArray {
@@ -200,7 +269,77 @@ export class OnlineOrderComponent implements OnInit {
     }
 
     removeProduct(i: number): void {
+        if (this.isBookedLine(i)) {
+            this._notify.warning('Booked item', 'This item came from the pre-order and cannot be removed. Cancel the pre-order instead if the customer no longer wants it.');
+            return;
+        }
         this.products.removeAt(i);
+    }
+
+    // Pull the whole booking onto this page: customer, delivery, money and every
+    // product line. Lines arrive WITHOUT a batch, because a pre-order never had
+    // one, and the system must not guess which batch a booked line meant.
+    private loadFromPreOrder(oid: string): void {
+        this.loading = true;
+        this._http
+            .get(`${APIEndpoint.GET_PRE_ORDER_DETAILS}/${oid}`)
+            .pipe(
+                takeUntilDestroyed(this._destroyRef),
+                finalize(() => (this.loading = false))
+            )
+            .subscribe({
+                next: (res: any) => {
+                    if (res.status !== 200 || !res.body?.data) return;
+                    const p = res.body.data.details;
+                    const items = res.body.data.items || [];
+
+                    this.preOrderNo = p.preorder_no;
+
+                    const advance = Number(p.advance_paid || 0);
+                    const total = Number(p.total_amount || 0);
+
+                    this._skipPaymentSync = true;
+                    this.form.patchValue({
+                        customer_name: p.customer_name,
+                        customer_phone: p.customer_phone,
+                        customer_email: p.customer_email,
+                        address: p.customer_address,
+                        city: p.delivery_city,
+                        zone: p.delivery_zone,
+                        area: p.delivery_area,
+                        postcode: p.delivery_postcode,
+                        delivery_charge: Number(p.delivery_charge || 0),
+                        discount_total: Number(p.discount_total || 0),
+                        // The advance already collected carries straight over.
+                        amount_paid: advance,
+                        payment_status: advance <= 0 ? 'unpaid' : advance >= total ? 'paid' : 'partially_paid',
+                        notes: p.notes,
+                    });
+                    this._skipPaymentSync = false;
+
+                    this.products.clear();
+                    items.forEach((i: any) =>
+                        this.products.push(
+                            this.createProductGroup({
+                                inventory_oid: null, // chosen per line, below
+                                product_oid: i.product_oid,
+                                product_name: i.product_name,
+                                quantity_available: null,
+                                quantity: Number(i.quantity),
+                                unit_price: Number(i.unit_price),
+                                discount: Number(i.discount || 0),
+                                total: Number(i.total),
+                                pre_order_item_oid: i.oid,
+                                booked_quantity: Number(i.quantity),
+                                line_state: 'awaiting_batch',
+                            })
+                        )
+                    );
+
+                    this._notify.info('Pre-order loaded', `Pick a batch for each of the ${items.length} booked item(s), then save to create the order.`);
+                },
+                error: (err: any) => this._notify.error('Error!', err?.error?.message || 'Unable to load the pre-order'),
+            });
     }
 
     private buildPayload(): any {
@@ -235,6 +374,9 @@ export class OnlineOrderComponent implements OnInit {
                 total: p.total,
             })),
         };
+        // `line_state` and `booked_quantity` are UI-only and deliberately dropped
+        // here; `pre_order_item_oid` is not sent either, since the pre-order link
+        // is established by mark-converted after the order is saved.
     }
 
     // Every action asks for confirmation first.
@@ -248,7 +390,15 @@ export class OnlineOrderComponent implements OnInit {
             this._notify.error('Error', 'Fill customer name, phone and delivery address, and add at least one product.');
             return;
         }
-        this.confirm(this.editOid ? 'Save changes to this order?' : 'Create this order and hold stock?', () => this.save());
+
+        // A booked line without a batch is not a valid order line.
+        if (this.awaitingBatchCount > 0) {
+            this._notify.error('Batch needed', `${this.awaitingBatchCount} pre-ordered item(s) still need a batch. Choose one for each before saving.`);
+            return;
+        }
+
+        const message = this.editOid ? 'Save changes to this order?' : this.fromPreOrderOid ? `Create this order from pre-order ${this.preOrderNo}? Stock will be held and the pre-order will be marked Converted.` : 'Create this order and hold stock?';
+        this.confirm(message, () => this.save());
     }
 
     promptDraft(): void {
@@ -320,6 +470,16 @@ export class OnlineOrderComponent implements OnInit {
                     if (res.status === 200 && res.body?.code === 200) {
                         this._notify.success('Saved', msg);
                         const oid = res.body.data?.oid || this.editOid;
+
+                        // Close the loop on a conversion: link both directions and
+                        // move the booking to Converted. The order already exists at
+                        // this point, so a failure here is reported but does not
+                        // discard the order.
+                        if (this.fromPreOrderOid && oid) {
+                            this._markPreOrderConverted(this.fromPreOrderOid, oid);
+                            return;
+                        }
+
                         if (oid) this._router.navigate([`/sales/orders/view/${oid}`]);
                         else this._router.navigate(['/sales/orders/list']);
                     } else {
@@ -327,6 +487,26 @@ export class OnlineOrderComponent implements OnInit {
                     }
                 },
                 error: (err: any) => this._notify.error('Blocked', err?.error?.message || 'Failed'),
+            });
+    }
+
+    private _markPreOrderConverted(preOrderOid: string, orderOid: string): void {
+        this._http
+            .post(APIEndpoint.MARK_PRE_ORDER_CONVERTED, { oid: preOrderOid, order_oid: orderOid })
+            .pipe(takeUntilDestroyed(this._destroyRef))
+            .subscribe({
+                next: (res: any) => {
+                    if (res.status === 200 && res.body?.code === 200) {
+                        this._notify.success('Pre-order converted', `Pre-order ${this.preOrderNo} is now marked Converted.`);
+                    } else {
+                        this._notify.warning('Order saved', `The order was created, but the pre-order could not be marked Converted: ${res.body?.message || 'unknown error'}`);
+                    }
+                    this._router.navigate([`/sales/orders/view/${orderOid}`]);
+                },
+                error: (err: any) => {
+                    this._notify.warning('Order saved', `The order was created, but the pre-order could not be marked Converted: ${err?.error?.message || 'request failed'}`);
+                    this._router.navigate([`/sales/orders/view/${orderOid}`]);
+                },
             });
     }
 

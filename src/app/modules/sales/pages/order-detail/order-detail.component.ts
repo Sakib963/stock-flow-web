@@ -50,17 +50,12 @@ export class OrderDetailComponent {
     returnVisible = false;
     returnLines: any[] = [];
     refundDelivery = false;
-    convertVisible = false;
-    convertLines: any[] = [];
-    batchOptions: Record<string, any[]> = {};
 
     // --- derived flags for which actions to show ---
     isPending = computed(() => this.order()?.status === 'Pending');
     isConfirmed = computed(() => this.order()?.status === 'Confirmed');
     isDispatched = computed(() => !!this.order()?.dispatched_on);
-    isPreorder = computed(() => this.order()?.order_type === 'Preorder');
-    canConfirm = computed(() => this.isPending() && !this.isPreorder());
-    canConvert = computed(() => this.isPending() && this.isPreorder());
+    canConfirm = computed(() => this.isPending());
     canEdit = computed(() => this.isPending() && this.order()?.channel === 'ONLINE');
     canCancel = computed(() => (this.isPending() || this.isConfirmed()) && !this.isDispatched());
     canDispatch = computed(() => this.isConfirmed() && !this.isDispatched());
@@ -177,30 +172,6 @@ export class OrderDetailComponent {
         this.act(APIEndpoint.ORDER_CREATE_RETURN, { order_oid: this.oid, refund_delivery_charge: this.refundDelivery, items }, 'Return processed', () => (this.returnVisible = false));
     }
 
-    // --- Convert pre-order ---
-    openConvert(): void {
-        this.convertLines = (this.order()?.items || []).map((i: any) => ({ order_item_oid: i.oid, product_oid: i.product_oid, product_name: i.product_name, quantity: i.quantity, inventory_oid: null }));
-        this.batchOptions = {};
-        this.convertVisible = true;
-        // Fetch sellable batches to assign per product.
-        this._http.get(APIEndpoint.POS_GET_PRODUCT_LIST, { search_text: '' }).subscribe({
-            next: (res: any) => {
-                if (res.status === 200) {
-                    for (const row of res.body.data || []) {
-                        (this.batchOptions[row.product_oid] ||= []).push(row);
-                    }
-                }
-            },
-        });
-    }
-    submitConvert(): void {
-        if (this.convertLines.some((l) => !l.inventory_oid)) {
-            this._notify.warning('Assign batches', 'Pick an in-stock batch for every line');
-            return;
-        }
-        const items = this.convertLines.map((l) => ({ order_item_oid: l.order_item_oid, inventory_oid: l.inventory_oid }));
-        this.act(APIEndpoint.ONLINE_CONVERT_PREORDER, { oid: this.oid, items }, 'Pre-order converted; stock held', () => (this.convertVisible = false));
-    }
 
     editOrder(): void {
         this._router.navigate(['/sales/online'], { state: { editOid: this.oid } });

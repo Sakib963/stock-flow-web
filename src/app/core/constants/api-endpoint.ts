@@ -134,9 +134,6 @@ export class APIEndpoint {
     static ONLINE_SMART_FILL = '/api/v1/sales/online/smart-fill';
     static ONLINE_CREATE_ORDER = '/api/v1/sales/online/create-online-order';
     static ONLINE_SAVE_DRAFT = '/api/v1/sales/online/save-draft';
-    static ONLINE_CREATE_PREORDER = '/api/v1/sales/online/create-preorder';
-    static ONLINE_CONVERT_PREORDER = '/api/v1/sales/online/convert-preorder';
-    static ONLINE_PREORDERS_FOR_PRODUCT = '/api/v1/sales/online/get-preorders-for-product';
     static ORDER_LIST = '/api/v1/sales/order/get-order-list';
     static ORDER_DETAILS = '/api/v1/sales/order/get-order-details';
     static ORDER_CONFIRM = '/api/v1/sales/order/confirm';
@@ -145,6 +142,25 @@ export class APIEndpoint {
     static ORDER_EDIT_PENDING = '/api/v1/sales/order/edit-pending';
     static ORDER_CREATE_RETURN = '/api/v1/sales/order/create-return';
     static DELIVERY_SEND_FOR_DELIVERY = '/api/v1/sales/delivery/send-for-delivery';
+
+    // Pre-Order feature: own tables, never the `orders` spine
+    static GET_PRE_ORDER_LIST = '/api/v1/sales/pre-order/get-pre-order-list';
+    static GET_PRE_ORDER_LIST_KPIS = '/api/v1/sales/pre-order/get-pre-order-list-kpis';
+    static GET_PRE_ORDER_DETAILS = '/api/v1/sales/pre-order/get-pre-order-details';
+    static CREATE_PRE_ORDER = '/api/v1/sales/pre-order/create-pre-order';
+    static UPDATE_PRE_ORDER_DETAILS = '/api/v1/sales/pre-order/update-pre-order-details';
+    static CONFIRM_PRE_ORDER = '/api/v1/sales/pre-order/confirm-pre-order';
+    static CANCEL_PRE_ORDER = '/api/v1/sales/pre-order/cancel-pre-order';
+    static RECORD_PRE_ORDER_ADVANCE = '/api/v1/sales/pre-order/record-advance';
+    static GET_PRE_ORDER_NUMBER = '/api/v1/sales/pre-order/get-pre-order-number';
+    static GET_PRE_ORDER_STOCK_READINESS = '/api/v1/sales/pre-order/get-stock-readiness';
+    static GET_BATCHES_FOR_PRODUCT = '/api/v1/sales/pre-order/get-batches-for-product';
+    static MARK_PRE_ORDER_CONVERTED = '/api/v1/sales/pre-order/mark-converted';
+    static GET_PRE_ORDERS_BY_PRODUCT = '/api/v1/sales/pre-order/get-pre-orders-by-product';
+    static GET_READY_TO_CONVERT = '/api/v1/sales/pre-order/get-ready-to-convert';
+    static GET_PRODUCT_LIST_FOR_PRE_ORDER = '/api/v1/sales/pre-order/get-product-list-for-pre-order';
+    static GENERATE_PRE_ORDER_REPORT = '/api/v1/sales/pre-order/generate-pre-order-report';
+    static EXPORT_PRE_ORDER_DATA = '/api/v1/sales/pre-order/export-pre-order-data';
 
     static CHANGE_PASSWORD = '/api/v1/profile/change-password/change-user-password';
     static VERIFY_OTP_FOR_PASSWORD_CHANGE = '/api/v1/profile/change-password/verify-otp-for-password-change';
