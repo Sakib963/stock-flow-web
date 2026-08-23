@@ -30,18 +30,12 @@ export class PrintService {
         return '৳' + (Number(n) || 0).toFixed(2);
     }
 
-    // Only allow a hex color into the printed HTML/CSS; otherwise use the fallback.
-    private hex(c: any, fallback: string): string {
-        return /^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/.test(String(c || '')) ? String(c) : fallback;
-    }
-
     private brand() {
         const s = this._settings.settings() || {};
         return {
             name: s.name || COMPANY_INFO.name,
             logo: s.logo_url || '',
-            invoiceBg: s.invoice_bg_url || s.logo_url || '',
-            color: this.hex(s.brand_color, '#1f2430'),
+            invoiceLogo: s.invoice_logo_url || s.logo_url || '',
             address: s.address || COMPANY_INFO.address || '',
             phone: s.phone_primary || COMPANY_INFO.phone || '',
             phone2: s.phone_secondary || '',
@@ -214,9 +208,7 @@ export class PrintService {
           * { box-sizing: border-box; }
           body { font-family: 'Times New Roman', Times, serif; color: #14181f; font-size: 12.5px; margin: 0; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 
-          /* Repeated on every page */
-          .watermark { position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; z-index: 0; }
-          .watermark img { width: 92%; max-width: none; opacity: 0.10; }
+          /* Footer repeats on every page */
           .page-footer { position: fixed; left: 0; right: 0; bottom: 0; height: 12mm; padding-top: 3mm; text-align: center; font-size: 10px; color: #667085; border-top: 1px solid #c9ccd3; background: #fff; z-index: 3; }
 
           .sheet { width: 100%; border-collapse: collapse; position: relative; z-index: 1; }
@@ -266,7 +258,6 @@ export class PrintService {
         </style>
       </head>
       <body>
-        ${b.invoiceBg ? `<div class="watermark"><img src="${this.esc(b.invoiceBg)}" alt=""/></div>` : ''}
         <div class="page-footer">${footerBits}${footerBits ? ' &nbsp;&bull;&nbsp; ' : ''}Thank you for your business</div>
 
         <table class="sheet">
@@ -275,7 +266,7 @@ export class PrintService {
 
             <div class="head">
               <div>
-                ${b.logo ? `<img class="logo" src="${this.esc(b.logo)}" alt=""/>` : ''}
+                ${b.invoiceLogo ? `<img class="logo" src="${this.esc(b.invoiceLogo)}" alt=""/>` : ''}
                 <div class="biz-name">${this.esc(b.name)}</div>
                 ${b.address ? `<div class="biz-meta">${this.esc(b.address)}</div>` : ''}
                 ${contact ? `<div class="biz-meta">${contact}</div>` : ''}
@@ -351,7 +342,7 @@ export class PrintService {
         let qr = '';
         if (order?.tracking_token) {
             try {
-                qr = await toDataURL(`${environment.trackerUrl}/${order.tracking_token}`, { margin: 1, width: 240 });
+                qr = await toDataURL(`${environment.trackerUrl.replace(/\/+$/, '')}/${order.tracking_token}`, { margin: 1, width: 240 });
             } catch (e) {
                 console.error('QR generation failed', e);
             }

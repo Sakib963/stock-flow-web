@@ -7,6 +7,7 @@ import { HttpService } from '@app/core/services/http.service';
 import { FileService } from '@app/core/services/file.service';
 import { SettingsService } from '@app/core/services/settings.service';
 import { markFormGroupTouched } from '@app/core/constants/helper';
+import { DEFAULT_TRACKER_TEMPLATE, TRACKER_TEMPLATES } from '@app/core/constants/tracker-templates';
 import { PageHeaderComponent } from '@app/shared/components/page-header/page-header.component';
 import { LoaderComponent } from '@app/shared/components/loader/loader.component';
 import { ConfirmationModalComponent } from '@app/shared/components/confirmation-modal/confirmation-modal.component';
@@ -17,7 +18,8 @@ import { finalize } from 'rxjs';
 
 // Settings: the shop's editable business profile + delivery defaults. Saving pushes
 // the new values to the DB and refreshes the app-wide SettingsService (which the 3
-// order prints and delivery defaults read from). Two tabs: Company Info + Delivery.
+// order prints and delivery defaults read from). Tabs: Company Info, Branding,
+// Tracking Page (which of the tracker's designs the public page uses) and Delivery.
 @Component({
     selector: 'settings',
     standalone: true,
@@ -30,7 +32,8 @@ export class SettingsComponent implements OnInit {
     loading = false;
     saving = false;
     uploadingLogo = false;
-    uploadingBg = false;
+    uploadingInvoiceLogo = false;
+    trackerTemplates = TRACKER_TEMPLATES;
 
     constructor(
         private _fb: FormBuilder,
@@ -67,8 +70,8 @@ export class SettingsComponent implements OnInit {
             facebook_url: [null],
             instagram_url: [null],
             invoice_footer: [null],
-            brand_color: ['#1677ff'],
-            invoice_bg_url: [null],
+            invoice_logo_url: [null],
+            tracker_template: [DEFAULT_TRACKER_TEMPLATE],
             // Delivery Details
             default_delivery_charge: [0, [Validators.min(0)]],
             order_system: ['both', [Validators.required]],
@@ -110,8 +113,8 @@ export class SettingsComponent implements OnInit {
             facebook_url: d.facebook_url,
             instagram_url: d.instagram_url,
             invoice_footer: d.invoice_footer,
-            brand_color: d.brand_color || '#1677ff',
-            invoice_bg_url: d.invoice_bg_url,
+            invoice_logo_url: d.invoice_logo_url,
+            tracker_template: d.tracker_template || DEFAULT_TRACKER_TEMPLATE,
             default_delivery_charge: Number(d.default_delivery_charge ?? 0),
             order_system: d.order_system || 'both',
         });
@@ -144,7 +147,7 @@ export class SettingsComponent implements OnInit {
         this.form.get('logo_url')?.setValue(null);
     }
 
-    onInvoiceBgSelected(event: Event): void {
+    onInvoiceLogoSelected(event: Event): void {
         const input = event.target as HTMLInputElement;
         const file = input.files?.[0];
         if (!file) return;
@@ -152,23 +155,32 @@ export class SettingsComponent implements OnInit {
             this._notify.error('Error', 'File size exceeds 500 KB. Please upload a smaller image.');
             return;
         }
-        this.uploadingBg = true;
+        this.uploadingInvoiceLogo = true;
         this._fileService.uploadImage(file).subscribe({
             next: (res: any) => {
-                this.uploadingBg = false;
-                if (res?.secure_url) this.form.get('invoice_bg_url')?.setValue(res.secure_url);
+                this.uploadingInvoiceLogo = false;
+                if (res?.secure_url) this.form.get('invoice_logo_url')?.setValue(res.secure_url);
                 else this._notify.error('Error', 'Failed to upload image');
             },
             error: () => {
-                this.uploadingBg = false;
+                this.uploadingInvoiceLogo = false;
                 this._notify.error('Error', 'Failed to upload image');
             },
         });
         input.value = '';
     }
 
-    removeInvoiceBg(): void {
-        this.form.get('invoice_bg_url')?.setValue(null);
+    removeInvoiceLogo(): void {
+        this.form.get('invoice_logo_url')?.setValue(null);
+    }
+
+    // Tracking page design. Only the key is stored; the tracker owns the actual design.
+    isTemplate(key: string): boolean {
+        return (this.form.get('tracker_template')?.value || DEFAULT_TRACKER_TEMPLATE) === key;
+    }
+
+    selectTemplate(key: string): void {
+        this.form.get('tracker_template')?.setValue(key);
     }
 
     // Confirm before saving (settings apply across the app and the order prints).

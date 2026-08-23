@@ -4,7 +4,7 @@
 
 <div *ngIf="!loading" class="p-4">
       <form nz-form [formGroup]="form" [nzLayout]="'vertical'" (ngSubmit)="promptSave()">
-            <nz-card nzSize="small" class="max-w-5xl">
+            <nz-card nzSize="small">
                   <nz-tabset nzType="line" nzTabPosition="top">
                         <!-- Company Info -->
                         <nz-tab nzTitle="Company Info">
@@ -76,7 +76,7 @@
                         <!-- Legal & Tax -->
                         <nz-tab nzTitle="Legal & Tax">
                               <p class="text-xs text-gray-400 pt-2 mb-2">Optional. Printed on the A4 invoice.</p>
-                              <div class="grid grid-cols-1 sm:grid-cols-3 gap-x-4 max-w-3xl">
+                              <div class="grid grid-cols-1 sm:grid-cols-3 gap-x-4">
                                     <nz-form-item>
                                           <nz-form-label>BIN</nz-form-label>
                                           <nz-form-control><input nz-input placeholder="Business ID Number" formControlName="bin" /></nz-form-control>
@@ -95,7 +95,7 @@
                         <!-- Payment -->
                         <nz-tab nzTitle="Payment">
                               <p class="text-xs text-gray-400 pt-2 mb-2">Optional. Collection details printed on the invoice.</p>
-                              <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 max-w-3xl">
+                              <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-4">
                                     <nz-form-item class="sm:col-span-2">
                                           <nz-form-label>Bank Details</nz-form-label>
                                           <nz-form-control><textarea nz-input rows="2" placeholder="Bank name, account name, account number, branch" formControlName="bank_details"></textarea></nz-form-control>
@@ -113,36 +113,26 @@
 
                         <!-- Branding -->
                         <nz-tab nzTitle="Branding">
-                              <p class="text-xs text-gray-400 pt-2 mb-2">Brand color, social links, and the note printed at the bottom of invoices.</p>
-                              <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 max-w-3xl">
+                              <p class="text-xs text-gray-400 pt-2 mb-2">Invoice logo, social links, and the note printed at the bottom of invoices.</p>
+                              <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-4">
                                     <nz-form-item class="sm:col-span-2">
-                                          <nz-form-label>Brand Color</nz-form-label>
-                                          <nz-form-control nzExtra="Accent used on the order tracking page.">
-                                                <div class="flex items-center gap-3">
-                                                      <input type="color" formControlName="brand_color" class="cursor-pointer" style="width:44px;height:34px;padding:0;border:1px solid #d9d9d9;border-radius:6px;background:none" />
-                                                      <span class="text-sm text-gray-500">{{ form.get('brand_color')?.value }}</span>
-                                                </div>
-                                          </nz-form-control>
-                                    </nz-form-item>
-
-                                    <nz-form-item class="sm:col-span-2">
-                                          <nz-form-label>Invoice Background</nz-form-label>
-                                          <nz-form-control nzExtra="Large full-width watermark printed behind every A4 invoice page. Best as a light/transparent PNG. If empty, the logo is used.">
+                                          <nz-form-label>Invoice Logo</nz-form-label>
+                                          <nz-form-control nzExtra="Logo shown on the A4 invoice header. If empty, the main logo is used.">
                                                 <div class="flex items-center gap-4 border rounded-lg p-3">
-                                                      @if (form.get('invoice_bg_url')?.value) {
-                                                      <img [src]="form.get('invoice_bg_url')?.value" alt="Invoice background" class="max-h-20 object-contain" />
+                                                      @if (form.get('invoice_logo_url')?.value) {
+                                                      <img [src]="form.get('invoice_logo_url')?.value" alt="Invoice logo" class="max-h-20 object-contain" />
                                                       } @else {
                                                       <div class="w-24 h-20 flex items-center justify-center text-gray-300"><i nz-icon nzType="picture" class="text-3xl"></i></div>
                                                       }
                                                       <div class="flex gap-2">
-                                                            <button nz-button type="button" nzType="default" nzSize="small" (click)="bgInput.click()" [nzLoading]="uploadingBg">
-                                                                  <i nz-icon nzType="upload"></i>{{ uploadingBg ? 'Uploading...' : 'Upload' }}
+                                                            <button nz-button type="button" nzType="default" nzSize="small" (click)="invLogoInput.click()" [nzLoading]="uploadingInvoiceLogo">
+                                                                  <i nz-icon nzType="upload"></i>{{ uploadingInvoiceLogo ? 'Uploading...' : 'Upload' }}
                                                             </button>
-                                                            @if (form.get('invoice_bg_url')?.value) {
-                                                            <button nz-button type="button" nzDanger nzSize="small" (click)="removeInvoiceBg()">Remove</button>
+                                                            @if (form.get('invoice_logo_url')?.value) {
+                                                            <button nz-button type="button" nzDanger nzSize="small" (click)="removeInvoiceLogo()">Remove</button>
                                                             }
                                                       </div>
-                                                      <input #bgInput type="file" accept="image/*" (change)="onInvoiceBgSelected($event)" hidden />
+                                                      <input #invLogoInput type="file" accept="image/*" (change)="onInvoiceLogoSelected($event)" hidden />
                                                 </div>
                                           </nz-form-control>
                                     </nz-form-item>
@@ -161,9 +151,54 @@
                               </div>
                         </nz-tab>
 
+                        <!-- Tracking Page -->
+                        <nz-tab nzTitle="Tracking Page">
+                              <p class="text-xs text-gray-400 pt-2 mb-3">
+                                    The public page customers land on when they scan the QR on an order. Pick one of the ready-made designs below. The order data shown is the same in every design, along with your business name and
+                                    logo; only the look and the wording change.
+                              </p>
+                              <div class="tpl-grid">
+                                    @for (t of trackerTemplates; track t.key) {
+                                    <button type="button" class="tpl-card" [class.tpl-card--on]="isTemplate(t.key)" (click)="selectTemplate(t.key)" [attr.aria-pressed]="isTemplate(t.key)">
+                                          <span class="tpl-thumb" [style.background]="t.preview.bg">
+                                                <span class="tpl-sheet" [style.background]="t.preview.card" [style.border-color]="t.preview.line" [style.border-radius]="t.preview.radius">
+                                                      <span class="tpl-pill" [style.background]="t.preview.accent"></span>
+                                                      <span class="tpl-line tpl-line--w" [style.background]="t.preview.line"></span>
+                                                      <span class="tpl-line tpl-line--n" [style.background]="t.preview.line"></span>
+                                                      @if (t.preview.layout === 'horizontal') {
+                                                      <span class="tpl-steps">
+                                                            <span class="tpl-dot" [style.background]="t.preview.accent"></span>
+                                                            <span class="tpl-rail" [style.background]="t.preview.accent"></span>
+                                                            <span class="tpl-dot" [style.background]="t.preview.accent"></span>
+                                                            <span class="tpl-rail" [style.background]="t.preview.line"></span>
+                                                            <span class="tpl-dot" [style.background]="t.preview.line"></span>
+                                                      </span>
+                                                      } @else {
+                                                      <span class="tpl-steps tpl-steps--v">
+                                                            <span class="tpl-row"><span class="tpl-dot" [style.background]="t.preview.accent"></span><span class="tpl-line tpl-line--w" [style.background]="t.preview.line"></span></span>
+                                                            <span class="tpl-row"><span class="tpl-dot" [style.background]="t.preview.accent"></span><span class="tpl-line tpl-line--n" [style.background]="t.preview.line"></span></span>
+                                                            <span class="tpl-row"><span class="tpl-dot" [style.background]="t.preview.line"></span><span class="tpl-line tpl-line--w" [style.background]="t.preview.line"></span></span>
+                                                      </span>
+                                                      }
+                                                </span>
+                                          </span>
+                                          <span class="tpl-meta">
+                                                <span class="tpl-name">
+                                                      {{ t.label }}
+                                                      @if (isTemplate(t.key)) {
+                                                      <i nz-icon nzType="check-circle" nzTheme="fill" class="tpl-check"></i>
+                                                      }
+                                                </span>
+                                                <span class="tpl-desc">{{ t.description }}</span>
+                                          </span>
+                                    </button>
+                                    }
+                              </div>
+                        </nz-tab>
+
                         <!-- Delivery Details -->
                         <nz-tab nzTitle="Delivery Details">
-                              <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 pt-2 max-w-3xl">
+                              <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 pt-2">
                                     <nz-form-item>
                                           <nz-form-label>Default Delivery Charge</nz-form-label>
                                           <nz-form-control nzExtra="Pre-filled on a new online order.">
@@ -185,7 +220,7 @@
                   </nz-tabset>
             </nz-card>
 
-            <div class="flex justify-end mt-4 max-w-5xl">
+            <div class="flex justify-end mt-4">
                   <button nz-button nzType="primary" type="submit" [nzLoading]="saving"><i nz-icon nzType="save"></i>Save Settings</button>
             </div>
       </form>
