@@ -1,3 +1,22 @@
+<!-- Smart Fill: paste a customer's message, get the customer + a structured
+     delivery address. Same parser the online-order page uses. -->
+<ng-template #smartFillPop>
+    <div class="w-72">
+        <textarea nz-input rows="4" placeholder="Paste the customer's Facebook / Messenger reply here (Bangla or English)..." [(ngModel)]="pastedText" [ngModelOptions]="{ standalone: true }"></textarea>
+        <button nz-button nzType="primary" nzBlock class="mt-2" type="button" [nzLoading]="parsing()" (click)="smartFill()">
+            <nz-icon nzType="thunderbolt" nzTheme="outline" />
+            Parse &amp; fill
+        </button>
+        <p class="text-xs text-gray-400 mt-1">Fills name, phone and address, split into city / zone / area / postcode. Review before saving.</p>
+    </div>
+</ng-template>
+
+<ng-template #numberSuffix>
+    @if (numberLoading()) {
+        <nz-spin nzSimple [nzSize]="'small'"></nz-spin>
+    }
+</ng-template>
+
 <div class="p-4">
     <form nz-form [formGroup]="form" [nzLayout]="'vertical'" (ngSubmit)="onSubmit()">
         <!-- Booking -->
@@ -7,7 +26,9 @@
                 <nz-form-item>
                     <nz-form-label>Pre-Order No</nz-form-label>
                     <nz-form-control>
-                        <input formControlName="preorder_no" nz-input readonly placeholder="Assigned on save" />
+                        <nz-input-group [nzSuffix]="numberSuffix">
+                            <input formControlName="preorder_no" nz-input readonly [placeholder]="numberLoading() ? 'Reserving number...' : 'Assigned on save'" />
+                        </nz-input-group>
                     </nz-form-control>
                 </nz-form-item>
 
@@ -29,7 +50,13 @@
 
         <!-- Customer -->
         <div class="border rounded-sm bg-white p-4 mb-4">
-            <h3 class="text-base font-bold text-gray-900 mb-4">Customer</h3>
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-base font-bold text-gray-900">Customer</h3>
+                <button nz-button nzSize="small" nzType="default" type="button" nz-popover nzPopoverTitle="Smart Fill" [nzPopoverContent]="smartFillPop" nzPopoverTrigger="click" nzPopoverPlacement="bottomRight">
+                    <nz-icon nzType="thunderbolt" nzTheme="outline" />
+                    Smart Fill
+                </button>
+            </div>
             <div class="grid grid-cols-1 md:gap-x-6 md:grid-cols-2 lg:grid-cols-3">
                 <nz-form-item>
                     <nz-form-label [nzRequired]="hasRequiredValidator('customer_name')">Customer Name</nz-form-label>
@@ -77,23 +104,30 @@
                 </nz-form-item>
 
                 <nz-form-item>
-                    <nz-form-label>City</nz-form-label>
-                    <nz-form-control>
-                        <input formControlName="delivery_city" nz-input placeholder="Enter city" />
-                    </nz-form-control>
-                </nz-form-item>
-
-                <nz-form-item>
-                    <nz-form-label>Zone</nz-form-label>
-                    <nz-form-control>
-                        <input formControlName="delivery_zone" nz-input placeholder="Enter zone" />
-                    </nz-form-control>
-                </nz-form-item>
-
-                <nz-form-item>
                     <nz-form-label>Area</nz-form-label>
                     <nz-form-control>
-                        <input formControlName="delivery_area" nz-input placeholder="Enter area" />
+                        <input formControlName="delivery_area" nz-input placeholder="e.g. Shekhertek" />
+                    </nz-form-control>
+                </nz-form-item>
+
+                <nz-form-item>
+                    <nz-form-label>Zone / Region</nz-form-label>
+                    <nz-form-control>
+                        <input formControlName="delivery_zone" nz-input placeholder="e.g. Mohammadpur" />
+                    </nz-form-control>
+                </nz-form-item>
+
+                <nz-form-item>
+                    <nz-form-label>City</nz-form-label>
+                    <nz-form-control>
+                        <input formControlName="delivery_city" nz-input placeholder="e.g. Dhaka" />
+                    </nz-form-control>
+                </nz-form-item>
+
+                <nz-form-item>
+                    <nz-form-label>Postcode</nz-form-label>
+                    <nz-form-control>
+                        <input formControlName="delivery_postcode" nz-input placeholder="e.g. 1207" />
                     </nz-form-control>
                 </nz-form-item>
             </div>
@@ -111,12 +145,12 @@
             }
 
             @if (items().length) {
-                <nz-table #itemTable [nzData]="items()" [nzShowPagination]="false" nzSize="small" class="mt-4">
+                <nz-table #itemTable [nzData]="items()" [nzShowPagination]="false" nzSize="small" nzBordered class="mt-4">
                     <thead>
                         <tr>
                             <th>Product</th>
                             <th class="text-center">In Stock</th>
-                            <th class="text-right">Qty</th>
+                            <th class="text-right">Quantity</th>
                             <th class="text-right">Unit Price</th>
                             <th class="text-right">Discount</th>
                             <th class="text-right">Total</th>
@@ -129,23 +163,25 @@
                         @for (item of itemTable.data; track item.product_oid; let i = $index) {
                             <tr>
                                 <td>{{ item.product_name }}</td>
+                                <!-- Context, not a warning: a line with nothing on hand is an
+                                     ordinary pre-order line, so it is not flagged as a problem. -->
                                 <td class="text-center">
                                     @if (item.sellable_quantity > 0) {
-                                        <nz-tag nzColor="#109648">{{ item.sellable_quantity }}</nz-tag>
+                                        {{ item.sellable_quantity }}
                                     } @else {
-                                        <nz-tag nzColor="#FA8C16">0</nz-tag>
+                                        <span class="text-gray-400" nz-tooltip nzTooltipTitle="Nothing on hand right now. Stock is assigned when this pre-order is converted into an order.">0</span>
                                     }
                                 </td>
                                 <td class="text-right">{{ item.quantity }}</td>
-                                <td class="text-right">{{ item.unit_price }}</td>
-                                <td class="text-right">{{ item.discount }}</td>
-                                <td class="text-right font-medium">{{ item.total }}</td>
+                                <td class="text-right">{{ item.unit_price | currency: '৳' : 'symbol' }}</td>
+                                <td class="text-right">{{ item.discount | currency: '৳' : 'symbol' }}</td>
+                                <td class="text-right font-medium">{{ item.total | currency: '৳' : 'symbol' }}</td>
                                 @if (linesEditable()) {
                                     <td class="text-right">
-                                        <button nz-button nzType="link" nzSize="small" type="button" (click)="editItem(i)">
+                                        <button nz-button nzType="text" nzShape="circle" nzSize="small" type="button" (click)="editItem(i)" nz-tooltip nzTooltipTitle="Edit">
                                             <nz-icon nzType="edit" nzTheme="outline"></nz-icon>
                                         </button>
-                                        <button nz-button nzType="link" nzDanger nzSize="small" type="button" (click)="removeItem(i)">
+                                        <button nz-button nzType="text" nzShape="circle" nzDanger nzSize="small" type="button" (click)="removeItem(i)" nz-tooltip nzTooltipTitle="Remove">
                                             <nz-icon nzType="delete" nzTheme="outline"></nz-icon>
                                         </button>
                                     </td>
@@ -155,7 +191,7 @@
                     </tbody>
                 </nz-table>
             } @else {
-                <nz-empty nzNotFoundContent="No items added yet"></nz-empty>
+                <nz-empty nzNotFoundContent="No item added yet"></nz-empty>
             }
         </div>
 
@@ -212,19 +248,19 @@
             <dl class="grid grid-cols-2 sm:grid-cols-4 gap-4">
                 <div>
                     <dt class="text-xs text-gray-500">Subtotal</dt>
-                    <dd class="text-sm font-medium text-gray-900">{{ subtotal() }}</dd>
+                    <dd class="text-sm font-medium text-gray-900">{{ subtotal() | currency: '৳' : 'symbol' }}</dd>
                 </div>
                 <div>
                     <dt class="text-xs text-gray-500">Grand Total</dt>
-                    <dd class="text-base font-bold text-gray-900">{{ grandTotal() }}</dd>
+                    <dd class="text-base font-bold text-gray-900">{{ grandTotal() | currency: '৳' : 'symbol' }}</dd>
                 </div>
                 <div>
                     <dt class="text-xs text-gray-500">Advance Paid</dt>
-                    <dd class="text-sm font-medium text-gray-900">{{ form.get('advance_paid')?.value || 0 }}</dd>
+                    <dd class="text-sm font-medium text-gray-900">{{ advancePaid() | currency: '৳' : 'symbol' }}</dd>
                 </div>
                 <div>
                     <dt class="text-xs text-gray-500">Balance Due</dt>
-                    <dd class="text-sm font-medium text-gray-900">{{ grandTotal() - (form.get('advance_paid')?.value || 0) }}</dd>
+                    <dd class="text-sm font-medium text-gray-900">{{ balanceDue() | currency: '৳' : 'symbol' }}</dd>
                 </div>
             </dl>
         </div>

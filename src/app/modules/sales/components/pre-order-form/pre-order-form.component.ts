@@ -1,9 +1,11 @@
 import { CommonModule } from '@angular/common';
 import { Component, computed, inject, input, output, signal } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { APIEndpoint } from '@app/core/constants/api-endpoint';
 import { Constants } from '@app/core/constants/constants';
 import { markFormGroupTouched } from '@app/core/constants/helper';
+import { getDefaultDeliveryCharge } from '@app/core/constants/settings-state';
 import { FormActions } from '@app/core/interfaces/form-action';
 import { HttpService } from '@app/core/services/http.service';
 import { SelectPreOrderProductComponent } from '@app/modules/sales/components/select-pre-order-product/select-pre-order-product.component';
@@ -11,6 +13,7 @@ import { ConfirmationModalComponent } from '@app/shared/components/confirmation-
 import { NgZorroCustomModule } from '@app/shared/ng-zorro-custom.module';
 import { NzModalService } from 'ng-zorro-antd/modal';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
+import { finalize } from 'rxjs';
 
 // Shared create/edit form for a pre-order (a booking for stock not yet held).
 //
@@ -20,7 +23,7 @@ import { NzNotificationService } from 'ng-zorro-antd/notification';
 @Component({
     selector: 'pre-order-form',
     standalone: true,
-    imports: [CommonModule, NgZorroCustomModule, ReactiveFormsModule, SelectPreOrderProductComponent],
+    imports: [CommonModule, FormsModule, NgZorroCustomModule, ReactiveFormsModule, SelectPreOrderProductComponent],
     templateUrl: './pre-order-form.component.html',
     styleUrl: './pre-order-form.component.scss',
 })
@@ -49,6 +52,16 @@ export class PreOrderFormComponent {
     editingItem: any = null;
     editingIndex: number | null = null;
 
+    // The number is reserved by the server, so the field is empty until that
+    // round trip returns. Show it loading rather than looking blank and broken.
+    numberLoading = signal(false);
+
+    // Smart Fill: the same parser the online-order page uses, so a pasted
+    // Messenger reply fills the customer and the structured delivery address here
+    // too. A pre-order becomes an order, and that order needs those fields.
+    pastedText = '';
+    parsing = signal(false);
+
     form = this._formBuilder.nonNullable.group({
         oid: [null as string | null],
         preorder_no: [null as string | null],
@@ -63,7 +76,7 @@ export class PreOrderFormComponent {
         delivery_area: [null as string | null],
         delivery_postcode: [null as string | null],
         discount_total: [0],
-        delivery_charge: [0],
+        delivery_charge: [getDefaultDeliveryCharge()],
         advance_paid: [0, [Validators.min(0)]],
         advance_method: [null as string | null],
         advance_reference: [null as string | null],
@@ -71,7 +84,18 @@ export class PreOrderFormComponent {
         notes: [null as string | null],
     });
 
+    // Money totals depend on form controls, which are not signals. Mirror the
+    // form's value into one so the computed totals below actually recompute when
+    // discount or delivery charge is typed.
+    private formValue = toSignal(this.form.valueChanges, { initialValue: this.form.getRawValue() });
+
     subtotal = computed(() => this.items().reduce((sum, i) => sum + Number(i.total || 0), 0));
+
+    grandTotal = computed(() => this.subtotal() - Number(this.formValue().discount_total || 0) + Number(this.formValue().delivery_charge || 0));
+
+    advancePaid = computed(() => Number(this.formValue().advance_paid || 0));
+
+    balanceDue = computed(() => this.grandTotal() - this.advancePaid());
 
     ngOnInit(): void {
         const preOrder = this.preOrder();
@@ -117,19 +141,49 @@ export class PreOrderFormComponent {
     }
 
     private _loadPreOrderNumber(): void {
-        this._httpService.get(APIEndpoint.GET_PRE_ORDER_NUMBER).subscribe({
-            next: (res: any) => {
-                if (res.status === 200 && res.body?.code === 200) {
-                    this.form.get('preorder_no')?.setValue(res.body.data.preorder_no);
-                }
-            },
-            error: () => {
-                // Non-fatal: the server assigns a number on save if this is blank.
-            },
-        });
+        this.numberLoading.set(true);
+        this._httpService
+            .get(APIEndpoint.GET_PRE_ORDER_NUMBER)
+            .pipe(finalize(() => this.numberLoading.set(false)))
+            .subscribe({
+                next: (res: any) => {
+                    if (res.status === 200 && res.body?.code === 200) {
+                        this.form.get('preorder_no')?.setValue(res.body.data.preorder_no);
+                    }
+                },
+                error: () => {
+                    // Non-fatal: the server assigns a number on save if this is blank.
+                },
+            });
     }
 
-    grandTotal = computed(() => this.subtotal() - Number(this.form.get('discount_total')?.value || 0) + Number(this.form.get('delivery_charge')?.value || 0));
+    // --- Smart Fill ---
+    smartFill(): void {
+        if (!this.pastedText.trim()) return;
+        this.parsing.set(true);
+        this._httpService
+            .post(APIEndpoint.ONLINE_SMART_FILL, { text: this.pastedText })
+            .pipe(finalize(() => this.parsing.set(false)))
+            .subscribe({
+                next: (res: any) => {
+                    if (res.status === 200 && res.body?.data) {
+                        const d = res.body.data;
+                        // Only overwrite what the parser actually found.
+                        this.form.patchValue({
+                            customer_name: d.name ?? this.form.get('customer_name')?.value,
+                            customer_phone: d.phone ?? this.form.get('customer_phone')?.value,
+                            customer_address: d.address ?? this.form.get('customer_address')?.value,
+                            delivery_city: d.city ?? this.form.get('delivery_city')?.value,
+                            delivery_zone: d.zone ?? this.form.get('delivery_zone')?.value,
+                            delivery_area: d.area ?? this.form.get('delivery_area')?.value,
+                            delivery_postcode: d.postcode ?? this.form.get('delivery_postcode')?.value,
+                        });
+                        this._notificationService.success('Parsed', 'Review the customer and delivery details below and edit if needed');
+                    }
+                },
+                error: (err: any) => this._notificationService.error('Error!', err?.error?.message || 'Unable to parse that message'),
+            });
+    }
 
     handleProductAction(event: { action: string; value: any }): void {
         if (event.action === 'cancel') {
@@ -153,7 +207,8 @@ export class PreOrderFormComponent {
             const next = [...this.items()];
             const merged = { ...next[existingIndex] };
             merged.quantity = Number(merged.quantity) + Number(event.value.quantity);
-            merged.total = merged.quantity * Number(merged.unit_price) - Number(merged.discount || 0);
+            // Per-unit discount, same as POS and Orders.
+            merged.total = Math.max(0, (Number(merged.unit_price) - Number(merged.discount || 0)) * merged.quantity);
             next[existingIndex] = merged;
             this.items.set(next);
             return;
@@ -186,8 +241,7 @@ export class PreOrderFormComponent {
             return;
         }
 
-        const advance = Number(this.form.get('advance_paid')?.value || 0);
-        if (advance > this.grandTotal()) {
+        if (this.advancePaid() > this.grandTotal()) {
             this._notificationService.warning('Pre-Order', 'Advance paid cannot be more than the pre-order total');
             return;
         }
@@ -228,10 +282,12 @@ export class PreOrderFormComponent {
     }
 
     resetForm(): void {
-        this.form.reset({ discount_total: 0, delivery_charge: 0, advance_paid: 0 });
+        this.form.reset({ discount_total: 0, delivery_charge: getDefaultDeliveryCharge(), advance_paid: 0 });
         this.items.set([]);
         this.editingItem = null;
         this.editingIndex = null;
+        this.pastedText = '';
+        this._loadPreOrderNumber();
     }
 
     onCancel(): void {

@@ -47,6 +47,10 @@ export class OnlineOrderComponent implements OnInit {
     // line still needs a batch chosen explicitly.
     fromPreOrderOid: string | null = null;
     preOrderNo: string | null = null;
+    // Kept for the conversion banner: these are the parts of the booking that are
+    // not otherwise visible on this page, so the admin can see what carried over.
+    preOrderAdvance = 0;
+    preOrderExpectedDate: string | null = null;
     batchPickerVisible = false;
     batchLineIndex: number | null = null;
     batchLine: any = null;
@@ -147,6 +151,35 @@ export class OnlineOrderComponent implements OnInit {
     // --- Pre-order conversion helpers ---
     get awaitingBatchCount(): number {
         return this.products.controls.filter((c) => c.get('line_state')?.value === 'awaiting_batch').length;
+    }
+
+    // Only lines that came from the booking count towards conversion progress.
+    // Anything added here during the conversion is an ordinary line and is not
+    // part of what has to be resolved before saving.
+    get bookedLineCount(): number {
+        return this.products.controls.filter((c) => !!c.get('pre_order_item_oid')?.value).length;
+    }
+
+    get batchedBookedCount(): number {
+        return this.bookedLineCount - this.awaitingBatchCount;
+    }
+
+    get batchProgressPercent(): number {
+        const total = this.bookedLineCount;
+        return total ? Math.round((this.batchedBookedCount / total) * 100) : 100;
+    }
+
+    get addedAtConversionCount(): number {
+        return this.products.length - this.bookedLineCount;
+    }
+
+    get conversionReady(): boolean {
+        return this.awaitingBatchCount === 0;
+    }
+
+    viewPreOrder(): void {
+        if (!this.fromPreOrderOid) return;
+        this._router.navigate([`/sales/pre-order/view/${this.fromPreOrderOid}`]);
     }
 
     isBookedLine(i: number): boolean {
@@ -294,9 +327,11 @@ export class OnlineOrderComponent implements OnInit {
                     const items = res.body.data.items || [];
 
                     this.preOrderNo = p.preorder_no;
+                    this.preOrderExpectedDate = p.expected_date || null;
 
                     const advance = Number(p.advance_paid || 0);
                     const total = Number(p.total_amount || 0);
+                    this.preOrderAdvance = advance;
 
                     this._skipPaymentSync = true;
                     this.form.patchValue({

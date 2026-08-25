@@ -51,7 +51,7 @@
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
             <nz-card nzSize="small"><nz-statistic [nzTitle]="'Grand Total'" [nzValue]="order().total_amount" [nzPrefix]="'৳'"></nz-statistic></nz-card>
             <nz-card nzSize="small"><nz-statistic [nzTitle]="'Items'" [nzValue]="(order().items || []).length"></nz-statistic></nz-card>
-            <nz-card nzSize="small"><nz-statistic [nzTitle]="'Payment'" [nzValue]="(order().payment_status || '—') + (order().payment_type ? ' · ' + order().payment_type : '')"></nz-statistic></nz-card>
+            <nz-card nzSize="small"><nz-statistic [nzTitle]="'Payment'" [nzValue]="(order().payment_status | paymentStatusLabel: '—') + (order().payment_type ? ' · ' + (order().payment_type | paymentTypeLabel) : '')"></nz-statistic></nz-card>
             <nz-card nzSize="small"><nz-statistic [nzTitle]="'Order Date'" [nzValue]="(order().created_on | date: dateFormat) || '—'"></nz-statistic></nz-card>
         </div>
 
@@ -129,10 +129,24 @@
                     </div>
                     <nz-divider class="my-2"></nz-divider>
                     <div class="flex justify-between text-sm mb-1">
-                        <span class="text-gray-500">Payment Type</span><span>{{ order().payment_type || '—' }}</span>
+                        <span class="text-gray-500">Payment Type</span><span>{{ order().payment_type | paymentTypeLabel: '—' }}</span>
                     </div>
-                    <div class="flex justify-between text-sm">
-                        <span class="text-gray-500">Payment Status</span><span>{{ order().payment_status || '—' }}</span>
+                    <div class="flex justify-between items-center text-sm">
+                        <span class="text-gray-500">Payment Status</span>
+                        @switch (order().payment_status) {
+                            @case ('paid') {
+                                <nz-tag nzColor="success" class="m-0">{{ order().payment_status | paymentStatusLabel }}</nz-tag>
+                            }
+                            @case ('partially_paid') {
+                                <nz-tag nzColor="warning" class="m-0">{{ order().payment_status | paymentStatusLabel }}</nz-tag>
+                            }
+                            @case ('unpaid') {
+                                <nz-tag nzColor="error" class="m-0">{{ order().payment_status | paymentStatusLabel }}</nz-tag>
+                            }
+                            @default {
+                                <span>{{ order().payment_status | paymentStatusLabel: '—' }}</span>
+                            }
+                        }
                     </div>
                     @if (order().payment_status === 'partially_paid') {
                         <div class="flex justify-between text-sm mt-1">

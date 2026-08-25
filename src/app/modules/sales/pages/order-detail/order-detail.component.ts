@@ -9,13 +9,14 @@ import { PrintService } from '@app/core/services/print.service';
 import { LoaderComponent } from '@app/shared/components/loader/loader.component';
 import { PageHeaderComponent } from '@app/shared/components/page-header/page-header.component';
 import { NgZorroCustomModule } from '@app/shared/ng-zorro-custom.module';
+import { PaymentStatusLabelPipe, PaymentTypeLabelPipe } from '@app/shared/pipe/payment-label.pipe';
 import { NzModalService } from 'ng-zorro-antd/modal';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { finalize } from 'rxjs';
 
 @Component({
     selector: 'order-detail',
-    imports: [CommonModule, FormsModule, NgZorroCustomModule, PageHeaderComponent, LoaderComponent],
+    imports: [CommonModule, FormsModule, NgZorroCustomModule, PageHeaderComponent, LoaderComponent, PaymentStatusLabelPipe, PaymentTypeLabelPipe],
     templateUrl: './order-detail.component.html',
     styleUrl: './order-detail.component.scss',
 })
