@@ -104,12 +104,7 @@ export class APIEndpoint {
 
     static GET_INVOICE_LIST_FOR_MANAGER = '/api/v1/manager/invoice/get-invoice-list';
 
-    static SAVE_PRODUCT_RETURN = '/api/v1/salesman/product-return/save-product-return';
-    static GET_PRODUCT_RETURN_LIST = '/api/v1/salesman/product-return/get-product-return-list';
-    static GET_PRODUCT_RETURN_DETAILS = '/api/v1/salesman/product-return/get-product-return-details';
 
-    static GET_PRODUCT_RETURN_LIST_FOR_MANAGER = '/api/v1/manager/product-return/get-product-return-list';
-    static GET_PRODUCT_RETURN_DETAILS_FOR_MANAGER = '/api/v1/manager/product-return/get-product-return-details';
 
     // Settings (business profile + delivery defaults)
     static GET_SETTINGS = '/api/v1/configuration/settings/get-settings';
@@ -140,8 +135,17 @@ export class APIEndpoint {
     static ORDER_CANCEL = '/api/v1/sales/order/cancel';
     static ORDER_DELIVER = '/api/v1/sales/order/deliver';
     static ORDER_EDIT_PENDING = '/api/v1/sales/order/edit-pending';
-    static ORDER_CREATE_RETURN = '/api/v1/sales/order/create-return';
     static DELIVERY_SEND_FOR_DELIVERY = '/api/v1/sales/delivery/send-for-delivery';
+
+    // Returns feature: raised from an order, Pending until confirmed
+    static GET_RETURN_LIST = '/api/v1/sales/return/get-return-list';
+    static GET_RETURN_LIST_KPIS = '/api/v1/sales/return/get-return-list-kpis';
+    static GET_RETURN_DETAILS = '/api/v1/sales/return/get-return-details';
+    static GET_RETURNS_FOR_ORDER = '/api/v1/sales/return/get-returns-for-order';
+    static CREATE_RETURN = '/api/v1/sales/return/create-return';
+    static CONFIRM_RETURN = '/api/v1/sales/return/confirm-return';
+    static CANCEL_RETURN = '/api/v1/sales/return/cancel-return';
+    static MARK_RETURN_REFUNDED = '/api/v1/sales/return/mark-refunded';
 
     // Pre-Order feature: own tables, never the `orders` spine
     static GET_PRE_ORDER_LIST = '/api/v1/sales/pre-order/get-pre-order-list';

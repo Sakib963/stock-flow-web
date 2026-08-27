@@ -109,6 +109,44 @@
                         </tbody>
                     </nz-table>
                 </nz-card>
+
+                <!-- Returns raised against this order. Hidden when there are none,
+                     so an order that never came back stays uncluttered. -->
+                @if (returns().length) {
+                    <nz-card nzSize="small" nzTitle="Returns">
+                        @if (pendingReturnUnits() > 0) {
+                            <nz-alert class="mb-3" nzType="warning" nzShowIcon [nzMessage]="pendingReturnUnits() + ' unit(s) are on an unconfirmed return'" [nzDescription]="'Those units have not moved yet and cannot be returned again until that return is confirmed or cancelled.'"></nz-alert>
+                        }
+                        <nz-table [nzData]="returns()" nzSize="small" [nzShowPagination]="false">
+                            <thead>
+                                <tr>
+                                    <th>Return</th>
+                                    <th>Reason</th>
+                                    <th nzAlign="center">Units</th>
+                                    <th nzAlign="right">Refund</th>
+                                    <th nzAlign="center">Status</th>
+                                    <th>Date</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @for (r of returns(); track r.oid) {
+                                    <tr>
+                                        <td>{{ r.return_no }}</td>
+                                        <td>{{ r.return_reason || '-' }}</td>
+                                        <td nzAlign="center">{{ r.units }}</td>
+                                        <td nzAlign="right">{{ r.refund_amount | currency: '৳' : 'symbol' }}</td>
+                                        <td nzAlign="center">
+                                            <nz-tag [nzColor]="returnStatusColor(r.status)">{{ r.status }}</nz-tag>
+                                        </td>
+                                        <td>{{ r.created_on | date: dateFormat }}</td>
+                                        <td nzAlign="right"><a (click)="openReturnRecord(r.oid)">Open</a></td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </nz-table>
+                    </nz-card>
+                }
             </div>
 
             <!-- Right: payment summary + timeline -->
@@ -202,14 +240,15 @@
         </ng-container>
     </nz-modal>
 
-    <!-- Return modal -->
-    <nz-modal [(nzVisible)]="returnVisible" nzTitle="Process return" (nzOnCancel)="returnVisible = false" [nzFooter]="null" nzWidth="640px">
+    <!-- Return modal. This records the return only: stock moves when it is
+         confirmed on the return's own page, so a mistake here is recoverable. -->
+    <nz-modal [(nzVisible)]="returnVisible" nzTitle="Record a return" (nzOnCancel)="returnVisible = false" [nzFooter]="null" nzWidth="720px">
         <ng-container *nzModalContent>
             <nz-table [nzData]="returnLines" nzSize="small" [nzShowPagination]="false">
                 <thead>
                     <tr>
                         <th>Product</th>
-                        <th nzAlign="center">Remaining</th>
+                        <th nzAlign="center">Can return</th>
                         <th nzAlign="center">Return qty</th>
                         <th>Condition</th>
                     </tr>
@@ -221,14 +260,58 @@
                             <td nzAlign="center">{{ l.remaining }}</td>
                             <td nzAlign="center"><nz-input-number [(ngModel)]="l.quantity" [nzMin]="0" [nzMax]="l.remaining" [nzStep]="1"></nz-input-number></td>
                             <td>
-                                <nz-select [(ngModel)]="l.condition" class="w-32"><nz-option nzValue="Good" nzLabel="Good (restock)"></nz-option><nz-option nzValue="Damaged" nzLabel="Damaged (dispose)"></nz-option></nz-select>
+                                <nz-select [(ngModel)]="l.condition" class="w-40"><nz-option nzValue="Good" nzLabel="Good (restock)"></nz-option><nz-option nzValue="Damaged" nzLabel="Damaged (write off)"></nz-option></nz-select>
                             </td>
                         </tr>
                     }
                 </tbody>
             </nz-table>
-            <label nz-checkbox class="mt-3" [(ngModel)]="refundDelivery">Also refund the delivery charge</label>
-            <div class="text-right mt-4"><button nz-button class="mr-2" (click)="returnVisible = false">Close</button><button nz-button nzType="primary" [nzLoading]="busy()" (click)="submitReturn()">Process return</button></div>
+
+            <div class="mt-4 flex flex-col gap-3">
+                <div>
+                    <label class="block text-sm mb-1">Reason</label>
+                    <nz-select class="w-full" nzPlaceHolder="Why are the goods coming back?" [(ngModel)]="returnReason">
+                        @for (reason of returnReasons; track reason) {
+                            <nz-option [nzValue]="reason" [nzLabel]="reason"></nz-option>
+                        }
+                    </nz-select>
+                </div>
+                <div>
+                    <label class="block text-sm mb-1">Note (optional)</label>
+                    <textarea nz-input rows="2" placeholder="Anything worth recording about this return" [(ngModel)]="returnNote"></textarea>
+                </div>
+                <!-- Delivery was a service that was performed, so it is only
+                     refundable when the whole order comes back. -->
+                @if (canRefundDelivery()) {
+                    <label nz-checkbox [(ngModel)]="refundDelivery">Also refund the delivery charge ({{ order().delivery_charge | currency: '৳' : 'symbol' }})</label>
+                } @else if (order().delivery_charge > 0) {
+                    <div class="text-xs text-gray-500">Delivery charge of {{ order().delivery_charge | currency: '৳' : 'symbol' }} is not refundable on a partial return.</div>
+                }
+
+                <div class="border-t pt-3 flex flex-col gap-1">
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm text-gray-500">Value of goods coming back</span>
+                        <span class="text-sm">{{ returnValuePreview() | currency: '৳' : 'symbol' }}</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm font-medium">Refund due to customer</span>
+                        <span class="text-lg font-semibold">{{ returnRefundPreview() | currency: '৳' : 'symbol' }}</span>
+                    </div>
+                    <!-- Only meaningful when the customer has not paid in full: the
+                         shop cannot refund money it never received. -->
+                    @if (returnDueReductionPreview() > 0) {
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-gray-500">Reduces what the customer owes</span>
+                            <span class="text-sm">{{ returnDueReductionPreview() | currency: '৳' : 'symbol' }}</span>
+                        </div>
+                        <div class="text-xs text-gray-500 mt-1">This order is {{ order().payment_status | paymentStatusLabel }}, so only the paid part can be refunded.</div>
+                    }
+                </div>
+            </div>
+
+            <nz-alert class="mt-3" nzType="info" nzShowIcon [nzMessage]="'This does not move stock yet'" [nzDescription]="'The return is saved as Pending. Open it and confirm once the goods are physically back, or cancel it if it was entered by mistake.'"></nz-alert>
+
+            <div class="text-right mt-4"><button nz-button class="mr-2" (click)="returnVisible = false">Close</button><button nz-button nzType="primary" [nzLoading]="busy()" (click)="submitReturn()">Record return</button></div>
         </ng-container>
     </nz-modal>
 

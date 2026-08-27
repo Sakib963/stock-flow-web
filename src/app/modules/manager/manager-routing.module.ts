@@ -78,24 +78,6 @@ const routes: Routes = [
                             },
                         ],
                     },
-                    {
-                        path: 'product-return',
-                        children: [
-                            {
-                                path: '',
-                                redirectTo: 'list',
-                                pathMatch: 'full',
-                            },
-                            {
-                                path: 'list',
-                                loadComponent: () => import('./pages/inventory/product-return/display-product-return-list-for-manager/display-product-return-list-for-manager.component').then((m) => m.DisplayProductReturnListForManagerComponent),
-                            },
-                            {
-                                path: 'view-product-return/:oid',
-                                loadComponent: () => import('./pages/inventory/product-return/view-product-return-details-for-manager/view-product-return-details-for-manager.component').then((m) => m.ViewProductReturnDetailsForManagerComponent),
-                            },
-                        ],
-                    },
                 ],
             },
             {

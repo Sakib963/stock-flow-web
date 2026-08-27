@@ -1,0 +1,185 @@
+<!-- Loader only on the first load: a refresh after an action keeps the page in
+     place rather than blanking it. -->
+@if (pageLoading() && !data()) {
+    <div class="flex justify-center items-center py-20">
+        <app-loader [isVisible]="true"></app-loader>
+    </div>
+}
+
+@if (data(); as r) {
+    <page-header [title]="r.return_no" [description]="'Return against order ' + r.invoice_no" [pageKey]="'sales.returns.view'" [showBackButton]="true" [extraTemplate]="headerActions"> </page-header>
+
+    <!-- Lifecycle actions. Each one appears only in the state it applies to. -->
+    <ng-template #headerActions>
+        <nz-space>
+            <nz-tag *nzSpaceItem [nzColor]="statusColor()">{{ r.status }}</nz-tag>
+            <nz-tag *nzSpaceItem nzColor="default">{{ r.channel }}</nz-tag>
+            @if (isPending()) {
+                <button *nzSpaceItem nz-button nzType="primary" [disabled]="busy()" (click)="confirmReturn()"><nz-icon nzType="check"></nz-icon>Confirm Return</button>
+                <button *nzSpaceItem nz-button nzDanger [disabled]="busy()" (click)="openCancel()"><nz-icon nzType="close"></nz-icon>Cancel</button>
+            }
+            @if (canMarkRefunded()) {
+                <button *nzSpaceItem nz-button nzType="primary" [disabled]="busy()" (click)="markRefunded()"><nz-icon nzType="dollar"></nz-icon>Mark Refunded</button>
+            }
+            <button *nzSpaceItem nz-button (click)="goToOrder()"><nz-icon nzType="file-text"></nz-icon>View Order</button>
+        </nz-space>
+    </ng-template>
+
+    <nz-divider class="my-0"></nz-divider>
+
+    <div class="p-4 flex flex-col gap-4">
+        <!-- A Pending return has changed nothing yet. Say so plainly: it is the
+             whole reason the confirmation step exists. -->
+        @if (isPending()) {
+            <nz-alert nzType="warning" nzShowIcon [nzMessage]="'Nothing has moved yet'" [nzDescription]="'This return is recorded but not confirmed. Stock, the order and the customer balance are all untouched. Confirm it once the goods are physically back, or cancel it if it was raised by mistake.'"></nz-alert>
+        }
+        @if (r.status === 'Cancelled') {
+            <nz-alert nzType="error" nzShowIcon [nzMessage]="'This return was cancelled'" [nzDescription]="'It never moved stock and the order was left as it was.'"></nz-alert>
+        }
+
+        <!-- Stat cards -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div class="border rounded-sm bg-white p-4 text-center">
+                <nz-statistic [nzValue]="r.refund_amount" [nzTitle]="'Refund Due'" [nzPrefix]="prefixMoney"></nz-statistic>
+                <ng-template #prefixMoney><span nz-icon nzType="dollar" nzTheme="outline"></span></ng-template>
+                <div class="text-xs text-gray-500 mt-1">
+                    @if (r.due_reduction > 0) {
+                        Goods worth {{ r.return_value }}, rest cancels customer due
+                    } @else {
+                        {{ r.status === 'Completed' ? 'Settled' : 'Owed to customer' }}
+                    }
+                </div>
+            </div>
+            <div class="border rounded-sm bg-white p-4 text-center">
+                <nz-statistic [nzValue]="r.total_units" [nzTitle]="'Units Returned'" [nzPrefix]="prefixUnits"></nz-statistic>
+                <ng-template #prefixUnits><span nz-icon nzType="rollback" nzTheme="outline"></span></ng-template>
+                <div class="text-xs text-gray-500 mt-1">{{ r.items.length }} line(s)</div>
+            </div>
+            <div class="border rounded-sm bg-white p-4 text-center">
+                <nz-statistic [nzValue]="r.restocked_units" [nzTitle]="'Restocked'" [nzValueStyle]="{ color: '#109648' }" [nzPrefix]="prefixStock"></nz-statistic>
+                <ng-template #prefixStock><span nz-icon nzType="inbox" nzTheme="outline"></span></ng-template>
+                <div class="text-xs text-gray-500 mt-1">{{ isPending() ? 'After confirmation' : 'Back on the shelf' }}</div>
+            </div>
+            <div class="border rounded-sm bg-white p-4 text-center">
+                <nz-statistic [nzValue]="r.disposed_units" [nzTitle]="'Disposed'" [nzValueStyle]="{ color: r.disposed_units > 0 ? '#DF2935' : undefined }" [nzPrefix]="prefixDispose"></nz-statistic>
+                <ng-template #prefixDispose><span nz-icon nzType="delete" nzTheme="outline"></span></ng-template>
+                <div class="text-xs text-gray-500 mt-1">{{ isPending() ? 'After confirmation' : 'Written off' }}</div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+            <!-- Returned items -->
+            <nz-card class="lg:col-span-2" nzTitle="Returned Items" [nzBordered]="true">
+                <nz-table #itemTable [nzData]="r.items" nzSize="small" [nzShowPagination]="false">
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Batch</th>
+                            <th nzAlign="center">Qty</th>
+                            <th nzAlign="center">Condition</th>
+                            <th nzAlign="center">Action</th>
+                            <th nzAlign="right">Unit Price</th>
+                            <th nzAlign="right">Line Refund</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (i of itemTable.data; track i.oid) {
+                            <tr>
+                                <td>
+                                    {{ i.product_name }}
+                                    @if (i.sold_quantity) {
+                                        <div class="text-xs text-gray-500">{{ i.return_quantity }} of {{ i.sold_quantity }} sold</div>
+                                    }
+                                </td>
+                                <td>{{ i.batch_code || '-' }}</td>
+                                <td nzAlign="center">{{ i.return_quantity }}</td>
+                                <td nzAlign="center">
+                                    <nz-tag [nzColor]="i.condition === 'Good' ? 'green' : 'red'">{{ i.condition }}</nz-tag>
+                                </td>
+                                <td nzAlign="center">
+                                    @if (i.action) {
+                                        <nz-tag [nzColor]="i.action === 'Restocked' ? 'green' : 'volcano'">{{ i.action }}</nz-tag>
+                                    } @else {
+                                        <span class="text-gray-400 text-xs">Pending</span>
+                                    }
+                                </td>
+                                <td nzAlign="right">
+                                    @if (i.unit_price !== null) {
+                                        {{ i.unit_price }}
+                                        @if (i.discount > 0) {
+                                            <div class="text-xs text-gray-500">less {{ i.discount }} discount</div>
+                                        }
+                                    } @else {
+                                        <span class="text-gray-400">-</span>
+                                    }
+                                </td>
+                                <td nzAlign="right">{{ i.unit_price !== null ? i.line_refund : '-' }}</td>
+                            </tr>
+                        }
+                    </tbody>
+                </nz-table>
+
+                @if (r.dispose_oid) {
+                    <div class="mt-4">
+                        <nz-alert nzType="info" nzShowIcon [nzMessage]="'Damaged units were written off'" [nzDescription]="disposalNote"></nz-alert>
+                        <ng-template #disposalNote>
+                            <span>The damaged units on this return became a disposal document.</span>
+                            <a class="ml-1" (click)="goToDisposal()">Open the disposal</a>
+                        </ng-template>
+                    </div>
+                }
+            </nz-card>
+
+            <div class="flex flex-col gap-4">
+                <!-- Order this return came from -->
+                <nz-card nzTitle="Order" [nzBordered]="true" [nzExtra]="orderLink">
+                    <ng-template #orderLink>
+                        <a (click)="goToOrder()">Open</a>
+                    </ng-template>
+                    <nz-descriptions [nzColumn]="1" nzSize="small">
+                        <nz-descriptions-item nzTitle="Invoice">{{ r.invoice_no }}</nz-descriptions-item>
+                        <nz-descriptions-item nzTitle="Channel">{{ r.channel }}</nz-descriptions-item>
+                        <nz-descriptions-item nzTitle="Order Status">{{ r.order_status }}</nz-descriptions-item>
+                        <nz-descriptions-item nzTitle="Order Date">{{ r.order_date | date: dateFormat }}</nz-descriptions-item>
+                        <nz-descriptions-item nzTitle="Order Total">{{ r.order_total }}</nz-descriptions-item>
+                        <nz-descriptions-item nzTitle="Customer">{{ r.customer_name || '-' }}</nz-descriptions-item>
+                        <nz-descriptions-item nzTitle="Phone">{{ r.customer_phone || '-' }}</nz-descriptions-item>
+                    </nz-descriptions>
+                </nz-card>
+
+                <!-- Why it came back, and the audit trail -->
+                <nz-card nzTitle="Return Details" [nzBordered]="true">
+                    <nz-descriptions [nzColumn]="1" nzSize="small">
+                        <nz-descriptions-item nzTitle="Reason">{{ r.return_reason || '-' }}</nz-descriptions-item>
+                        <nz-descriptions-item nzTitle="Note">{{ r.notes || '-' }}</nz-descriptions-item>
+                        <nz-descriptions-item nzTitle="Value of Goods">{{ r.return_value }}</nz-descriptions-item>
+                        <nz-descriptions-item nzTitle="Refund Due">{{ r.refund_amount }}</nz-descriptions-item>
+                        @if (r.due_reduction > 0) {
+                            <nz-descriptions-item nzTitle="Cancels Customer Due">{{ r.due_reduction }}</nz-descriptions-item>
+                        }
+                        <nz-descriptions-item nzTitle="Order Paid">{{ r.order_amount_paid }} of {{ r.order_total }}</nz-descriptions-item>
+                        <nz-descriptions-item nzTitle="Delivery Charge">{{ r.refund_delivery_charge ? 'Refunded (' + r.delivery_charge + ')' : 'Not refunded' }}</nz-descriptions-item>
+                        <nz-descriptions-item nzTitle="Raised By">{{ r.created_by }}</nz-descriptions-item>
+                        <nz-descriptions-item nzTitle="Raised On">{{ r.created_on | date: dateFormat }}</nz-descriptions-item>
+                        @if (r.edited_on) {
+                            <nz-descriptions-item [nzTitle]="r.status === 'Cancelled' ? 'Cancelled By' : 'Confirmed By'">{{ r.edited_by }}</nz-descriptions-item>
+                            <nz-descriptions-item [nzTitle]="r.status === 'Cancelled' ? 'Cancelled On' : 'Confirmed On'">{{ r.edited_on | date: dateFormat }}</nz-descriptions-item>
+                        }
+                    </nz-descriptions>
+                </nz-card>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cancel modal: a withdrawal needs a reason on the record -->
+    <nz-modal [(nzVisible)]="cancelVisible" nzTitle="Cancel this return" (nzOnCancel)="cancelVisible = false" [nzFooter]="null">
+        <ng-container *nzModalContent>
+            <p class="mb-3">{{ r.return_no }} will be withdrawn. No stock moves and the order is left exactly as it is.</p>
+            <textarea nz-input rows="3" placeholder="Why is this return being withdrawn?" [(ngModel)]="cancelReason"></textarea>
+            <div class="text-right mt-4">
+                <button nz-button class="mr-2" (click)="cancelVisible = false">Close</button>
+                <button nz-button nzDanger nzType="primary" [nzLoading]="busy()" (click)="submitCancel()">Cancel Return</button>
+            </div>
+        </ng-container>
+    </nz-modal>
+}

@@ -51,6 +51,13 @@ export class OrderDetailComponent {
     returnVisible = false;
     returnLines: any[] = [];
     refundDelivery = false;
+    returnReason = '';
+    returnNote = '';
+    readonly returnReasons = ['Damaged on arrival', 'Wrong item sent', 'Size or fit', 'Changed mind', 'Not as described', 'Other'];
+
+    // Returns already raised against this order.
+    returns = signal<any[]>([]);
+    pendingReturnUnits = signal(0);
 
     // --- derived flags for which actions to show ---
     isPending = computed(() => this.order()?.status === 'Pending');
@@ -61,7 +68,15 @@ export class OrderDetailComponent {
     canCancel = computed(() => (this.isPending() || this.isConfirmed()) && !this.isDispatched());
     canDispatch = computed(() => this.isConfirmed() && !this.isDispatched());
     canDeliver = computed(() => this.isConfirmed() && this.isDispatched());
-    canReturn = computed(() => ['Delivered', 'PartiallyReturned'].includes(this.order()?.status));
+    // A return needs a realized sale: POS lands at Purchased, online at Delivered.
+    // PartiallyReturned means an earlier return took some units but more can
+    // still come back. Units already claimed by an unconfirmed return are
+    // excluded, so the button disappears once nothing is left to send back.
+    returnableUnits = computed(() => {
+        const sold = (this.order()?.items || []).reduce((sum: number, i: any) => sum + (Number(i.quantity) - Number(i.returned_qty || 0)), 0);
+        return Math.max(0, sold - this.pendingReturnUnits());
+    });
+    canReturn = computed(() => ['Purchased', 'Delivered', 'PartiallyReturned'].includes(this.order()?.status) && this.returnableUnits() > 0);
 
     constructor(
         private _http: HttpService,
@@ -89,6 +104,37 @@ export class OrderDetailComponent {
                 },
                 error: (err: any) => this._notify.error('Error!', err?.error?.message),
             });
+        this.loadReturns();
+    }
+
+    // Returns raised against this order. Also gives the pending unit count, which
+    // is what keeps the same units from being claimed by two open returns.
+    loadReturns(): void {
+        this._http
+            .get(APIEndpoint.GET_RETURNS_FOR_ORDER, { order_oid: this.oid })
+            .pipe(takeUntilDestroyed(this._destroyRef))
+            .subscribe({
+                next: (res: any) => {
+                    if (res.status === 200 && res.body?.code === 200) {
+                        this.returns.set(res.body.data?.returns || []);
+                        this.pendingReturnUnits.set(Number(res.body.data?.pending_units || 0));
+                    }
+                },
+                error: () => {
+                    // Non-fatal: the order is still fully usable without this panel.
+                    this.returns.set([]);
+                    this.pendingReturnUnits.set(0);
+                },
+            });
+    }
+
+    openReturnRecord(return_oid: string): void {
+        this._router.navigate([`/sales/returns/view/${return_oid}`]);
+    }
+
+    returnStatusColor(status: string): string {
+        const map: Record<string, string> = { Pending: 'orange', Returned: 'blue', Completed: 'green', Cancelled: 'red' };
+        return map[status] || 'default';
     }
 
     private act(endpoint: string, body: any, successMsg: string, after?: () => void): void {
@@ -153,24 +199,86 @@ export class OrderDetailComponent {
     }
 
     // --- Return ---
+    // Raising a return only records it. Nothing moves until it is confirmed on
+    // the return's own page, which is what makes a mistake here recoverable.
     openReturn(): void {
         this.refundDelivery = false;
-        this.returnLines = (this.order()?.items || []).map((i: any) => ({
-            order_item_oid: i.oid,
-            product_name: i.product_name,
-            remaining: Number(i.quantity) - Number(i.returned_qty),
-            quantity: 0,
-            condition: 'Good',
-        }));
+        this.returnReason = '';
+        this.returnNote = '';
+        this.returnLines = (this.order()?.items || [])
+            .map((i: any) => ({
+                order_item_oid: i.oid,
+                product_name: i.product_name,
+                remaining: Number(i.quantity) - Number(i.returned_qty || 0),
+                unit_price: Number(i.unit_price || 0),
+                discount: Number(i.discount || 0),
+                quantity: 0,
+                condition: 'Good',
+            }))
+            // A line with nothing left to send back is noise, not a choice.
+            .filter((l: any) => l.remaining > 0);
         this.returnVisible = true;
     }
+
+    // Delivery is a service that was performed, so it is only refundable when the
+    // whole order is coming back. Anything less and the toggle is hidden and forced off.
+    isFullReturn(): boolean {
+        return this.returnLines.length > 0 && this.returnLines.every((l) => l.quantity === l.remaining);
+    }
+
+    canRefundDelivery(): boolean {
+        return Number(this.order()?.delivery_charge || 0) > 0 && this.isFullReturn();
+    }
+
+    // What the goods are worth: unit_price less the per-unit discount, which is
+    // exactly what the customer was charged for them.
+    returnValuePreview(): number {
+        const items = this.returnLines.reduce((sum, l) => sum + l.quantity * Math.max(0, l.unit_price - l.discount), 0);
+        return items + (this.canRefundDelivery() && this.refundDelivery ? Number(this.order()?.delivery_charge || 0) : 0);
+    }
+
+    // Mirrors utils/return-utils.js: payment_status is authoritative, because
+    // amount_paid is not written by every intake path and a fully paid sale can
+    // still carry amount_paid = 0.
+    effectiveAmountPaid(): number {
+        const o = this.order();
+        if (o?.payment_status === 'paid') return Number(o?.total_amount || 0);
+        if (o?.payment_status === 'partially_paid') return Number(o?.amount_paid || 0);
+        return 0;
+    }
+
+    // Mirrors the server: the shop can only give back what it received, so the
+    // refund is capped at what the customer paid less anything already committed
+    // to an earlier return. The rest cancels part of what they still owe.
+    returnRefundPreview(): number {
+        const paid = this.effectiveAmountPaid();
+        const committed = this.returns()
+            .filter((r: any) => r.status !== 'Cancelled')
+            .reduce((s: number, r: any) => s + Number(r.refund_amount || 0), 0);
+        return Math.max(0, Math.min(this.returnValuePreview(), paid - committed));
+    }
+
+    returnDueReductionPreview(): number {
+        return Math.max(0, this.returnValuePreview() - this.returnRefundPreview());
+    }
+
     submitReturn(): void {
         const items = this.returnLines.filter((l) => l.quantity > 0).map((l) => ({ order_item_oid: l.order_item_oid, quantity: l.quantity, condition: l.condition }));
         if (!items.length) {
             this._notify.warning('Nothing selected', 'Set a return quantity on at least one line');
             return;
         }
-        this.act(APIEndpoint.ORDER_CREATE_RETURN, { order_oid: this.oid, refund_delivery_charge: this.refundDelivery, items }, 'Return processed', () => (this.returnVisible = false));
+        if (!this.returnReason) {
+            this._notify.warning('Reason required', 'Pick why the goods are coming back');
+            return;
+        }
+        this.act(
+            APIEndpoint.CREATE_RETURN,
+            // Guarded on the server too: delivery is only refundable on a full return.
+            { order_oid: this.oid, refund_delivery_charge: this.canRefundDelivery() && this.refundDelivery, return_reason: this.returnReason, note: this.returnNote?.trim() || null, items },
+            'Return recorded. Confirm it to move the stock',
+            () => (this.returnVisible = false)
+        );
     }
 
 

@@ -48,6 +48,19 @@ export const SALES_BREADCRUMBS: ModuleBreadcrumbConfig = {
         },
     },
 
+    // Returns get their own trail: they are browsed as a body of work in their
+    // own right, even though each one is raised from an order.
+    returns: {
+        parent: [
+            { label: 'Home', url: '/', icon: 'home' },
+            { label: 'Returns', url: '/sales/returns/list' },
+        ],
+        pages: {
+            list: [{ label: 'List' }],
+            view: [{ label: 'Details' }],
+        },
+    },
+
     // Pre-orders are bookings, not orders, so they get their own trail rather
     // than hanging off Orders.
     'pre-order': {

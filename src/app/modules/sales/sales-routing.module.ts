@@ -45,6 +45,22 @@ const routes: Routes = [
               },
           ]
         : []),
+    // Returns are raised from an order, so they are registered for every shop,
+    // not gated on a channel the way the intake routes are.
+    {
+        path: 'returns',
+        children: [
+            { path: '', redirectTo: 'list', pathMatch: 'full' },
+            {
+                path: 'list',
+                loadComponent: () => import('./pages/returns/return-list/return-list.component').then((m) => m.ReturnListComponent),
+            },
+            {
+                path: 'view/:oid',
+                loadComponent: () => import('./pages/returns/view-return-details/view-return-details.component').then((m) => m.ViewReturnDetailsComponent),
+            },
+        ],
+    },
     {
         path: 'orders',
         children: [

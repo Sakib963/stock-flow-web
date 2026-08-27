@@ -139,11 +139,6 @@ export class Menu {
                     route: '/manager/inventory/invoice',
                 },
                 {
-                    icon: 'assets/icons/product-return.svg',
-                    label: 'Product Return',
-                    route: '/manager/inventory/product-return',
-                },
-                {
                     icon: 'assets/icons/dispose.svg',
                     label: 'Dispose',
                     route: '/inventory/product-dispose/list',
@@ -179,6 +174,14 @@ export class Menu {
                     icon: 'assets/icons/report.svg',
                     label: 'Orders',
                     route: '/sales/orders/list',
+                },
+                // Returns live here rather than under Inventory: a return is
+                // rooted in an order and its refund is sales money. The stock
+                // consequence still shows up in Inventory (Overview + Dispose).
+                {
+                    icon: 'assets/icons/product-return.svg',
+                    label: 'Returns',
+                    route: '/sales/returns/list',
                 },
                 // Pre-orders are bookings, not orders, so they get their own entry
                 // rather than a filter on the Orders list. Online-only for now.
@@ -245,12 +248,12 @@ export class Menu {
             ],
         },
         {
-            group: 'Product Return',
+            group: 'Returns',
             items: [
                 {
                     icon: 'assets/icons/product-return.svg',
-                    label: 'Product Return',
-                    route: '/sales/product-return',
+                    label: 'Returns',
+                    route: '/sales/returns/list',
                 },
             ],
         },
