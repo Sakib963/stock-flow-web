@@ -18,12 +18,11 @@
 <!-- Template for header content (filters, search) -->
 <ng-template #headerFilters>
       <nz-divider class="mt-0 mb-4"></nz-divider>
-      <nz-input-group [nzPrefix]="prefixTemplateSearch" class="w-full md:w-96">
+      <nz-input-wrapper class="w-full md:w-96">
+            <span nzInputPrefix nz-icon nzType="search"></span>
             <input type="text" nz-input placeholder="Search categories..." [formControl]="searchControl" />
-      </nz-input-group>
-      <ng-template #prefixTemplateSearch>
-            <span nz-icon nzType="search"></span>
-      </ng-template>
+      </nz-input-wrapper>
+
 </ng-template>
 
 <!-- Page Loading State -->

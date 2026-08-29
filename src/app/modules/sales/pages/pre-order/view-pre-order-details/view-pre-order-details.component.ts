@@ -1,6 +1,6 @@
 import { CommonModule, DatePipe, Location } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, computed, DestroyRef, inject, input, signal } from '@angular/core';
+import { Component, computed, DestroyRef, inject, input, signal, ChangeDetectionStrategy } from '@angular/core';
 import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -22,6 +22,7 @@ import { catchError, combineLatest, EMPTY, finalize, map, startWith, Subject, sw
     selector: 'view-pre-order-details',
     imports: [PageHeaderComponent, NgZorroCustomModule, FormsModule, NotFoundComponent, LoaderComponent, DatePipe, SafeTextPipe, CommonModule, PreOrderFormComponent],
     templateUrl: './view-pre-order-details.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './view-pre-order-details.component.scss',
 })
 export class ViewPreOrderDetailsComponent {

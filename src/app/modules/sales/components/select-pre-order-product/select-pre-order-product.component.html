@@ -33,16 +33,14 @@
                     <nz-form-label>In Stock</nz-form-label>
                     <nz-form-control>
                         @if (selectedProduct && selectedProduct.sellable_quantity <= 0) {
-                            <nz-input-group [nzAddOnAfter]="stockNote">
+                            <nz-input-wrapper>
                                 <input nz-input [value]="selectedProduct.sellable_quantity" disabled />
-                            </nz-input-group>
+                                <span nzInputAddonAfter class="text-xs text-gray-500" nz-tooltip nzTooltipTitle="Nothing on hand right now. The booking is still valid; stock is assigned when this pre-order is converted into an order.">To book</span>
+                            </nz-input-wrapper>
                         } @else {
                             <input nz-input [value]="selectedProduct ? selectedProduct.sellable_quantity : ''" disabled />
                         }
                     </nz-form-control>
-                    <ng-template #stockNote>
-                        <span class="text-xs text-gray-500" nz-tooltip nzTooltipTitle="Nothing on hand right now. The booking is still valid; stock is assigned when this pre-order is converted into an order.">To book</span>
-                    </ng-template>
                 </nz-form-item>
 
                 <nz-form-item>

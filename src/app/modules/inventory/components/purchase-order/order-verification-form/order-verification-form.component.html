@@ -184,7 +184,7 @@
                             <nz-icon nzType="question-circle" nzTheme="outline" class="ml-1 text-gray-500" nz-tooltip nzTooltipTitle="Optional context about budget, expectations, or negotiation notes."></nz-icon>
                         </nz-form-label>
                         <nz-form-control [nzValidateStatus]="group.get('cost_remarks') || ''" [nzHasFeedback]="true">
-                            <textarea nz-input formControlName="cost_remarks" nzAutosize [nzAutosize]="{ minRows: 2, maxRows: 4 }"></textarea>
+                            <textarea nz-input formControlName="cost_remarks" cdkTextareaAutosize [cdkAutosizeMinRows]="2" [cdkAutosizeMaxRows]="4"></textarea>
                         </nz-form-control>
                     </nz-form-item>
                 }

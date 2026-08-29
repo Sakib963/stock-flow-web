@@ -30,12 +30,10 @@
         <nz-select class="w-full md:w-36" nzAllowClear nzPlaceHolder="Status" [formControl]="statusControl">
             <nz-option *ngFor="let s of statusList" [nzLabel]="s.label" [nzValue]="s.value"></nz-option>
         </nz-select>
-        <nz-input-group [nzPrefix]="prefixSearch" class="w-full md:w-72">
+        <nz-input-wrapper class="w-full md:w-72">
+            <span nzInputPrefix nz-icon nzType="search"></span>
             <input type="text" nz-input placeholder="Search by product name or batch code..." [formControl]="searchControl" />
-        </nz-input-group>
-        <ng-template #prefixSearch>
-            <span nz-icon nzType="search"></span>
-        </ng-template>
+        </nz-input-wrapper>
         <button nz-button nzType="default" nzDanger (click)="resetFilters()">
             <nz-icon nzType="redo"></nz-icon>
             Reset

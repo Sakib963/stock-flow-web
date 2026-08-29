@@ -1,4 +1,4 @@
-import { Component, Input, TemplateRef, OnInit } from '@angular/core';
+import { Component, Input, TemplateRef, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { NgZorroCustomModule } from '@app/shared/ng-zorro-custom.module';
@@ -15,6 +15,7 @@ export interface Breadcrumb {
   standalone: true,
   imports: [CommonModule, RouterModule, NgZorroCustomModule],
   templateUrl: './page-header.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './page-header.component.scss',
 })
 export class PageHeaderComponent implements OnInit {

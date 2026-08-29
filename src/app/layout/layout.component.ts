@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
 import { AuthService } from '@app/modules/auth/services/auth.service';
@@ -18,6 +18,7 @@ import { FooterComponent } from '@app/shared/components/footer/footer.component'
         FooterComponent,
     ],
     templateUrl: './layout.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./layout.component.scss']
 })
 export class LayoutComponent {

@@ -1,4 +1,4 @@
-import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   Validators,
@@ -21,6 +21,7 @@ import { markFormGroupTouched } from '@app/core/constants/helper';
         SecondaryButton,
     ],
     templateUrl: './password-change-form.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./password-change-form.component.scss']
 })
 export class PasswordChangeFormComponent implements OnInit {

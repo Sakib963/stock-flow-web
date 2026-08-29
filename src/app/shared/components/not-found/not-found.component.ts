@@ -1,4 +1,4 @@
-import { Component, computed, input, output } from '@angular/core';
+import { Component, computed, input, output, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AngularSvgIconModule } from 'angular-svg-icon';
 import { RouterLink } from '@angular/router';
@@ -10,6 +10,7 @@ import { NgZorroCustomModule } from '@app/shared/ng-zorro-custom.module';
   selector: 'app-not-found',
   imports: [CommonModule, NgZorroCustomModule, TranslateModule, RouterLink],
   templateUrl: './not-found.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./not-found.component.scss'],
 })
 export class NotFoundComponent {

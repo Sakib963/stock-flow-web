@@ -5,6 +5,7 @@ import {
   Input,
   OnInit,
   Output,
+  ChangeDetectionStrategy
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -20,6 +21,7 @@ import { finalize } from 'rxjs';
   selector: 'otp-verification',
   imports: [CommonModule, FormsModule, NgZorroCustomModule, SpinnerComponent],
   templateUrl: './otp-verification.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./otp-verification.component.scss'],
 })
 export class OtpVerificationComponent implements OnInit {

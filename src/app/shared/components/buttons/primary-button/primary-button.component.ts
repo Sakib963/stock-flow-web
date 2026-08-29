@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SpinnerComponent } from '../../spinner/spinner.component';
 import { DisableForGuestDirective } from '@app/shared/directives/guest-user.directive';
@@ -8,6 +8,7 @@ import { NgZorroCustomModule } from '@app/shared/ng-zorro-custom.module';
     selector: 'primary-button',
     imports: [CommonModule, SpinnerComponent, DisableForGuestDirective, NgZorroCustomModule],
     templateUrl: './primary-button.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./primary-button.component.scss']
 })
 export class PrimaryButton {

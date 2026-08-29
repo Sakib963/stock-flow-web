@@ -1,4 +1,4 @@
-import { Component, DestroyRef, OnInit } from '@angular/core';
+import { Component, DestroyRef, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
@@ -29,6 +29,7 @@ import { AngularSvgIconModule } from 'angular-svg-icon';
         SpinnerComponent,
     ],
     templateUrl: './login-page-secondary.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./login-page-secondary.component.scss']
 })
 export class LoginPageSecondaryComponent implements OnInit {

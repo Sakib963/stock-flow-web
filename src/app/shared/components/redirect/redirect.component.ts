@@ -1,4 +1,4 @@
-import { Component, OnInit, effect } from '@angular/core';
+import { Component, OnInit, effect, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '@app/modules/auth/services/auth.service';
 import { Router } from '@angular/router';
@@ -9,6 +9,7 @@ import { LoaderComponent } from '../loader/loader.component';
     selector: 'app-redirect',
     imports: [CommonModule, LoaderComponent],
     templateUrl: './redirect.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./redirect.component.scss'],
 })
 export class RedirectComponent implements OnInit {

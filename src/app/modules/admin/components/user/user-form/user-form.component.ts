@@ -5,6 +5,7 @@ import {
   Input,
   OnInit,
   Output,
+  ChangeDetectionStrategy
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NgZorroCustomModule } from '@app/shared/ng-zorro-custom.module';
@@ -39,6 +40,7 @@ import { SecondaryButton } from '@app/shared/components/buttons/secondary-button
     SecondaryButton,
   ],
   templateUrl: './user-form.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./user-form.component.scss'],
 })
 export class UserFormComponent implements OnInit {

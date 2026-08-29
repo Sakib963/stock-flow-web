@@ -1,6 +1,6 @@
 import { Location } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 import { APIEndpoint } from '@app/core/constants/api-endpoint';
 import { FormActions } from '@app/core/interfaces/form-action';
 import { ProductFormComponent } from '@app/modules/configuration/components/product-form/product-form.component';
@@ -14,6 +14,7 @@ import { catchError, EMPTY, finalize } from 'rxjs';
   selector: 'create-product',
   imports: [PageHeaderComponent, NgZorroCustomModule, ProductFormComponent],
   templateUrl: './create-product.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './create-product.component.scss'
 })
 export class CreateProductComponent {

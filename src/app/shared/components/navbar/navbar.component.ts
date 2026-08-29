@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Output, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ProfileMenuComponent } from '../profile-menu/profile-menu.component';
 
@@ -6,6 +6,7 @@ import { ProfileMenuComponent } from '../profile-menu/profile-menu.component';
     selector: 'app-navbar',
     imports: [CommonModule, ProfileMenuComponent],
     templateUrl: './navbar.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./navbar.component.scss']
 })
 export class NavbarComponent {

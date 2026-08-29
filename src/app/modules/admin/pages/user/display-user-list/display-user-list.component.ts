@@ -1,4 +1,4 @@
-import { Component, DestroyRef, OnInit } from '@angular/core';
+import { Component, DestroyRef, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpService } from '@app/core/services/http.service';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
@@ -24,6 +24,7 @@ import { PrimaryButtonWithPlusIcon } from '@app/shared/components/buttons/primar
         PrimaryButtonWithPlusIcon
     ],
     templateUrl: './display-user-list.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./display-user-list.component.scss']
 })
 export class DisplayUserListComponent implements OnInit {

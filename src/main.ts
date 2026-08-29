@@ -14,6 +14,9 @@ import { CloudinaryModule } from '@cloudinary/ng';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { forkJoin, map } from 'rxjs';
+import { provideNzDateFnsAdapter } from 'ng-zorro-antd/core/time';
+import { provideNgIconsConfig } from '@ng-icons/core';
+
 
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http, './assets/i18n/', '.json');
@@ -86,5 +89,7 @@ bootstrapApplication(AppComponent, {
       const settings = inject(SettingsService);
       return auth.getJwtToken() ? settings.load() : Promise.resolve();
     }),
+    provideNzDateFnsAdapter(),
+    provideNgIconsConfig({ size: '1.25rem', strokeWidth: 1.75 }),
   ],
 }).catch((err) => console.error(err));

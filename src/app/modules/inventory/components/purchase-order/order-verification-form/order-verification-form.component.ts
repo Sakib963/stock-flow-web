@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject, input, OnInit, output } from '@angular/core';
+import { Component, DestroyRef, inject, input, OnInit, output, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { NgZorroCustomModule } from '@app/shared/ng-zorro-custom.module';
@@ -14,6 +14,7 @@ import { NzNotificationService } from 'ng-zorro-antd/notification';
     selector: 'app-order-verification-form',
     imports: [CommonModule, NgZorroCustomModule, ReactiveFormsModule],
     templateUrl: './order-verification-form.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './order-verification-form.component.scss',
 })
 export class OrderVerificationFormComponent implements OnInit {

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, DestroyRef, inject } from '@angular/core';
+import { Component, DestroyRef, inject, ChangeDetectionStrategy } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ReactiveFormsModule, FormControl } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
@@ -19,6 +19,7 @@ import { debounceTime, distinctUntilChanged, finalize, map } from 'rxjs';
     selector: 'warehouse-list',
     imports: [CommonModule, NgZorroCustomModule, ReactiveFormsModule, PageHeaderComponent, AdaptiveListComponent, LoaderComponent],
     templateUrl: './warehouse-list.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './warehouse-list.component.scss',
 })
 export class WarehouseListComponent {

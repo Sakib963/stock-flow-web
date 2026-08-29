@@ -11,12 +11,6 @@
     </div>
 </ng-template>
 
-<ng-template #numberSuffix>
-    @if (numberLoading()) {
-        <nz-spin nzSimple [nzSize]="'small'"></nz-spin>
-    }
-</ng-template>
-
 <div class="p-4">
     <form nz-form [formGroup]="form" [nzLayout]="'vertical'" (ngSubmit)="onSubmit()">
         <!-- Booking -->
@@ -26,9 +20,14 @@
                 <nz-form-item>
                     <nz-form-label>Pre-Order No</nz-form-label>
                     <nz-form-control>
-                        <nz-input-group [nzSuffix]="numberSuffix">
+                        <nz-input-wrapper>
                             <input formControlName="preorder_no" nz-input readonly [placeholder]="numberLoading() ? 'Reserving number...' : 'Assigned on save'" />
-                        </nz-input-group>
+                            <span nzInputSuffix>
+                                @if (numberLoading()) {
+                                    <nz-spin nzSimple [nzSize]="'small'"></nz-spin>
+                                }
+                            </span>
+                        </nz-input-wrapper>
                     </nz-form-control>
                 </nz-form-item>
 
@@ -99,7 +98,7 @@
                 <nz-form-item class="lg:col-span-3">
                     <nz-form-label>Delivery Address</nz-form-label>
                     <nz-form-control>
-                        <textarea formControlName="customer_address" nz-input placeholder="Optional now, required when this becomes an order" nzAutosize></textarea>
+                        <textarea formControlName="customer_address" nz-input placeholder="Optional now, required when this becomes an order" cdkTextareaAutosize></textarea>
                     </nz-form-control>
                 </nz-form-item>
 

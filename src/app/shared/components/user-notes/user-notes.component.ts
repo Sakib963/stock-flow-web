@@ -8,6 +8,7 @@ import {
   OnInit,
   output,
   signal,
+  ChangeDetectionStrategy
 } from '@angular/core';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -29,6 +30,7 @@ import { ConfirmationModalComponent } from '../confirmation-modal/confirmation-m
     DatePipe,
   ],
   templateUrl: './user-notes.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './user-notes.component.scss',
 })
 export class UserNotesComponent implements OnInit {

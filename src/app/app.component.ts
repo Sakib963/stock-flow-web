@@ -1,4 +1,4 @@
-import { Component, computed } from '@angular/core';
+import { Component, computed, ChangeDetectionStrategy } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { AuthService } from './modules/auth/services/auth.service';
 import { CommonModule } from '@angular/common';
@@ -8,6 +8,7 @@ import { TranslateService } from '@ngx-translate/core';
     selector: 'app-root',
     imports: [RouterOutlet, CommonModule],
     templateUrl: './app.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./app.component.scss']
 })
 export class AppComponent {

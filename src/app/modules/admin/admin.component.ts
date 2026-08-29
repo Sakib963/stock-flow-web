@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
 
@@ -6,6 +6,7 @@ import { RouterOutlet } from '@angular/router';
     selector: 'app-admin',
     imports: [CommonModule, RouterOutlet],
     templateUrl: './admin.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./admin.component.scss']
 })
 export class AdminComponent {

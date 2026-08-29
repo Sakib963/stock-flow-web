@@ -1,5 +1,5 @@
 import { CommonModule, Location } from '@angular/common';
-import { Component, computed, inject, input, output } from '@angular/core';
+import { Component, computed, inject, input, output, ChangeDetectionStrategy } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { markFormGroupTouched } from '@app/core/constants/helper';
 import { FormActions } from '@app/core/interfaces/form-action';
@@ -12,6 +12,7 @@ import { Observable, of } from 'rxjs';
   selector: 'category-form',
   imports: [CommonModule, NgZorroCustomModule, ReactiveFormsModule],
   templateUrl: './category-form.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './category-form.component.scss',
 })
 export class CategoryFormComponent {

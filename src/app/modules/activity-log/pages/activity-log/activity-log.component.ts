@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, DestroyRef, OnInit } from '@angular/core';
+import { Component, DestroyRef, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { APIEndpoint } from '@app/core/constants/api-endpoint';
@@ -29,6 +29,7 @@ interface ActivityLogItem {
     standalone: true,
     imports: [CommonModule, FormsModule, ReactiveFormsModule, NgZorroCustomModule, PageHeaderComponent, LoaderComponent, AdaptiveListComponent],
     templateUrl: './activity-log.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './activity-log.component.scss',
 })
 export class ActivityLogComponent implements OnInit {

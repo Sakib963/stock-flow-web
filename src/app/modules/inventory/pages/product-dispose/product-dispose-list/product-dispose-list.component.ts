@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, DestroyRef, OnInit } from '@angular/core';
+import { Component, DestroyRef, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ReactiveFormsModule, FormControl } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
@@ -20,6 +20,7 @@ import { map, debounceTime, distinctUntilChanged, finalize } from 'rxjs';
     selector: 'product-dispose-list',
     imports: [CommonModule, NgZorroCustomModule, ReactiveFormsModule, PageHeaderComponent, AdaptiveListComponent, LoaderComponent],
     templateUrl: './product-dispose-list.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './product-dispose-list.component.scss',
 })
 export class ProductDisposeListComponent implements OnInit {

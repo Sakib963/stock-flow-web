@@ -1,4 +1,4 @@
-import { Component, DestroyRef, OnInit, inject, signal } from '@angular/core';
+import { Component, DestroyRef, OnInit, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { NgZorroCustomModule } from '@app/shared/ng-zorro-custom.module';
@@ -84,6 +84,7 @@ interface ProductiveCategory {
     standalone: true,
     imports: [CommonModule, RouterModule, NgZorroCustomModule, PageHeaderComponent, LoaderComponent],
     templateUrl: './configuration-dashboard.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./configuration-dashboard.component.scss'],
 })
 export class ConfigurationDashboardComponent implements OnInit {

@@ -1,4 +1,5 @@
 import { NgModule } from '@angular/core';
+import { TextFieldModule } from '@angular/cdk/text-field';
 
 import { NzAlertModule } from 'ng-zorro-antd/alert';
 import { NzAvatarModule } from 'ng-zorro-antd/avatar';
@@ -11,7 +12,7 @@ import { NzCollapseModule } from 'ng-zorro-antd/collapse';
 import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
 import { NzDescriptionsModule } from 'ng-zorro-antd/descriptions';
 import { NzDividerModule } from 'ng-zorro-antd/divider';
-import { NzDropDownModule } from 'ng-zorro-antd/dropdown';
+import { NzDropdownModule } from 'ng-zorro-antd/dropdown';
 import { NzEmptyModule } from 'ng-zorro-antd/empty';
 import { NzFormModule } from 'ng-zorro-antd/form';
 import { NzGridModule } from 'ng-zorro-antd/grid';
@@ -19,9 +20,7 @@ import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzImageModule } from 'ng-zorro-antd/image';
 import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzInputNumberModule } from 'ng-zorro-antd/input-number';
-import { NzMessageModule } from 'ng-zorro-antd/message';
 import { NzModalModule } from 'ng-zorro-antd/modal';
-import { NzNotificationModule } from 'ng-zorro-antd/notification';
 import { NzPageHeaderModule } from 'ng-zorro-antd/page-header';
 import { NzPaginationModule } from 'ng-zorro-antd/pagination';
 import { NzPopoverModule } from 'ng-zorro-antd/popover';
@@ -36,7 +35,7 @@ import { NzTabsModule } from 'ng-zorro-antd/tabs';
 import { NzTagModule } from 'ng-zorro-antd/tag';
 import { NzTimePickerModule } from 'ng-zorro-antd/time-picker';
 import { NzTimelineModule } from 'ng-zorro-antd/timeline';
-import { NzToolTipModule } from 'ng-zorro-antd/tooltip';
+import { NzTooltipModule } from 'ng-zorro-antd/tooltip';
 import { NzTreeModule } from 'ng-zorro-antd/tree';
 import { NzTreeSelectModule } from 'ng-zorro-antd/tree-select';
 import { NzUploadModule } from 'ng-zorro-antd/upload';
@@ -52,19 +51,20 @@ import { NzSpaceModule } from 'ng-zorro-antd/space';
 import { NzPopconfirmModule } from 'ng-zorro-antd/popconfirm';
 import { NzStatisticModule } from 'ng-zorro-antd/statistic';
 
+// NzMessageModule and NzNotificationModule were removed in ng-zorro v20. Both are now
+// service-only (NzMessageService / NzNotificationService are providedIn: 'root'),
+// so there is no module left to import.
 const NG_ZORRO_MODULES = [
   NzGridModule,
   NzBreadCrumbModule,
   NzButtonModule,
-  NzMessageModule,
   NzTabsModule,
   NzCardModule,
   NzDividerModule,
   NzFormModule,
   NzInputModule,
   NzImageModule,
-  NzDropDownModule,
-  NzNotificationModule,
+  NzDropdownModule,
   NzSelectModule,
   NzDatePickerModule,
   NzSkeletonModule,
@@ -76,7 +76,7 @@ const NG_ZORRO_MODULES = [
   NzRadioModule,
   NzSwitchModule,
   NzIconModule,
-  NzToolTipModule,
+  NzTooltipModule,
   NzTimelineModule,
   NzBadgeModule,
   NzDescriptionsModule,
@@ -104,7 +104,8 @@ const NG_ZORRO_MODULES = [
   NzSpinModule,
   NzSpaceModule,
   NzPopconfirmModule,
-  NzStatisticModule
+  NzStatisticModule,
+  TextFieldModule
 ];
 
 @NgModule({

@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, Inject, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { NgZorroCustomModule } from '@app/shared/ng-zorro-custom.module';
@@ -26,6 +26,7 @@ export interface UpdatePricingDrawerData {
     selector: 'inventory-update-pricing-form',
     imports: [CommonModule, ReactiveFormsModule, NgZorroCustomModule],
     templateUrl: './update-pricing-form.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './update-pricing-form.component.scss',
 })
 export class UpdatePricingFormComponent implements OnInit {

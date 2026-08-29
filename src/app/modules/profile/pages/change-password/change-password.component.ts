@@ -1,4 +1,4 @@
-import { Component, DestroyRef } from '@angular/core';
+import { Component, DestroyRef, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { OtpVerificationComponent } from '../../components/otp-verification/otp-verification.component';
@@ -25,6 +25,7 @@ import { AuthService } from '@app/modules/auth/services/auth.service';
     LoaderComponent,
   ],
   templateUrl: './change-password.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./change-password.component.scss'],
 })
 export class ChangePasswordComponent {

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, DestroyRef, computed, inject, signal } from '@angular/core';
+import { Component, DestroyRef, computed, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -17,6 +17,7 @@ import { finalize } from 'rxjs';
     selector: 'view-return-details',
     imports: [CommonModule, NgZorroCustomModule, FormsModule, PageHeaderComponent, LoaderComponent],
     templateUrl: './view-return-details.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './view-return-details.component.scss',
 })
 export class ViewReturnDetailsComponent {

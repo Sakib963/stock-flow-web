@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, DestroyRef, inject, input, OnInit, output } from '@angular/core';
+import { Component, computed, DestroyRef, inject, input, OnInit, output, ChangeDetectionStrategy } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { APIEndpoint } from '@app/core/constants/api-endpoint';
@@ -16,6 +16,7 @@ import { finalize } from 'rxjs';
     selector: 'app-aisle-form',
     imports: [CommonModule, NgZorroCustomModule, ReactiveFormsModule],
     templateUrl: './aisle-form.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./aisle-form.component.scss'],
 })
 export class AisleFormComponent implements OnInit {

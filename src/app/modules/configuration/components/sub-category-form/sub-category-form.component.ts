@@ -1,5 +1,5 @@
 import { CommonModule, Location } from '@angular/common';
-import { Component, computed, DestroyRef, inject, input, output, signal } from '@angular/core';
+import { Component, computed, DestroyRef, inject, input, output, signal, ChangeDetectionStrategy } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { APIEndpoint } from '@app/core/constants/api-endpoint';
@@ -16,6 +16,7 @@ import { finalize } from 'rxjs';
     selector: 'sub-category-form',
     imports: [CommonModule, NgZorroCustomModule, ReactiveFormsModule],
     templateUrl: './sub-category-form.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './sub-category-form.component.scss',
 })
 export class SubCategoryFormComponent {

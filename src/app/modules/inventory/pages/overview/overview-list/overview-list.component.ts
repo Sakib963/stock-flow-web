@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, DestroyRef, OnInit, signal } from '@angular/core';
+import { Component, DestroyRef, OnInit, signal, ChangeDetectionStrategy } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -19,6 +19,7 @@ import { debounceTime, distinctUntilChanged, finalize, map } from 'rxjs';
     selector: 'inventory-overview-list',
     imports: [CommonModule, NgZorroCustomModule, ReactiveFormsModule, PageHeaderComponent, AdaptiveListComponent, LoaderComponent],
     templateUrl: './overview-list.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './overview-list.component.scss',
 })
 export class OverviewListComponent implements OnInit {

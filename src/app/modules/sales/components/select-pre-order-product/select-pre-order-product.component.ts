@@ -1,4 +1,4 @@
-import { Component, DestroyRef, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
+import { Component, DestroyRef, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { LoaderComponent } from '@app/shared/components/loader/loader.component';
 import { NgZorroCustomModule } from '@app/shared/ng-zorro-custom.module';
@@ -26,6 +26,7 @@ import { NzFormTooltipIcon } from 'ng-zorro-antd/form';
     standalone: true,
     imports: [CommonModule, LoaderComponent, NgZorroCustomModule, ReactiveFormsModule, FormsModule],
     templateUrl: './select-pre-order-product.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './select-pre-order-product.component.scss',
 })
 export class SelectPreOrderProductComponent implements OnInit, OnChanges {

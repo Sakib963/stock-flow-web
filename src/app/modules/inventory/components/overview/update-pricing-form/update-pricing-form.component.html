@@ -62,7 +62,7 @@
                 <nz-form-item>
                     <nz-form-label>Cost Remarks <nz-icon nzType="question-circle" nzTheme="outline" class="ml-1 text-gray-400" nz-tooltip [nzTooltipTitle]="getTooltipText('cost_remarks')"></nz-icon></nz-form-label>
                     <nz-form-control [nzValidateStatus]="form.get('cost_remarks') || ''" [nzHasFeedback]="true">
-                        <textarea nz-input formControlName="cost_remarks" [nzAutosize]="{ minRows: 2, maxRows: 4 }" placeholder="Add context notes for these costs"></textarea>
+                        <textarea nz-input formControlName="cost_remarks" cdkTextareaAutosize [cdkAutosizeMinRows]="2" [cdkAutosizeMaxRows]="4" placeholder="Add context notes for these costs"></textarea>
                     </nz-form-control>
                 </nz-form-item>
 

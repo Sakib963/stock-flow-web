@@ -1,4 +1,4 @@
-import { Component, computed, inject, OnInit, signal, ViewChild, ElementRef, AfterViewInit, OnDestroy, DestroyRef } from '@angular/core';
+import { Component, computed, inject, OnInit, signal, ViewChild, ElementRef, AfterViewInit, OnDestroy, DestroyRef, ChangeDetectionStrategy } from '@angular/core';
 import { Location } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { PageHeaderComponent } from '@app/shared/components/page-header/page-header.component';
@@ -60,6 +60,7 @@ interface StockDistributionSegment {
     standalone: true,
     imports: [CommonModule, FormsModule, PageHeaderComponent, NgZorroCustomModule, LoaderComponent, CurrencyFormatPipe],
     templateUrl: './analytics.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './analytics.component.scss',
 })
 export class AnalyticsComponent implements OnInit, AfterViewInit, OnDestroy {

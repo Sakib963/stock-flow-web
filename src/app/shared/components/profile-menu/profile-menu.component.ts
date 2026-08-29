@@ -1,4 +1,4 @@
-import { Component, EventEmitter, inject, OnInit, Output, signal } from '@angular/core';
+import { Component, EventEmitter, inject, OnInit, Output, signal, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '@app/modules/auth/services/auth.service';
 import { NgZorroCustomModule } from '@app/shared/ng-zorro-custom.module';
@@ -20,6 +20,7 @@ import { NoteService } from '@app/core/services/note.service';
     UserNotesComponent
   ],
   templateUrl: './profile-menu.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./profile-menu.component.scss'],
 })
 export class ProfileMenuComponent implements OnInit {

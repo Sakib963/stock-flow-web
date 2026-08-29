@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, inject, input, output, signal } from '@angular/core';
+import { Component, computed, inject, input, output, signal, ChangeDetectionStrategy } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { APIEndpoint } from '@app/core/constants/api-endpoint';
@@ -25,6 +25,7 @@ import { finalize } from 'rxjs';
     standalone: true,
     imports: [CommonModule, FormsModule, NgZorroCustomModule, ReactiveFormsModule, SelectPreOrderProductComponent],
     templateUrl: './pre-order-form.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './pre-order-form.component.scss',
 })
 export class PreOrderFormComponent {

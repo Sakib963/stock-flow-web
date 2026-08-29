@@ -1,6 +1,6 @@
 import { Location } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 import { APIEndpoint } from '@app/core/constants/api-endpoint';
 import { FormActions } from '@app/core/interfaces/form-action';
 import { PreOrderFormComponent } from '@app/modules/sales/components/pre-order-form/pre-order-form.component';
@@ -14,6 +14,7 @@ import { catchError, EMPTY, finalize } from 'rxjs';
     selector: 'create-pre-order',
     imports: [PageHeaderComponent, NgZorroCustomModule, PreOrderFormComponent],
     templateUrl: './create-pre-order.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './create-pre-order.component.scss',
 })
 export class CreatePreOrderComponent {

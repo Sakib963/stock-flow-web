@@ -1,4 +1,4 @@
-import { Component, Inject } from '@angular/core';
+import { Component, Inject, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NgZorroCustomModule } from '@app/shared/ng-zorro-custom.module';
 import { AngularSvgIconModule } from 'angular-svg-icon';
@@ -14,6 +14,7 @@ export interface ModalData {
     selector: 'app-confirmation-modal',
     imports: [CommonModule, NgZorroCustomModule, AngularSvgIconModule],
     templateUrl: './confirmation-modal.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./confirmation-modal.component.scss']
 })
 export class ConfirmationModalComponent {

@@ -1,4 +1,4 @@
-import { Component, computed, DestroyRef, HostListener, inject, input, OnInit, output, signal } from '@angular/core';
+import { Component, computed, DestroyRef, HostListener, inject, input, OnInit, output, signal, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { PrimaryButton } from '@app/shared/components/buttons/primary-button/primary-button.component';
@@ -20,6 +20,7 @@ import { CurrencyFormatPipe } from '@app/shared/pipe/currency-format.pipe';
     selector: 'product-dispose-form',
     imports: [CommonModule, NgZorroCustomModule, ReactiveFormsModule, PrimaryButton, SecondaryButton, CurrencyFormatPipe],
     templateUrl: './product-dispose-form.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './product-dispose-form.component.scss',
 })
 export class ProductDisposeFormComponent implements OnInit {

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, DestroyRef } from '@angular/core';
+import { Component, DestroyRef, ChangeDetectionStrategy } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
@@ -19,6 +19,7 @@ import { debounceTime, distinctUntilChanged, finalize, map } from 'rxjs';
     selector: 'sub-category-list',
     imports: [CommonModule, NgZorroCustomModule, ReactiveFormsModule, PageHeaderComponent, AdaptiveListComponent, LoaderComponent],
     templateUrl: './sub-category-list.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './sub-category-list.component.scss',
 })
 export class SubCategoryListComponent {

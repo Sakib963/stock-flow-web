@@ -1,4 +1,4 @@
-import { Component, computed, DestroyRef, HostListener, inject, input, OnInit, output, signal } from '@angular/core';
+import { Component, computed, DestroyRef, HostListener, inject, input, OnInit, output, signal, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { PrimaryButton } from '@app/shared/components/buttons/primary-button/primary-button.component';
@@ -21,6 +21,7 @@ import { CurrencyFormatPipe } from '@app/shared/pipe/currency-format.pipe';
     selector: 'app-purchase-order-form',
     imports: [CommonModule, NgZorroCustomModule, ReactiveFormsModule, PrimaryButton, SecondaryButton, AngularSvgIconModule, CurrencyFormatPipe],
     templateUrl: './purchase-order-form.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './purchase-order-form.component.scss',
 })
 export class PurchaseOrderFormComponent implements OnInit {

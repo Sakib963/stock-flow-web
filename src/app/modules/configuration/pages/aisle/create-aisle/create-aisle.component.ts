@@ -1,4 +1,4 @@
-import { Component, computed, DestroyRef, inject, signal } from '@angular/core';
+import { Component, computed, DestroyRef, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { AisleFormComponent } from '@app/modules/configuration/components/aisle/aisle-form/aisle-form.component';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -16,6 +16,7 @@ import { NgZorroCustomModule } from '@app/shared/ng-zorro-custom.module';
     selector: 'app-create-aisle',
     imports: [PageHeaderComponent, NgZorroCustomModule, AisleFormComponent],
     templateUrl: './create-aisle.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./create-aisle.component.scss'],
 })
 export class CreateAisleComponent {

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, inject, input, output } from '@angular/core';
+import { Component, computed, inject, input, output, ChangeDetectionStrategy } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { markFormGroupTouched } from '@app/core/constants/helper';
 import { FormActions } from '@app/core/interfaces/form-action';
@@ -11,6 +11,7 @@ import { NzModalService } from 'ng-zorro-antd/modal';
     selector: 'supplier-form',
     imports: [CommonModule, NgZorroCustomModule, ReactiveFormsModule],
     templateUrl: './supplier-form.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './supplier-form.component.scss',
 })
 export class SupplierFormComponent {

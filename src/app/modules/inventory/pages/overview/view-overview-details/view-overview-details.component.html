@@ -192,7 +192,7 @@
                 <div id="barcode-label-content" class="border border-dashed p-2 rounded text-center text-sm w-[70mm] mx-auto uppercase space-y-1">
                     <p class="font-medium">{{ data.companyName }}</p>
                     <p class="font-bold text-base">{{ data.productName }}</p>
-                    <ngx-barcode6 [bc-format]="'CODE128'" [bc-value]="data.batchCode" [bc-width]="1.2" [bc-height]="40" [bc-display-value]="true"></ngx-barcode6>
+                    <barcode [value]="data.batchCode" [width]="1.2" [height]="40" />
                     @if (data.price !== null) {
                         <div class="font-semibold text-base">{{ data.price | currencyFormat }}</div>
                     }

@@ -1,6 +1,6 @@
 import { Location } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 import { APIEndpoint } from '@app/core/constants/api-endpoint';
 import { FormActions } from '@app/core/interfaces/form-action';
 import { WarehouseFormComponent } from '@app/modules/configuration/components/warehouse-form/warehouse-form.component';
@@ -14,6 +14,7 @@ import { catchError, EMPTY, finalize } from 'rxjs';
     selector: 'create-warehouse',
     imports: [PageHeaderComponent, NgZorroCustomModule, WarehouseFormComponent],
     templateUrl: './create-warehouse.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './create-warehouse.component.scss',
 })
 export class CreateWarehouseComponent {

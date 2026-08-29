@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, DestroyRef, signal } from '@angular/core';
+import { Component, DestroyRef, signal, ChangeDetectionStrategy } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -20,6 +20,7 @@ import { debounceTime, distinctUntilChanged, finalize, map } from 'rxjs';
     selector: 'return-list',
     imports: [CommonModule, NgZorroCustomModule, ReactiveFormsModule, FormsModule, PageHeaderComponent, AdaptiveListComponent, LoaderComponent],
     templateUrl: './return-list.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './return-list.component.scss',
 })
 export class ReturnListComponent {

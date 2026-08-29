@@ -178,36 +178,40 @@
                               <nz-form-item>
                                     <nz-form-label [nzRequired]="true">Customer Name</nz-form-label>
                                     <nz-form-control nzErrorTip="Please enter the customer name">
-                                          <nz-input-group nzPrefixIcon="user">
+                                          <nz-input-wrapper>
+<span nzInputPrefix nz-icon nzType="user"></span>
                                                 <input nz-input placeholder="Enter customer name" formControlName="customer_name" />
-                                          </nz-input-group>
+                                          </nz-input-wrapper>
                                     </nz-form-control>
                               </nz-form-item>
 
                               <nz-form-item>
                                     <nz-form-label [nzRequired]="true">Phone</nz-form-label>
                                     <nz-form-control nzErrorTip="Please enter the phone number">
-                                          <nz-input-group nzPrefixIcon="phone">
+                                          <nz-input-wrapper>
+<span nzInputPrefix nz-icon nzType="phone"></span>
                                                 <input nz-input placeholder="Enter phone number" formControlName="customer_phone" />
-                                          </nz-input-group>
+                                          </nz-input-wrapper>
                                     </nz-form-control>
                               </nz-form-item>
 
                               <nz-form-item>
                                     <nz-form-label>Email</nz-form-label>
                                     <nz-form-control>
-                                          <nz-input-group nzPrefixIcon="mail">
+                                          <nz-input-wrapper>
+<span nzInputPrefix nz-icon nzType="mail"></span>
                                                 <input nz-input placeholder="Enter email (optional)" formControlName="customer_email" />
-                                          </nz-input-group>
+                                          </nz-input-wrapper>
                                     </nz-form-control>
                               </nz-form-item>
 
                               <nz-form-item>
                                     <nz-form-label>Facebook / Social Handle</nz-form-label>
                                     <nz-form-control>
-                                          <nz-input-group nzPrefixIcon="facebook">
+                                          <nz-input-wrapper>
+<span nzInputPrefix nz-icon nzType="facebook"></span>
                                                 <input nz-input placeholder="Page name or profile (optional)" formControlName="social_handle" />
-                                          </nz-input-group>
+                                          </nz-input-wrapper>
                                     </nz-form-control>
                               </nz-form-item>
 

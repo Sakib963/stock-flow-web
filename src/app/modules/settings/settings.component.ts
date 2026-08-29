@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, DestroyRef, OnInit } from '@angular/core';
+import { Component, DestroyRef, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { APIEndpoint } from '@app/core/constants/api-endpoint';
@@ -25,6 +25,7 @@ import { finalize } from 'rxjs';
     standalone: true,
     imports: [CommonModule, FormsModule, ReactiveFormsModule, NgZorroCustomModule, PageHeaderComponent, LoaderComponent],
     templateUrl: './settings.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './settings.component.scss',
 })
 export class SettingsComponent implements OnInit {

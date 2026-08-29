@@ -1,5 +1,5 @@
 import { CommonModule, Location } from '@angular/common';
-import { Component, DestroyRef, OnInit, computed, inject, signal } from '@angular/core';
+import { Component, DestroyRef, OnInit, computed, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
@@ -20,6 +20,7 @@ import { finalize } from 'rxjs';
     selector: 'view-product-dispose',
     imports: [CommonModule, NgZorroCustomModule, PageHeaderComponent, LoaderComponent, ProductDisposeFormComponent, CurrencyFormatPipe, FormsModule],
     templateUrl: './view-product-dispose.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './view-product-dispose.component.scss',
 })
 export class ViewProductDisposeComponent implements OnInit {

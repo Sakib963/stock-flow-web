@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, DestroyRef } from '@angular/core';
+import { Component, DestroyRef, ChangeDetectionStrategy } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ReactiveFormsModule, FormControl } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
@@ -19,6 +19,7 @@ import { debounceTime, distinctUntilChanged, finalize, map } from 'rxjs';
     selector: 'brand-list',
     imports: [CommonModule, NgZorroCustomModule, ReactiveFormsModule, PageHeaderComponent, AdaptiveListComponent, LoaderComponent],
     templateUrl: './brand-list.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './brand-list.component.scss',
 })
 export class BrandListComponent {

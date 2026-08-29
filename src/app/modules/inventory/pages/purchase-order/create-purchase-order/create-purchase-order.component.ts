@@ -1,6 +1,6 @@
 import { CommonModule, Location } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, computed, DestroyRef, inject, signal } from '@angular/core';
+import { Component, computed, DestroyRef, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import { APIEndpoint } from '@app/core/constants/api-endpoint';
@@ -17,6 +17,7 @@ import { catchError, EMPTY, finalize } from 'rxjs';
     selector: 'create-purchase-order',
     imports: [CommonModule, PurchaseOrderFormComponent, PageHeaderComponent, NgZorroCustomModule],
     templateUrl: './create-purchase-order.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './create-purchase-order.component.scss',
 })
 export class CreatePurchaseOrderComponent {

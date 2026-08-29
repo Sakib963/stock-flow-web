@@ -1,4 +1,4 @@
-import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '@app/modules/auth/services/auth.service';
 import { SessionService } from '@app/core/services/session.service';
@@ -13,6 +13,7 @@ import { SmartTranslatePipe } from '@app/shared/pipe/smart-translate.pipe';
     selector: 'app-sidebar',
     imports: [CommonModule, RouterLink, AngularSvgIconModule, SmartTranslatePipe],
     templateUrl: './sidebar.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./sidebar.component.scss']
 })
 export class SidebarComponent implements OnInit {

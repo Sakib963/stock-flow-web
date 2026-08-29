@@ -1,4 +1,4 @@
-import { Component, DestroyRef, Input, OnInit } from '@angular/core';
+import { Component, DestroyRef, Input, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { HttpService } from '@app/core/services/http.service';
 import { ActivatedRoute } from '@angular/router';
@@ -13,6 +13,7 @@ import { UserFormComponent } from '@app/modules/admin/components/user/user-form/
     selector: 'app-view-user-details',
     imports: [CommonModule, LoaderComponent, UserFormComponent],
     templateUrl: './view-user-details.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./view-user-details.component.scss']
 })
 export class ViewUserDetailsComponent implements OnInit {

@@ -1,10 +1,11 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 @Component({
     selector: 'app-admin-dashboard',
     imports: [CommonModule],
     templateUrl: './admin-dashboard.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./admin-dashboard.component.scss']
 })
 export class AdminDashboardComponent {

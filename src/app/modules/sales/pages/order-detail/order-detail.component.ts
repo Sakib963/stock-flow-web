@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, DestroyRef, computed, signal } from '@angular/core';
+import { Component, DestroyRef, computed, signal, ChangeDetectionStrategy } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -18,6 +18,7 @@ import { finalize } from 'rxjs';
     selector: 'order-detail',
     imports: [CommonModule, FormsModule, NgZorroCustomModule, PageHeaderComponent, LoaderComponent, PaymentStatusLabelPipe, PaymentTypeLabelPipe],
     templateUrl: './order-detail.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './order-detail.component.scss',
 })
 export class OrderDetailComponent {

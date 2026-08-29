@@ -5,9 +5,10 @@
 <ng-template #headerFilters>
     <nz-divider class="mt-0 mb-4"></nz-divider>
     <div class="flex flex-wrap items-center gap-3">
-        <nz-input-group [nzPrefix]="prefixTemplateSearch" class="w-full md:w-96">
+        <nz-input-wrapper class="w-full md:w-96">
+            <span nzInputPrefix nz-icon nzType="search"></span>
             <input type="text" nz-input placeholder="Search by return, order, customer or phone..." [formControl]="searchControl" />
-        </nz-input-group>
+        </nz-input-wrapper>
         <nz-select class="w-full md:w-48" nzAllowClear nzPlaceHolder="All statuses" (ngModelChange)="onStatusChange($event)" [ngModel]="payload.status || null">
             @for (status of statusOptions; track status) {
                 <nz-option [nzValue]="status" [nzLabel]="status"></nz-option>
@@ -20,9 +21,6 @@
             </nz-select>
         }
     </div>
-    <ng-template #prefixTemplateSearch>
-        <span nz-icon nzType="search"></span>
-    </ng-template>
 </ng-template>
 
 <!-- Page Loading State -->

@@ -17,12 +17,11 @@
     <nz-select class="mb-4 md:mb-0 mr-4 w-full md:w-60" nzAllowClear nzPlaceHolder="Filter by Status" [formControl]="statusControl">
         <nz-option *ngFor="let status of statusList" [nzLabel]="status.label" [nzValue]="status.value"> </nz-option>
     </nz-select>
-    <nz-input-group [nzPrefix]="prefixTemplateSearch" class="w-full md:w-96">
+    <nz-input-wrapper class="w-full md:w-96">
+            <span nzInputPrefix nz-icon nzType="search"></span>
         <input type="text" nz-input placeholder="Search purchase orders..." [formControl]="searchControl" />
-    </nz-input-group>
-    <ng-template #prefixTemplateSearch>
-        <span nz-icon nzType="search"></span>
-    </ng-template>
+    </nz-input-wrapper>
+
 </ng-template>
 
 <!-- Page Loading State -->

@@ -1,6 +1,6 @@
 import { DatePipe, Location } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, computed, DestroyRef, inject, input, signal } from '@angular/core';
+import { Component, computed, DestroyRef, inject, input, signal, ChangeDetectionStrategy } from '@angular/core';
 import { toObservable, toSignal, takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
@@ -22,6 +22,7 @@ import { Subject, combineLatest, startWith, tap, switchMap, map, catchError, EMP
     selector: 'view-brand-details',
     imports: [PageHeaderComponent, NgZorroCustomModule, FormsModule, BrandFormComponent, NotFoundComponent, LoaderComponent, DatePipe, SafeTextPipe],
     templateUrl: './view-brand-details.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './view-brand-details.component.scss',
 })
 export class ViewBrandDetailsComponent {

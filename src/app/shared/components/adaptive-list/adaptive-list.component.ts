@@ -1,4 +1,4 @@
-import { Component, inject, input, output } from '@angular/core';
+import { Component, inject, input, output, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
@@ -11,6 +11,7 @@ import { CurrencyFormatPipe } from '@app/shared/pipe/currency-format.pipe';
     standalone: true,
     imports: [CommonModule, FormsModule, RouterModule, NgZorroCustomModule, CurrencyFormatPipe],
     templateUrl: './adaptive-list.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './adaptive-list.component.scss',
 })
 export class AdaptiveListComponent {

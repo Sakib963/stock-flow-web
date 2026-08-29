@@ -1,6 +1,6 @@
 import { DatePipe, Location } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, computed, DestroyRef, inject, input, signal } from '@angular/core';
+import { Component, computed, DestroyRef, inject, input, signal, ChangeDetectionStrategy } from '@angular/core';
 import { toObservable, toSignal, takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
@@ -22,6 +22,7 @@ import { DROPDOWN_OPTIONS } from '@app/core/constants/dropdown-options';
     selector: 'app-view-aisle-details',
     imports: [PageHeaderComponent, NgZorroCustomModule, FormsModule, AisleFormComponent, NotFoundComponent, LoaderComponent, DatePipe],
     templateUrl: './view-aisle-details.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./view-aisle-details.component.scss'],
 })
 export class ViewAisleDetailsComponent {

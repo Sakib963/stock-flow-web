@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
 
@@ -6,6 +6,7 @@ import { RouterOutlet } from '@angular/router';
     selector: 'app-auth',
     imports: [CommonModule, RouterOutlet],
     templateUrl: './auth.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./auth.component.scss']
 })
 export class AuthComponent {

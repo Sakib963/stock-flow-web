@@ -1,4 +1,4 @@
-import { Component, EventEmitter, HostListener, Input, Output } from '@angular/core';
+import { Component, EventEmitter, HostListener, Input, Output, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { trigger, style, transition, animate, state } from '@angular/animations';
@@ -9,6 +9,7 @@ import { trigger, style, transition, animate, state } from '@angular/animations'
   imports: [CommonModule, NzIconModule],
   templateUrl: './image-preview-modal.component.html',
   styleUrls: ['./image-preview-modal.component.scss'],
+  changeDetection: ChangeDetectionStrategy.Eager,
   animations: [
     trigger('fadeIn', [
       state('void', style({ opacity: 0 })),

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, DestroyRef, EventEmitter, Input, OnChanges, Output, SimpleChanges, inject } from '@angular/core';
+import { Component, DestroyRef, EventEmitter, Input, OnChanges, Output, SimpleChanges, inject, ChangeDetectionStrategy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { APIEndpoint } from '@app/core/constants/api-endpoint';
@@ -21,6 +21,7 @@ import { finalize } from 'rxjs';
     standalone: true,
     imports: [CommonModule, FormsModule, NgZorroCustomModule, LoaderComponent],
     templateUrl: './select-batch-for-line.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './select-batch-for-line.component.scss',
 })
 export class SelectBatchForLineComponent implements OnChanges {

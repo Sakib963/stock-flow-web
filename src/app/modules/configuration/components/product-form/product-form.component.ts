@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, DestroyRef, inject, input, OnInit, output, signal } from '@angular/core';
+import { Component, computed, DestroyRef, inject, input, OnInit, output, signal, ChangeDetectionStrategy } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { markFormGroupTouched } from '@app/core/constants/helper';
@@ -20,6 +20,7 @@ import { DropdownList } from '@app/core/interfaces/dropdown';
     selector: 'product-form',
     imports: [CommonModule, NgZorroCustomModule, ReactiveFormsModule],
     templateUrl: './product-form.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './product-form.component.scss',
 })
 export class ProductFormComponent implements OnInit {

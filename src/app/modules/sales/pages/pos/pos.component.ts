@@ -1,4 +1,4 @@
-import { Component, DestroyRef, OnInit } from '@angular/core';
+import { Component, DestroyRef, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NgZorroCustomModule } from '@app/shared/ng-zorro-custom.module';
 import { FormArray, FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -24,6 +24,7 @@ import { PrintService } from '@app/core/services/print.service';
     standalone: true,
     imports: [CommonModule, NgZorroCustomModule, FormsModule, ReactiveFormsModule, LoaderComponent, SelectProductComponent],
     templateUrl: './pos.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './pos.component.scss',
 })
 export class PosComponent implements OnInit {

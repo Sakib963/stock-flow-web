@@ -5,7 +5,7 @@
 <div *ngIf="!loading" class="p-4">
       <form nz-form [formGroup]="form" [nzLayout]="'vertical'" (ngSubmit)="promptSave()">
             <nz-card nzSize="small">
-                  <nz-tabset nzType="line" nzTabPosition="top">
+                  <nz-tabs nzType="line" nzTabPosition="top">
                         <!-- Company Info -->
                         <nz-tab nzTitle="Company Info">
                               <div class="grid grid-cols-1 md:grid-cols-3 gap-6 pt-2">
@@ -217,7 +217,7 @@
                                     </nz-form-item>
                               </div>
                         </nz-tab>
-                  </nz-tabset>
+                  </nz-tabs>
             </nz-card>
 
             <div class="flex justify-end mt-4">

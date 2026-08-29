@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, DestroyRef, OnInit } from '@angular/core';
+import { Component, DestroyRef, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ReactiveFormsModule, FormControl } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
@@ -19,6 +19,7 @@ import { map, debounceTime, distinctUntilChanged, finalize } from 'rxjs';
     selector: 'purchase-order-list',
     imports: [CommonModule, NgZorroCustomModule, ReactiveFormsModule, PageHeaderComponent, AdaptiveListComponent, LoaderComponent],
     templateUrl: './purchase-order-list.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './purchase-order-list.component.scss',
 })
 export class PurchaseOrderListComponent implements OnInit {

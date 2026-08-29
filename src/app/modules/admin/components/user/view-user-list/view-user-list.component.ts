@@ -1,10 +1,11 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 @Component({
     selector: 'app-view-user-list',
     imports: [CommonModule],
     templateUrl: './view-user-list.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./view-user-list.component.scss']
 })
 export class ViewUserListComponent {

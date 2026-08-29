@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, DestroyRef, signal } from '@angular/core';
+import { Component, DestroyRef, signal, ChangeDetectionStrategy } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -19,6 +19,7 @@ import { debounceTime, distinctUntilChanged, finalize, map } from 'rxjs';
     selector: 'pre-order-list',
     imports: [CommonModule, NgZorroCustomModule, ReactiveFormsModule, FormsModule, PageHeaderComponent, AdaptiveListComponent, LoaderComponent],
     templateUrl: './pre-order-list.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './pre-order-list.component.scss',
 })
 export class PreOrderListComponent {

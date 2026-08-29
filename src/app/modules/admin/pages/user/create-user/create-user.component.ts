@@ -1,4 +1,4 @@
-import { Component, DestroyRef } from '@angular/core';
+import { Component, DestroyRef, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { UserFormComponent } from '@app/modules/admin/components/user/user-form/user-form.component';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -11,6 +11,7 @@ import { NzNotificationService } from 'ng-zorro-antd/notification';
     selector: 'app-create-user',
     imports: [CommonModule, UserFormComponent],
     templateUrl: './create-user.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./create-user.component.scss']
 })
 export class CreateUserComponent {

@@ -1,5 +1,5 @@
 import { CommonModule, Location } from '@angular/common';
-import { Component, DestroyRef, OnInit } from '@angular/core';
+import { Component, DestroyRef, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { APIEndpoint } from '@app/core/constants/api-endpoint';
 import { HttpService } from '@app/core/services/http.service';
@@ -12,6 +12,7 @@ import { finalize } from 'rxjs';
   selector: 'update-profile',
   imports: [LoaderComponent, CommonModule, UserFormComponent],
   templateUrl: './update-profile.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './update-profile.component.scss',
 })
 export class UpdateProfileComponent implements OnInit {

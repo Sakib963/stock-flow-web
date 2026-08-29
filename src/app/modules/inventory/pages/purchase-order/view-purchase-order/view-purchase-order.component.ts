@@ -1,5 +1,5 @@
 import { CommonModule, Location } from '@angular/common';
-import { Component, DestroyRef, OnInit, computed, inject, signal } from '@angular/core';
+import { Component, DestroyRef, OnInit, computed, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
@@ -21,6 +21,7 @@ import { finalize } from 'rxjs';
     selector: 'view-purchase-order',
     imports: [CommonModule, NgZorroCustomModule, PageHeaderComponent, LoaderComponent, OrderVerificationFormComponent, PurchaseOrderFormComponent, CurrencyFormatPipe, FormsModule],
     templateUrl: './view-purchase-order.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './view-purchase-order.component.scss',
 })
 export class ViewPurchaseOrderComponent implements OnInit {

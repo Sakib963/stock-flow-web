@@ -1,5 +1,5 @@
 import { CommonModule, Location } from '@angular/common';
-import { Component, DestroyRef, OnInit, inject, signal } from '@angular/core';
+import { Component, DestroyRef, OnInit, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -15,13 +15,14 @@ import { NgZorroCustomModule } from '@app/shared/ng-zorro-custom.module';
 import { CurrencyFormatPipe } from '@app/shared/pipe/currency-format.pipe';
 import { NzDrawerService } from 'ng-zorro-antd/drawer';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
-import { NgxBarcode6Module } from 'ngx-barcode6';
+import { BarcodeComponent } from '@app/shared/components/barcode/barcode.component';
 import { finalize } from 'rxjs';
 
 @Component({
     selector: 'view-overview-details',
-    imports: [CommonModule, NgZorroCustomModule, PageHeaderComponent, LoaderComponent, CurrencyFormatPipe, FormsModule, NgxBarcode6Module],
+    imports: [CommonModule, NgZorroCustomModule, PageHeaderComponent, LoaderComponent, CurrencyFormatPipe, FormsModule, BarcodeComponent],
     templateUrl: './view-overview-details.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './view-overview-details.component.scss',
 })
 export class ViewOverviewDetailsComponent implements OnInit {

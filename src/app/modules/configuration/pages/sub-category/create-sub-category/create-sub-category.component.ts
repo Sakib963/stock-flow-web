@@ -1,6 +1,6 @@
 import { Location } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 import { APIEndpoint } from '@app/core/constants/api-endpoint';
 import { FormActions } from '@app/core/interfaces/form-action';
 import { CategoryFormComponent } from '@app/modules/configuration/components/category-form/category-form.component';
@@ -15,6 +15,7 @@ import { catchError, EMPTY, finalize } from 'rxjs';
     selector: 'create-sub-category',
     imports: [PageHeaderComponent, NgZorroCustomModule, SubCategoryFormComponent],
     templateUrl: './create-sub-category.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './create-sub-category.component.scss',
 })
 export class CreateSubCategoryComponent {

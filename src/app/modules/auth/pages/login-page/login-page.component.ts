@@ -1,4 +1,4 @@
-import { Component, DestroyRef, OnInit } from '@angular/core';
+import { Component, DestroyRef, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NgZorroCustomModule } from '@app/shared/ng-zorro-custom.module';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -17,6 +17,7 @@ import { COMPANY_INFO } from '@app/core/constants/company-info';
     selector: 'app-login-page',
     imports: [CommonModule, NgZorroCustomModule, ReactiveFormsModule, AngularSvgIconModule, RouterLink],
     templateUrl: './login-page.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./login-page.component.scss'],
 })
 export class LoginPageComponent implements OnInit {
