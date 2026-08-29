@@ -132,7 +132,32 @@
                                                 </nz-radio-group>
                                           </nz-form-control>
                                     </nz-form-item>
+
+                                    <!-- Only a partial payment needs an amount typed. A paid sale
+                                         is filled in automatically, an unpaid one is zero. -->
+                                    @if (form.get('payment_status')?.value === 'partially_paid') {
+                                          <nz-form-item class="col-span-2">
+                                                <nz-form-label [nzRequired]="true">Amount Paid</nz-form-label>
+                                                <nz-form-control>
+                                                      <nz-input-number class="w-full" formControlName="amount_paid" [nzMin]="0" [nzMax]="form.get('total_amount')?.value || 0" [nzStep]="1" [nzPlaceHolder]="'How much did the customer hand over?'"></nz-input-number>
+                                                </nz-form-control>
+                                          </nz-form-item>
+                                    }
                               </div>
+
+                              <!-- Paid and due, so the cashier can see what is still owed. -->
+                              @if (form.get('payment_status')?.value !== 'paid') {
+                                    <div class="border-t pt-3 mt-1 flex flex-col gap-1">
+                                          <div class="flex justify-between items-center">
+                                                <span class="text-sm text-gray-500">Paid</span>
+                                                <span class="text-sm">{{ form.get('amount_paid')?.value || 0 | currency: '৳' : 'symbol' }}</span>
+                                          </div>
+                                          <div class="flex justify-between items-center">
+                                                <span class="text-sm font-medium">Due</span>
+                                                <span class="text-base font-semibold" [class.text-red-500]="amountDue > 0">{{ amountDue | currency: '৳' : 'symbol' }}</span>
+                                          </div>
+                                    </div>
+                              }
                         </nz-card>
 
                         <ng-template #paymentTitle>

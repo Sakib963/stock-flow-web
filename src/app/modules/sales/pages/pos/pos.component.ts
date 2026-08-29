@@ -70,6 +70,31 @@ export class PosComponent implements OnInit {
                 }
                 refCtrl?.updateValueAndValidity();
             });
+
+        // Marking a sale paid fills the amount for the cashier. Only a partial
+        // payment needs typing, and switching away from it clears the figure so a
+        // stale number can never be saved against an unpaid sale.
+        this.form
+            .get('payment_status')
+            ?.valueChanges.pipe(takeUntilDestroyed(this._destroyRef))
+            .subscribe((status) => this.syncAmountPaid(status));
+    }
+
+    // Keeps amount_paid consistent with the status and the running total. Mirrors
+    // resolveAmountPaid on the server, which is authoritative.
+    private syncAmountPaid(status = this.form.get('payment_status')?.value): void {
+        const ctrl = this.form.get('amount_paid');
+        if (status === 'paid') {
+            ctrl?.setValue(Number(this.form.get('total_amount')?.value || 0), { emitEvent: false });
+        } else if (status === 'unpaid') {
+            ctrl?.setValue(0, { emitEvent: false });
+        }
+        // partially_paid keeps whatever the cashier typed.
+    }
+
+    // Shown in the summary so the cashier can see what is still owed.
+    get amountDue(): number {
+        return Math.max(0, Number(this.form.get('total_amount')?.value || 0) - Number(this.form.get('amount_paid')?.value || 0));
     }
 
     createForm(): FormGroup {
@@ -83,6 +108,7 @@ export class PosComponent implements OnInit {
             payment_method: ['cash', Validators.required],
             payment_reference: [null],
             payment_status: ['paid', Validators.required],
+            amount_paid: [0, [Validators.min(0)]],
             notes: [null],
             status: ['Draft'],
             total_amount: [0, [Validators.required, Validators.min(0)]],
@@ -148,6 +174,8 @@ export class PosComponent implements OnInit {
         }, 0);
 
         this.form.get('total_amount')?.setValue(total);
+        // A paid sale tracks the total as the cart changes.
+        this.syncAmountPaid();
     }
 
     updateProductInInvoice(updatedProduct: any): void {
@@ -191,6 +219,8 @@ export class PosComponent implements OnInit {
             payment_method: raw.payment_method,
             payment_reference: raw.payment_reference || null,
             payment_status: raw.payment_status,
+            // Only meaningful for a partial payment; the server fills the rest.
+            amount_paid: raw.payment_status === 'partially_paid' ? Number(raw.amount_paid || 0) : undefined,
             notes: raw.notes || null,
             total_amount: raw.total_amount,
             products: (raw.products || []).map((p: any) => ({
@@ -348,6 +378,7 @@ export class PosComponent implements OnInit {
             payment_method: data.payment_method,
             payment_reference: data.payment_reference,
             payment_status: data.payment_status,
+            amount_paid: Number(data.amount_paid || 0),
             notes: data.notes,
             status: data.status,
             total_amount: data.total_amount,
@@ -370,6 +401,7 @@ export class PosComponent implements OnInit {
             payment_method: 'cash',
             payment_reference: null,
             payment_status: 'paid',
+            amount_paid: 0,
             notes: null,
             status: 'Draft',
             total_amount: 0,
