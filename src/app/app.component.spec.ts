@@ -1,29 +1,47 @@
 import { TestBed } from '@angular/core/testing';
-import { RouterTestingModule } from '@angular/router/testing';
+import { provideRouter } from '@angular/router';
+import { provideNzI18n, en_US } from 'ng-zorro-antd/i18n';
 import { AppComponent } from './app.component';
 
-describe('AppComponent', () => {
-  beforeEach(() => TestBed.configureTestingModule({
-    imports: [RouterTestingModule],
-    declarations: [AppComponent]
-  }));
+// Proves the bootstrap actually runs, which a successful build does not. Each assertion covers one
+// piece of the new stack, so a regression in any of them fails here rather than in the browser.
+describe('AppComponent (bootstrap stack)', () => {
+    beforeEach(async () => {
+        await TestBed.configureTestingModule({
+            imports: [AppComponent],
+            providers: [provideRouter([]), provideNzI18n(en_US)],
+        }).compileComponents();
+    });
 
-  it('should create the app', () => {
-    const fixture = TestBed.createComponent(AppComponent);
-    const app = fixture.componentInstance;
-    expect(app).toBeTruthy();
-  });
+    it('creates the root component', () => {
+        const fixture = TestBed.createComponent(AppComponent);
+        expect(fixture.componentInstance).toBeTruthy();
+    });
 
-  it(`should have as title 'stock-flow-web'`, () => {
-    const fixture = TestBed.createComponent(AppComponent);
-    const app = fixture.componentInstance;
-    expect(app.title).toEqual('stock-flow-web');
-  });
+    it('renders an ng-zorro button', async () => {
+        const fixture = TestBed.createComponent(AppComponent);
+        await fixture.whenStable();
+        const el = fixture.nativeElement as HTMLElement;
+        expect(el.querySelector('button.ant-btn')).toBeTruthy();
+    });
 
-  it('should render title', () => {
-    const fixture = TestBed.createComponent(AppComponent);
-    fixture.detectChanges();
-    const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('.content span')?.textContent).toContain('stock-flow-web app is running!');
-  });
+    it('resolves lucide icons through provideIcons', async () => {
+        const fixture = TestBed.createComponent(AppComponent);
+        await fixture.whenStable();
+        const el = fixture.nativeElement as HTMLElement;
+        // ng-icons only injects an svg once the named icon has actually been provided.
+        expect(el.querySelector('ng-icon svg')).toBeTruthy();
+    });
+
+    it('repaints from a signal with no zone.js present', async () => {
+        const fixture = TestBed.createComponent(AppComponent);
+        await fixture.whenStable();
+        const el = fixture.nativeElement as HTMLElement;
+        const button = el.querySelector('button.ant-btn') as HTMLButtonElement;
+
+        expect(button.textContent).toContain('0');
+        button.click();
+        await fixture.whenStable();
+        expect(button.textContent).toContain('1');
+    });
 });

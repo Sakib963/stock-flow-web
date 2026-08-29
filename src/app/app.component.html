@@ -1,8 +1,19 @@
-<div *ngIf="authService.isLoading" class="w-full h-screen flex justify-center items-center">
-      <div class="home_loader"></div>
+<!-- TEMPORARY stack check. Replaced wholesale by the app shell and design system. -->
+<div class="min-h-screen bg-slate-50 font-mulish flex items-center justify-center p-6">
+    <nz-card class="w-full max-w-lg animate-fade-in" nzTitle="StockFlow bootstrap">
+        <div class="flex items-center gap-3 mb-4">
+            <ng-icon name="lucideBoxes" class="text-primary"></ng-icon>
+            <span class="text-secondary font-semibold">Angular 22 zoneless, ng-zorro 22, Tailwind 4, lucide icons</span>
+        </div>
+
+        <ul class="space-y-1 text-sm text-slate-600 mb-5">
+            <li class="flex items-center gap-2"><ng-icon name="lucideCheck" class="text-primary"></ng-icon> Tailwind 4 theme tokens: this card uses font-mulish and text-primary</li>
+            <li class="flex items-center gap-2"><ng-icon name="lucideCheck" class="text-primary"></ng-icon> ng-zorro renders and picks up the Less theme</li>
+            <li class="flex items-center gap-2"><ng-icon name="lucideCheck" class="text-primary"></ng-icon> Icons resolve through provideIcons</li>
+        </ul>
+
+        <button nz-button nzType="primary" (click)="clicks.set(clicks() + 1)">Signal updates without zone.js: {{ clicks() }}</button>
+    </nz-card>
 </div>
 
-<!-- Wrap router-outlet in a container -->
-<div [class.hidden]="authService.isLoading">
-      <router-outlet></router-outlet>
-</div>
+<router-outlet />

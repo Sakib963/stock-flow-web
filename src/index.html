@@ -1,33 +1,68 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>StockFlow</title>
+        <base href="/" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="icon" type="image/svg+xml" href="assets/icons/logo.svg" />
 
-<head>
-  <meta charset="utf-8" />
-  <title>StockFlow</title>
-  <base href="/" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="icon" type="image/svg+xml" href="assets/icons/logo.svg" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link href="https://fonts.googleapis.com/css2?family=Tenor+Sans&display=swap" rel="stylesheet" />
+        <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet" />
+        <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali&family=Roboto&display=swap" rel="stylesheet" />
+        <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&family=Mulish:ital,wght@0,200..1000;1,200..1000&display=swap" rel="stylesheet" />
 
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Tenor+Sans&display=swap" rel="stylesheet" />
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali&family=Roboto&display=swap" rel="stylesheet" />
-  <link
-    href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&family=Mulish:ital,wght@0,200..1000;1,200..1000&display=swap"
-    rel="stylesheet">
+        <!-- Boot loader styles are inline on purpose. This has to paint before any stylesheet or
+             JS bundle has downloaded, so it cannot depend on styles.css or on Tailwind. Keep it
+             small, self-contained, and free of anything that needs a network round trip. -->
+        <style>
+            .app-boot {
+                position: fixed;
+                inset: 0;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background: #ffffff;
+                font-family: 'Mulish', system-ui, -apple-system, 'Segoe UI', sans-serif;
+            }
 
+            /* ---- BOOT LOADER DESIGN SLOT ----------------------------------------------
+               Replace everything between this marker and its closing marker with the real
+               loader design. Keep the outer .app-boot wrapper so removal still works. */
+            .app-boot__mark {
+                width: 44px;
+                height: 44px;
+                border: 3px solid #ece9fb;
+                border-top-color: #594ed1;
+                border-radius: 50%;
+                animation: app-boot-spin 0.7s linear infinite;
+            }
 
-</head>
+            @keyframes app-boot-spin {
+                to {
+                    transform: rotate(360deg);
+                }
+            }
 
-<body>
-  <app-root>
-    <div class="h-screen flex justify-center items-center">
-      <div class="mx-auto">
-        <div class="home_loader"></div>
-      </div>
-    </div>
-  </app-root>
-</body>
+            @media (prefers-reduced-motion: reduce) {
+                .app-boot__mark {
+                    animation-duration: 2s;
+                }
+            }
+            /* ---- END BOOT LOADER DESIGN SLOT ------------------------------------------ */
+        </style>
+    </head>
 
+    <body>
+        <!-- Angular clears the root element's children when it renders the root component, so this
+             markup is the pre-bootstrap screen: it is visible from first paint until the app is
+             ready, and needs no code to tear it down. -->
+        <app-root>
+            <div class="app-boot">
+                <div class="app-boot__mark"></div>
+            </div>
+        </app-root>
+    </body>
 </html>
