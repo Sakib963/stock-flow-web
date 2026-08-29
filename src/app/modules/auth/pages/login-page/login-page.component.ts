@@ -100,13 +100,13 @@ export class LoginPageComponent implements OnInit {
                                 this._router.navigate(['/admin/dashboard']);
                             } else if (res.data.role === ROLES.MANAGER) {
                                 this.authService.setGuestUser(false);
-                                this._router.navigate(['/configuration/category/list']);
+                                this._router.navigate(['/configuration/stats']);
                             } else if (res.data.role === ROLES.SALESMAN) {
                                 this.authService.setGuestUser(false);
-                                this._router.navigate(['/sales/quick-sale']);
+                                this._router.navigate(['/sales/pos']);
                             } else if (res.data.role === ROLES.GUEST) {
                                 this.authService.setGuestUser(true);
-                                this._router.navigate(['/manager/dashboard']);
+                                this._router.navigate(['/configuration/stats']);
                             }
                         }
                     },

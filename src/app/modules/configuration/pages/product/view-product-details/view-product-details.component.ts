@@ -199,7 +199,7 @@ export class ViewProductDetailsComponent {
 
     viewInventory(): void {
         // Navigate to inventory page filtered by this product
-        this._router.navigate(['/manager/inventory'], {
+        this._router.navigate(['/inventory/overview/list'], {
             queryParams: {
                 productId: this.itemId(),
                 productName: this.product()?.name,
@@ -209,7 +209,7 @@ export class ViewProductDetailsComponent {
 
     viewPurchaseHistory(): void {
         // Navigate to purchase history filtered by this product
-        this._router.navigate(['/manager/purchase'], {
+        this._router.navigate(['/inventory/purchase-order'], {
             queryParams: {
                 productId: this.itemId(),
                 productName: this.product()?.name,
@@ -218,8 +218,8 @@ export class ViewProductDetailsComponent {
     }
 
     viewSalesHistory(): void {
-        // Navigate to sales/invoice page filtered by this product
-        this._router.navigate(['/manager/invoice'], {
+        // Navigate to the orders list filtered by this product
+        this._router.navigate(['/sales/orders/list'], {
             queryParams: {
                 productId: this.itemId(),
                 productName: this.product()?.name,

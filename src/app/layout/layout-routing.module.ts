@@ -44,15 +44,6 @@ const routes: Routes = [
                 canActivate: [RoleGuard],
                 data: { roles: [ROLES.ADMIN, ROLES.MANAGER] },
             },
-            // {
-            //   path: 'manager',
-            //   loadChildren: () =>
-            //     import('../modules/manager/manager.module').then(
-            //       (m) => m.ManagerModule
-            //     ),
-            //   canActivate: [RoleGuard],
-            //   data: { roles: [ROLES.MANAGER, ROLES.GUEST] },
-            // },
             {
                 path: 'sales',
                 loadChildren: () => import('../modules/sales/sales.module').then((m) => m.SalesModule),
@@ -64,12 +55,6 @@ const routes: Routes = [
                 loadComponent: () => import('../modules/settings/settings.component').then((m) => m.SettingsComponent),
                 canActivate: [RoleGuard],
                 data: { roles: [ROLES.ADMIN, ROLES.MANAGER] },
-            },
-            {
-                path: 'shared',
-                loadChildren: () => import('../modules/shared/shared.module').then((m) => m.SharedModule),
-                canActivate: [RoleGuard],
-                data: { roles: [ROLES.SALESMAN] },
             },
             {
                 path: 'profile',

@@ -98,7 +98,7 @@ export class LoginPageSecondaryComponent implements OnInit {
                 this._router.navigate(['/admin/dashboard']);
                 console.log(this.authService.currentUserRole);
               } else if (res.data.role === ROLES.MANAGER) {
-                this._router.navigate(['/manager/dashboard']);
+                this._router.navigate(['/configuration/stats']);
                 console.log(this.authService.currentUserRole);
               }
             }

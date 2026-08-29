@@ -158,7 +158,7 @@ export class ViewSupplierDetailsComponent {
     // Quick Actions
     viewSuppliedProducts(): void {
         // Navigate to products page with supplier filter
-        this._router.navigate(['/manager/product'], {
+        this._router.navigate(['/configuration/product'], {
             queryParams: {
                 supplier: this.itemId(),
                 supplierName: this.supplier()?.name,
@@ -168,7 +168,7 @@ export class ViewSupplierDetailsComponent {
 
     viewPurchaseOrders(): void {
         // Navigate to purchase orders page with supplier filter
-        this._router.navigate(['/manager/purchase'], {
+        this._router.navigate(['/inventory/purchase-order'], {
             queryParams: {
                 supplier: this.itemId(),
                 supplierName: this.supplier()?.name,

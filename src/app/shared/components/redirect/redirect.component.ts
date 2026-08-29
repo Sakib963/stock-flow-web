@@ -40,15 +40,16 @@ export class RedirectComponent implements OnInit {
         }
     }
 
+    // Landing route per role. Every destination is a revamp route: the legacy
+    // /manager/dashboard and /sales/quick-sale targets were deleted with the rest
+    // of the old generation.
     private performRedirect(role: string): void {
         if (role === ROLES.ADMIN) {
             this._router.navigate(['/admin/dashboard']);
-        } else if (role === ROLES.MANAGER) {
-            this._router.navigate(['/configuration/category/list']);
-        } else if (role === ROLES.GUEST) {
-            this._router.navigate(['/manager/dashboard']);
+        } else if (role === ROLES.MANAGER || role === ROLES.GUEST) {
+            this._router.navigate(['/configuration/stats']);
         } else if (role === ROLES.SALESMAN) {
-            this._router.navigate(['/sales/quick-sale']);
+            this._router.navigate(['/sales/pos']);
         }
     }
 }

@@ -1,6 +1,5 @@
 import { Breadcrumb } from '@app/shared/components/page-header/page-header.component';
 import { CONFIGURATION_BREADCRUMBS, ModuleBreadcrumbConfig } from '@app/modules/configuration/config/configuration-breadcrumb.config';
-import { MANAGER_BREADCRUMBS } from '@app/modules/manager/config/breadcrumb.config';
 import { ADMIN_BREADCRUMBS } from '@app/modules/admin/config/breadcrumb.config';
 import { INVENTORY_BREADCRUMBS } from '@app/modules/inventory/config/inventory-breadcrumb.config';
 import { SALES_BREADCRUMBS } from '@app/modules/sales/config/sales-breadcrumb.config';
@@ -20,7 +19,6 @@ export const BREADCRUMB_REGISTRY: BreadcrumbRegistry = {
     configuration: CONFIGURATION_BREADCRUMBS,
     inventory: INVENTORY_BREADCRUMBS,
     sales: SALES_BREADCRUMBS,
-    manager: MANAGER_BREADCRUMBS,
     admin: ADMIN_BREADCRUMBS,
     // Add other modules as they are created
     // profile: PROFILE_BREADCRUMBS,
@@ -29,7 +27,7 @@ export const BREADCRUMB_REGISTRY: BreadcrumbRegistry = {
 
 /**
  * Get breadcrumbs from the global registry
- * @param module - Module name (e.g., 'configuration', 'manager')
+ * @param module - Module name (e.g., 'configuration', 'sales')
  * @param feature - Feature name (e.g., 'category', 'product')
  * @param pageType - Page type (e.g., 'list', 'create', 'view', 'edit')
  * @returns Complete breadcrumb array

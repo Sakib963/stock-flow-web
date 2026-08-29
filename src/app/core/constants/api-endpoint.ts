@@ -81,31 +81,6 @@ export class APIEndpoint {
     static GET_INVENTORY_OVERVIEW_PRODUCT_DETAILS = '/api/v1/inventory/inventory-overview/get-product-details';
     static UPDATE_INVENTORY_OVERVIEW_PRICING = '/api/v1/inventory/inventory-overview/update-pricing';
 
-    static GET_PRODUCT_LIST_FOR_OVERVIEW = '/api/v1/manager/inventory-overview/get-product-list';
-    static GET_PRODUCT_DETAILS_FOR_OVERVIEW = '/api/v1/manager/inventory-overview/get-product-details';
-    static UPDATE_PRICING = '/api/v1/manager/inventory-overview/update-pricing';
-
-    static UPDATE_ATTENDANCE = '/api/v1/salesman/attendance/update-attendance';
-    static GET_ATTENDANCE_LIST = '/api/v1/salesman/attendance/get-attendance-list';
-    static CHECK_CURRENT_ATTENDANCE_STATUS = '/api/v1/salesman/attendance/check-current-attendance-status';
-
-    static GET_EMPLOYEE_ATTENDANCE_LIST = '/api/v1/manager/attendance/get-employee-attendance-list';
-    static GET_EMPLOYEE_ATTENDANCE_DETAILS = '/api/v1/manager/attendance/get-employee-attendance-details';
-    static UPDATE_EMPLOYEE_ATTENDANCE = '/api/v1/manager/attendance/update-employee-attendance';
-
-    static GET_PRODUCT_LIST_FOR_SALE = '/api/v1/salesman/sale/get-product-list';
-    static GET_INVOICE_NUMBER_FOR_SALE = '/api/v1/salesman/sale/get-invoice-number';
-    static SAVE_INVOICE_IN_DRAFT = '/api/v1/salesman/sale/save-invoice-in-draft';
-    static GET_INVOICE_DETAILS = '/api/v1/salesman/sale/get-invoice-details';
-    static CONFIRM_SALES_INVOICE = '/api/v1/salesman/sale/confirm-sales-invoice';
-
-    static GET_INVOICE_LIST = '/api/v1/salesman/invoice/get-invoice-list';
-    static DELETE_INVOICE = '/api/v1/salesman/invoice/delete-invoice';
-
-    static GET_INVOICE_LIST_FOR_MANAGER = '/api/v1/manager/invoice/get-invoice-list';
-
-
-
     // Settings (business profile + delivery defaults)
     static GET_SETTINGS = '/api/v1/configuration/settings/get-settings';
     static UPDATE_SETTINGS = '/api/v1/configuration/settings/update-settings';
@@ -170,14 +145,6 @@ export class APIEndpoint {
     static VERIFY_OTP_FOR_PASSWORD_CHANGE = '/api/v1/profile/change-password/verify-otp-for-password-change';
 
     static GET_PROFILE_INFO = '/api/v1/profile/profile-info/get-profile-info';
-
-    static GET_DASHBOARD_DATA_FOR_MANAGER = '/api/v1/manager/dashboard/get-dashboard-data-for-manager';
-
-    static GET_CURRENT_STOCK_REPORT = '/api/v1/manager/reports/get-current-stock-report';
-    static GET_LOW_STOCK_REPORT = '/api/v1/manager/reports/get-low-stock-report';
-    static GET_PRODUCT_WISE_STOCK_REPORT = '/api/v1/manager/reports/get-product-wise-stock-report';
-
-    static GET_PURCHASE_ORDER_REPORT = '/api/v1/manager/reports/get-purchase-order-report';
 
     static GET_USER_NOTES = '/api/v1/profile/notes/get-note-list';
     static GET_NOTE_BY_ID = '/api/v1/profile/notes/get-note-details';

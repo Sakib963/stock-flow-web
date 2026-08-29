@@ -56,10 +56,12 @@ export class Menu {
         {
             group: '',
             items: [
+                // Points at the revamp dashboard until the single feature-based
+                // /dashboard route is built. The legacy /manager/dashboard is gone.
                 {
                     icon: 'assets/icons/dashboard.svg',
                     label: 'Dashboard',
-                    route: '/manager/dashboard',
+                    route: '/configuration/stats',
                 },
             ],
         },
@@ -107,16 +109,8 @@ export class Menu {
                     label: 'Aisle/Zone',
                     route: '/configuration/aisle',
                 },
-                // {
-                //     icon: 'assets/icons/alert.svg',
-                //     label: 'Alerts & Low Stock',
-                //     route: '/configuration/alerts',
-                // },
-                // {
-                //     icon: 'assets/icons/analytics.svg',
-                //     label: 'Analytics',
-                //     route: '/configuration/analytics',
-                // },
+                // Analytics moves to the "Analytics & Reports" group when the
+                // Reports feature lands. Backlog item, not forgotten.
             ],
         },
         {
@@ -134,27 +128,12 @@ export class Menu {
                     route: '/inventory/purchase-order',
                 },
                 {
-                    icon: 'assets/icons/invoice.svg',
-                    label: 'Invoice',
-                    route: '/manager/inventory/invoice',
-                },
-                {
                     icon: 'assets/icons/dispose.svg',
                     label: 'Dispose',
                     route: '/inventory/product-dispose/list',
                 },
             ],
         },
-        // {
-        //     group: 'Employee',
-        //     items: [
-        //         {
-        //             icon: 'assets/icons/calendar.svg',
-        //             label: 'Attendance',
-        //             route: '/manager/employee/attendance',
-        //         },
-        //     ],
-        // },
         {
             group: 'Sales & Orders',
             icon: 'assets/icons/purchase.svg',
@@ -197,14 +176,12 @@ export class Menu {
             ],
         },
         {
+            // Becomes "Analytics & Reports" once the Reports feature is built and
+            // the existing analytics page is surfaced. Both are backlog items; the
+            // legacy /manager/reports page was deleted with the rest of that module.
             group: 'Analytics',
             icon: 'assets/icons/analytics.svg',
             items: [
-                {
-                    icon: 'assets/icons/report.svg',
-                    label: 'Reports',
-                    route: '/manager/reports',
-                },
                 {
                     icon: 'assets/icons/activity-log.svg',
                     label: 'Activity Log',
@@ -226,30 +203,24 @@ export class Menu {
         ];
     }
 
+    // Every entry points at a revamp route. Quick Sale became POS and the legacy
+    // invoice list was replaced by the Orders list, so the two dead links this
+    // list used to carry are gone rather than repaired in place.
     static salesPages: MenuItem[] = [
         {
-            group: 'Sales',
+            group: 'Sales & Orders',
+            icon: 'assets/icons/purchase.svg',
             items: [
                 {
                     icon: 'assets/icons/purchase.svg',
-                    label: 'Quick Sale',
-                    route: '/sales/quick-sale',
+                    label: 'POS Sale',
+                    route: '/sales/pos',
                 },
-            ],
-        },
-        {
-            group: 'Invoice',
-            items: [
                 {
-                    icon: 'assets/icons/invoice.svg',
-                    label: 'Invoice',
-                    route: '/sales/invoice',
+                    icon: 'assets/icons/report.svg',
+                    label: 'Orders',
+                    route: '/sales/orders/list',
                 },
-            ],
-        },
-        {
-            group: 'Returns',
-            items: [
                 {
                     icon: 'assets/icons/product-return.svg',
                     label: 'Returns',
@@ -257,15 +228,5 @@ export class Menu {
                 },
             ],
         },
-        // {
-        //     group: 'Employee',
-        //     items: [
-        //         {
-        //             icon: 'assets/icons/calendar.svg',
-        //             label: 'Attendance',
-        //             route: '/shared/attendance',
-        //         },
-        //     ],
-        // },
     ];
 }

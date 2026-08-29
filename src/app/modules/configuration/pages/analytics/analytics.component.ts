@@ -541,8 +541,8 @@ export class AnalyticsComponent implements OnInit, AfterViewInit, OnDestroy {
 
     viewReference(type: string, id: string): void {
         const routes: Record<string, string> = {
-            'purchase-order': '/manager/inventory/purchase-order/view',
-            'product-return': '/manager/inventory/product-return/view',
+            'purchase-order': '/inventory/purchase-order',
+            'product-return': '/sales/returns/view',
             'product-dispose': '/inventory/product-dispose',
         };
         const route = routes[type];

@@ -12,10 +12,6 @@ const routes: Routes = [
         loadComponent: () => import('./pages/configuration-dashboard/configuration-dashboard.component').then((m) => m.ConfigurationDashboardComponent),
     },
     {
-        path: 'alerts',
-        loadComponent: () => import('./pages/alerts/alerts.component').then((m) => m.AlertsComponent),
-    },
-    {
         path: 'analytics',
         loadComponent: () => import('./pages/analytics/analytics.component').then((m) => m.AnalyticsComponent),
     },
