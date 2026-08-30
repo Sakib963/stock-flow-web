@@ -9,46 +9,200 @@
 
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-        <link href="https://fonts.googleapis.com/css2?family=Tenor+Sans&display=swap" rel="stylesheet" />
-        <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet" />
-        <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali&family=Roboto&display=swap" rel="stylesheet" />
-        <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&family=Mulish:ital,wght@0,200..1000;1,200..1000&display=swap" rel="stylesheet" />
+        <link href="https://fonts.googleapis.com/css2?family=Mulish:wght@400;500;600;700;800&family=Hind+Siliguri:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
 
-        <!-- Boot loader styles are inline on purpose. This has to paint before any stylesheet or
-             JS bundle has downloaded, so it cannot depend on styles.css or on Tailwind. Keep it
-             small, self-contained, and free of anything that needs a network round trip. -->
         <style>
-            .app-boot {
-                position: fixed;
-                inset: 0;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                background: #ffffff;
-                font-family: 'Mulish', system-ui, -apple-system, 'Segoe UI', sans-serif;
+            html,
+            body {
+                margin: 0;
+                height: 100%;
             }
 
             /* ---- BOOT LOADER DESIGN SLOT ----------------------------------------------
-               Replace everything between this marker and its closing marker with the real
-               loader design. Keep the outer .app-boot wrapper so removal still works. */
-            .app-boot__mark {
-                width: 44px;
-                height: 44px;
-                border: 3px solid #ece9fb;
-                border-top-color: #594ed1;
-                border-radius: 50%;
-                animation: app-boot-spin 0.7s linear infinite;
+               Shell skeleton, per Design/design_handoff_loader. This paints at first paint and
+               is replaced when Angular renders the root component, so it can depend on no
+               stylesheet, no webfont and no JavaScript. It contains no text on purpose: text
+               would reflow when Mulish lands, and would need translating.
+
+               The geometry here is provisional. It comes from token defaults, not from a
+               measured shell, because the app shell has not been designed yet. Re-derive the
+               header height, sider width, gutter and row heights from the real shell when it
+               lands, or the layout will visibly jump on every boot. */
+
+            /* Scoped border-box reset. Tailwind's preflight has not loaded at boot, so without
+               this the sider renders at 190 + 16 + 1 = 207px and the shell shifts sideways the
+               instant the app appears. Scoped to .app-boot, and the node dies on bootstrap. */
+            .app-boot,
+            .app-boot * {
+                box-sizing: border-box;
             }
 
-            @keyframes app-boot-spin {
-                to {
-                    transform: rotate(360deg);
+            .app-boot {
+                position: fixed;
+                inset: 0;
+                background: #f4f6f8;
+                display: flex;
+                flex-direction: column;
+                overflow: hidden;
+            }
+
+            .app-boot__header {
+                flex: none;
+                height: 56px;
+                background: #fff;
+                border-bottom: 1px solid #dfe3e9;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                padding: 0 20px;
+            }
+            .app-boot__brand {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
+            .app-boot__logo {
+                width: 26px;
+                height: 26px;
+                display: block;
+                opacity: 0.5;
+            }
+            .app-boot__avatar {
+                width: 28px;
+                height: 28px;
+                border-radius: 50%;
+                background: #edeff3;
+            }
+
+            .app-boot__body {
+                flex: 1;
+                display: flex;
+                min-height: 0;
+            }
+            .app-boot__sider {
+                flex: none;
+                width: 190px;
+                background: #fff;
+                border-right: 1px solid #dfe3e9;
+                padding: 12px 8px;
+                display: flex;
+                flex-direction: column;
+                gap: 8px;
+            }
+            .app-boot__nav-active {
+                height: 34px;
+                border-radius: 6px;
+                background: #e1ddfa;
+            }
+            .app-boot__nav {
+                height: 30px;
+                border-radius: 6px;
+                background: #f4f6f8;
+            }
+            .app-boot__nav-group {
+                height: 10px;
+                border-radius: 3px;
+                background: #f4f6f8;
+                margin: 8px 0 0 10px;
+            }
+
+            .app-boot__main {
+                flex: 1;
+                min-width: 0;
+                padding: 24px 32px;
+                display: flex;
+                flex-direction: column;
+                gap: 16px;
+            }
+            .app-boot__page-head {
+                background: #fff;
+                border: 1px solid #dfe3e9;
+                border-radius: 8px;
+                padding: 16px 20px;
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .app-boot__table {
+                flex: 1;
+                background: #fff;
+                border: 1px solid #dfe3e9;
+                border-radius: 8px;
+                overflow: hidden;
+                display: flex;
+                flex-direction: column;
+            }
+            .app-boot__thead {
+                height: 36px;
+                background: #f7f8fa;
+                border-bottom: 1px solid #dfe3e9;
+                display: flex;
+                align-items: center;
+                gap: 18px;
+                padding: 0 16px;
+            }
+            .app-boot__row {
+                height: 40px;
+                border-bottom: 1px solid #edeff3;
+                display: flex;
+                align-items: center;
+                gap: 18px;
+                padding: 0 16px;
+            }
+            .app-boot__row:last-child {
+                border-bottom: none;
+            }
+
+            .app-boot__bar {
+                display: block;
+                border-radius: 3px;
+                background: #f4f6f8;
+            }
+            .app-boot__bar--head {
+                background: #dfe3e9;
+                height: 8px;
+            }
+            .app-boot__bar--end {
+                margin-left: auto;
+            }
+
+            /* Two elements shimmer, no more. Animating every bar makes the frame look like it is
+               vibrating rather than loading, and costs frames while the CPU parses the bundle. */
+            .app-boot__bar--live {
+                background: linear-gradient(90deg, #edeff3 30%, #f7f8fa 50%, #edeff3 70%);
+                background-size: 220% 100%;
+                animation: app-boot-shimmer 1.1s linear infinite;
+            }
+            @keyframes app-boot-shimmer {
+                0% {
+                    background-position: -180% 0;
+                }
+                100% {
+                    background-position: 180% 0;
                 }
             }
 
+            /* The skeleton conveys meaning through shape, not movement, so freezing the shimmer
+               flat loses nothing. A slower shimmer is not an acceptable substitute. */
             @media (prefers-reduced-motion: reduce) {
-                .app-boot__mark {
-                    animation-duration: 2s;
+                .app-boot__bar--live {
+                    background: #edeff3;
+                    animation: none;
+                }
+            }
+
+            /* Hidden, not narrowed: a 190px rail on a 390px screen is a frame the app will not
+               fill, which reintroduces the jump the skeleton exists to prevent. */
+            @media (max-width: 767px) {
+                .app-boot__sider {
+                    display: none;
+                }
+                .app-boot__main {
+                    padding: 16px;
+                }
+                .app-boot__cell--wide {
+                    display: none;
                 }
             }
             /* ---- END BOOT LOADER DESIGN SLOT ------------------------------------------ */
@@ -57,11 +211,70 @@
 
     <body>
         <!-- Angular clears the root element's children when it renders the root component, so this
-             markup is the pre-bootstrap screen: it is visible from first paint until the app is
-             ready, and needs no code to tear it down. -->
+             markup is the pre-bootstrap screen: visible from first paint until the app is ready,
+             with no teardown code, no fade and no minimum display time. -->
         <app-root>
-            <div class="app-boot">
-                <div class="app-boot__mark"></div>
+            <div class="app-boot" aria-hidden="true">
+                <div class="app-boot__header">
+                    <div class="app-boot__brand">
+                        <img class="app-boot__logo" src="assets/icons/logo.svg" alt="" />
+                        <span class="app-boot__bar app-boot__bar--live" style="width: 84px; height: 11px"></span>
+                    </div>
+                    <span class="app-boot__avatar"></span>
+                </div>
+
+                <div class="app-boot__body">
+                    <div class="app-boot__sider">
+                        <span class="app-boot__nav-active"></span>
+                        <span class="app-boot__nav-group" style="width: 62px"></span>
+                        <span class="app-boot__nav"></span>
+                        <span class="app-boot__nav"></span>
+                        <span class="app-boot__nav"></span>
+                        <span class="app-boot__nav-group" style="width: 44px"></span>
+                        <span class="app-boot__nav"></span>
+                        <span class="app-boot__nav"></span>
+                    </div>
+
+                    <div class="app-boot__main">
+                        <div class="app-boot__page-head">
+                            <span class="app-boot__bar app-boot__bar--live" style="width: 180px; height: 16px; border-radius: 4px"></span>
+                            <span class="app-boot__bar" style="width: 300px; height: 9px"></span>
+                        </div>
+
+                        <div class="app-boot__table">
+                            <div class="app-boot__thead">
+                                <span class="app-boot__bar app-boot__bar--head" style="width: 96px"></span>
+                                <span class="app-boot__bar app-boot__bar--head app-boot__cell--wide" style="width: 60px"></span>
+                                <span class="app-boot__bar app-boot__bar--head app-boot__cell--wide" style="width: 76px"></span>
+                                <span class="app-boot__bar app-boot__bar--head app-boot__bar--end" style="width: 56px"></span>
+                            </div>
+                            <div class="app-boot__row">
+                                <span class="app-boot__bar" style="width: 130px; height: 8px"></span>
+                                <span class="app-boot__bar app-boot__cell--wide" style="width: 48px; height: 8px"></span>
+                                <span class="app-boot__bar app-boot__cell--wide" style="width: 82px; height: 8px"></span>
+                                <span class="app-boot__bar app-boot__bar--end" style="width: 48px; height: 8px"></span>
+                            </div>
+                            <div class="app-boot__row">
+                                <span class="app-boot__bar" style="width: 112px; height: 8px"></span>
+                                <span class="app-boot__bar app-boot__cell--wide" style="width: 48px; height: 8px"></span>
+                                <span class="app-boot__bar app-boot__cell--wide" style="width: 70px; height: 8px"></span>
+                                <span class="app-boot__bar app-boot__bar--end" style="width: 48px; height: 8px"></span>
+                            </div>
+                            <div class="app-boot__row">
+                                <span class="app-boot__bar" style="width: 144px; height: 8px"></span>
+                                <span class="app-boot__bar app-boot__cell--wide" style="width: 48px; height: 8px"></span>
+                                <span class="app-boot__bar app-boot__cell--wide" style="width: 64px; height: 8px"></span>
+                                <span class="app-boot__bar app-boot__bar--end" style="width: 48px; height: 8px"></span>
+                            </div>
+                            <div class="app-boot__row">
+                                <span class="app-boot__bar" style="width: 120px; height: 8px"></span>
+                                <span class="app-boot__bar app-boot__cell--wide" style="width: 48px; height: 8px"></span>
+                                <span class="app-boot__bar app-boot__cell--wide" style="width: 76px; height: 8px"></span>
+                                <span class="app-boot__bar app-boot__bar--end" style="width: 48px; height: 8px"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </app-root>
     </body>

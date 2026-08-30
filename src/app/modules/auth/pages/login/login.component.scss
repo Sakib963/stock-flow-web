@@ -1,0 +1,514 @@
+// Sign-in screen. Values come from Design/design_handoff_login; do not introduce new ones.
+
+:host {
+    display: block;
+    height: 100vh;
+    height: 100dvh;
+}
+
+.login {
+    display: grid;
+    grid-template-columns: 512px 1fr;
+    height: 100%;
+    overflow: hidden;
+}
+
+/* Identity panel ---------------------------------------------------------- */
+
+.login__panel {
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(172deg, #2b2283 0%, #1e1766 58%, #130e4a 100%);
+    padding: 44px 44px 40px;
+    display: flex;
+    flex-direction: column;
+}
+
+.login__rule {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+}
+.login__rule--v {
+    background-image: repeating-linear-gradient(90deg, rgb(255 255 255 / 0.05) 0 1px, transparent 1px 64px);
+}
+.login__rule--h {
+    background-image: repeating-linear-gradient(0deg, rgb(255 255 255 / 0.035) 0 1px, transparent 1px 56px);
+}
+
+.login__chart {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    pointer-events: none;
+}
+.login__chart--desktop {
+    width: 512px;
+    height: 340px;
+}
+.login__chart--mobile {
+    display: none;
+}
+
+.login__topbar {
+    position: relative;
+    flex: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+.login__brand {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+.login__lockup {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.login__logo {
+    width: 26px;
+    height: 26px;
+    display: block;
+}
+.login__wordmark {
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: -0.015em;
+    color: #fff;
+}
+
+.login__headline-block {
+    position: relative;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+.login__headline {
+    margin: 0;
+    // Measure is set in px, never ch: a ch clamp resolves against the wrapper's inherited font
+    // size rather than the headline's, which silently crushes it to about half this width.
+    max-width: 424px;
+    font-size: 34px;
+    line-height: 1.18;
+    font-weight: 800;
+    letter-spacing: -0.028em;
+    color: #fff;
+    text-wrap: pretty;
+}
+.login__subcopy {
+    margin: 16px 0 0;
+    max-width: 340px;
+    font-size: 15px;
+    line-height: 1.68;
+    color: #e1ddfa;
+    text-wrap: pretty;
+}
+
+.login__attribution {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    // On the indigo panel only #E1DDFA clears contrast. #C6BFF3 is a border tint at 4.41:1.
+    color: #e1ddfa;
+    text-decoration: none;
+    width: fit-content;
+    transition: color 0.2s cubic-bezier(0.215, 0.61, 0.355, 1);
+
+    &:hover,
+    &:focus-visible {
+        color: #ffffff;
+        text-decoration: underline;
+    }
+}
+
+/* Language toggle --------------------------------------------------------- */
+
+.login__lang {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.login__lang--onLight {
+    position: absolute;
+    top: 24px;
+    right: 28px;
+    z-index: 1;
+}
+.login__lang-icon {
+    color: #9aa3b0;
+}
+.login__lang-group {
+    display: flex;
+    background: #f4f6f8;
+    border: 1px solid #dfe3e9;
+    border-radius: 6px;
+    padding: 2px;
+    gap: 2px;
+}
+// Desktop shows the toggle in the form column only; the dark one belongs to the mobile header.
+.login__lang--onDark {
+    display: none;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    padding: 2px;
+    gap: 2px;
+}
+
+.login__lang-btn {
+    border: 0;
+    background: transparent;
+    padding: 3px 10px;
+    border-radius: 4px;
+    font: 600 12px/1 'Mulish', sans-serif;
+    color: #4a515c;
+    cursor: pointer;
+
+    &.is-active {
+        background: #fff;
+        color: #1c2028;
+        font-weight: 700;
+        box-shadow: 0 1px 2px rgb(28 32 40 / 0.06);
+    }
+}
+.login__lang-btn--bn {
+    font-family: 'Hind Siliguri', sans-serif;
+}
+
+/* Form column ------------------------------------------------------------- */
+
+.login__form-col {
+    position: relative;
+    background: #f4f6f8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 48px;
+    overflow-y: auto;
+}
+
+// The same ruled ledger lines that texture the panel, carried onto the white side so the column
+// is not a blank field. Decoration here has to come from the product's own vocabulary: the system
+// forbids illustration, photography and badges, and the logo is the only image on the page.
+// Masked to nothing through the middle, so the form itself still sits on clean white and the
+// input borders never compete with a rule.
+.login__form-col::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background-image:
+        repeating-linear-gradient(90deg, rgb(28 32 40 / 0.032) 0 1px, transparent 1px 64px),
+        repeating-linear-gradient(0deg, rgb(28 32 40 / 0.022) 0 1px, transparent 1px 56px);
+    // A genuinely clear core, not just a soft spot: the form and its message slots sit on plain
+    // white, and the ruling only starts once it is well clear of the controls.
+    -webkit-mask-image: radial-gradient(ellipse 420px 340px at 50% 50%, transparent 0%, transparent 46%, #000 100%);
+    mask-image: radial-gradient(ellipse 420px 340px at 50% 50%, transparent 0%, transparent 46%, #000 100%);
+}
+
+.login__card {
+    position: relative;
+    width: 432px; // 368px of content inside 32px padding, so the measure stays as specified.
+    background: #fff;
+    border: 1px solid #dfe3e9;
+    border-radius: 8px;
+    padding: 32px;
+    // Two layers rather than one big blur: a tight contact shadow to seat the card on the
+    // ruled ground, and a wide soft one to lift it. A single large blur reads as a smudge.
+    box-shadow:
+        0 1px 2px rgb(28 32 40 / 0.05),
+        0 14px 36px -10px rgb(28 32 40 / 0.18);
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.login__title {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: #1c2028;
+}
+.login__hint {
+    margin: 3px 0 0;
+    font-size: 13px;
+    line-height: 1.5;
+    color: #6b7480;
+}
+
+.login__fields {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+.login__field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+.login__label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #2e3440;
+}
+.login__field-icon {
+    color: #9aa3b0;
+}
+
+// Reserved from the start, so an error appearing never pushes the form down.
+.login__message {
+    // Pulls back most of the field's own 6px gap, so the message sits close under the control.
+    margin: -2px 0 0;
+    min-height: 15px;
+    font-size: 12px;
+    line-height: 15px;
+    color: #d92d20;
+}
+
+.login__password-dots:not([type='text']) {
+    font-size: 16px;
+    letter-spacing: 0.16em;
+}
+
+.login__reveal {
+    border: 0;
+    background: transparent;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    color: #9aa3b0;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+.login__row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 8px;
+}
+.login__remember {
+    font-size: 13px;
+    color: #2e3440;
+}
+.login__forgot {
+    font-size: 13px;
+    font-weight: 600;
+    color: #4a3fbf;
+    white-space: nowrap;
+}
+.login__forgot-short {
+    display: none;
+}
+
+.login__submit {
+    margin-top: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-weight: 600;
+    transition: background-color 0.2s cubic-bezier(0.215, 0.61, 0.355, 1);
+}
+
+.login__footer {
+    margin: 0;
+    border-top: 1px solid #edeff3;
+    padding-top: 16px;
+    font-size: 12px;
+    line-height: 1.6;
+    color: #4a515c;
+}
+.login__link {
+    color: #4a3fbf;
+    font-weight: 600;
+}
+.login__footer-short {
+    display: none;
+}
+
+/* Between 768 and 1024 both columns stay, the panel just narrows. */
+@media (max-width: 1024px) and (min-width: 768px) {
+    .login {
+        grid-template-columns: minmax(380px, 40vw) 1fr;
+    }
+    .login__chart--desktop {
+        width: 100%;
+    }
+}
+
+/* Mobile: the panel becomes a 288px header. */
+@media (max-width: 767px) {
+    :host {
+        height: auto;
+        min-height: 100dvh;
+    }
+    .login {
+        display: flex;
+        flex-direction: column;
+        min-height: 100dvh;
+        height: auto;
+        overflow: visible;
+    }
+
+    .login__panel {
+        flex: none;
+        height: 288px;
+        // The 104px foot is load-bearing: it reserves the 96px strip the stock line occupies, so
+        // the bottom-aligned headline cannot run into the stroke and the green nodes.
+        padding: 22px 24px 104px;
+        background: linear-gradient(168deg, #2b2283 0%, #1e1766 58%, #130e4a 100%);
+    }
+    .login__rule--v {
+        background-image: repeating-linear-gradient(90deg, rgb(255 255 255 / 0.05) 0 1px, transparent 1px 48px);
+    }
+    .login__rule--h {
+        background-image: repeating-linear-gradient(0deg, rgb(255 255 255 / 0.035) 0 1px, transparent 1px 44px);
+    }
+
+    .login__chart--desktop {
+        display: none;
+    }
+    .login__chart--mobile {
+        display: block;
+        width: 100%;
+        height: 96px;
+    }
+
+    .login__logo {
+        width: 24px;
+        height: 24px;
+    }
+    .login__wordmark {
+        font-size: 19px;
+    }
+    .login__lockup {
+        gap: 9px;
+    }
+
+    .login__lang--onDark {
+        display: flex;
+        background: rgb(255 255 255 / 0.14);
+        border-color: rgb(255 255 255 / 0.24);
+
+        .login__lang-btn {
+            font-size: 11px;
+            padding: 3px 9px;
+            color: #fff;
+
+            &.is-active {
+                background: #fff;
+                color: #1e1766;
+                font-weight: 700;
+                box-shadow: none;
+            }
+        }
+    }
+    .login__lang--onLight {
+        display: none;
+    }
+
+    .login__headline {
+        font-size: 27px;
+        line-height: 1.2;
+        letter-spacing: -0.026em;
+        max-width: 300px;
+    }
+    // An owner checking the shop from a phone already knows what StockFlow is.
+    .login__subcopy {
+        display: none;
+    }
+    .login__attribution {
+        font-size: 11px;
+    }
+    .login__headline-block {
+        justify-content: flex-end;
+    }
+
+    .login__form-col::before {
+        display: none;
+    }
+    .login__form-col {
+        flex: 1;
+        min-height: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        justify-content: flex-start;
+        padding: 26px 24px 22px;
+    }
+    .login__form-col {
+        background: #fff;
+    }
+    .login__card {
+        width: 100%;
+        flex: 1;
+        gap: 20px;
+        background: none;
+        border: 0;
+        border-radius: 0;
+        padding: 0;
+        box-shadow: none;
+    }
+    .login__title {
+        font-size: 21px;
+    }
+    .login__fields {
+        gap: 4px;
+    }
+
+    // 48px is the touch control height, reserved for counter-standing use. ng-zorro's "large"
+    // is 40px, so the host is resized here rather than by inventing a new nzSize.
+    nz-input-wrapper {
+        height: 48px;
+        padding: 0 14px;
+        gap: 10px;
+    }
+    .login__field-icon {
+        font-size: 16px;
+    }
+    input[nz-input] {
+        font-size: 15px;
+    }
+    .login__password-dots:not([type='text']) {
+        font-size: 17px;
+        letter-spacing: 0.18em;
+    }
+    .login__submit {
+        height: 48px;
+        font-size: 15px;
+        font-weight: 700;
+    }
+
+    .login__row {
+        padding-top: 2px;
+    }
+    .login__forgot-long {
+        display: none;
+    }
+    .login__forgot-short {
+        display: inline;
+    }
+
+    .login__foot {
+        margin-top: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+    .login__footer {
+        padding-top: 14px;
+    }
+    .login__footer-long {
+        display: none;
+    }
+    .login__footer-short {
+        display: inline;
+    }
+}

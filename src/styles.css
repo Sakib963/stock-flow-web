@@ -1,53 +1,80 @@
-/* Global stylesheet for the revamped app.
+/* Global stylesheet.
    Plain CSS on purpose: Tailwind 4 is configured in CSS (@theme) rather than a JS config file,
    and Sass would try to resolve `@import "tailwindcss"` itself and fail. Component styles are
-   still SCSS. ng-zorro's own theming stays in theme.less, which loads before this file. */
+   still SCSS. ng-zorro's theming lives in theme.less, which loads before this file.
+
+   Palette and type come from Design/. Do not introduce values that are not in the token tables. */
 
 @import 'tailwindcss';
 
 @theme {
-    /* Brand palette, carried over from the old tailwind.config.js. --color-primary drives
-       bg-primary / text-primary / border-primary, and the named steps drive -light / -dark. */
-    --color-primary: #594ed1;
-    --color-primary-light: #7e75e5;
-    --color-primary-dark: #4639a8;
-    --color-secondary: #180b26;
+    /* Indigo ramp. primary-6 is the interactive colour; 8 through 10 build the identity panel
+       gradient; primary-2 is the only indigo that is legible as text on a dark ground. */
+    --color-primary-2: #e1ddfa;
+    --color-primary-5: #7c6fd6;
+    --color-primary-6: #4a3fbf;
+    --color-primary-7: #3a30a1;
+    --color-primary-8: #2b2283;
+    --color-primary-9: #1e1766;
+    --color-primary-10: #130e4a;
+    --color-primary: var(--color-primary-6);
 
-    --font-tenor: 'Tenor Sans', sans-serif;
-    --font-roboto: 'Roboto', sans-serif;
-    --font-bangla: 'Noto Sans Bengali', sans-serif;
-    --font-siliguri: 'Hind Siliguri', sans-serif;
-    --font-mulish: 'Mulish', sans-serif;
+    /* Reserved for the stock line and batch nodes. Not a UI colour. */
+    --color-brand-green: #5eb248;
 
-    --animate-fade-in: fade-in 0.5s ease-out;
-    --animate-slide-in-up: slide-in-up 0.5s ease-out;
+    /* Neutrals. n-400 is a placeholder and icon colour only: it is 2.55:1 on white and must
+       never carry body copy. Small functional text uses n-600. */
+    --color-n-900: #1c2028;
+    --color-n-800: #2e3440;
+    --color-n-600: #4a515c;
+    --color-n-500: #6b7480;
+    --color-n-400: #9aa3b0;
+    --color-n-200: #dfe3e9;
+    --color-n-100: #edeff3;
+    --color-n-75: #f4f6f8;
+    --color-n-50: #f7f8fa;
 
-    @keyframes fade-in {
-        from {
-            opacity: 0;
-        }
-        to {
-            opacity: 1;
-        }
-    }
+    --color-danger: #d92d20;
+    --color-danger-bg: #fdecea;
+    --color-danger-border: #f7c4be;
+    --color-success: #127a46;
+    --color-warning: #f2a33c;
 
-    @keyframes slide-in-up {
-        from {
-            opacity: 0;
-            transform: translateY(20px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
+    --font-sans: 'Mulish', system-ui, -apple-system, 'Segoe UI', sans-serif;
+    --font-bangla: 'Hind Siliguri', 'Mulish', sans-serif;
+    --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+
+    --radius-control: 6px;
+    --radius-container: 8px;
+
+    /* 40px is the standing-at-the-counter control height, 48px the touch variant. Neither is
+       the app default: data screens use ng-zorro's 32px. */
+    --spacing-control: 40px;
+    --spacing-touch: 48px;
 }
 
-/* The same brand values as custom properties, for the places that need a raw CSS variable
-   (ng-zorro overrides, inline styles) rather than a Tailwind utility. */
 :root {
-    --primary-color: #594ed1;
-    --primary-color-light: #7e75e5;
-    --primary-color-dark: #4639a8;
-    --secondary-color: #180b26;
+    color-scheme: light;
+}
+
+body {
+    margin: 0;
+    font-family: var(--font-sans);
+    color: var(--color-n-800);
+    background: var(--color-n-75);
+}
+
+/* Bengali sets at the same sizes as Latin so switching language never moves the layout, but it
+   needs the taller line box to avoid clipping ascenders and matras. */
+:lang(bn),
+.lang-bn {
+    font-family: var(--font-bangla);
+    line-height: 1.7;
+}
+
+/* One focus ring for the whole app. Never removed, only restyled. */
+:where(a, button, input, select, textarea, [tabindex]):focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px rgb(74 63 191 / 0.22);
+    border-color: var(--color-primary-6);
 }

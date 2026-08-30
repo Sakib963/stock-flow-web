@@ -1,0 +1,29 @@
+{
+    "auth": {
+        "panelHeadline": "Close the day with numbers that agree.",
+        "panelBody": "Counter sales, online orders, returns and disposals settle into one record. The stock on the screen is the stock on the shelf.",
+        "signIn": "Sign in",
+        "signInHint": "Use the email your shop admin registered.",
+        "email": "Email",
+        "emailPlaceholder": "you@yourshop.com",
+        "password": "Password",
+        "keepSignedIn": "Keep me signed in",
+        "forgot": "Forgot password?",
+        "forgotShort": "Forgot?",
+        "noAccount": "No account? Ask your shop admin, or",
+        "talkToUs": "talk to us",
+        "noAccountTail": "about StockFlow for your business.",
+        "noAccountTailShort": "about StockFlow.",
+        "attribution": "An Arithma Labs product",
+        "showPassword": "Show password",
+        "hidePassword": "Hide password",
+        "errBadCredentials": "Email or password is incorrect. Check both and try again.",
+        "errNetwork": "Cannot reach StockFlow. Check the internet connection and try again.",
+        "errServer": "Something went wrong at our end. Try again in a moment.",
+        "errDisabled": "This account is no longer active. Ask your shop admin to restore it.",
+        "errEmailRequired": "Enter your email.",
+        "errEmailInvalid": "That does not look like an email address.",
+        "errPasswordRequired": "Enter your password.",
+        "sessionExpired": "You were signed out after 30 minutes of inactivity."
+    }
+}

@@ -1,15 +1,45 @@
-// Custom ng-zorro theme
-// Override primary color to match Tailwind config: #594ED1
+// ng-zorro theme, driven by the design system in Design/.
+//
+// Everything visual must be reachable from here. If a page ends up writing !important against an
+// .ant-* selector, the variable below is wrong, not the CSS.
 
-@import "ng-zorro-antd/ng-zorro-antd.less";
+@import 'ng-zorro-antd/ng-zorro-antd.less';
 
-// Primary Color - ng-zorro will automatically generate the color palette
-@primary-color: #594ED1;// Optional: Customize other theme variables
+// primary-6. Replaces the old #594ED1: this one is 7.58:1 on white, AAA for body text.
+@primary-color: #4a3fbf;
 @info-color: @primary-color;
 @link-color: @primary-color;
-@success-color: #52c41a;
-@warning-color: #faad14;
-@error-color: #f5222d;
 
-// Font
+@success-color: #127a46;
+@warning-color: #f2a33c;
+@error-color: #d92d20;
+
+// Controls and buttons are 6px in the design system. Ant's default is 2px.
+@border-radius-base: 6px;
+@border-radius-sm: 4px;
+
 @font-size-base: 14px;
+@font-family: 'Mulish', system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+// Neutrals, so controls inherit the design palette instead of Ant's greys.
+@text-color: #2e3440;
+@text-color-secondary: #6b7480;
+@heading-color: #1c2028;
+@border-color-base: #dfe3e9;
+@border-color-split: #edeff3;
+@disabled-color: #9aa3b0;
+
+// n-400 is the placeholder colour, and only ever a placeholder colour: 2.55:1 on white.
+@input-placeholder-color: #9aa3b0;
+@input-hover-border-color: #7c6fd6;
+@input-icon-color: #9aa3b0;
+
+// 40px is the standing-at-the-counter control height. `large` is what the sign-in form uses;
+// data screens keep the 32px default.
+@height-lg: 40px;
+
+// Matches the app-wide focus ring in styles.css.
+@outline-color: @primary-color;
+@outline-width: 2px;
+@outline-blur-size: 0;
+@outline-fade: 0.22;
