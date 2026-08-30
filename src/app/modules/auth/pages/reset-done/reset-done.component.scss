@@ -1,0 +1,20 @@
+// Password changed. Frame is auth-shell; card is _auth-card.scss.
+@use '../../auth-card' as *;
+
+.done__mark {
+    width: 44px;
+    height: 44px;
+    border-radius: 8px;
+    background: #e8f6ee;
+    border: 1px solid #b7e0c6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #127a46;
+}
+
+@media (max-width: 767px) {
+    .auth-foot {
+        margin-top: auto;
+    }
+}

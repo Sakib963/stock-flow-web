@@ -1,0 +1,22 @@
+<auth-shell [clearCoreHeight]="300">
+    <div class="auth-card">
+        <span class="done__mark" aria-hidden="true">
+            <ng-icon name="lucideCircleCheck" size="22px" />
+        </span>
+
+        <div>
+            <h2 class="auth-title">{{ 'auth.reset.doneTitle' | translate }}</h2>
+            <p class="auth-hint">
+                {{ 'auth.reset.doneBody' | translate }} <span class="auth-strong">{{ email() }}</span
+                >{{ ' ' }}{{ 'auth.reset.doneBodyTail' | translate }}
+            </p>
+        </div>
+
+        <a nz-button nzType="primary" nzSize="large" nzBlock class="auth-submit" routerLink="/auth/login">
+            {{ 'auth.reset.goToSignIn' | translate }}
+            <ng-icon name="lucideArrowRight" size="16px" />
+        </a>
+
+        <p class="auth-foot">{{ 'auth.reset.doneFoot' | translate }}</p>
+    </div>
+</auth-shell>

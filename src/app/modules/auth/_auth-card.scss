@@ -1,0 +1,176 @@
+// Shared card and field styling for every auth page. Imported by each page's component styles
+// with `@use '../../../auth-card' as *;` rather than living in the shell, because Angular's style
+// encapsulation means the shell cannot reach content projected into it.
+//
+// Values come from Design/design_handoff_login and design_handoff_recovery.
+
+.auth-card {
+    position: relative;
+    width: 432px; // 368px of content inside 32px padding, so the measure stays as specified.
+    background: #fff;
+    border: 1px solid #dfe3e9;
+    border-radius: 8px;
+    padding: 32px;
+    // Two layers rather than one big blur: a tight contact shadow to seat the card on the ruled
+    // ground, and a wide soft one to lift it. A single large blur reads as a smudge.
+    box-shadow:
+        0 1px 2px rgb(28 32 40 / 0.05),
+        0 14px 36px -10px rgb(28 32 40 / 0.18);
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.auth-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #4a3fbf;
+    text-decoration: none;
+    width: fit-content;
+    background: none;
+    border: 0;
+    padding: 0;
+    cursor: pointer;
+
+    &:hover {
+        text-decoration: underline;
+    }
+}
+
+.auth-title {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: #1c2028;
+}
+.auth-hint {
+    margin: 3px 0 0;
+    font-size: 13px;
+    line-height: 1.5;
+    color: #6b7480;
+}
+.auth-strong {
+    color: #2e3440;
+    font-weight: 700;
+}
+
+.auth-fields {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+.auth-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+.auth-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #2e3440;
+}
+.auth-label-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+}
+.auth-field-icon {
+    color: #9aa3b0;
+}
+
+// Reserved from the start, so an appearing error never pushes the form down.
+.auth-message {
+    // Pulls back most of the field's own 6px gap, so the message sits close under the control.
+    margin: -2px 0 0;
+    min-height: 15px;
+    font-size: 12px;
+    line-height: 15px;
+    color: #d92d20;
+}
+
+.auth-password-dots:not([type='text']) {
+    font-size: 16px;
+    letter-spacing: 0.16em;
+}
+
+.auth-reveal {
+    border: 0;
+    background: transparent;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    color: #9aa3b0;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+.auth-submit {
+    margin-top: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-weight: 600;
+    transition: background-color 0.2s cubic-bezier(0.215, 0.61, 0.355, 1);
+}
+
+.auth-foot {
+    margin: 0;
+    border-top: 1px solid #edeff3;
+    padding-top: 16px;
+    font-size: 12px;
+    line-height: 1.6;
+    color: #4a515c;
+}
+.auth-link {
+    color: #4a3fbf;
+    font-weight: 600;
+}
+
+@media (max-width: 767px) {
+    // A card inside a 390px screen is just a second border, so it dissolves into the page.
+    .auth-card {
+        width: 100%;
+        flex: 1;
+        gap: 20px;
+        background: none;
+        border: 0;
+        border-radius: 0;
+        padding: 0;
+        box-shadow: none;
+    }
+    .auth-title {
+        font-size: 21px;
+    }
+    .auth-fields {
+        gap: 4px;
+    }
+
+    // 48px is the touch control height, reserved for counter-standing use. ng-zorro's "large" is
+    // 40px, so the host is resized here rather than by inventing a new nzSize.
+    nz-input-wrapper {
+        height: 48px;
+        padding: 0 14px;
+        gap: 10px;
+    }
+    .auth-field-icon {
+        font-size: 16px;
+    }
+    input[nz-input] {
+        font-size: 15px;
+    }
+    .auth-password-dots:not([type='text']) {
+        font-size: 17px;
+        letter-spacing: 0.18em;
+    }
+    .auth-submit {
+        height: 48px;
+        font-size: 15px;
+        font-weight: 700;
+    }
+}

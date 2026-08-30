@@ -1,0 +1,72 @@
+<div class="auth">
+    <!-- Identity panel. Becomes the 288px header below 768px. -->
+    <aside class="auth__panel">
+        <!-- Ruled ledger grid, the stock line and the batch nodes. Decoration only: it carries no
+             data and must never be mistaken for a live chart. -->
+        <div class="auth__rule auth__rule--v" aria-hidden="true"></div>
+        <div class="auth__rule auth__rule--h" aria-hidden="true"></div>
+
+        <svg class="auth__chart auth__chart--desktop" viewBox="0 0 512 300" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+            <defs>
+                <linearGradient id="sfArea" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0" stop-color="#5EB248" stop-opacity=".26" />
+                    <stop offset="1" stop-color="#5EB248" stop-opacity="0" />
+                </linearGradient>
+            </defs>
+            <path fill="url(#sfArea)" d="M0 244 H64 V206 H128 V226 H192 V158 H256 V182 H320 V112 H384 V140 H448 V74 H512 V300 H0 Z" />
+            <path fill="none" stroke="rgba(255,255,255,0.34)" stroke-width="2" d="M0 244 H64 V206 H128 V226 H192 V158 H256 V182 H320 V112 H384 V140 H448 V74 H512" />
+            <path fill="#5EB248" d="M60 202 h8 v8 h-8 z M188 154 h8 v8 h-8 z M316 108 h8 v8 h-8 z M444 70 h8 v8 h-8 z" />
+        </svg>
+
+        <!-- Redrawn at mobile scale rather than cropped, so the steps stay legible in 96px. -->
+        <svg class="auth__chart auth__chart--mobile" viewBox="0 0 390 96" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+            <defs>
+                <linearGradient id="sfAreaMobile" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0" stop-color="#5EB248" stop-opacity=".30" />
+                    <stop offset="1" stop-color="#5EB248" stop-opacity="0" />
+                </linearGradient>
+            </defs>
+            <path fill="url(#sfAreaMobile)" d="M0 78 H56 V64 H112 V70 H168 V50 H224 V58 H280 V34 H336 V42 H390 V96 H0 Z" />
+            <path fill="none" stroke="rgba(255,255,255,0.34)" stroke-width="2" d="M0 78 H56 V64 H112 V70 H168 V50 H224 V58 H280 V34 H336 V42 H390" />
+            <path fill="#5EB248" d="M53 61 h6 v6 h-6 z M165 47 h6 v6 h-6 z M277 31 h6 v6 h-6 z" />
+        </svg>
+
+        <div class="auth__topbar">
+            <div class="auth__brand">
+                <div class="auth__lockup">
+                    <img class="auth__logo" src="assets/icons/logo.svg" alt="" />
+                    <span class="auth__wordmark">StockFlow</span>
+                </div>
+                <!-- The whole line links, not just the two words: the copy is one translation
+                     string, and splitting it would leave the anchor untranslatable. -->
+                <a class="auth__attribution" href="https://sakib.app" target="_blank" rel="noopener noreferrer">
+                    <ng-icon name="lucideShieldCheck" size="14px" />
+                    {{ 'auth.attribution' | translate }}
+                </a>
+            </div>
+
+            <!-- The toggle rides in the header on mobile and in the form column on desktop. -->
+            <div class="auth__lang auth__lang--onDark">
+                <button type="button" class="auth__lang-btn" [class.is-active]="language.current() === 'en'" [attr.aria-pressed]="language.current() === 'en'" (click)="setLanguage('en')">EN</button>
+                <button type="button" class="auth__lang-btn auth__lang-btn--bn" [class.is-active]="language.current() === 'bn'" [attr.aria-pressed]="language.current() === 'bn'" (click)="setLanguage('bn')">বাংলা</button>
+            </div>
+        </div>
+
+        <div class="auth__headline-block">
+            <h1 class="auth__headline">{{ 'auth.panelHeadline' | translate }}</h1>
+            <p class="auth__subcopy">{{ 'auth.panelBody' | translate }}</p>
+        </div>
+    </aside>
+
+    <main class="auth__form-col" [style.--auth-clear-core]="clearCoreHeight() + 'px'">
+        <div class="auth__lang auth__lang--onLight">
+            <ng-icon name="lucideLanguages" size="14px" class="auth__lang-icon" />
+            <div class="auth__lang-group">
+                <button type="button" class="auth__lang-btn" [class.is-active]="language.current() === 'en'" [attr.aria-pressed]="language.current() === 'en'" (click)="setLanguage('en')">EN</button>
+                <button type="button" class="auth__lang-btn auth__lang-btn--bn" [class.is-active]="language.current() === 'bn'" [attr.aria-pressed]="language.current() === 'bn'" (click)="setLanguage('bn')">বাংলা</button>
+            </div>
+        </div>
+
+        <ng-content />
+    </main>
+</div>

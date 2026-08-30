@@ -8,15 +8,15 @@ import { NzCheckboxModule } from 'ng-zorro-antd/checkbox';
 import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { NgIcon, provideIcons } from '@ng-icons/core';
-import { lucideArrowRight, lucideEye, lucideEyeOff, lucideLanguages, lucideLock, lucideMail, lucideShieldCheck, lucideTriangleAlert } from '@ng-icons/lucide';
+import { lucideArrowRight, lucideEye, lucideEyeOff, lucideLock, lucideMail } from '@ng-icons/lucide';
 import { AuthService, LoginFailure } from '@app/core/services/auth.service';
-import { AppLanguage, LanguageService } from '@app/core/services/language.service';
+import { AuthShellComponent } from '@app/modules/auth/components/auth-shell/auth-shell.component';
 import { Constants } from '@app/core/constants/constants';
 
 @Component({
     selector: 'login',
-    imports: [ReactiveFormsModule, RouterLink, TranslatePipe, NzButtonModule, NzCheckboxModule, NzInputModule, NgIcon],
-    providers: [provideIcons({ lucideArrowRight, lucideEye, lucideEyeOff, lucideLanguages, lucideLock, lucideMail, lucideShieldCheck, lucideTriangleAlert })],
+    imports: [ReactiveFormsModule, RouterLink, TranslatePipe, NzButtonModule, NzCheckboxModule, NzInputModule, NgIcon, AuthShellComponent],
+    providers: [provideIcons({ lucideArrowRight, lucideEye, lucideEyeOff, lucideLock, lucideMail })],
     templateUrl: './login.component.html',
     styleUrl: './login.component.scss',
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -26,7 +26,6 @@ export class LoginComponent implements AfterViewInit {
     private readonly _auth = inject(AuthService);
     private readonly _router = inject(Router);
     private readonly _route = inject(ActivatedRoute);
-    readonly language = inject(LanguageService);
     private readonly _message = inject(NzMessageService);
     private readonly _translate = inject(TranslateService);
 
@@ -100,10 +99,6 @@ export class LoginComponent implements AfterViewInit {
         if (this.sessionExpired()) {
             this._translate.get('auth.sessionExpired').subscribe((text: string) => this._message.info(text, { nzDuration: 8000 }));
         }
-    }
-
-    setLanguage(lang: AppLanguage): void {
-        this.language.use(lang);
     }
 
     onEmailBlur(): void {

@@ -106,16 +106,6 @@ describe('LoginComponent', () => {
         expect((el.querySelector('#login-password') as HTMLInputElement).type).toBe('text');
     });
 
-    it('switches language and persists the choice', async () => {
-        const { fixture, cmp } = await render();
-        cmp.setLanguage('bn');
-        await fixture.whenStable();
-
-        expect(cmp.language.current()).toBe('bn');
-        expect(localStorage.getItem(Constants.LANG_STORE_KEY)).toBe('bn');
-        expect(document.body.classList.contains('lang-bn')).toBe(true);
-    });
-
     it('stores tokens and keeps them on a successful sign in', async () => {
         const { fixture, cmp } = await render();
         cmp.form.setValue({ email: 'owner@shop.com', password: 'secret', remember: true });
