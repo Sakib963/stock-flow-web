@@ -68,5 +68,23 @@
             "errNoAccount": "No account found with that email address. Check the spelling, or ask your shop admin.",
             "resending": "Sending a new code..."
         }
+    },
+    "shell": {
+        "searchPlaceholder": "Search features",
+        "noMatch": "Nothing matches that.",
+        "signOut": "Sign out",
+        "new": "new",
+        "soon": "soon",
+        "notesSoon": "Notes, coming soon",
+        "notificationsSoon": "Notifications, coming soon"
+    },
+    "dashboard": {
+        "title": "Dashboard",
+        "takings": "Today's takings",
+        "needsAttention": "Needs attention",
+        "runningLow": "Running low",
+        "noData": "No data yet",
+        "accessTitle": "What this account can reach",
+        "accessBody": "Sections come from the server, already filtered by role. A narrower role sees fewer."
     }
 }

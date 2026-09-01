@@ -9,6 +9,8 @@ import { provideTranslateHttpLoader } from '@ngx-translate/http-loader';
 import { routes } from './app.routes';
 import { tokenInterceptor } from '@app/core/interceptors/token.interceptor';
 import { LanguageService } from '@app/core/services/language.service';
+import { AuthService } from '@app/core/services/auth.service';
+import { SessionService } from '@app/core/services/session.service';
 
 // No zone.js and no provideZonelessChangeDetection() call: Angular 22 runs zoneless whenever
 // zone.js is absent from the polyfills, which is the default for a v22 application. Components
@@ -30,6 +32,16 @@ export const appConfig: ApplicationConfig = {
         // rather than flashing English and then switching.
         provideAppInitializer(() => {
             inject(LanguageService);
+        }),
+        // The shell cannot render without the menu and permissions, so the boot payload is fetched
+        // before Angular paints. The skeleton in index.html is what covers this wait, which is the
+        // whole reason it exists. Only for an already-signed-in user: the call needs a token, and a
+        // failure must not block the app from reaching the sign-in screen.
+        provideAppInitializer(() => {
+            const auth = inject(AuthService);
+            const session = inject(SessionService);
+            if (!auth.getAccessToken()) return Promise.resolve();
+            return session.load().catch(() => undefined);
         }),
     ],
 };

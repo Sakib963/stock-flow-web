@@ -24,14 +24,14 @@
                stylesheet, no webfont and no JavaScript. It contains no text on purpose: text
                would reflow when Mulish lands, and would need translating.
 
-               The geometry here is provisional. It comes from token defaults, not from a
-               measured shell, because the app shell has not been designed yet. Re-derive the
-               header height, sider width, gutter and row heights from the real shell when it
-               lands, or the layout will visibly jump on every boot. */
+               Re-derived from the built shell in layout.component.scss: header 56px, sider 240px,
+               gutter 24px by 28px, rows 40px. If those change, change these in the same edit, or
+               the layout visibly jumps at the moment the app appears and the product reads as if
+               it stutters on every boot. */
 
             /* Scoped border-box reset. Tailwind's preflight has not loaded at boot, so without
-               this the sider renders at 190 + 16 + 1 = 207px and the shell shifts sideways the
-               instant the app appears. Scoped to .app-boot, and the node dies on bootstrap. */
+               this the sider renders wider than its declared width and the shell shifts sideways
+               the instant the app appears. Scoped to .app-boot, and the node dies on bootstrap. */
             .app-boot,
             .app-boot * {
                 box-sizing: border-box;
@@ -53,23 +53,95 @@
                 border-bottom: 1px solid #dfe3e9;
                 display: flex;
                 align-items: center;
-                justify-content: space-between;
-                padding: 0 20px;
             }
+            /* Same indigo and same texture as the sider, so the dark column reads as one piece
+               from the top of the window down. */
             .app-boot__brand {
+                flex: none;
+                width: 240px;
+                height: 100%;
                 display: flex;
                 align-items: center;
                 gap: 10px;
+                padding: 0 14px;
+                background:
+                    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Ccircle cx='16' cy='16' r='1.1' fill='%23ffffff' fill-opacity='0.07'/%3E%3C/svg%3E") repeat,
+                    #241c66;
             }
             .app-boot__logo {
-                width: 26px;
-                height: 26px;
+                width: 24px;
+                height: 24px;
                 display: block;
-                opacity: 0.5;
+            }
+            .app-boot__brand-bar {
+                display: block;
+                height: 11px;
+                width: 84px;
+                border-radius: 3px;
+                background: rgba(255, 255, 255, 0.22);
+            }
+            .app-boot__header-rest {
+                flex: 1;
+                min-width: 0;
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                padding: 0 16px;
+            }
+            /* Phone only, shown by the media query below. */
+            .app-boot__hamburger {
+                display: none;
+                flex: none;
+                width: 34px;
+                height: 34px;
+                margin-left: 8px;
+                border-radius: 6px;
+                background: #f4f6f8;
+            }
+            /* 32px, the same box the collapse control occupies, so the search field lands on the
+               same x when the app arrives instead of sliding left. */
+            .app-boot__toggle {
+                flex: none;
+                width: 32px;
+                height: 32px;
+                border-radius: 6px;
+                background: #f4f6f8;
+            }
+            .app-boot__search {
+                flex: none;
+                width: 240px;
+                max-width: 100%;
+                height: 30px;
+                border-radius: 6px;
+                background: #f7f8fa;
+                border: 1px solid #dfe3e9;
+            }
+            .app-boot__hgroup {
+                margin-left: auto;
+                display: flex;
+                align-items: center;
+                gap: 6px;
+            }
+            .app-boot__hicon {
+                flex: none;
+                width: 32px;
+                height: 32px;
+                border-radius: 6px;
+                background: #f4f6f8;
+            }
+            .app-boot__lang {
+                flex: none;
+                width: 86px;
+                height: 26px;
+                border-radius: 6px;
+                background: #f4f6f8;
+                border: 1px solid #dfe3e9;
+                margin: 0 4px;
             }
             .app-boot__avatar {
-                width: 28px;
-                height: 28px;
+                flex: none;
+                width: 30px;
+                height: 30px;
                 border-radius: 50%;
                 background: #edeff3;
             }
@@ -81,35 +153,36 @@
             }
             .app-boot__sider {
                 flex: none;
-                width: 190px;
-                background: #fff;
-                border-right: 1px solid #dfe3e9;
-                padding: 12px 8px;
+                width: 240px;
+                background:
+                    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Ccircle cx='16' cy='16' r='1.1' fill='%23ffffff' fill-opacity='0.07'/%3E%3C/svg%3E") repeat,
+                    #241c66;
+                padding: 12px 10px 20px;
                 display: flex;
                 flex-direction: column;
-                gap: 8px;
+                gap: 2px;
             }
             .app-boot__nav-active {
-                height: 34px;
+                height: 36px;
                 border-radius: 6px;
-                background: #e1ddfa;
+                background: rgba(255, 255, 255, 0.14);
             }
             .app-boot__nav {
-                height: 30px;
+                height: 36px;
                 border-radius: 6px;
-                background: #f4f6f8;
+                background: rgba(255, 255, 255, 0.06);
             }
             .app-boot__nav-group {
                 height: 10px;
                 border-radius: 3px;
-                background: #f4f6f8;
-                margin: 8px 0 0 10px;
+                background: rgba(255, 255, 255, 0.1);
+                margin: 12px 0 6px 10px;
             }
 
             .app-boot__main {
                 flex: 1;
                 min-width: 0;
-                padding: 24px 32px;
+                padding: 24px 28px;
                 display: flex;
                 flex-direction: column;
                 gap: 16px;
@@ -192,10 +265,30 @@
                 }
             }
 
-            /* Hidden, not narrowed: a 190px rail on a 390px screen is a frame the app will not
-               fill, which reintroduces the jump the skeleton exists to prevent. */
+            /* The shell has no sider at this width: it is a drawer behind the hamburger, closed on
+               arrival. So the skeleton draws no sider either, and reserves the hamburger instead. */
             @media (max-width: 767px) {
                 .app-boot__sider {
+                    display: none;
+                }
+                .app-boot__hamburger {
+                    display: block;
+                }
+                /* The dark treatment goes with the drawer. Left here it would be a stray block of
+                   indigo with no column under it. */
+                .app-boot__brand {
+                    width: auto;
+                    flex: 1 1 auto;
+                    min-width: 0;
+                    padding: 0;
+                    background: none;
+                }
+                .app-boot__brand-bar {
+                    background: #edeff3;
+                    width: 96px;
+                }
+                .app-boot__toggle,
+                .app-boot__search {
                     display: none;
                 }
                 .app-boot__main {
@@ -216,11 +309,21 @@
         <app-root>
             <div class="app-boot" aria-hidden="true">
                 <div class="app-boot__header">
+                    <span class="app-boot__hamburger"></span>
                     <div class="app-boot__brand">
                         <img class="app-boot__logo" src="assets/icons/logo.svg" alt="" />
-                        <span class="app-boot__bar app-boot__bar--live" style="width: 84px; height: 11px"></span>
+                        <span class="app-boot__brand-bar"></span>
                     </div>
-                    <span class="app-boot__avatar"></span>
+                    <div class="app-boot__header-rest">
+                        <span class="app-boot__toggle"></span>
+                        <span class="app-boot__search"></span>
+                        <span class="app-boot__hgroup">
+                            <span class="app-boot__hicon"></span>
+                            <span class="app-boot__hicon"></span>
+                            <span class="app-boot__lang"></span>
+                            <span class="app-boot__avatar"></span>
+                        </span>
+                    </div>
                 </div>
 
                 <div class="app-boot__body">
