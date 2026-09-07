@@ -166,7 +166,9 @@
     background: transparent;
     padding: 3px 10px;
     border-radius: 4px;
-    font: 600 12px/1 'Mulish', sans-serif;
+    font:
+        600 12px/1 'Mulish',
+        sans-serif;
     color: #4a515c;
     cursor: pointer;
 
@@ -204,9 +206,7 @@
     position: absolute;
     inset: 0;
     pointer-events: none;
-    background-image:
-        repeating-linear-gradient(90deg, rgb(28 32 40 / 0.032) 0 1px, transparent 1px 64px),
-        repeating-linear-gradient(0deg, rgb(28 32 40 / 0.022) 0 1px, transparent 1px 56px);
+    background-image: repeating-linear-gradient(90deg, rgb(28 32 40 / 0.032) 0 1px, transparent 1px 64px), repeating-linear-gradient(0deg, rgb(28 32 40 / 0.022) 0 1px, transparent 1px 56px);
     -webkit-mask-image: radial-gradient(ellipse 420px var(--auth-clear-core, 340px) at 50% 50%, transparent 0%, transparent 46%, #000 100%);
     mask-image: radial-gradient(ellipse 420px var(--auth-clear-core, 340px) at 50% 50%, transparent 0%, transparent 46%, #000 100%);
 }

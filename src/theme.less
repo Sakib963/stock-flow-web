@@ -3,43 +3,69 @@
 // Everything visual must be reachable from here. If a page ends up writing !important against an
 // .ant-* selector, the variable below is wrong, not the CSS.
 
-@import 'ng-zorro-antd/ng-zorro-antd.less';
+// The cascade layer order for the whole app, declared here because this file loads before
+// styles.css and the first declaration is the one that fixes the order.
+//
+// This is load-bearing, and the middle position is the whole point. Tailwind puts every utility in
+// `@layer utilities` and its preflight reset in `@layer base`, while unlayered CSS beats any layer
+// outright, no matter the specificity. So:
+//
+//   * ant unlayered (where it started) beat the utilities. `a { color: @link-color }` won against
+//     `text-white` and `bg-primary` on every anchor in the app, which is how the active rail row
+//     lost its indigo fill.
+//   * ant below `base` loses to preflight, which zeroes `border-width` on every element. That
+//     takes the border off every ant input, select and picker in the app.
+//
+// Between the two is the only correct place: preflight lays the ground, ant styles its components
+// on top of it, and our utilities have the last word. Unlayered CSS, component stylesheets
+// included, still outranks all of it, which is what makes the ban on `!important` against `.ant-*`
+// achievable rather than aspirational.
+@layer theme, base, vendor, components, utilities;
 
-// primary-6. Replaces the old #594ED1: this one is 7.58:1 on white, AAA for body text.
-@primary-color: #4a3fbf;
-@info-color: @primary-color;
-@link-color: @primary-color;
+@layer vendor {
+    @import 'ng-zorro-antd/ng-zorro-antd.less';
 
-@success-color: #127a46;
-@warning-color: #f2a33c;
-@error-color: #d92d20;
+    // primary-6. Replaces the old #594ED1: this one is 7.58:1 on white, AAA for body text.
+    @primary-color: #4a3fbf;
+    @info-color: @primary-color;
+    @link-color: @primary-color;
 
-// Controls and buttons are 6px in the design system. Ant's default is 2px.
-@border-radius-base: 6px;
-@border-radius-sm: 4px;
+    @success-color: #127a46;
+    @warning-color: #f2a33c;
+    @error-color: #d92d20;
 
-@font-size-base: 14px;
-@font-family: 'Mulish', system-ui, -apple-system, 'Segoe UI', sans-serif;
+    // Controls and buttons are 6px in the design system. Ant's default is 2px.
+    @border-radius-base: 6px;
+    @border-radius-sm: 4px;
 
-// Neutrals, so controls inherit the design palette instead of Ant's greys.
-@text-color: #2e3440;
-@text-color-secondary: #6b7480;
-@heading-color: #1c2028;
-@border-color-base: #dfe3e9;
-@border-color-split: #edeff3;
-@disabled-color: #9aa3b0;
+    @font-size-base: 14px;
+    @font-family:
+        'Mulish',
+        system-ui,
+        -apple-system,
+        'Segoe UI',
+        sans-serif;
 
-// n-400 is the placeholder colour, and only ever a placeholder colour: 2.55:1 on white.
-@input-placeholder-color: #9aa3b0;
-@input-hover-border-color: #7c6fd6;
-@input-icon-color: #9aa3b0;
+    // Neutrals, so controls inherit the design palette instead of Ant's greys.
+    @text-color: #2e3440;
+    @text-color-secondary: #6b7480;
+    @heading-color: #1c2028;
+    @border-color-base: #dfe3e9;
+    @border-color-split: #edeff3;
+    @disabled-color: #9aa3b0;
 
-// 40px is the standing-at-the-counter control height. `large` is what the sign-in form uses;
-// data screens keep the 32px default.
-@height-lg: 40px;
+    // n-400 is the placeholder colour, and only ever a placeholder colour: 2.55:1 on white.
+    @input-placeholder-color: #9aa3b0;
+    @input-hover-border-color: #7c6fd6;
+    @input-icon-color: #9aa3b0;
 
-// Matches the app-wide focus ring in styles.css.
-@outline-color: @primary-color;
-@outline-width: 2px;
-@outline-blur-size: 0;
-@outline-fade: 0.22;
+    // 40px is the standing-at-the-counter control height. `large` is what the sign-in form uses;
+    // data screens keep the 32px default.
+    @height-lg: 40px;
+
+    // Matches the app-wide focus ring in styles.css.
+    @outline-color: @primary-color;
+    @outline-width: 2px;
+    @outline-blur-size: 0;
+    @outline-fade: 0.22;
+}

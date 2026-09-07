@@ -38,7 +38,11 @@ export class LoginComponent implements AfterViewInit {
         remember: [true],
     });
 
-    readonly loading = this._auth.loading;
+    // Sign-in is two waits, not one: the credentials call, then the boot payload the shell
+    // route fetches before it will activate. The button stays busy across both, so the form never
+    // sits there looking idle and inviting a second submit.
+    private readonly _navigating = signal(false);
+    readonly loading = computed(() => this._auth.loading() || this._navigating());
     readonly passwordVisible = signal(false);
     readonly submitted = signal(false);
     readonly failure = signal<LoginFailure | null>(null);
@@ -121,15 +125,20 @@ export class LoginComponent implements AfterViewInit {
             return;
         }
 
-        const { email, password } = this.form.getRawValue();
+        const { email, password, remember } = this.form.getRawValue();
         this.failure.set(null);
 
-        this._auth.login({ email, password }).subscribe({
+        this._auth.login({ email, password, remember }).subscribe({
             next: () => {
                 const origUrl = this._route.snapshot.queryParamMap.get('origUrl');
-                void this._router.navigateByUrl(origUrl || Constants.APP_ROUTE);
+                this._navigating.set(true);
+                // Whatever the navigation does, the button has to come back: a refused route
+                // leaves the person on this screen, and a spinner that never stops looks like
+                // a crash.
+                void this._router.navigateByUrl(origUrl || Constants.APP_ROUTE).finally(() => this._navigating.set(false));
             },
             error: (error: HttpErrorResponse) => {
+                this._navigating.set(false);
                 const failure = this._auth.classifyFailure(error);
                 this.failure.set(failure);
                 this._message.error(this._translate.instant(this.failureKey() ?? 'auth.errServer'), { nzDuration: 6000 });

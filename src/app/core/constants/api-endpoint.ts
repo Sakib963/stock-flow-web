@@ -2,6 +2,7 @@
 // Only the auth routes are listed so far; the rest arrive with the features that use them.
 export class APIEndpoint {
     static readonly SIGN_IN = '/api/v1/auth/sign-in';
+    static readonly SIGN_OUT = '/api/v1/auth/sign-out';
     static readonly REFRESH_TOKEN = '/api/v1/auth/refresh-token';
     static readonly GET_USER_INFO = '/api/v1/auth/get-user-info';
     // Password recovery. Both are unauthenticated: a user who has forgotten their password has

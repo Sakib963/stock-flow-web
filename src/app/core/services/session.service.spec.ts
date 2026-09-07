@@ -26,9 +26,7 @@ const payload: SessionPayload = {
             isDisabled: false,
             disabledMessage: { en: null, bn: null },
             isNew: false,
-            children: [
-                { id: 'sales-returns', label: { en: 'Returns', bn: 'ফেরত' }, description: { en: 'Goods coming back.', bn: 'ফেরত আসা পণ্য।' }, tags: ['refund', 'ফেরত'], icon: 'lucideUndo2', order: 0, route: '/app/sales/returns', permission: 'sales.return.view', isDisabled: true, disabledMessage: { en: 'Being rebuilt.', bn: 'নতুন করে তৈরি হচ্ছে।' }, isNew: false, children: [] },
-            ],
+            children: [{ id: 'sales-returns', label: { en: 'Returns', bn: 'ফেরত' }, description: { en: 'Goods coming back.', bn: 'ফেরত আসা পণ্য।' }, tags: ['refund', 'ফেরত'], icon: 'lucideUndo2', order: 0, route: '/app/sales/returns', permission: 'sales.return.view', isDisabled: true, disabledMessage: { en: 'Being rebuilt.', bn: 'নতুন করে তৈরি হচ্ছে।' }, isNew: false, children: [] }],
         },
     ],
     counters: { notifications: 0 },
@@ -44,7 +42,7 @@ describe('SessionService', () => {
         });
         service = TestBed.inject(SessionService);
 
-        const load = service.load();
+        const load = service.load('token');
         TestBed.inject(HttpTestingController)
             .expectOne((r) => r.url.includes(APIEndpoint.GET_USER_INFO))
             .flush({ code: 200, data: payload });

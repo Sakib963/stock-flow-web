@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { authGuard } from '@app/core/guards/auth.guard';
 import { permissionGuard } from '@app/core/guards/permission.guard';
+import { sessionGuard } from '@app/core/guards/session.guard';
 
 // Opening the app lands on '', which redirects by session: into the shell if a token is stored,
 // out to sign-in if not. The boot skeleton in index.html covers the moment before this resolves.
@@ -15,7 +16,9 @@ export const routes: Routes = [
     {
         // Everything signed in sits inside the shell, so the menu and header are rendered once.
         path: 'app',
-        canActivate: [authGuard],
+        // authGuard answers whether there is a session, sessionGuard makes sure its payload is
+        // loaded. Signing in does not reload the page, so the app initializer never sees it.
+        canActivate: [authGuard, sessionGuard],
         loadComponent: () => import('@app/layout/layout.component').then((m) => m.LayoutComponent),
         children: [
             { path: '', pathMatch: 'full', redirectTo: 'dashboard' },

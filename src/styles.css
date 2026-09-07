@@ -38,11 +38,70 @@
     --color-danger-bg: #fdecea;
     --color-danger-border: #f7c4be;
     --color-success: #127a46;
+    --color-success-bg: #e8f6ee;
+    --color-success-border: #b7e0c6;
     --color-warning: #f2a33c;
+    --color-warning-bg: #fdf4e3;
+    --color-warning-border: #f3e2c0;
+
+    /* Shell, from Design/design_handoff_shell §8. These lived in a second Sass token sheet inside
+       the layout folder, which meant the indigo ramp above had a duplicate that nothing kept in
+       step. The application frame is the only thing that should reach for them: a page that needs
+       indigo takes it from the primary ramp.
+
+       The sider ground is near-white rather than the old deep indigo, so status colour on the rail
+       reads as status instead of competing with a saturated column. */
+    --color-sider-bg: #fbfafe;
+    --color-sider-border: #e3dff8;
+    --color-sider-icon: #5c5588;
+
+    /* Indigo grounds, palest first. */
+    --color-primary-wash: #f3f1fd; /* tinted square behind a search result icon */
+    --color-primary-open: #f2f0fb; /* an open group that is not itself active */
+    --color-primary-tint: #edeafc; /* hover ground on the sider */
+    --color-primary-mark: #c9c2ee; /* inactive child marker, the rule's foot dot */
+    --color-primary-soft: #b7adec; /* closed-group active hint, the child rule */
+
+    /* The shell's pale danger ground. It is not --color-danger-bg (#fdecea): the two arrived from
+       different token tables and differ by a shade nobody can see side by side. Reconcile them to
+       one value when the design system is next reviewed, rather than by guessing here. */
+    --color-danger-wash: #fef3f2;
+
+    /* What keeps the indigo fill from reading flat against the pale sider: a contact shadow plus a
+       hairline ring. Without it the active row looks pasted on. */
+    --shadow-active: 0 1px 2px rgb(74 63 191 / 0.34), 0 0 0 1px rgb(74 63 191 / 0.22);
+    --shadow-panel: 0 1px 2px rgb(28 32 40 / 0.05), 0 12px 28px -8px rgb(28 32 40 / 0.18);
+
+    /* Shell type scale, named for what each step carries rather than its size.
+       The frame sets smaller than the pages it holds: it is chrome, and it has to stay quiet next
+       to the data. The half-pixel steps are from the design handoff, not rounding, and none of
+       these has a name in Tailwind's own scale, which is why they are here. */
+    --text-shell-badge: 9.5px; /* the soon/new marker */
+    --text-shell-micro: 10px; /* a group count, a key cap */
+    --text-shell-meta: 10.5px; /* a timestamp, an email, an example chip */
+    --text-shell-hint: 11px; /* the footer strips under a panel */
+    --text-shell-note: 11.5px; /* a role, a secondary row line */
+    --text-shell-row: 12.5px; /* the standard row: menu, account, notification */
+    --text-shell-title: 13px; /* a nav row, a panel heading */
+    --text-shell-dialog: 15px; /* the shortcuts dialog heading */
+
+    /* The lift under a segmented control's selected half. */
+    --shadow-raised: 0 1px 2px rgb(28 32 40 / 0.08);
+
+    /* How tall a header panel may grow before it scrolls: the window less the header and a margin. */
+    --spacing-panel-max: min(520px, calc(100dvh - 96px));
+
+    /* The accordion and chevron easing: slow out, so a group settles rather than snapping. */
+    --ease-shell: cubic-bezier(0.32, 0.72, 0, 1);
+    /* The width transition the sider and the brand block share. */
+    --ease-width: cubic-bezier(0.215, 0.61, 0.355, 1);
 
     --font-sans: 'Mulish', system-ui, -apple-system, 'Segoe UI', sans-serif;
     --font-bangla: 'Hind Siliguri', 'Mulish', sans-serif;
     --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+    /* Mono that can also set Bengali. The search hints show examples of what to type and one of
+       the three is always in the other language, but Plex Mono carries no Bengali glyphs. */
+    --font-mono-bn: 'IBM Plex Mono', 'Hind Siliguri', ui-monospace, monospace;
 
     --radius-control: 6px;
     --radius-container: 8px;
@@ -77,4 +136,180 @@ body {
     outline: none;
     box-shadow: 0 0 0 2px rgb(74 63 191 / 0.22);
     border-color: var(--color-primary-6);
+}
+
+/* Shell phone overlays.
+
+   Below 768px the shell's menu, search and notifications are ng-zorro's drawer and modal. They
+   render into the CDK overlay container at body level, which is the point: nothing in the shell
+   can clip them, restack them, or push the page sideways. It also puts their own chrome outside
+   the reach of the shell's scoped styles, so the two resets they need live here, keyed by the wrap
+   class each overlay is given. Everything inside them is still styled by the shell, because a
+   template carries the encapsulation of the component that declared it.
+
+   No !important, and nothing here reaches past the wrap class into ant's own layout. */
+.sf-drawer .ant-drawer-body {
+    display: flex;
+    flex-direction: column;
+}
+.sf-sheet .ant-modal-content {
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+/* The shell's dropdowns, popovers and tooltips are ng-zorro's, so their chrome renders in the CDK
+   overlay container and the shell's scoped styles cannot reach it. These strip the parts of ant's
+   surface that would sit behind our own: our panels bring their own background, border and shadow,
+   and the popover arrow has no place on a menu flyout. Keyed by the overlay class each one is
+   given, and no !important anywhere. */
+.sf-panel .ant-dropdown-menu,
+.sf-flyout .ant-popover-inner {
+    padding: 0;
+    background: transparent;
+    box-shadow: none;
+}
+.sf-flyout .ant-popover-arrow {
+    display: none;
+}
+.sf-flyout .ant-popover-inner-content {
+    padding: 0;
+}
+
+/* Shell utilities.
+
+   The pieces the application frame paints in more than one component: the icon button in the
+   header, the drawer head and two panel heads; the panel surface behind three overlays; the phone
+   sheet container; the heading over a run of rows; the two-line empty state.
+
+   They are here rather than in a shared Sass partial because a partial is copied into every
+   component that uses it, so "change it in one place" was only ever true of the source. A utility
+   is one rule that every template names. */
+
+@utility sf-icon-btn {
+    position: relative;
+    flex: none;
+    display: flex;
+    border: 0;
+    background: none;
+    padding: 7px;
+    border-radius: var(--radius-control);
+    color: var(--color-n-600);
+    cursor: pointer;
+
+    &:hover {
+        background: var(--color-n-75);
+        color: var(--color-n-900);
+    }
+
+    &.is-open {
+        background: var(--color-primary-wash);
+        color: var(--color-primary-6);
+    }
+
+    &[disabled] {
+        color: #c0c6d0;
+        cursor: not-allowed;
+
+        &:hover {
+            background: none;
+            color: #c0c6d0;
+        }
+    }
+}
+
+/* The surface, and nothing about where it sits: the account and notification panels are placed by
+   the CDK inside an nz-dropdown, and the search panel positions itself below its own field. */
+@utility sf-panel {
+    background: #fff;
+    border: 1px solid var(--color-n-200);
+    border-radius: var(--radius-container);
+    box-shadow: var(--shadow-panel);
+    overflow: hidden;
+}
+
+/* The container for the same content on a phone, inside an ng-zorro overlay. It shares nothing
+   with sf-panel on purpose: the sheet used to reuse the dropdown's class and switch off its
+   properties one at a time, and the one that slipped through was a 340px min-width meant for a
+   desktop popover, so every row came out wider than the screen. */
+@utility sf-sheet {
+    display: flex;
+    flex-direction: column;
+    /* The overlay is opened 12px from the top, so this is the rest of the screen. */
+    max-height: calc(100dvh - 24px);
+    overflow: hidden;
+    border-radius: var(--radius-container);
+}
+
+/* The heading over a run of rows: a search section, a notification day. */
+@utility sf-group-head {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 9px 12px 5px;
+    font: 700 10px/1 var(--font-sans);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--color-n-500);
+}
+
+/* Nothing to show, said in two lines: what is empty, and what to do about it. */
+@utility sf-empty {
+    padding: 26px 16px;
+    text-align: center;
+
+    p {
+        margin: 0 0 3px;
+        font-size: 12.5px;
+        font-weight: 600;
+        color: var(--color-n-600);
+    }
+
+    small {
+        font-size: 11.5px;
+        color: var(--color-n-400);
+    }
+}
+
+/* The avatar behind the person's initials. The header trigger draws it at 30px and the account
+   panel at 36px, so the size stays a utility and only the gradient lives here: it was the one
+   value the two copies could drift on. */
+@utility sf-avatar {
+    border-radius: 50%;
+    background: linear-gradient(140deg, var(--color-primary-6) 0%, #6f63e0 100%);
+    color: #fff;
+    text-align: center;
+    flex: none;
+}
+
+/* A key cap. The search panel's footer hint draws it, and so does the shortcuts dialog. The
+   heavier bottom border is what reads as a physical key rather than a chip. */
+@utility sf-kbd {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 17px;
+    height: 17px;
+    padding: 0 4px;
+    background: #fff;
+    border: 1px solid var(--color-n-200);
+    border-radius: 3px;
+    font: 600 10px/1 var(--font-mono);
+    color: var(--color-n-600);
+}
+
+/* The shortcuts dialog's key cap. Same idea as sf-kbd, one size up: the dialog is a reference
+   someone reads, not a hint glanced at in a footer. */
+@utility sf-key {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 20px;
+    height: 20px;
+    padding: 0 5px;
+    background: var(--color-n-50);
+    border: 1px solid var(--color-n-200);
+    border-bottom-width: 2px;
+    border-radius: 4px;
+    font: 600 10.5px/1 var(--font-mono);
+    color: var(--color-n-600);
 }

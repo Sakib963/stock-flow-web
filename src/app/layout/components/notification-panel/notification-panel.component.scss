@@ -1,0 +1,15 @@
+// The unread edge bar, and nothing else.
+//
+// A pseudo-element is one of the four things the styling rule keeps in SCSS: it has no element to
+// carry a utility class. Everything else in this panel is utilities in the template.
+
+.is-unread::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 8px;
+    bottom: 8px;
+    width: 3px;
+    border-radius: 0 3px 3px 0;
+    background: var(--color-primary-6);
+}

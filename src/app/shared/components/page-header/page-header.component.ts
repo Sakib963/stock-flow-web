@@ -13,60 +13,8 @@ import { ChangeDetectionStrategy, Component, input } from '@angular/core';
  */
 @Component({
     selector: 'page-header',
-    template: `
-        <header class="page-header">
-            <div class="page-header__text">
-                <h1 class="page-header__title">{{ title() }}</h1>
-                @if (subtitle()) {
-                    <p class="page-header__subtitle">{{ subtitle() }}</p>
-                }
-            </div>
-            <div class="page-header__actions">
-                <ng-content />
-            </div>
-        </header>
-    `,
-    styles: [
-        `
-            .page-header {
-                display: flex;
-                align-items: flex-start;
-                justify-content: space-between;
-                gap: 16px;
-                background: #fff;
-                border: 1px solid #dfe3e9;
-                border-radius: 8px;
-                padding: 18px 22px;
-                margin-bottom: 16px;
-            }
-            .page-header__title {
-                margin: 0;
-                font-size: 18px;
-                font-weight: 700;
-                letter-spacing: -0.015em;
-                color: #1c2028;
-            }
-            .page-header__subtitle {
-                margin: 4px 0 0;
-                font-size: 13px;
-                line-height: 1.5;
-                color: #6b7480;
-            }
-            .page-header__actions {
-                display: flex;
-                align-items: center;
-                gap: 8px;
-                flex: none;
-            }
-            @media (max-width: 767px) {
-                .page-header {
-                    flex-direction: column;
-                    align-items: stretch;
-                    padding: 16px;
-                }
-            }
-        `,
-    ],
+    templateUrl: './page-header.component.html',
+    styleUrl: './page-header.component.scss',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PageHeaderComponent {

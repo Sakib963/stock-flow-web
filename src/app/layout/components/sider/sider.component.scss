@@ -1,0 +1,151 @@
+// What is left of the rail's styling after the utilities took the rest: the markers drawn as
+// pseudo-elements, the accordion, and the scrollbar. All four are on the carve-out list, and all
+// four are there for the same reason: there is no element to hang a utility class on.
+//
+// Per Design/design_handoff_shell §2.
+
+/* Markers ------------------------------------------------------------------ */
+
+// The active row's bar. It sits outside the rounded row, in the sider gutter, so it reads as a
+// marker on the column rather than a stripe inside the button.
+.shell__nav--child.is-active::after,
+.shell__nav-list > .is-active::after {
+    content: '';
+    position: absolute;
+    left: -8px;
+    top: 50%;
+    margin-top: -12px;
+    width: 3px;
+    height: 24px;
+    border-radius: 0 3px 3px 0;
+    background: var(--color-primary-6);
+}
+
+// The edge bar belongs to top-level rows. On a child it would collide with the rule.
+.shell__nav--child.is-active::after {
+    display: none;
+}
+
+// The rail still has to point at "you are inside Selling" when the group is shut. Softer and
+// shorter than the real active bar, so it reads as a hint rather than a second active row.
+.shell__nav-list > .has-active:not(.is-open)::after {
+    content: '';
+    position: absolute;
+    left: -8px;
+    top: 50%;
+    margin-top: -8px;
+    width: 3px;
+    height: 16px;
+    border-radius: 0 3px 3px 0;
+    background: var(--color-primary-soft);
+}
+
+/* Children ----------------------------------------------------------------- */
+
+// grid-template-rows 0fr to 1fr rather than max-height: the row resolves to the content real
+// height, so there is no guessed maximum to overshoot and no jump when a group has many children.
+.shell__children {
+    display: grid;
+    grid-template-rows: 0fr;
+    opacity: 0;
+    flex: none;
+    transition:
+        grid-template-rows 0.26s var(--ease-shell),
+        opacity 0.2s;
+
+    &.is-open {
+        grid-template-rows: 1fr;
+        opacity: 1;
+    }
+}
+
+.shell__children-inner {
+    overflow: hidden;
+    min-height: 0;
+    // A zero-height row still holds focusable links. visibility transitions discretely, so it
+    // flips to visible at the start of the opening and back only once the closing has finished.
+    visibility: hidden;
+    transition: visibility 0.26s;
+
+    .shell__children.is-open & {
+        visibility: visible;
+    }
+}
+
+// The rule that ties the children to their group. It fades out downward so it ends without a hard
+// stop, and the dot below is what closes it off.
+.shell__children-list {
+    &::before {
+        content: '';
+        position: absolute;
+        left: 1px;
+        top: 3px;
+        bottom: 11px;
+        width: 2px;
+        border-radius: 1px;
+        background: linear-gradient(180deg, var(--color-primary-soft) 0%, rgb(183 173 236 / 0) 100%);
+    }
+
+    &::after {
+        content: '';
+        position: absolute;
+        left: 0;
+        bottom: 5px;
+        width: 4px;
+        height: 4px;
+        border-radius: 50%;
+        background: var(--color-primary-mark);
+    }
+}
+
+// Centred on the rule: the list pads 17px, so -17px puts this marker box at the rule x and its
+// 4px width shares the rule centre line.
+.shell__nav--child::before {
+    content: '';
+    position: absolute;
+    left: -17px;
+    top: 50%;
+    margin-top: -2px;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--color-primary-mark);
+    transition:
+        height 0.15s,
+        margin-top 0.15s,
+        background 0.15s;
+}
+
+.shell__nav--child:hover::before {
+    background: var(--color-primary-soft);
+}
+
+.shell__nav--child.is-active::before {
+    margin-top: -9px;
+    height: 19px;
+    border-radius: 2px;
+    background: var(--color-primary-6);
+}
+
+.shell__nav--child.is-disabled::before {
+    background: #ded9f4;
+}
+
+/* Scrollbar ---------------------------------------------------------------- */
+
+.shell__nav-list {
+    scrollbar-color: #d5cff1 transparent;
+    scrollbar-width: thin;
+}
+
+/* Reduced motion ----------------------------------------------------------- */
+
+// A group conveys openness by showing its children, not by the way it gets there. Freezing the
+// accordion loses nothing.
+@media (prefers-reduced-motion: reduce) {
+    .shell__children,
+    .shell__children-inner,
+    .shell__nav--child::before {
+        transition: none;
+    }
+}

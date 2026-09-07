@@ -1,0 +1,62 @@
+<div class="sf-panel w-65.5 p-1.5 max-md:w-[min(280px,calc(100vw-20px))]">
+    <div class="mb-1.25 flex items-center gap-2.5 border-b border-n-100 px-2 pt-2 pb-3">
+        <span class="sf-avatar size-9 text-shell-title/9 font-bold">{{ session.initials() }}</span>
+        <span class="flex min-w-0 flex-col gap-px">
+            <span class="truncate text-shell-title font-bold text-n-900">{{ session.user()?.name }}</span>
+            <!-- Role, and the job title beside it when the record carries one. There is no
+                 separate permission-tier label to show yet. -->
+            <span class="truncate text-shell-note font-semibold text-primary">
+                {{ session.user()?.role }}
+                @if (session.user()?.designation) {
+                    &middot; {{ session.user()?.designation }}
+                }
+            </span>
+            <!-- Monospace because an email is an identifier: it is read character by character
+                 when someone is checking which account they are signed in as. -->
+            <span class="truncate font-mono text-shell-meta/[1.4] font-normal text-n-500">{{ session.user()?.email }}</span>
+        </span>
+    </div>
+
+    <!-- The language belongs to the person, not to the page, so it sits with the other things they
+         own. It also gives the phone header back the ~120px the two names were costing it.
+
+         A row that holds a control rather than being one, so it takes the row's icon and label
+         alignment and none of its hover or pointer behaviour. -->
+    <div class="group flex h-10 w-full cursor-default items-center gap-2.25 rounded-control px-2 text-left text-shell-row/none font-semibold text-n-800">
+        <ng-icon name="lucideGlobe" size="15px" class="flex-none text-n-500" />
+        <span class="flex-1 truncate">{{ 'shell.language' | translate }}</span>
+        <span class="flex flex-none items-center gap-0.5 rounded-control border border-n-200 bg-n-75 p-0.5">
+            <button type="button" class="cursor-pointer rounded-sm px-2 py-0.75 text-xs/none" [class]="language.current() === 'en' ? 'bg-white font-bold text-primary-8 shadow-raised' : 'font-semibold text-n-600'" (click)="language.use('en')">EN</button>
+            <button type="button" class="cursor-pointer rounded-sm px-2 py-0.75 font-bangla text-xs/none" [class]="language.current() === 'bn' ? 'bg-white font-bold text-primary-8 shadow-raised' : 'font-semibold text-n-600'" (click)="language.use('bn')">বাংলা</button>
+        </span>
+    </div>
+
+    <div class="my-1.25 h-px bg-n-100"></div>
+
+    <!-- Present but not usable, like the disabled menu items: neither page is ported yet, and a
+         row that navigates nowhere is worse than one that says so. -->
+    <button type="button" class="group flex h-8.5 w-full cursor-not-allowed items-center gap-2.25 rounded-control px-2 text-left text-shell-row/none font-semibold text-n-500" disabled nz-tooltip nzTooltipPlacement="left" [nzTooltipTitle]="'shell.accountSoon' | translate">
+        <ng-icon name="lucideCircleUser" size="15px" class="flex-none text-n-400" />
+        <span class="flex-1 truncate">{{ 'shell.myAccount' | translate }}</span>
+        <badge>{{ 'shell.soon' | translate }}</badge>
+    </button>
+    <button type="button" class="group flex h-8.5 w-full cursor-not-allowed items-center gap-2.25 rounded-control px-2 text-left text-shell-row/none font-semibold text-n-500" disabled nz-tooltip nzTooltipPlacement="left" [nzTooltipTitle]="'shell.accountSoon' | translate">
+        <ng-icon name="lucideCalendarClock" size="15px" class="flex-none text-n-400" />
+        <span class="flex-1 truncate">{{ 'shell.myAttendance' | translate }}</span>
+        <badge>{{ 'shell.soon' | translate }}</badge>
+    </button>
+    @if (!state.isPhone()) {
+        <button type="button" class="group flex h-8.5 w-full cursor-pointer items-center gap-2.25 rounded-control px-2 text-left text-shell-row/none font-semibold text-n-800 hover:bg-n-50 hover:text-n-900" (click)="state.openShortcuts()">
+            <ng-icon name="lucideKeyboard" size="15px" class="flex-none text-n-500 group-hover:text-n-600" />
+            <span class="flex-1 truncate">{{ 'shell.keyboardShortcuts' | translate }}</span>
+            <span class="flex-none font-mono text-shell-meta/none font-medium text-n-400">?</span>
+        </button>
+    }
+
+    <div class="my-1.25 h-px bg-n-100"></div>
+
+    <button type="button" class="group flex h-8.5 w-full cursor-pointer items-center gap-2.25 rounded-control px-2 text-left text-shell-row/none font-semibold text-danger hover:bg-danger-wash" (click)="signOut()">
+        <ng-icon name="lucideLogOut" size="15px" class="flex-none text-danger" />
+        <span class="flex-1 truncate">{{ 'shell.signOut' | translate }}</span>
+    </button>
+</div>

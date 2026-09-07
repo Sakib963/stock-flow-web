@@ -14,29 +14,8 @@ import { SessionService } from '@app/core/services/session.service';
 @Component({
     selector: 'dashboard',
     imports: [TranslatePipe, PageHeaderComponent],
-    template: `
-        <page-header [title]="'dashboard.title' | translate" [subtitle]="greeting()" />
-
-        <section class="grid gap-4 md:grid-cols-3">
-            @for (tile of tiles(); track tile.key) {
-                <article class="rounded-[8px] border border-n-200 bg-white p-5">
-                    <h2 class="text-n-500 text-xs font-semibold uppercase tracking-wide">{{ tile.key | translate }}</h2>
-                    <p class="text-n-400 mt-3 text-2xl font-bold">&mdash;</p>
-                    <p class="text-n-500 mt-1 text-xs">{{ 'dashboard.noData' | translate }}</p>
-                </article>
-            }
-        </section>
-
-        <section class="mt-4 rounded-[8px] border border-n-200 bg-white p-5">
-            <h2 class="text-n-900 text-sm font-bold">{{ 'dashboard.accessTitle' | translate }}</h2>
-            <p class="text-n-500 mt-1 text-xs">{{ 'dashboard.accessBody' | translate }}</p>
-            <ul class="mt-3 flex flex-wrap gap-2">
-                @for (section of sections(); track section) {
-                    <li class="rounded-[6px] border border-n-200 bg-n-75 px-2.5 py-1 text-xs font-semibold text-n-600">{{ section }}</li>
-                }
-            </ul>
-        </section>
-    `,
+    templateUrl: './dashboard.component.html',
+    styleUrl: './dashboard.component.scss',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DashboardComponent {

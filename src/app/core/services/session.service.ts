@@ -23,21 +23,47 @@ export class SessionService {
     private readonly _payload = signal<SessionPayload | null>(null);
     readonly loaded = computed(() => this._payload() !== null);
 
+    /**
+     * The session the payload in memory belongs to, so a second person signing in on the same
+     * counter machine cannot inherit the first one's menu and permissions. It is the refresh token,
+     * which survives a renewal and changes only at sign-in. The check belongs to
+     * whoever holds both halves, which is the shell guard: this service must not depend on
+     * AuthService, because the token interceptor depends on AuthService and the translation files
+     * are fetched through it. That ring is a boot-time circular dependency.
+     */
+    private readonly _loadedFor = signal<string | null>(null);
+    readonly loadedFor = this._loadedFor.asReadonly();
+
     readonly user = computed(() => this._payload()?.user ?? null);
     readonly business = computed(() => this._payload()?.business ?? null);
+
+    /**
+     * Initials for the avatar, which is the only place a photo would otherwise be needed.
+     *
+     * Here rather than in a component because the header trigger and the account panel are two
+     * components drawing the same avatar, and a second copy of this would be the one that drifted.
+     */
+    readonly initials = computed(() => {
+        const name = this.user()?.name ?? '';
+        const parts = name.trim().split(/\s+/).filter(Boolean);
+        if (!parts.length) return '?';
+        return (parts[0][0] + (parts.length > 1 ? parts[parts.length - 1][0] : '')).toUpperCase();
+    });
     readonly menu = computed(() => this._payload()?.menu ?? []);
     readonly notifications = computed(() => this._payload()?.counters?.notifications ?? 0);
 
     /** A Set, because `can()` is called on every guarded control on every render. */
     private readonly _permissions = computed(() => new Set(this._payload()?.permissions ?? []));
 
-    async load(): Promise<void> {
+    async load(owner: string): Promise<void> {
         const response = await firstValueFrom(this._http.get<{ data: SessionPayload }>(`${environment.baseUrl}${APIEndpoint.GET_USER_INFO}`));
         this._payload.set(response?.data ?? null);
+        this._loadedFor.set(owner);
     }
 
     clear(): void {
         this._payload.set(null);
+        this._loadedFor.set(null);
     }
 
     /**

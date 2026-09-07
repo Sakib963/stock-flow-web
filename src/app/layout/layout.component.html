@@ -1,151 +1,61 @@
-<div class="shell" [class.is-collapsed]="collapsed()" [class.is-mobile-open]="mobileOpen()">
-    <header class="shell__header">
-        <!-- Phone only. The sider is not a rail at this width, it is a drawer, so the control that
-             opens it has to live in the bar that is always visible. -->
-        <button type="button" class="shell__icon-btn shell__hamburger" (click)="toggleMobile()" [attr.aria-expanded]="mobileOpen()" [attr.aria-label]="mobileOpen() ? 'Close menu' : 'Open menu'">
-            <ng-icon [name]="mobileOpen() ? 'lucideX' : 'lucideMenu'" size="20px" />
-        </button>
+<!-- `--sider` is bound rather than declared in CSS: the header's brand block and the sider column
+     are two components measured from the same number, and a custom property is what crosses that
+     boundary. Bound here so the width sits beside the condition that changes it. -->
+<div class="flex h-full flex-col bg-n-75" [style.--sider]="state.railCollapsed() ? '64px' : '252px'">
+    <header-bar />
 
-        <div class="shell__brand">
-            <img class="shell__logo" src="assets/icons/logo.svg" alt="" />
-            <span class="shell__business" [title]="session.business()?.name || ''">{{ session.business()?.name || 'StockFlow' }}</span>
-        </div>
-
-        <!-- Sits with the search rather than in the brand block: it acts on the column beside it,
-             so it belongs next to the other things the person operates, not inside the logo. -->
-        <button type="button" class="shell__icon-btn shell__toggle" (click)="toggleCollapsed()" [attr.aria-label]="collapsed() ? 'Expand menu' : 'Collapse menu'">
-            <ng-icon [name]="collapsed() ? 'lucidePanelLeftOpen' : 'lucidePanelLeftClose'" size="18px" />
-        </button>
-
-        <!-- Global search over features. The menu is the index, so this costs no request. -->
-        <div class="shell__search">
-            <nz-input-wrapper>
-                <ng-icon nzInputPrefix name="lucideSearch" size="15px" class="shell__search-icon" />
-                <input nz-input type="text" [placeholder]="'shell.searchPlaceholder' | translate" [ngModel]="searchTerm()" (ngModelChange)="onSearch($event)" (keydown.escape)="closeSearch()" />
-            </nz-input-wrapper>
-
-            @if (searchTerm()) {
-                <div class="shell__results">
-                    @for (item of results(); track item.id) {
-                        <button type="button" class="shell__result" [class.is-disabled]="item.isDisabled" [disabled]="item.isDisabled" (click)="go(item)">
-                            <ng-icon [name]="item.icon || 'lucideLayers'" size="16px" />
-                            <span class="shell__result-main">
-                                <span class="shell__result-label">
-                                    {{ session.label(item) }}
-                                    @if (item.isDisabled) {
-                                        <span class="shell__badge">{{ 'shell.soon' | translate }}</span>
-                                    } @else if (item.isNew) {
-                                        <span class="shell__badge shell__badge--new">{{ 'shell.new' | translate }}</span>
-                                    }
-                                </span>
-                                <span class="shell__result-desc">{{ item.isDisabled ? session.disabledMessage(item) : session.description(item) }}</span>
-                            </span>
-                        </button>
-                    } @empty {
-                        <p class="shell__no-result">{{ 'shell.noMatch' | translate }}</p>
-                    }
-                </div>
-            }
-        </div>
-
-        <div class="shell__header-right">
-            <!-- Both are disabled rather than hidden: the person should see where these live before
-                 they arrive. Notes exists on the server already, its page is not ported yet. -->
-            <button type="button" class="shell__icon-btn" disabled [title]="'shell.notesSoon' | translate">
-                <ng-icon name="lucideStickyNote" size="18px" />
-            </button>
-            <button type="button" class="shell__icon-btn" disabled [title]="'shell.notificationsSoon' | translate">
-                <ng-icon name="lucideBell" size="18px" />
-            </button>
-
-            <div class="shell__lang">
-                <ng-icon name="lucideGlobe" size="14px" class="shell__lang-icon" />
-                <button type="button" [class.is-active]="language.current() === 'en'" (click)="language.use('en')">EN</button>
-                <button type="button" class="shell__lang-bn" [class.is-active]="language.current() === 'bn'" (click)="language.use('bn')">বাংলা</button>
-            </div>
-
-            <button type="button" class="shell__profile" nz-dropdown [nzDropdownMenu]="profileMenu" nzTrigger="click" nzPlacement="bottomRight" [title]="session.user()?.name || ''">
-                <span class="shell__avatar">{{ initials() }}</span>
-                <ng-icon name="lucideChevronDown" size="14px" class="shell__who-chevron" />
-            </button>
-
-            <nz-dropdown-menu #profileMenu="nzDropdownMenu">
-                <ul nz-menu>
-                    <li nz-menu-item nzDisabled>
-                        <span class="shell__menu-head">
-                            <strong>{{ session.user()?.name }}</strong>
-                            <small>{{ session.user()?.email }}</small>
-                            <small class="shell__menu-role">{{ session.user()?.role }}</small>
-                        </span>
-                    </li>
-                    <li nz-menu-divider></li>
-                    <li nz-menu-item (click)="signOut()">{{ 'shell.signOut' | translate }}</li>
-                </ul>
-            </nz-dropdown-menu>
-        </div>
-    </header>
-
-    <div class="shell__body">
-        @if (mobileOpen()) {
-            <div class="shell__backdrop" (click)="closeMobile()"></div>
+    <div class="relative flex min-h-0 flex-1">
+        <!-- A rail at this width. Below 768px the same component is the drawer's body instead, so
+             it is rendered there and not here: two copies would mean two of every menu row in the
+             accessibility tree, and the hidden one would be the one a screen reader read. -->
+        @if (!state.isPhone()) {
+            <sider />
         }
 
-        <!-- Built entirely from the boot payload. The server sends only what this person may see,
-             so there is nothing to filter here and nothing to hide. -->
-        <nav class="shell__sider">
-            <div class="shell__nav-list">
-                @for (item of session.menu(); track item.id) {
-                    @if (item.children.length) {
-                        <button type="button" class="shell__nav shell__nav--group" [class.is-open]="isOpen(item.id)" (click)="toggleGroup(item.id)" [title]="session.label(item)">
-                            <ng-icon [name]="item.icon || 'lucideLayers'" size="18px" class="shell__nav-icon" />
-                            <span class="shell__nav-label">{{ session.label(item) }}</span>
-                            <ng-icon name="lucideChevronDown" size="14px" class="shell__nav-chevron" />
-                        </button>
-
-                        @if (isOpen(item.id) && !collapsed()) {
-                            <div class="shell__children">
-                                @for (child of item.children; track child.id) {
-                                    <a class="shell__nav shell__nav--child" [class.is-disabled]="child.isDisabled" [routerLink]="child.isDisabled ? null : child.route" routerLinkActive="is-active" [title]="child.isDisabled ? session.disabledMessage(child) : session.description(child)">
-                                        <span class="shell__nav-label">{{ session.label(child) }}</span>
-                                        @if (child.isDisabled) {
-                                            <span class="shell__badge">{{ 'shell.soon' | translate }}</span>
-                                        } @else if (child.isNew) {
-                                            <span class="shell__badge shell__badge--new">{{ 'shell.new' | translate }}</span>
-                                        }
-                                    </a>
-                                }
-                            </div>
-                        }
-                    } @else {
-                        <a class="shell__nav" [class.is-disabled]="item.isDisabled" [routerLink]="item.isDisabled ? null : item.route" routerLinkActive="is-active" [title]="item.isDisabled ? session.disabledMessage(item) : session.description(item)">
-                            <ng-icon [name]="item.icon || 'lucideLayers'" size="18px" class="shell__nav-icon" />
-                            <span class="shell__nav-label">{{ session.label(item) }}</span>
-                            @if (item.isDisabled) {
-                                <span class="shell__badge">{{ 'shell.soon' | translate }}</span>
-                            } @else if (item.isNew) {
-                                <span class="shell__badge shell__badge--new">{{ 'shell.new' | translate }}</span>
-                            }
-                        </a>
-                    }
-                }
-            </div>
-
-            <!-- Pinned below the scrolling list, not appended to it, so a long menu never pushes
-                 the version out of reach. Support asks for it before anything else. -->
-            <div class="shell__sider-footer">
-                <span class="shell__sider-app">
-                    StockFlow
-                    <span class="shell__sider-version">v{{ version }}</span>
-                </span>
-                <a class="shell__sider-by" href="https://sakib.app" target="_blank" rel="noopener noreferrer" title="Arithma Labs">
-                    <span class="shell__sider-by-full">Arithma Labs</span>
-                    <span class="shell__sider-by-short">AL</span>
-                </a>
-            </div>
-        </nav>
-
-        <main class="shell__main">
+        <main class="min-w-0 flex-1 overflow-y-auto p-4 md:px-7 md:py-6">
             <router-outlet />
         </main>
     </div>
+
+    @if (state.shortcutsOpen()) {
+        <shortcuts-dialog [modifier]="state.modifier" (close)="state.closeShortcuts()" />
+    }
 </div>
+
+<!-- Phone overlays ---------------------------------------------------------------------------
+
+     ng-zorro rather than hand-rolled, and only here. These render into the CDK overlay container
+     at body level, so no ancestor of the shell can clip them, restack them or make them scroll the
+     page sideways, which is what every phone bug in this shell has been. They also bring the focus
+     trap, the scroll lock and Escape, none of which the hand-rolled versions had.
+
+     The wide-window dropdowns stay anchored to their triggers in the header: a dropdown hanging
+     off a button is not what a modal does, and up there the shell is not clipping anything. -->
+
+<!-- The whole drawer is behind the width check, not just its `nzVisible`. nz-drawer builds its
+     content template as soon as it exists, so binding only `nzVisible` left a second copy of the
+     entire menu mounted on a wide window: every nav row twice in the accessibility tree, and the
+     hidden one is the copy a screen reader reaches first. -->
+@if (state.isPhone()) {
+    <nz-drawer [nzVisible]="state.mobileOpen()" [nzContent]="siderDrawer" nzPlacement="left" [nzClosable]="false" [nzWidth]="state.drawerWidth" [nzBodyStyle]="{ padding: '0' }" nzWrapClassName="sf-drawer" (nzOnClose)="state.closeMobile()" />
+}
+
+<nz-modal [nzVisible]="state.isPhone() && state.openPanel() === 'search'" [nzContent]="searchSheet" [nzFooter]="null" [nzClosable]="false" [nzWidth]="state.sheetWidth" [nzStyle]="{ top: '12px' }" [nzBodyStyle]="{ padding: '0' }" nzWrapClassName="sf-sheet" (nzOnCancel)="closePanel()" />
+
+<nz-modal [nzVisible]="state.isPhone() && state.openPanel() === 'notifications'" [nzContent]="notifySheet" [nzFooter]="null" [nzClosable]="false" [nzWidth]="state.sheetWidth" [nzStyle]="{ top: '12px' }" [nzBodyStyle]="{ padding: '0' }" nzWrapClassName="sf-sheet" (nzOnCancel)="closePanel()" />
+
+<!-- ng-zorro takes a template for its content, so each overlay gets a one-line one that stamps the
+     component. The component brings its own styles wherever the CDK puts it, which is why none of
+     these need the shell to reach into the overlay container after them. -->
+
+<ng-template #siderDrawer>
+    <sider />
+</ng-template>
+
+<ng-template #searchSheet>
+    <search-panel variant="sheet" />
+</ng-template>
+
+<ng-template #notifySheet>
+    <notification-panel variant="sheet" />
+</ng-template>

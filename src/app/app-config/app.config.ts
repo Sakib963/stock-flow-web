@@ -6,7 +6,7 @@ import { provideNzDateFnsAdapter } from 'ng-zorro-antd/core/time';
 import { provideNgIconsConfig } from '@ng-icons/core';
 import { provideTranslateService } from '@ngx-translate/core';
 import { provideTranslateHttpLoader } from '@ngx-translate/http-loader';
-import { routes } from './app.routes';
+import { routes } from '@app/app-routes/app.routes';
 import { tokenInterceptor } from '@app/core/interceptors/token.interceptor';
 import { LanguageService } from '@app/core/services/language.service';
 import { AuthService } from '@app/core/services/auth.service';
@@ -41,7 +41,7 @@ export const appConfig: ApplicationConfig = {
             const auth = inject(AuthService);
             const session = inject(SessionService);
             if (!auth.getAccessToken()) return Promise.resolve();
-            return session.load().catch(() => undefined);
+            return session.load(auth.sessionKey()).catch(() => undefined);
         }),
     ],
 };

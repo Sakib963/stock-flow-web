@@ -1,0 +1,178 @@
+<nav class="relative flex flex-none flex-col overflow-hidden border-r border-sider-border bg-sider-bg pt-2.5 transition-[width] duration-[180ms] ease-width max-md:h-full max-md:w-full max-md:border-r-0 max-md:p-0 md:w-(--sider)" data-shell="sider">
+    <!-- One wash stretched over the whole column, drawn against a 252 by 844 box with
+         preserveAspectRatio="none" so it fills any sider height. The collapsed rail shows the
+         same drawing clipped, which reads quieter without needing a second asset. Deliberately
+         no shape behind the logo: an earlier pass had a watermark circle there and it read as
+         an unexplained blob. -->
+    <div class="pointer-events-none absolute inset-0 z-0 overflow-hidden" aria-hidden="true" data-shell="sider-art">
+        <svg class="absolute inset-0 block size-full" viewBox="0 0 252 844" preserveAspectRatio="none" focusable="false">
+            <path d="M0 0h252v34c-52 28-108-4-160 20-30 14-60 6-92 24V0Z" fill="#E6E1FA" />
+            <path d="M0 0h252v15c-60 26-118-6-168 18-26 12-52 4-84 18V0Z" fill="#DCD6F6" />
+            <path d="M252 96c-46 30-96-6-146 26-34 22-70 8-106 34v168c40-30 78-12 114-36 46-30 96 4 138-26V96Z" fill="#F6F4FD" />
+            <ellipse cx="248" cy="300" rx="86" ry="70" fill="#F4F2FD" />
+            <path d="M0 372c44-26 80 14 132-6 36-14 74 4 120-18v150c-46 24-84 4-122 20-40 16-84-16-130 12V372Z" fill="#F7F5FD" />
+            <ellipse cx="10" cy="452" rx="66" ry="52" fill="#F5F3FD" />
+            <path d="M0 844V648c46-28 84 16 138-6 34-14 66 2 114-18v220H0Z" fill="#F1EEFC" />
+            <path d="M0 844v-96c54-24 96 20 152-4 32-14 62 0 100-16v116H0Z" fill="#E9E5FB" />
+            <ellipse cx="16" cy="742" rx="60" ry="44" fill="#F3F1FD" />
+        </svg>
+    </div>
+
+    <!-- The drawer covers the header, so the brand and the way out travel with the menu. -->
+    @if (state.isPhone()) {
+        <div class="relative z-1 mb-1 flex h-14 flex-none items-center gap-2.5 border-b border-sider-border pr-2 pl-3.5" data-shell="drawer-head">
+            <img class="size-6 flex-none" src="assets/icons/logo.svg" alt="" />
+            <span class="min-w-0 flex-1 truncate text-sm font-bold text-n-900">{{ session.business()?.name || 'StockFlow' }}</span>
+            <button type="button" class="sf-icon-btn" (click)="state.closeMobile()" [attr.aria-label]="'shell.closeMenu' | translate">
+                <ng-icon name="lucideX" size="18px" />
+            </button>
+        </div>
+    }
+
+    <!-- The list scrolls; the footer does not. Appending the footer to the list would let a long
+         menu push the version number off the bottom, and support asks for it before anything else.
+
+         Built entirely from the boot payload. The server sends only what this person may see, so
+         there is nothing to filter here and nothing to hide. -->
+    <div class="shell__nav-list relative z-1 flex min-h-0 flex-1 flex-col gap-0.5 overflow-x-hidden overflow-y-auto">
+        @for (item of session.menu(); track item.id) {
+            @if (item.children.length) {
+                <button
+                    type="button"
+                    class="group relative flex h-9.5 flex-none cursor-pointer items-center gap-2.75 rounded-control text-left text-shell-title/none font-semibold whitespace-nowrap text-n-900 transition-[background,color] duration-150"
+                    [class]="railClasses(item)"
+                    [class.is-open]="nav.isOpen(item.id)"
+                    [class.has-active]="nav.activeGroup() === item.id"
+                    [attr.aria-expanded]="nav.isOpen(item.id)"
+                    (click)="nav.toggleGroup(item.id)"
+                    (mouseenter)="nav.hoverGroup.set(item)"
+                    nz-popover
+                    nzPopoverPlacement="rightTop"
+                    nzPopoverOverlayClassName="sf-flyout"
+                    [nzPopoverTrigger]="state.railCollapsed() ? 'hover' : null"
+                    [nzPopoverContent]="groupFlyout"
+                    nz-tooltip
+                    nzTooltipPlacement="right"
+                    nzTooltipOverlayClassName="sf-tip"
+                    [nzTooltipTrigger]="state.railCollapsed() ? null : 'hover'"
+                    [nzTooltipTitle]="state.railCollapsed() ? '' : session.description(item)"
+                >
+                    <ng-icon [name]="item.icon || iconFallback" size="18px" strokeWidth="1.8" class="flex-none group-hover:text-primary" [class]="nav.isOpen(item.id) ? 'text-primary' : 'text-sider-icon'" />
+                    @if (!state.railCollapsed()) {
+                        <span class="flex-1 overflow-hidden text-ellipsis">{{ session.label(item) }}</span>
+                        <ng-icon name="lucideChevronDown" size="13px" class="flex-none transition-transform duration-[240ms] ease-shell" [class]="nav.isOpen(item.id) ? 'rotate-0 text-primary' : '-rotate-90 text-n-400'" />
+                    } @else {
+                        <!-- The collapsed rail has no chevron, so this is what says "there is more
+                             behind this icon" before the flyout appears. -->
+                        <span class="absolute right-3.25 bottom-1.75 size-1 rounded-full bg-primary-soft"></span>
+                    }
+                </button>
+
+                <!-- Always rendered, never conditional: the open and shut states are a
+                     grid-row transition, and an element that is not there cannot animate. The
+                     inner wrapper is what goes invisible so shut children stay out of the tab
+                     order. Both live in the stylesheet: a grid-row transition has no utility. -->
+                <div class="shell__children" [class.is-open]="nav.isOpen(item.id) && !state.railCollapsed()">
+                    <div class="shell__children-inner">
+                        <div class="shell__children-list relative mt-0.5 mr-2 mb-1.5 ml-5.5 flex flex-col gap-0.5 pl-4.25">
+                            @for (child of item.children; track child.id) {
+                                <a
+                                    class="shell__nav--child relative m-0 flex h-7.75 flex-none items-center gap-1.75 rounded-control pr-2.5 pl-1.75 text-left text-shell-row/none font-medium whitespace-nowrap no-underline transition-[background,color] duration-150"
+                                    [class]="childClasses(child, rla.isActive)"
+                                    [class.is-disabled]="child.isDisabled"
+                                    [routerLink]="child.isDisabled ? null : child.route"
+                                    routerLinkActive="is-active"
+                                    #rla="routerLinkActive"
+                                    [attr.tabindex]="nav.isOpen(item.id) && !state.railCollapsed() ? null : -1"
+                                    (click)="child.isDisabled && nav.explainDisabled(child, $event)"
+                                    nz-tooltip
+                                    nzTooltipPlacement="right"
+                                    nzTooltipOverlayClassName="sf-tip"
+                                    [nzTooltipTitle]="child.isDisabled ? session.disabledMessage(child) : session.description(child)"
+                                >
+                                    <span class="flex-1 overflow-hidden text-ellipsis">{{ session.label(child) }}</span>
+                                    @if (child.isDisabled) {
+                                        <badge>{{ 'shell.soon' | translate }}</badge>
+                                    } @else if (child.isNew) {
+                                        <badge variant="new">{{ 'shell.new' | translate }}</badge>
+                                    }
+                                </a>
+                            }
+                        </div>
+                    </div>
+                </div>
+            } @else {
+                <a
+                    class="group relative flex h-9.5 flex-none items-center gap-2.75 rounded-control text-left text-shell-title/none font-semibold whitespace-nowrap no-underline transition-[background,color] duration-150"
+                    [class]="railClasses(item, rla.isActive)"
+                    [routerLink]="item.isDisabled ? null : item.route"
+                    routerLinkActive="is-active"
+                    #rla="routerLinkActive"
+                    (click)="item.isDisabled && nav.explainDisabled(item, $event)"
+                    nz-tooltip
+                    nzTooltipPlacement="right"
+                    nzTooltipOverlayClassName="sf-tip"
+                    [nzTooltipTrigger]="state.railCollapsed() ? 'hover' : null"
+                    [nzTooltipTitle]="state.railCollapsed() ? nav.rowTitle(item) : ''"
+                >
+                    <ng-icon [name]="item.icon || iconFallback" size="18px" strokeWidth="1.8" class="flex-none" [class]="iconClasses(item, rla.isActive)" />
+                    @if (!state.railCollapsed()) {
+                        <span class="flex-1 overflow-hidden text-ellipsis">{{ session.label(item) }}</span>
+                        @if (item.isDisabled) {
+                            <badge>{{ 'shell.soon' | translate }}</badge>
+                        } @else if (item.isNew) {
+                            <badge variant="new">{{ 'shell.new' | translate }}</badge>
+                        }
+                    }
+                </a>
+            }
+        }
+    </div>
+
+    <!-- Pinned below the scrolling list, not appended to it, so a long menu never pushes the
+         version out of reach. -->
+    <div class="relative z-1 mx-2 mt-2 flex flex-none items-center gap-2 border-t border-sider-border pt-2.5 pb-3.5 text-shell-hint whitespace-nowrap" [class]="state.railCollapsed() ? 'justify-center px-0' : 'justify-between px-1'">
+        @if (!state.railCollapsed()) {
+            <span class="font-semibold text-n-600">
+                StockFlow
+                <span class="font-medium text-n-500">v{{ version }}</span>
+            </span>
+        }
+        <a class="font-semibold text-n-500 no-underline hover:text-primary hover:underline" href="https://sakib.app" target="_blank" rel="noopener noreferrer" nz-tooltip nzTooltipPlacement="top" nzTooltipTitle="Arithma Labs">
+            {{ state.railCollapsed() ? 'AL' : 'Arithma Labs' }}
+        </a>
+    </div>
+</nav>
+
+<!-- The collapsed rail's group flyout. Shared by every group row, because hover opens exactly
+     one at a time and the CDK anchors it to whichever row triggered it. It carries no position of
+     its own: the CDK anchors it, flips it near the foot of the window and bridges the gap the
+     pointer has to cross. All three used to be a getBoundingClientRect, a clamp and a close timer. -->
+<ng-template #groupFlyout>
+    @if (nav.hoverGroup(); as group) {
+        <div class="max-w-66 min-w-49 rounded-container border border-sider-border bg-white p-1.5 shadow-panel">
+            <div class="mb-1.25 truncate border-b border-n-100 px-2.5 pt-1.25 pb-1.75 text-shell-hint/none font-bold text-n-900">{{ session.label(group) }}</div>
+            @for (child of group.children; track child.id) {
+                <a
+                    class="flex h-7.75 items-center gap-2 rounded-control px-2.5 text-shell-row/none font-medium whitespace-nowrap no-underline"
+                    [class]="flyoutClasses(child, rla.isActive)"
+                    [routerLink]="child.isDisabled ? null : child.route"
+                    routerLinkActive="is-active"
+                    #rla="routerLinkActive"
+                    (click)="child.isDisabled && nav.explainDisabled(child, $event)"
+                    nz-tooltip
+                    nzTooltipPlacement="right"
+                    nzTooltipOverlayClassName="sf-tip"
+                    [nzTooltipTitle]="child.isDisabled ? session.disabledMessage(child) : session.description(child)"
+                >
+                    <span class="flex-1 overflow-hidden text-ellipsis">{{ session.label(child) }}</span>
+                    @if (child.isDisabled) {
+                        <badge>{{ 'shell.soon' | translate }}</badge>
+                    } @else if (child.isNew) {
+                        <badge variant="new">{{ 'shell.new' | translate }}</badge>
+                    }
+                </a>
+            }
+        </div>
+    }
+</ng-template>

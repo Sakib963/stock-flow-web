@@ -1,0 +1,46 @@
+<nz-modal nzVisible [nzFooter]="null" [nzWidth]="420" nzWrapClassName="sf-shortcuts" (nzOnCancel)="close.emit()">
+    <ng-container *nzModalContent>
+        <header class="border-b border-n-100 px-0.5 pt-0.5 pb-3">
+            <h2 class="m-0 text-shell-dialog font-bold tracking-[-0.015em] text-n-900">{{ 'shell.shortcutsTitle' | translate }}</h2>
+            <p class="mt-0.75 mb-0 text-xs/[1.5] text-n-500">{{ 'shell.shortcutsSubtitle' | translate }}</p>
+        </header>
+
+        <ul class="m-0 list-none p-0 pt-1.5">
+            <li class="flex h-9 items-center justify-between gap-4 rounded-control px-2 hover:bg-n-50">
+                <span class="min-w-0 truncate text-shell-row text-n-800">{{ 'shell.shortcutSearch' | translate }}</span>
+                <span class="flex flex-none items-center gap-1">
+                    <kbd class="sf-key">{{ modifier() }}</kbd>
+                    <kbd class="sf-key">K</kbd>
+                </span>
+            </li>
+            <li class="flex h-9 items-center justify-between gap-4 rounded-control px-2 hover:bg-n-50">
+                <span class="min-w-0 truncate text-shell-row text-n-800">{{ 'shell.shortcutSider' | translate }}</span>
+                <span class="flex flex-none items-center gap-1">
+                    <kbd class="sf-key">{{ modifier() }}</kbd>
+                    <kbd class="sf-key">B</kbd>
+                </span>
+            </li>
+            <li class="flex h-9 items-center justify-between gap-4 rounded-control px-2 hover:bg-n-50">
+                <span class="min-w-0 truncate text-shell-row text-n-800">{{ 'shell.shortcutMove' | translate }}</span>
+                <span class="flex flex-none items-center gap-1">
+                    <kbd class="sf-key"><ng-icon name="lucideArrowUp" size="11px" /></kbd>
+                    <kbd class="sf-key"><ng-icon name="lucideArrowDown" size="11px" /></kbd>
+                </span>
+            </li>
+            <li class="flex h-9 items-center justify-between gap-4 rounded-control px-2 hover:bg-n-50">
+                <span class="min-w-0 truncate text-shell-row text-n-800">{{ 'shell.shortcutOpen' | translate }}</span>
+                <span class="flex flex-none items-center gap-1">
+                    <kbd class="sf-key"><ng-icon name="lucideCornerDownLeft" size="11px" /></kbd>
+                </span>
+            </li>
+            <li class="flex h-9 items-center justify-between gap-4 rounded-control px-2 hover:bg-n-50">
+                <span class="min-w-0 truncate text-shell-row text-n-800">{{ 'shell.shortcutClose' | translate }}</span>
+                <span class="flex flex-none items-center gap-1"><kbd class="sf-key">Esc</kbd></span>
+            </li>
+            <li class="flex h-9 items-center justify-between gap-4 rounded-control px-2 hover:bg-n-50">
+                <span class="min-w-0 truncate text-shell-row text-n-800">{{ 'shell.shortcutHelp' | translate }}</span>
+                <span class="flex flex-none items-center gap-1"><kbd class="sf-key">?</kbd></span>
+            </li>
+        </ul>
+    </ng-container>
+</nz-modal>
