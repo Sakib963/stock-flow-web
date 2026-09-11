@@ -1,51 +1,67 @@
 <auth-shell [clearCoreHeight]="340">
-    <form class="auth-card" [formGroup]="form" (ngSubmit)="handleSubmit()" novalidate>
+    <form class="sf-auth-card" [formGroup]="form" (ngSubmit)="handleSubmit()" novalidate>
         <div>
-            <h2 class="auth-title">{{ 'auth.signIn' | translate }}</h2>
-            <p class="auth-hint">{{ 'auth.signInHint' | translate }}</p>
+            <h2 class="m-0 text-2xl font-bold tracking-[-0.02em] text-n-900 max-md:text-[21px]">{{ 'auth.signIn' | translate }}</h2>
+            <p class="mt-0.75 mb-0 text-shell-title/normal text-n-500">{{ 'auth.signInHint' | translate }}</p>
         </div>
 
-        <div class="auth-fields">
-            <div class="auth-field">
-                <label class="auth-label" for="login-email">{{ 'auth.email' | translate }}</label>
-                <nz-input-wrapper>
-                    <ng-icon nzInputPrefix name="lucideMail" size="16px" class="auth-field-icon" />
-                    <input #emailInput id="login-email" nz-input nzSize="large" [nzStatus]="emailError() || credentialsRejected() ? 'error' : ''" type="email" inputmode="email" autocomplete="username" formControlName="email" [placeholder]="'auth.emailPlaceholder' | translate" [attr.aria-invalid]="!!emailError()" [attr.aria-describedby]="emailError() ? 'login-email-error' : null" (blur)="onEmailBlur()" />
+        <div class="flex flex-col gap-1">
+            <div class="flex flex-col gap-1.5">
+                <label class="text-shell-title font-semibold text-n-800" for="login-email">{{ 'auth.email' | translate }}</label>
+                <!-- 48px is the touch control height, reserved for counter-standing use. ng-zorro's
+                     "large" is 40px, so the host is resized here rather than by inventing a size. -->
+                <nz-input-wrapper class="max-md:h-12 max-md:gap-2.5 max-md:px-3.5">
+                    <ng-icon nzInputPrefix name="lucideMail" size="16px" class="text-n-400 max-md:text-base" />
+                    <input #emailInput id="login-email" class="max-md:text-[15px]" nz-input nzSize="large" [nzStatus]="emailError() || credentialsRejected() ? 'error' : ''" type="email" inputmode="email" autocomplete="username" formControlName="email" [placeholder]="'auth.emailPlaceholder' | translate" [attr.aria-invalid]="!!emailError()" [attr.aria-describedby]="emailError() ? 'login-email-error' : null" (blur)="onEmailBlur()" />
                 </nz-input-wrapper>
                 <!-- The slot is always present, so an appearing error never shifts the layout. -->
-                <p class="auth-message" id="login-email-error">
+                <p class="sf-auth-message" id="login-email-error">
                     @if (emailError(); as key) {
                         {{ key | translate }}
                     }
                 </p>
             </div>
 
-            <div class="auth-field">
-                <label class="auth-label" for="login-password">{{ 'auth.password' | translate }}</label>
-                <nz-input-wrapper>
-                    <ng-icon nzInputPrefix name="lucideLock" size="16px" class="auth-field-icon" />
-                    <input #passwordInput id="login-password" nz-input nzSize="large" [nzStatus]="passwordError() || credentialsRejected() ? 'error' : ''" [type]="passwordVisible() ? 'text' : 'password'" autocomplete="current-password" formControlName="password" [class.auth-password-dots]="!passwordVisible()" [attr.aria-invalid]="!!passwordError()" [attr.aria-describedby]="passwordError() ? 'login-password-error' : null" (blur)="onPasswordBlur()" />
-                    <button nzInputSuffix type="button" class="auth-reveal" (click)="togglePasswordVisible()" [attr.aria-pressed]="passwordVisible()" [attr.aria-label]="(passwordVisible() ? 'auth.hidePassword' : 'auth.showPassword') | translate">
+            <div class="flex flex-col gap-1.5">
+                <label class="text-shell-title font-semibold text-n-800" for="login-password">{{ 'auth.password' | translate }}</label>
+                <nz-input-wrapper class="max-md:h-12 max-md:gap-2.5 max-md:px-3.5">
+                    <ng-icon nzInputPrefix name="lucideLock" size="16px" class="text-n-400 max-md:text-base" />
+                    <!-- Wider tracking while the value is masked, so the dots read as a count. -->
+                    <input
+                        #passwordInput
+                        id="login-password"
+                        nz-input
+                        nzSize="large"
+                        [nzStatus]="passwordError() || credentialsRejected() ? 'error' : ''"
+                        [type]="passwordVisible() ? 'text' : 'password'"
+                        autocomplete="current-password"
+                        formControlName="password"
+                        [class]="passwordVisible() ? 'max-md:text-[15px]' : 'text-base tracking-[0.16em] max-md:text-[17px] max-md:tracking-[0.18em]'"
+                        [attr.aria-invalid]="!!passwordError()"
+                        [attr.aria-describedby]="passwordError() ? 'login-password-error' : null"
+                        (blur)="onPasswordBlur()"
+                    />
+                    <button nzInputSuffix type="button" class="flex cursor-pointer items-center rounded-sm border-0 bg-transparent p-0 text-n-400" (click)="togglePasswordVisible()" [attr.aria-pressed]="passwordVisible()" [attr.aria-label]="(passwordVisible() ? 'auth.hidePassword' : 'auth.showPassword') | translate">
                         <ng-icon [name]="passwordVisible() ? 'lucideEyeOff' : 'lucideEye'" size="16px" />
                     </button>
                 </nz-input-wrapper>
-                <p class="auth-message" id="login-password-error">
+                <p class="sf-auth-message" id="login-password-error">
                     @if (passwordError(); as key) {
                         {{ key | translate }}
                     }
                 </p>
             </div>
 
-            <div class="login__row">
-                <label nz-checkbox formControlName="remember" class="login__remember">{{ 'auth.keepSignedIn' | translate }}</label>
+            <div class="mt-2 flex items-center justify-between gap-3 max-md:pt-0.5">
+                <label nz-checkbox formControlName="remember" class="text-shell-title text-n-800">{{ 'auth.keepSignedIn' | translate }}</label>
                 <!-- Carries the typed email across, so the recovery screen can prefill it. -->
-                <a class="login__forgot" [routerLink]="['/auth/forgot-password']" [state]="{ email: form.controls.email.value }">
-                    <span class="login__forgot-long">{{ 'auth.forgot' | translate }}</span>
-                    <span class="login__forgot-short">{{ 'auth.forgotShort' | translate }}</span>
+                <a class="text-shell-title font-semibold whitespace-nowrap text-primary" [routerLink]="['/auth/forgot-password']" [state]="{ email: form.controls.email.value }">
+                    <span class="max-md:hidden">{{ 'auth.forgot' | translate }}</span>
+                    <span class="hidden max-md:inline">{{ 'auth.forgotShort' | translate }}</span>
                 </a>
             </div>
 
-            <button nz-button nzType="primary" nzSize="large" nzBlock type="submit" class="auth-submit" [nzLoading]="loading()">
+            <button nz-button nzType="primary" nzSize="large" nzBlock type="submit" class="mt-2.5 flex items-center justify-center gap-2 font-semibold transition-colors duration-200 ease-width max-md:h-12 max-md:text-[15px] max-md:font-bold" [nzLoading]="loading()">
                 {{ 'auth.signIn' | translate }}
                 @if (!loading()) {
                     <ng-icon name="lucideArrowRight" size="16px" />
@@ -53,11 +69,11 @@
             </button>
         </div>
 
-        <div class="login__foot">
-            <p class="auth-foot">
-                {{ 'auth.noAccount' | translate }} <a class="auth-link" href="mailto:hello@arithmalabs.com">{{ 'auth.talkToUs' | translate }}</a
-                >{{ ' ' }}<span class="login__footer-long">{{ 'auth.noAccountTail' | translate }}</span>
-                <span class="login__footer-short">{{ 'auth.noAccountTailShort' | translate }}</span>
+        <div class="max-md:mt-auto">
+            <p class="m-0 border-t border-n-100 pt-4 text-xs/[1.6] text-n-600">
+                {{ 'auth.noAccount' | translate }} <a class="font-semibold text-primary" href="mailto:hello@arithmalabs.com">{{ 'auth.talkToUs' | translate }}</a
+                >{{ ' ' }}<span class="max-md:hidden">{{ 'auth.noAccountTail' | translate }}</span>
+                <span class="hidden max-md:inline">{{ 'auth.noAccountTailShort' | translate }}</span>
             </p>
         </div>
     </form>

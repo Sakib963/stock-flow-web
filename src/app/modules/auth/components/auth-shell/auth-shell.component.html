@@ -1,12 +1,14 @@
-<div class="auth">
-    <!-- Identity panel. Becomes the 288px header below 768px. -->
-    <aside class="auth__panel">
+<div class="grid h-full grid-cols-[512px_1fr] overflow-hidden max-lg:grid-cols-[minmax(380px,40vw)_1fr] max-md:flex max-md:min-h-dvh max-md:flex-col max-md:overflow-visible">
+    <!-- Identity panel. Becomes the 288px header below 768px, where the 104px foot is
+         load-bearing: it reserves the strip the stock line occupies, so the bottom-aligned
+         headline cannot run into the stroke and the green nodes. -->
+    <aside class="auth__panel relative flex flex-col overflow-hidden p-11 pb-10 max-md:h-72 max-md:flex-none max-md:px-6 max-md:pt-5.5 max-md:pb-26">
         <!-- Ruled ledger grid, the stock line and the batch nodes. Decoration only: it carries no
              data and must never be mistaken for a live chart. -->
-        <div class="auth__rule auth__rule--v" aria-hidden="true"></div>
-        <div class="auth__rule auth__rule--h" aria-hidden="true"></div>
+        <div class="auth__rule--v pointer-events-none absolute inset-0" aria-hidden="true"></div>
+        <div class="auth__rule--h pointer-events-none absolute inset-0" aria-hidden="true"></div>
 
-        <svg class="auth__chart auth__chart--desktop" viewBox="0 0 512 300" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+        <svg class="pointer-events-none absolute bottom-0 left-0 h-85 w-128 max-lg:w-full max-md:hidden" viewBox="0 0 512 300" preserveAspectRatio="none" aria-hidden="true" focusable="false">
             <defs>
                 <linearGradient id="sfArea" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="0" stop-color="#5EB248" stop-opacity=".26" />
@@ -19,7 +21,7 @@
         </svg>
 
         <!-- Redrawn at mobile scale rather than cropped, so the steps stay legible in 96px. -->
-        <svg class="auth__chart auth__chart--mobile" viewBox="0 0 390 96" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+        <svg class="pointer-events-none absolute bottom-0 left-0 hidden h-24 w-full max-md:block" viewBox="0 0 390 96" preserveAspectRatio="none" aria-hidden="true" focusable="false">
             <defs>
                 <linearGradient id="sfAreaMobile" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="0" stop-color="#5EB248" stop-opacity=".30" />
@@ -31,39 +33,44 @@
             <path fill="#5EB248" d="M53 61 h6 v6 h-6 z M165 47 h6 v6 h-6 z M277 31 h6 v6 h-6 z" />
         </svg>
 
-        <div class="auth__topbar">
-            <div class="auth__brand">
-                <div class="auth__lockup">
-                    <img class="auth__logo" src="assets/icons/logo.svg" alt="" />
-                    <span class="auth__wordmark">StockFlow</span>
+        <div class="relative flex flex-none items-center justify-between gap-3">
+            <div class="flex flex-col gap-1.5">
+                <div class="flex items-center gap-2.5 max-md:gap-2.25">
+                    <img data-auth="logo" class="block size-6.5 max-md:size-6" src="assets/icons/logo.svg" alt="" />
+                    <span class="text-[22px] font-extrabold tracking-[-0.015em] text-white max-md:text-[19px]">StockFlow</span>
                 </div>
                 <!-- The whole line links, not just the two words: the copy is one translation
-                     string, and splitting it would leave the anchor untranslatable. -->
-                <a class="auth__attribution" href="https://sakib.app" target="_blank" rel="noopener noreferrer">
+                     string, and splitting it would leave the anchor untranslatable.
+                     On the indigo panel only primary-2 clears contrast. -->
+                <a data-auth="attribution" class="inline-flex w-fit items-center gap-2 text-xs text-primary-2 no-underline transition-colors duration-200 ease-width hover:text-white hover:underline focus-visible:text-white focus-visible:underline max-md:text-shell-hint" href="https://sakib.app" target="_blank" rel="noopener noreferrer">
                     <ng-icon name="lucideShieldCheck" size="14px" />
                     {{ 'auth.attribution' | translate }}
                 </a>
             </div>
 
             <!-- The toggle rides in the header on mobile and in the form column on desktop. -->
-            <div class="auth__lang auth__lang--onDark">
-                <button type="button" class="auth__lang-btn" [class.is-active]="language.current() === 'en'" [attr.aria-pressed]="language.current() === 'en'" (click)="setLanguage('en')">EN</button>
-                <button type="button" class="auth__lang-btn auth__lang-btn--bn" [class.is-active]="language.current() === 'bn'" [attr.aria-pressed]="language.current() === 'bn'" (click)="setLanguage('bn')">বাংলা</button>
+            <div class="hidden items-center gap-0.5 rounded-control border border-white/24 bg-white/14 p-0.5 max-md:flex">
+                <button type="button" class="cursor-pointer rounded-sm px-2.25 py-0.75 text-shell-hint/none" [class]="language.current() === 'en' ? 'bg-white font-bold text-primary-9' : 'font-semibold text-white'" [attr.aria-pressed]="language.current() === 'en'" (click)="setLanguage('en')">EN</button>
+                <button type="button" class="cursor-pointer rounded-sm px-2.25 py-0.75 font-bangla text-shell-hint/none" [class]="language.current() === 'bn' ? 'bg-white font-bold text-primary-9' : 'font-semibold text-white'" [attr.aria-pressed]="language.current() === 'bn'" (click)="setLanguage('bn')">বাংলা</button>
             </div>
         </div>
 
-        <div class="auth__headline-block">
-            <h1 class="auth__headline">{{ 'auth.panelHeadline' | translate }}</h1>
-            <p class="auth__subcopy">{{ 'auth.panelBody' | translate }}</p>
+        <div class="relative flex flex-1 flex-col justify-center max-md:justify-end">
+            <!-- The measure is set in px, never ch: a ch clamp resolves against the wrapper's
+                 inherited font size rather than the headline's, which silently crushes it to about
+                 half this width. -->
+            <h1 class="m-0 max-w-106 text-[34px]/[1.18] font-extrabold tracking-[-0.028em] text-pretty text-white max-md:max-w-75 max-md:text-[27px]/[1.2] max-md:tracking-[-0.026em]">{{ 'auth.panelHeadline' | translate }}</h1>
+            <!-- An owner checking the shop from a phone already knows what StockFlow is. -->
+            <p class="mt-4 mb-0 max-w-85 text-[15px]/[1.68] text-pretty text-primary-2 max-md:hidden">{{ 'auth.panelBody' | translate }}</p>
         </div>
     </aside>
 
-    <main class="auth__form-col" [style.--auth-clear-core]="clearCoreHeight() + 'px'">
-        <div class="auth__lang auth__lang--onLight">
-            <ng-icon name="lucideLanguages" size="14px" class="auth__lang-icon" />
-            <div class="auth__lang-group">
-                <button type="button" class="auth__lang-btn" [class.is-active]="language.current() === 'en'" [attr.aria-pressed]="language.current() === 'en'" (click)="setLanguage('en')">EN</button>
-                <button type="button" class="auth__lang-btn auth__lang-btn--bn" [class.is-active]="language.current() === 'bn'" [attr.aria-pressed]="language.current() === 'bn'" (click)="setLanguage('bn')">বাংলা</button>
+    <main class="auth__form-col relative flex items-center justify-center overflow-y-auto bg-n-75 p-12 max-md:min-h-0 max-md:flex-1 max-md:flex-col max-md:items-stretch max-md:justify-start max-md:bg-white max-md:px-6 max-md:pt-6.5 max-md:pb-5.5" [style.--auth-clear-core]="clearCoreHeight() + 'px'">
+        <div class="absolute top-6 right-7 z-1 flex items-center gap-2 max-md:hidden">
+            <ng-icon name="lucideLanguages" size="14px" class="text-n-400" />
+            <div class="flex gap-0.5 rounded-control border border-n-200 bg-n-75 p-0.5">
+                <button type="button" class="cursor-pointer rounded-sm px-2.5 py-0.75 text-xs/none" [class]="language.current() === 'en' ? 'bg-white font-bold text-n-900 shadow-[0_1px_2px_rgb(28_32_40/0.06)]' : 'font-semibold text-n-600'" [attr.aria-pressed]="language.current() === 'en'" (click)="setLanguage('en')">EN</button>
+                <button type="button" class="cursor-pointer rounded-sm px-2.5 py-0.75 font-bangla text-xs/none" [class]="language.current() === 'bn' ? 'bg-white font-bold text-n-900 shadow-[0_1px_2px_rgb(28_32_40/0.06)]' : 'font-semibold text-n-600'" [attr.aria-pressed]="language.current() === 'bn'" (click)="setLanguage('bn')">বাংলা</button>
             </div>
         </div>
 

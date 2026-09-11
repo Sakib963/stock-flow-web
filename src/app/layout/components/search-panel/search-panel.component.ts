@@ -14,24 +14,18 @@ import { ShellStateService } from '@app/layout/services/shell-state.service';
 /**
  * The header search: the field, and the results hanging off it.
  *
- * One component in two containers. On a wide window it is the field in the header with an anchored
- * panel below it; on a phone it is the body of an ng-zorro modal, with the field in the sheet head.
- * The variants are separate templates rather than one template with properties undone one at a
- * time: the phone sheet used to reuse the dropdown's own container class and unset its properties,
- * and the one that got missed, a 340px min-width meant for a desktop popover, pushed every row
- * wider than the screen.
- *
- * Exactly one of the two is ever mounted, which is what lets the field carry a single view
- * reference. The shell asks for focus through the service rather than reaching for that reference,
- * because it cannot know which variant is on screen.
+ * One component in two containers: the field in the header with an anchored panel below it on a
+ * wide window, and the body of an ng-zorro modal on a phone. Exactly one is ever mounted, which is
+ * what lets the field carry a single view reference.
  */
 @Component({
     selector: 'search-panel',
     imports: [NgTemplateOutlet, FormsModule, NzInputModule, TranslatePipe, NgIcon, BadgeComponent],
     providers: [provideIcons({ ...SHELL_MENU_ICONS, lucideArrowDown, lucideArrowUp, lucideCommand, lucideCornerDownLeft, lucideSearch, lucideX })],
-    // The host draws no box of its own, so the field stays the direct flex child of the header
-    // bar, and the sheet the direct child of the modal body.
-    host: { class: 'contents' },
+    host: {
+        class: 'contents',
+        '(document:mousedown)': 'onOutsidePointer($event)',
+    },
     templateUrl: './search-panel.component.html',
     styleUrl: './search-panel.component.scss',
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -47,25 +41,36 @@ export class SearchPanelComponent implements AfterViewInit {
     readonly session = this.nav.session;
     readonly iconFallback = MENU_ICON_FALLBACK;
 
+    private readonly _host = inject<ElementRef<HTMLElement>>(ElementRef);
     private readonly _field = viewChild<ElementRef<HTMLInputElement>>('searchInput');
 
     constructor() {
         effect(() => {
-            // Read first so the effect tracks it even on the run that does nothing.
             const requested = this.search.focusRequest();
             if (requested) this.focusField();
         });
     }
 
     ngAfterViewInit(): void {
-        // The sheet mounts because the panel opened, so its field takes focus without being asked.
         if (this.variant() === 'sheet') this.focusField();
     }
 
     /**
-     * Deferred by a tick. The field can be mounting in the same change detection pass that opened
-     * the panel, and focus applied before it is laid out lands nowhere, taking the on-screen
-     * keyboard with it.
+     * Shuts the inline panel when the pointer goes down outside it. The panel is anchored by hand
+     * rather than through the CDK, so nothing else is listening for this. The sheet is excluded
+     * because ng-zorro's modal handles its own dismissal.
+     */
+    onOutsidePointer(event: MouseEvent): void {
+        if (this.variant() !== 'inline' || this.state.openPanel() !== 'search') return;
+        if (this._host.nativeElement.contains(event.target as Node)) return;
+
+        this.search.reset();
+        this.state.closePanel();
+    }
+
+    /**
+     * Deferred a tick. The field can mount in the same change detection pass that opened the
+     * panel, and focus applied before it is laid out lands nowhere.
      */
     focusField(): void {
         setTimeout(() => {

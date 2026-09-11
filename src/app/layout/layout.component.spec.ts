@@ -44,7 +44,7 @@ const menu: MenuItem[] = [
     leaf('activity', '/app/activity', { label: { en: 'Activity log', bn: 'কার্যক্রম' }, isDisabled: true, disabledMessage: { en: 'Recording already, the page is next.', bn: 'রেকর্ড হচ্ছে, পেজটি পরের ধাপে।' } }),
     leaf('sales', null, {
         label: { en: 'Sales', bn: 'বিক্রি' },
-        children: [leaf('sales-pos', '/app/sales/pos', { label: { en: 'Counter sale', bn: 'কাউন্টার বিক্রি' }, tags: ['pos', 'counter', 'sell', 'order'] }), leaf('sales-online', '/app/sales/online', { label: { en: 'Online order', bn: 'অনলাইন অর্ডার' }, tags: ['online', 'delivery', 'order'] }), leaf('sales-returns', '/app/sales/returns', { label: { en: 'Returns', bn: 'ফেরত' }, tags: ['return', 'refund'] })],
+        children: [leaf('sales-pos', '/app/sales/pos', { label: { en: 'Counter sale', bn: 'কাউন্টার বিক্রি' }, description: { en: 'Ring up a sale at the counter and take the payment on the spot.', bn: 'কাউন্টারে বিক্রি করুন এবং তখনই পেমেন্ট নিন।' }, tags: ['pos', 'counter', 'sell', 'order'] }), leaf('sales-online', '/app/sales/online', { label: { en: 'Online order', bn: 'অনলাইন অর্ডার' }, tags: ['online', 'delivery', 'order'] }), leaf('sales-returns', '/app/sales/returns', { label: { en: 'Returns', bn: 'ফেরত' }, tags: ['return', 'refund'] })],
     }),
     leaf('inventory', null, {
         label: { en: 'Inventory', bn: 'স্টক' },
@@ -137,7 +137,7 @@ describe('LayoutComponent', () => {
     }
 
     /** The phone overlays render into the CDK container at body level, not inside the fixture. */
-    const overlay = (selector: string) => document.querySelector<HTMLElement>(selector);
+    const overlay = <T extends HTMLElement = HTMLElement>(selector: string) => document.querySelector<T>(selector);
 
     it('keeps the business name binding in the restyled brand row', async () => {
         const { el } = await render();
@@ -257,6 +257,42 @@ describe('LayoutComponent', () => {
         expect(search.term()).toBe('');
     });
 
+    it('closes the search panel when the pointer goes down outside it', async () => {
+        const { fixture, el, state, search } = await render();
+
+        search.onSearch('order');
+        fixture.detectChanges();
+        await fixture.whenStable();
+        expect(el.querySelector('[data-shell=search-panel]')).toBeTruthy();
+
+        // Inside the field is not outside the panel: clicking to put the cursor in the text must
+        // not shut it, which is the reason nz-dropdown cannot drive this one.
+        el.querySelector<HTMLInputElement>('[data-shell=search] input')!.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
+        fixture.detectChanges();
+        expect(state.openPanel()).toBe('search');
+
+        document.body.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
+        fixture.detectChanges();
+        await fixture.whenStable();
+
+        expect(state.openPanel()).toBeNull();
+        expect(search.term()).toBe('');
+        expect(el.querySelector('[data-shell=search-panel]')).toBeNull();
+    });
+
+    it('shows a result description in full, and the tags that matched', async () => {
+        const { fixture, el, search } = await render();
+
+        search.onSearch('counter');
+        fixture.detectChanges();
+        await fixture.whenStable();
+
+        // Its own element, not the remainder of the label's line: on one line it was the half that
+        // got truncated, and the panel is the only place a description is ever shown.
+        expect(el.querySelector('[data-shell=search-desc]')?.textContent?.trim()).toBe('Ring up a sale at the counter and take the payment on the spot.');
+        expect(rows(el, '[data-shell=search-tag]').map((t) => t.textContent?.trim())).toEqual(['counter']);
+    });
+
     it('never opens two header panels at once', async () => {
         const { state, search } = await render();
         state.openSearchPanel();
@@ -292,7 +328,7 @@ describe('LayoutComponent', () => {
         expect(el.querySelector('sider')).toBeTruthy();
     });
 
-    it('opens search as a sheet on a phone, in a container that is not the desktop dropdown', async () => {
+    it('opens search as a sheet on a phone, in a container that is not the desktop panel', async () => {
         await atPhoneWidth(async () => {
             const { fixture, el, search } = await render();
             // The field is not in the bar at this width, so the bar carries the way in instead.
@@ -303,10 +339,7 @@ describe('LayoutComponent', () => {
             fixture.detectChanges();
             await fixture.whenStable();
 
-            expect(overlay('.sf-sheet')).toBeTruthy();
-            // The bug this replaced: the sheet reused .shell__panel and inherited a 340px
-            // min-width meant for a desktop popover, so every row came out wider than the screen.
-            expect(overlay('.sf-sheet')?.classList.contains('shell__panel')).toBe(false);
+            expect(overlay('.sf-sheet input[role="combobox"]')).toBeTruthy();
             expect(overlay('[data-shell=search-panel]')).toBeNull();
         });
     });
@@ -364,6 +397,68 @@ describe('LayoutComponent', () => {
             expect(overlay('.shell__children.is-open')).toBeTruthy();
         });
     });
+    it('opens notifications and the account menu in a drawer, at every width', async () => {
+        const { fixture, el, state } = await render();
+
+        // Both were overlays hung off their trigger before: a dropdown on a wide window and a
+        // modal sheet on a phone. One drawer at both widths is one dismissal model, not two.
+        expect(overlay('.ant-drawer-open notification-panel')).toBeNull();
+
+        el.querySelector<HTMLButtonElement>('[data-shell=bell]')!.click();
+        fixture.detectChanges();
+        await fixture.whenStable();
+        expect(state.openPanel()).toBe('notifications');
+        expect(overlay('.ant-drawer-open notification-panel')).toBeTruthy();
+
+        el.querySelector<HTMLButtonElement>('[data-shell=account]')!.click();
+        fixture.detectChanges();
+        await fixture.whenStable();
+        expect(state.openPanel()).toBe('account');
+        expect(overlay('.ant-drawer-open account-menu')).toBeTruthy();
+    });
+
+    it('keeps sign out on the drawer floor, out of the scrolling region, and closes on the drawer X', async () => {
+        const { fixture, el, state } = await render();
+
+        el.querySelector<HTMLButtonElement>('[data-shell=account]')!.click();
+        fixture.detectChanges();
+        await fixture.whenStable();
+
+        // One scrolling region, with the footer outside it. The whole panel used to be a single
+        // block inside the drawer body, so anything that overflowed scrolled sign out away too.
+        const scroll = overlay('[data-shell=account-scroll]')!;
+        const footer = overlay('[data-shell=account-footer]')!;
+        expect(scroll).toBeTruthy();
+        expect(footer.querySelector('button')).toBeTruthy();
+        expect(scroll.contains(footer)).toBe(false);
+
+        // The drawer's own close button, not one built by hand.
+        const close = overlay<HTMLButtonElement>('.ant-drawer-open .ant-drawer-close')!;
+        expect(close).toBeTruthy();
+        close.click();
+        fixture.detectChanges();
+        await fixture.whenStable();
+        expect(state.openPanel()).toBeNull();
+    });
+
+    it('opens notifications from the bell on a phone', async () => {
+        await atPhoneWidth(async () => {
+            const { fixture, el, state } = await render();
+
+            // The bell used to carry the dropdown with `[nzDisabled]="state.isPhone()"`, and nzDisabled
+            // sets a real `disabled` attribute on its trigger, so the browser swallowed the click that
+            // opens the sheet and the bell was dead at this width.
+            const bell = el.querySelector<HTMLButtonElement>('[data-shell=bell]')!;
+            expect(bell.disabled).toBe(false);
+
+            bell.click();
+            fixture.detectChanges();
+            await fixture.whenStable();
+
+            expect(state.openPanel()).toBe('notifications');
+        });
+    });
+
     it('never leaves the drawer open behind a panel, or a panel behind the drawer', async () => {
         const { state, notifications } = await render();
 
@@ -413,7 +508,7 @@ describe('LayoutComponent', () => {
     });
 
     it('focuses the field on the platform accelerator, from anywhere in the app', async () => {
-        const { fixture, el, cmp, state, search } = await render();
+        const { fixture, el, cmp, state } = await render();
         cmp.onGlobalKey(new KeyboardEvent('keydown', { key: 'k', ctrlKey: true }));
         fixture.detectChanges();
         expect(state.openPanel()).toBe('search');

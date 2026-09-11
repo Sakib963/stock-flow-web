@@ -16,6 +16,7 @@ import { AppLanguage, LanguageService } from '@app/core/services/language.servic
     selector: 'auth-shell',
     imports: [TranslatePipe, NgIcon],
     providers: [provideIcons({ lucideLanguages, lucideShieldCheck })],
+    host: { class: 'block h-dvh max-md:h-auto max-md:min-h-dvh' },
     templateUrl: './auth-shell.component.html',
     styleUrl: './auth-shell.component.scss',
     changeDetection: ChangeDetectionStrategy.OnPush,

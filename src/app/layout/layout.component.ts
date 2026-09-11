@@ -4,11 +4,14 @@ import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { filter } from 'rxjs';
 import { NzDrawerModule } from 'ng-zorro-antd/drawer';
 import { NzModalModule } from 'ng-zorro-antd/modal';
+import { TranslatePipe } from '@ngx-translate/core';
+import { AccountMenuComponent } from '@app/layout/components/account-menu/account-menu.component';
 import { HeaderBarComponent } from '@app/layout/components/header-bar/header-bar.component';
 import { NotificationPanelComponent } from '@app/layout/components/notification-panel/notification-panel.component';
 import { SearchPanelComponent } from '@app/layout/components/search-panel/search-panel.component';
 import { SiderComponent } from '@app/layout/components/sider/sider.component';
 import { ShortcutsDialogComponent } from '@app/layout/components/shortcuts-dialog/shortcuts-dialog.component';
+import { NotificationService } from '@app/core/services/notification.service';
 import { ShellNavService } from '@app/layout/services/shell-nav.service';
 import { ShellSearchService } from '@app/layout/services/shell-search.service';
 import { ShellStateService } from '@app/layout/services/shell-state.service';
@@ -26,7 +29,7 @@ import { ShellStateService } from '@app/layout/services/shell-state.service';
  */
 @Component({
     selector: 'layout',
-    imports: [RouterOutlet, NzDrawerModule, NzModalModule, HeaderBarComponent, SiderComponent, SearchPanelComponent, NotificationPanelComponent, ShortcutsDialogComponent],
+    imports: [RouterOutlet, NzDrawerModule, NzModalModule, TranslatePipe, HeaderBarComponent, SiderComponent, SearchPanelComponent, NotificationPanelComponent, AccountMenuComponent, ShortcutsDialogComponent],
     host: {
         class: 'block h-dvh',
         '(document:keydown)': 'onGlobalKey($event)',
@@ -40,6 +43,7 @@ export class LayoutComponent {
 
     readonly state = inject(ShellStateService);
     readonly nav = inject(ShellNavService);
+    readonly notifications = inject(NotificationService);
     readonly search = inject(ShellSearchService);
 
     private _primed = false;

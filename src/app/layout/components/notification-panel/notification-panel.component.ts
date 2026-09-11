@@ -1,13 +1,12 @@
-import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { TranslatePipe } from '@ngx-translate/core';
 import { NgIcon, provideIcons } from '@ng-icons/core';
-import { lucidePackage, lucideShoppingCart, lucideTruck, lucideUndo2, lucideUsers, lucideX } from '@ng-icons/lucide';
+import { lucidePackage, lucideShoppingCart, lucideTruck, lucideUndo2, lucideUsers } from '@ng-icons/lucide';
 import { AppNotification, NotificationCategory } from '@app/core/models/notification.model';
 import { NotificationDay } from '@app/core/models/shell.model';
 import { LanguageService } from '@app/core/services/language.service';
 import { NotificationService } from '@app/core/services/notification.service';
 import { BadgeComponent } from '@app/layout/components/badge/badge.component';
-import { ShellStateService } from '@app/layout/services/shell-state.service';
 
 /** Which lucide icon stands for each kind of alert. Registered in the provider list below. */
 export const NOTIFICATION_ICON: Record<NotificationCategory, string> = {
@@ -36,28 +35,18 @@ export const CATEGORY_TONE: Record<NotificationCategory, string> = {
 
 const DAY = 86_400_000;
 
-/**
- * The notifications panel: an anchored dropdown on a wide window, an ng-zorro sheet on a phone.
- *
- * The two variants differ only in the container class and whether the head carries a close button,
- * so unlike the search panel this is one template with a single conditional rather than two.
- */
+/** The notifications panel: the body of the right-hand drawer, at every width. */
 @Component({
     selector: 'notification-panel',
     imports: [TranslatePipe, NgIcon, BadgeComponent],
-    providers: [provideIcons({ lucidePackage, lucideShoppingCart, lucideTruck, lucideUndo2, lucideUsers, lucideX })],
-    // The host draws no box of its own, so the panel stays the direct child of whichever overlay
-    // the CDK put it in.
+    providers: [provideIcons({ lucidePackage, lucideShoppingCart, lucideTruck, lucideUndo2, lucideUsers })],
+    // The host draws no box of its own, so the panel fills the drawer body it is stamped into.
     host: { class: 'contents' },
     templateUrl: './notification-panel.component.html',
     styleUrl: './notification-panel.component.scss',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NotificationPanelComponent {
-    /** `panel` is the anchored dropdown; `sheet` is the phone modal body. */
-    readonly variant = input<'panel' | 'sheet'>('panel');
-
-    readonly state = inject(ShellStateService);
     readonly notifications = inject(NotificationService);
     readonly language = inject(LanguageService);
 

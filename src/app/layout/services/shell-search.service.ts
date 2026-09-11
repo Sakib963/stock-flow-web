@@ -103,6 +103,18 @@ export class ShellSearchService {
     /** Something was typed and nothing matched, which is a different panel from the idle one. */
     readonly noMatch = computed(() => !!this.term().trim() && !this._matched().length);
 
+    /**
+     * Up to three tags that actually matched, so a row hit by a synonym says why it is there.
+     *
+     * Matching covers tags as well as labels and descriptions, so "godown" finds Warehouses with
+     * nothing on the row explaining the connection. Only the tags that matched: the rest are noise.
+     */
+    matchedTags(item: MenuItem): string[] {
+        const tokens = this.term().trim().toLowerCase().split(/s+/).filter(Boolean);
+        if (!tokens.length) return [];
+        return item.tags.filter((tag) => tokens.some((token) => tag.toLowerCase().includes(token))).slice(0, 3);
+    }
+
     onSearch(term: string): void {
         this.term.set(term);
         this.cursor.set(0);

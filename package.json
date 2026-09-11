@@ -6,7 +6,8 @@
         "start": "ng serve --open",
         "build": "ng build",
         "watch": "ng build --watch --configuration development",
-        "test": "ng test"
+        "test": "ng test",
+        "verify": "ng build && node tools/check-utilities.js && node tools/check-tokens.js"
     },
     "private": true,
     "packageManager": "npm@11.17.0",

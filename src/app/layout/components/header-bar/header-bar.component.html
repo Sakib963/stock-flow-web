@@ -1,34 +1,24 @@
-<!-- z-70 puts the bar above the drawer and above the panel overlay, so both the hamburger and the
-     trigger that opened a panel stay clickable while that panel is open. -->
+<!-- z-70 keeps the bar above the drawers, so the trigger that opened one stays clickable. -->
 <header class="relative z-70 flex h-14 flex-none items-center gap-2 border-b border-n-200 bg-white pr-2.5 md:gap-3 md:pr-4">
-    <!-- Phone only. The sider is not a rail at this width, it is a drawer, so the control that
-         opens it has to live in the bar that is always visible. -->
     <button type="button" class="sf-icon-btn ml-2 md:hidden" (click)="state.toggleMobile()" [attr.aria-expanded]="state.mobileOpen()" [attr.aria-label]="'shell.openMenu' | translate">
         <ng-icon name="lucideMenu" size="20px" />
     </button>
 
-    <!-- Continues the sider column up through the header, so the rail reads as one piece from the
-         top of the window. Its own border-right is what carries the sider edge across the band.
-         On a phone the tint goes: left in the header it would be a stray block of lavender with no
-         column beneath it. -->
-    <div data-shell="brand" class="flex h-full flex-none items-center overflow-hidden max-md:w-auto max-md:gap-0 max-md:border-r-0 max-md:bg-transparent max-md:p-0 md:w-(--sider) md:border-r md:border-sider-border md:bg-sider-bg md:transition-[width] md:duration-[180ms] md:ease-width" [class]="state.railCollapsed() ? 'md:justify-center md:gap-0 md:px-2' : 'md:gap-2.5 md:px-3.5'">
+    <!-- Continues the sider column up through the header so the rail reads as one piece. The tint
+         goes on a phone, where there is no column beneath it to continue. -->
+    <div data-shell="brand" class="flex h-full flex-none items-center overflow-hidden max-md:w-auto max-md:gap-0 max-md:border-r-0 max-md:bg-transparent max-md:p-0 md:w-(--sider) md:border-r md:border-sider-border md:bg-sider-bg md:transition-[width] md:duration-180 md:ease-width" [class]="state.railCollapsed() ? 'md:justify-center md:gap-0 md:px-2' : 'md:gap-2.5 md:px-3.5'">
         <img class="size-6 flex-none" src="assets/icons/logo.svg" alt="" />
-        <!-- Hidden on a phone: beside the controls it truncated to two letters, which is noise
-             rather than branding. The logo carries it here, and the drawer says it in full. -->
         @if (!state.isPhone() && !state.railCollapsed()) {
             <span class="truncate text-sm font-bold text-n-900" data-shell="business" nz-tooltip nzTooltipPlacement="bottom" [nzTooltipTitle]="session.business()?.name || ''">{{ session.business()?.name || 'StockFlow' }}</span>
         }
     </div>
 
-    <!-- Sits with the search rather than in the brand block: it acts on the column beside it,
-         so it belongs next to the other things the person operates, not inside the logo. -->
     <button type="button" class="sf-icon-btn ml-1 max-md:hidden" (click)="state.toggleCollapsed()" [attr.aria-label]="state.collapsed() ? 'Expand menu' : 'Collapse menu'">
         <ng-icon [name]="state.collapsed() ? 'lucidePanelLeftOpen' : 'lucidePanelLeftClose'" size="18px" />
     </button>
 
-    <!-- Not rendered at all on a phone, rather than hidden: the panel carries the field, and a
-         hidden second copy would be the one the focus call found. The phone sheet renders the
-         same component in its other variant, so exactly one field exists at any width. -->
+    <!-- Not rendered at all on a phone rather than hidden: the sheet carries the field, and a
+         hidden second copy would be the one the focus call found. -->
     @if (!state.isPhone()) {
         <search-panel variant="inline" />
     }
@@ -40,79 +30,23 @@
             </button>
         }
 
-        <!-- Disabled rather than hidden: the person should see where this lives before it
-             arrives. Notes exists on the server already, its page is not ported yet. Gone on a
-             phone, where it is 38px of bar spent on a button that cannot be pressed. -->
+        <!-- Disabled rather than hidden: the person should see where this lives before it arrives. -->
         <button type="button" class="sf-icon-btn max-md:hidden" disabled nz-tooltip nzTooltipPlacement="bottom" [nzTooltipTitle]="'shell.notesSoon' | translate">
             <ng-icon name="lucideStickyNote" size="18px" />
         </button>
 
-        <!-- Stretched so the panel hangs from the full header height. -->
-        <div class="relative flex items-center self-stretch">
-            <button
-                #bellTrigger
-                type="button"
-                class="sf-icon-btn"
-                [class.is-open]="state.openPanel() === 'notifications'"
-                [attr.aria-expanded]="state.openPanel() === 'notifications'"
-                nz-dropdown
-                nzTrigger="click"
-                nzPlacement="bottomRight"
-                nzOverlayClassName="sf-panel"
-                [nzDisabled]="state.isPhone()"
-                [nzDropdownMenu]="notifyMenu"
-                [nzVisible]="!state.isPhone() && state.openPanel() === 'notifications'"
-                (nzVisibleChange)="state.onPanelVisible('notifications', $event)"
-                (click)="state.isPhone() && state.togglePanel('notifications')"
-                nz-tooltip
-                nzTooltipPlacement="bottom"
-                [nzTooltipTitle]="'shell.notifications' | translate"
-            >
-                <ng-icon name="lucideBell" size="18px" />
-                <!-- Only while something is unread. A dot that is always there stops being read as
-                     a state and becomes part of the icon. It sits over the bell rather than beside
-                     it, so an unread alert never changes the width of the header group, and it
-                     carries a ring in the header ground so it stays legible over the glyph. -->
-                @if (notifications.hasUnread()) {
-                    <span class="absolute top-1.25 right-1.25 size-1.5 rounded-full bg-danger shadow-[0_0_0_1.5px_#fff]" data-shell="bell-dot"></span>
-                }
-            </button>
-        </div>
+        <button #bellTrigger type="button" class="sf-icon-btn" data-shell="bell" [class.is-open]="state.openPanel() === 'notifications'" [attr.aria-expanded]="state.openPanel() === 'notifications'" (click)="state.togglePanel('notifications')" nz-tooltip nzTooltipPlacement="bottom" [nzTooltipTitle]="'shell.notifications' | translate">
+            <ng-icon name="lucideBell" size="18px" />
+            <!-- Over the bell rather than beside it, so an unread alert never changes the width of
+                 the header group. -->
+            @if (notifications.hasUnread()) {
+                <span class="absolute top-1.25 right-1.25 size-1.5 rounded-full bg-danger shadow-[0_0_0_1.5px_#fff]" data-shell="bell-dot"></span>
+            }
+        </button>
 
-        <!-- Avatar and a chevron, nothing else. The name, email and role belong in the panel,
-             where they are read once, rather than in the header, where they cost 140px and are
-             read never. -->
-        <div class="relative flex items-center self-stretch">
-            <button
-                #accountTrigger
-                type="button"
-                class="group flex cursor-pointer items-center gap-1 rounded-control p-1 hover:bg-n-75"
-                [class.bg-n-75]="state.openPanel() === 'account'"
-                [attr.aria-expanded]="state.openPanel() === 'account'"
-                nz-dropdown
-                nzTrigger="click"
-                nzPlacement="bottomRight"
-                nzOverlayClassName="sf-panel"
-                [nzDropdownMenu]="accountMenu"
-                [nzVisible]="state.openPanel() === 'account'"
-                (nzVisibleChange)="state.onPanelVisible('account', $event)"
-                nz-tooltip
-                nzTooltipPlacement="bottomRight"
-                [nzTooltipTitle]="session.user()?.name || ''"
-            >
-                <span class="sf-avatar size-7.5 text-shell-hint/[30px] font-bold">{{ session.initials() }}</span>
-                <ng-icon name="lucideChevronDown" size="14px" class="text-n-400 transition-transform duration-200 ease-shell" [class.rotate-180]="state.openPanel() === 'account'" />
-            </button>
-        </div>
+        <button #accountTrigger type="button" class="flex cursor-pointer items-center gap-1 rounded-control p-1 hover:bg-n-75" data-shell="account" [class.bg-n-75]="state.openPanel() === 'account'" [attr.aria-expanded]="state.openPanel() === 'account'" (click)="state.togglePanel('account')" nz-tooltip nzTooltipPlacement="bottomRight" [nzTooltipTitle]="session.user()?.name || ''">
+            <nz-avatar [nzText]="session.initials()" [nzSize]="30" class="text-shell-hint font-bold" />
+            <ng-icon name="lucideChevronDown" size="14px" class="text-n-400 transition-transform duration-200 ease-shell" [class.rotate-180]="state.openPanel() === 'account'" />
+        </button>
     </div>
 </header>
-
-<!-- A short menu anchored to its avatar reads correctly at any width, so the account panel is a
-     dropdown on a phone too rather than a sheet. -->
-<nz-dropdown-menu #accountMenu="nzDropdownMenu">
-    <account-menu />
-</nz-dropdown-menu>
-
-<nz-dropdown-menu #notifyMenu="nzDropdownMenu">
-    <notification-panel variant="panel" />
-</nz-dropdown-menu>

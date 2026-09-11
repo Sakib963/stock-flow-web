@@ -1,9 +1,4 @@
-<nav class="relative flex flex-none flex-col overflow-hidden border-r border-sider-border bg-sider-bg pt-2.5 transition-[width] duration-[180ms] ease-width max-md:h-full max-md:w-full max-md:border-r-0 max-md:p-0 md:w-(--sider)" data-shell="sider">
-    <!-- One wash stretched over the whole column, drawn against a 252 by 844 box with
-         preserveAspectRatio="none" so it fills any sider height. The collapsed rail shows the
-         same drawing clipped, which reads quieter without needing a second asset. Deliberately
-         no shape behind the logo: an earlier pass had a watermark circle there and it read as
-         an unexplained blob. -->
+<nav class="relative flex flex-none flex-col overflow-hidden border-r border-sider-border bg-sider-bg pt-2.5 transition-[width] duration-180 ease-width max-md:size-full max-md:border-r-0 max-md:p-0 md:w-(--sider)" data-shell="sider">
     <div class="pointer-events-none absolute inset-0 z-0 overflow-hidden" aria-hidden="true" data-shell="sider-art">
         <svg class="absolute inset-0 block size-full" viewBox="0 0 252 844" preserveAspectRatio="none" focusable="false">
             <path d="M0 0h252v34c-52 28-108-4-160 20-30 14-60 6-92 24V0Z" fill="#E6E1FA" />
@@ -18,7 +13,6 @@
         </svg>
     </div>
 
-    <!-- The drawer covers the header, so the brand and the way out travel with the menu. -->
     @if (state.isPhone()) {
         <div class="relative z-1 mb-1 flex h-14 flex-none items-center gap-2.5 border-b border-sider-border pr-2 pl-3.5" data-shell="drawer-head">
             <img class="size-6 flex-none" src="assets/icons/logo.svg" alt="" />
@@ -29,11 +23,6 @@
         </div>
     }
 
-    <!-- The list scrolls; the footer does not. Appending the footer to the list would let a long
-         menu push the version number off the bottom, and support asks for it before anything else.
-
-         Built entirely from the boot payload. The server sends only what this person may see, so
-         there is nothing to filter here and nothing to hide. -->
     <div class="shell__nav-list relative z-1 flex min-h-0 flex-1 flex-col gap-0.5 overflow-x-hidden overflow-y-auto">
         @for (item of session.menu(); track item.id) {
             @if (item.children.length) {
@@ -60,18 +49,12 @@
                     <ng-icon [name]="item.icon || iconFallback" size="18px" strokeWidth="1.8" class="flex-none group-hover:text-primary" [class]="nav.isOpen(item.id) ? 'text-primary' : 'text-sider-icon'" />
                     @if (!state.railCollapsed()) {
                         <span class="flex-1 overflow-hidden text-ellipsis">{{ session.label(item) }}</span>
-                        <ng-icon name="lucideChevronDown" size="13px" class="flex-none transition-transform duration-[240ms] ease-shell" [class]="nav.isOpen(item.id) ? 'rotate-0 text-primary' : '-rotate-90 text-n-400'" />
+                        <ng-icon name="lucideChevronDown" size="13px" class="flex-none transition-transform duration-240 ease-shell" [class]="nav.isOpen(item.id) ? 'rotate-0 text-primary' : '-rotate-90 text-n-400'" />
                     } @else {
-                        <!-- The collapsed rail has no chevron, so this is what says "there is more
-                             behind this icon" before the flyout appears. -->
                         <span class="absolute right-3.25 bottom-1.75 size-1 rounded-full bg-primary-soft"></span>
                     }
                 </button>
 
-                <!-- Always rendered, never conditional: the open and shut states are a
-                     grid-row transition, and an element that is not there cannot animate. The
-                     inner wrapper is what goes invisible so shut children stay out of the tab
-                     order. Both live in the stylesheet: a grid-row transition has no utility. -->
                 <div class="shell__children" [class.is-open]="nav.isOpen(item.id) && !state.railCollapsed()">
                     <div class="shell__children-inner">
                         <div class="shell__children-list relative mt-0.5 mr-2 mb-1.5 ml-5.5 flex flex-col gap-0.5 pl-4.25">
@@ -129,8 +112,6 @@
         }
     </div>
 
-    <!-- Pinned below the scrolling list, not appended to it, so a long menu never pushes the
-         version out of reach. -->
     <div class="relative z-1 mx-2 mt-2 flex flex-none items-center gap-2 border-t border-sider-border pt-2.5 pb-3.5 text-shell-hint whitespace-nowrap" [class]="state.railCollapsed() ? 'justify-center px-0' : 'justify-between px-1'">
         @if (!state.railCollapsed()) {
             <span class="font-semibold text-n-600">
@@ -144,10 +125,6 @@
     </div>
 </nav>
 
-<!-- The collapsed rail's group flyout. Shared by every group row, because hover opens exactly
-     one at a time and the CDK anchors it to whichever row triggered it. It carries no position of
-     its own: the CDK anchors it, flips it near the foot of the window and bridges the gap the
-     pointer has to cross. All three used to be a getBoundingClientRect, a clamp and a close timer. -->
 <ng-template #groupFlyout>
     @if (nav.hoverGroup(); as group) {
         <div class="max-w-66 min-w-49 rounded-container border border-sider-border bg-white p-1.5 shadow-panel">

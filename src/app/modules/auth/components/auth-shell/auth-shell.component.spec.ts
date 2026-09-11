@@ -25,12 +25,12 @@ describe('AuthShellComponent', () => {
     it('renders the identity panel and the logo', async () => {
         const { el } = await render();
         expect(el.querySelector('.auth__panel')).toBeTruthy();
-        expect(el.querySelector('.auth__logo')).toBeTruthy();
+        expect(el.querySelector('[data-auth=logo]')).toBeTruthy();
     });
 
     it('links the attribution to sakib.app in a new tab', async () => {
         const { el } = await render();
-        const link = el.querySelector('.auth__attribution') as HTMLAnchorElement;
+        const link = el.querySelector('[data-auth=attribution]') as HTMLAnchorElement;
         expect(link.getAttribute('href')).toBe('https://sakib.app');
         expect(link.getAttribute('rel')).toContain('noopener');
     });

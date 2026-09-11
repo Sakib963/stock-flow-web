@@ -92,6 +92,8 @@ export class ShellStateService {
     // created, and both are viewport-relative anyway.
     readonly drawerWidth = 'min(300px, calc(100vw - 48px))';
     readonly sheetWidth = 'calc(100vw - 24px)';
+    /** The notifications and account drawers, which come in from the right at every width. */
+    readonly panelWidth = 'min(380px, calc(100vw - 32px))';
 
     constructor() {
         // The rail and the drawer are different components of the same sider, and which one is on

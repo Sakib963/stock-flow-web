@@ -1,4 +1,16 @@
-// Nothing here. The panel is utilities throughout, and the two pieces it shares with other shell
-// components, the surface and the avatar, are `@utility` definitions in styles.css.
-//
-// The file stays so the component keeps its three-file shape.
+// Outside a dropdown this is ant's inline menu, whose root draws a rule down its right edge to
+// separate it from a page. In a drawer there is nothing on the other side of that edge.
+.ant-menu {
+    border-inline-end: 0;
+}
+
+// Ant widens every inline item by 1px so it covers the border removed above. With no border left
+// to cover, that 1px is pure overflow, and it showed as a horizontal scrollbar under the menu.
+.ant-menu-inline .ant-menu-item {
+    width: 100%;
+}
+
+// nz-avatar defaults to ant's grey. The header trigger draws the same face one size down.
+.ant-avatar {
+    background: linear-gradient(140deg, var(--color-primary-6) 0%, var(--color-primary-5) 100%);
+}

@@ -1,8 +1,11 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { NzAvatarModule } from 'ng-zorro-antd/avatar';
+import { NzButtonModule } from 'ng-zorro-antd/button';
+import { NzMenuModule } from 'ng-zorro-antd/menu';
 import { NzTooltipModule } from 'ng-zorro-antd/tooltip';
 import { TranslatePipe } from '@ngx-translate/core';
 import { NgIcon, provideIcons } from '@ng-icons/core';
-import { lucideCalendarClock, lucideCircleUser, lucideGlobe, lucideKeyboard, lucideLogOut } from '@ng-icons/lucide';
+import { lucideCircleUser, lucideGlobe, lucideKeyRound, lucideKeyboard, lucideLogOut } from '@ng-icons/lucide';
 import { AuthService } from '@app/core/services/auth.service';
 import { LanguageService } from '@app/core/services/language.service';
 import { SessionService } from '@app/core/services/session.service';
@@ -12,15 +15,13 @@ import { ShellStateService } from '@app/layout/services/shell-state.service';
 /**
  * The account menu: who is signed in, the language switch, and the way out.
  *
- * A dropdown at every width. A short menu anchored to its own avatar reads correctly on a phone
- * too, so unlike search and notifications this one never becomes a sheet.
+ * The body of the right-hand drawer: who is signed in, the language switch, and the way out.
  */
 @Component({
     selector: 'account-menu',
-    imports: [NzTooltipModule, TranslatePipe, NgIcon, BadgeComponent],
-    providers: [provideIcons({ lucideCalendarClock, lucideCircleUser, lucideGlobe, lucideKeyboard, lucideLogOut })],
-    // The host draws no box of its own, so the panel stays the direct child of the dropdown
-    // overlay that the CDK positions.
+    imports: [NzAvatarModule, NzButtonModule, NzMenuModule, NzTooltipModule, TranslatePipe, NgIcon, BadgeComponent],
+    providers: [provideIcons({ lucideCircleUser, lucideGlobe, lucideKeyRound, lucideKeyboard, lucideLogOut })],
+    // The host draws no box of its own, so the menu stays the direct child of the CDK overlay.
     host: { class: 'contents' },
     templateUrl: './account-menu.component.html',
     styleUrl: './account-menu.component.scss',

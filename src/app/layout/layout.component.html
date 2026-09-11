@@ -1,13 +1,11 @@
-<!-- `--sider` is bound rather than declared in CSS: the header's brand block and the sider column
-     are two components measured from the same number, and a custom property is what crosses that
-     boundary. Bound here so the width sits beside the condition that changes it. -->
+<!-- `--sider` crosses a component boundary: the header's brand block and the sider column are
+     measured from the same number. -->
 <div class="flex h-full flex-col bg-n-75" [style.--sider]="state.railCollapsed() ? '64px' : '252px'">
     <header-bar />
 
     <div class="relative flex min-h-0 flex-1">
-        <!-- A rail at this width. Below 768px the same component is the drawer's body instead, so
-             it is rendered there and not here: two copies would mean two of every menu row in the
-             accessibility tree, and the hidden one would be the one a screen reader read. -->
+        <!-- Below 768px the same component is the drawer's body instead. Two copies would mean two
+             of every nav row in the accessibility tree. -->
         @if (!state.isPhone()) {
             <sider />
         }
@@ -22,40 +20,42 @@
     }
 </div>
 
-<!-- Phone overlays ---------------------------------------------------------------------------
-
-     ng-zorro rather than hand-rolled, and only here. These render into the CDK overlay container
-     at body level, so no ancestor of the shell can clip them, restack them or make them scroll the
-     page sideways, which is what every phone bug in this shell has been. They also bring the focus
-     trap, the scroll lock and Escape, none of which the hand-rolled versions had.
-
-     The wide-window dropdowns stay anchored to their triggers in the header: a dropdown hanging
-     off a button is not what a modal does, and up there the shell is not clipping anything. -->
-
-<!-- The whole drawer is behind the width check, not just its `nzVisible`. nz-drawer builds its
-     content template as soon as it exists, so binding only `nzVisible` left a second copy of the
-     entire menu mounted on a wide window: every nav row twice in the accessibility tree, and the
-     hidden one is the copy a screen reader reaches first. -->
+<!-- The width check wraps the whole drawer, not just its `nzVisible`: nz-drawer builds its content
+     template as soon as it exists, so binding only `nzVisible` left a second copy of the menu
+     mounted on a wide window. -->
 @if (state.isPhone()) {
     <nz-drawer [nzVisible]="state.mobileOpen()" [nzContent]="siderDrawer" nzPlacement="left" [nzClosable]="false" [nzWidth]="state.drawerWidth" [nzBodyStyle]="{ padding: '0' }" nzWrapClassName="sf-drawer" (nzOnClose)="state.closeMobile()" />
 }
 
+<!-- Search is a sheet from the top on a phone: it is a field you type into, so it belongs where
+     the keyboard pushes it. On a wide window the field and its panel are in the header itself. -->
 <nz-modal [nzVisible]="state.isPhone() && state.openPanel() === 'search'" [nzContent]="searchSheet" [nzFooter]="null" [nzClosable]="false" [nzWidth]="state.sheetWidth" [nzStyle]="{ top: '12px' }" [nzBodyStyle]="{ padding: '0' }" nzWrapClassName="sf-sheet" (nzOnCancel)="closePanel()" />
 
-<nz-modal [nzVisible]="state.isPhone() && state.openPanel() === 'notifications'" [nzContent]="notifySheet" [nzFooter]="null" [nzClosable]="false" [nzWidth]="state.sheetWidth" [nzStyle]="{ top: '12px' }" [nzBodyStyle]="{ padding: '0' }" nzWrapClassName="sf-sheet" (nzOnCancel)="closePanel()" />
+<nz-drawer [nzVisible]="state.openPanel() === 'notifications'" [nzTitle]="'shell.notifications' | translate" [nzExtra]="notifyActions" [nzContent]="notifyDrawer" nzPlacement="right" [nzWidth]="state.panelWidth" [nzBodyStyle]="{ padding: '0' }" nzWrapClassName="sf-drawer" (nzOnClose)="closePanel()" />
 
-<!-- ng-zorro takes a template for its content, so each overlay gets a one-line one that stamps the
-     component. The component brings its own styles wherever the CDK puts it, which is why none of
-     these need the shell to reach into the overlay container after them. -->
+<nz-drawer [nzVisible]="state.openPanel() === 'account'" [nzTitle]="'shell.account' | translate" [nzContent]="accountDrawer" nzPlacement="right" [nzWidth]="state.panelWidth" [nzBodyStyle]="{ padding: '0' }" nzWrapClassName="sf-drawer" (nzOnClose)="closePanel()" />
 
 <ng-template #siderDrawer>
     <sider />
 </ng-template>
 
-<ng-template #searchSheet>
-    <search-panel variant="sheet" />
+<ng-template #notifyActions>
+    @if (notifications.unread(); as unread) {
+        <span class="inline-flex size-4.5 min-w-4.5 items-center justify-center rounded-full bg-primary-wash px-1.25 font-mono text-shell-meta/none font-semibold text-primary">{{ unread }}</span>
+    }
+    <button type="button" class="ml-2 cursor-pointer rounded-sm px-1.5 py-1 text-shell-note/none font-semibold text-primary not-disabled:hover:bg-primary-wash disabled:cursor-default disabled:text-n-400" [disabled]="!notifications.hasUnread()" (click)="notifications.markAllRead()">
+        {{ 'shell.markAllRead' | translate }}
+    </button>
 </ng-template>
 
-<ng-template #notifySheet>
-    <notification-panel variant="sheet" />
+<ng-template #notifyDrawer>
+    <notification-panel />
+</ng-template>
+
+<ng-template #accountDrawer>
+    <account-menu />
+</ng-template>
+
+<ng-template #searchSheet>
+    <search-panel variant="sheet" />
 </ng-template>

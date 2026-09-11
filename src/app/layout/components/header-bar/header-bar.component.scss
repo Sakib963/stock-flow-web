@@ -1,4 +1,4 @@
-// Nothing here. The bar is utilities throughout, and the icon button and the avatar are
-// `@utility` definitions in styles.css because the sider and the panels draw them too.
-//
-// The file stays so the component keeps its three-file shape.
+// nz-avatar defaults to ant's grey. Same face the account menu draws, one size down.
+.ant-avatar {
+    background: linear-gradient(140deg, var(--color-primary-6) 0%, var(--color-primary-5) 100%);
+}

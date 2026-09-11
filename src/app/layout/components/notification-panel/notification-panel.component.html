@@ -1,25 +1,5 @@
-<div [class]="variant() === 'sheet' ? 'sf-sheet' : 'sf-panel flex max-h-panel-max w-[min(384px,calc(100vw-20px))] flex-col'">
-    <header class="flex flex-none items-center gap-2 border-b border-n-100 px-3 py-2.75">
-        <span class="text-shell-title font-bold text-n-900">{{ 'shell.notifications' | translate }}</span>
-        @if (notifications.unread(); as unread) {
-            <span class="inline-flex h-4.5 min-w-4.5 items-center justify-center rounded-full bg-primary-wash px-1.25 font-mono text-shell-meta/none font-semibold text-primary">{{ unread }}</span>
-        }
-        <button type="button" class="ml-auto cursor-pointer rounded-sm px-1.5 py-1 text-shell-note/none font-semibold text-primary not-disabled:hover:bg-primary-wash disabled:cursor-default disabled:text-n-400" [disabled]="!notifications.hasUnread()" (click)="notifications.markAllRead()">
-            {{ 'shell.markAllRead' | translate }}
-        </button>
-        @if (state.isPhone()) {
-            <button type="button" class="sf-icon-btn" (click)="state.closePanel()" [attr.aria-label]="'shell.close' | translate">
-                <ng-icon name="lucideX" size="16px" />
-            </button>
-        }
-    </header>
-
-    <!-- These rows are a fixed sample, not this business. Saying so on screen is the whole reason
-         the panel can ship before the endpoint: a stale or invented alert that looks real is worse
-         than no panel at all. Delete this strip and NotificationService.isSample together.
-
-         Deliberately plain and above the list rather than tucked into the footer: someone deciding
-         whether to act on an alert has to see it first. -->
+<div class="flex min-h-0 flex-1 flex-col">
+    <!-- Delete this strip and NotificationService.isSample together when the endpoint lands. -->
     @if (notifications.isSample) {
         <p class="m-0 flex-none border-b border-warning-border bg-warning-bg px-3 py-1.75 text-shell-hint/[1.45] text-[#7a5312]">{{ 'shell.notificationsSample' | translate }}</p>
     }
@@ -31,18 +11,12 @@
             </div>
 
             @for (row of day.rows; track row.item.id) {
-                <!-- Unread carries both a warmer ground and an edge bar, because the ground alone
-                     is too close to the hover state to be read as a state at a glance. The bar is
-                     a pseudo-element, so it is the one thing here still in the stylesheet. -->
                 <button type="button" class="relative flex w-full cursor-pointer items-start gap-2.5 rounded-control px-2.5 py-2 text-left hover:bg-n-50" [class]="row.item.readAt ? '' : 'is-unread bg-[#faf9fe]'" (click)="onNotification(row.item)">
                     <span class="mt-px grid size-6.5 flex-none place-items-center rounded-control" [class]="categoryTone[row.item.category]">
                         <ng-icon [name]="categoryIcon[row.item.category]" size="13px" />
                     </span>
                     <span class="flex min-w-0 flex-1 flex-col gap-0.5">
                         <span class="text-shell-row/[1.35]" [class]="row.item.readAt ? 'font-semibold text-n-800' : 'font-bold text-n-900'">{{ title(row.item) }}</span>
-                        <!-- One line, clipped. An alert is a pointer at work to do, not the work
-                             itself, so it never grows into a paragraph that pushes the next alert
-                             off the panel. -->
                         <span class="truncate text-shell-note/[1.45] text-n-500">{{ body(row.item) }}</span>
                     </span>
                     <span class="flex-none font-mono text-shell-meta/[1.6] font-medium text-n-400">{{ row.time }}</span>
@@ -56,8 +30,6 @@
         }
     </div>
 
-    <!-- The activity log is not ported yet, so this says so rather than navigating into a route
-         that does not exist. -->
     <button type="button" class="flex w-full flex-none cursor-pointer items-center justify-center gap-1.75 border-t border-n-100 bg-n-50 px-3 py-2.5 text-xs/none font-semibold text-primary not-disabled:hover:bg-primary-wash disabled:cursor-not-allowed disabled:text-n-500" disabled>
         {{ 'shell.viewAllActivity' | translate }}
         <badge>{{ 'shell.soon' | translate }}</badge>
