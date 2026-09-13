@@ -7,6 +7,7 @@ import { routes } from './app.routes';
 import { APIEndpoint } from '@app/core/constants/api-endpoint';
 import { Constants } from '@app/core/constants/constants';
 import { SessionPayload } from '@app/core/models/session.model';
+import { AuthService } from '@app/core/services/auth.service';
 
 const payload = (permissions: string[]): SessionPayload => ({
     version: 'v1',
@@ -39,12 +40,17 @@ describe('shell routing after sign-in', () => {
 
     beforeEach(() => {
         localStorage.clear();
-        localStorage.setItem(Constants.AUTH_STORE_KEY, JSON.stringify({ access_token: 'token', refresh_token: 'refresh' }));
         TestBed.configureTestingModule({
             providers: [provideHttpClient(), provideHttpClientTesting(), provideRouter(routes), provideTranslateService({ fallbackLang: 'en' })],
         });
         router = TestBed.inject(Router);
         http = TestBed.inject(HttpTestingController);
+
+        TestBed.inject(AuthService).login({ email: 'owner@shop.com', password: 'secret', remember: true }).subscribe();
+        http.expectOne((r) => r.url.includes(APIEndpoint.SIGN_IN)).flush({
+            code: 200,
+            data: { access_token: 'token', expires_in: 900, session_id: 'session-1', refresh_transport: 'cookie', user: { id: 'u1', email: 'owner@shop.com', name: 'Samiha', role: 'Owner' } },
+        });
     });
 
     afterEach(() => localStorage.clear());

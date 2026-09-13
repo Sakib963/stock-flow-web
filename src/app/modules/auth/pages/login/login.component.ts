@@ -9,7 +9,8 @@ import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideArrowRight, lucideEye, lucideEyeOff, lucideLock, lucideMail } from '@ng-icons/lucide';
-import { AuthService, LoginFailure } from '@app/core/services/auth.service';
+import { AuthService } from '@app/core/services/auth.service';
+import { LoginFailure } from '@app/core/models/auth.model';
 import { AuthShellComponent } from '@app/modules/auth/components/auth-shell/auth-shell.component';
 import { Constants } from '@app/core/constants/constants';
 
@@ -46,7 +47,6 @@ export class LoginComponent implements AfterViewInit {
     readonly passwordVisible = signal(false);
     readonly submitted = signal(false);
     readonly failure = signal<LoginFailure | null>(null);
-    readonly sessionExpired = signal(this._route.snapshot.queryParamMap.get('reason') === 'expired');
 
     // Reactive forms are not signals, so field state is mirrored into signals for the computeds.
     private readonly _emailValue = signal('');
@@ -62,6 +62,7 @@ export class LoginComponent implements AfterViewInit {
             network: 'auth.errNetwork',
             server: 'auth.errServer',
             disabled: 'auth.errDisabled',
+            throttled: 'auth.errThrottled',
         };
         return keys[failure];
     });
@@ -93,16 +94,11 @@ export class LoginComponent implements AfterViewInit {
             // Once a failed attempt is being corrected, drop the alert rather than leaving a
             // stale message above fields the user has already changed.
             if (this.failure()) this.failure.set(null);
-            if (this.sessionExpired()) this.sessionExpired.set(false);
         });
     }
 
     ngAfterViewInit(): void {
         this._emailInput()?.nativeElement.focus();
-
-        if (this.sessionExpired()) {
-            this._translate.get('auth.sessionExpired').subscribe((text: string) => this._message.info(text, { nzDuration: 8000 }));
-        }
     }
 
     onEmailBlur(): void {

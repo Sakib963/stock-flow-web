@@ -33,6 +33,12 @@ describe('LoginComponent', () => {
         expect(el.querySelector('button[type="submit"]')).toBeTruthy();
     });
 
+    it('tells the person what goes in each field before they type', async () => {
+        const { el } = await render();
+        expect(el.querySelector('#login-email')?.getAttribute('placeholder')).toBe('auth.emailPlaceholder');
+        expect(el.querySelector('#login-password')?.getAttribute('placeholder')).toBe('auth.passwordPlaceholder');
+    });
+
     it('projects the leading icons into the input wrapper', async () => {
         const { el } = await render();
         // Guards the ng-zorro v22 projection API: a wrong attribute silently drops the icon.
@@ -106,16 +112,31 @@ describe('LoginComponent', () => {
         expect((el.querySelector('#login-password') as HTMLInputElement).type).toBe('text');
     });
 
-    it('stores tokens and keeps them on a successful sign in', async () => {
+    it('signs in with the keep-signed-in choice and keeps only the refresh token on the machine', async () => {
         const { fixture, cmp } = await render();
         cmp.form.setValue({ email: 'owner@shop.com', password: 'secret', remember: true });
         cmp.handleSubmit();
 
         const http = TestBed.inject(HttpTestingController);
-        http.expectOne((r) => r.url.includes(APIEndpoint.SIGN_IN)).flush({ code: 200, message: 'ok', data: { access_token: 'a', refresh_token: 'r' } });
+        const request = http.expectOne((r) => r.url.includes(APIEndpoint.SIGN_IN));
+        expect(request.request.body.remember).toBe(true);
+        request.flush({ code: 200, message: 'ok', data: { access_token: 'a', expires_in: 900, session_id: 's', refresh_transport: 'body', refresh_token: 'r', user: { id: 'u1', email: 'owner@shop.com', name: 'Samiha', role: 'Owner' } } });
         await fixture.whenStable();
 
-        expect(JSON.parse(localStorage.getItem(Constants.AUTH_STORE_KEY) ?? '{}').access_token).toBe('a');
+        expect(JSON.parse(localStorage.getItem(Constants.AUTH_STORE_KEY) ?? '{}')).toEqual({ transport: 'body', refresh_token: 'r', session_id: 's', remember: true });
+    });
+
+    it('asks the person to wait when sign-in is throttled', async () => {
+        const { fixture, cmp } = await render();
+        cmp.form.setValue({ email: 'owner@shop.com', password: 'secret', remember: true });
+        cmp.handleSubmit();
+
+        TestBed.inject(HttpTestingController)
+            .expectOne((r) => r.url.includes(APIEndpoint.SIGN_IN))
+            .flush({ message: 'Too many sign-in attempts.' }, { status: 429, statusText: 'Too Many Requests' });
+        await fixture.whenStable();
+
+        expect(cmp.failureKey()).toBe('auth.errThrottled');
     });
 
     it('raises a failure through the message service, not an inline alert', async () => {

@@ -33,15 +33,15 @@ export const appConfig: ApplicationConfig = {
         provideAppInitializer(() => {
             inject(LanguageService);
         }),
-        // The shell cannot render without the menu and permissions, so the boot payload is fetched
-        // before Angular paints. The skeleton in index.html is what covers this wait, which is the
-        // whole reason it exists. Only for an already-signed-in user: the call needs a token, and a
-        // failure must not block the app from reaching the sign-in screen.
-        provideAppInitializer(() => {
+        // Who is signed in is settled before the first route is guarded, so no screen renders on a
+        // guess and then bounces. The access token lives in memory only, so this is one renewal per
+        // load. The shell cannot render without the menu and permissions either, so the boot
+        // payload follows. The skeleton in index.html covers both waits, which is why it exists.
+        provideAppInitializer(async () => {
             const auth = inject(AuthService);
             const session = inject(SessionService);
-            if (!auth.getAccessToken()) return Promise.resolve();
-            return session.load(auth.sessionKey()).catch(() => undefined);
+            await auth.restore();
+            if (auth.isAuthenticated()) await session.load(auth.sessionKey()).catch(() => undefined);
         }),
     ],
 };

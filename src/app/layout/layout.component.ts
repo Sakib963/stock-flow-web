@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, afterNextRender, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { filter } from 'rxjs';
@@ -9,6 +9,7 @@ import { AccountMenuComponent } from '@app/layout/components/account-menu/accoun
 import { HeaderBarComponent } from '@app/layout/components/header-bar/header-bar.component';
 import { NotificationPanelComponent } from '@app/layout/components/notification-panel/notification-panel.component';
 import { SearchPanelComponent } from '@app/layout/components/search-panel/search-panel.component';
+import { SessionsDialogComponent } from '@app/layout/components/sessions-dialog/sessions-dialog.component';
 import { SiderComponent } from '@app/layout/components/sider/sider.component';
 import { ShortcutsDialogComponent } from '@app/layout/components/shortcuts-dialog/shortcuts-dialog.component';
 import { NotificationService } from '@app/core/services/notification.service';
@@ -29,7 +30,7 @@ import { ShellStateService } from '@app/layout/services/shell-state.service';
  */
 @Component({
     selector: 'layout',
-    imports: [RouterOutlet, NzDrawerModule, NzModalModule, TranslatePipe, HeaderBarComponent, SiderComponent, SearchPanelComponent, NotificationPanelComponent, AccountMenuComponent, ShortcutsDialogComponent],
+    imports: [RouterOutlet, NzDrawerModule, NzModalModule, TranslatePipe, HeaderBarComponent, SiderComponent, SearchPanelComponent, NotificationPanelComponent, AccountMenuComponent, ShortcutsDialogComponent, SessionsDialogComponent],
     host: {
         class: 'block h-dvh',
         '(document:keydown)': 'onGlobalKey($event)',
@@ -49,6 +50,21 @@ export class LayoutComponent {
     private _primed = false;
 
     constructor() {
+        // Signing out lands on a lazy page. Fetching it while the shell is idle means leaving never
+        // waits on a download, which is when the shell used to sit on screen with nothing in it.
+        afterNextRender(() => {
+            const preload = () => void import('@app/modules/auth/auth.routes');
+            if ('requestIdleCallback' in window) requestIdleCallback(preload);
+            else setTimeout(preload, 2000);
+        });
+
+        // The dialogs' open state outlives the shell in a root service. Leaving the shell with one
+        // open (a sign-out, an ended session) would otherwise reopen it after the next sign-in.
+        inject(DestroyRef).onDestroy(() => {
+            this.state.shortcutsOpen.set(false);
+            this.state.sessionsOpen.set(false);
+        });
+
         this._router.events
             .pipe(
                 filter((e) => e instanceof NavigationEnd),

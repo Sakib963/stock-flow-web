@@ -18,6 +18,10 @@
     @if (state.shortcutsOpen()) {
         <shortcuts-dialog [modifier]="state.modifier" (close)="state.closeShortcuts()" />
     }
+
+    @if (state.sessionsOpen()) {
+        <sessions-dialog (close)="state.closeSessions()" />
+    }
 </div>
 
 <!-- The width check wraps the whole drawer, not just its `nzVisible`: nz-drawer builds its content

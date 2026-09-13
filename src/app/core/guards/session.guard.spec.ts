@@ -4,7 +4,6 @@ import { HttpTestingController, provideHttpClientTesting } from '@angular/common
 import { ActivatedRouteSnapshot, provideRouter, RouterStateSnapshot } from '@angular/router';
 import { provideTranslateService } from '@ngx-translate/core';
 import { APIEndpoint } from '@app/core/constants/api-endpoint';
-import { Constants } from '@app/core/constants/constants';
 import { SessionPayload } from '@app/core/models/session.model';
 import { tokenInterceptor } from '@app/core/interceptors/token.interceptor';
 import { AuthService } from '@app/core/services/auth.service';
@@ -20,25 +19,33 @@ const payload = (name: string): SessionPayload => ({
     counters: { notifications: 0 },
 });
 
-/** The refresh token is the session key: it survives a renewal and changes only at sign-in. */
-const storeSession = (key: string, access = `access-${key}`) => localStorage.setItem(Constants.AUTH_STORE_KEY, JSON.stringify({ access_token: access, refresh_token: key }));
+const grant = (sessionId: string, access = `access-${sessionId}`) => ({ access_token: access, expires_in: 900, session_id: sessionId, refresh_transport: 'cookie' });
+const settle = () => new Promise((resolve) => setTimeout(resolve, 0));
 
 const activate = () => TestBed.runInInjectionContext(() => sessionGuard({} as ActivatedRouteSnapshot, {} as RouterStateSnapshot)) as Promise<boolean>;
 
 describe('sessionGuard', () => {
+    let auth: AuthService;
     let session: SessionService;
     let http: HttpTestingController;
+
+    /** The session id is the key: it survives a renewal and changes only at sign-in. */
+    const signIn = (sessionId: string) => {
+        auth.login({ email: 'owner@shop.com', password: 'correct', remember: true }).subscribe();
+        http.expectOne((r) => r.url.includes(APIEndpoint.SIGN_IN)).flush({ code: 200, data: { ...grant(sessionId), user: { id: 'u1', email: 'owner@shop.com', name: 'Samiha', role: 'Owner' } } });
+    };
 
     const flush = (name: string) => http.expectOne((r) => r.url.includes(APIEndpoint.GET_USER_INFO)).flush({ code: 200, data: payload(name) });
 
     beforeEach(() => {
         localStorage.clear();
-        storeSession('session-a');
         TestBed.configureTestingModule({
             providers: [provideHttpClient(), provideHttpClientTesting(), provideRouter([{ path: '**', children: [] }]), provideTranslateService({ fallbackLang: 'en' })],
         });
+        auth = TestBed.inject(AuthService);
         session = TestBed.inject(SessionService);
         http = TestBed.inject(HttpTestingController);
+        signIn('session-a');
     });
 
     afterEach(() => localStorage.clear());
@@ -67,7 +74,7 @@ describe('sessionGuard', () => {
         flush('Samiha');
         await first;
 
-        storeSession('session-b');
+        signIn('session-b');
         const second = activate();
         flush('Rafi');
 
@@ -75,13 +82,15 @@ describe('sessionGuard', () => {
         expect(session.user()?.name).toBe('Rafi');
     });
 
-    /** Renewing the access token every 30 minutes must not refetch a menu that has not changed. */
+    /** Renewing the access token every 15 minutes must not refetch a menu that has not changed. */
     it('does not refetch when only the access token was renewed', async () => {
         const first = activate();
         flush('Samiha');
         await first;
 
-        storeSession('session-a', 'access-renewed');
+        auth.renewAccessToken().subscribe();
+        await settle();
+        http.expectOne((r) => r.url.includes(APIEndpoint.REFRESH_TOKEN)).flush({ code: 200, data: grant('session-a', 'access-renewed') });
 
         expect(await activate()).toBe(true);
         http.expectNone((r) => r.url.includes(APIEndpoint.GET_USER_INFO));
@@ -92,7 +101,8 @@ describe('sessionGuard', () => {
         http.expectOne((r) => r.url.includes(APIEndpoint.GET_USER_INFO)).flush({ code: 500, message: 'nope' }, { status: 500, statusText: 'Server Error' });
 
         expect(await result).toBe(false);
-        expect(TestBed.inject(AuthService).getAccessToken()).toBe('');
+        expect(auth.isAuthenticated()).toBe(false);
+        expect(auth.getAccessToken()).toBe('');
         expect(session.loaded()).toBe(false);
     });
 });

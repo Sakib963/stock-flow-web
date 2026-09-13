@@ -12,7 +12,8 @@
             <span class="w-full truncate font-mono text-xs text-n-500">{{ session.user()?.email }}</span>
         </div>
 
-        <ul nz-menu nzMode="inline" class="w-full">
+        <!-- Every item opens a dialog or acts, none is a place, so a click must not stay highlighted. -->
+        <ul nz-menu nzMode="inline" [nzSelectable]="false" class="w-full">
             <li class="flex items-center px-4 py-2 text-sm text-n-800">
                 <ng-icon name="lucideGlobe" size="15px" class="mr-2 text-n-500" />
                 <span class="flex-1 truncate">{{ 'shell.language' | translate }}</span>
@@ -30,6 +31,7 @@
             <li nz-menu-item nzDisabled nz-tooltip nzTooltipPlacement="left" [nzTooltipTitle]="'shell.accountSoon' | translate">
                 <ng-icon name="lucideKeyRound" size="15px" class="mr-2 align-middle" />{{ 'shell.changePassword' | translate }}<badge class="ml-2 align-middle">{{ 'shell.soon' | translate }}</badge>
             </li>
+            <li nz-menu-item (click)="state.openSessions()"><ng-icon name="lucideMonitorSmartphone" size="15px" class="mr-2 align-middle" />{{ 'shell.sessions.menu' | translate }}</li>
             @if (!state.isPhone()) {
                 <li nz-menu-item (click)="state.openShortcuts()"><ng-icon name="lucideKeyboard" size="15px" class="mr-2 align-middle" />{{ 'shell.keyboardShortcuts' | translate }}<span class="ml-2 align-middle font-mono text-shell-meta text-n-400">?</span></li>
             }

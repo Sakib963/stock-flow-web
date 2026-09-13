@@ -7,7 +7,7 @@ import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { NgIcon, provideIcons } from '@ng-icons/core';
-import { lucideArrowLeft, lucideArrowRight, lucideCircle, lucideCircleCheck, lucideCircleX, lucideClock, lucideEye, lucideEyeOff, lucideKeyRound, lucideLock, lucideRotateCcw } from '@ng-icons/lucide';
+import { lucideArrowLeft, lucideArrowRight, lucideCircle, lucideCircleCheck, lucideCircleX, lucideClock, lucideEye, lucideEyeOff, lucideInfo, lucideKeyRound, lucideLock, lucideRotateCcw } from '@ng-icons/lucide';
 import { AuthShellComponent } from '@app/modules/auth/components/auth-shell/auth-shell.component';
 import { RecoveryFailure, RecoveryService } from '@app/modules/auth/services/recovery.service';
 
@@ -21,7 +21,7 @@ const RULES = {
 @Component({
     selector: 'reset-password',
     imports: [ReactiveFormsModule, TranslatePipe, NzButtonModule, NzInputModule, NgIcon, AuthShellComponent],
-    providers: [provideIcons({ lucideArrowLeft, lucideArrowRight, lucideCircle, lucideCircleCheck, lucideCircleX, lucideClock, lucideEye, lucideEyeOff, lucideKeyRound, lucideLock, lucideRotateCcw })],
+    providers: [provideIcons({ lucideArrowLeft, lucideArrowRight, lucideCircle, lucideCircleCheck, lucideCircleX, lucideClock, lucideEye, lucideEyeOff, lucideInfo, lucideKeyRound, lucideLock, lucideRotateCcw })],
     templateUrl: './reset-password.component.html',
     styleUrl: './reset-password.component.scss',
     changeDetection: ChangeDetectionStrategy.OnPush,

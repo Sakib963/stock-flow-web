@@ -7,6 +7,7 @@
         "email": "Email",
         "emailPlaceholder": "you@yourshop.com",
         "password": "Password",
+        "passwordPlaceholder": "Enter your password",
         "keepSignedIn": "Keep me signed in",
         "forgot": "Forgot password?",
         "forgotShort": "Forgot?",
@@ -24,7 +25,36 @@
         "errEmailRequired": "Enter your email.",
         "errEmailInvalid": "That does not look like an email address.",
         "errPasswordRequired": "Enter your password.",
-        "sessionExpired": "You were signed out after 30 minutes of inactivity.",
+        "errThrottled": "Too many sign-in attempts. Wait a few minutes and try again.",
+        "ended": {
+            "signInAgain": "Sign in again",
+            "resetPassword": "Reset your password",
+            "foot": "A session that has ended cannot be picked up again. Signing in starts a new one on this device.",
+            "expired": {
+                "title": "Your session expired",
+                "body": "This device was not used for a while, so it signed you out on its own to keep the account safe. Sign in again to carry on where you left off."
+            },
+            "signedOut": {
+                "title": "You have been signed out",
+                "body": "This session was closed from this browser, in another tab or by signing in again. Sign in to carry on."
+            },
+            "signedOutElsewhere": {
+                "title": "Signed out from another device",
+                "body": "This device was signed out from the signed-in devices list on another phone or computer. If that was not you, sign in and reset your password straight away."
+            },
+            "passwordChanged": {
+                "title": "Your password was changed",
+                "body": "Changing the password signs the account out of its other devices. Sign in with the new password. If you did not change it, reset it now."
+            },
+            "accountDisabled": {
+                "title": "This account has been turned off",
+                "body": "Your organisation's admin turned this account off, so it was signed out on every device. Ask them to turn it back on."
+            },
+            "security": {
+                "title": "Signed out to keep your account safe",
+                "body": "This sign-in was used from somewhere else at the same time, which can mean it was copied, so it was ended everywhere. Sign in again, and if this happens again, reset your password."
+            }
+        },
         "reset": {
             "backToSignIn": "Back to sign in",
             "requestTitle": "Reset your password",
@@ -60,6 +90,7 @@
             "errThrottled": "Too many attempts. Wait a few minutes and try again.",
             "errConfirmRequired": "Confirm the new password.",
             "errMismatch": "The two passwords do not match.",
+            "signsOutEverywhere": "Setting a new password signs this account out on every device. Anyone still signed in will need the new password to get back in.",
             "doneTitle": "Password changed",
             "doneBody": "The new password is active now. A confirmation has gone to",
             "doneBodyTail": "so there is a record of when it changed.",
@@ -73,6 +104,35 @@
         "searchPlaceholder": "Search features",
         "noMatch": "Nothing matches that.",
         "signOut": "Sign out",
+        "signOutEverywhere": "Sign out of all devices",
+        "signOutEverywhereTitle": "Sign out of every device?",
+        "signOutEverywhereBody": "This ends every session on this account, on every phone and computer, this one included. Anyone using it will have to sign in again.",
+        "signOutEverywhereConfirm": "Sign out everywhere",
+        "signOutEverywhereFailed": "Could not sign out the other devices. Check the connection and try again.",
+        "cancel": "Cancel",
+        "sessions": {
+            "menu": "Signed-in devices",
+            "title": "Signed-in devices",
+            "subtitle": "Every phone and computer signed in to this account right now. If you do not recognise one, sign it out and change your password.",
+            "thisDevice": "This device",
+            "activeNow": "Active now",
+            "lastActive": "Last active {{time}}",
+            "signedIn": "Signed in {{date}}",
+            "keptSignedIn": "Kept signed in",
+            "browserOn": "{{browser}} on {{os}}",
+            "deviceNamed": "{{name}}",
+            "confirmOne": "Sign this device out? It will have to sign in again.",
+            "confirmOthers": "Sign out every other device? This one stays signed in.",
+            "unknownDevice": "Unrecognised device",
+            "signOut": "Sign out",
+            "signedOut": "{{device}} has been signed out.",
+            "signOutOthers": "Sign out other devices",
+            "signedOutOthers": "Every other device has been signed out.",
+            "onlyThisDevice": "No other device is signed in to this account.",
+            "loadFailed": "Could not load your signed-in devices. Check the connection and try again.",
+            "actionFailed": "Could not sign that device out. Check the connection and try again.",
+            "retry": "Try again"
+        },
         "new": "new",
         "soon": "soon",
         "notesSoon": "Notes, coming soon",

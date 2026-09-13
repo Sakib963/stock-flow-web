@@ -7,10 +7,9 @@ import { SessionService } from '@app/core/services/session.service';
  * Makes sure the boot payload in memory belongs to the person who is signed in now, before any
  * signed-in screen activates.
  *
- * The app initializer can only cover a reload that already has a token. Signing in happens inside
- * the running app with no reload, so on that path nothing ever fetched the payload: the shell
- * activated with no permissions and no menu, and the permission guard bounced the landing route
- * back to itself forever.
+ * The app initializer can only cover a reload. Signing in happens inside the running app with no
+ * reload, so on that path nothing else fetches the payload: the shell would activate with no
+ * permissions and no menu, and the permission guard would bounce the landing route back to itself.
  *
  * The freshness check lives here rather than in AuthService, which is the natural-looking home for
  * it. AuthService cannot reach SessionService: the token interceptor injects AuthService, the
@@ -30,9 +29,9 @@ export const sessionGuard: CanActivateFn = async () => {
         return true;
     } catch {
         // Without the payload there is no menu to draw and nothing to check a route against.
-        // Signing out is the honest end, and it clears the token, so the login page cannot bounce
-        // straight back here through the guest guard.
-        auth.logout();
+        // Signing out is the honest end, and it resolves the status to anonymous, so the login page
+        // cannot bounce straight back here through the guest guard.
+        void auth.signOut();
         session.clear();
         return false;
     }

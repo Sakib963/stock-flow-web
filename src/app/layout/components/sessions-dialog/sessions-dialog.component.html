@@ -1,0 +1,90 @@
+<nz-modal nzVisible [nzTitle]="title" [nzFooter]="loading() || failed() ? null : footer" [nzWidth]="480" [nzBodyStyle]="{ padding: '4px 24px' }" nzWrapClassName="sf-sessions" (nzOnCancel)="close.emit()">
+    <ng-container *nzModalContent>
+        @if (loading()) {
+            <nz-skeleton class="block py-4" [nzActive]="true" [nzAvatar]="{ shape: 'square' }" [nzParagraph]="{ rows: 2 }" />
+        } @else if (failed()) {
+            <div class="flex flex-col items-start gap-3 py-4" data-sessions="failed">
+                <p class="m-0 text-shell-row text-n-700">{{ 'shell.sessions.loadFailed' | translate }}</p>
+                <button nz-button type="button" (click)="load()">{{ 'shell.sessions.retry' | translate }}</button>
+            </div>
+        } @else {
+            <ul class="m-0 list-none p-0">
+                @for (row of rows(); track row.id) {
+                    <li class="flex items-start gap-3 border-b border-n-100 py-3 last:border-b-0" [attr.data-session]="row.id">
+                        <span class="mt-0.5 flex size-9 flex-none items-center justify-center rounded-control" [class]="row.current ? 'bg-primary-wash text-primary' : 'bg-n-75 text-n-600'">
+                            <ng-icon [name]="row.icon" size="18px" />
+                        </span>
+
+                        <div class="min-w-0 flex-1">
+                            <div class="flex flex-wrap items-center gap-2">
+                                <span class="min-w-0 truncate text-shell-row font-semibold text-n-900">{{ row.label.key | translate: row.label.params }}</span>
+                                @if (row.current) {
+                                    <nz-tag nzColor="processing" class="m-0">{{ 'shell.sessions.thisDevice' | translate }}</nz-tag>
+                                }
+                            </div>
+                            <p class="mt-0.5 mb-0 text-xs/normal text-n-500">
+                                @if (row.current) {
+                                    {{ 'shell.sessions.activeNow' | translate }}
+                                } @else {
+                                    {{ 'shell.sessions.lastActive' | translate: { time: row.lastActive } }}
+                                }
+                                &middot; {{ 'shell.sessions.signedIn' | translate: { date: row.signedIn } }}
+                            </p>
+                            @if (row.ip_address) {
+                                <p class="mt-0.5 mb-0 font-mono text-shell-meta text-n-400">{{ row.ip_address }}</p>
+                            }
+                        </div>
+
+                        @if (!row.current) {
+                            <button
+                                nz-button
+                                nzSize="small"
+                                type="button"
+                                class="flex-none"
+                                nz-popconfirm
+                                [nzPopconfirmTitle]="'shell.sessions.confirmOne' | translate"
+                                [nzOkText]="'shell.sessions.signOut' | translate"
+                                [nzCancelText]="'shell.cancel' | translate"
+                                [nzOkDanger]="true"
+                                [nzLoading]="busy() === row.id"
+                                [disabled]="busy() !== null"
+                                (nzOnConfirm)="signOutDevice(row)"
+                            >
+                                {{ 'shell.sessions.signOut' | translate }}
+                            </button>
+                        }
+                    </li>
+                }
+            </ul>
+        }
+    </ng-container>
+</nz-modal>
+
+<ng-template #title>
+    <h2 class="m-0 text-shell-dialog font-bold tracking-[-0.015em] text-n-900">{{ 'shell.sessions.title' | translate }}</h2>
+    <p class="mt-0.75 mb-0 text-xs/normal font-normal text-n-500">{{ 'shell.sessions.subtitle' | translate }}</p>
+</ng-template>
+
+<ng-template #footer>
+    <div class="flex flex-wrap items-center justify-between gap-2 text-left" data-sessions="footer">
+        @if (hasOthers()) {
+            <button
+                nz-button
+                type="button"
+                nz-popconfirm
+                [nzPopconfirmTitle]="'shell.sessions.confirmOthers' | translate"
+                [nzOkText]="'shell.sessions.signOutOthers' | translate"
+                [nzCancelText]="'shell.cancel' | translate"
+                [nzOkDanger]="true"
+                [nzLoading]="busy() === 'others'"
+                [disabled]="busy() !== null"
+                (nzOnConfirm)="signOutOthers()"
+            >
+                {{ 'shell.sessions.signOutOthers' | translate }}
+            </button>
+        } @else {
+            <span class="text-xs/normal text-n-500">{{ 'shell.sessions.onlyThisDevice' | translate }}</span>
+        }
+        <button nz-button nzType="text" nzDanger type="button" [disabled]="busy() !== null" (click)="confirmSignOutEverywhere()">{{ 'shell.signOutEverywhere' | translate }}</button>
+    </div>
+</ng-template>

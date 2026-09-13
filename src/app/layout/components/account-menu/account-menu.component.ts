@@ -5,22 +5,18 @@ import { NzMenuModule } from 'ng-zorro-antd/menu';
 import { NzTooltipModule } from 'ng-zorro-antd/tooltip';
 import { TranslatePipe } from '@ngx-translate/core';
 import { NgIcon, provideIcons } from '@ng-icons/core';
-import { lucideCircleUser, lucideGlobe, lucideKeyRound, lucideKeyboard, lucideLogOut } from '@ng-icons/lucide';
+import { lucideCircleUser, lucideGlobe, lucideKeyRound, lucideKeyboard, lucideLogOut, lucideMonitorSmartphone } from '@ng-icons/lucide';
 import { AuthService } from '@app/core/services/auth.service';
 import { LanguageService } from '@app/core/services/language.service';
 import { SessionService } from '@app/core/services/session.service';
 import { BadgeComponent } from '@app/layout/components/badge/badge.component';
 import { ShellStateService } from '@app/layout/services/shell-state.service';
 
-/**
- * The account menu: who is signed in, the language switch, and the way out.
- *
- * The body of the right-hand drawer: who is signed in, the language switch, and the way out.
- */
+/** The body of the right-hand drawer: who is signed in, the language switch, and the ways out. */
 @Component({
     selector: 'account-menu',
     imports: [NzAvatarModule, NzButtonModule, NzMenuModule, NzTooltipModule, TranslatePipe, NgIcon, BadgeComponent],
-    providers: [provideIcons({ lucideCircleUser, lucideGlobe, lucideKeyRound, lucideKeyboard, lucideLogOut })],
+    providers: [provideIcons({ lucideCircleUser, lucideGlobe, lucideKeyRound, lucideKeyboard, lucideLogOut, lucideMonitorSmartphone })],
     // The host draws no box of its own, so the menu stays the direct child of the CDK overlay.
     host: { class: 'contents' },
     templateUrl: './account-menu.component.html',
@@ -34,8 +30,10 @@ export class AccountMenuComponent {
     readonly session = inject(SessionService);
     readonly language = inject(LanguageService);
 
-    signOut(): void {
+    async signOut(): Promise<void> {
+        await this._auth.signOut();
+        // Only once the sign-in page is showing. Clearing first emptied the shell while it was
+        // still on screen, and on a slow connection it stayed that way.
         this.session.clear();
-        this._auth.signOut();
     }
 }

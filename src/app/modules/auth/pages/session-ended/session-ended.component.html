@@ -1,0 +1,24 @@
+<auth-shell [clearCoreHeight]="320">
+    <div class="sf-auth-card" [attr.data-reason]="view().copy">
+        <span class="flex size-11 items-center justify-center rounded-container border" [class]="view().tone" aria-hidden="true">
+            <ng-icon [name]="view().icon" size="22px" />
+        </span>
+
+        <div>
+            <h2 class="m-0 text-2xl font-bold tracking-[-0.02em] text-n-900 max-md:text-[21px]">{{ 'auth.ended.' + view().copy + '.title' | translate }}</h2>
+            <p class="mt-0.75 mb-0 text-shell-title/normal text-n-500">{{ 'auth.ended.' + view().copy + '.body' | translate }}</p>
+        </div>
+
+        <div class="mt-2.5 flex flex-col gap-3">
+            <a nz-button nzType="primary" nzSize="large" nzBlock class="flex items-center justify-center gap-2 font-semibold transition-colors duration-200 ease-width max-md:h-12 max-md:text-[15px] max-md:font-bold" routerLink="/auth/login" [queryParams]="signInQuery()" data-ended="sign-in">
+                {{ 'auth.ended.signInAgain' | translate }}
+                <ng-icon name="lucideArrowRight" size="16px" />
+            </a>
+            @if (view().offerReset) {
+                <a class="text-center text-shell-title font-semibold text-primary" routerLink="/auth/forgot-password" data-ended="reset">{{ 'auth.ended.resetPassword' | translate }}</a>
+            }
+        </div>
+
+        <p class="m-0 border-t border-n-100 pt-4 text-xs/[1.6] text-n-600 max-md:mt-auto">{{ 'auth.ended.foot' | translate }}</p>
+    </div>
+</auth-shell>

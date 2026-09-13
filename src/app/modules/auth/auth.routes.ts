@@ -15,6 +15,12 @@ export const AUTH_ROUTES: Routes = [
         loadComponent: () => import('./pages/login/login.component').then((m) => m.LoginComponent),
     },
     {
+        // Where a session that ended without the person asking lands, with why.
+        path: 'session-ended',
+        canActivate: [guestGuard],
+        loadComponent: () => import('./pages/session-ended/session-ended.component').then((m) => m.SessionEndedComponent),
+    },
+    {
         path: 'forgot-password',
         loadComponent: () => import('./pages/forgot-password/forgot-password.component').then((m) => m.ForgotPasswordComponent),
     },

@@ -63,6 +63,7 @@ export class ShellStateService {
 
     readonly openPanel = signal<HeaderPanel | null>(null);
     readonly shortcutsOpen = signal(false);
+    readonly sessionsOpen = signal(false);
 
     /**
      * The panel the person just dismissed, as opposed to one that closed because the page changed.
@@ -176,6 +177,16 @@ export class ShellStateService {
     closeShortcuts(): void {
         this.shortcutsOpen.set(false);
         // The dialog is opened from the account menu, so that is where focus goes back to.
+        this.dismissed.set('account');
+    }
+
+    openSessions(): void {
+        this.openPanel.set(null);
+        this.sessionsOpen.set(true);
+    }
+
+    closeSessions(): void {
+        this.sessionsOpen.set(false);
         this.dismissed.set('account');
     }
 

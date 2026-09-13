@@ -14,7 +14,7 @@ describe('appConfig', () => {
     afterEach(() => localStorage.clear());
 
     it('boots with a stored session', async () => {
-        localStorage.setItem(Constants.AUTH_STORE_KEY, JSON.stringify({ access_token: 'token', refresh_token: 'refresh' }));
+        localStorage.setItem(Constants.AUTH_STORE_KEY, JSON.stringify({ transport: 'body', refresh_token: 'refresh' }));
 
         const app = await createApplication(appConfig);
         expect(app.injector).toBeTruthy();
