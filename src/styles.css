@@ -126,8 +126,7 @@ body {
 
 /* Bengali sets at the same sizes as Latin so switching language never moves the layout, but it
    needs the taller line box to avoid clipping ascenders and matras. */
-:lang(bn),
-.lang-bn {
+body.lang-bn {
     font-family: var(--font-bangla);
     line-height: 1.7;
 }

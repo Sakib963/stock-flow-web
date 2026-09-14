@@ -1,4 +1,4 @@
-<nz-modal nzVisible [nzTitle]="title" [nzFooter]="loading() || failed() ? null : footer" [nzWidth]="480" [nzBodyStyle]="{ padding: '4px 24px' }" nzWrapClassName="sf-sessions" (nzOnCancel)="close.emit()">
+<nz-modal nzVisible [nzTitle]="title" [nzFooter]="loading() || failed() ? null : footer" (nzOnCancel)="close.emit()">
     <ng-container *nzModalContent>
         @if (loading()) {
             <nz-skeleton class="block py-4" [nzActive]="true" [nzAvatar]="{ shape: 'square' }" [nzParagraph]="{ rows: 2 }" />
@@ -36,20 +36,7 @@
                         </div>
 
                         @if (!row.current) {
-                            <button
-                                nz-button
-                                nzSize="small"
-                                type="button"
-                                class="flex-none"
-                                nz-popconfirm
-                                [nzPopconfirmTitle]="'shell.sessions.confirmOne' | translate"
-                                [nzOkText]="'shell.sessions.signOut' | translate"
-                                [nzCancelText]="'shell.cancel' | translate"
-                                [nzOkDanger]="true"
-                                [nzLoading]="busy() === row.id"
-                                [disabled]="busy() !== null"
-                                (nzOnConfirm)="signOutDevice(row)"
-                            >
+                            <button nz-button nzSize="small" type="button" class="flex-none" nz-popconfirm [nzPopconfirmTitle]="'shell.sessions.confirmOne' | translate" [nzOkText]="'shell.sessions.signOut' | translate" [nzCancelText]="'shell.cancel' | translate" [nzOkDanger]="true" [nzLoading]="busy() === row.id" [disabled]="busy() !== null" (nzOnConfirm)="signOutDevice(row)">
                                 {{ 'shell.sessions.signOut' | translate }}
                             </button>
                         }
@@ -68,18 +55,7 @@
 <ng-template #footer>
     <div class="flex flex-wrap items-center justify-between gap-2 text-left" data-sessions="footer">
         @if (hasOthers()) {
-            <button
-                nz-button
-                type="button"
-                nz-popconfirm
-                [nzPopconfirmTitle]="'shell.sessions.confirmOthers' | translate"
-                [nzOkText]="'shell.sessions.signOutOthers' | translate"
-                [nzCancelText]="'shell.cancel' | translate"
-                [nzOkDanger]="true"
-                [nzLoading]="busy() === 'others'"
-                [disabled]="busy() !== null"
-                (nzOnConfirm)="signOutOthers()"
-            >
+            <button nz-button type="button" nz-popconfirm [nzPopconfirmTitle]="'shell.sessions.confirmOthers' | translate" [nzOkText]="'shell.sessions.signOutOthers' | translate" [nzCancelText]="'shell.cancel' | translate" [nzOkDanger]="true" [nzLoading]="busy() === 'others'" [disabled]="busy() !== null" (nzOnConfirm)="signOutOthers()">
                 {{ 'shell.sessions.signOutOthers' | translate }}
             </button>
         } @else {
