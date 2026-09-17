@@ -6,7 +6,8 @@ this file holds what is specific to the web app. Both apply.
 
 `modules/auth` and `layout/` are the only built references for how the new app is written. The old
 generations (`refactor/order-sales-core`, `dev`) are read for business logic only, never for
-structure or UI.
+structure or UI. The one exception is the list page config, whose contract lives in
+`stock-flow-documents/docs/list-page/list-page.md` and learns from the old `TableConfig`.
 
 ## Stack and toolchain
 
@@ -144,7 +145,7 @@ structure or UI.
 
 These are the rules every screen follows. They come from the shell brief and handoffs in `Design/`
 and from what the built screens already do. Where a pattern belongs to a design round that has not
-happened yet (tables, filters, forms, detail pages, charts, POS, see `plan/backlog.md`), do not
+happened yet (tables, filters, forms, detail pages, charts, POS, see `plan/backlog/backlog.md`), do not
 invent it inside a feature: raise it for the next brief with the `design-brief` skill.
 
 ### Who it is for
