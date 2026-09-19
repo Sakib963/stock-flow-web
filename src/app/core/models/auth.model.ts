@@ -11,12 +11,6 @@ export type LoginFailure = 'credentials' | 'network' | 'server' | 'disabled' | '
  */
 export type RefreshTransport = 'cookie' | 'body';
 
-export interface AuthResponse<T> {
-    code: number;
-    message: string;
-    data: T;
-}
-
 export interface TokenGrant {
     access_token: string;
     expires_in: number;

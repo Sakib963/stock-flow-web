@@ -8,9 +8,9 @@ import { provideTranslateService } from '@ngx-translate/core';
 import { provideTranslateHttpLoader } from '@ngx-translate/http-loader';
 import { routes } from '@app/app-routes/app.routes';
 import { tokenInterceptor } from '@app/core/interceptors/token.interceptor';
-import { LanguageService } from '@app/core/services/language.service';
-import { AuthService } from '@app/core/services/auth.service';
-import { SessionService } from '@app/core/services/session.service';
+import { LanguageService } from '@app/core/services/language/language.service';
+import { AuthService } from '@app/core/services/auth/auth.service';
+import { SessionService } from '@app/core/services/session/session.service';
 
 // No zone.js and no provideZonelessChangeDetection() call: Angular 22 runs zoneless whenever
 // zone.js is absent from the polyfills, which is the default for a v22 application. Components

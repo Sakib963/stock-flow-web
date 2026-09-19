@@ -4,8 +4,8 @@ import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucidePackage, lucideShoppingCart, lucideTruck, lucideUndo2, lucideUsers } from '@ng-icons/lucide';
 import { AppNotification, NotificationCategory } from '@app/core/models/notification.model';
 import { NotificationDay } from '@app/core/models/shell.model';
-import { LanguageService } from '@app/core/services/language.service';
-import { NotificationService } from '@app/core/services/notification.service';
+import { LanguageService } from '@app/core/services/language/language.service';
+import { NotificationService } from '@app/core/services/notification/notification.service';
 import { BadgeComponent } from '@app/layout/components/badge/badge.component';
 
 /** Which lucide icon stands for each kind of alert. Registered in the provider list below. */

@@ -12,10 +12,10 @@ import { SearchPanelComponent } from '@app/layout/components/search-panel/search
 import { SessionsDialogComponent } from '@app/layout/components/sessions-dialog/sessions-dialog.component';
 import { SiderComponent } from '@app/layout/components/sider/sider.component';
 import { ShortcutsDialogComponent } from '@app/layout/components/shortcuts-dialog/shortcuts-dialog.component';
-import { NotificationService } from '@app/core/services/notification.service';
-import { ShellNavService } from '@app/layout/services/shell-nav.service';
-import { ShellSearchService } from '@app/layout/services/shell-search.service';
-import { ShellStateService } from '@app/layout/services/shell-state.service';
+import { NotificationService } from '@app/core/services/notification/notification.service';
+import { ShellNavService } from '@app/layout/services/shell-nav/shell-nav.service';
+import { ShellSearchService } from '@app/layout/services/shell-search/shell-search.service';
+import { ShellStateService } from '@app/layout/services/shell-state/shell-state.service';
 
 /**
  * The application shell: the frame, the phone overlays, and the keys that work anywhere in the app.

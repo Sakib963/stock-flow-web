@@ -1,7 +1,7 @@
 import { Routes } from '@angular/router';
-import { authGuard } from '@app/core/guards/auth.guard';
-import { permissionGuard } from '@app/core/guards/permission.guard';
-import { sessionGuard } from '@app/core/guards/session.guard';
+import { authGuard } from '@app/core/guards/auth/auth.guard';
+import { permissionGuard } from '@app/core/guards/permission/permission.guard';
+import { sessionGuard } from '@app/core/guards/session/session.guard';
 
 // Opening the app lands on '', which redirects by session: into the shell if a token is stored,
 // out to sign-in if not. The boot skeleton in index.html covers the moment before this resolves.
@@ -27,6 +27,10 @@ export const routes: Routes = [
                 canActivate: [permissionGuard],
                 data: { permission: 'dashboard.overview.view' },
                 loadComponent: () => import('@app/modules/dashboard/pages/dashboard/dashboard.component').then((m) => m.DashboardComponent),
+            },
+            {
+                path: 'configuration',
+                loadChildren: () => import('@app/modules/configuration/configuration.routes').then((m) => m.CONFIGURATION_ROUTES),
             },
         ],
     },

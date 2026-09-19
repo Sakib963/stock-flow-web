@@ -1,0 +1,115 @@
+@let col = column();
+@if (col.type === 'component') {
+    <renderer-outlet kind="cell" [renderer]="col.renderer" [bindings]="rendererBindings()" />
+} @else if (empty() && col.type !== 'boolean') {
+    <span class="text-n-400" aria-hidden="true">&middot;</span>
+} @else {
+    @switch (col.type) {
+        @case ('name') {
+            <span class="flex min-w-0 items-center gap-2">
+                @if (thumb(); as src) {
+                    <img [src]="src" alt="" class="size-6 flex-none rounded-sm border border-n-100 object-cover" />
+                }
+                <span class="min-w-0">
+                    @if (openRoute(); as route) {
+                        <a [routerLink]="route" data-truncate class="block truncate font-semibold text-n-900 hover:text-primary" [nz-tooltip]="truncated() ? text() : null" (mouseenter)="measure()" (click)="stopRow($event)">{{ text() }}</a>
+                    } @else {
+                        <span data-truncate class="block truncate font-semibold text-n-900" [nz-tooltip]="truncated() ? text() : null" (mouseenter)="measure()">{{ text() }}</span>
+                    }
+                    @if (sub(); as subline) {
+                        <span class="block truncate text-[11px] text-n-600">{{ subline }}</span>
+                    }
+                </span>
+            </span>
+        }
+        @case ('identifier') {
+            <span class="inline-flex items-center gap-1 whitespace-nowrap">
+                @if (openRoute(); as route) {
+                    <a [routerLink]="route" class="font-mono text-xs text-primary hover:underline" (click)="stopRow($event)">{{ text() }}</a>
+                } @else {
+                    <span class="font-mono text-xs text-n-800">{{ text() }}</span>
+                }
+                @if (col.copy) {
+                    <button type="button" class="sf-icon-btn size-5" [nz-tooltip]="'list.copy' | translate" [attr.aria-label]="'list.copy' | translate" (click)="copy($event)">
+                        <ng-icon name="lucideCopy" size="12px" aria-hidden="true" />
+                    </button>
+                }
+            </span>
+        }
+        @case ('text') {
+            <span data-truncate class="block truncate text-n-600" [nz-tooltip]="truncated() ? text() : null" (mouseenter)="measure()">{{ text() }}</span>
+        }
+        @case ('long-text') {
+            <span data-truncate class="block text-n-600" [class.truncate]="col.lines !== 2" [class.line-clamp-2]="col.lines === 2" [nz-tooltip]="truncated() ? text() : null" (mouseenter)="measure()">{{ text() }}</span>
+        }
+        @case ('number') {
+            <span class="tabular-nums">{{ value() | money: 'number' }}</span>
+        }
+        @case ('quantity') {
+            <span class="tabular-nums">{{ value() | money: 'number' }}</span>
+        }
+        @case ('percent') {
+            <span class="tabular-nums">{{ value() | money: 'number' }}%</span>
+        }
+        @case ('money') {
+            <span class="font-bold tabular-nums" [class.text-danger-ink]="moneyInk()" [class.text-n-900]="!moneyInk()">{{ value() | money }}</span>
+        }
+        @case ('stock') {
+            @if (stock(); as s) {
+                <span class="block leading-tight">
+                    <span class="font-semibold tabular-nums" [class]="s.ink">{{ value() | money: 'number' }}</span>
+                    @if (s.key) {
+                        <span class="block text-[11px]" [class]="s.key === 'list.stock.restockAt' ? 'text-n-600' : s.ink">{{ s.key | translate: { level: s.level } }}</span>
+                    }
+                </span>
+            }
+        }
+        @case ('date') {
+            <span class="whitespace-nowrap tabular-nums text-n-600">{{ value() | recordDate: language() : { time: col.time, relative: col.relative } }}</span>
+        }
+        @case ('status') {
+            @if (tone(); as t) {
+                <status-tag [label]="t.style.label" [tone]="t.style.tone" [icon]="t.style.icon" />
+            }
+        }
+        @case ('dot') {
+            @if (tone(); as t) {
+                <span class="inline-flex items-center gap-1.5 whitespace-nowrap text-n-600">
+                    <span class="size-1.5 flex-none rounded-full" [class]="dotClass()" aria-hidden="true"></span>
+                    {{ t.style.label | text }}
+                </span>
+            }
+        }
+        @case ('boolean') {
+            <span class="text-n-600">{{ (value() ? col.yes : col.no) | text }}</span>
+        }
+        @case ('phone') {
+            <span class="whitespace-nowrap tabular-nums text-n-600">{{ text() }}</span>
+        }
+        @case ('person') {
+            <span class="block min-w-0">
+                <span data-truncate class="block truncate text-n-800" [nz-tooltip]="truncated() ? text() : null" (mouseenter)="measure()">{{ text() }}</span>
+                @if (sub(); as subline) {
+                    <span class="block truncate text-[11px] text-n-600">{{ subline }}</span>
+                }
+            </span>
+        }
+        @case ('tags') {
+            <span class="flex flex-wrap gap-1">
+                @for (tag of tags(); track $index) {
+                    <status-tag [label]="tag.label" [tone]="tag.tone" [icon]="tag.icon" />
+                }
+            </span>
+        }
+        @case ('image') {
+            <img [src]="text()" alt="" class="size-6 rounded-sm border border-n-100 object-cover" />
+        }
+        @case ('link') {
+            @if (linkRoute(); as route) {
+                <a [routerLink]="route" class="text-primary hover:underline" (click)="stopRow($event)">{{ linkText() }}</a>
+            } @else {
+                <span class="text-n-600">{{ linkText() }}</span>
+            }
+        }
+    }
+}

@@ -1,0 +1,34 @@
+<nz-table [nzData]="rows()" [nzFrontPagination]="false" [nzShowPagination]="false" [nzSize]="size()" [nzScroll]="scroll()" nzTableLayout="fixed" [nzNoResult]="' '">
+    <thead>
+        <tr cdkDropList cdkDropListOrientation="horizontal" [cdkDropListDisabled]="!canReorder()" (cdkDropListDropped)="onDrop($event)">
+            @for (column of columns(); track column.key) {
+                <th [nzWidth]="width(column)" [nzAlign]="align(column)" [nzColumnKey]="column.key" [nzShowSort]="!!column.sortable" [nzSortFn]="!!column.sortable" [nzSortOrder]="sortOrder(column)" (nzSortOrderChange)="onSort(column, $event)" cdkDrag [cdkDragDisabled]="!isMovable(column)" [class.cursor-grab]="isMovable(column)">
+                    {{ column.label | text }}
+                </th>
+            }
+        </tr>
+    </thead>
+    <tbody>
+        @if (loading()) {
+            @for (i of skeleton(); track i) {
+                <tr data-table="skeleton-row">
+                    @for (column of columns(); track column.key) {
+                        <td [nzAlign]="align(column)">
+                            <nz-skeleton [nzActive]="true" [nzTitle]="{ width: '72%' }" [nzParagraph]="false" class="sf-cell-skeleton" />
+                        </td>
+                    }
+                </tr>
+            }
+        } @else {
+            @for (row of rows(); track idOf(row)) {
+                <tr class="odd:[&>td]:bg-row-zebra hover:[&>td]:bg-primary-wash" [class.cursor-pointer]="!!openRoute()" data-table="row" (click)="onRowClick(row, $event)">
+                    @for (column of columns(); track column.key) {
+                        <td [nzAlign]="align(column)">
+                            <table-cell [column]="column" [row]="row" [openRoute]="routeFor(row)" [where]="where()" />
+                        </td>
+                    }
+                </tr>
+            }
+        }
+    </tbody>
+</nz-table>

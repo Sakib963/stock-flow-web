@@ -7,12 +7,12 @@ import { provideNzI18n, en_US } from 'ng-zorro-antd/i18n';
 import { provideTranslateService } from '@ngx-translate/core';
 import { APIEndpoint } from '@app/core/constants/api-endpoint';
 import { MenuItem, SessionPayload } from '@app/core/models/session.model';
-import { NotificationService } from '@app/core/services/notification.service';
-import { SessionService } from '@app/core/services/session.service';
-import { LanguageService } from '@app/core/services/language.service';
-import { ShellNavService } from '@app/layout/services/shell-nav.service';
-import { ShellSearchService } from '@app/layout/services/shell-search.service';
-import { ShellStateService } from '@app/layout/services/shell-state.service';
+import { NotificationService } from '@app/core/services/notification/notification.service';
+import { SessionService } from '@app/core/services/session/session.service';
+import { LanguageService } from '@app/core/services/language/language.service';
+import { ShellNavService } from '@app/layout/services/shell-nav/shell-nav.service';
+import { ShellSearchService } from '@app/layout/services/shell-search/shell-search.service';
+import { ShellStateService } from '@app/layout/services/shell-state/shell-state.service';
 import { LayoutComponent } from './layout.component';
 
 /**

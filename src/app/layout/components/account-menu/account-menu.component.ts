@@ -6,11 +6,11 @@ import { NzTooltipModule } from 'ng-zorro-antd/tooltip';
 import { TranslatePipe } from '@ngx-translate/core';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideCircleUser, lucideGlobe, lucideKeyRound, lucideKeyboard, lucideLogOut, lucideMonitorSmartphone } from '@ng-icons/lucide';
-import { AuthService } from '@app/core/services/auth.service';
-import { LanguageService } from '@app/core/services/language.service';
-import { SessionService } from '@app/core/services/session.service';
+import { AuthService } from '@app/core/services/auth/auth.service';
+import { LanguageService } from '@app/core/services/language/language.service';
+import { SessionService } from '@app/core/services/session/session.service';
 import { BadgeComponent } from '@app/layout/components/badge/badge.component';
-import { ShellStateService } from '@app/layout/services/shell-state.service';
+import { ShellStateService } from '@app/layout/services/shell-state/shell-state.service';
 
 /** The body of the right-hand drawer: who is signed in, the language switch, and the ways out. */
 @Component({

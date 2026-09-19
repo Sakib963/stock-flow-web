@@ -2,7 +2,8 @@ import { ChangeDetectionStrategy, Component, inject, input } from '@angular/core
 import { TranslatePipe } from '@ngx-translate/core';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideLanguages, lucideShieldCheck } from '@ng-icons/lucide';
-import { AppLanguage, LanguageService } from '@app/core/services/language.service';
+import { AppLanguage } from '@app/core/models/language.model';
+import { LanguageService } from '@app/core/services/language/language.service';
 
 /**
  * The frame every auth screen sits in: the indigo identity panel, the ruled form column, and the

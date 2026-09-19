@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { TranslatePipe } from '@ngx-translate/core';
 import { PageHeaderComponent } from '@app/shared/components/page-header/page-header.component';
-import { SessionService } from '@app/core/services/session.service';
+import { SessionService } from '@app/core/services/session/session.service';
 
 /**
  * The landing screen.

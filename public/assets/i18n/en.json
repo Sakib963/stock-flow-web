@@ -173,7 +173,8 @@
         "soonReason": "This part is not built yet. It will open here as soon as it is ready.",
         "language": "Language",
         "openMenu": "Open menu",
-        "closeMenu": "Close menu"
+        "closeMenu": "Close menu",
+        "home": "Home"
     },
     "dashboard": {
         "title": "Dashboard",
@@ -183,5 +184,47 @@
         "noData": "No data yet",
         "accessTitle": "What this account can reach",
         "accessBody": "Sections come from the server, already filtered by role. A narrower role sees fewer."
+    },
+    "list": {
+        "back": "Back",
+        "moreActions": "More actions",
+        "retry": "Try again",
+        "rendererFailed": "This view could not load. Your filters are kept.",
+        "loading": "Loading the list",
+        "range": "{{from}}–{{to}} of {{total}}",
+        "noMatchTitle": "Nothing matches these filters",
+        "noMatchBody": "Clear one of them and the list comes back.",
+        "errorTitle": "Could not load the list",
+        "networkBody": "Check the internet connection, then try again. Your filters and page are kept.",
+        "serverBody": "Something went wrong on our side. Try again in a moment. Your filters and page are kept.",
+        "forbiddenTitle": "You cannot see this list",
+        "forbiddenBody": "Your role does not include it. Ask the business admin if you need it.",
+        "copy": "Copy",
+        "copied": "Copied",
+        "copyFailed": "Could not copy. Select the text and copy it instead.",
+        "columns": "Columns",
+        "resetColumns": "Reset",
+        "reorderHint": "Drag to reorder, or hold Alt and press the up or down arrow.",
+        "columnFixed": "Fixed",
+        "columnMoved": "{{column}} moved to position {{position}} of {{total}}",
+        "stock": {
+            "out": "Out of stock",
+            "below": "Below {{level}}",
+            "restockAt": "Restock at {{level}}"
+        }
+    },
+    "configuration": {
+        "category": {
+            "code": "Code",
+            "name": "Category",
+            "created": "Added",
+            "status": {
+                "label": "Status",
+                "active": "Active",
+                "inactive": "Inactive"
+            },
+            "emptyTitle": "No categories yet",
+            "emptyBody": "Categories group the products you sell, so stock and reports can be read by group."
+        }
     }
 }

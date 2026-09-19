@@ -23,19 +23,34 @@ structure or UI. The one exception is the list page config, whose contract lives
 | Where | What |
 | --- | --- |
 | `src/app/core/` | Cross-cutting: `constants/`, `models/`, `guards/`, `interceptors/`, `services/` |
-| `src/app/modules/<feature>/` | A feature: `pages/`, `components/`, `services/`, `<feature>.routes.ts` |
+| `src/app/modules/<feature>/` | A feature: `pages/`, `components/`, `services/`, `config/`, `<feature>.routes.ts` |
 | `src/app/shared/` | Components used by more than one feature (`page-header`) |
 | `src/app/layout/` | The shell: sider, header bar, panels, `constants/`, `services/` |
 | `src/app/app-routes/app.routes.ts` | The map of the app. A feature owns its own routes file |
 | `public/assets/i18n/en.json`, `bn.json` | The only translation files loaded. The subfolders beside them are from the old app |
 | `tools/` | `check-utilities.js`, `check-tokens.js`, `verify-values.js`, and `cdp.mjs` for driving Chrome |
 
-- **Nothing loose at a folder root, and every file in a folder that says what it is.** A file with a
-  spec beside it gets its own directory holding both (`app-config/app.config.ts` +
-  `app-config/app.config.spec.ts`). A file already inside a directory that names its kind does not
-  need a second one: `core/services/auth.service.ts` and its spec sit together in `services/`.
-  Constants, models and helpers live under `constants/`, `models/` or `utils/`, never at a module
-  root: the shell's icon registry is `layout/constants/shell-icons.ts`.
+- **Nothing loose at a folder root.** Constants, models and helpers live under `constants/`,
+  `models/` or `utils/`, never at a module root: the shell's icon registry is
+  `layout/constants/shell-icons.ts`.
+- **One unit per directory, as soon as a kind folder holds more than one unit.** A kind folder is
+  `pipes/`, `services/`, `guards/`, `interceptors/`, `utils/`, `config/`, `components/`, `pages/`.
+  A *unit* is one pipe, service, guard, util, page config or component, with everything that belongs
+  to it: its spec, and a component's `.html` and `.scss`.
+  - **One unit in the folder: leave it flat.** `modules/auth/services/recovery.service.ts` is the
+    only service there, so it needs no folder of its own.
+  - **Two or more: every one of them gets a folder**, named for the unit without the kind suffix,
+    and nothing stays loose beside them. `shared/pipes/money/money.pipe.ts` +
+    `money.pipe.spec.ts`, `core/guards/auth/auth.guard.ts`, `shared/utils/tone-map/tone-map.ts`,
+    `modules/configuration/config/category-list/category-list.config.ts`.
+  - Adding the second unit to a flat folder is what triggers the split, and moving the first one is
+    part of that change, not a later tidy-up.
+  - **A unit that owns private children keeps them in its own `components/`**, which is then a kind
+    folder like any other: `shared/components/table/table.component.ts` with
+    `table/components/table-cell/`, `table-layout/` and `column-picker/` beside it. They stay there
+    rather than moving up to `shared/components/`, because nothing outside the table may use them.
+  - `core/models/` and `constants/` are the exception: one declaration file each, never a spec or a
+    second file, so a folder around each would hold exactly one file.
 - **Types live in `core/models/*.model.ts`**, never inside the service that fetches them. A payload
   shape is consumed by guards, the shell and pages; importing a service to describe a shape couples
   them for no reason. There is no `core/interfaces/`.

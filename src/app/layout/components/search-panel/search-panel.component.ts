@@ -7,9 +7,9 @@ import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideArrowDown, lucideArrowUp, lucideCommand, lucideCornerDownLeft, lucideSearch, lucideX } from '@ng-icons/lucide';
 import { MENU_ICON_FALLBACK, SHELL_MENU_ICONS } from '@app/layout/constants/shell-icons';
 import { BadgeComponent } from '@app/layout/components/badge/badge.component';
-import { ShellNavService } from '@app/layout/services/shell-nav.service';
-import { ShellSearchService } from '@app/layout/services/shell-search.service';
-import { ShellStateService } from '@app/layout/services/shell-state.service';
+import { ShellNavService } from '@app/layout/services/shell-nav/shell-nav.service';
+import { ShellSearchService } from '@app/layout/services/shell-search/shell-search.service';
+import { ShellStateService } from '@app/layout/services/shell-state/shell-state.service';
 
 /**
  * The header search: the field, and the results hanging off it.

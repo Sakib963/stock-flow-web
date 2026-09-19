@@ -1,11 +1,69 @@
-<header class="page-header">
-    <div>
-        <h1 class="page-header__title">{{ title() }}</h1>
-        @if (subtitle()) {
-            <p class="page-header__subtitle">{{ subtitle() }}</p>
+<header class="-mx-4 -mt-4 mb-4 border-b border-n-200 bg-white px-4 pt-3 shadow-2xs md:-mx-7 md:-mt-6 md:mb-6 md:px-7">
+    @if (crumbs().length) {
+        <nz-breadcrumb nzSeparator="/" class="text-xs max-md:hidden" data-page-header="breadcrumb">
+            @for (crumb of crumbs(); track $index; let last = $last) {
+                <nz-breadcrumb-item>
+                    @if (crumb.route && !last) {
+                        <a [routerLink]="crumb.route">{{ crumb.label | text }}</a>
+                    } @else {
+                        <span [class.font-semibold]="last" [class.text-n-800]="last">{{ crumb.label | text }}</span>
+                    }
+                </nz-breadcrumb-item>
+            }
+        </nz-breadcrumb>
+
+        @if (backCrumb(); as crumb) {
+            <a class="inline-flex items-center gap-1 text-xs font-semibold text-n-600 hover:text-primary md:hidden" [routerLink]="crumb.route" data-page-header="back-link">
+                <ng-icon name="lucideChevronLeft" size="14px" aria-hidden="true" />
+                {{ crumb.label | text }}
+            </a>
         }
-    </div>
-    <div class="page-header__actions">
-        <ng-content />
+    }
+
+    <div class="flex flex-wrap items-start justify-between gap-x-4.5 gap-y-2 pt-1 pb-3">
+        <div class="flex min-w-0 flex-wrap items-center gap-x-2.25 gap-y-0.75">
+            @if (back()) {
+                <button nz-button nzType="text" type="button" class="inline-flex items-center justify-center" [nz-tooltip]="'list.back' | translate" [attr.aria-label]="'list.back' | translate" (click)="goBack()">
+                    <ng-icon name="lucideChevronLeft" size="16px" aria-hidden="true" />
+                </button>
+            }
+            <h1 class="m-0 text-[21px] leading-[1.3] font-extrabold tracking-[-0.015em] text-n-900 max-md:text-lg">{{ heading() | text }}</h1>
+            @if (showCount()) {
+                <span class="rounded-full bg-n-100 px-2 py-0.5 font-mono text-xs font-semibold text-n-600 tabular-nums" data-page-header="count">{{ count() | money: 'number' }}</span>
+            }
+            <ng-content select="[pageHeaderStatus]" />
+            @if (leadText(); as leadCopy) {
+                <p class="m-0 basis-full text-xs text-n-600 max-md:hidden" data-page-header="lead">{{ leadCopy | text }}</p>
+            }
+        </div>
+
+        <div class="flex flex-none items-center gap-2 max-md:w-full max-md:flex-wrap">
+            <ng-content />
+            @for (item of visibleActions(); track item.key) {
+                <button nz-button [nzType]="item.primary ? 'primary' : 'default'" type="button" class="inline-flex items-center gap-1.5" [attr.data-action]="item.key" (click)="run(item)">
+                    @if (iconOf(item); as icon) {
+                        <ng-icon [name]="icon" size="14px" aria-hidden="true" />
+                    }
+                    <span>{{ item.label | text }}</span>
+                </button>
+            }
+            @if (overflowActions().length) {
+                <button nz-button type="button" class="inline-flex items-center justify-center" nz-dropdown nzTrigger="click" nzPlacement="bottomRight" [nzDropdownMenu]="more" [nz-tooltip]="'list.moreActions' | translate" [attr.aria-label]="'list.moreActions' | translate">
+                    <ng-icon name="lucideEllipsis" size="14px" aria-hidden="true" />
+                </button>
+                <nz-dropdown-menu #more="nzDropdownMenu">
+                    <ul nz-menu>
+                        @for (item of overflowActions(); track item.key) {
+                            <li nz-menu-item [attr.data-action]="item.key" (click)="run(item)">
+                                @if (iconOf(item); as icon) {
+                                    <ng-icon [name]="icon" size="14px" class="mr-2 align-middle" aria-hidden="true" />
+                                }
+                                {{ item.label | text }}
+                            </li>
+                        }
+                    </ul>
+                </nz-dropdown-menu>
+            }
+        </div>
     </div>
 </header>

@@ -9,7 +9,7 @@ import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideArrowRight, lucideEye, lucideEyeOff, lucideLock, lucideMail } from '@ng-icons/lucide';
-import { AuthService } from '@app/core/services/auth.service';
+import { AuthService } from '@app/core/services/auth/auth.service';
 import { LoginFailure } from '@app/core/models/auth.model';
 import { AuthShellComponent } from '@app/modules/auth/components/auth-shell/auth-shell.component';
 import { Constants } from '@app/core/constants/constants';

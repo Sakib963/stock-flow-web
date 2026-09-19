@@ -7,7 +7,7 @@ import { NzMessageService } from 'ng-zorro-antd/message';
 import { provideTranslateService } from '@ngx-translate/core';
 import { APIEndpoint } from '@app/core/constants/api-endpoint';
 import { ActiveSession } from '@app/core/models/auth.model';
-import { LanguageService } from '@app/core/services/language.service';
+import { LanguageService } from '@app/core/services/language/language.service';
 import { SessionsDialogComponent } from './sessions-dialog.component';
 
 const minutesAgo = (n: number) => new Date(Date.now() - n * 60_000).toISOString();

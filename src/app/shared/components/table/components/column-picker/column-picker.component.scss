@@ -1,0 +1,24 @@
+// The CDK's own drag classes: a preview element that leaves the list, and a placeholder that stays
+// behind. Neither is reachable from a Tailwind utility, because the CDK adds them at drag time.
+.cdk-drag-preview {
+    border-radius: 6px;
+    background: var(--color-white);
+    box-shadow: var(--shadow-panel);
+    opacity: 0.95;
+}
+
+.cdk-drag-placeholder {
+    opacity: 0.35;
+}
+
+.cdk-drag-animating,
+.picker-row:not(.cdk-drag-dragging) {
+    transition: transform 0.2s cubic-bezier(0.215, 0.61, 0.355, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .cdk-drag-animating,
+    .picker-row:not(.cdk-drag-dragging) {
+        transition: none;
+    }
+}

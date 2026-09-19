@@ -4,10 +4,10 @@ import { NzTooltipModule } from 'ng-zorro-antd/tooltip';
 import { TranslatePipe } from '@ngx-translate/core';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideBell, lucideChevronDown, lucideMenu, lucidePanelLeftClose, lucidePanelLeftOpen, lucideSearch, lucideStickyNote } from '@ng-icons/lucide';
-import { SessionService } from '@app/core/services/session.service';
-import { NotificationService } from '@app/core/services/notification.service';
+import { SessionService } from '@app/core/services/session/session.service';
+import { NotificationService } from '@app/core/services/notification/notification.service';
 import { SearchPanelComponent } from '@app/layout/components/search-panel/search-panel.component';
-import { ShellStateService } from '@app/layout/services/shell-state.service';
+import { ShellStateService } from '@app/layout/services/shell-state/shell-state.service';
 
 /**
  * The header bar: the brand block, the collapse control, and the triggers on the right.

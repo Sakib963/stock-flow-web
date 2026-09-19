@@ -7,7 +7,7 @@ import { routes } from './app.routes';
 import { APIEndpoint } from '@app/core/constants/api-endpoint';
 import { Constants } from '@app/core/constants/constants';
 import { SessionPayload } from '@app/core/models/session.model';
-import { AuthService } from '@app/core/services/auth.service';
+import { AuthService } from '@app/core/services/auth/auth.service';
 
 const payload = (permissions: string[]): SessionPayload => ({
     version: 'v1',

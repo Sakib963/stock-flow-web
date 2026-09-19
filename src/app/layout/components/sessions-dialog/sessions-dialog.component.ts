@@ -11,9 +11,9 @@ import { NzTagModule } from 'ng-zorro-antd/tag';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideMonitor, lucideSmartphone, lucideTablet } from '@ng-icons/lucide';
 import { ActiveSession } from '@app/core/models/auth.model';
-import { AuthService } from '@app/core/services/auth.service';
-import { LanguageService } from '@app/core/services/language.service';
-import { SessionService } from '@app/core/services/session.service';
+import { AuthService } from '@app/core/services/auth/auth.service';
+import { LanguageService } from '@app/core/services/language/language.service';
+import { SessionService } from '@app/core/services/session/session.service';
 
 const ICONS: Record<ActiveSession['device']['type'], string> = { desktop: 'lucideMonitor', phone: 'lucideSmartphone', tablet: 'lucideTablet' };
 

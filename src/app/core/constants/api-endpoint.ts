@@ -1,5 +1,5 @@
 // Every endpoint the app calls lives here. No inline URLs in services or components.
-// Only the auth routes are listed so far; the rest arrive with the features that use them.
+// Endpoints arrive with the features that use them.
 export class APIEndpoint {
     static readonly SIGN_IN = '/api/v1/auth/sign-in';
     static readonly SIGN_OUT = '/api/v1/auth/sign-out';
@@ -12,4 +12,7 @@ export class APIEndpoint {
     // no token, so the token interceptor must not attach one or expect a 401 to mean expiry.
     static readonly FORGOT_PASSWORD = '/api/v1/auth/forgot-password';
     static readonly RESET_PASSWORD = '/api/v1/auth/reset-password';
+
+    // Configuration
+    static readonly GET_CATEGORY_LIST = '/api/v1/configuration/category/get-category-list';
 }

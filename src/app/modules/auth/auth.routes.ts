@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { guestGuard } from '@app/core/guards/auth.guard';
+import { guestGuard } from '@app/core/guards/auth/auth.guard';
 
 /**
  * Everything under /auth. Kept with the module rather than in app.routes.ts so the feature owns
