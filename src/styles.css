@@ -50,6 +50,16 @@
     --color-warning-bg: #fdf4e3;
     --color-warning-border: #f3e2c0;
 
+    /* Ink on a status tint, from the records handoff: the bright status colours above are too light
+       to read as 11px text on their own -bg. In flight is the brand tint, not a fifth colour. */
+    --color-success-ink: #0c5d35;
+    --color-warning-ink: #a15c07;
+    --color-danger-ink: #a81e14;
+    --color-progress-border: #c6bff3;
+
+    /* Odd list rows. Paler than n-50, so zebra striping guides the eye without reading as a fill. */
+    --color-row-zebra: #fcfcfd;
+
     /* Shell, from Design/design_handoff_shell §8. These lived in a second Sass token sheet inside
        the layout folder, which meant the indigo ramp above had a duplicate that nothing kept in
        step. The application frame is the only thing that should reach for them: a page that needs
@@ -170,6 +180,12 @@ body.lang-bn {
 }
 .sf-flyout .ant-popover-inner-content {
     padding: 0;
+}
+
+/* Lists, from the records handoff. A skeleton bar the height of a line of 13px text, so skeleton rows are exactly as tall as real ones. */
+.sf-cell-skeleton .ant-skeleton-title {
+    height: 12px;
+    margin: 0;
 }
 
 /* Shell utilities.
