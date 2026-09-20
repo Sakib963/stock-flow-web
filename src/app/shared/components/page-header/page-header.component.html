@@ -32,7 +32,10 @@
             }
             <h1 class="m-0 text-[21px] leading-[1.3] font-extrabold tracking-[-0.015em] text-ink max-md:text-lg">{{ heading() | text }}</h1>
             @if (showCount()) {
-                <span class="rounded-full bg-line-soft px-2 py-0.5 font-mono text-xs font-semibold text-ink-muted tabular-nums" data-page-header="count">{{ count() | money: 'number' }}</span>
+                <span class="rounded-full bg-line-soft px-2 py-0.5 font-mono text-xs font-semibold text-ink-muted transition-opacity tabular-nums" [class.opacity-55]="countStale()" data-page-header="count">{{ count() | money: 'number' }}</span>
+            } @else if (showCountPlaceholder()) {
+                <!-- Decorative: the table below already carries the progressbar that announces the load. -->
+                <span class="inline-block h-5 w-10 animate-pulse rounded-full bg-line-soft align-middle motion-reduce:animate-none" data-page-header="count-placeholder" aria-hidden="true"></span>
             }
             <ng-content select="[pageHeaderStatus]" />
             @if (leadText(); as leadCopy) {

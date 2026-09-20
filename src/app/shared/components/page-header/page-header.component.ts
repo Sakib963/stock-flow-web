@@ -54,6 +54,8 @@ export class PageHeaderComponent {
     readonly lead = input<Text | null>(null);
     /** The list total, shown when the config asks for a count. Null while it is not known. */
     readonly count = input<number | null>(null);
+    /** A request for the count is in flight. Tells an unknown count apart from a failed one. */
+    readonly countPending = input(false);
 
     readonly action = output<ActionEvent>();
 
@@ -76,7 +78,19 @@ export class PageHeaderComponent {
         return description?.en ? { en: description.en, bn: description.bn ?? description.en } : null;
     });
 
-    readonly showCount = computed(() => !!this.config()?.count && this.count() !== null);
+    private readonly _wantsCount = computed(() => !!this.config()?.count);
+
+    readonly showCount = computed(() => this._wantsCount() && this.count() !== null);
+
+    /**
+     * A count that has not arrived holds its place instead of appearing from nowhere and shoving the
+     * title's neighbours sideways. It is a placeholder only while a request is running: a count the
+     * page failed to load would otherwise pulse for ever, promising a number that is not coming.
+     */
+    readonly showCountPlaceholder = computed(() => this._wantsCount() && this.count() === null && this.countPending());
+
+    /** A known count with a newer one in flight, so the number on screen is about to change. */
+    readonly countStale = computed(() => this.showCount() && this.countPending());
 
     readonly crumbs = computed<readonly Crumb[]>(() => {
         const setting = this.config()?.breadcrumb ?? 'menu';

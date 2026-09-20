@@ -1,6 +1,7 @@
 // What is left of the rail's styling after the utilities took the rest: the markers drawn as
-// pseudo-elements, the accordion, and the scrollbar. All four are on the carve-out list, and all
-// four are there for the same reason: there is no element to hang a utility class on.
+// pseudo-elements and the accordion. Both are on the carve-out list, and both are there for the
+// same reason: there is no element to hang a utility class on. The rail no longer styles its own
+// scrollbar; it inherits the one styles.css sets for the whole app.
 //
 // Per Design/design_handoff_shell §2.
 
@@ -131,13 +132,6 @@
 
 .shell__nav--child.is-disabled::before {
     background: #ded9f4;
-}
-
-/* Scrollbar ---------------------------------------------------------------- */
-
-.shell__nav-list {
-    scrollbar-color: #d5cff1 transparent;
-    scrollbar-width: thin;
 }
 
 /* Reduced motion ----------------------------------------------------------- */

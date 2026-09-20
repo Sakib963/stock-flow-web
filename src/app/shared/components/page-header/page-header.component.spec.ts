@@ -31,7 +31,7 @@ const menu: MenuItem[] = [
     leaf('dashboard', '/app/dashboard'),
     leaf('configuration', null, {
         label: { en: 'Configuration', bn: 'কনফিগারেশন' },
-        children: [leaf('categories', '/app/configuration/categories', { label: { en: 'Categories', bn: 'ক্যাটাগরি' }, description: { en: 'How products are grouped.', bn: 'পণ্য কীভাবে ভাগ করা আছে।' } })],
+        children: [leaf('categories', '/app/configuration/categories', { label: { en: 'Categories', bn: 'ক্যাটাগরি' }, description: { en: 'Create the product groups, like Saree or Cosmetics, that every product is filed under.', bn: 'পণ্যের ক্যাটাগরি তৈরি করুন, যেমন শাড়ি বা কসমেটিকস, প্রতিটি পণ্য যার নিচে থাকে।' } })],
     }),
 ];
 
@@ -72,7 +72,7 @@ describe('PageHeaderComponent', () => {
         const { el } = await render([]);
 
         expect(el.querySelector('h1')?.textContent?.trim()).toBe('Categories');
-        expect(el.querySelector('[data-page-header="lead"]')?.textContent?.trim()).toBe('How products are grouped.');
+        expect(el.querySelector('[data-page-header="lead"]')?.textContent?.trim()).toBe('Create the product groups, like Saree or Cosmetics, that every product is filed under.');
         const crumbs = el.querySelector('[data-page-header="breadcrumb"]')?.textContent ?? '';
         expect(crumbs).toContain('Configuration');
         expect(crumbs).toContain('Categories');
@@ -108,6 +108,29 @@ describe('PageHeaderComponent', () => {
         TestBed.resetTestingModule();
         const unknown = await render([], { config: HEADER, count: null });
         expect(unknown.el.querySelector('[data-page-header="count"]')).toBeNull();
+    });
+
+    it('holds the count place with a placeholder while the list is loading', async () => {
+        const { el } = await render([], { config: HEADER, count: null, countPending: true });
+
+        expect(el.querySelector('[data-page-header="count"]')).toBeNull();
+        expect(el.querySelector('[data-page-header="count-placeholder"]')).not.toBeNull();
+    });
+
+    it('leaves the count out entirely when nothing is loading, so a failed load does not pulse for ever', async () => {
+        const { el } = await render([], { config: HEADER, count: null, countPending: false });
+
+        expect(el.querySelector('[data-page-header="count"]')).toBeNull();
+        expect(el.querySelector('[data-page-header="count-placeholder"]')).toBeNull();
+    });
+
+    it('dims the count it already has while a newer one is on the way, instead of swapping it for a placeholder', async () => {
+        const { el } = await render([], { config: HEADER, count: 1250, countPending: true });
+
+        const count = el.querySelector('[data-page-header="count"]');
+        expect(count?.textContent?.trim()).toBe('1,250');
+        expect(count?.classList).toContain('opacity-55');
+        expect(el.querySelector('[data-page-header="count-placeholder"]')).toBeNull();
     });
 
     it('opens a navigate action itself and hands any other kind to the page', async () => {

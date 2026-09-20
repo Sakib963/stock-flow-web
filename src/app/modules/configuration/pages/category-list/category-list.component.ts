@@ -20,4 +20,11 @@ export class CategoryListComponent {
     private readonly _table = viewChild(TableComponent);
     // The store, not the table's own view of it: the header binds before the table has its config.
     readonly total = computed(() => this._table()?.store.total() ?? null);
+
+    // Before the view exists there is no store to ask, and a list always starts by loading, so the
+    // header shows the placeholder from the first frame rather than one change detection later.
+    readonly countPending = computed(() => {
+        const state = this._table()?.store.state() ?? 'loading';
+        return state === 'loading' || state === 'refreshing';
+    });
 }

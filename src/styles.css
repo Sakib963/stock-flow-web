@@ -147,6 +147,48 @@ body.lang-bn {
     line-height: 1.7;
 }
 
+/* Scrollbars.
+
+   The default bar is operating system chrome: grey, chunky, arrow-capped, and different on every
+   machine, so the app looks like it ends wherever something scrolls. A 2px indigo line with no
+   track and no buttons keeps it part of the app instead.
+
+   At 2px this is an indicator, not a handle: it says where you are in the list, and scrolling is
+   done with the wheel, the trackpad or the keyboard, all of which are untouched. Nobody was
+   dragging a thin bar anyway.
+
+   primary-soft, not primary-6: this line stands next to data all day, and the interactive indigo
+   at full strength reads as something to click.
+
+   Why it is written twice. `scrollbar-width` takes only auto, thin or none, so an exact width has
+   to come from the WebKit pseudo-elements, and Chromium ignores those on any element that sets
+   `scrollbar-width` or `scrollbar-color`. Setting both would therefore throw the 2px away. The
+   standard properties are scoped to the one engine that has no pseudo-element scrollbars, where
+   `thin` is the closest it offers. */
+::-webkit-scrollbar {
+    width: 4px;
+    height: 2px;
+}
+::-webkit-scrollbar-track,
+::-webkit-scrollbar-corner {
+    background: var(--color-primary-soft);
+}
+::-webkit-scrollbar-thumb {
+    background: var(--color-primary);
+    border-radius: 2px;
+}
+/* The stepper arrows at each end. */
+::-webkit-scrollbar-button {
+    display: none;
+}
+
+@supports (scrollbar-width: thin) and (not selector(::-webkit-scrollbar)) {
+    html {
+        scrollbar-width: thin;
+        scrollbar-color: var(--color-primary-soft) transparent;
+    }
+}
+
 /* One focus ring for the whole app. Never removed, only restyled. */
 :where(a, button, input, select, textarea, [tabindex]):focus-visible {
     outline: none;
