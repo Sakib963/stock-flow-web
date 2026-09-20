@@ -63,15 +63,70 @@ export class SiderComponent {
 
         // Present but not usable. Still legible: greying it into illegibility is the same as
         // hiding it, and this person is allowed to reach it, just not yet.
-        if (item.isDisabled) return `${width} is-disabled cursor-not-allowed text-n-500`;
+        if (item.isDisabled) return `${width} is-disabled cursor-not-allowed text-ink-soft`;
 
-        const open = this.nav.isOpen(item.id) && item.children.length ? 'bg-primary-open' : '';
-        return `${width} ${open} text-n-800 hover:bg-primary-tint hover:text-n-900`.trim();
+        return `${width} text-ink-body hover:bg-primary-tint hover:text-ink`;
+    }
+
+    /**
+     * The ground an open group stands on, carrying the header and its children together.
+     *
+     * A collapsed rail gets none of it: its children are in the flyout, so a tinted block would
+     * mark a group that shows nothing.
+     */
+    groupClasses(item: MenuItem): string {
+        return this.isExpanded(item) ? 'bg-primary-open' : '';
+    }
+
+    /** Open as the person sees it: a collapsed rail shows a group's children in the flyout, so its
+     *  stored open state says nothing about the rail. */
+    isExpanded(item: MenuItem): boolean {
+        return this.nav.isOpen(item.id) && !this.state.railCollapsed();
+    }
+
+    /**
+     * The group header. It differs from `railClasses` in where the margin sits: the header spans
+     * its group's ground, which is what carries the inset from the rail edge.
+     */
+    groupRowClasses(item: MenuItem): string {
+        const width = this.state.railCollapsed() ? 'justify-center px-0' : 'pr-2.5 pl-3';
+
+        if (item.isDisabled) return `${width} is-disabled cursor-not-allowed text-ink-soft`;
+
+        // A collapsed rail is icons only, with the children behind a flyout, so nothing else on it says
+        // which section the page belongs to. The row takes the ground the open block would have given it.
+        if (this.state.railCollapsed() && this.holdsActive(item)) return `${width} bg-primary-open text-primary`;
+
+        // No fill of its own once the group is open: it already sits on the group's ground, and a
+        // second fill on top of it would read as the selected page rather than the open section.
+        if (this.isExpanded(item)) return `${width} text-primary hover:bg-primary-tint`;
+
+        // A shut group holding the page being shown says so with the gutter bar in the stylesheet, not
+        // with a fill: two groups wearing the open block's ground reads as two open sections.
+        return `${width} text-ink-body hover:bg-primary-tint hover:text-ink`;
+    }
+
+    groupIconClasses(item: MenuItem): string {
+        return this.isExpanded(item) || (this.state.railCollapsed() && this.holdsActive(item)) ? 'text-primary' : 'text-sider-icon';
+    }
+
+    private holdsActive(item: MenuItem): boolean {
+        return this.nav.activeGroup() === item.id;
+    }
+
+    groupChevronClasses(item: MenuItem): string {
+        return this.nav.isOpen(item.id) ? 'rotate-0 text-primary' : '-rotate-90 text-ink-faint';
+    }
+
+    /** A group holding something the person has not seen yet. Its children carry the New badge, but a
+     *  shut group hides them, so the header has to say it on their behalf. */
+    hasNewChild(item: MenuItem): boolean {
+        return item.children.some((child) => child.isNew && !child.isDisabled);
     }
 
     iconClasses(item: MenuItem, isActive = false): string {
         if (isActive) return 'text-white';
-        if (item.isDisabled) return 'text-n-400';
+        if (item.isDisabled) return 'text-ink-faint';
         return 'text-sider-icon group-hover:text-primary';
     }
 
@@ -79,13 +134,13 @@ export class SiderComponent {
      *  made the rail noisy without adding meaning. The marker is a pseudo-element. */
     childClasses(child: MenuItem, isActive = false): string {
         if (isActive) return 'is-active bg-primary text-white shadow-active';
-        if (child.isDisabled) return 'is-disabled cursor-not-allowed text-n-500';
-        return 'text-n-800 hover:bg-primary-tint hover:text-n-900';
+        if (child.isDisabled) return 'is-disabled cursor-not-allowed text-ink-soft';
+        return 'text-ink-body hover:bg-primary-tint hover:text-ink';
     }
 
     flyoutClasses(child: MenuItem, isActive = false): string {
         if (isActive) return 'is-active bg-primary text-white shadow-active';
-        if (child.isDisabled) return 'is-disabled cursor-not-allowed text-n-500';
-        return 'text-n-800 hover:bg-primary-tint hover:text-n-900';
+        if (child.isDisabled) return 'is-disabled cursor-not-allowed text-ink-soft';
+        return 'text-ink-body hover:bg-primary-tint hover:text-ink';
     }
 }

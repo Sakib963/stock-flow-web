@@ -44,7 +44,11 @@ const menu: MenuItem[] = [
     leaf('activity', '/app/activity', { label: { en: 'Activity log', bn: 'কার্যক্রম' }, isDisabled: true, disabledMessage: { en: 'Recording already, the page is next.', bn: 'রেকর্ড হচ্ছে, পেজটি পরের ধাপে।' } }),
     leaf('sales', null, {
         label: { en: 'Sales', bn: 'বিক্রি' },
-        children: [leaf('sales-pos', '/app/sales/pos', { label: { en: 'Counter sale', bn: 'কাউন্টার বিক্রি' }, description: { en: 'Ring up a sale at the counter and take the payment on the spot.', bn: 'কাউন্টারে বিক্রি করুন এবং তখনই পেমেন্ট নিন।' }, tags: ['pos', 'counter', 'sell', 'order'] }), leaf('sales-online', '/app/sales/online', { label: { en: 'Online order', bn: 'অনলাইন অর্ডার' }, tags: ['online', 'delivery', 'order'] }), leaf('sales-returns', '/app/sales/returns', { label: { en: 'Returns', bn: 'ফেরত' }, tags: ['return', 'refund'] })],
+        children: [
+            leaf('sales-pos', '/app/sales/pos', { label: { en: 'Counter sale', bn: 'কাউন্টার বিক্রি' }, description: { en: 'Ring up a sale at the counter and take the payment on the spot.', bn: 'কাউন্টারে বিক্রি করুন এবং তখনই পেমেন্ট নিন।' }, tags: ['pos', 'counter', 'sell', 'order'] }),
+            leaf('sales-online', '/app/sales/online', { label: { en: 'Online order', bn: 'অনলাইন অর্ডার' }, tags: ['online', 'delivery', 'order'] }),
+            leaf('sales-returns', '/app/sales/returns', { label: { en: 'Returns', bn: 'ফেরত' }, tags: ['return', 'refund'], isNew: true }),
+        ],
     }),
     leaf('inventory', null, {
         label: { en: 'Inventory', bn: 'স্টক' },
@@ -181,14 +185,46 @@ describe('LayoutComponent', () => {
         const { fixture, el, state, nav } = await render('/app/sales/pos');
 
         // Deep-linked, so it arrives open with the active child marked inside it.
-        expect(el.querySelector('.shell__nav-list > .has-active.is-open')).toBeTruthy();
+        expect(el.querySelector('.shell__group > .has-active.is-open')).toBeTruthy();
         expect(el.querySelector('.shell__nav--child.is-active')?.textContent?.trim()).toContain('Counter sale');
 
         nav.toggleGroup('sales');
         fixture.detectChanges();
-        // Shut, and only one group is flagged: the stylesheet draws the soft hint on this state.
-        expect(rows(el, '.shell__nav-list > .has-active').length).toBe(1);
-        expect(el.querySelector('.shell__nav-list > .has-active.is-open')).toBeNull();
+        // Shut, and only one group is flagged: the stylesheet draws the marker on this state.
+        expect(rows(el, '.shell__group > .has-active').length).toBe(1);
+        expect(el.querySelector('.shell__group > .has-active.is-open')).toBeNull();
+
+        // Flagged, but not tinted: another group can be open at the same time, and a shut group
+        // wearing the open block's ground would read as a second open section. The gutter bar the
+        // stylesheet draws on this state is what says where the person is.
+        const shut = el.querySelector('.shell__group > .has-active')!;
+        expect(shut.classList.contains('bg-primary-open')).toBe(false);
+        expect(shut.classList.contains('text-primary')).toBe(false);
+
+        // Collapsed to icons, with the children behind a flyout, the row is all there is: it takes the
+        // ground back so the section holding the page stands apart from the icons around it.
+        state.collapsed.set(true);
+        fixture.detectChanges();
+        const rail = el.querySelector('.shell__group > .has-active')!;
+        expect(rail.classList.contains('bg-primary-open')).toBe(true);
+        expect(rail.classList.contains('is-open')).toBe(false);
+    });
+
+    it('marks a group holding a new feature whether it is open, shut or collapsed to the rail', async () => {
+        const { fixture, el, state, nav } = await render();
+        const marks = () => rows(el, '.shell__group > [aria-expanded] [data-shell="new-mark"]');
+
+        // Shut, so the child's New badge is hidden and the header carries the mark. Only the group
+        // that actually holds the new feature gets one.
+        expect(marks().length).toBe(1);
+
+        nav.toggleGroup('sales');
+        fixture.detectChanges();
+        expect(marks().length).toBe(1);
+
+        state.collapsed.set(true);
+        fixture.detectChanges();
+        expect(marks().length).toBe(1);
     });
 
     it('renders children whether the group is open or shut, and keeps shut ones out of the tab order', async () => {
@@ -203,6 +239,28 @@ describe('LayoutComponent', () => {
         const open = el.querySelector('.shell__children.is-open');
         expect(open).toBeTruthy();
         expect(rows(open as HTMLElement, '.shell__nav--child').every((a) => a.getAttribute('tabindex') === null)).toBe(true);
+    });
+
+    it('stands an open group and its children on one ground, and takes it away on a collapsed rail', async () => {
+        const { fixture, el, state, nav } = await render();
+        const ground = () => el.querySelector('.shell__group.bg-primary-open');
+
+        expect(ground()).toBeNull();
+
+        nav.toggleGroup('sales');
+        fixture.detectChanges();
+        // The header and its children are inside the same tinted block, which is what says "you
+        // are in this section" rather than leaving the children looking like loose rows.
+        const block = ground();
+        expect(block).toBeTruthy();
+        expect(block?.querySelector('.has-active, [aria-expanded="true"]')).toBeTruthy();
+        expect(rows(block as HTMLElement, '.shell__nav--child').length).toBe(3);
+
+        // Collapsed, the children are in the flyout instead, so a tinted block would mark a group
+        // that shows nothing.
+        state.collapsed.set(true);
+        fixture.detectChanges();
+        expect(ground()).toBeNull();
     });
 
     it('groups matches by the section they live under, and omits sections that match nothing', async () => {
@@ -312,20 +370,28 @@ describe('LayoutComponent', () => {
             fixture.detectChanges();
             await fixture.whenStable();
 
-            const head = overlay('[data-shell=drawer-head]');
+            // The same brand row the rail carries at a wide window, plus the way out.
+            const head = overlay('[data-shell=brand]');
             expect(head).toBeTruthy();
-            expect(head?.querySelector('[data-shell=drawer-head] span')?.textContent?.trim()).toBe('Samiha Style Studio');
+            expect(head?.querySelector('[data-shell=business]')?.textContent?.trim()).toBe('Samiha Style Studio');
             expect(head?.querySelector('button')).toBeTruthy();
         });
     });
 
-    it('keeps the rail docked in the frame on a wide window', async () => {
+    it('runs the rail the full height with the header beside it, not over it', async () => {
         const { el } = await render();
-        // Anchored on the component element rather than a styling class. The classes are Tailwind
+        // Anchored on the component elements rather than a styling class. The classes are Tailwind
         // utilities now, so a class name here would assert how the rail looks in order to find out
         // where it is, and would break on any restyle that changed nothing structural.
-        expect(el.querySelector('main')?.previousElementSibling?.tagName.toLowerCase()).toBe('sider');
-        expect(el.querySelector('sider')).toBeTruthy();
+        const sider = el.querySelector('sider');
+        const header = el.querySelector('header-bar');
+        expect(sider).toBeTruthy();
+        // The rail comes first in the frame, and the header shares a column with the page.
+        expect(sider!.compareDocumentPosition(header!) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+        expect(el.querySelector('main')?.previousElementSibling?.tagName.toLowerCase()).toBe('header-bar');
+        // The brand belongs to the rail, so the header carries no copy of it.
+        expect(header!.querySelector('[data-shell=brand]')).toBeNull();
+        expect(sider!.querySelector('[data-shell=brand]')).toBeTruthy();
     });
 
     it('opens search as a sheet on a phone, in a container that is not the desktop panel', async () => {
@@ -339,7 +405,7 @@ describe('LayoutComponent', () => {
             fixture.detectChanges();
             await fixture.whenStable();
 
-            expect(overlay('.sf-sheet input[role="combobox"]')).toBeTruthy();
+            expect(overlay('.overlay-sheet input[role="combobox"]')).toBeTruthy();
             expect(overlay('[data-shell=search-panel]')).toBeNull();
         });
     });
@@ -357,7 +423,7 @@ describe('LayoutComponent', () => {
         const { el } = await render();
         const badge = el.querySelector('badge span')!;
         expect(badge.classList.contains('uppercase')).toBe(true); // static
-        expect(badge.classList.contains('text-n-500')).toBe(true); // bound
+        expect(badge.classList.contains('text-ink-soft')).toBe(true); // bound
     });
 
     it('renders exactly one search field on a wide window', async () => {
@@ -375,7 +441,7 @@ describe('LayoutComponent', () => {
             phone.search.requestFocus();
             phone.fixture.detectChanges();
             await phone.fixture.whenStable();
-            expect(overlay('.sf-sheet input[role="combobox"]')).toBeTruthy();
+            expect(overlay('.overlay-sheet input[role="combobox"]')).toBeTruthy();
         });
     });
     it('leaves the stored desktop collapse alone on a phone, and still opens groups', async () => {
@@ -439,6 +505,27 @@ describe('LayoutComponent', () => {
         fixture.detectChanges();
         await fixture.whenStable();
         expect(state.openPanel()).toBeNull();
+    });
+
+    it('asks before signing out, and sends nothing until the confirmation is answered', async () => {
+        const { fixture, el } = await render();
+
+        el.querySelector<HTMLButtonElement>('[data-shell=account]')!.click();
+        fixture.detectChanges();
+        await fixture.whenStable();
+
+        overlay<HTMLButtonElement>('[data-shell=account-footer] button')!.click();
+        fixture.detectChanges();
+        await fixture.whenStable();
+
+        // The footer button only asks. Ending the session is the confirmation's job, and until the
+        // server has answered it nothing here has been forgotten.
+        expect(overlay('.ant-modal-confirm')).toBeTruthy();
+        TestBed.inject(HttpTestingController).expectNone((r) => r.url.includes(APIEndpoint.SIGN_OUT));
+
+        overlay<HTMLButtonElement>('.ant-modal-confirm-btns .ant-btn:not(.ant-btn-dangerous)')!.click();
+        fixture.detectChanges();
+        await fixture.whenStable();
     });
 
     it('opens notifications from the bell on a phone', async () => {

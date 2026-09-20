@@ -1,25 +1,25 @@
 <div class="flex min-h-0 flex-1 flex-col">
     <div class="min-h-0 flex-1 overflow-y-auto" data-shell="account-scroll">
-        <div class="flex flex-col items-center gap-1 border-b border-n-100 px-4 pt-5 pb-4 text-center">
+        <div class="flex flex-col items-center gap-1 border-b border-line-soft px-4 pt-5 pb-4 text-center">
             <nz-avatar [nzText]="session.initials()" [nzSize]="64" class="mb-2 text-xl font-bold" />
-            <span class="w-full truncate text-sm font-bold text-n-900">{{ session.user()?.name }}</span>
+            <span class="w-full truncate text-sm font-bold text-ink">{{ session.user()?.name }}</span>
             <span class="w-full truncate text-shell-note font-semibold text-primary">
                 {{ session.user()?.role }}
                 @if (session.user()?.designation) {
                     &middot; {{ session.user()?.designation }}
                 }
             </span>
-            <span class="w-full truncate font-mono text-xs text-n-500">{{ session.user()?.email }}</span>
+            <span class="w-full truncate font-mono text-xs text-ink-soft">{{ session.user()?.email }}</span>
         </div>
 
         <!-- Every item opens a dialog or acts, none is a place, so a click must not stay highlighted. -->
         <ul nz-menu nzMode="inline" [nzSelectable]="false" class="w-full">
-            <li class="flex items-center px-4 py-2 text-sm text-n-800">
-                <ng-icon name="lucideGlobe" size="15px" class="mr-2 text-n-500" />
+            <li class="flex items-center px-4 py-2 text-sm text-ink-body">
+                <ng-icon name="lucideGlobe" size="15px" class="mr-2 text-ink-soft" />
                 <span class="flex-1 truncate">{{ 'shell.language' | translate }}</span>
-                <span class="flex flex-none items-center gap-0.5 rounded-control border border-n-200 bg-n-75 p-0.5">
-                    <button type="button" class="cursor-pointer rounded-sm px-2 py-0.75 text-xs/none" [class]="language.current() === 'en' ? 'bg-white font-bold text-primary-8 shadow-raised' : 'font-semibold text-n-600'" (click)="language.use('en')">EN</button>
-                    <button type="button" class="cursor-pointer rounded-sm px-2 py-0.75 font-bangla text-xs/none" [class]="language.current() === 'bn' ? 'bg-white font-bold text-primary-8 shadow-raised' : 'font-semibold text-n-600'" (click)="language.use('bn')">বাংলা</button>
+                <span class="flex flex-none items-center gap-0.5 rounded-control border border-line bg-surface-page p-0.5">
+                    <button type="button" class="cursor-pointer rounded-sm px-2 py-0.75 text-xs/none" [class]="language.current() === 'en' ? 'bg-white font-bold text-primary-8 shadow-raised' : 'font-semibold text-ink-muted'" (click)="language.use('en')">EN</button>
+                    <button type="button" class="cursor-pointer rounded-sm px-2 py-0.75 font-bangla text-xs/none" [class]="language.current() === 'bn' ? 'bg-white font-bold text-primary-8 shadow-raised' : 'font-semibold text-ink-muted'" (click)="language.use('bn')">বাংলা</button>
                 </span>
             </li>
 
@@ -33,12 +33,17 @@
             </li>
             <li nz-menu-item (click)="state.openSessions()"><ng-icon name="lucideMonitorSmartphone" size="15px" class="mr-2 align-middle" />{{ 'shell.sessions.menu' | translate }}</li>
             @if (!state.isPhone()) {
-                <li nz-menu-item (click)="state.openShortcuts()"><ng-icon name="lucideKeyboard" size="15px" class="mr-2 align-middle" />{{ 'shell.keyboardShortcuts' | translate }}<span class="ml-2 align-middle font-mono text-shell-meta text-n-400">?</span></li>
+                <li nz-menu-item (click)="state.openShortcuts()"><ng-icon name="lucideKeyboard" size="15px" class="mr-2 align-middle" />{{ 'shell.keyboardShortcuts' | translate }}<span class="ml-2 align-middle font-mono text-shell-meta text-ink-faint">?</span></li>
             }
         </ul>
     </div>
 
-    <div class="flex-none border-t border-n-100 p-3" data-shell="account-footer">
-        <button nz-button nzType="dashed" nzSize="large" class="w-full inline-flex items-center justify-center" (click)="signOut()"><ng-icon name="lucideLogOut" size="15px" class="mr-2 align-middle" />{{ 'shell.signOut' | translate }}</button>
+    <div class="flex-none border-t border-line-soft p-3" data-shell="account-footer">
+        <!-- Plain, because leaving is not a warning until it is asked for. The confirmation carries the
+             weight, and its Sign out button carries the wait for the server. -->
+        <button nz-button nzSize="large" nzBlock type="button" class="flex items-center justify-center gap-2 font-semibold" (click)="confirmSignOut()">
+            <ng-icon name="lucideLogOut" size="16px" aria-hidden="true" />
+            {{ 'shell.signOut' | translate }}
+        </button>
     </div>
 </div>

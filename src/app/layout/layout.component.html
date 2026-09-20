@@ -1,16 +1,18 @@
-<!-- `--sider` crosses a component boundary: the header's brand block and the sider column are
-     measured from the same number. -->
-<div class="flex h-full flex-col bg-n-75" [style.--sider]="state.railCollapsed() ? '64px' : '252px'">
-    <header-bar />
+<!-- `--sider` is bound here rather than inside the sider because it is the frame's measurement:
+     the rail reads it for its width, and the boot skeleton is drawn to the same two numbers. -->
+<!-- The sider runs the full height of the window and the header sits beside it, which is what lets
+     the brand block be part of the rail instead of a piece of header painted to look like it. -->
+<div class="flex h-full bg-surface-page" [style.--sider]="state.railCollapsed() ? '64px' : '252px'">
+    <!-- Below 768px the same component is the drawer's body instead. Two copies would mean two
+         of every nav row in the accessibility tree. -->
+    @if (!state.isPhone()) {
+        <sider />
+    }
 
-    <div class="relative flex min-h-0 flex-1">
-        <!-- Below 768px the same component is the drawer's body instead. Two copies would mean two
-             of every nav row in the accessibility tree. -->
-        @if (!state.isPhone()) {
-            <sider />
-        }
+    <div class="relative flex min-w-0 flex-1 flex-col">
+        <header-bar />
 
-        <main class="min-w-0 flex-1 overflow-y-auto p-4 md:px-7 md:py-6">
+        <main class="min-h-0 flex-1 overflow-y-auto p-2 md:p-4">
             <router-outlet />
         </main>
     </div>
@@ -28,16 +30,16 @@
      template as soon as it exists, so binding only `nzVisible` left a second copy of the menu
      mounted on a wide window. -->
 @if (state.isPhone()) {
-    <nz-drawer [nzVisible]="state.mobileOpen()" [nzContent]="siderDrawer" nzPlacement="left" [nzClosable]="false" [nzWidth]="state.drawerWidth" [nzBodyStyle]="{ padding: '0' }" nzWrapClassName="sf-drawer" (nzOnClose)="state.closeMobile()" />
+    <nz-drawer [nzVisible]="state.mobileOpen()" [nzContent]="siderDrawer" nzPlacement="left" [nzClosable]="false" [nzWidth]="state.drawerWidth" [nzBodyStyle]="drawerBody" (nzOnClose)="state.closeMobile()" />
 }
 
 <!-- Search is a sheet from the top on a phone: it is a field you type into, so it belongs where
      the keyboard pushes it. On a wide window the field and its panel are in the header itself. -->
-<nz-modal [nzVisible]="state.isPhone() && state.openPanel() === 'search'" [nzContent]="searchSheet" [nzFooter]="null" [nzClosable]="false" [nzWidth]="state.sheetWidth" [nzStyle]="{ top: '12px' }" [nzBodyStyle]="{ padding: '0' }" nzWrapClassName="sf-sheet" (nzOnCancel)="closePanel()" />
+<nz-modal [nzVisible]="state.isPhone() && state.openPanel() === 'search'" [nzContent]="searchSheet" [nzFooter]="null" [nzClosable]="false" [nzWidth]="state.sheetWidth" [nzStyle]="{ top: '12px' }" [nzBodyStyle]="{ padding: '0' }" nzWrapClassName="overlay-sheet" (nzOnCancel)="closePanel()" />
 
-<nz-drawer [nzVisible]="state.openPanel() === 'notifications'" [nzTitle]="'shell.notifications' | translate" [nzExtra]="notifyActions" [nzContent]="notifyDrawer" nzPlacement="right" [nzWidth]="state.panelWidth" [nzBodyStyle]="{ padding: '0' }" nzWrapClassName="sf-drawer" (nzOnClose)="closePanel()" />
+<nz-drawer [nzVisible]="state.openPanel() === 'notifications'" [nzTitle]="'shell.notifications' | translate" [nzExtra]="notifyActions" [nzContent]="notifyDrawer" nzPlacement="right" [nzWidth]="state.panelWidth" [nzBodyStyle]="drawerBody" (nzOnClose)="closePanel()" />
 
-<nz-drawer [nzVisible]="state.openPanel() === 'account'" [nzTitle]="'shell.account' | translate" [nzContent]="accountDrawer" nzPlacement="right" [nzWidth]="state.panelWidth" [nzBodyStyle]="{ padding: '0' }" nzWrapClassName="sf-drawer" (nzOnClose)="closePanel()" />
+<nz-drawer [nzVisible]="state.openPanel() === 'account'" [nzTitle]="'shell.account' | translate" [nzContent]="accountDrawer" nzPlacement="right" [nzWidth]="state.panelWidth" [nzBodyStyle]="drawerBody" (nzOnClose)="closePanel()" />
 
 <ng-template #siderDrawer>
     <sider />
@@ -47,7 +49,7 @@
     @if (notifications.unread(); as unread) {
         <span class="inline-flex size-4.5 min-w-4.5 items-center justify-center rounded-full bg-primary-wash px-1.25 font-mono text-shell-meta/none font-semibold text-primary">{{ unread }}</span>
     }
-    <button type="button" class="ml-2 cursor-pointer rounded-sm px-1.5 py-1 text-shell-note/none font-semibold text-primary not-disabled:hover:bg-primary-wash disabled:cursor-default disabled:text-n-400" [disabled]="!notifications.hasUnread()" (click)="notifications.markAllRead()">
+    <button type="button" class="ml-2 cursor-pointer rounded-sm px-1.5 py-1 text-shell-note/none font-semibold text-primary not-disabled:hover:bg-primary-wash disabled:cursor-default disabled:text-ink-faint" [disabled]="!notifications.hasUnread()" (click)="notifications.markAllRead()">
         {{ 'shell.markAllRead' | translate }}
     </button>
 </ng-template>

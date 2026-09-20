@@ -5,14 +5,14 @@
         <!-- Anchored by hand, not nz-dropdown: that toggles on a click of its trigger, so clicking
              to put the cursor in the text would close the panel. -->
         @if (state.openPanel() === 'search') {
-            <div class="sf-panel absolute inset-x-0 top-[calc(100%+6px)] flex max-h-panel-max min-w-85 flex-col" data-shell="search-panel">
+            <div class="absolute inset-x-0 top-[calc(100%+6px)] flex max-h-panel-max min-w-85 flex-col overflow-hidden rounded-container border border-line bg-white shadow-panel" data-shell="search-panel">
                 <ng-container [ngTemplateOutlet]="results" />
             </div>
         }
     </div>
 } @else {
-    <div class="sf-sheet">
-        <div class="flex flex-none items-center gap-1 border-b border-n-100 py-2.5 pr-2 pl-3">
+    <div class="flex max-h-[calc(100dvh-24px)] flex-col overflow-hidden rounded-container">
+        <div class="flex flex-none items-center gap-1 border-b border-line-soft py-2.5 pr-2 pl-3">
             <div class="min-w-0 flex-1">
                 <ng-container [ngTemplateOutlet]="field" />
             </div>
@@ -28,10 +28,10 @@
 
 <ng-template #field>
     <nz-input-wrapper class="w-full">
-        <ng-icon nzInputPrefix name="lucideSearch" size="15px" class="text-n-400" />
+        <ng-icon nzInputPrefix name="lucideSearch" size="15px" class="text-ink-faint" />
         <input #searchInput nz-input type="text" role="combobox" autocomplete="off" [placeholder]="'shell.searchPlaceholder' | translate" [ngModel]="search.term()" (ngModelChange)="search.onSearch($event)" (focus)="state.openSearchPanel()" (keydown)="search.onSearchKey($event)" [attr.aria-expanded]="state.openPanel() === 'search'" />
         @if (!state.isPhone()) {
-            <span nzInputSuffix class="inline-flex items-center gap-0.5 rounded-sm border border-n-200 bg-white px-1 py-0.75 font-mono text-shell-micro/none font-semibold whitespace-nowrap text-n-500 select-none">
+            <span nzInputSuffix class="inline-flex items-center gap-0.5 rounded-sm border border-line bg-white px-1 py-0.75 font-mono text-shell-micro/none font-semibold whitespace-nowrap text-ink-soft select-none">
                 @if (state.isMac) {
                     <ng-icon name="lucideCommand" size="11px" />
                 } @else {
@@ -54,18 +54,18 @@
             @for (group of search.groups(); track group.id) {
                 <div class="sf-group-head">
                     <span>{{ group.label ?? (group.labelKey! | translate) }}</span>
-                    <span class="font-mono text-shell-micro/none font-semibold text-n-400">{{ group.count }}</span>
+                    <span class="font-mono text-shell-micro/none font-semibold text-ink-faint">{{ group.count }}</span>
                 </div>
 
                 @for (row of group.rows; track row.item.id) {
-                    <button type="button" class="flex w-full items-start gap-2.5 rounded-control px-2 py-2 text-left hover:bg-n-50" [class]="(search.cursor() === row.index ? 'bg-n-50 ' : '') + (row.item.isDisabled ? 'cursor-not-allowed' : 'cursor-pointer')" [disabled]="row.item.isDisabled" (mouseenter)="search.cursor.set(row.index)" (click)="search.go(row.item)">
+                    <button type="button" class="flex w-full items-start gap-2.5 rounded-control px-2 py-2 text-left hover:bg-surface-sunken" [class]="(search.cursor() === row.index ? 'bg-surface-sunken ' : '') + (row.item.isDisabled ? 'cursor-not-allowed' : 'cursor-pointer')" [disabled]="row.item.isDisabled" (mouseenter)="search.cursor.set(row.index)" (click)="search.go(row.item)">
                         <span class="mt-0.5 grid size-5.5 flex-none place-items-center rounded-control bg-primary-wash text-primary">
                             <ng-icon [name]="row.item.icon || iconFallback" size="13px" />
                         </span>
 
                         <span class="flex min-w-0 flex-1 flex-col gap-0.5">
                             <span class="flex items-center gap-1.5">
-                                <span class="min-w-0 truncate text-shell-title font-semibold" [class]="row.item.isDisabled ? 'text-n-500' : 'text-n-800'">{{ session.label(row.item) }}</span>
+                                <span class="min-w-0 truncate text-shell-title font-semibold" [class]="row.item.isDisabled ? 'text-ink-soft' : 'text-ink-body'">{{ session.label(row.item) }}</span>
                                 @if (row.item.isDisabled) {
                                     <badge>{{ 'shell.soon' | translate }}</badge>
                                 } @else if (row.item.isNew) {
@@ -75,14 +75,14 @@
 
                             @let detail = row.item.isDisabled ? session.disabledMessage(row.item) : session.description(row.item);
                             @if (detail) {
-                                <span class="text-xs/[1.45] text-n-500" data-shell="search-desc">{{ detail }}</span>
+                                <span class="text-xs/[1.45] text-ink-soft" data-shell="search-desc">{{ detail }}</span>
                             }
 
                             @let tags = search.matchedTags(row.item);
                             @if (tags.length) {
                                 <span class="mt-0.5 flex flex-wrap items-center gap-1">
                                     @for (tag of tags; track tag) {
-                                        <span class="rounded-sm border border-n-200 bg-n-50 px-1.25 py-0.5 font-mono-bn text-shell-meta/none font-medium text-n-600" data-shell="search-tag">{{ tag }}</span>
+                                        <span class="rounded-sm border border-line bg-surface-sunken px-1.25 py-0.5 font-mono-bn text-shell-meta/none font-medium text-ink-muted" data-shell="search-tag">{{ tag }}</span>
                                     }
                                 </span>
                             }
@@ -99,16 +99,16 @@
     }
 
     @if (!search.term().trim()) {
-        <div class="flex flex-none flex-wrap items-center gap-1.5 border-t border-n-100 px-3 py-2 text-shell-hint text-n-500">
+        <div class="flex flex-none flex-wrap items-center gap-1.5 border-t border-line-soft px-3 py-2 text-shell-hint text-ink-soft">
             <span>{{ 'shell.searchBy' | translate }}</span>
-            <span class="rounded-sm border border-n-200 bg-n-50 px-1.5 py-0.75 font-mono-bn text-shell-meta/normal font-medium text-n-600">{{ 'shell.searchByOne' | translate }}</span>
-            <span class="rounded-sm border border-n-200 bg-n-50 px-1.5 py-0.75 font-mono-bn text-shell-meta/normal font-medium text-n-600">{{ 'shell.searchByTwo' | translate }}</span>
-            <span class="rounded-sm border border-n-200 bg-n-50 px-1.5 py-0.75 font-mono-bn text-shell-meta/normal font-medium text-n-600">{{ 'shell.searchByThree' | translate }}</span>
+            <span class="rounded-sm border border-line bg-surface-sunken px-1.5 py-0.75 font-mono-bn text-shell-meta/normal font-medium text-ink-muted">{{ 'shell.searchByOne' | translate }}</span>
+            <span class="rounded-sm border border-line bg-surface-sunken px-1.5 py-0.75 font-mono-bn text-shell-meta/normal font-medium text-ink-muted">{{ 'shell.searchByTwo' | translate }}</span>
+            <span class="rounded-sm border border-line bg-surface-sunken px-1.5 py-0.75 font-mono-bn text-shell-meta/normal font-medium text-ink-muted">{{ 'shell.searchByThree' | translate }}</span>
         </div>
     }
 
     @if (!state.isPhone()) {
-        <div class="flex flex-none items-center gap-3.5 border-t border-n-100 bg-n-50 px-3 py-1.75 text-shell-hint text-n-500">
+        <div class="flex flex-none items-center gap-3.5 border-t border-line-soft bg-surface-sunken px-3 py-1.75 text-shell-hint text-ink-soft">
             <span class="inline-flex items-center gap-1">
                 <span class="sf-kbd"><ng-icon name="lucideArrowUp" size="9px" class="block" /></span>
                 <span class="sf-kbd"><ng-icon name="lucideArrowDown" size="9px" class="block" /></span>

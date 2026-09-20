@@ -28,17 +28,19 @@
     /* Reserved for the stock line and batch nodes. Not a UI colour. */
     --color-brand-green: #5eb248;
 
-    /* Neutrals. n-400 is a placeholder and icon colour only: it is 2.55:1 on white and must
-       never carry body copy. Small functional text uses n-600. */
-    --color-n-900: #1c2028;
-    --color-n-800: #2e3440;
-    --color-n-600: #4a515c;
-    --color-n-500: #6b7480;
-    --color-n-400: #9aa3b0;
-    --color-n-200: #dfe3e9;
-    --color-n-100: #edeff3;
-    --color-n-75: #f4f6f8;
-    --color-n-50: #f7f8fa;
+    /* Neutrals, named for the job rather than a step number. `ink` is text, darkest first; `line`
+       is the two hairline rules; `surface` is the two grounds a page sits on.
+       `ink-faint` is a placeholder and icon colour only: it is 2.55:1 on white and must never
+       carry body copy. Small functional text uses `ink-muted`. */
+    --color-ink: #1c2028;
+    --color-ink-body: #2e3440;
+    --color-ink-muted: #4a515c;
+    --color-ink-soft: #6b7480;
+    --color-ink-faint: #9aa3b0;
+    --color-line: #dfe3e9;
+    --color-line-soft: #edeff3;
+    --color-surface-page: #f4f6f8;
+    --color-surface-sunken: #f7f8fa;
 
     --color-danger: #d92d20;
     --color-danger-bg: #fdecea;
@@ -57,7 +59,7 @@
     --color-danger-ink: #a81e14;
     --color-progress-border: #c6bff3;
 
-    /* Odd list rows. Paler than n-50, so zebra striping guides the eye without reading as a fill. */
+    /* Odd list rows. Paler than surface-sunken, so zebra striping guides the eye without reading as a fill. */
     --color-row-zebra: #fcfcfd;
 
     /* Shell, from Design/design_handoff_shell §8. These lived in a second Sass token sheet inside
@@ -65,16 +67,20 @@
        step. The application frame is the only thing that should reach for them: a page that needs
        indigo takes it from the primary ramp.
 
-       The sider ground is near-white rather than the old deep indigo, so status colour on the rail
-       reads as status instead of competing with a saturated column. */
-    --color-sider-bg: #fbfafe;
+       The sider ground is a light indigo grey rather than the old deep indigo, so status colour on
+       the rail reads as status instead of competing with a saturated column.
+
+       It is the first rung of a ladder, and the rungs have to move together: ground, then the open
+       group's block, then hover, then the active fill. Darkening the ground on its own is what made
+       the open block invisible, because it closed on the tint standing above it. */
+    --color-sider-bg: #efecf9;
     --color-sider-border: #e3dff8;
     --color-sider-icon: #5c5588;
 
     /* Indigo grounds, palest first. */
     --color-primary-wash: #f3f1fd; /* tinted square behind a search result icon */
-    --color-primary-open: #f2f0fb; /* an open group that is not itself active */
-    --color-primary-tint: #edeafc; /* hover ground on the sider */
+    --color-primary-open: #dcd4f2; /* an open group that is not itself active */
+    --color-primary-tint: #cbc2ec; /* hover ground on the sider */
     --color-primary-mark: #c9c2ee; /* inactive child marker, the rule's foot dot */
     --color-primary-soft: #b7adec; /* closed-group active hint, the child rule */
 
@@ -130,8 +136,8 @@
 body {
     margin: 0;
     font-family: var(--font-sans);
-    color: var(--color-n-800);
-    background: var(--color-n-75);
+    color: var(--color-ink-body);
+    background: var(--color-surface-page);
 }
 
 /* Bengali sets at the same sizes as Latin so switching language never moves the layout, but it
@@ -148,37 +154,38 @@ body.lang-bn {
     border-color: var(--color-primary-6);
 }
 
-/* Shell phone overlays.
+/* Overlay chrome.
 
-   Below 768px the shell's menu, search and notifications are ng-zorro's drawer and modal. They
-   render into the CDK overlay container at body level, which is the point: nothing in the shell
-   can clip them, restack them, or push the page sideways. It also puts their own chrome outside
-   the reach of the shell's scoped styles, so the two resets they need live here, keyed by the wrap
-   class each overlay is given. Everything inside them is still styled by the shell, because a
-   template carries the encapsulation of the component that declared it.
+   An ng-zorro overlay renders into the CDK container at body level, which is the point: nothing in
+   the app can clip it, restack it or push the page sideways. It also puts ant's own chrome outside
+   the reach of every component stylesheet, and no Tailwind class can name an element ant wrote.
+   So the handful of rules that have to reach it live here, each keyed by the class its template
+   hands the overlay. `overlay-` says exactly that: this class is a hook for an ng-zorro overlay,
+   not something you put on a div.
 
-   No !important, and nothing here reaches past the wrap class into ant's own layout. */
-.sf-drawer .ant-drawer-body {
-    display: flex;
-    flex-direction: column;
-}
-.sf-sheet .ant-modal-content {
-    border-radius: 8px;
+   Anything ng-zorro exposes as an input belongs in the template instead. The drawer body's
+   padding and flex column are `nzBodyStyle` in layout.component.ts for that reason.
+
+   These never raise specificity by force, and none reaches past the wrap class into ant own layout. */
+
+/* The phone search sheet. Ant rounds its content to @border-radius-base (6px); the sheet is a
+   container, so it takes the 8px container radius and clips its own corners to it. */
+.overlay-sheet .ant-modal-content {
+    border-radius: var(--radius-container);
     overflow: hidden;
 }
 
-/* The sider's collapsed-rail group flyout is an nz-popover, whose chrome renders in the CDK
-   overlay container where a component stylesheet cannot reach it. The flyout brings its own
-   surface, so ant's is stripped from behind it. Keyed by the overlay class, no !important. */
-.sf-flyout .ant-popover-inner {
+/* The sider's collapsed-rail group flyout. It brings its own surface, so ant's is stripped from
+   behind it rather than drawn twice. */
+.overlay-flyout .ant-popover-inner {
     padding: 0;
     background: transparent;
     box-shadow: none;
 }
-.sf-flyout .ant-popover-arrow {
+.overlay-flyout .ant-popover-arrow {
     display: none;
 }
-.sf-flyout .ant-popover-inner-content {
+.overlay-flyout .ant-popover-inner-content {
     padding: 0;
 }
 
@@ -191,12 +198,16 @@ body.lang-bn {
 /* Shell utilities.
 
    The pieces the application frame paints in more than one component: the icon button in the
-   header, the drawer head and two panel heads; the panel surface behind three overlays; the phone
-   sheet container; the heading over a run of rows; the two-line empty state.
+   header, the drawer head and two panel heads; the heading over a run of rows; the two-line empty
+   state; the two key caps.
 
    They are here rather than in a shared Sass partial because a partial is copied into every
    component that uses it, so "change it in one place" was only ever true of the source. A utility
-   is one rule that every template names. */
+   is one rule that every template names.
+
+   More than one component is the whole bar for being here. A class only one template names is a
+   run of Tailwind utilities in that template, where you can read it: that is where the search
+   panel's surface and its phone sheet went, and neither is missed. */
 
 @utility sf-icon-btn {
     position: relative;
@@ -206,12 +217,12 @@ body.lang-bn {
     background: none;
     padding: 7px;
     border-radius: var(--radius-control);
-    color: var(--color-n-600);
+    color: var(--color-ink-muted);
     cursor: pointer;
 
     &:hover {
-        background: var(--color-n-75);
-        color: var(--color-n-900);
+        background: var(--color-surface-page);
+        color: var(--color-ink);
     }
 
     &.is-open {
@@ -230,30 +241,6 @@ body.lang-bn {
     }
 }
 
-/* The surface, and nothing about where it sits: the notifications panel is placed by the CDK
-   inside an nz-dropdown, and the search panel positions itself below its own field. Neither is a
-   menu, so neither gets ant's dropdown surface for free the way the account menu does. */
-@utility sf-panel {
-    background: #fff;
-    border: 1px solid var(--color-n-200);
-    border-radius: var(--radius-container);
-    box-shadow: var(--shadow-panel);
-    overflow: hidden;
-}
-
-/* The container for the same content on a phone, inside an ng-zorro overlay. It shares nothing
-   with sf-panel on purpose: the sheet used to reuse the dropdown's class and switch off its
-   properties one at a time, and the one that slipped through was a 340px min-width meant for a
-   desktop popover, so every row came out wider than the screen. */
-@utility sf-sheet {
-    display: flex;
-    flex-direction: column;
-    /* The overlay is opened 12px from the top, so this is the rest of the screen. */
-    max-height: calc(100dvh - 24px);
-    overflow: hidden;
-    border-radius: var(--radius-container);
-}
-
 /* The heading over a run of rows: a search section, a notification day. */
 @utility sf-group-head {
     display: flex;
@@ -263,7 +250,7 @@ body.lang-bn {
     font: 700 10px/1 var(--font-sans);
     text-transform: uppercase;
     letter-spacing: 0.06em;
-    color: var(--color-n-500);
+    color: var(--color-ink-soft);
 }
 
 /* Nothing to show, said in two lines: what is empty, and what to do about it. */
@@ -275,12 +262,12 @@ body.lang-bn {
         margin: 0 0 3px;
         font-size: 12.5px;
         font-weight: 600;
-        color: var(--color-n-600);
+        color: var(--color-ink-muted);
     }
 
     small {
         font-size: 11.5px;
-        color: var(--color-n-400);
+        color: var(--color-ink-faint);
     }
 }
 
@@ -294,10 +281,10 @@ body.lang-bn {
     height: 17px;
     padding: 0 4px;
     background: #fff;
-    border: 1px solid var(--color-n-200);
+    border: 1px solid var(--color-line);
     border-radius: 3px;
     font: 600 10px/1 var(--font-mono);
-    color: var(--color-n-600);
+    color: var(--color-ink-muted);
 }
 
 /* The shortcuts dialog's key cap. Same idea as sf-kbd, one size up: the dialog is a reference
@@ -309,12 +296,12 @@ body.lang-bn {
     min-width: 20px;
     height: 20px;
     padding: 0 5px;
-    background: var(--color-n-50);
-    border: 1px solid var(--color-n-200);
+    background: var(--color-surface-sunken);
+    border: 1px solid var(--color-line);
     border-bottom-width: 2px;
     border-radius: 4px;
     font: 600 10.5px/1 var(--font-mono);
-    color: var(--color-n-600);
+    color: var(--color-ink-muted);
 }
 
 /* Auth surfaces.
@@ -327,7 +314,7 @@ body.lang-bn {
     /* 368px of content inside 32px padding, so the measure stays as the handoff specifies. */
     width: 432px;
     background: #fff;
-    border: 1px solid var(--color-n-200);
+    border: 1px solid var(--color-line);
     border-radius: var(--radius-container);
     padding: 32px;
     display: flex;

@@ -28,10 +28,11 @@ export const sessionGuard: CanActivateFn = async () => {
         await session.load(key);
         return true;
     } catch {
-        // Without the payload there is no menu to draw and nothing to check a route against.
-        // Signing out is the honest end, and it resolves the status to anonymous, so the login page
-        // cannot bounce straight back here through the guest guard.
-        void auth.signOut();
+        // Without the payload there is no menu to draw and nothing to check a route against. Ending
+        // it here and now is the honest end, and it resolves the status to anonymous, so the login
+        // page cannot bounce straight back here through the guest guard. Not `signOut`, which waits
+        // for the server: there is no screen left to wait on.
+        void auth.abandonSession();
         session.clear();
         return false;
     }

@@ -10,7 +10,7 @@ const TONES: Record<Tone, string> = {
     warning: 'bg-warning-bg border-warning-border text-warning-ink',
     danger: 'bg-danger-bg border-danger-border text-danger-ink',
     progress: 'bg-primary-wash border-progress-border text-primary-8',
-    neutral: 'bg-n-100 border-n-200 text-n-600',
+    neutral: 'bg-line-soft border-line text-ink-muted',
 };
 
 const SIZES = {

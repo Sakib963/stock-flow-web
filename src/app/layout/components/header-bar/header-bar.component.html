@@ -1,19 +1,16 @@
 <!-- z-70 keeps the bar above the drawers, so the trigger that opened one stays clickable. -->
-<header class="relative z-70 flex h-14 flex-none items-center gap-2 border-b border-n-200 bg-white pr-2.5 md:gap-3 md:pr-4">
+<header class="relative z-70 flex h-14 flex-none items-center gap-2 border-b border-line bg-white pr-2.5 md:gap-3 md:pr-4">
     <button type="button" class="sf-icon-btn ml-2 md:hidden" (click)="state.toggleMobile()" [attr.aria-expanded]="state.mobileOpen()" [attr.aria-label]="'shell.openMenu' | translate">
         <ng-icon name="lucideMenu" size="20px" />
     </button>
 
-    <!-- Continues the sider column up through the header so the rail reads as one piece. The tint
-         goes on a phone, where there is no column beneath it to continue. -->
-    <div data-shell="brand" class="flex h-full flex-none items-center overflow-hidden max-md:w-auto max-md:gap-0 max-md:border-r-0 max-md:bg-transparent max-md:p-0 md:w-(--sider) md:border-r md:border-sider-border md:bg-sider-bg md:transition-[width] md:duration-180 md:ease-width" [class]="state.railCollapsed() ? 'md:justify-center md:gap-0 md:px-2' : 'md:gap-2.5 md:px-3.5'">
+    <!-- Phone only. On a wide window the brand belongs to the rail, which now runs the full height
+         of the window, so there is nothing here for it to continue. -->
+    @if (state.isPhone()) {
         <img class="size-6 flex-none" src="assets/icons/logo.svg" alt="" />
-        @if (!state.isPhone() && !state.railCollapsed()) {
-            <span class="truncate text-sm font-bold text-n-900" data-shell="business" nz-tooltip nzTooltipPlacement="bottom" [nzTooltipTitle]="session.business()?.name || ''">{{ session.business()?.name || 'StockFlow' }}</span>
-        }
-    </div>
+    }
 
-    <button type="button" class="sf-icon-btn ml-1 max-md:hidden" (click)="state.toggleCollapsed()" [attr.aria-label]="state.collapsed() ? 'Expand menu' : 'Collapse menu'">
+    <button type="button" class="sf-icon-btn ml-2 max-md:hidden" (click)="state.toggleCollapsed()" [attr.aria-label]="state.collapsed() ? 'Expand menu' : 'Collapse menu'">
         <ng-icon [name]="state.collapsed() ? 'lucidePanelLeftOpen' : 'lucidePanelLeftClose'" size="18px" />
     </button>
 
@@ -44,9 +41,9 @@
             }
         </button>
 
-        <button #accountTrigger type="button" class="flex cursor-pointer items-center gap-1 rounded-control p-1 hover:bg-n-75" data-shell="account" [class.bg-n-75]="state.openPanel() === 'account'" [attr.aria-expanded]="state.openPanel() === 'account'" (click)="state.togglePanel('account')" nz-tooltip nzTooltipPlacement="bottomRight" [nzTooltipTitle]="session.user()?.name || ''">
+        <button #accountTrigger type="button" class="flex cursor-pointer items-center gap-1 rounded-control p-1 hover:bg-surface-page" data-shell="account" [class.bg-surface-page]="state.openPanel() === 'account'" [attr.aria-expanded]="state.openPanel() === 'account'" (click)="state.togglePanel('account')" nz-tooltip nzTooltipPlacement="bottomRight" [nzTooltipTitle]="session.user()?.name || ''">
             <nz-avatar [nzText]="session.initials()" [nzSize]="30" class="text-shell-hint font-bold" />
-            <ng-icon name="lucideChevronDown" size="14px" class="text-n-400 transition-transform duration-200 ease-shell" [class.rotate-180]="state.openPanel() === 'account'" />
+            <ng-icon name="lucideChevronDown" size="14px" class="text-ink-faint transition-transform duration-200 ease-shell" [class.rotate-180]="state.openPanel() === 'account'" />
         </button>
     </div>
 </header>

@@ -65,12 +65,12 @@
         </div>
     </aside>
 
-    <main class="auth__form-col relative flex items-center justify-center overflow-y-auto bg-n-75 p-12 max-md:min-h-0 max-md:flex-1 max-md:flex-col max-md:items-stretch max-md:justify-start max-md:bg-white max-md:px-6 max-md:pt-6.5 max-md:pb-5.5" [style.--auth-clear-core]="clearCoreHeight() + 'px'">
+    <main class="auth__form-col relative flex items-center justify-center overflow-y-auto bg-surface-page p-12 max-md:min-h-0 max-md:flex-1 max-md:flex-col max-md:items-stretch max-md:justify-start max-md:bg-white max-md:px-6 max-md:pt-6.5 max-md:pb-5.5" [style.--auth-clear-core]="clearCoreHeight() + 'px'">
         <div class="absolute top-6 right-7 z-1 flex items-center gap-2 max-md:hidden">
-            <ng-icon name="lucideLanguages" size="14px" class="text-n-400" />
-            <div class="flex gap-0.5 rounded-control border border-n-200 bg-n-75 p-0.5">
-                <button type="button" class="cursor-pointer rounded-sm px-2.5 py-0.75 text-xs/none" [class]="language.current() === 'en' ? 'bg-white font-bold text-n-900 shadow-[0_1px_2px_rgb(28_32_40/0.06)]' : 'font-semibold text-n-600'" [attr.aria-pressed]="language.current() === 'en'" (click)="setLanguage('en')">EN</button>
-                <button type="button" class="cursor-pointer rounded-sm px-2.5 py-0.75 font-bangla text-xs/none" [class]="language.current() === 'bn' ? 'bg-white font-bold text-n-900 shadow-[0_1px_2px_rgb(28_32_40/0.06)]' : 'font-semibold text-n-600'" [attr.aria-pressed]="language.current() === 'bn'" (click)="setLanguage('bn')">বাংলা</button>
+            <ng-icon name="lucideLanguages" size="14px" class="text-ink-faint" />
+            <div class="flex gap-0.5 rounded-control border border-line bg-surface-page p-0.5">
+                <button type="button" class="cursor-pointer rounded-sm px-2.5 py-0.75 text-xs/none" [class]="language.current() === 'en' ? 'bg-white font-bold text-ink shadow-[0_1px_2px_rgb(28_32_40/0.06)]' : 'font-semibold text-ink-muted'" [attr.aria-pressed]="language.current() === 'en'" (click)="setLanguage('en')">EN</button>
+                <button type="button" class="cursor-pointer rounded-sm px-2.5 py-0.75 font-bangla text-xs/none" [class]="language.current() === 'bn' ? 'bg-white font-bold text-ink shadow-[0_1px_2px_rgb(28_32_40/0.06)]' : 'font-semibold text-ink-muted'" [attr.aria-pressed]="language.current() === 'bn'" (click)="setLanguage('bn')">বাংলা</button>
             </div>
         </div>
 

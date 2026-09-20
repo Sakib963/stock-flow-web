@@ -11,15 +11,15 @@
             </div>
 
             @for (row of day.rows; track row.item.id) {
-                <button type="button" class="relative flex w-full cursor-pointer items-start gap-2.5 rounded-control px-2.5 py-2 text-left hover:bg-n-50" [class]="row.item.readAt ? '' : 'is-unread bg-[#faf9fe]'" (click)="onNotification(row.item)">
+                <button type="button" class="relative flex w-full cursor-pointer items-start gap-2.5 rounded-control px-2.5 py-2 text-left hover:bg-surface-sunken" [class]="row.item.readAt ? '' : 'is-unread bg-[#faf9fe]'" (click)="onNotification(row.item)">
                     <span class="mt-px grid size-6.5 flex-none place-items-center rounded-control" [class]="categoryTone[row.item.category]">
                         <ng-icon [name]="categoryIcon[row.item.category]" size="13px" />
                     </span>
                     <span class="flex min-w-0 flex-1 flex-col gap-0.5">
-                        <span class="text-shell-row/[1.35]" [class]="row.item.readAt ? 'font-semibold text-n-800' : 'font-bold text-n-900'">{{ title(row.item) }}</span>
-                        <span class="truncate text-shell-note/[1.45] text-n-500">{{ body(row.item) }}</span>
+                        <span class="text-shell-row/[1.35]" [class]="row.item.readAt ? 'font-semibold text-ink-body' : 'font-bold text-ink'">{{ title(row.item) }}</span>
+                        <span class="truncate text-shell-note/[1.45] text-ink-soft">{{ body(row.item) }}</span>
                     </span>
-                    <span class="flex-none font-mono text-shell-meta/[1.6] font-medium text-n-400">{{ row.time }}</span>
+                    <span class="flex-none font-mono text-shell-meta/[1.6] font-medium text-ink-faint">{{ row.time }}</span>
                 </button>
             }
         } @empty {
@@ -30,7 +30,7 @@
         }
     </div>
 
-    <button type="button" class="flex w-full flex-none cursor-pointer items-center justify-center gap-1.75 border-t border-n-100 bg-n-50 px-3 py-2.5 text-xs/none font-semibold text-primary not-disabled:hover:bg-primary-wash disabled:cursor-not-allowed disabled:text-n-500" disabled>
+    <button type="button" class="flex w-full flex-none cursor-pointer items-center justify-center gap-1.75 border-t border-line-soft bg-surface-sunken px-3 py-2.5 text-xs/none font-semibold text-primary not-disabled:hover:bg-primary-wash disabled:cursor-not-allowed disabled:text-ink-soft" disabled>
         {{ 'shell.viewAllActivity' | translate }}
         <badge>{{ 'shell.soon' | translate }}</badge>
     </button>

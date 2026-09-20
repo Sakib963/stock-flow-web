@@ -1,4 +1,4 @@
-<nav class="relative flex flex-none flex-col overflow-hidden border-r border-sider-border bg-sider-bg pt-2.5 transition-[width] duration-180 ease-width max-md:size-full max-md:border-r-0 max-md:p-0 md:w-(--sider)" data-shell="sider">
+<nav class="relative flex flex-none flex-col overflow-hidden border-r border-sider-border bg-sider-bg transition-[width] duration-180 ease-width max-md:size-full max-md:border-r-0 max-md:p-0 md:w-(--sider)" data-shell="sider">
     <div class="pointer-events-none absolute inset-0 z-0 overflow-hidden" aria-hidden="true" data-shell="sider-art">
         <svg class="absolute inset-0 block size-full" viewBox="0 0 252 844" preserveAspectRatio="none" focusable="false">
             <path d="M0 0h252v34c-52 28-108-4-160 20-30 14-60 6-92 24V0Z" fill="#E6E1FA" />
@@ -13,74 +13,84 @@
         </svg>
     </div>
 
-    @if (state.isPhone()) {
-        <div class="relative z-1 mb-1 flex h-14 flex-none items-center gap-2.5 border-b border-sider-border pr-2 pl-3.5" data-shell="drawer-head">
-            <img class="size-6 flex-none" src="assets/icons/logo.svg" alt="" />
-            <span class="min-w-0 flex-1 truncate text-sm font-bold text-n-900">{{ session.business()?.name || 'StockFlow' }}</span>
+    <!-- No rule under it: the brand is the top of this column, not a header sitting on it. It is
+         the same 56px as the header beside it so the two line up across the fold. -->
+    <div class="relative z-1 mb-1 flex h-14 flex-none items-center overflow-hidden" data-shell="brand" [class]="state.railCollapsed() ? 'justify-center px-2' : 'gap-2.5 pr-2 pl-3.5'">
+        <img class="size-6 flex-none" src="assets/icons/logo.svg" alt="" />
+        @if (!state.railCollapsed()) {
+            <span class="min-w-0 flex-1 truncate text-sm font-bold text-ink" data-shell="business" nz-tooltip nzTooltipPlacement="bottom" [nzTooltipTitle]="session.business()?.name || ''">{{ session.business()?.name || 'StockFlow' }}</span>
+        }
+        @if (state.isPhone()) {
             <button type="button" class="sf-icon-btn" (click)="state.closeMobile()" [attr.aria-label]="'shell.closeMenu' | translate">
                 <ng-icon name="lucideX" size="18px" />
             </button>
-        </div>
-    }
+        }
+    </div>
 
     <div class="shell__nav-list relative z-1 flex min-h-0 flex-1 flex-col gap-0.5 overflow-x-hidden overflow-y-auto">
         @for (item of session.menu(); track item.id) {
             @if (item.children.length) {
-                <button
-                    type="button"
-                    class="group relative flex h-9.5 flex-none cursor-pointer items-center gap-2.75 rounded-control text-left text-shell-title/none font-semibold whitespace-nowrap text-n-900 transition-[background,color] duration-150"
-                    [class]="railClasses(item)"
-                    [class.is-open]="nav.isOpen(item.id)"
-                    [class.has-active]="nav.activeGroup() === item.id"
-                    [attr.aria-expanded]="nav.isOpen(item.id)"
-                    (click)="nav.toggleGroup(item.id)"
-                    (mouseenter)="nav.hoverGroup.set(item)"
-                    nz-popover
-                    nzPopoverPlacement="rightTop"
-                    nzPopoverOverlayClassName="sf-flyout"
-                    [nzPopoverTrigger]="state.railCollapsed() ? 'hover' : null"
-                    [nzPopoverContent]="groupFlyout"
-                    nz-tooltip
-                    nzTooltipPlacement="right"
-                    nzTooltipOverlayClassName="sf-tip"
-                    [nzTooltipTrigger]="state.railCollapsed() ? null : 'hover'"
-                    [nzTooltipTitle]="state.railCollapsed() ? '' : session.description(item)"
-                >
-                    <ng-icon [name]="item.icon || iconFallback" size="18px" strokeWidth="1.8" class="flex-none group-hover:text-primary" [class]="nav.isOpen(item.id) ? 'text-primary' : 'text-sider-icon'" />
-                    @if (!state.railCollapsed()) {
-                        <span class="flex-1 overflow-hidden text-ellipsis">{{ session.label(item) }}</span>
-                        <ng-icon name="lucideChevronDown" size="13px" class="flex-none transition-transform duration-240 ease-shell" [class]="nav.isOpen(item.id) ? 'rotate-0 text-primary' : '-rotate-90 text-n-400'" />
-                    } @else {
-                        <span class="absolute right-3.25 bottom-1.75 size-1 rounded-full bg-primary-soft"></span>
-                    }
-                </button>
-
-                <div class="shell__children" [class.is-open]="nav.isOpen(item.id) && !state.railCollapsed()">
-                    <div class="shell__children-inner">
-                        <div class="shell__children-list relative mt-0.5 mr-2 mb-1.5 ml-5.5 flex flex-col gap-0.5 pl-4.25">
-                            @for (child of item.children; track child.id) {
-                                <a
-                                    class="shell__nav--child relative m-0 flex h-7.75 flex-none items-center gap-1.75 rounded-control pr-2.5 pl-1.75 text-left text-shell-row/none font-medium whitespace-nowrap no-underline transition-[background,color] duration-150"
-                                    [class]="childClasses(child, rla.isActive)"
-                                    [class.is-disabled]="child.isDisabled"
-                                    [routerLink]="child.isDisabled ? null : child.route"
-                                    routerLinkActive="is-active"
-                                    #rla="routerLinkActive"
-                                    [attr.tabindex]="nav.isOpen(item.id) && !state.railCollapsed() ? null : -1"
-                                    (click)="child.isDisabled && nav.explainDisabled(child, $event)"
-                                    nz-tooltip
-                                    nzTooltipPlacement="right"
-                                    nzTooltipOverlayClassName="sf-tip"
-                                    [nzTooltipTitle]="child.isDisabled ? session.disabledMessage(child) : session.description(child)"
-                                >
-                                    <span class="flex-1 overflow-hidden text-ellipsis">{{ session.label(child) }}</span>
-                                    @if (child.isDisabled) {
-                                        <badge>{{ 'shell.soon' | translate }}</badge>
-                                    } @else if (child.isNew) {
-                                        <badge variant="new">{{ 'shell.new' | translate }}</badge>
-                                    }
-                                </a>
+                <!-- The header and its children share one ground, so an open group reads as a block
+                     you are inside rather than a row followed by some loose links. That is also why
+                     the row's own margin moves out here: the ground has to span both. -->
+                <div class="shell__group mx-2 flex-none rounded-container transition-colors duration-150" [class]="groupClasses(item)">
+                    <button
+                        type="button"
+                        class="group relative flex h-9.5 w-full cursor-pointer items-center gap-2.75 rounded-control text-left text-shell-title/none font-semibold whitespace-nowrap transition-[background,color] duration-150"
+                        [class]="groupRowClasses(item)"
+                        [class.is-open]="isExpanded(item)"
+                        [class.has-active]="nav.activeGroup() === item.id"
+                        [attr.aria-expanded]="nav.isOpen(item.id)"
+                        (click)="nav.toggleGroup(item.id)"
+                        (mouseenter)="nav.hoverGroup.set(item)"
+                        nz-popover
+                        nzPopoverPlacement="rightTop"
+                        nzPopoverOverlayClassName="overlay-flyout"
+                        [nzPopoverTrigger]="state.railCollapsed() ? 'hover' : null"
+                        [nzPopoverContent]="groupFlyout"
+                        nz-tooltip
+                        nzTooltipPlacement="right"
+                        [nzTooltipTrigger]="state.railCollapsed() ? null : 'hover'"
+                        [nzTooltipTitle]="state.railCollapsed() ? '' : session.description(item)"
+                    >
+                        <ng-icon [name]="item.icon || iconFallback" size="18px" strokeWidth="1.8" class="flex-none group-hover:text-primary" [class]="groupIconClasses(item)" />
+                        @if (!state.railCollapsed()) {
+                            <span class="flex-1 overflow-hidden text-ellipsis">{{ session.label(item) }}</span>
+                            @if (hasNewChild(item)) {
+                                <span class="size-1.5 flex-none rounded-full bg-primary" data-shell="new-mark" aria-hidden="true"></span>
                             }
+                            <ng-icon name="lucideChevronDown" size="13px" class="flex-none transition-transform duration-240 ease-shell" [class]="groupChevronClasses(item)" />
+                        } @else {
+                            <span class="absolute right-3.25 bottom-1.75 size-1 rounded-full" [class]="hasNewChild(item) ? 'bg-primary' : 'bg-primary-soft'" [attr.data-shell]="hasNewChild(item) ? 'new-mark' : null"></span>
+                        }
+                    </button>
+
+                    <div class="shell__children" [class.is-open]="nav.isOpen(item.id) && !state.railCollapsed()">
+                        <div class="shell__children-inner">
+                            <div class="shell__children-list relative mt-0.5 mr-1.5 mb-1.5 ml-3.5 flex flex-col gap-0.5 pl-4.25">
+                                @for (child of item.children; track child.id) {
+                                    <a
+                                        class="shell__nav--child relative m-0 flex h-7.75 flex-none items-center gap-1.75 rounded-control pr-2.5 pl-1.75 text-left text-shell-row/none font-medium whitespace-nowrap no-underline transition-[background,color] duration-150"
+                                        [class]="childClasses(child, rla.isActive)"
+                                        [class.is-disabled]="child.isDisabled"
+                                        [routerLink]="child.isDisabled ? null : child.route"
+                                        routerLinkActive="is-active"
+                                        #rla="routerLinkActive"
+                                        [attr.tabindex]="nav.isOpen(item.id) && !state.railCollapsed() ? null : -1"
+                                        (click)="child.isDisabled && nav.explainDisabled(child, $event)"
+                                        nz-tooltip
+                                        nzTooltipPlacement="right"
+                                        [nzTooltipTitle]="child.isDisabled ? session.disabledMessage(child) : session.description(child)"
+                                    >
+                                        <span class="flex-1 overflow-hidden text-ellipsis">{{ session.label(child) }}</span>
+                                        @if (child.isDisabled) {
+                                            <badge>{{ 'shell.soon' | translate }}</badge>
+                                        } @else if (child.isNew) {
+                                            <badge variant="new">{{ 'shell.new' | translate }}</badge>
+                                        }
+                                    </a>
+                                }
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -94,7 +104,6 @@
                     (click)="item.isDisabled && nav.explainDisabled(item, $event)"
                     nz-tooltip
                     nzTooltipPlacement="right"
-                    nzTooltipOverlayClassName="sf-tip"
                     [nzTooltipTrigger]="state.railCollapsed() ? 'hover' : null"
                     [nzTooltipTitle]="state.railCollapsed() ? nav.rowTitle(item) : ''"
                 >
@@ -114,12 +123,12 @@
 
     <div class="relative z-1 mx-2 mt-2 flex flex-none items-center gap-2 border-t border-sider-border pt-2.5 pb-3.5 text-shell-hint whitespace-nowrap" [class]="state.railCollapsed() ? 'justify-center px-0' : 'justify-between px-1'">
         @if (!state.railCollapsed()) {
-            <span class="font-semibold text-n-600">
+            <span class="font-semibold text-ink-muted">
                 StockFlow
-                <span class="font-medium text-n-500">v{{ version }}</span>
+                <span class="font-medium text-ink-soft">v{{ version }}</span>
             </span>
         }
-        <a class="font-semibold text-n-500 no-underline hover:text-primary hover:underline" href="https://sakib.app" target="_blank" rel="noopener noreferrer" nz-tooltip nzTooltipPlacement="top" nzTooltipTitle="Arithma Labs">
+        <a class="font-semibold text-ink-soft no-underline hover:text-primary hover:underline" href="https://sakib.app" target="_blank" rel="noopener noreferrer" nz-tooltip nzTooltipPlacement="top" nzTooltipTitle="Arithma Labs">
             {{ state.railCollapsed() ? 'AL' : 'Arithma Labs' }}
         </a>
     </div>
@@ -128,20 +137,9 @@
 <ng-template #groupFlyout>
     @if (nav.hoverGroup(); as group) {
         <div class="max-w-66 min-w-49 rounded-container border border-sider-border bg-white p-1.5 shadow-panel">
-            <div class="mb-1.25 truncate border-b border-n-100 px-2.5 pt-1.25 pb-1.75 text-shell-hint/none font-bold text-n-900">{{ session.label(group) }}</div>
+            <div class="mb-1.25 truncate border-b border-line-soft px-2.5 pt-1.25 pb-1.75 text-shell-hint/none font-bold text-ink">{{ session.label(group) }}</div>
             @for (child of group.children; track child.id) {
-                <a
-                    class="flex h-7.75 items-center gap-2 rounded-control px-2.5 text-shell-row/none font-medium whitespace-nowrap no-underline"
-                    [class]="flyoutClasses(child, rla.isActive)"
-                    [routerLink]="child.isDisabled ? null : child.route"
-                    routerLinkActive="is-active"
-                    #rla="routerLinkActive"
-                    (click)="child.isDisabled && nav.explainDisabled(child, $event)"
-                    nz-tooltip
-                    nzTooltipPlacement="right"
-                    nzTooltipOverlayClassName="sf-tip"
-                    [nzTooltipTitle]="child.isDisabled ? session.disabledMessage(child) : session.description(child)"
-                >
+                <a class="flex h-7.75 items-center gap-2 rounded-control px-2.5 text-shell-row/none font-medium whitespace-nowrap no-underline" [class]="flyoutClasses(child, rla.isActive)" [routerLink]="child.isDisabled ? null : child.route" routerLinkActive="is-active" #rla="routerLinkActive" (click)="child.isDisabled && nav.explainDisabled(child, $event)" nz-tooltip nzTooltipPlacement="right" [nzTooltipTitle]="child.isDisabled ? session.disabledMessage(child) : session.description(child)">
                     <span class="flex-1 overflow-hidden text-ellipsis">{{ session.label(child) }}</span>
                     @if (child.isDisabled) {
                         <badge>{{ 'shell.soon' | translate }}</badge>

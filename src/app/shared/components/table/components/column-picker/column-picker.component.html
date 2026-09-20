@@ -5,26 +5,26 @@
 <ng-template #panel>
     <div class="w-64 max-w-[calc(100vw-2rem)]">
         <header class="flex items-center gap-2 px-1 pb-2">
-            <p class="m-0 flex-1 text-xs font-bold text-n-800">{{ 'list.columns' | translate }}</p>
-            <button nz-button nzType="text" nzSize="small" type="button" class="text-xs text-n-600 hover:text-primary" (click)="reset()" data-picker="reset">
+            <p class="m-0 flex-1 text-xs font-bold text-ink-body">{{ 'list.columns' | translate }}</p>
+            <button nz-button nzType="text" nzSize="small" type="button" class="text-xs text-ink-muted hover:text-primary" (click)="reset()" data-picker="reset">
                 <ng-icon name="lucideRotateCcw" size="13px" aria-hidden="true" />
                 <span class="ml-1">{{ 'list.resetColumns' | translate }}</span>
             </button>
         </header>
 
         @if (canReorder()) {
-            <p class="m-0 px-1 pb-2 text-[11px] text-n-500">{{ 'list.reorderHint' | translate }}</p>
+            <p class="m-0 px-1 pb-2 text-[11px] text-ink-soft">{{ 'list.reorderHint' | translate }}</p>
         }
 
         <ul class="m-0 max-h-72 list-none overflow-y-auto p-0" cdkDropList [cdkDropListDisabled]="!canReorder()" (cdkDropListDropped)="onDrop($event)" data-picker="list">
             @for (column of rows(); track column.key; let i = $index) {
-                <li class="picker-row flex items-center gap-2 rounded-control px-1 py-1.5 hover:bg-n-75 focus-visible:bg-n-75 focus-visible:outline-none" cdkDrag [cdkDragDisabled]="!canReorder()" [tabindex]="0" (keydown)="onKeydown(i, $event)" data-picker="row">
+                <li class="picker-row flex items-center gap-2 rounded-control px-1 py-1.5 hover:bg-surface-page focus-visible:bg-surface-page focus-visible:outline-none" cdkDrag [cdkDragDisabled]="!canReorder()" [tabindex]="0" (keydown)="onKeydown(i, $event)" data-picker="row">
                     @if (canReorder()) {
-                        <span class="flex cursor-grab text-n-400 active:cursor-grabbing" cdkDragHandle aria-hidden="true">
+                        <span class="flex cursor-grab text-ink-faint active:cursor-grabbing" cdkDragHandle aria-hidden="true">
                             <ng-icon name="lucideGripVertical" size="14px" />
                         </span>
                     }
-                    <label nz-checkbox class="flex-1 text-xs text-n-800" [nzChecked]="isShown(column)" [nzDisabled]="!canToggle(column)" (nzCheckedChange)="toggle(column)">
+                    <label nz-checkbox class="flex-1 text-xs text-ink-body" [nzChecked]="isShown(column)" [nzDisabled]="!canToggle(column)" (nzCheckedChange)="toggle(column)">
                         {{ column.label | text }}
                     </label>
                 </li>
@@ -32,12 +32,12 @@
         </ul>
 
         @if (pinned().length) {
-            <ul class="m-0 mt-1 list-none border-t border-n-100 p-0 pt-2">
+            <ul class="m-0 mt-1 list-none border-t border-line-soft p-0 pt-2">
                 @for (column of pinned(); track column.key) {
-                    <li class="flex items-center gap-2 px-1 py-1.5 text-xs text-n-500">
-                        <ng-icon name="lucideCheck" size="13px" class="text-n-400" aria-hidden="true" />
+                    <li class="flex items-center gap-2 px-1 py-1.5 text-xs text-ink-soft">
+                        <ng-icon name="lucideCheck" size="13px" class="text-ink-faint" aria-hidden="true" />
                         <span class="flex-1">{{ column.label | text }}</span>
-                        <span class="text-[11px] text-n-400">{{ 'list.columnFixed' | translate }}</span>
+                        <span class="text-[11px] text-ink-faint">{{ 'list.columnFixed' | translate }}</span>
                     </li>
                 }
             </ul>

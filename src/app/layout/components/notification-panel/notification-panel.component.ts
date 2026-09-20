@@ -30,7 +30,7 @@ export const CATEGORY_TONE: Record<NotificationCategory, string> = {
     dispatch: 'bg-[#e6f6f4] text-[#0b5c55]',
     stock: 'bg-warning-bg text-[#b06d0c]',
     return: 'bg-success-bg text-success',
-    staff: 'bg-n-75 text-n-500',
+    staff: 'bg-surface-page text-ink-soft',
 };
 
 const DAY = 86_400_000;

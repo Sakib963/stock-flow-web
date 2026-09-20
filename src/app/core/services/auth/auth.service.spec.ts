@@ -335,11 +335,57 @@ describe('AuthService', () => {
             expect(pending()).toBeNull();
         });
 
-        /** The person leaves either way, and the server still hears about it once there is a connection. */
-        it('leaves at once when the server cannot be reached, and sends the sign-out again on the next start', async () => {
+        /** A refresh token the server still honours, with nobody left who can see the session or end it,
+         *  is worse than a person who has to press the button again. */
+        it('stays signed in when the sign-out never reached the server', async () => {
             signIn(true);
 
             const leaving = auth.signOut();
+            backend.expectOne((r) => r.url.includes(APIEndpoint.SIGN_OUT)).error(new ProgressEvent('error'), { status: 0 });
+            let failed = false;
+            try {
+                await leaving;
+            } catch {
+                failed = true;
+            }
+            await settle();
+
+            expect(failed).toBe(true);
+            expect(auth.isAuthenticated()).toBe(true);
+            expect(stored()).not.toBeNull();
+            // Nothing queued either: a replay on the next load would end a session this person is still using.
+            expect(pending()).toBeNull();
+        });
+
+        /** The endpoint answers 200 for a session it could not find too, so anything else means it did
+         *  not run, and a refused request is no more a closed session than an undelivered one. */
+        it.each([
+            ['a refusal', 400],
+            ['a server fault', 500],
+        ])('stays signed in on %s, because only a 200 says the session is over', async (_case, status) => {
+            signIn(true);
+
+            const leaving = auth.signOut();
+            backend.expectOne((r) => r.url.includes(APIEndpoint.SIGN_OUT)).flush({ code: status }, { status, statusText: 'Refused' });
+            let failed = false;
+            try {
+                await leaving;
+            } catch {
+                failed = true;
+            }
+            await settle();
+
+            expect(failed).toBe(true);
+            expect(auth.isAuthenticated()).toBe(true);
+            expect(stored()).not.toBeNull();
+            expect(pending()).toBeNull();
+        });
+
+        /** The app is unusable at this point, so leaving cannot depend on the server answering. */
+        it('abandons a session the app cannot use, and sends the sign-out again on the next start', async () => {
+            signIn(true);
+
+            const leaving = auth.abandonSession();
             backend.expectOne((r) => r.url.includes(APIEndpoint.SIGN_OUT)).error(new ProgressEvent('error'), { status: 0 });
             await leaving;
             await settle();

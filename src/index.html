@@ -24,7 +24,7 @@
                stylesheet, no webfont and no JavaScript. It contains no text on purpose: text
                would reflow when Mulish lands, and would need translating.
 
-               Re-derived from the built shell in layout.component.scss: header 56px, sider 252px,
+               Re-derived from the built shell: sider 252px full height and owning the brand, header 56px beside it,
                gutter 24px by 28px, rows 40px. If those change, change these in the same edit, or
                the layout visibly jumps at the moment the app appears and the product reads as if
                it stutters on every boot. */
@@ -37,12 +37,12 @@
                 box-sizing: border-box;
             }
 
+            /* Sider first, header beside it: the rail runs the full height and owns the brand. */
             .app-boot {
                 position: fixed;
                 inset: 0;
                 background: #f4f6f8;
                 display: flex;
-                flex-direction: column;
                 overflow: hidden;
             }
 
@@ -54,18 +54,14 @@
                 display: flex;
                 align-items: center;
             }
-            /* Same ground and same right edge as the sider, so the column reads as one piece from
-               the top of the window down. */
+            /* The top of the rail, on the rail's own ground and with no rule under it. */
             .app-boot__brand {
                 flex: none;
-                width: 252px;
-                height: 100%;
+                height: 56px;
                 display: flex;
                 align-items: center;
                 gap: 10px;
                 padding: 0 14px;
-                background: #fbfafe;
-                border-right: 1px solid #e3dff8;
             }
             .app-boot__logo {
                 width: 24px;
@@ -147,8 +143,9 @@
 
             .app-boot__body {
                 flex: 1;
+                min-width: 0;
                 display: flex;
-                min-height: 0;
+                flex-direction: column;
             }
             .app-boot__sider {
                 flex: none;
@@ -156,9 +153,15 @@
                 background:
                     url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 252 844' preserveAspectRatio='none'%3E%3Cpath d='M0 0h252v34c-52 28-108-4-160 20-30 14-60 6-92 24V0Z' fill='%23E6E1FA'/%3E%3Cpath d='M0 0h252v15c-60 26-118-6-168 18-26 12-52 4-84 18V0Z' fill='%23DCD6F6'/%3E%3Cpath d='M252 96c-46 30-96-6-146 26-34 22-70 8-106 34v168c40-30 78-12 114-36 46-30 96 4 138-26V96Z' fill='%23F6F4FD'/%3E%3Cellipse cx='248' cy='300' rx='86' ry='70' fill='%23F4F2FD'/%3E%3Cpath d='M0 372c44-26 80 14 132-6 36-14 74 4 120-18v150c-46 24-84 4-122 20-40 16-84-16-130 12V372Z' fill='%23F7F5FD'/%3E%3Cellipse cx='10' cy='452' rx='66' ry='52' fill='%23F5F3FD'/%3E%3Cpath d='M0 844V648c46-28 84 16 138-6 34-14 66 2 114-18v220H0Z' fill='%23F1EEFC'/%3E%3Cpath d='M0 844v-96c54-24 96 20 152-4 32-14 62 0 100-16v116H0Z' fill='%23E9E5FB'/%3E%3Cellipse cx='16' cy='742' rx='60' ry='44' fill='%23F3F1FD'/%3E%3C/svg%3E")
                         no-repeat center / 100% 100%,
-                    #fbfafe;
+                    #efecf9;
                 border-right: 1px solid #e3dff8;
-                padding: 10px 8px 20px;
+                display: flex;
+                flex-direction: column;
+            }
+            .app-boot__nav-list {
+                flex: 1;
+                min-height: 0;
+                padding: 4px 8px 20px;
                 display: flex;
                 flex-direction: column;
                 gap: 2px;
@@ -183,7 +186,7 @@
             .app-boot__main {
                 flex: 1;
                 min-width: 0;
-                padding: 24px 28px;
+                padding: 16px;
                 display: flex;
                 flex-direction: column;
                 gap: 16px;
@@ -275,26 +278,14 @@
                 .app-boot__hamburger {
                     display: block;
                 }
-                /* The tinted treatment goes with the drawer. Left here it would be a stray block
-                   of lavender with no column under it. */
-                .app-boot__brand {
-                    width: auto;
-                    flex: 1 1 auto;
-                    min-width: 0;
-                    padding: 0;
-                    background: none;
-                    border-right: 0;
-                }
-                .app-boot__brand-bar {
-                    background: #edeff3;
-                    width: 96px;
-                }
+                /* The brand goes with the rail, so at this width it is inside the hidden sider and
+                   needs nothing of its own here. */
                 .app-boot__toggle,
                 .app-boot__search {
                     display: none;
                 }
                 .app-boot__main {
-                    padding: 16px;
+                    padding: 8px;
                 }
                 .app-boot__cell--wide {
                     display: none;
@@ -307,26 +298,12 @@
     <body>
         <app-root>
             <div class="app-boot" aria-hidden="true">
-                <div class="app-boot__header">
-                    <span class="app-boot__hamburger"></span>
+                <div class="app-boot__sider">
                     <div class="app-boot__brand">
                         <img class="app-boot__logo" src="assets/icons/logo.svg" alt="" />
                         <span class="app-boot__brand-bar"></span>
                     </div>
-                    <div class="app-boot__header-rest">
-                        <span class="app-boot__toggle"></span>
-                        <span class="app-boot__search"></span>
-                        <span class="app-boot__hgroup">
-                            <span class="app-boot__hicon"></span>
-                            <span class="app-boot__hicon"></span>
-                            <span class="app-boot__lang"></span>
-                            <span class="app-boot__avatar"></span>
-                        </span>
-                    </div>
-                </div>
-
-                <div class="app-boot__body">
-                    <div class="app-boot__sider">
+                    <div class="app-boot__nav-list">
                         <span class="app-boot__nav-active"></span>
                         <span class="app-boot__nav-group" style="width: 62px"></span>
                         <span class="app-boot__nav"></span>
@@ -335,6 +312,22 @@
                         <span class="app-boot__nav-group" style="width: 44px"></span>
                         <span class="app-boot__nav"></span>
                         <span class="app-boot__nav"></span>
+                    </div>
+                </div>
+
+                <div class="app-boot__body">
+                    <div class="app-boot__header">
+                        <span class="app-boot__hamburger"></span>
+                        <div class="app-boot__header-rest">
+                            <span class="app-boot__toggle"></span>
+                            <span class="app-boot__search"></span>
+                            <span class="app-boot__hgroup">
+                                <span class="app-boot__hicon"></span>
+                                <span class="app-boot__hicon"></span>
+                                <span class="app-boot__lang"></span>
+                                <span class="app-boot__avatar"></span>
+                            </span>
+                        </div>
                     </div>
 
                     <div class="app-boot__main">

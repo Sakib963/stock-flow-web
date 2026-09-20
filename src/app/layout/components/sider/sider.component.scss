@@ -26,18 +26,20 @@
     display: none;
 }
 
-// The rail still has to point at "you are inside Selling" when the group is shut. Softer and
-// shorter than the real active bar, so it reads as a hint rather than a second active row.
-.shell__nav-list > .has-active:not(.is-open)::after {
+// The rail still has to point at "you are inside Selling" when the group is shut, and this bar is the
+// only thing saying it, so it is the accent at full strength rather than a hint. The fill it used to
+// carry is gone: another group can be open at the same time, and a shut group tinted like the open
+// block reads as a second open section. An open group needs none of it: its ground says where you are.
+.shell__group > .has-active:not(.is-open)::after {
     content: '';
     position: absolute;
     left: -8px;
     top: 50%;
-    margin-top: -8px;
+    margin-top: -10px;
     width: 3px;
-    height: 16px;
+    height: 20px;
     border-radius: 0 3px 3px 0;
-    background: var(--color-primary-soft);
+    background: var(--color-primary-6);
 }
 
 /* Children ----------------------------------------------------------------- */

@@ -128,15 +128,34 @@ export class AuthService {
     }
 
     /**
-     * Ends the session on the server and leaves for the sign-in screen.
+     * Ends the session on the server, then leaves for the sign-in screen.
+     *
+     * Nothing here is forgotten until the server says the session is over. The endpoint answers 200
+     * whatever it found, an ended session included, so any other answer means it did not run: leaving
+     * on one would strand a live refresh token that nobody can see and nobody can end, which on a
+     * borrowed or shared counter machine is the whole risk. It throws instead, and the caller offers
+     * another try.
      *
      * The navigation happens before any caller clears what the shell shows. The sign-in page is a
      * lazy chunk, and clearing first left the shell on screen, empty, until the chunk arrived.
-     *
-     * Leaving never waits on the server. A revoke that cannot be delivered is remembered and sent
-     * on the next load, while the cookie or stored token that identifies the session still exists.
      */
     async signOut(): Promise<void> {
+        const stored = this.readStored();
+        const accessToken = this._accessToken;
+
+        if (stored || accessToken) await this.postSignOut(stored?.transport === 'body' ? { refresh_token: stored.refresh_token } : {}, accessToken, false);
+
+        this.forget();
+        await this.goToSignIn();
+    }
+
+    /**
+     * Drops this session without waiting on the server, for the one path where the app cannot carry
+     * on regardless: the boot payload will not load, so there is no screen left to keep the person
+     * on while a revoke is attempted. The revoke is still sent, and remembered for the next load if
+     * it cannot be delivered, because the stored token that names the session is still here.
+     */
+    async abandonSession(): Promise<void> {
         const stored = this.readStored();
         const accessToken = this._accessToken;
         this.forget();
@@ -318,10 +337,19 @@ export class AuthService {
         return this.sendSignOut(pending, accessToken);
     }
 
-    private async sendSignOut(pending: PendingSignOut, accessToken: string | null): Promise<void> {
+    /** `keepalive` for a revoke nobody is waiting on: it has to survive the page it was fired from. */
+    private postSignOut(pending: PendingSignOut, accessToken: string | null, keepalive: boolean): Promise<unknown> {
         const headers = accessToken ? { Authorization: `Bearer ${accessToken}` } : undefined;
+        return firstValueFrom(this._http.post(this.url(APIEndpoint.SIGN_OUT), { refresh_token: pending.refresh_token ?? null }, { withCredentials: true, headers, keepalive }));
+    }
+
+    /**
+     * The queued revoke, which answers a different question from `signOut`: not "may this person
+     * leave", they already have, but "is this worth sending again".
+     */
+    private async sendSignOut(pending: PendingSignOut, accessToken: string | null): Promise<void> {
         try {
-            await firstValueFrom(this._http.post(this.url(APIEndpoint.SIGN_OUT), { refresh_token: pending.refresh_token ?? null }, { withCredentials: true, headers, keepalive: true }));
+            await this.postSignOut(pending, accessToken, true);
             this.clearPending();
         } catch (error) {
             // Delivered and refused is as final as delivered and accepted. Only an undelivered one

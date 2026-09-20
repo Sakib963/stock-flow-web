@@ -47,6 +47,14 @@ export class LayoutComponent {
     readonly notifications = inject(NotificationService);
     readonly search = inject(ShellSearchService);
 
+    /**
+     * What every shell drawer's body needs: no padding of its own, and a column its content can
+     * grow a scrolling region inside. It is here rather than in a global `.ant-drawer-body` rule
+     * because ng-zorro takes it as an input, and a rule reaching into ant's own element from
+     * `styles.css` is a rule nobody finds from the template.
+     */
+    readonly drawerBody = { padding: '0', display: 'flex', flexDirection: 'column' };
+
     private _primed = false;
 
     constructor() {

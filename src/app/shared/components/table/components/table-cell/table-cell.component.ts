@@ -22,7 +22,7 @@ const DOT: Record<Tone, string> = {
     warning: 'bg-warning',
     danger: 'bg-danger',
     progress: 'bg-primary',
-    neutral: 'bg-n-400',
+    neutral: 'bg-ink-faint',
 };
 
 /**
@@ -103,7 +103,7 @@ export class TableCellComponent {
         const on = this.amount();
         if (on <= 0) return { ink: 'text-danger-ink', key: 'list.stock.out', level };
         if (!Number.isNaN(level) && on <= level) return { ink: 'text-warning-ink', key: 'list.stock.below', level };
-        return { ink: 'text-n-900', key: Number.isNaN(level) ? null : 'list.stock.restockAt', level };
+        return { ink: 'text-ink', key: Number.isNaN(level) ? null : 'list.stock.restockAt', level };
     });
 
     readonly linkRoute = computed(() => {

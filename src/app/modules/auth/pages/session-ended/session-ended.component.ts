@@ -15,7 +15,7 @@ interface EndedView {
 }
 
 // Whole class strings, so Tailwind finds them when it scans this file.
-const CALM = 'border-n-200 bg-primary-wash text-primary';
+const CALM = 'border-line bg-primary-wash text-primary';
 const WARNING = 'border-warning-border bg-warning-bg text-warning';
 const DANGER = 'border-danger-border bg-danger-bg text-danger';
 
