@@ -57,11 +57,23 @@
                         @if (!state.railCollapsed()) {
                             <span class="flex-1 overflow-hidden text-ellipsis">{{ session.label(item) }}</span>
                             @if (hasNewChild(item)) {
-                                <span class="size-1.5 flex-none rounded-full bg-primary" data-shell="new-mark" aria-hidden="true"></span>
+                                <!-- A ping, not a dot: a group is collapsed by default, so the mark has to pull the eye to a
+                                     feature the person cannot see yet. The ring is dropped under reduced motion, leaving the dot. -->
+                                <span class="relative flex size-1.5 flex-none" data-shell="new-mark" aria-hidden="true">
+                                    <span class="absolute inline-flex size-full animate-ping rounded-full bg-primary opacity-75 motion-reduce:hidden"></span>
+                                    <span class="relative inline-flex size-full rounded-full bg-primary"></span>
+                                </span>
                             }
                             <ng-icon name="lucideChevronDown" size="13px" class="flex-none transition-transform duration-240 ease-shell" [class]="groupChevronClasses(item)" />
                         } @else {
-                            <span class="absolute right-3.25 bottom-1.75 size-1 rounded-full" [class]="hasNewChild(item) ? 'bg-primary' : 'bg-primary-soft'" [attr.data-shell]="hasNewChild(item) ? 'new-mark' : null"></span>
+                            @if (hasNewChild(item)) {
+                                <span class="absolute right-3.25 bottom-1.75 flex size-1" data-shell="new-mark" aria-hidden="true">
+                                    <span class="absolute inline-flex size-full animate-ping rounded-full bg-primary opacity-75 motion-reduce:hidden"></span>
+                                    <span class="relative inline-flex size-full rounded-full bg-primary"></span>
+                                </span>
+                            } @else {
+                                <span class="absolute right-3.25 bottom-1.75 size-1 rounded-full bg-primary-soft" aria-hidden="true"></span>
+                            }
                         }
                     </button>
 

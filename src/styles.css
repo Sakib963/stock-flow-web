@@ -231,6 +231,16 @@ body.lang-bn {
     padding: 0;
 }
 
+/* Every select dropdown, the table's page size changer included.
+
+   Its CDK viewport is `overflow: auto` on both axes, with the height set to exactly the option
+   count times 32px. That leaves no slack: a sideways overflow adds a horizontal bar, the bar eats
+   height the box does not have, and a vertical bar appears to compensate. A four-option list ends
+   up with two scrollbars. The label is already ellipsised, so sideways scroll buys nothing. */
+.ant-select-dropdown .cdk-virtual-scroll-viewport {
+    overflow-x: hidden;
+}
+
 /* Lists, from the records handoff. A skeleton bar the height of a line of 13px text, so skeleton rows are exactly as tall as real ones. */
 .sf-cell-skeleton .ant-skeleton-title {
     height: 12px;
