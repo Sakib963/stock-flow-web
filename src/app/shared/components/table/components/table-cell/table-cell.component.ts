@@ -1,17 +1,19 @@
-import { ChangeDetectionStrategy, Component, ElementRef, computed, inject, input, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideCopy } from '@ng-icons/lucide';
 import { NzMessageService } from 'ng-zorro-antd/message';
+import { NzPopoverModule } from 'ng-zorro-antd/popover';
 import { NzTooltipModule } from 'ng-zorro-antd/tooltip';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
-import { Row, Tone } from '@app/core/models/config.model';
+import { DateFormat, Row, Tone } from '@app/core/models/config.model';
 import { Column } from '@app/core/models/table.model';
 import { LanguageService } from '@app/core/services/language/language.service';
 import { RendererOutletComponent } from '@app/shared/components/renderer-outlet/renderer-outlet.component';
 import { StatusTagComponent } from '@app/shared/components/status-tag/status-tag.component';
 import { MoneyPipe } from '@app/shared/pipes/money/money.pipe';
 import { RecordDatePipe } from '@app/shared/pipes/record-date/record-date.pipe';
+import { UserCardComponent } from '@app/shared/components/user-card/user-card.component';
 import { TextPipe } from '@app/shared/pipes/text/text.pipe';
 import { fillRoute } from '@app/shared/utils/fill-route/fill-route';
 import { readPath } from '@app/shared/utils/read-path/read-path';
@@ -29,17 +31,20 @@ const DOT: Record<Tone, string> = {
  * One value, drawn by its column's type, the same in every layout: money is right-aligned tabular
  * taka in a table and on a card alike. A column's type decides alignment, font, truncation and
  * tooltip, so nothing is styled per screen.
+ *
+ * Anything carrying words shows the whole of it on hover, whether or not the column happened to
+ * cut it short: a tooltip that appeared only on an overflowing cell was indistinguishable from
+ * one that had never been built.
  */
 @Component({
     selector: 'table-cell',
-    imports: [RouterLink, NgIcon, NzTooltipModule, TranslatePipe, TextPipe, MoneyPipe, RecordDatePipe, StatusTagComponent, RendererOutletComponent],
+    imports: [RouterLink, NgIcon, NzPopoverModule, NzTooltipModule, TranslatePipe, TextPipe, MoneyPipe, RecordDatePipe, StatusTagComponent, UserCardComponent, RendererOutletComponent],
     providers: [provideIcons({ lucideCopy })],
     templateUrl: './table-cell.component.html',
     styleUrl: './table-cell.component.scss',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TableCellComponent {
-    private readonly _host = inject(ElementRef<HTMLElement>);
     private readonly _message = inject(NzMessageService);
     private readonly _translate = inject(TranslateService);
     readonly language = inject(LanguageService).current;
@@ -58,9 +63,6 @@ export class TableCellComponent {
         const value = this.value();
         return value === undefined || value === null || value === '' || (Array.isArray(value) && !value.length);
     });
-
-    /** Set on hover, so a tooltip appears only when the text was actually cut short. */
-    readonly truncated = signal(false);
 
     readonly sub = computed(() => {
         const column = this.column();
@@ -116,15 +118,29 @@ export class TableCellComponent {
         return String((column.type === 'link' && column.text ? readPath(this.row(), column.text) : this.value()) ?? '');
     });
 
+    readonly dateFormat = computed<DateFormat>(() => {
+        const column = this.column();
+        return column.type === 'date' ? (column.format ?? 'date') : 'date';
+    });
+
+    /**
+     * The name a row carries, and the account behind it. Nothing else: the designation, the photo
+     * and the rest are what the card fetches when somebody opens it.
+     */
+    readonly person = computed(() => {
+        const column = this.column();
+        if (column.type !== 'user') return null;
+
+        const account = String(this.value() ?? '');
+        const name = column.name ? String(readPath(this.row(), column.name) ?? '') : '';
+
+        return { label: name || account, account, named: !!name };
+    });
+
     readonly rendererBindings = computed(() => {
         const column = this.column();
         return { row: this.row(), column, inputs: column.type === 'component' ? (column.inputs ?? {}) : {} };
     });
-
-    measure(): void {
-        const text = this._host.nativeElement.querySelector('[data-truncate]') as HTMLElement | null;
-        this.truncated.set(!!text && (text.scrollWidth > text.clientWidth || text.scrollHeight > text.clientHeight));
-    }
 
     async copy(event: Event): Promise<void> {
         event.stopPropagation();

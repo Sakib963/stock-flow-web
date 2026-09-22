@@ -58,7 +58,7 @@ describe('orderedColumns', () => {
 });
 
 describe('visibleColumns', () => {
-    const prefs = (over: Partial<TablePreferences> = {}): TablePreferences => ({ layout: 'table', density: 'compact', order: ['code', 'name', 'supplier', 'stock', 'status', 'actions'], hidden: [], ...over });
+    const prefs = (over: Partial<TablePreferences> = {}): TablePreferences => ({ layout: 'table', order: ['code', 'name', 'supplier', 'stock', 'status', 'actions'], hidden: [], ...over });
 
     it('leaves out what was hidden', () => {
         expect(keys(visibleColumns(COLUMNS, prefs({ hidden: ['supplier', 'stock'] })))).toEqual(['code', 'name', 'status', 'actions']);
@@ -102,12 +102,12 @@ describe('moveColumn', () => {
 });
 
 describe('mergePreferences', () => {
-    const fallback = { layout: 'table', density: 'compact' as const };
+    const fallback = { layout: 'table' as const };
 
     it('starts from the config when nothing is stored, hiding the columns the config hides', () => {
         const columns = [...COLUMNS, column('cost', { hidden: true })];
 
-        expect(mergePreferences(columns, ['table'], null, fallback)).toEqual({ layout: 'table', density: 'compact', order: ['code', 'name', 'supplier', 'stock', 'status', 'actions', 'cost'], hidden: ['cost'] });
+        expect(mergePreferences(columns, ['table'], null, fallback)).toEqual({ layout: 'table', order: ['code', 'name', 'supplier', 'stock', 'status', 'actions', 'cost'], hidden: ['cost'] });
     });
 
     it('falls back to the config layout when the stored one is gone', () => {
@@ -119,7 +119,6 @@ describe('mergePreferences', () => {
     });
 
     it('ignores a density that is not one of the two', () => {
-        expect(mergePreferences(COLUMNS, ['table'], { density: 'roomy' as never }, fallback).density).toBe('compact');
     });
 
     it('stops hiding a column that has been locked since', () => {

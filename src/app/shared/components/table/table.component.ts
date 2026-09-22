@@ -1,17 +1,19 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input, output, signal, untracked } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgIcon, provideIcons } from '@ng-icons/core';
+import { lucideRefreshCw, lucideRotateCcw } from '@ng-icons/lucide';
 import { NzButtonModule } from 'ng-zorro-antd/button';
+import { NzModalModule, NzModalService } from 'ng-zorro-antd/modal';
 import { NzPaginationModule } from 'ng-zorro-antd/pagination';
-import { TranslatePipe } from '@ngx-translate/core';
-import { fromEvent, map } from 'rxjs';
-import { ActionEvent, Row } from '@app/core/models/config.model';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { ActionEvent, Row, Text } from '@app/core/models/config.model';
 import { LayoutContext } from '@app/core/models/renderer.model';
 import { Layout, RowAction, TableConfig, TablePreferences, TableSort, TableState } from '@app/core/models/table.model';
+import { LanguageService } from '@app/core/services/language/language.service';
 import { SessionService } from '@app/core/services/session/session.service';
 import { RendererOutletComponent } from '@app/shared/components/renderer-outlet/renderer-outlet.component';
 import { ColumnPickerComponent } from '@app/shared/components/table/components/column-picker/column-picker.component';
+import { CardLayoutComponent } from '@app/shared/components/table/components/card-layout/card-layout.component';
 import { TableLayoutComponent } from '@app/shared/components/table/components/table-layout/table-layout.component';
 import { LIST_ICONS, isListIcon } from '@app/shared/constants/list-icons';
 import { LIST_DEFAULT_PAGE_SIZE } from '@app/shared/constants/list-timing';
@@ -21,11 +23,16 @@ import { ListStore } from '@app/shared/services/list-store/list-store.service';
 import { moveColumn, visibleColumns } from '@app/shared/utils/column-order/column-order';
 import { matches } from '@app/shared/utils/condition/condition';
 import { fillRoute } from '@app/shared/utils/fill-route/fill-route';
-
-const PHONE_MAX = 767;
+import { resolveText } from '@app/shared/utils/resolve-text/resolve-text';
+import { isPhoneWidth, viewportWidth } from '@app/shared/utils/viewport/viewport';
 
 /** A layout's stable name: the built-ins are known by their type, a registered one by its key. */
 const layoutKey = (layout: Layout): string => (layout.type === 'component' ? layout.key : layout.type);
+
+const warnedPhoneLayout = new Set<string>();
+
+/** What a danger action asks when its config named no confirmation of its own. */
+const GENERIC_CONFIRM = { title: 'list.confirmTitle', body: 'list.confirmBody', ok: 'list.confirmOk' } as const;
 
 /**
  * The table: rows from a config, in the current layout, with their states and the footer.
@@ -40,8 +47,10 @@ const layoutKey = (layout: Layout): string => (layout.type === 'component' ? lay
  */
 @Component({
     selector: 'list-table',
-    imports: [NgIcon, NzButtonModule, NzPaginationModule, TranslatePipe, TextPipe, MoneyPipe, ColumnPickerComponent, TableLayoutComponent, RendererOutletComponent],
-    providers: [ListStore, provideIcons(LIST_ICONS)],
+    // NzModalModule is imported for its provider, not its template: NzModalService has no root
+    // provider of its own, and a confirmation that cannot open is a confirmation that never asks.
+    imports: [NgIcon, NzButtonModule, NzModalModule, NzPaginationModule, TranslatePipe, TextPipe, MoneyPipe, ColumnPickerComponent, CardLayoutComponent, TableLayoutComponent, RendererOutletComponent],
+    providers: [ListStore, provideIcons({ ...LIST_ICONS, lucideRefreshCw })],
     templateUrl: './table.component.html',
     styleUrl: './table.component.scss',
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -49,6 +58,9 @@ const layoutKey = (layout: Layout): string => (layout.type === 'component' ? lay
 export class TableComponent {
     private readonly _session = inject(SessionService);
     private readonly _router = inject(Router);
+    private readonly _modal = inject(NzModalService);
+    private readonly _translate = inject(TranslateService);
+    private readonly _language = inject(LanguageService).current;
     private readonly _route = inject(ActivatedRoute, { optional: true });
     private readonly _pageStore = inject(ListStore, { skipSelf: true, optional: true });
     private readonly _ownStore = inject(ListStore, { self: true });
@@ -62,6 +74,8 @@ export class TableComponent {
     readonly state = input<TableState | null>(null);
 
     readonly action = output<ActionEvent>();
+    /** The no-match state asks for the search and every filter to be dropped. Whoever owns them does it. */
+    readonly resetQuery = output<void>();
     /** Only without a source: the host reloads for these. */
     readonly pageChange = output<{ page: number; size: number }>();
     readonly sortChange = output<TableSort | null>();
@@ -70,8 +84,8 @@ export class TableComponent {
     readonly store = this._pageStore ?? this._ownStore;
     readonly loads = computed(() => !!this._pageStore || !!this.config().source);
 
-    private readonly _width = toSignal(fromEvent(window, 'resize').pipe(map(() => window.innerWidth)), { initialValue: window.innerWidth });
-    readonly isPhone = computed(() => this._width() <= PHONE_MAX);
+    private readonly _width = viewportWidth();
+    readonly isPhone = isPhoneWidth(this._width);
 
     private readonly _hostPage = signal(1);
     private readonly _hostSize = signal<number | null>(null);
@@ -99,6 +113,13 @@ export class TableComponent {
 
     readonly showsPicker = computed(() => (this.personalise().hide || this.personalise().reorder) && this.permittedColumns().some((c) => !c.pin));
 
+    /** Only where the table loads: a host that owns the rows owns when they are fetched again. */
+    readonly showsReload = computed(() => this.loads());
+
+    reload(): void {
+        this.store.reload();
+    }
+
     /**
      * What a layout draws: permitted, shown, in the person's order, minus what is too narrow to fit.
      *
@@ -112,7 +133,45 @@ export class TableComponent {
 
     private readonly _rowActions = computed(() => (this.config().rowActions ?? []).filter((a) => this._session.can(a.permission)));
 
-    readonly layout = computed(() => this.config().layouts.find((l) => (!l.permission || this._session.can(l.permission)) && (l.type === 'table' || l.type === 'component')) ?? { type: 'table' as const });
+    /** The actions column exists when this person has any row action at all, not per row. */
+    readonly hasActions = computed(() => this._rowActions().length > 0);
+
+    /** On unless a config turns it off. Every list is read against a printed sheet sooner or later. */
+    readonly showsSerial = computed(() => this.config().serial !== false);
+
+    readonly offset = computed(() => (this.page() - 1) * this.size());
+
+    readonly permittedLayouts = computed(() => this.config().layouts.filter((l) => !l.permission || this._session.can(l.permission)));
+
+    /**
+     * What is drawn: the config's first permitted layout, except on a phone, where `phoneLayout`
+     * names one of the same list instead (REQ-21).
+     *
+     * A `phoneLayout` that names no layout is warned about rather than quietly falling back. It
+     * reads as a working setting and is not one, and a silent fallback is how a list ends up in a
+     * layout nobody chose.
+     */
+    readonly layout = computed<Layout>(() => {
+        const layouts = this.permittedLayouts();
+        if (!layouts.length) return { type: 'table' };
+
+        if (this.isPhone()) {
+            const wanted = this.config().phoneLayout;
+            if (!wanted) return layouts.find((l) => l.type === 'cards') ?? layouts[0];
+
+            const found = layouts.find((l) => layoutKey(l) === wanted);
+            if (found) return found;
+
+            const id = `${this.config().key}:${wanted}`;
+            if (!warnedPhoneLayout.has(id)) {
+                warnedPhoneLayout.add(id);
+                console.warn(`[list-table] "${this.config().key}" asks for the phone layout "${wanted}", which its layouts do not include. Known here: ${layouts.map(layoutKey).join(', ')}.`);
+            }
+            return layouts.find((l) => l.type === 'cards') ?? layouts[0];
+        }
+
+        return layouts[0];
+    });
 
     readonly showsFooter = computed(() => {
         const state = this.viewState();
@@ -143,7 +202,9 @@ export class TableComponent {
         rows: this.viewRows,
         columns: this.columns,
         state: this.viewState,
-        density: computed(() => this.preferences().density),
+        offset: this.offset,
+        serial: this.showsSerial,
+        hasActions: this.hasActions,
         selection: null,
         sort: this.sort,
         setSort: (sort) => this.setSort(sort),
@@ -159,7 +220,7 @@ export class TableComponent {
         effect(() => {
             const config = this.config();
             const columns = this.permittedColumns();
-            untracked(() => this.store.configurePreferences(config.key, columns, config.layouts.map(layoutKey), { layout: layoutKey(this.layout()), density: config.density ?? 'compact' }));
+            untracked(() => this.store.configurePreferences(config.key, columns, config.layouts.map(layoutKey), { layout: layoutKey(this.layout()) }));
         });
 
         effect(() => {
@@ -204,9 +265,40 @@ export class TableComponent {
     run(key: string, row: Row): void {
         const action = this.actionsFor(row).find((a) => a.key === key);
         if (!action) return;
+
+        // Asked here rather than in the menu, so an action reached from a registered layout, a
+        // board drop or a keyboard path is asked the same question. A danger action confirms
+        // even where its config forgot to say how: REQ-26 is the rule, and a missing field
+        // must not be what silences it.
+        const confirm = action.confirm ?? (action.danger ? GENERIC_CONFIRM : null);
+        if (confirm) {
+            this._modal.confirm({
+                nzTitle: this.copy(confirm.title),
+                nzContent: this.copy(confirm.body),
+                nzOkText: this.copy(confirm.ok),
+                nzOkDanger: !!action.danger,
+                nzCancelText: this._translate.instant('list.cancel'),
+                nzOnOk: () => this.dispatch(action, row),
+            });
+            return;
+        }
+        this.dispatch(action, row);
+    }
+
+    private copy(text: Text): string {
+        return resolveText(text, this._language(), (key) => this._translate.instant(key));
+    }
+
+    private dispatch(action: RowAction, row: Row): void {
         if (action.run.kind === 'navigate') {
             const route = fillRoute(action.run.route, row);
             if (route) void this._router.navigateByUrl(route);
+            return;
+        }
+        // A registered action handler has nowhere to run until provideActionHandlers exists.
+        // Saying so beats emitting to a host that is not listening, which reads as a dead button.
+        if (action.run.kind === 'handler') {
+            console.warn(`[list-table] "${action.key}" names the action handler "${action.run.handler}", which this build cannot run yet.`);
             return;
         }
         this.action.emit({ action, rows: [row] });

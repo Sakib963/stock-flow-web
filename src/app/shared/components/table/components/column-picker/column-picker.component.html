@@ -1,5 +1,6 @@
-<button nz-button nzType="text" nzSize="small" type="button" class="sf-icon-btn" nz-popover nzPopoverTrigger="click" nzPopoverPlacement="bottomRight" [nzPopoverContent]="panel" [(nzPopoverVisible)]="open" nz-tooltip [nzTooltipTitle]="open() ? null : ('list.columns' | translate)" [attr.aria-label]="'list.columns' | translate" [attr.aria-expanded]="open()" data-picker="button">
-    <ng-icon name="lucideColumns3" size="16px" aria-hidden="true" />
+<button nz-button type="button" class="inline-flex items-center gap-1.5" nz-popover nzPopoverTrigger="click" nzPopoverPlacement="bottomRight" [nzPopoverContent]="panel" [(nzPopoverVisible)]="open" [attr.aria-expanded]="open()" data-picker="button">
+    <ng-icon name="lucideColumns3" size="14px" aria-hidden="true" />
+    <span class="text-xs">{{ 'list.columns' | translate }}</span>
 </button>
 
 <ng-template #panel>

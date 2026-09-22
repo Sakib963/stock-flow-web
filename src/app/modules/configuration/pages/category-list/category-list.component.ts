@@ -1,30 +1,31 @@
-import { ChangeDetectionStrategy, Component, computed, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { NzMessageService } from 'ng-zorro-antd/message';
+import { TranslateService } from '@ngx-translate/core';
 import { CATEGORY_LIST } from '@app/modules/configuration/config/category-list/category-list.config';
-import { PageHeaderComponent } from '@app/shared/components/page-header/page-header.component';
-import { TableComponent } from '@app/shared/components/table/table.component';
+import { ListShellPageComponent } from '@app/shared/components/list-shell-page/list-shell-page.component';
 
 /**
- * Categories, hosting the page header and the table from their configs. The list shell page
- * replaces this component when it is built; the route then points at the shell with the same config.
+ * Categories, drawn entirely from its config by the list shell page.
+ *
+ * The page exists for the one thing a config cannot hold: what Add, View and Edit do. Until the
+ * category form is built they say so, which is honest, and the day it exists this component goes
+ * back to being a wrapper while the config's three `emit` runs become `navigate`.
  */
 @Component({
     selector: 'category-list',
-    imports: [PageHeaderComponent, TableComponent],
+    imports: [ListShellPageComponent],
     templateUrl: './category-list.component.html',
     styleUrl: './category-list.component.scss',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CategoryListComponent {
+    private readonly _message = inject(NzMessageService);
+    private readonly _translate = inject(TranslateService);
+
     readonly config = CATEGORY_LIST;
 
-    private readonly _table = viewChild(TableComponent);
-    // The store, not the table's own view of it: the header binds before the table has its config.
-    readonly total = computed(() => this._table()?.store.total() ?? null);
-
-    // Before the view exists there is no store to ask, and a list always starts by loading, so the
-    // header shows the placeholder from the first frame rather than one change detection later.
-    readonly countPending = computed(() => {
-        const state = this._table()?.store.state() ?? 'loading';
-        return state === 'loading' || state === 'refreshing';
-    });
+    /** Add, View and Edit all land here, and all three have the same answer until the form exists. */
+    onAction(): void {
+        this._message.info(this._translate.instant('configuration.category.formComing'));
+    }
 }

@@ -1,0 +1,31 @@
+<button type="button" class="sf-icon-btn size-6.5 items-center justify-center p-0 max-md:size-11" [class.is-open]="open()" nz-dropdown nzTrigger="click" nzPlacement="bottomRight" [nzDropdownMenu]="menu" [(nzVisible)]="open" (click)="stopRow($event)" [attr.aria-label]="'list.rowActions' | translate" [attr.aria-expanded]="open()" data-row="actions">
+    <ng-icon name="lucideEllipsis" size="15px" aria-hidden="true" />
+</button>
+
+<nz-dropdown-menu #menu="nzDropdownMenu">
+    <ul nz-menu class="min-w-44">
+        @if (label()) {
+            <li class="px-3 py-1.5 font-mono text-[11px] text-ink-soft">{{ label() }}</li>
+            <li nz-menu-divider></li>
+        }
+        @for (item of ordinary(); track item.key) {
+            <li nz-menu-item [attr.data-action]="item.key" (click)="pick(item, $event)">
+                @if (iconOf(item); as icon) {
+                    <ng-icon [name]="icon" size="14px" class="mr-2 align-middle text-ink-soft" aria-hidden="true" />
+                }
+                {{ item.label | text }}
+            </li>
+        }
+        @if (dangerous().length && ordinary().length) {
+            <li nz-menu-divider></li>
+        }
+        @for (item of dangerous(); track item.key) {
+            <li nz-menu-item class="text-danger-ink" [attr.data-action]="item.key" (click)="pick(item, $event)">
+                @if (iconOf(item); as icon) {
+                    <ng-icon [name]="icon" size="14px" class="mr-2 align-middle" aria-hidden="true" />
+                }
+                {{ item.label | text }}
+            </li>
+        }
+    </ul>
+</nz-dropdown-menu>

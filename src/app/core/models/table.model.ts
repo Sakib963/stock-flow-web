@@ -1,4 +1,4 @@
-import { Action, Condition, Endpoint, JsonObject, Params, Text, Tone, ToneMap, ToneStyle } from '@app/core/models/config.model';
+import { Action, Condition, DateFormat, Endpoint, JsonObject, Params, Text, Tone, ToneMap, ToneStyle } from '@app/core/models/config.model';
 import { RendererRef } from '@app/core/models/renderer.model';
 
 interface ColumnBase {
@@ -11,6 +11,8 @@ interface ColumnBase {
     /** Numbers and money default right. */
     align?: 'left' | 'center' | 'right';
     sortable?: boolean;
+    /** The parameter the server sorts by, where it is not the field itself: a person column sorts by their time. */
+    sortKey?: string;
     /** px width at which the column drops out. */
     hideBelow?: number;
     /** Off until picked in Columns. */
@@ -24,6 +26,7 @@ interface ColumnBase {
 
 export type Column =
     | (ColumnBase & { type: 'text' })
+    /** Prose that will not fit: the cell clamps and the full value opens in a popover, not a tooltip. */
     | (ColumnBase & { type: 'long-text'; lines?: 1 | 2 })
     | (ColumnBase & { type: 'name'; sub?: string; thumb?: string })
     | (ColumnBase & { type: 'identifier'; copy?: boolean })
@@ -32,12 +35,19 @@ export type Column =
     | (ColumnBase & { type: 'stock'; restockAt: string })
     | (ColumnBase & { type: 'money'; due?: boolean })
     | (ColumnBase & { type: 'percent' })
-    | (ColumnBase & { type: 'date'; time?: boolean; relative?: boolean })
+    | (ColumnBase & { type: 'date'; format?: DateFormat })
     | (ColumnBase & { type: 'status'; tones: ToneMap; fallback?: ToneStyle })
     | (ColumnBase & { type: 'dot'; tones: ToneMap })
     | (ColumnBase & { type: 'boolean'; yes: Text; no: Text })
     | (ColumnBase & { type: 'phone' })
-    | (ColumnBase & { type: 'person'; sub?: string })
+    /**
+     * A person: the name a row carries, which opens their card. The one column type for a human, so
+     * a staff name reads the same in every list.
+     *
+     * `key` is the account the row stores, usually an email, and is what the card is fetched by.
+     * It is also what the cell falls back to when the row has no name to show.
+     */
+    | (ColumnBase & { type: 'user'; name?: string })
     | (ColumnBase & { type: 'tags'; tones?: ToneMap })
     | (ColumnBase & { type: 'image' })
     | (ColumnBase & { type: 'link'; route: string; text?: string })
@@ -55,7 +65,7 @@ interface LayoutBase {
 export type Layout =
     | (LayoutBase & { type: 'table' })
     | (LayoutBase & { type: 'cards'; title: string; subtitle?: string; badge?: string; meta?: readonly string[] })
-    | (LayoutBase & { type: 'grid'; media: string; title: string; subtitle?: string; badge?: string; meta?: readonly string[]; minWidth?: number })
+    | (LayoutBase & { type: 'grid'; media?: string; title: string; subtitle?: string; badge?: string; meta?: readonly string[]; minWidth?: number })
     | (LayoutBase & RendererRef & { type: 'component'; key: string; label: Text; icon: string; skeleton: 'rows' | 'cards' | 'grid'; columns?: readonly string[] });
 
 export interface TableSource {
@@ -106,7 +116,8 @@ export interface TableConfig {
     rowActions?: readonly RowAction[];
     bulkActions?: readonly BulkAction[];
     selection?: 'none' | 'multiple';
-    density?: 'compact' | 'standard';
+    /** The # column, counted from the page offset. On unless a table says otherwise. */
+    serial?: boolean;
     personalise?: { hide?: boolean; reorder?: boolean };
     pageSize?: { default: number; options: readonly number[] };
     sort?: TableSort;
@@ -121,7 +132,6 @@ export type TableState = 'idle' | 'loading' | 'refreshing' | 'data' | 'empty' | 
 /** Per person, per table, on the device. */
 export interface TablePreferences {
     layout: string;
-    density: 'compact' | 'standard';
     order: readonly string[];
     hidden: readonly string[];
 }

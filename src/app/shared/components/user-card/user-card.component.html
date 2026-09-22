@@ -1,0 +1,48 @@
+<div class="w-60 max-w-[calc(100vw-2rem)]" data-user-card [attr.aria-busy]="loading()">
+    <div class="flex gap-2.5">
+        @if (card()?.photo; as photo) {
+            <img [src]="photo" alt="" class="size-10 flex-none rounded-full border border-line-soft object-cover" />
+        } @else {
+            <span class="flex size-10 flex-none items-center justify-center rounded-full bg-primary-wash text-xs font-bold text-primary-8" aria-hidden="true">{{ initials() }}</span>
+        }
+
+        <div class="min-w-0 flex-1">
+            <p class="m-0 truncate text-xs font-bold text-ink">{{ name() }}</p>
+
+            @if (loading()) {
+                <div class="mt-1.5 flex flex-col gap-1.5" data-user-card="loading">
+                    <span class="block h-2 w-3/5 animate-pulse rounded-sm bg-line-soft motion-reduce:animate-none"></span>
+                    <span class="block h-2 w-4/5 animate-pulse rounded-sm bg-line-soft motion-reduce:animate-none"></span>
+                </div>
+            } @else if (failure()) {
+                <p class="m-0 mt-1 flex items-start gap-1 text-[11px] text-ink-muted" data-user-card="error">
+                    <ng-icon name="lucideCircleAlert" size="12px" class="mt-px flex-none text-danger-ink" aria-hidden="true" />
+                    <span>{{ failureKey() | translate }}</span>
+                </p>
+            } @else if (card(); as person) {
+                <dl class="m-0 mt-1 flex flex-col gap-0.5 text-[11px] text-ink-muted" data-user-card="details">
+                    @if (person.designation) {
+                        <div class="flex items-center gap-1.5">
+                            <ng-icon name="lucideBriefcase" size="12px" class="flex-none text-ink-faint" aria-hidden="true" />
+                            <dd class="m-0 truncate">{{ person.designation }}</dd>
+                        </div>
+                    }
+                    @if (person.role) {
+                        <div class="flex items-center gap-1.5">
+                            <ng-icon name="lucideShieldCheck" size="12px" class="flex-none text-ink-faint" aria-hidden="true" />
+                            <dd class="m-0 truncate">{{ person.role }}</dd>
+                        </div>
+                    }
+                    <div class="flex items-center gap-1.5">
+                        <ng-icon name="lucideMail" size="12px" class="flex-none text-ink-faint" aria-hidden="true" />
+                        <dd class="m-0 truncate font-mono">{{ person.email }}</dd>
+                    </div>
+                </dl>
+
+                @if (!person.active) {
+                    <p class="m-0 mt-1.5 border-t border-line-soft pt-1.5 text-[11px] text-ink-soft">{{ 'list.user.leftBusiness' | translate }}</p>
+                }
+            }
+        </div>
+    </div>
+</div>

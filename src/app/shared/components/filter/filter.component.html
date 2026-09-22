@@ -1,0 +1,135 @@
+<div class="flex flex-wrap items-center gap-2" data-filter="controls">
+    @if (inline()) {
+        @for (field of fields(); track field.key) {
+            <ng-container [ngTemplateOutlet]="control" [ngTemplateOutletContext]="{ $implicit: field }" />
+        }
+    } @else if (fields().length) {
+        <!-- The modal opens from a plain button; every other render hangs the same panel off a
+             popover, and a directive cannot be added conditionally, so the two are written out. -->
+        @if (isModal()) {
+            <button nz-button type="button" class="inline-flex items-center gap-1.5" [class.border-primary]="appliedCount()" (click)="openPanel()" data-filter="button">
+                <ng-container [ngTemplateOutlet]="filterButtonFace" />
+            </button>
+        } @else {
+            <button nz-button type="button" class="inline-flex items-center gap-1.5" [class.border-primary]="appliedCount()" nz-popover nzPopoverTrigger="click" nzPopoverPlacement="bottomLeft" [nzPopoverContent]="panel" [(nzPopoverVisible)]="popoverOpen" data-filter="button">
+                <ng-container [ngTemplateOutlet]="filterButtonFace" />
+            </button>
+        }
+    }
+
+    @if (hasSearch()) {
+        <!-- A share of the strip rather than a fixed width, so a wide monitor gives the search room.
+             The floor keeps it typeable between the phone breakpoint and a wide window, where a
+             sixth of the strip is a few characters. -->
+        <nz-input-wrapper class="w-1/6 min-w-56 max-md:w-full" data-filter="search">
+            <ng-icon nzInputPrefix name="lucideSearch" size="14px" class="text-ink-faint" aria-hidden="true" />
+            <input nz-input type="text" class="text-xs" [ngModel]="search()" (ngModelChange)="search.set($event)" [attr.placeholder]="config().search?.placeholder | text" [attr.aria-label]="config().search?.placeholder | text" />
+            @if (search()) {
+                <button nzInputSuffix type="button" class="sf-icon-btn size-4.5 items-center justify-center p-0" [attr.aria-label]="'list.clearSearch' | translate" (click)="clearSearch()" data-filter="clear-search">
+                    <ng-icon name="lucideX" size="12px" aria-hidden="true" />
+                </button>
+            }
+        </nz-input-wrapper>
+    }
+
+    <!-- Reset sits with the controls, not only among the chips: it is the way back from any state
+         that narrowed the list, including a search that matched nothing and left no chip behind. -->
+    @if (anyApplied()) {
+        <button nz-button type="button" class="inline-flex items-center gap-1.5" (click)="resetAll()" data-filter="reset">
+            <ng-icon name="lucideRotateCcw" size="14px" aria-hidden="true" />
+            <span class="text-xs">{{ 'list.resetFilters' | translate }}</span>
+        </button>
+    }
+</div>
+
+@if (showsChips() && chips().length) {
+    <div class="mt-1.5 flex flex-wrap items-center gap-1.5" data-filter="chips">
+        @for (chip of chips(); track chip.field.key) {
+            <span class="inline-flex max-w-full items-center gap-1 rounded-sm border border-line bg-surface-sunken py-0.5 ps-2 pe-1 text-[11px] text-ink-muted" data-filter="chip">
+                <span class="truncate">{{ chip.text }}</span>
+                @if (!chip.field.required) {
+                    <button type="button" class="sf-icon-btn size-4 items-center justify-center p-0" [attr.aria-label]="'list.removeFilter' | translate: { filter: chip.text }" (click)="clear(chip.field)">
+                        <ng-icon name="lucideX" size="11px" aria-hidden="true" />
+                    </button>
+                }
+            </span>
+        }
+    </div>
+}
+
+<ng-template #filterButtonFace>
+    <ng-icon name="lucideListFilter" size="14px" aria-hidden="true" />
+    <span class="text-xs">{{ 'list.filters' | translate }}</span>
+    @if (appliedCount()) {
+        <span class="ml-0.5 rounded-full bg-primary px-1.5 text-[11px] font-bold text-white tabular-nums">{{ appliedCount() }}</span>
+    }
+</ng-template>
+
+<!-- The panel: an nz-modal where the config asks for one, one field per row with an explicit Apply,
+     and an nz-popover for `bar`, which applies as you change it. -->
+<ng-template #panel>
+    <div [class]="isModal() ? 'flex flex-col gap-3' : 'flex w-64 max-w-[calc(100vw-2rem)] flex-col gap-2.5'">
+        @for (field of fields(); track field.key) {
+            <div class="flex flex-col gap-1">
+                <span class="text-[11px] font-semibold text-ink-muted">{{ field.label | text }}</span>
+                <ng-container [ngTemplateOutlet]="control" [ngTemplateOutletContext]="{ $implicit: field, block: true, draft: isModal() }" />
+            </div>
+        }
+    </div>
+</ng-template>
+
+<ng-template #modalFooter>
+    <div class="flex items-center gap-2">
+        <button nz-button nzType="text" type="button" class="mr-auto inline-flex items-center gap-1.5" (click)="clearDraft()">
+            <ng-icon name="lucideEraser" size="14px" aria-hidden="true" />
+            <span class="text-xs">{{ 'list.clearFilters' | translate }}</span>
+        </button>
+        <button nz-button type="button" class="inline-flex items-center gap-1.5" (click)="closePanel()">
+            <ng-icon name="lucideX" size="14px" aria-hidden="true" />
+            <span class="text-xs">{{ 'list.cancel' | translate }}</span>
+        </button>
+        <button nz-button nzType="primary" type="button" class="inline-flex items-center gap-1.5" (click)="applyDraft()" data-filter="apply">
+            <ng-icon name="lucideCheck" size="14px" aria-hidden="true" />
+            <span class="text-xs">{{ 'list.applyFilters' | translate }}</span>
+        </button>
+    </div>
+</ng-template>
+
+<!-- One definition per field type, drawn the same inline, in the popover and in the modal. `block`
+     fills the column; `draft` writes to the pending values a modal applies on its own button. -->
+<ng-template #control let-field let-block="block" let-draft="draft">
+    @switch (field.type) {
+        @case ('text') {
+            <input nz-input type="text" class="text-xs" [class.w-40]="!block" [class.w-full]="block" [disabled]="disabled(field)" [ngModel]="valueOf(field, draft)" (ngModelChange)="set(field, $event, draft)" [attr.placeholder]="(field.placeholder ?? field.label) | text" [attr.aria-label]="field.label | text" />
+        }
+        @case ('select') {
+            <nz-select class="text-xs" [class.w-40]="!block" [class.w-full]="block" [nzAllowClear]="!field.required" [nzDisabled]="disabled(field)" [nzPlaceHolder]="field.label | text" [ngModel]="valueOf(field, draft)" (ngModelChange)="set(field, $event, draft)">
+                @for (choice of choicesOf(field); track choice.value) {
+                    <nz-option [nzValue]="choice.value" [nzLabel]="choice.label | text" />
+                }
+            </nz-select>
+        }
+        @case ('multi-select') {
+            <nz-select class="text-xs" [class.min-w-44]="!block" [class.w-full]="block" nzMode="multiple" [nzMaxTagCount]="field.maxTags ?? 2" [nzAllowClear]="!field.required" [nzDisabled]="disabled(field)" [nzPlaceHolder]="field.label | text" [ngModel]="listOf(field, draft)" (ngModelChange)="setList(field, $event, draft)">
+                @for (choice of choicesOf(field); track choice.value) {
+                    <nz-option [nzValue]="choice.value" [nzLabel]="choice.label | text" />
+                }
+            </nz-select>
+        }
+        @case ('segmented') {
+            <nz-segmented nzSize="small" [nzBlock]="!!block" [ngModel]="valueOf(field, draft) ?? ''" (ngModelChange)="set(field, $event, draft)">
+                @for (choice of choicesOf(field); track choice.value) {
+                    <label nz-segmented-item [nzValue]="choice.value">{{ choice.label | text }}</label>
+                }
+            </nz-segmented>
+        }
+        @case ('toggle') {
+            <span class="inline-flex items-center gap-1.5 text-xs text-ink-muted">
+                <nz-switch nzSize="small" [ngModel]="toggleOf(field, draft)" (ngModelChange)="setToggle(field, $event, draft)" [nzDisabled]="disabled(field)" />
+                @if (!block) {
+                    <span>{{ field.label | text }}</span>
+                }
+            </span>
+        }
+    }
+</ng-template>

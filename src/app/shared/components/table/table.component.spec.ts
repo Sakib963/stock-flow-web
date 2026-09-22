@@ -37,6 +37,9 @@ const CATEGORIES: TableConfig = {
     empty: { icon: 'lucideFolderTree', title: 'No categories yet', body: 'Categories group the products you sell.' },
 };
 
+/** The same list with the host owning the rows, for what is drawn rather than what is fetched. */
+const PASSED: TableConfig = { ...CATEGORIES, source: undefined };
+
 const ROWS = [
     { oid: 'c-1', category_code: 'SAR', name: 'Saree', description: 'Silk and cotton', status: 'Active', allowed_actions: ['deactivate'] },
     { oid: 'c-2', category_code: 'KUR', name: 'Kurti', description: null, status: 'Inactive' },
@@ -88,6 +91,37 @@ describe('TableComponent', () => {
         expect(el.querySelectorAll('[data-table="row"]').length).toBe(2);
         expect(el.textContent).toContain('Saree');
         expect(el.querySelector('[data-table="range"]')?.textContent).toContain('list.range');
+    });
+
+it('numbers every row from the page offset, so row one of page three is not called one', async () => {
+        await setup([]);
+        const { fixture, el, cmp } = await render();
+        await respond(fixture, { code: 200, message: 'ok', data: { rows: ROWS }, total: 44 });
+
+        const serialOf = () => [...el.querySelectorAll('[data-table="row"]')].map((row) => row.querySelector('td')?.textContent?.trim());
+        expect(serialOf()).toEqual(['1', '2']);
+
+        cmp.onPage(3);
+        await vi.advanceTimersByTimeAsync(150);
+        await respond(fixture, { code: 200, message: 'ok', data: { rows: ROWS }, total: 44 });
+
+        expect(serialOf()).toEqual(['41', '42']);
+    });
+
+    it('draws no actions column at all for someone with none of its actions', async () => {
+        await setup([]);
+        const { el, cmp } = await render(PASSED, { rows: ROWS });
+
+        expect(cmp.hasActions()).toBe(false);
+        expect(el.querySelector('[data-row="actions"]')).toBeNull();
+    });
+
+    it('gives a row its menu where the person holds an action and the row allows it', async () => {
+        await setup(['configuration.category.view', 'configuration.category.edit']);
+        const { el, cmp } = await render(PASSED, { rows: ROWS });
+
+        expect(cmp.hasActions()).toBe(true);
+        expect(el.querySelectorAll('[data-row="actions"]').length).toBe(2);
     });
 
     it('leaves out a column the person may not see, such as a margin', async () => {

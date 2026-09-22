@@ -1,0 +1,57 @@
+<div class="grid gap-2.5 p-3" [style]="gridStyle()" data-layout="cards">
+    @if (loading()) {
+        @for (i of skeleton(); track i) {
+            <div class="rounded-container border border-line bg-white p-3" data-layout="skeleton-card">
+                <nz-skeleton [nzActive]="true" [nzTitle]="{ width: '60%' }" [nzParagraph]="{ rows: 2 }" />
+            </div>
+        }
+    } @else {
+        @for (row of rows(); track idOf(row); let index = $index) {
+            <article class="flex flex-col rounded-container border border-line bg-white transition-colors hover:border-primary-soft motion-reduce:transition-none" [class.cursor-pointer]="!!openRoute()" data-layout="card" (click)="onCardClick(row, $event)">
+                @if (mediaColumn(); as media) {
+                    <div class="flex h-28 items-center justify-center overflow-hidden rounded-t-container bg-surface-sunken">
+                        <table-cell [column]="media" [row]="row" [where]="where()" />
+                    </div>
+                }
+
+                <header class="flex items-start gap-2 px-3 pt-2.5">
+                    @if (context().serial()) {
+                        <span class="mt-0.5 font-mono text-[11px] tabular-nums text-ink-soft" aria-hidden="true">{{ numberOf(index) }}</span>
+                    }
+                    <div class="min-w-0 flex-1">
+                        @if (titleColumn(); as title) {
+                            <table-cell [column]="title" [row]="row" [openRoute]="routeFor(row)" [where]="where()" />
+                        }
+                        @if (subtitleColumn(); as subtitle) {
+                            <div class="mt-0.5 text-[11px] text-ink-muted">
+                                <table-cell [column]="subtitle" [row]="row" [where]="where()" />
+                            </div>
+                        }
+                    </div>
+                    @if (badgeColumn(); as badge) {
+                        <table-cell [column]="badge" [row]="row" [where]="where()" />
+                    }
+                    @if (context().hasActions()) {
+                        @let actions = context().actionsFor(row);
+                        @if (actions.length) {
+                            <row-actions [actions]="actions" [label]="labelOf(row)" (run)="context().run($event, row)" />
+                        }
+                    }
+                </header>
+
+                @if (metaColumns().length) {
+                    <dl class="m-0 grid grid-cols-[auto_1fr] items-baseline gap-x-3 gap-y-1 px-3 pt-2 pb-3">
+                        @for (column of metaColumns(); track column.key) {
+                            <dt class="text-[11px] whitespace-nowrap text-ink-soft">{{ column.label | text }}</dt>
+                            <dd class="m-0 min-w-0 text-xs text-ink-body">
+                                <table-cell [column]="column" [row]="row" [where]="where()" />
+                            </dd>
+                        }
+                    </dl>
+                } @else {
+                    <div class="pb-3"></div>
+                }
+            </article>
+        }
+    }
+</div>

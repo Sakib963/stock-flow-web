@@ -13,6 +13,9 @@ export class APIEndpoint {
     static readonly FORGOT_PASSWORD = '/api/v1/auth/forgot-password';
     static readonly RESET_PASSWORD = '/api/v1/auth/reset-password';
 
+    // Who a name in a list belongs to, fetched when a person card opens.
+    static readonly GET_USER_CARD = '/api/v1/auth/get-user-card';
+
     // Configuration
     static readonly GET_CATEGORY_LIST = '/api/v1/configuration/category/get-category-list';
 }

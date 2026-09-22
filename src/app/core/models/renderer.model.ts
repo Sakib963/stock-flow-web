@@ -20,7 +20,12 @@ export interface LayoutContext {
     /** Permitted, visible, in the person's order. */
     columns: Signal<readonly Column[]>;
     state: Signal<TableState>;
-    density: Signal<'compact' | 'standard'>;
+    /** Rows before this page: a row's serial number is this, plus its index, plus one. */
+    offset: Signal<number>;
+    /** Whether this table numbers its rows. */
+    serial: Signal<boolean>;
+    /** Whether any row action survives this person's permissions, which is what puts the column there. */
+    hasActions: Signal<boolean>;
     /** Null when selection is 'none'. */
     selection: WritableSignal<ReadonlySet<string>> | null;
     sort: Signal<TableSort | null>;

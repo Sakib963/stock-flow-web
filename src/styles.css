@@ -247,6 +247,40 @@ body.lang-bn {
     margin: 0;
 }
 
+/* The list table's own chrome, from the records handoff §7: rows 36px under a 34px header.
+
+   There is one density. The handoff's roomier variant was built and then removed: nobody wanted a
+   second row height, and it was a second set of numbers to keep in step.
+
+   The header is a label strip, not a row of data, so it sets one step smaller than the body and
+   carries its height itself. ng-zorro sizes header cells from the same padding variables as the
+   body cells, so there is no Less variable that moves one without the other, and the header it
+   gave us was as tall as two rows of data. Five rows of vertical padding is five rows of the list
+   nobody can see at 1366x768.
+
+   These reach ant's own elements, which no component stylesheet can name, so they are here beside
+   the other .ant-* hooks rather than in the table's .scss. */
+.sf-list-table .ant-table-thead > tr > th {
+    height: 34px;
+    padding: 0 10px;
+    font-size: 11.5px;
+    font-weight: 700;
+    line-height: 1.25;
+    white-space: nowrap;
+}
+
+.sf-list-table .ant-table-tbody > tr > td {
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+
+
+/* The sort arrows sit inside that height rather than growing it. */
+.sf-list-table .ant-table-column-sorter {
+    margin-inline-start: 4px;
+}
+
 /* Shell utilities.
 
    The pieces the application frame paints in more than one component: the icon button in the

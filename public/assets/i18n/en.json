@@ -195,7 +195,7 @@
         "retry": "Try again",
         "rendererFailed": "This view could not load. Your filters are kept.",
         "loading": "Loading the list",
-        "range": "{{from}}–{{to}} of {{total}}",
+        "range": "Displaying {{from}}-{{to}} out of {{total}} records",
         "noMatchTitle": "Nothing matches these filters",
         "noMatchBody": "Clear one of them and the list comes back.",
         "errorTitle": "Could not load the list",
@@ -215,7 +215,32 @@
             "out": "Out of stock",
             "below": "Below {{level}}",
             "restockAt": "Restock at {{level}}"
-        }
+        },
+        "serial": "Row number",
+        "rowActions": "Row actions",
+        "viewDetails": "Click to view details",
+        "refresh": "Refresh",
+        "densityCompact": "Tighter rows",
+        "densityStandard": "Roomier rows",
+        "filters": "Filters",
+        "clearSearch": "Clear the search",
+        "removeFilter": "Remove {{filter}}",
+        "cancel": "Cancel",
+        "user": {
+            "addedOn": "Added",
+            "editedOn": "Edited",
+            "leftBusiness": "This account is no longer active",
+            "failed": "Could not load this person. Try again in a moment.",
+            "network": "Could not reach StockFlow. Check the connection.",
+            "forbidden": "Your role does not include seeing who people are."
+        },
+        "confirmTitle": "Are you sure?",
+        "confirmBody": "This cannot be undone.",
+        "confirmOk": "Yes, do it",
+        "action": "Action",
+        "resetFilters": "Reset",
+        "applyFilters": "Apply",
+        "clearFilters": "Clear all"
     },
     "configuration": {
         "category": {
@@ -228,7 +253,15 @@
                 "inactive": "Inactive"
             },
             "emptyTitle": "No categories yet",
-            "emptyBody": "Categories group the products you sell, so stock and reports can be read by group."
+            "emptyBody": "Categories group the products you sell, so stock and reports can be read by group.",
+            "add": "Add category",
+            "description": "Description",
+            "lastTouched": "Last updated by",
+            "searchPlaceholder": "Search name, code or description",
+            "view": "View",
+            "edit": "Edit",
+            "formComing": "The category form is being built. It arrives in the next round.",
+            "lastTouchedOn": "Last updated"
         }
     }
 }

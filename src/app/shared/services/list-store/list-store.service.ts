@@ -65,17 +65,17 @@ export class ListStore {
     }
 
     /**
-     * Layout, density, column order and hidden columns for one table, remembered on this device
-     * (REQ-23). One state, so the picker, the layout switcher and every layout read the same thing.
+     * Layout, column order and hidden columns for one table, remembered on this device (REQ-23).
+     * One state, so the picker, the layout switcher and every layout read the same thing.
      *
      * Reconciled with the config on every open, never replayed as stored: the config ships with the
      * app and this sits in a browser that may be months behind it.
      */
-    readonly preferences = signal<TablePreferences>({ layout: 'table', density: 'compact', order: [], hidden: [] });
+    readonly preferences = signal<TablePreferences>({ layout: 'table', order: [], hidden: [] });
 
     private _preferencesKey: string | null = null;
 
-    configurePreferences(key: string, columns: readonly Column[], layouts: readonly string[], fallback: { layout: string; density: 'compact' | 'standard' }): void {
+    configurePreferences(key: string, columns: readonly Column[], layouts: readonly string[], fallback: { layout: string }): void {
         this._preferencesKey = key;
         this.preferences.set(mergePreferences(columns, layouts, this.readPreferences(key), fallback));
     }

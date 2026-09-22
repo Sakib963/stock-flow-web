@@ -1,0 +1,15 @@
+@let page = view();
+@if (page) {
+    <page-header [config]="page.header" [count]="total()" [countPending]="countPending()" (action)="action.emit($event)" />
+
+    <!-- The table is written twice rather than wrapping the filter in @if inside it: a node inside a
+         control flow block sits in an embedded view, which no ng-content selector can reach, so the
+         filter would silently never appear in the toolbar. -->
+    @if (page.filter; as filter) {
+        <list-table [config]="page.table" [context]="context()" (action)="action.emit($event)" (resetQuery)="onReset()">
+            <list-filter listToolbar [config]="filter" [values]="store.filters()" (valuesChange)="onFilters($event)" [search]="store.search()" (searchChange)="onSearch($event)" [loading]="countPending()" [narrow]="isPhone()" />
+        </list-table>
+    } @else {
+        <list-table [config]="page.table" [context]="context()" (action)="action.emit($event)" />
+    }
+}

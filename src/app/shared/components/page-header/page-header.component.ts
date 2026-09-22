@@ -104,15 +104,6 @@ export class PageHeaderComponent {
         return this._session.can('dashboard.overview.view') ? [HOME, ...trail] : trail;
     });
 
-    /** On a phone the breadcrumb is one link back to the nearest crumb that goes somewhere. */
-    readonly backCrumb = computed(() => {
-        const crumbs = this.crumbs();
-        return crumbs
-            .slice(0, -1)
-            .reverse()
-            .find((c) => !!c.route) ?? null;
-    });
-
     readonly back = computed(() => this.config()?.back ?? null);
 
     private readonly _actions = computed(() => (this.config()?.actions ?? []).filter((a) => this._session.can(a.permission)));

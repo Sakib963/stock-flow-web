@@ -5,7 +5,6 @@ import { lucideCheck, lucideColumns3, lucideGripVertical, lucideRotateCcw } from
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzCheckboxModule } from 'ng-zorro-antd/checkbox';
 import { NzPopoverModule } from 'ng-zorro-antd/popover';
-import { NzTooltipModule } from 'ng-zorro-antd/tooltip';
 import { TranslatePipe } from '@ngx-translate/core';
 import { Column, TablePreferences } from '@app/core/models/table.model';
 import { TextPipe } from '@app/shared/pipes/text/text.pipe';
@@ -23,7 +22,7 @@ import { mergeOrder, moveColumn, orderedColumns } from '@app/shared/utils/column
  */
 @Component({
     selector: 'column-picker',
-    imports: [CdkDrag, CdkDragHandle, CdkDropList, NgIcon, NzButtonModule, NzCheckboxModule, NzPopoverModule, NzTooltipModule, TranslatePipe, TextPipe],
+    imports: [CdkDrag, CdkDragHandle, CdkDropList, NgIcon, NzButtonModule, NzCheckboxModule, NzPopoverModule, TranslatePipe, TextPipe],
     providers: [provideIcons({ lucideCheck, lucideColumns3, lucideGripVertical, lucideRotateCcw })],
     templateUrl: './column-picker.component.html',
     styleUrl: './column-picker.component.scss',

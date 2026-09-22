@@ -88,16 +88,15 @@ export function moveColumn(columns: readonly Column[], order: readonly string[],
 /**
  * The preferences a table starts from: what was stored, reconciled with the config.
  *
- * A layout or density that the config no longer offers falls back to the config's own, so removing
- * a board layout does not leave someone staring at an empty card with no way back.
+ * A layout the config no longer offers falls back to the config's own, so removing a board layout
+ does not leave someone staring at an empty card with no way back.
  */
-export function mergePreferences(columns: readonly Column[], layouts: readonly string[], stored: Partial<TablePreferences> | null, fallback: { layout: string; density: 'compact' | 'standard' }): TablePreferences {
+export function mergePreferences(columns: readonly Column[], layouts: readonly string[], stored: Partial<TablePreferences> | null, fallback: { layout: string }): TablePreferences {
     const present = new Set(columns.map((c) => c.key));
     const lockedNow = new Set(columns.filter((c) => c.locked).map((c) => c.key));
 
     return {
         layout: stored?.layout && layouts.includes(stored.layout) ? stored.layout : fallback.layout,
-        density: stored?.density === 'compact' || stored?.density === 'standard' ? stored.density : fallback.density,
         order: mergeOrder(columns, stored?.order),
         // A column locked since the preference was stored stops being hidden, rather than being
         // both locked and absent.

@@ -2,16 +2,22 @@ import { CdkDrag, CdkDragDrop, CdkDropList } from '@angular/cdk/drag-drop';
 import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
 import { NzSkeletonModule } from 'ng-zorro-antd/skeleton';
 import { NzTableModule, NzTableSortOrder } from 'ng-zorro-antd/table';
+import { TranslatePipe } from '@ngx-translate/core';
 import { Row } from '@app/core/models/config.model';
 import { LayoutContext } from '@app/core/models/renderer.model';
 import { Column } from '@app/core/models/table.model';
+import { RowActionsComponent } from '@app/shared/components/table/components/row-actions/row-actions.component';
 import { TableCellComponent } from '@app/shared/components/table/components/table-cell/table-cell.component';
 import { TextPipe } from '@app/shared/pipes/text/text.pipe';
 import { fillRoute } from '@app/shared/utils/fill-route/fill-route';
+import { readPath } from '@app/shared/utils/read-path/read-path';
 
 const RIGHT: ReadonlySet<Column['type']> = new Set(['number', 'quantity', 'stock', 'money', 'percent']);
 /** The column without a width is never squeezed below this: the table scrolls inside its card instead. */
 const SLACK_MIN_PX = 220;
+/** Wide enough for a four figure serial, and no wider: it is the least interesting column on screen. */
+const SERIAL_PX = 52;
+const ACTIONS_PX = 76;
 
 /**
  * The table layout: columns across, one row per record. It takes the same LayoutContext a
@@ -19,7 +25,7 @@ const SLACK_MIN_PX = 220;
  */
 @Component({
     selector: 'table-layout',
-    imports: [CdkDrag, CdkDropList, NzTableModule, NzSkeletonModule, TableCellComponent, TextPipe],
+    imports: [CdkDrag, CdkDropList, NzTableModule, NzSkeletonModule, TranslatePipe, RowActionsComponent, TableCellComponent, TextPipe],
     templateUrl: './table-layout.component.html',
     styleUrl: './table-layout.component.scss',
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -40,10 +46,27 @@ export class TableLayoutComponent {
     readonly columns = computed(() => this.context().columns());
     readonly rows = computed(() => this.context().rows());
     readonly loading = computed(() => this.context().state() === 'loading');
-    readonly size = computed(() => (this.context().density() === 'compact' ? 'small' : 'middle'));
     readonly skeleton = computed(() => Array.from({ length: this.skeletonRows() }, (_, i) => i));
 
-    readonly scroll = computed(() => ({ x: `${this.columns().reduce((sum, c) => sum + (c.width ?? SLACK_MIN_PX), 0)}px` }));
+    readonly serial = computed(() => this.context().serial());
+    readonly hasActions = computed(() => this.context().hasActions());
+
+    readonly scroll = computed(() => {
+        const columns = this.columns().reduce((sum, c) => sum + (c.width ?? SLACK_MIN_PX), 0);
+        return { x: `${columns + (this.serial() ? SERIAL_PX : 0) + (this.hasActions() ? ACTIONS_PX : 0)}px` };
+    });
+
+    readonly serialWidth = `${SERIAL_PX}px`;
+    readonly actionsWidth = `${ACTIONS_PX}px`;
+
+    /**
+     * The number in the # column: the row's place in the whole list, not in the page on screen.
+     * Row 1 of page 3 at 20 a page is 41, which is what someone counting against a printed sheet
+     * expects, and what a colleague on the phone means by "the forty-first one".
+     */
+    numberOf(index: number): number {
+        return this.context().offset() + index + 1;
+    }
 
     align(column: Column): 'left' | 'right' | 'center' {
         return column.align ?? (RIGHT.has(column.type) ? 'right' : 'left');
@@ -53,14 +76,19 @@ export class TableLayoutComponent {
         return column.width ? `${column.width}px` : null;
     }
 
+    /** What the server is asked to sort by, which is the field unless the column names another. */
+    sortKey(column: Column): string {
+        return column.sortKey ?? column.key;
+    }
+
     sortOrder(column: Column): NzTableSortOrder {
         const sort = this.context().sort();
-        if (!sort || sort.key !== column.key) return null;
+        if (!sort || sort.key !== this.sortKey(column)) return null;
         return sort.order === 'asc' ? 'ascend' : 'descend';
     }
 
     onSort(column: Column, order: NzTableSortOrder): void {
-        this.context().setSort(order ? { key: column.key, order: order === 'ascend' ? 'asc' : 'desc' } : null);
+        this.context().setSort(order ? { key: this.sortKey(column), order: order === 'ascend' ? 'asc' : 'desc' } : null);
     }
 
     /** A pinned column is not a drop target either, so nothing can be dropped past one. */
@@ -79,6 +107,12 @@ export class TableLayoutComponent {
 
     idOf(row: Row): string {
         return String(row[this.rowKey()] ?? '');
+    }
+
+    /** The menu head repeats the row's code, or its name where a list has no code to show. */
+    labelOf(row: Row): string {
+        const named = this.columns().find((c) => c.type === 'identifier') ?? this.columns().find((c) => c.type === 'name');
+        return named ? String(readPath(row, named.key) ?? '') : '';
     }
 
     routeFor(row: Row): string | null {

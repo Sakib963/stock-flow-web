@@ -2,8 +2,8 @@ import { Condition, Endpoint, JsonObject, Params, Text } from '@app/core/models/
 import { RendererRef } from '@app/core/models/renderer.model';
 
 export interface FilterConfig {
-    /** row: up to 3 fields inline; modal: 4 or more; bar: a popover that applies live. */
-    render: 'row' | 'modal' | 'bar';
+    /** Defaults to modal, one field per row. row: up to 3 fields inline; bar: a popover that applies live. */
+    render?: 'row' | 'modal' | 'bar';
     /** key defaults to 'search'. */
     search?: { placeholder: Text; key?: string };
     fields: readonly FilterField[];
@@ -25,7 +25,6 @@ interface FilterFieldBase {
     disabledHint?: Text;
     /** For remote choices, the permission their endpoint requires. */
     permission?: string;
-    span?: 1 | 2;
 }
 
 export interface Choice {

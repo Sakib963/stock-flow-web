@@ -12,9 +12,9 @@
                 }
                 <span class="min-w-0">
                     @if (openRoute(); as route) {
-                        <a [routerLink]="route" data-truncate class="block truncate font-semibold text-ink hover:text-primary" [nz-tooltip]="truncated() ? text() : null" (mouseenter)="measure()" (click)="stopRow($event)">{{ text() }}</a>
+                        <a [routerLink]="route" class="block truncate font-semibold text-ink hover:text-primary" [nz-tooltip]="text()" (click)="stopRow($event)">{{ text() }}</a>
                     } @else {
-                        <span data-truncate class="block truncate font-semibold text-ink" [nz-tooltip]="truncated() ? text() : null" (mouseenter)="measure()">{{ text() }}</span>
+                        <span class="block truncate font-semibold text-ink" [nz-tooltip]="text()">{{ text() }}</span>
                     }
                     @if (sub(); as subline) {
                         <span class="block truncate text-[11px] text-ink-muted">{{ subline }}</span>
@@ -27,7 +27,7 @@
                 @if (openRoute(); as route) {
                     <a [routerLink]="route" class="font-mono text-xs text-primary hover:underline" (click)="stopRow($event)">{{ text() }}</a>
                 } @else {
-                    <span class="font-mono text-xs text-ink-body">{{ text() }}</span>
+                    <span class="font-mono text-xs text-ink-body" [nz-tooltip]="text()">{{ text() }}</span>
                 }
                 @if (col.copy) {
                     <button type="button" class="sf-icon-btn size-5" [nz-tooltip]="'list.copy' | translate" [attr.aria-label]="'list.copy' | translate" (click)="copy($event)">
@@ -37,10 +37,13 @@
             </span>
         }
         @case ('text') {
-            <span data-truncate class="block truncate text-ink-muted" [nz-tooltip]="truncated() ? text() : null" (mouseenter)="measure()">{{ text() }}</span>
+            <span class="block truncate text-ink-muted" [nz-tooltip]="text()">{{ text() }}</span>
         }
         @case ('long-text') {
-            <span data-truncate class="block text-ink-muted" [class.truncate]="col.lines !== 2" [class.line-clamp-2]="col.lines === 2" [nz-tooltip]="truncated() ? text() : null" (mouseenter)="measure()">{{ text() }}</span>
+            <span class="block cursor-help text-ink-muted" [class.truncate]="col.lines !== 2" [class.line-clamp-2]="col.lines === 2" nz-popover nzPopoverTrigger="hover" nzPopoverPlacement="topLeft" [nzPopoverContent]="full">{{ text() }}</span>
+            <ng-template #full>
+                <p class="m-0 max-w-xs text-xs leading-relaxed whitespace-pre-line text-ink-body">{{ text() }}</p>
+            </ng-template>
         }
         @case ('number') {
             <span class="tabular-nums">{{ value() | money: 'number' }}</span>
@@ -65,7 +68,8 @@
             }
         }
         @case ('date') {
-            <span class="whitespace-nowrap tabular-nums text-ink-muted">{{ value() | recordDate: language() : { time: col.time, relative: col.relative } }}</span>
+            <!-- The tooltip carries the time, which the column itself usually leaves out. -->
+            <span class="whitespace-nowrap tabular-nums text-ink-muted" [nz-tooltip]="value() | recordDate: language() : 'date-time-12'">{{ value() | recordDate: language() : dateFormat() }}</span>
         }
         @case ('status') {
             @if (tone(); as t) {
@@ -86,13 +90,15 @@
         @case ('phone') {
             <span class="whitespace-nowrap tabular-nums text-ink-muted">{{ text() }}</span>
         }
-        @case ('person') {
-            <span class="block min-w-0">
-                <span data-truncate class="block truncate text-ink-body" [nz-tooltip]="truncated() ? text() : null" (mouseenter)="measure()">{{ text() }}</span>
-                @if (sub(); as subline) {
-                    <span class="block truncate text-[11px] text-ink-muted">{{ subline }}</span>
-                }
-            </span>
+        @case ('user') {
+            @if (person(); as who) {
+                <button type="button" class="-mx-1 block max-w-full cursor-pointer truncate rounded-control px-1 text-left text-ink-body underline decoration-line decoration-dotted underline-offset-2 hover:text-primary hover:decoration-primary" nz-popover nzPopoverTrigger="click" nzPopoverPlacement="bottomLeft" [nzPopoverContent]="card" [nz-tooltip]="'list.viewDetails' | translate" (click)="stopRow($event)">
+                    {{ who.label }}
+                </button>
+                <ng-template #card>
+                    <user-card [email]="who.account" [fallbackName]="who.named ? who.label : null" />
+                </ng-template>
+            }
         }
         @case ('tags') {
             <span class="flex flex-wrap gap-1">

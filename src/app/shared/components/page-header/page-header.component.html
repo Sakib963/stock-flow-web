@@ -3,7 +3,11 @@
      and the header bar, and the two had to be kept in step by hand. -->
 <header class="mb-2 rounded-container border border-line bg-white px-4 pt-3 md:mb-4 md:px-5">
     @if (crumbs().length) {
-        <nz-breadcrumb nzSeparator="/" class="text-xs max-md:hidden" data-page-header="breadcrumb">
+        <!-- The whole trail on every size. A phone used to get one back link instead, and the
+             nearest crumb with a route is usually Home, so the header read "< Home" and said
+             nothing about where the page sat. It scrolls rather than wraps: one line that runs off
+             beats two lines that push the title down. -->
+        <nz-breadcrumb nzSeparator="/" class="block overflow-x-auto text-xs whitespace-nowrap" data-page-header="breadcrumb">
             @for (crumb of crumbs(); track $index; let last = $last) {
                 <nz-breadcrumb-item>
                     @if (crumb.route && !last) {
@@ -14,13 +18,6 @@
                 </nz-breadcrumb-item>
             }
         </nz-breadcrumb>
-
-        @if (backCrumb(); as crumb) {
-            <a class="inline-flex items-center gap-1 text-xs font-semibold text-ink-muted hover:text-primary md:hidden" [routerLink]="crumb.route" data-page-header="back-link">
-                <ng-icon name="lucideChevronLeft" size="14px" aria-hidden="true" />
-                {{ crumb.label | text }}
-            </a>
-        }
     }
 
     <div class="flex flex-wrap items-start justify-between gap-x-4.5 gap-y-2 pt-1 pb-3">
@@ -39,7 +36,7 @@
             }
             <ng-content select="[pageHeaderStatus]" />
             @if (leadText(); as leadCopy) {
-                <p class="m-0 basis-full text-xs text-ink-muted max-md:hidden" data-page-header="lead">{{ leadCopy | text }}</p>
+                <p class="m-0 basis-full text-xs text-ink-muted" data-page-header="lead">{{ leadCopy | text }}</p>
             }
         </div>
 

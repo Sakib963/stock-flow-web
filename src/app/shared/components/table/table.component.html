@@ -6,11 +6,28 @@
         </div>
     }
 
-    @if (showsPicker()) {
-        <div class="flex items-center justify-end gap-1 border-b border-line px-2 py-1.5" data-table="toolbar">
-            <column-picker [columns]="permittedColumns()" [preferences]="preferences()" (preferencesChange)="onPreferences($event)" [canHide]="personalise().hide" [canReorder]="personalise().reorder" />
+    <!-- One strip, not two. The host projects the search and filter fields into the left, and the
+         controls that change how the rows are drawn sit at the right. A separate filter bar above
+         the card cost a whole band of vertical space and said nothing the chips do not. -->
+    <div class="flex flex-wrap items-center gap-x-3 gap-y-2 border-b border-line px-3 py-2" data-table="toolbar">
+        <div class="min-w-0 flex-1 max-md:order-last max-md:basis-full">
+            <ng-content select="[listToolbar]" />
         </div>
-    }
+
+        <!-- self-start, not the strip's centring: an applied chip grows the left slot, and these two
+             must not drift down the moment someone filters. -->
+        <div class="flex flex-none items-center gap-2 self-start">
+            @if (showsReload()) {
+                <button nz-button type="button" class="inline-flex items-center gap-1.5" (click)="reload()" data-table="reload">
+                    <ng-icon name="lucideRefreshCw" size="14px" aria-hidden="true" />
+                    <span class="text-xs">{{ 'list.refresh' | translate }}</span>
+                </button>
+            }
+            @if (showsPicker()) {
+                <column-picker [columns]="permittedColumns()" [preferences]="preferences()" (preferencesChange)="onPreferences($event)" [canHide]="personalise().hide" [canReorder]="personalise().reorder" />
+            }
+        </div>
+    </div>
 
     @switch (state) {
         @case ('empty') {
@@ -29,6 +46,12 @@
                 </span>
                 <p class="m-0 text-sm font-bold text-ink">{{ 'list.noMatchTitle' | translate }}</p>
                 <p class="m-0 mt-1 max-w-sm text-xs text-ink-muted">{{ 'list.noMatchBody' | translate }}</p>
+                <!-- The way out of a dead end, where the person is already looking. Clearing from here
+                     is the same reset the toolbar offers, so there is no second idea of "cleared". -->
+                <button nz-button nzType="primary" type="button" class="mt-4 inline-flex items-center gap-1.5" data-table="reset" (click)="resetQuery.emit()">
+                    <ng-icon name="lucideRotateCcw" size="14px" aria-hidden="true" />
+                    <span>{{ 'list.resetFilters' | translate }}</span>
+                </button>
             </div>
         }
         @case ('idle') {
@@ -55,6 +78,8 @@
                 @let current = layout();
                 @if (current.type === 'component') {
                     <renderer-outlet kind="layout" [renderer]="current.renderer" [bindings]="{ context: layoutContext, inputs: current.inputs ?? {} }" />
+                } @else if (current.type === 'cards' || current.type === 'grid') {
+                    <card-layout [context]="layoutContext" [layout]="current" [rowKey]="config().rowKey" [openRoute]="openRoute()" [skeletonCards]="size()" [where]="config().key" />
                 } @else {
                     <table-layout [context]="layoutContext" [rowKey]="config().rowKey" [openRoute]="openRoute()" [skeletonRows]="size()" [where]="config().key" [canReorder]="canDragHeaders()" (reorder)="onReorder($event)" />
                 }
@@ -76,7 +101,7 @@
                     }
                 </span>
             }
-            <nz-pagination class="ml-auto" nzSize="small" [nzSimple]="isPhone()" [nzShowSizeChanger]="!isPhone()" [nzPageIndex]="page()" [nzPageSize]="size()" [nzTotal]="r.total" [nzPageSizeOptions]="sizeOptions()" (nzPageIndexChange)="onPage($event)" (nzPageSizeChange)="onSize($event)" />
+            <nz-pagination class="ml-auto" nzSize="small" [nzShowSizeChanger]="true" [nzPageIndex]="page()" [nzPageSize]="size()" [nzTotal]="r.total" [nzPageSizeOptions]="sizeOptions()" (nzPageIndexChange)="onPage($event)" (nzPageSizeChange)="onSize($event)" />
         </footer>
     }
 </section>

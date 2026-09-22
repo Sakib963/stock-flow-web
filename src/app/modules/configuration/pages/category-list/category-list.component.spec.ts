@@ -7,6 +7,8 @@ import { provideTranslateService } from '@ngx-translate/core';
 import { APIEndpoint } from '@app/core/constants/api-endpoint';
 import { CategoryListComponent } from './category-list.component';
 
+const PAGE = { code: 200, message: 'ok', data: { rows: [{ oid: 'c-1', category_code: 'SAR', name: 'Saree', status: 'Active' }] }, total: 31 };
+
 describe('CategoryListComponent', () => {
     afterEach(() => vi.useRealTimers());
 
@@ -23,7 +25,7 @@ describe('CategoryListComponent', () => {
 
         TestBed.inject(HttpTestingController)
             .expectOne((r) => r.url.endsWith(APIEndpoint.GET_CATEGORY_LIST))
-            .flush({ code: 200, message: 'ok', data: { rows: [{ oid: 'c-1', category_code: 'SAR', name: 'Saree', status: 'Active' }] }, total: 31 });
+            .flush(PAGE);
         await vi.advanceTimersByTimeAsync(400);
         fixture.detectChanges();
 

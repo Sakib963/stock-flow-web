@@ -12,7 +12,7 @@ describe('ColumnPickerComponent', () => {
     let fixture: ComponentFixture<ColumnPickerComponent>;
     let picker: ColumnPickerComponent;
 
-    const prefs = (over: Partial<TablePreferences> = {}): TablePreferences => ({ layout: 'table', density: 'compact', order: ['code', 'name', 'supplier', 'stock', 'status'], hidden: [], ...over });
+    const prefs = (over: Partial<TablePreferences> = {}): TablePreferences => ({ layout: 'table', order: ['code', 'name', 'supplier', 'stock', 'status'], hidden: [], ...over });
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({ imports: [ColumnPickerComponent], providers: [provideNzI18n(en_US), provideTranslateService({ fallbackLang: 'en' })] }).compileComponents();

@@ -16,6 +16,15 @@ export type Text = string | { en: string; bn: string };
 
 export type Tone = 'success' | 'warning' | 'danger' | 'progress' | 'neutral';
 
+/**
+ * How a date reads, named for what a person sees rather than a format string.
+ *
+ * 'date' is the list default (24 Aug 2026). The slashed forms are for screens people scan against
+ * paper, where a fixed-width 24/08/2026 lines up and a month name does not. A config picks one; a
+ * pattern string would let every list invent its own.
+ */
+export type DateFormat = 'date' | 'date-time' | 'date-time-12' | 'slashed' | 'slashed-time' | 'slashed-time-12' | 'time' | 'time-12' | 'relative';
+
 export type JsonValue = string | number | boolean | null | readonly JsonValue[] | { readonly [key: string]: JsonValue };
 export type JsonObject = { readonly [key: string]: JsonValue };
 
