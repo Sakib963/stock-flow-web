@@ -1,0 +1,20 @@
+<page-header [back]="back" [title]="'configuration.category.editTitle' | translate" [lead]="'configuration.category.formLead' | translate" />
+
+@if (category(); as record) {
+    <form-page [formId]="editor()?.formId ?? ''" [saving]="saving()" [remaining]="editor()?.remaining() ?? 0" saveLabel="form.saveChanges" (cancel)="cancel()">
+        <category-form [editing]="record" (submitted)="save()" />
+    </form-page>
+} @else if (loading()) {
+    <!-- Shaped like the four fields that are coming, so the page does not jump when they land. -->
+    <div class="mx-auto w-full max-w-[700px] rounded-container border border-line bg-white p-5" role="status" [attr.aria-label]="'form.loading' | translate">
+        <nz-skeleton nzActive [nzTitle]="false" [nzParagraph]="{ rows: 6 }" />
+    </div>
+} @else if (failed(); as failure) {
+    <div class="sf-empty" role="alert">
+        <p class="m-0 text-sm text-ink-body">{{ 'configuration.category.loadFailed.' + failure | translate }}</p>
+        <div class="mt-3 flex items-center justify-center gap-2">
+            <button nz-button nzType="default" type="button" (click)="backToList()">{{ 'configuration.category.backToList' | translate }}</button>
+            <button nz-button nzType="primary" type="button" (click)="load()">{{ 'form.retry' | translate }}</button>
+        </div>
+    </div>
+}

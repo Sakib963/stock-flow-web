@@ -12,7 +12,7 @@ import { NzTooltipModule } from 'ng-zorro-antd/tooltip';
 import { TranslatePipe } from '@ngx-translate/core';
 import { filter, map } from 'rxjs';
 import { ActionEvent, Text } from '@app/core/models/config.model';
-import { Crumb, PageAction, PageHeaderConfig } from '@app/core/models/page-header.model';
+import { Crumb, PageAction, PageBack, PageHeaderConfig } from '@app/core/models/page-header.model';
 import { SessionService } from '@app/core/services/session/session.service';
 import { LIST_ICONS, isListIcon } from '@app/shared/constants/list-icons';
 import { MoneyPipe } from '@app/shared/pipes/money/money.pipe';
@@ -52,6 +52,7 @@ export class PageHeaderComponent {
     /** Overrides the config and the menu. */
     readonly title = input<Text | null>(null);
     readonly lead = input<Text | null>(null);
+    readonly back = input<PageBack | null>(null);
     /** The list total, shown when the config asks for a count. Null while it is not known. */
     readonly count = input<number | null>(null);
     /** A request for the count is in flight. Tells an unknown count apart from a failed one. */
@@ -104,7 +105,7 @@ export class PageHeaderComponent {
         return this._session.can('dashboard.overview.view') ? [HOME, ...trail] : trail;
     });
 
-    readonly back = computed(() => this.config()?.back ?? null);
+    readonly backTarget = computed(() => this.back() ?? this.config()?.back ?? null);
 
     private readonly _actions = computed(() => (this.config()?.actions ?? []).filter((a) => this._session.can(a.permission)));
 
@@ -121,7 +122,7 @@ export class PageHeaderComponent {
     }
 
     goBack(): void {
-        const back = this.back();
+        const back = this.backTarget();
         if (back === 'history') this._location.back();
         else if (back) void this._router.navigateByUrl(back.route);
     }

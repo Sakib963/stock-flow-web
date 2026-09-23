@@ -9,6 +9,9 @@ export interface Crumb {
     route?: string;
 }
 
+/** Where the header's back arrow goes. `history` steps back; a route goes somewhere definite. */
+export type PageBack = 'history' | { route: string };
+
 export interface PageHeaderConfig {
     /** Default: the feature's menu label. */
     title?: Text;
@@ -17,7 +20,7 @@ export interface PageHeaderConfig {
     /** Default 'menu': the feature's path in the menu. */
     breadcrumb?: 'menu' | readonly Crumb[] | false;
     /** Record and form pages. */
-    back?: 'history' | { route: string };
+    back?: PageBack;
     /** The row total beside the title. */
     count?: boolean;
     /** At most two visible, exactly one primary. */

@@ -1,0 +1,84 @@
+@if (record(); as loaded) {
+    <page-header [back]="back" [title]="loaded.details.name" [lead]="loaded.details.description ?? ('configuration.category.noDescription' | translate)">
+        <span pageHeaderStatus>
+            @if (tone(); as style) {
+                <status-tag [label]="style.label" [tone]="style.tone" [icon]="style.icon" size="standard" />
+            }
+        </span>
+        @if (canEdit()) {
+            <button nz-button nzType="primary" type="button" class="inline-flex items-center gap-1.5" (click)="edit()">
+                <ng-icon name="lucidePencil" size="14px" aria-hidden="true" />
+                <span>{{ 'configuration.category.edit' | translate }}</span>
+            </button>
+        }
+    </page-header>
+
+    <!-- The numbers first: they are what someone opened this page to find out. -->
+    <div class="mb-2 grid grid-cols-[repeat(auto-fit,minmax(172px,1fr))] gap-px overflow-hidden rounded-container border border-line bg-line md:mb-4">
+        @for (stat of stats(); track stat.key) {
+            <div class="bg-white px-4 py-3">
+                <p class="m-0 flex items-center gap-1.5 text-[11px] font-semibold text-ink-muted uppercase">
+                    <ng-icon [name]="stat.icon" size="13px" aria-hidden="true" />
+                    {{ stat.label | translate }}
+                </p>
+                <p class="mt-1 mb-0 font-mono text-xl font-bold tabular-nums text-ink">{{ stat.value | money: stat.format }}</p>
+            </div>
+        }
+    </div>
+
+    <div class="rounded-container border border-line bg-white px-4 py-4 md:px-5">
+        <dl class="m-0 grid grid-cols-[repeat(auto-fit,minmax(148px,1fr))] gap-x-4 gap-y-3">
+            <div>
+                <dt class="text-[11px] font-semibold text-ink-muted uppercase">{{ 'configuration.category.code' | translate }}</dt>
+                <dd class="mt-0.5 mb-0 font-mono text-sm text-ink">{{ loaded.details.category_code }}</dd>
+            </div>
+            <div>
+                <dt class="text-[11px] font-semibold text-ink-muted uppercase">{{ 'configuration.category.created' | translate }}</dt>
+                <dd class="mt-0.5 mb-0 text-sm text-ink">{{ loaded.details.created_on | recordDate: language() : 'date' }}</dd>
+            </div>
+            <div>
+                <dt class="text-[11px] font-semibold text-ink-muted uppercase">{{ 'configuration.category.lastTouchedOn' | translate }}</dt>
+                <dd class="mt-0.5 mb-0 text-sm text-ink">{{ loaded.details.last_action_on | recordDate: language() : 'date' }}</dd>
+            </div>
+        </dl>
+    </div>
+
+    <section class="mt-2 rounded-container border border-line bg-white px-4 py-4 md:mt-4 md:px-5">
+        <h2 class="m-0 mb-2 text-sm font-bold text-ink">{{ 'configuration.category.activity' | translate }}</h2>
+        @for (entry of loaded.activity; track $index) {
+            <div class="border-line border-b py-2 last:border-b-0">
+                <p class="m-0 text-[13px] font-semibold text-ink-body">{{ entry.action }}</p>
+                @if (entry.description) {
+                    <p class="mt-0.5 mb-0 text-xs text-ink-muted">{{ entry.description }}</p>
+                }
+                <p class="mt-0.5 mb-0 text-[11px] text-ink-muted">{{ entry.user }} &middot; {{ entry.date | recordDate: language() : 'date-time-12' }}</p>
+            </div>
+        } @empty {
+            <p class="m-0 text-xs text-ink-muted">{{ 'configuration.category.noActivity' | translate }}</p>
+        }
+    </section>
+} @else if (loading()) {
+    <!-- The stat strip and the cards below it arrive together, so their places are held rather
+         than popping in from nothing. -->
+    <div role="status" [attr.aria-label]="'form.loading' | translate">
+        <div class="mb-2 grid grid-cols-[repeat(auto-fit,minmax(172px,1fr))] gap-px overflow-hidden rounded-container border border-line bg-line md:mb-4">
+            @for (cell of [1, 2, 3, 4]; track cell) {
+                <div class="bg-white px-4 py-3">
+                    <nz-skeleton nzActive [nzTitle]="false" [nzParagraph]="{ rows: 2 }" />
+                </div>
+            }
+        </div>
+        <div class="rounded-container border border-line bg-white px-4 py-4 md:px-5">
+            <nz-skeleton nzActive [nzTitle]="false" [nzParagraph]="{ rows: 3 }" />
+        </div>
+    </div>
+} @else if (failed(); as failure) {
+    <div class="sf-empty" role="alert">
+        <!-- A refusal, a dropped connection and a server fault ask different things of the person. -->
+        <p class="m-0 text-sm text-ink-body">{{ 'configuration.category.loadFailed.' + failure | translate }}</p>
+        <div class="mt-3 flex items-center justify-center gap-2">
+            <button nz-button nzType="default" type="button" (click)="backToList()">{{ 'configuration.category.backToList' | translate }}</button>
+            <button nz-button nzType="primary" type="button" (click)="load()">{{ 'form.retry' | translate }}</button>
+        </div>
+    </div>
+}

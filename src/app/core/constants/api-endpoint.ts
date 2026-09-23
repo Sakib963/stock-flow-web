@@ -18,4 +18,9 @@ export class APIEndpoint {
 
     // Configuration
     static readonly GET_CATEGORY_LIST = '/api/v1/configuration/category/get-category-list';
+    static readonly GET_CATEGORY_DETAILS = '/api/v1/configuration/category/get-category-details';
+    static readonly CREATE_CATEGORY = '/api/v1/configuration/category/create-category';
+    static readonly UPDATE_CATEGORY_DETAILS = '/api/v1/configuration/category/update-category-details';
+    static readonly CHECK_CATEGORY_AVAILABILITY = '/api/v1/configuration/category/check-category-availability';
+    static readonly GENERATE_CATEGORY_CODE = '/api/v1/configuration/category/generate-category-code';
 }

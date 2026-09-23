@@ -1,6 +1,7 @@
 import { APIEndpoint } from '@app/core/constants/api-endpoint';
 import { ToneMap } from '@app/core/models/config.model';
 import { ListShellPageConfig } from '@app/core/models/list-shell-page.model';
+import { CATEGORY_ROUTES } from '@app/modules/configuration/constants/category-routes';
 
 export const CATEGORY_STATUS: ToneMap = {
     Active: { label: 'configuration.category.status.active', tone: 'success', icon: 'lucideCheck' },
@@ -9,20 +10,21 @@ export const CATEGORY_STATUS: ToneMap = {
 
 /**
  * Categories: the first list on the new shell page, and the config every other one is copied from.
- *
- * Create, view and edit emit rather than navigate, because the category form is the next round and
- * a button that navigates nowhere is worse than one that says so. Swapping each `emit` for a
- * `navigate` is the whole change when the form lands.
  */
 export const CATEGORY_LIST: ListShellPageConfig = {
     permission: 'configuration.category.view',
     header: {
         count: true,
-        actions: [{ key: 'create', label: 'configuration.category.add', icon: 'lucidePlus', permission: 'configuration.category.create', primary: true, run: { kind: 'emit' } }],
+        actions: [{ key: 'create', label: 'configuration.category.add', icon: 'lucidePlus', permission: 'configuration.category.create', primary: true, run: { kind: 'navigate', route: CATEGORY_ROUTES.create } }],
     },
+    // No `filter` on any of these: a card here reports, it does not narrow the list. The status
+    // filter is one click away in the filter itself, and a card that silently changed what the
+    // table showed was read as the page breaking rather than as a filter being applied.
     stats: [
-        { key: 'active', label: 'configuration.category.stat.active', icon: 'lucideCheck', tone: 'success', filter: { status: 'Active' } },
-        { key: 'inactive', label: 'configuration.category.stat.inactive', icon: 'lucideCircleDashed', filter: { status: 'Inactive' } },
+        { key: 'active', label: 'configuration.category.stat.active', icon: 'lucideCheck', tone: 'success' },
+        { key: 'inactive', label: 'configuration.category.stat.inactive', icon: 'lucideCircleDashed' },
+        { key: 'products', label: 'configuration.category.stat.products', icon: 'lucidePackage' },
+        { key: 'empty', label: 'configuration.category.stat.empty', icon: 'lucideInbox', tone: 'warning' },
     ],
     filter: {
         render: 'modal',
@@ -62,8 +64,8 @@ export const CATEGORY_LIST: ListShellPageConfig = {
         rowActions: [
             // stateful: false, because a category has no state that closes either of these off. The
             // permission is the whole gate, and the server checks the same code.
-            { key: 'view', label: 'configuration.category.view', icon: 'lucideEye', permission: 'configuration.category.view', stateful: false, run: { kind: 'emit' } },
-            { key: 'edit', label: 'configuration.category.edit', icon: 'lucidePencil', permission: 'configuration.category.edit', stateful: false, run: { kind: 'emit' } },
+            { key: 'view', label: 'configuration.category.view', icon: 'lucideEye', permission: 'configuration.category.view', stateful: false, run: { kind: 'navigate', route: CATEGORY_ROUTES.detailPattern } },
+            { key: 'edit', label: 'configuration.category.edit', icon: 'lucidePencil', permission: 'configuration.category.edit', stateful: false, run: { kind: 'navigate', route: CATEGORY_ROUTES.editPattern } },
         ],
         empty: { icon: 'lucideFolderTree', title: 'configuration.category.emptyTitle', body: 'configuration.category.emptyBody' },
     },

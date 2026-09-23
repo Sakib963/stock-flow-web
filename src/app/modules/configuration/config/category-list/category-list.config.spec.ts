@@ -38,8 +38,18 @@ describe('the categories list config', () => {
     });
 
     it('is guarded by the same permission it declares', () => {
-        const route = CONFIGURATION_ROUTES.find((r) => r.path === 'categories');
-        expect(route?.data?.['permission']).toBe(CATEGORY_LIST.permission);
+        // The feature's routes sit under a pathless parent that carries the module's providers.
+        const routes = CONFIGURATION_ROUTES.flatMap((route) => route.children ?? [route]);
+        expect(routes.find((r) => r.path === 'categories')?.data?.['permission']).toBe(CATEGORY_LIST.permission);
+    });
+
+    it('routes every action somewhere the module actually declares', () => {
+        const routes = CONFIGURATION_ROUTES.flatMap((route) => route.children ?? [route]);
+        const declared = routes.map((r) => `/app/configuration/${r.path}`);
+        const targets = [...(CATEGORY_LIST.header.actions ?? []), ...(table.rowActions ?? [])].map((a) => (a.run.kind === 'navigate' ? a.run.route : null)).filter((route): route is string => !!route);
+
+        expect(targets.length).toBe(3);
+        expect(targets.filter((route) => !declared.includes(route.replace(':oid', ':oid')))).toEqual([]);
     });
 
     it('names only icons that are registered', () => {
@@ -49,17 +59,7 @@ describe('the categories list config', () => {
 
     it('has every label in both languages', () => {
         const choiceLabels = (CATEGORY_LIST.filter?.fields ?? []).flatMap((f) => ('choices' in f && Array.isArray(f.choices) ? f.choices.map((c) => c.label) : []));
-        const keys = [
-            ...table.columns.map((c) => c.label),
-            table.empty.title,
-            table.empty.body,
-            ...statusStyles.map((s) => s.label),
-            ...(CATEGORY_LIST.header.actions ?? []).map((a) => a.label),
-            ...(table.rowActions ?? []).map((a) => a.label),
-            ...(CATEGORY_LIST.filter?.fields ?? []).map((f) => f.label),
-            ...(CATEGORY_LIST.filter?.search ? [CATEGORY_LIST.filter.search.placeholder] : []),
-            ...choiceLabels,
-        ].filter((k): k is string => typeof k === 'string');
+        const keys = [...table.columns.map((c) => c.label), table.empty.title, table.empty.body, ...statusStyles.map((s) => s.label), ...(CATEGORY_LIST.header.actions ?? []).map((a) => a.label), ...(table.rowActions ?? []).map((a) => a.label), ...(CATEGORY_LIST.filter?.fields ?? []).map((f) => f.label), ...(CATEGORY_LIST.filter?.search ? [CATEGORY_LIST.filter.search.placeholder] : []), ...choiceLabels].filter((k): k is string => typeof k === 'string');
         expect(keys.filter((k) => !keyExists(en, k))).toEqual([]);
         expect(keys.filter((k) => !keyExists(bn, k))).toEqual([]);
     });

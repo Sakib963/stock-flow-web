@@ -260,12 +260,72 @@
             "searchPlaceholder": "Search name, code or description",
             "view": "View",
             "edit": "Edit",
-            "formComing": "The category form is being built. It arrives in the next round.",
             "lastTouchedOn": "Last updated",
             "stat": {
                 "active": "Active categories",
-                "inactive": "Inactive categories"
-            }
+                "inactive": "Inactive categories",
+                "products": "Products in them",
+                "empty": "Without products"
+            },
+            "createTitle": "Add category",
+            "editTitle": "Edit category",
+            "formLead": "Categories group the products you sell, so stock and reports can be read by group.",
+            "nameHelper": "What you would call this group of products when talking to a customer.",
+            "codeHelper": "A short code for reports and labels. Use your own, or have one made for you.",
+            "descriptionHelper": "Optional. What belongs in this category, for whoever adds products later.",
+            "statusHelper": "Inactive keeps the category and its history, and stops it being offered on new products.",
+            "updated": "Category saved.",
+            "createdMessage": "Category added.",
+            "loadFailed": {
+                "network": "Could not reach the server. Check your connection and try again.",
+                "forbidden": "You do not have permission to see this category.",
+                "server": "This category could not be loaded. Try again in a moment."
+            },
+            "backToList": "Back to categories",
+            "noDescription": "No description yet.",
+            "activity": "Recent activity",
+            "noActivity": "Nothing has happened to this category yet.",
+            "detailStat": {
+                "products": "Products",
+                "stock": "Units in stock",
+                "spent": "Spent on this stock",
+                "lowStock": "Low on stock"
+            },
+            "nameTaken": "Another category already has this name.",
+            "codeTaken": "Another category already has this code."
         }
+    },
+    "form": {
+        "save": "Save",
+        "saveChanges": "Save changes",
+        "cancel": "Cancel",
+        "loading": "Loading…",
+        "retry": "Try again",
+        "required": "This is needed.",
+        "tooLong": "Keep this to {{max}} characters or fewer.",
+        "remaining": "{{count}} still to fill in",
+        "fixErrors": "Check the fields marked below.",
+        "saveFailed": {
+            "network": "Could not reach the server. Check your connection and try again.",
+            "forbidden": "You do not have permission to save this. Ask your admin if you should.",
+            "server": "The server could not save this. Try again in a moment."
+        },
+        "checking": "Checking…",
+        "leave": {
+            "title": "Leave without saving?",
+            "body": "What you have typed here will not be kept.",
+            "discard": "Discard it",
+            "stay": "Keep editing"
+        }
+    },
+    "codeGenerator": {
+        "title": "Suggested code",
+        "hint": "make one for me",
+        "lead": "Built from the name. Nothing changes until you apply it.",
+        "working": "Building a code…",
+        "apply": "Apply this code",
+        "retry": "Try again",
+        "needsName": "Type the name first, then a code can be built from it.",
+        "failed": "A code could not be built just now. Type one yourself, or try again."
     }
 }

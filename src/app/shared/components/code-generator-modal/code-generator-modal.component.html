@@ -1,0 +1,32 @@
+<p class="mt-0 mb-3 text-[13px] text-ink-muted">{{ 'codeGenerator.lead' | translate }}</p>
+
+<div class="flex min-h-[92px] items-center justify-center rounded-container border border-line bg-surface-sunken px-4 py-4">
+    @if (loading()) {
+        <nz-spin nzSimple [nzTip]="'codeGenerator.working' | translate" />
+    } @else if (error(); as message) {
+        <p class="m-0 flex items-center gap-2 text-center text-[13px] text-danger-ink">
+            <ng-icon name="lucideCircleAlert" size="16px" aria-hidden="true" />
+            {{ message | translate }}
+        </p>
+    } @else if (code(); as suggestion) {
+        <p class="m-0 font-mono text-2xl font-bold tracking-[0.08em] text-ink" data-generator="code">{{ suggestion }}</p>
+    }
+</div>
+
+<div class="mt-4 flex justify-end gap-2">
+    <button nz-button nzType="default" type="button" class="inline-flex items-center gap-1.5" (click)="dismiss()">
+        <ng-icon name="lucideX" size="14px" aria-hidden="true" />
+        <span>{{ 'form.cancel' | translate }}</span>
+    </button>
+    @if (error() && !loading()) {
+        <button nz-button nzType="primary" type="button" class="inline-flex items-center gap-1.5" (click)="generate()">
+            <ng-icon name="lucideRotateCw" size="14px" aria-hidden="true" />
+            <span>{{ 'codeGenerator.retry' | translate }}</span>
+        </button>
+    } @else {
+        <button nz-button nzType="primary" type="button" class="inline-flex items-center gap-1.5" [disabled]="!code()" (click)="accept()">
+            <ng-icon name="lucideCheck" size="14px" aria-hidden="true" />
+            <span>{{ 'codeGenerator.apply' | translate }}</span>
+        </button>
+    }
+</div>
