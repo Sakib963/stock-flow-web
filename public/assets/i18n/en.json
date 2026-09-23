@@ -261,7 +261,11 @@
             "view": "View",
             "edit": "Edit",
             "formComing": "The category form is being built. It arrives in the next round.",
-            "lastTouchedOn": "Last updated"
+            "lastTouchedOn": "Last updated",
+            "stat": {
+                "active": "Active categories",
+                "inactive": "Inactive categories"
+            }
         }
     }
 }

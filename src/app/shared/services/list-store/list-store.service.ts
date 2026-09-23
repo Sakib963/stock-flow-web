@@ -13,10 +13,49 @@ import { resolveParams } from '@app/shared/utils/param-value/param-value';
 import { isEmptyValue } from '@app/shared/utils/empty-value/empty-value';
 import { readPath } from '@app/shared/utils/read-path/read-path';
 
-type Outcome = { ok: true; body: unknown } | { ok: false; failure: RequestFailure };
+type Outcome = { ok: true; body: unknown } | { ok: false; failure: RequestFailure; refused: boolean };
 
 /** One namespace, so clearing site data for this app clears every table's preferences together. */
 const PREFERENCES_PREFIX = 'sf.table.';
+
+/**
+ * Where a list remembers where someone was.
+ *
+ * sessionStorage, not localStorage and not the URL. Not the URL, because a link people paste and
+ * bookmark should be the page, not one person's half-narrowed view of it. Not localStorage, because
+ * a filter set on Tuesday must not still be hiding rows on Friday: the classic "the list is broken"
+ * report that is really a filter nobody remembers setting. A tab is the right lifetime, so a reload
+ * and a trip to a record and back come back to the same page, and a new tab starts clean.
+ */
+const STATE_PREFIX = 'sf.list.';
+
+interface StoredState {
+    page: number;
+    size: number;
+    sort: TableSort | null;
+    search: string;
+    filters: FilterValues;
+}
+
+/** Stored by an app that may be months behind this one, so every field is checked before it is used. */
+const readStored = (raw: string | null): StoredState | null => {
+    let parsed: unknown;
+    try {
+        parsed = raw ? JSON.parse(raw) : null;
+    } catch {
+        return null;
+    }
+    if (!parsed || typeof parsed !== 'object') return null;
+
+    const state = parsed as Partial<StoredState>;
+    const page = Number(state.page);
+    const size = Number(state.size);
+    if (!Number.isInteger(page) || page < 1 || !Number.isInteger(size) || size < 1) return null;
+
+    const sort = state.sort && typeof state.sort.key === 'string' && (state.sort.order === 'asc' || state.sort.order === 'desc') ? state.sort : null;
+    const filters = state.filters && typeof state.filters === 'object' ? state.filters : {};
+    return { page, size, sort, search: typeof state.search === 'string' ? state.search : '', filters };
+};
 
 const classify = (error: HttpErrorResponse): RequestFailure => (error.status === 0 ? 'network' : error.status === 403 ? 'forbidden' : 'server');
 
@@ -109,36 +148,98 @@ export class ListStore {
         if (first) {
             this.size.set(setup.pageSize ?? LIST_DEFAULT_PAGE_SIZE.default);
             this.sort.set(setup.sort ?? null);
+            // After the config's own opening position, so what someone left behind wins over it,
+            // and before the first request, so the list is never loaded twice to arrive there.
+            this.restore();
         }
         this._requests.next(first ? 0 : LIST_TIMING.triggerDebounceMs);
+    }
+
+    private restore(): void {
+        const key = this._setup?.key;
+        if (!key) return;
+
+        let stored: StoredState | null = null;
+        try {
+            stored = readStored(sessionStorage.getItem(`${STATE_PREFIX}${key}`));
+        } catch {
+            // Storage blocked. The config's opening position is a fine answer.
+        }
+        if (!stored) return;
+
+        this.page.set(stored.page);
+        this.size.set(stored.size);
+        this.sort.set(stored.sort);
+        this.search.set(stored.search);
+        this.filters.set(stored.filters);
+    }
+
+    /** Drops what was remembered and returns to the config's opening position. False when there was nothing. */
+    private forget(): boolean {
+        const key = this._setup?.key;
+        if (!key) return false;
+
+        let had = false;
+        try {
+            had = sessionStorage.getItem(`${STATE_PREFIX}${key}`) !== null;
+            sessionStorage.removeItem(`${STATE_PREFIX}${key}`);
+        } catch {
+            return false;
+        }
+        if (!had) return false;
+
+        this.page.set(1);
+        this.size.set(this._setup?.pageSize ?? LIST_DEFAULT_PAGE_SIZE.default);
+        this.sort.set(this._setup?.sort ?? null);
+        this.search.set('');
+        this.filters.set({});
+        return true;
+    }
+
+    /** Written on every change rather than on leaving, because nothing tells a page it is being left. */
+    private remember(): void {
+        const key = this._setup?.key;
+        if (!key) return;
+
+        const state: StoredState = { page: this.page(), size: this.size(), sort: this.sort(), search: this.search(), filters: this.filters() };
+        try {
+            sessionStorage.setItem(`${STATE_PREFIX}${key}`, JSON.stringify(state));
+        } catch {
+            // Storage blocked or full. The list still works; it just opens where the config says.
+        }
     }
 
     setSearch(text: string): void {
         this.search.set(text);
         this.page.set(1);
+        this.remember();
         this._requests.next(LIST_TIMING.searchDebounceMs);
     }
 
     setFilters(values: FilterValues): void {
         this.filters.set(values);
         this.page.set(1);
+        this.remember();
         this._requests.next(LIST_TIMING.triggerDebounceMs);
     }
 
     setPage(page: number): void {
         this.page.set(page);
+        this.remember();
         this._requests.next(LIST_TIMING.triggerDebounceMs);
     }
 
     setSize(size: number): void {
         this.size.set(size);
         this.page.set(1);
+        this.remember();
         this._requests.next(LIST_TIMING.triggerDebounceMs);
     }
 
     setSort(sort: TableSort | null): void {
         this.sort.set(sort);
         this.page.set(1);
+        this.remember();
         this._requests.next(LIST_TIMING.triggerDebounceMs);
     }
 
@@ -163,7 +264,7 @@ export class ListStore {
 
         return this._http.get<unknown>(`${environment.baseUrl}${setup.source.endpoint}`, { params: this.params(setup) }).pipe(
             map((body): Outcome => ({ ok: true, body })),
-            catchError((error: HttpErrorResponse) => of<Outcome>({ ok: false, failure: classify(error) })),
+            catchError((error: HttpErrorResponse) => of<Outcome>({ ok: false, failure: classify(error), refused: error.status === 400 })),
             delayWhen(() => timer(Math.max(0, LIST_TIMING.minLoadingMs - (Date.now() - started))))
         );
     }
@@ -190,6 +291,13 @@ export class ListStore {
 
     private apply(outcome: Outcome): void {
         if (!outcome.ok) {
+            // A remembered sort key or filter that a release has since removed comes back as a 400,
+            // and a retry would send exactly the same thing: the tab would be stuck on a list that
+            // works everywhere else. Forget it once and open where the config says.
+            if (outcome.refused && this.forget()) {
+                this.retry();
+                return;
+            }
             this.failure.set(outcome.failure);
             this.state.set('error');
             return;
@@ -204,6 +312,7 @@ export class ListStore {
         // A filter or a deletion can leave the page past the end: step back to the last real page.
         if (!rows.length && total > 0 && this.page() > 1) {
             this.page.set(Math.max(1, Math.ceil(total / this.size())));
+            this.remember();
             this._requests.next(0);
             return;
         }

@@ -104,7 +104,11 @@ function handle(request) {
     if (request.method === 'OPTIONS') return { status: 204, headers: cors(request), body: '' };
     if (url.includes('/refresh-token')) return answer(request, { access_token: 'access-1', refresh_token: 'refresh-1', refresh_transport: 'body', session_id: 'session-1' });
     if (url.includes('/get-user-info')) return answer(request, SESSION);
-    if (url.includes('/get-category-list')) return answer(request, { rows: ROWS }, { total: ROWS.length });
+    if (url.includes('/get-category-list')) {
+        // Counted here the way the endpoint counts them, so the stat strip is photographed with real numbers.
+        const stats = { active: ROWS.filter((r) => r.status === 'Active').length, inactive: ROWS.filter((r) => r.status === 'Inactive').length };
+        return answer(request, url.includes('include=stats') ? { rows: ROWS, stats } : { rows: ROWS }, { total: ROWS.length });
+    }
     if (url.includes('/get-user-card')) return answer(request, { name: 'Ahmad Saif', email: 'ahmad@samiha.test', designation: 'Manager', role: 'Manager', photo: null, active: true });
     console.log('  unmocked API call:', url);
     return answer(request, {});

@@ -142,6 +142,8 @@ export interface TablePreferences {
 
 /** What a list store needs to load a table. */
 export interface ListStoreSetup {
+    /** The table's `key`. Given, the list remembers page, size, sort, search and filters for the tab. */
+    key?: string;
     source: TableSource;
     pageSize?: number;
     sort?: TableSort | null;

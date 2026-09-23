@@ -20,6 +20,10 @@ export const CATEGORY_LIST: ListShellPageConfig = {
         count: true,
         actions: [{ key: 'create', label: 'configuration.category.add', icon: 'lucidePlus', permission: 'configuration.category.create', primary: true, run: { kind: 'emit' } }],
     },
+    stats: [
+        { key: 'active', label: 'configuration.category.stat.active', icon: 'lucideCheck', tone: 'success', filter: { status: 'Active' } },
+        { key: 'inactive', label: 'configuration.category.stat.inactive', icon: 'lucideCircleDashed', filter: { status: 'Inactive' } },
+    ],
     filter: {
         render: 'modal',
         search: { placeholder: 'configuration.category.searchPlaceholder' },

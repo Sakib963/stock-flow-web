@@ -31,10 +31,22 @@ const CONFIG: ListShellPageConfig = {
 
 const PAGE = { code: 200, message: 'ok', data: { rows: [{ oid: 'c-1', name: 'Saree' }] }, total: 31 };
 
+const WITH_STATS: ListShellPageConfig = {
+    ...CONFIG,
+    stats: [
+        { key: 'active', label: { en: 'Active', bn: 'চালু' }, icon: 'lucideCheck', tone: 'success', filter: { status: 'Active' } },
+        { key: 'inactive', label: { en: 'Inactive', bn: 'বন্ধ' }, icon: 'lucideCircleDashed' },
+    ],
+};
+
+const STATS_PAGE = { ...PAGE, data: { ...PAGE.data, stats: { active: 7, inactive: 2 } } };
+
 describe('ListShellPageComponent', () => {
+    // The store remembers a list per tab, and every config here shares one key.
+    beforeEach(() => sessionStorage.clear());
     afterEach(() => vi.useRealTimers());
 
-    async function open() {
+    async function open(config: ListShellPageConfig = CONFIG, body: object = PAGE) {
         vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout', 'setInterval', 'clearInterval', 'Date'] });
         await TestBed.configureTestingModule({
             imports: [ListShellPageComponent],
@@ -42,13 +54,13 @@ describe('ListShellPageComponent', () => {
         }).compileComponents();
 
         const fixture = TestBed.createComponent(ListShellPageComponent);
-        fixture.componentRef.setInput('config', CONFIG);
+        fixture.componentRef.setInput('config', config);
         fixture.detectChanges();
         await vi.advanceTimersByTimeAsync(0);
 
         const http = TestBed.inject(HttpTestingController);
         const first = http.expectOne((r) => r.url.endsWith(APIEndpoint.GET_CATEGORY_LIST));
-        first.flush(PAGE);
+        first.flush(body);
         await vi.advanceTimersByTimeAsync(400);
         fixture.detectChanges();
 
@@ -100,6 +112,37 @@ describe('ListShellPageComponent', () => {
         fixture.detectChanges();
 
         expect(el.querySelector('[data-filter="chip"]')?.textContent).toContain('Active');
+    });
+
+    it('asks for stats only when a config shows them, and draws a placeholder until they land', async () => {
+        const plain = await open();
+        expect(plain.first.request.params.has('include')).toBe(false);
+        expect(plain.el.querySelector('[data-page=stats]')).toBeNull();
+
+        TestBed.resetTestingModule();
+        const { first, el } = await open(WITH_STATS, PAGE);
+
+        expect(first.request.params.get('include')).toBe('stats');
+        // The response carried no stats, so neither card invents a zero.
+        expect(el.querySelectorAll('[data-stat] .tabular-nums').length).toBe(0);
+    });
+
+    it('shows each stat card and narrows the list to the one that was clicked', async () => {
+        const { fixture, http, el } = await open(WITH_STATS, STATS_PAGE);
+
+        const cards = [...el.querySelectorAll('[data-stat]')];
+        expect(cards.map((c) => c.querySelector('.tabular-nums')?.textContent?.trim())).toEqual(['7', '2']);
+
+        // Only the card with a filter is a button; the other reports and does nothing.
+        expect(cards.map((c) => c.tagName)).toEqual(['BUTTON', 'DIV']);
+
+        (cards[0] as HTMLButtonElement).click();
+        fixture.detectChanges();
+        await vi.advanceTimersByTimeAsync(150);
+
+        const sent = http.expectOne((r) => r.url.endsWith(APIEndpoint.GET_CATEGORY_LIST));
+        expect(sent.request.params.get('status')).toBe('Active');
+        sent.flush(STATS_PAGE);
     });
 
     it('does not undo the filters someone set when the record above it changes', async () => {

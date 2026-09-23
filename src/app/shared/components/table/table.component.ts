@@ -231,6 +231,7 @@ export class TableComponent {
             if (this._pageStore || !config.source) return;
             untracked(() =>
                 this._ownStore.configure({
+                    key: config.key,
                     source: config.source!,
                     pageSize: config.pageSize?.default,
                     sort: config.sort ?? null,

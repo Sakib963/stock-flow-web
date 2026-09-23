@@ -2,6 +2,24 @@
 @if (page) {
     <page-header [config]="page.header" [count]="total()" [countPending]="countPending()" (action)="action.emit($event)" />
 
+    @if (showsStats()) {
+        <div class="mb-3 grid gap-2.5 sm:grid-cols-2 lg:grid-cols-4" data-page="stats">
+            @for (stat of statCards(); track stat.key) {
+                <!-- A card that narrows the list is a button; one that only reports a number is not.
+                     A div with a click handler is neither, and the keyboard never reaches it. -->
+                @if (stat.filter) {
+                    <button type="button" class="flex items-center gap-3 rounded-container border border-line bg-white p-3 text-left transition-colors hover:border-primary-soft motion-reduce:transition-none" [attr.data-stat]="stat.key" (click)="onStat(stat)">
+                        <ng-container [ngTemplateOutlet]="face" [ngTemplateOutletContext]="{ $implicit: stat }" />
+                    </button>
+                } @else {
+                    <div class="flex items-center gap-3 rounded-container border border-line bg-white p-3" [attr.data-stat]="stat.key">
+                        <ng-container [ngTemplateOutlet]="face" [ngTemplateOutletContext]="{ $implicit: stat }" />
+                    </div>
+                }
+            }
+        </div>
+    }
+
     <!-- The table is written twice rather than wrapping the filter in @if inside it: a node inside a
          control flow block sits in an embedded view, which no ng-content selector can reach, so the
          filter would silently never appear in the toolbar. -->
@@ -13,3 +31,17 @@
         <list-table [config]="page.table" [context]="context()" (action)="action.emit($event)" />
     }
 }
+
+<ng-template #face let-stat>
+    <span class="flex size-9 flex-none items-center justify-center rounded-full" [class]="toneClass(stat)">
+        <ng-icon [name]="iconOf(stat)" size="17px" aria-hidden="true" />
+    </span>
+    <span class="min-w-0">
+        <span class="block truncate text-xs text-ink-muted">{{ stat.label | text }}</span>
+        @if (stat.value !== null) {
+            <span class="block text-base font-bold tabular-nums text-ink">{{ stat.value | money: stat.format ?? 'number' }}</span>
+        } @else {
+            <span class="mt-1.5 block h-3.5 w-14 animate-pulse rounded-sm bg-line-soft motion-reduce:animate-none" aria-hidden="true"></span>
+        }
+    </span>
+</ng-template>
