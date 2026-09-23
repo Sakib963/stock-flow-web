@@ -21,7 +21,7 @@
         <!-- A share of the strip rather than a fixed width, so a wide monitor gives the search room.
              The floor keeps it typeable between the phone breakpoint and a wide window, where a
              sixth of the strip is a few characters. -->
-        <nz-input-wrapper class="w-1/6 min-w-56 max-md:w-full" data-filter="search">
+        <nz-input-wrapper class="w-1/6 min-w-56 max-md:w-auto max-md:min-w-0 max-md:flex-1" data-filter="search">
             <ng-icon nzInputPrefix name="lucideSearch" size="14px" class="text-ink-faint" aria-hidden="true" />
             <input nz-input type="text" class="text-xs" [ngModel]="search()" (ngModelChange)="search.set($event)" [attr.placeholder]="config().search?.placeholder | text" [attr.aria-label]="config().search?.placeholder | text" />
             @if (search()) {

@@ -136,6 +136,8 @@ export class TableComponent {
     /** The actions column exists when this person has any row action at all, not per row. */
     readonly hasActions = computed(() => this._rowActions().length > 0);
 
+    readonly actionStyle = computed(() => this.config().rowActionStyle ?? 'auto');
+
     /** On unless a config turns it off. Every list is read against a printed sheet sooner or later. */
     readonly showsSerial = computed(() => this.config().serial !== false);
 

@@ -85,6 +85,8 @@ export interface RowAction extends Action {
     danger?: boolean;
 }
 
+export type RowActionStyle = 'auto' | 'menu' | 'inline';
+
 export interface BulkAction extends Action {
     stateful?: boolean;
 }
@@ -114,6 +116,8 @@ export interface TableConfig {
     /** A row click opens it: '/app/sales/orders/:oid'. */
     open?: { route: string };
     rowActions?: readonly RowAction[];
+    /** 'auto' is icon buttons up to two actions and a menu above that. */
+    rowActionStyle?: RowActionStyle;
     bulkActions?: readonly BulkAction[];
     selection?: 'none' | 'multiple';
     /** The # column, counted from the page offset. On unless a table says otherwise. */

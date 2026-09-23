@@ -1,31 +1,51 @@
-<button type="button" class="sf-icon-btn size-6.5 items-center justify-center p-0 max-md:size-11" [class.is-open]="open()" nz-dropdown nzTrigger="click" nzPlacement="bottomRight" [nzDropdownMenu]="menu" [(nzVisible)]="open" (click)="stopRow($event)" [attr.aria-label]="'list.rowActions' | translate" [attr.aria-expanded]="open()" data-row="actions">
-    <ng-icon name="lucideEllipsis" size="15px" aria-hidden="true" />
-</button>
+@if (inline()) {
+    <div class="flex items-center justify-center gap-0.5">
+        @for (item of actions(); track item.key) {
+            <button type="button" class="sf-icon-btn size-6.5 items-center justify-center p-0" [attr.data-action]="item.key" [attr.aria-label]="item.label | text" nz-tooltip nzTooltipPlacement="top" [nzTooltipTitle]="item.label | text" (click)="pick(item, $event)">
+                <!-- The colour is on the icon, not the button: the button's own hover rule would win over a utility on it. -->
+                <ng-icon [name]="iconOf(item) ?? 'lucideEllipsis'" size="15px" [class.text-danger-ink]="item.danger" aria-hidden="true" />
+            </button>
+        }
+    </div>
+} @else {
+    <!-- The same 26px button at every width. It used to grow to 44px below md for the touch target, and
+         that one control set the height of every row on a phone: 37px became 55px, so the same table
+         read as compact on a desktop and loose on a phone. The target is widened instead of the button,
+         through an overlay that takes no space, out to the width of its column and the height of its
+         row, so nothing overlaps the row above or below. -->
+    <button type="button" class="sf-icon-btn size-6.5 items-center justify-center p-0 max-md:after:absolute max-md:after:-inset-x-4 max-md:after:-inset-y-1.5 max-md:after:content-['']" [class.is-open]="open()" nz-dropdown nzTrigger="click" nzPlacement="bottomRight" [nzDropdownMenu]="menu" [(nzVisible)]="open" (click)="stopRow($event)" [attr.aria-label]="'list.rowActions' | translate" [attr.aria-expanded]="open()" data-row="actions">
+        <ng-icon name="lucideEllipsis" size="15px" aria-hidden="true" />
+    </button>
 
-<nz-dropdown-menu #menu="nzDropdownMenu">
-    <ul nz-menu class="min-w-44">
-        @if (label()) {
-            <li class="px-3 py-1.5 font-mono text-[11px] text-ink-soft">{{ label() }}</li>
-            <li nz-menu-divider></li>
-        }
-        @for (item of ordinary(); track item.key) {
-            <li nz-menu-item [attr.data-action]="item.key" (click)="pick(item, $event)">
-                @if (iconOf(item); as icon) {
-                    <ng-icon [name]="icon" size="14px" class="mr-2 align-middle text-ink-soft" aria-hidden="true" />
-                }
-                {{ item.label | text }}
-            </li>
-        }
-        @if (dangerous().length && ordinary().length) {
-            <li nz-menu-divider></li>
-        }
-        @for (item of dangerous(); track item.key) {
-            <li nz-menu-item class="text-danger-ink" [attr.data-action]="item.key" (click)="pick(item, $event)">
-                @if (iconOf(item); as icon) {
-                    <ng-icon [name]="icon" size="14px" class="mr-2 align-middle" aria-hidden="true" />
-                }
-                {{ item.label | text }}
-            </li>
-        }
-    </ul>
-</nz-dropdown-menu>
+    <nz-dropdown-menu #menu="nzDropdownMenu">
+        <ul nz-menu class="min-w-44">
+            @if (label()) {
+                <li class="px-3 py-1.5 font-mono text-[11px] text-ink-soft">{{ label() }}</li>
+                <li nz-menu-divider></li>
+            }
+            @for (item of ordinary(); track item.key) {
+                <li nz-menu-item [attr.data-action]="item.key" (click)="pick(item, $event)">
+                    <span class="flex items-center gap-2">
+                        @if (iconOf(item); as icon) {
+                            <ng-icon [name]="icon" size="14px" class="text-ink-soft" aria-hidden="true" />
+                        }
+                        {{ item.label | text }}
+                    </span>
+                </li>
+            }
+            @if (dangerous().length && ordinary().length) {
+                <li nz-menu-divider></li>
+            }
+            @for (item of dangerous(); track item.key) {
+                <li nz-menu-item class="text-danger-ink" [attr.data-action]="item.key" (click)="pick(item, $event)">
+                    <span class="flex items-center gap-2">
+                        @if (iconOf(item); as icon) {
+                            <ng-icon [name]="icon" size="14px" aria-hidden="true" />
+                        }
+                        {{ item.label | text }}
+                    </span>
+                </li>
+            }
+        </ul>
+    </nz-dropdown-menu>
+}

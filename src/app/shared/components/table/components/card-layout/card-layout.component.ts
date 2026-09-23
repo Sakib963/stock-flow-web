@@ -3,7 +3,7 @@ import { NzCardModule } from 'ng-zorro-antd/card';
 import { NzSkeletonModule } from 'ng-zorro-antd/skeleton';
 import { Row } from '@app/core/models/config.model';
 import { LayoutContext } from '@app/core/models/renderer.model';
-import { Column, Layout } from '@app/core/models/table.model';
+import { Column, Layout, RowActionStyle } from '@app/core/models/table.model';
 import { RowActionsComponent } from '@app/shared/components/table/components/row-actions/row-actions.component';
 import { TableCellComponent } from '@app/shared/components/table/components/table-cell/table-cell.component';
 import { TextPipe } from '@app/shared/pipes/text/text.pipe';
@@ -30,6 +30,7 @@ export class CardLayoutComponent {
     readonly openRoute = input<string | null>(null);
     readonly skeletonCards = input(8);
     readonly where = input('a list');
+    readonly actionStyle = input<RowActionStyle>('auto');
 
     readonly rows = computed(() => this.context().rows());
     readonly loading = computed(() => this.context().state() === 'loading');

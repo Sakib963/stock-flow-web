@@ -43,3 +43,7 @@ Thumbs.db
 
 # Ignore all environment files by default
 src/environments
+
+# Screenshots from tools/shot.mjs, regenerated on demand.
+tools/shots/
+

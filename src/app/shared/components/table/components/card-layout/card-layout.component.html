@@ -34,7 +34,7 @@
                     @if (context().hasActions()) {
                         @let actions = context().actionsFor(row);
                         @if (actions.length) {
-                            <row-actions [actions]="actions" [label]="labelOf(row)" (run)="context().run($event, row)" />
+                            <row-actions [actions]="actions" [label]="labelOf(row)" [mode]="actionStyle()" (run)="context().run($event, row)" />
                         }
                     }
                 </header>

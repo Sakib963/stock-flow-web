@@ -10,7 +10,7 @@
          controls that change how the rows are drawn sit at the right. A separate filter bar above
          the card cost a whole band of vertical space and said nothing the chips do not. -->
     <div class="flex flex-wrap items-center gap-x-3 gap-y-2 border-b border-line px-3 py-2" data-table="toolbar">
-        <div class="min-w-0 flex-1 max-md:order-last max-md:basis-full">
+        <div class="min-w-0 flex-1 max-md:basis-full">
             <ng-content select="[listToolbar]" />
         </div>
 
@@ -79,9 +79,9 @@
                 @if (current.type === 'component') {
                     <renderer-outlet kind="layout" [renderer]="current.renderer" [bindings]="{ context: layoutContext, inputs: current.inputs ?? {} }" />
                 } @else if (current.type === 'cards' || current.type === 'grid') {
-                    <card-layout [context]="layoutContext" [layout]="current" [rowKey]="config().rowKey" [openRoute]="openRoute()" [skeletonCards]="size()" [where]="config().key" />
+                    <card-layout [context]="layoutContext" [layout]="current" [rowKey]="config().rowKey" [openRoute]="openRoute()" [skeletonCards]="size()" [where]="config().key" [actionStyle]="actionStyle()" />
                 } @else {
-                    <table-layout [context]="layoutContext" [rowKey]="config().rowKey" [openRoute]="openRoute()" [skeletonRows]="size()" [where]="config().key" [canReorder]="canDragHeaders()" (reorder)="onReorder($event)" />
+                    <table-layout [context]="layoutContext" [rowKey]="config().rowKey" [openRoute]="openRoute()" [skeletonRows]="size()" [where]="config().key" [actionStyle]="actionStyle()" [canReorder]="canDragHeaders()" (reorder)="onReorder($event)" />
                 }
             </div>
         }

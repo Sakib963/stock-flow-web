@@ -5,7 +5,7 @@ import { NzTableModule, NzTableSortOrder } from 'ng-zorro-antd/table';
 import { TranslatePipe } from '@ngx-translate/core';
 import { Row } from '@app/core/models/config.model';
 import { LayoutContext } from '@app/core/models/renderer.model';
-import { Column } from '@app/core/models/table.model';
+import { Column, RowActionStyle } from '@app/core/models/table.model';
 import { RowActionsComponent } from '@app/shared/components/table/components/row-actions/row-actions.component';
 import { TableCellComponent } from '@app/shared/components/table/components/table-cell/table-cell.component';
 import { TextPipe } from '@app/shared/pipes/text/text.pipe';
@@ -39,6 +39,7 @@ export class TableLayoutComponent {
     readonly where = input('a list');
     /** Off when the config refuses reorder, and on a phone, where a drag is a scroll. */
     readonly canReorder = input(false);
+    readonly actionStyle = input<RowActionStyle>('auto');
 
     /** Indexes into the movable columns, which is what the header shows once pins are at the edges. */
     readonly reorder = output<{ from: number; to: number }>();

@@ -19,7 +19,9 @@
             @for (i of skeleton(); track i) {
                 <tr data-table="skeleton-row">
                     @if (serial()) {
-                        <td nzAlign="right" class="text-ink-soft tabular-nums">{{ numberOf($index) }}</td>
+                        <td nzAlign="right">
+                            <nz-skeleton [nzActive]="true" [nzTitle]="{ width: '100%' }" [nzParagraph]="false" class="sf-cell-skeleton" />
+                        </td>
                     }
                     @for (column of columns(); track column.key) {
                         <td [nzAlign]="align(column)">
@@ -46,7 +48,7 @@
                         <td nzAlign="center">
                             @let actions = context().actionsFor(row);
                             @if (actions.length) {
-                                <row-actions [actions]="actions" [label]="labelOf(row)" (run)="context().run($event, row)" />
+                                <row-actions [actions]="actions" [label]="labelOf(row)" [mode]="actionStyle()" (run)="context().run($event, row)" />
                             }
                         </td>
                     }

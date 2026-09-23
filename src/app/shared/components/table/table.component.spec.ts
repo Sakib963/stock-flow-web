@@ -116,11 +116,19 @@ it('numbers every row from the page offset, so row one of page three is not call
         expect(el.querySelector('[data-row="actions"]')).toBeNull();
     });
 
-    it('gives a row its menu where the person holds an action and the row allows it', async () => {
+    it('gives a row its actions where the person holds one and the row allows it', async () => {
         await setup(['configuration.category.view', 'configuration.category.edit']);
         const { el, cmp } = await render(PASSED, { rows: ROWS });
 
         expect(cmp.hasActions()).toBe(true);
+        const perRow = [...el.querySelectorAll('[data-table="row"]')].map((row) => row.querySelectorAll('[data-action]').length);
+        expect(perRow).toEqual([2, 1]);
+    });
+
+    it('puts the actions behind one menu where the config asks for it', async () => {
+        await setup(['configuration.category.view', 'configuration.category.edit']);
+        const { el } = await render({ ...PASSED, rowActionStyle: 'menu' }, { rows: ROWS });
+
         expect(el.querySelectorAll('[data-row="actions"]').length).toBe(2);
     });
 

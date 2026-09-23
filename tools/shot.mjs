@@ -79,17 +79,35 @@ const ROWS = NAMES.map((name, i) => ({
     allowed_actions: ['view', 'edit'],
 }));
 
-const answer = (data, extra = {}) => ({ status: 200, body: JSON.stringify({ code: 200, message: 'ok', data, ...extra }) });
+/**
+ * CORS for a credentialed request, which is stricter than the usual copy-paste headers.
+ *
+ * `*` is a literal, not a wildcard, once credentials are in play: neither the origin nor the
+ * allowed headers may be starred. The requested headers are echoed back instead. Get this wrong
+ * and the preflight is answered, the real call is never made, and the app boots to the sign-in
+ * screen as though the server were down.
+ */
+const cors = (request) => ({
+    'access-control-allow-origin': `http://127.0.0.1:${PORT}`,
+    'access-control-allow-credentials': 'true',
+    'access-control-allow-headers': request?.headers?.['Access-Control-Request-Headers'] ?? request?.headers?.['access-control-request-headers'] ?? 'authorization,content-type',
+    'access-control-allow-methods': 'GET,POST,PUT,PATCH,DELETE,OPTIONS',
+});
 
+const answer = (request, data, extra = {}) => ({ status: 200, headers: cors(request), body: JSON.stringify({ code: 200, message: 'ok', data, ...extra }) });
+
+// Matched on the API path, not the host: a production build points at the deployed server, so
+// pinning this to localhost mocked nothing and the app booted straight back to the sign-in screen.
 function handle(request) {
     const url = request.url;
-    if (!url.includes('localhost:3000')) return null;
-    if (url.includes('/refresh-token')) return answer({ access_token: 'access-1', refresh_token: 'refresh-1', refresh_transport: 'body', session_id: 'session-1' });
-    if (url.includes('/get-user-info')) return answer(SESSION);
-    if (url.includes('/get-category-list')) return answer({ rows: ROWS }, { total: ROWS.length });
-    if (url.includes('/get-user-card')) return answer({ name: 'Ahmad Saif', email: 'ahmad@samiha.test', designation: 'Manager', role: 'Manager', photo: null, active: true });
+    if (!url.includes('/api/v1/')) return null;
+    if (request.method === 'OPTIONS') return { status: 204, headers: cors(request), body: '' };
+    if (url.includes('/refresh-token')) return answer(request, { access_token: 'access-1', refresh_token: 'refresh-1', refresh_transport: 'body', session_id: 'session-1' });
+    if (url.includes('/get-user-info')) return answer(request, SESSION);
+    if (url.includes('/get-category-list')) return answer(request, { rows: ROWS }, { total: ROWS.length });
+    if (url.includes('/get-user-card')) return answer(request, { name: 'Ahmad Saif', email: 'ahmad@samiha.test', designation: 'Manager', role: 'Manager', photo: null, active: true });
     console.log('  unmocked API call:', url);
-    return answer({});
+    return answer(request, {});
 }
 
 const seed = "try { localStorage.setItem('__x9f4c2e8a1b7d6f3c0a5e9b2d4f8a11__', JSON.stringify({ transport: 'body', refresh_token: 'refresh-1', session_id: 'session-1', remember: true })); localStorage.setItem('__x7d2a9f4e1c8b3d6a0f5e2c9b7a41__', 'session-1'); } catch (e) {}";
