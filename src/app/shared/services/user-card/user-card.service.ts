@@ -4,9 +4,8 @@ import { Observable, catchError, map, shareReplay, throwError } from 'rxjs';
 import { environment } from '@env/environment';
 import { APIEndpoint } from '@app/core/constants/api-endpoint';
 import { ApiResponse, RequestFailure } from '@app/core/models/api.model';
+import { failureOf } from '@app/shared/utils/request-failure/request-failure';
 import { UserCard } from '@app/core/models/user-card.model';
-
-const classify = (error: HttpErrorResponse): RequestFailure => (error.status === 0 ? 'network' : error.status === 403 ? 'forbidden' : 'server');
 
 /**
  * Who a name in a list belongs to, fetched the first time somebody asks and kept for the visit.
@@ -31,7 +30,7 @@ export class UserCardService {
                 // A failure is not cached: the next click should ask again rather than repeat an
                 // error from a connection that has since come back.
                 this._cards.delete(key);
-                return throwError(() => classify(error));
+                return throwError(() => failureOf(error));
             }),
             shareReplay({ bufferSize: 1, refCount: false })
         );

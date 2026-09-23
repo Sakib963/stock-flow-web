@@ -4,6 +4,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { EMPTY, Observable, Subject, catchError, debounce, delayWhen, map, of, switchMap, timer } from 'rxjs';
 import { environment } from '@env/environment';
 import { RequestFailure } from '@app/core/models/api.model';
+import { failureOf } from '@app/shared/utils/request-failure/request-failure';
 import { JsonObject, Row } from '@app/core/models/config.model';
 import { FilterValues } from '@app/core/models/filter.model';
 import { Column, ListStoreSetup, TablePreferences, TableSort, TableState } from '@app/core/models/table.model';
@@ -56,8 +57,6 @@ const readStored = (raw: string | null): StoredState | null => {
     const filters = state.filters && typeof state.filters === 'object' ? state.filters : {};
     return { page, size, sort, search: typeof state.search === 'string' ? state.search : '', filters };
 };
-
-const classify = (error: HttpErrorResponse): RequestFailure => (error.status === 0 ? 'network' : error.status === 403 ? 'forbidden' : 'server');
 
 /**
  * The state of one list and the only thing that loads it: page, size, sort, search and filters in,
@@ -264,7 +263,7 @@ export class ListStore {
 
         return this._http.get<unknown>(`${environment.baseUrl}${setup.source.endpoint}`, { params: this.params(setup) }).pipe(
             map((body): Outcome => ({ ok: true, body })),
-            catchError((error: HttpErrorResponse) => of<Outcome>({ ok: false, failure: classify(error), refused: error.status === 400 })),
+            catchError((error: HttpErrorResponse) => of<Outcome>({ ok: false, failure: failureOf(error), refused: error.status === 400 })),
             delayWhen(() => timer(Math.max(0, LIST_TIMING.minLoadingMs - (Date.now() - started))))
         );
     }
