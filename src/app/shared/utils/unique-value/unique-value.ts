@@ -1,5 +1,6 @@
 import { AbstractControl, AsyncValidatorFn, ValidationErrors } from '@angular/forms';
 import { Observable, catchError, map, of, switchMap, timer } from 'rxjs';
+import { UniqueValueOptions } from '@app/core/models/form.model';
 
 const SETTLE_MS = 400;
 
@@ -13,10 +14,10 @@ const SETTLE_MS = 400;
  * A check that cannot run answers null, not "taken". The database refuses a duplicate either way,
  * and a hint that turns a network blip into "that name is used" would be worse than no hint.
  */
-export const uniqueValue = (check: (value: string) => Observable<boolean>, settleMs = SETTLE_MS): AsyncValidatorFn => {
+export const uniqueValue = (check: (value: string) => Observable<boolean>, { settleMs = SETTLE_MS, isOwn }: UniqueValueOptions = {}): AsyncValidatorFn => {
     return (control: AbstractControl): Observable<ValidationErrors | null> => {
         const value = (control.value ?? '').toString().trim();
-        if (!value) return of(null);
+        if (!value || isOwn?.(value)) return of(null);
 
         return timer(settleMs).pipe(
             switchMap(() => check(value)),

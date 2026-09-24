@@ -47,9 +47,9 @@
 
 <ng-template #notifyActions>
     @if (notifications.unread(); as unread) {
-        <span class="inline-flex size-4.5 min-w-4.5 items-center justify-center rounded-full bg-primary-wash px-1.25 font-mono text-shell-meta/none font-semibold text-primary">{{ unread }}</span>
+        <span class="inline-flex size-4.5 min-w-4.5 items-center justify-center rounded-full bg-primary-wash px-1.25 font-mono text-shell-meta/none font-semibold text-primary">{{ unread | digits }}</span>
     }
-    <button type="button" class="ml-2 cursor-pointer rounded-sm px-1.5 py-1 text-shell-note/none font-semibold text-primary not-disabled:hover:bg-primary-wash disabled:cursor-default disabled:text-ink-faint" [disabled]="!notifications.hasUnread()" (click)="notifications.markAllRead()">
+    <button type="button" class="ml-2 cursor-pointer rounded-sm px-1.5 py-1 text-shell-note/none font-semibold text-primary bn:leading-normal not-disabled:hover:bg-primary-wash disabled:cursor-default disabled:text-ink-faint" [disabled]="!notifications.hasUnread()" (click)="notifications.markAllRead()">
         {{ 'shell.markAllRead' | translate }}
     </button>
 </ng-template>

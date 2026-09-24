@@ -10,8 +10,8 @@ describe('RecordDatePipe', () => {
         expect(pipe.transform('2026-08-24T10:00:00Z', 'en')).toBe('24 Aug 2026');
     });
 
-    it('keeps Western digits in Bengali', () => {
-        expect(pipe.transform('2026-08-24T10:00:00Z', 'bn')).toMatch(/24.*2026/);
+    it('writes the date in Bengali digits when the page is in Bengali', () => {
+        expect(pipe.transform('2026-08-24T10:00:00Z', 'bn')).toMatch(/২৪.*২০২৬/);
     });
 
     it('says how long ago only within the last day', () => {

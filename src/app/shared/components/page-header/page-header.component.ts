@@ -3,7 +3,7 @@ import { ChangeDetectionStrategy, Component, computed, inject, input, output } f
 import { toSignal } from '@angular/core/rxjs-interop';
 import { NavigationEnd, Router, RouterLink } from '@angular/router';
 import { NgIcon, provideIcons } from '@ng-icons/core';
-import { lucideChevronLeft, lucideEllipsis } from '@ng-icons/lucide';
+import { lucideArrowLeft, lucideEllipsis } from '@ng-icons/lucide';
 import { NzBreadCrumbModule } from 'ng-zorro-antd/breadcrumb';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzDropdownModule } from 'ng-zorro-antd/dropdown';
@@ -38,7 +38,7 @@ const HOME: Crumb = { label: 'shell.home', route: '/app/dashboard' };
 @Component({
     selector: 'page-header',
     imports: [RouterLink, NgIcon, NzBreadCrumbModule, NzButtonModule, NzDropdownModule, NzMenuModule, NzTooltipModule, TranslatePipe, TextPipe, MoneyPipe],
-    providers: [provideIcons({ ...LIST_ICONS, lucideChevronLeft, lucideEllipsis })],
+    providers: [provideIcons({ ...LIST_ICONS, lucideArrowLeft, lucideEllipsis })],
     templateUrl: './page-header.component.html',
     styleUrl: './page-header.component.scss',
     changeDetection: ChangeDetectionStrategy.OnPush,

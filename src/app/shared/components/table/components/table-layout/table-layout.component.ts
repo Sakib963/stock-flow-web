@@ -11,6 +11,7 @@ import { TableCellComponent } from '@app/shared/components/table/components/tabl
 import { TextPipe } from '@app/shared/pipes/text/text.pipe';
 import { fillRoute } from '@app/shared/utils/fill-route/fill-route';
 import { readPath } from '@app/shared/utils/read-path/read-path';
+import { DigitsPipe } from '@app/shared/pipes/digits/digits.pipe';
 
 const RIGHT: ReadonlySet<Column['type']> = new Set(['number', 'quantity', 'stock', 'money', 'percent']);
 /** The column without a width is never squeezed below this: the table scrolls inside its card instead. */
@@ -25,7 +26,7 @@ const ACTIONS_PX = 76;
  */
 @Component({
     selector: 'table-layout',
-    imports: [CdkDrag, CdkDropList, NzTableModule, NzSkeletonModule, TranslatePipe, RowActionsComponent, TableCellComponent, TextPipe],
+    imports: [DigitsPipe, CdkDrag, CdkDropList, NzTableModule, NzSkeletonModule, TranslatePipe, RowActionsComponent, TableCellComponent, TextPipe],
     templateUrl: './table-layout.component.html',
     styleUrl: './table-layout.component.scss',
     changeDetection: ChangeDetectionStrategy.OnPush,

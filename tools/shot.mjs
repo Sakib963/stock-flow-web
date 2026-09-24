@@ -15,6 +15,8 @@ import { launch } from './cdp.mjs';
 const DIST = 'dist/stock-flow-web/browser';
 const ROUTE = process.argv[2] ?? '/app/configuration/categories';
 const OUT = process.argv[3] ?? 'tools/shots';
+/** What to wait for before the shot. A form or a record page has no table row to wait on. */
+const READY = process.argv[4] ?? '[data-table="row"]';
 const PORT = 4321;
 const SIZES = [
     ['desktop', 1366, 768],
@@ -57,7 +59,7 @@ const SESSION = {
     version: '1',
     user: { name: 'Nazmus Sakib', email: 'owner@samiha.test', mobile_number: null, photo: null, designation: 'Owner', role: 'Owner' },
     business: { name: 'Samiha Style Studio', logoUrl: null, orderSystem: 'BOTH' },
-    permissions: ['dashboard.overview.view', 'configuration.category.view', 'configuration.category.create', 'configuration.category.edit'],
+    permissions: ['dashboard.overview.view', 'configuration.category.view', 'configuration.category.create', 'configuration.category.edit', 'configuration.category.export'],
     menu: MENU,
     counters: { notifications: 0 },
 };
@@ -109,6 +111,18 @@ function handle(request) {
         const stats = { active: ROWS.filter((r) => r.status === 'Active').length, inactive: ROWS.filter((r) => r.status === 'Inactive').length };
         return answer(request, url.includes('include=stats') ? { rows: ROWS, stats } : { rows: ROWS }, { total: ROWS.length });
     }
+    if (url.includes('/get-category-details')) {
+        const row = ROWS[1];
+        return answer(request, {
+            details: { ...row, created_by: 'owner@samiha.test' },
+            stats: { totalProducts: 12, activeProducts: 11, amountSpent: 48250, totalAvailableQuantity: 340, lowStockItems: 2, outOfStockItems: 1, averageProductPrice: 1250 },
+            activity: [
+                { oid: 'log-1', date: '2026-09-20T14:22:18Z', user: 'owner@samiha.test', action: 'Updated category', description: 'Status changed from "Inactive" to "Active"' },
+                { oid: 'log-2', date: '2026-09-01T10:00:00Z', user: 'ahmad@samiha.test', action: 'Created category', description: 'Created category "Clothing" with code CODE-002' },
+            ],
+        });
+    }
+    if (url.includes('/check-category-availability')) return answer(request, { field: 'name', available: true });
     if (url.includes('/get-user-card')) return answer(request, { name: 'Ahmad Saif', email: 'ahmad@samiha.test', designation: 'Manager', role: 'Manager', photo: null, active: true });
     console.log('  unmocked API call:', url);
     return answer(request, {});
@@ -148,7 +162,7 @@ try {
     for (const [label, w, h] of SIZES) {
         await browser.setViewport(w, h);
         await browser.goto('http://127.0.0.1:' + PORT + BASE + ROUTE);
-        await browser.waitFor('[data-table="row"]');
+        await browser.waitFor(READY);
         await browser.screenshot(join(OUT, label + '.png'));
         console.log(label.padEnd(8), await browser.eval(PROBE));
     }

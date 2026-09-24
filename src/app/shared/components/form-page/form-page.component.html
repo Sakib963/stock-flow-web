@@ -1,22 +1,29 @@
-<div class="mx-auto w-full max-w-[700px]">
+<div class="w-full">
     <div class="rounded-container border border-line bg-white px-4 pt-4 md:px-5 md:pt-5">
         <ng-content />
     </div>
 
-    <!-- The count sits with the buttons rather than at the top, because it is what someone checks
-         at the moment they reach for Save. -->
-    <div class="mt-3 flex flex-wrap items-center justify-between gap-x-4 gap-y-2 rounded-container border border-line bg-white px-4 py-3 md:px-5">
-        <p class="m-0 text-xs text-ink-muted">
+    <action-footer>
+        <ng-container footerNote>
             @if (remaining() > 0) {
-                {{ 'form.remaining' | translate: { count: remaining() } }}
+                {{ 'form.remaining' | translate: { count: remaining() } | digits }}
             }
-        </p>
-        <div class="flex flex-none items-center gap-2 max-md:w-full max-md:flex-wrap">
-            <button nz-button nzType="default" type="button" [disabled]="saving()" (click)="cancel.emit()">{{ 'form.cancel' | translate }}</button>
-            <!-- Submit only, with no click handler: carrying both meant one press ran the handler
-                 and then the form's submit default, and the record was written twice. It reaches a
-                 form outside this component through HTML's own `form` attribute. -->
-            <button nz-button nzType="primary" type="submit" [attr.form]="formId()" [nzLoading]="saving()" [disabled]="saving()">{{ saveLabel() | translate }}</button>
-        </div>
-    </div>
+        </ng-container>
+        <button nz-button nzType="default" type="button" class="inline-flex items-center gap-1.5" [disabled]="saving()" (click)="cancel.emit()">
+            <ng-icon name="lucideX" size="14px" aria-hidden="true" />
+            <span>{{ 'form.cancel' | translate }}</span>
+        </button>
+        <!-- Submit only, with no click handler: carrying both meant one press ran the handler and
+             then the form's submit default, and the record was written twice. It reaches a form
+             outside this component through HTML's own `form` attribute.
+
+             nzLoading draws its own spinner where the icon sits, so the icon is dropped while the
+             write is in flight rather than standing beside a second spinner. -->
+        <button nz-button nzType="primary" type="submit" class="inline-flex items-center gap-1.5" [attr.form]="formId()" [nzLoading]="saving()" [disabled]="saving()">
+            @if (!saving()) {
+                <ng-icon name="lucideCheck" size="14px" aria-hidden="true" />
+            }
+            <span>{{ saveLabel() | translate }}</span>
+        </button>
+    </action-footer>
 </div>

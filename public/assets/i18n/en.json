@@ -288,11 +288,52 @@
             "detailStat": {
                 "products": "Products",
                 "stock": "Units in stock",
-                "spent": "Spent on this stock",
-                "lowStock": "Low on stock"
+                "spent": "Spent on stock in hand",
+                "lowStock": "Low on stock",
+                "outOfStock": "Out of stock",
+                "averagePrice": "Average price"
             },
             "nameTaken": "Another category already has this name.",
-            "codeTaken": "Another category already has this code."
+            "codeTaken": "Another category already has this code.",
+            "namePlaceholder": "Saree, Footwear, Skincare",
+            "codePlaceholder": "SARE",
+            "descriptionPlaceholder": "What belongs in this category",
+            "statusPlaceholder": "Pick a status",
+            "notSet": "Not set",
+            "fact": {
+                "activeProducts": "Active products"
+            },
+            "report": {
+                "products": "Export products to Excel",
+                "inventory": "Download inventory report",
+                "empty": "There is nothing in this category to report on yet.",
+                "failed": {
+                    "network": "The report could not be downloaded. Check your connection and try again.",
+                    "forbidden": "You do not have access to download this report.",
+                    "server": "The report could not be built just now. Try again in a moment."
+                }
+            },
+            "detailTitle": "Category details",
+            "detailLead": "What this category holds, how its stock stands, and what has changed in it.",
+            "section": {
+                "details": "Details"
+            },
+            "addDescription": "Add a description",
+            "quickActions": "Quick actions",
+            "quick": {
+                "products": "View all products",
+                "lowStock": "View low stock products",
+                "analytics": "View analytics",
+                "notReady": "Products and analytics open from here once those pages are part of the app."
+            },
+            "confirmCreate": {
+                "title": "Add this category?",
+                "body": "{{name}} ({{code}}) will be added to your categories."
+            },
+            "confirmEdit": {
+                "title": "Save changes to this category?",
+                "body": "The changes show everywhere {{name}} appears, including on the products already in it."
+            }
         }
     },
     "form": {
@@ -316,6 +357,9 @@
             "body": "What you have typed here will not be kept.",
             "discard": "Discard it",
             "stay": "Keep editing"
+        },
+        "confirm": {
+            "cancel": "Not yet"
         }
     },
     "codeGenerator": {

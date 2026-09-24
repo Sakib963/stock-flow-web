@@ -10,6 +10,7 @@ import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideArrowLeft, lucideArrowRight, lucideCircle, lucideCircleCheck, lucideCircleX, lucideClock, lucideEye, lucideEyeOff, lucideInfo, lucideKeyRound, lucideLock, lucideRotateCcw } from '@ng-icons/lucide';
 import { AuthShellComponent } from '@app/modules/auth/components/auth-shell/auth-shell.component';
 import { RecoveryFailure, RecoveryService } from '@app/modules/auth/services/recovery.service';
+import { DigitsPipe } from '@app/shared/pipes/digits/digits.pipe';
 
 /** The three rules, checked live so the list can tick off as the user types. */
 const RULES = {
@@ -20,7 +21,7 @@ const RULES = {
 
 @Component({
     selector: 'reset-password',
-    imports: [ReactiveFormsModule, TranslatePipe, NzButtonModule, NzInputModule, NgIcon, AuthShellComponent],
+    imports: [DigitsPipe, ReactiveFormsModule, TranslatePipe, NzButtonModule, NzInputModule, NgIcon, AuthShellComponent],
     providers: [provideIcons({ lucideArrowLeft, lucideArrowRight, lucideCircle, lucideCircleCheck, lucideCircleX, lucideClock, lucideEye, lucideEyeOff, lucideInfo, lucideKeyRound, lucideLock, lucideRotateCcw })],
     templateUrl: './reset-password.component.html',
     styleUrl: './reset-password.component.scss',

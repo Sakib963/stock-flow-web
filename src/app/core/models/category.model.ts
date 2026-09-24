@@ -5,6 +5,7 @@ export interface Category {
     category_code: string;
     description: string | null;
     status: CategoryStatus;
+    created_by?: string | null;
     created_on?: string;
     last_action_by?: string | null;
     last_action_on?: string | null;
@@ -40,11 +41,16 @@ export interface CategoryStats {
 }
 
 export interface CategoryActivity {
+    /** The activity log row's own id, so two entries in the same millisecond do not collide. */
+    oid: string;
     date: string;
     user: string;
     action: string;
     description: string | null;
 }
+
+/** The reports a category offers. Each one is a download, gated by `configuration.category.export`. */
+export type CategoryReport = 'products' | 'inventory';
 
 export interface CategoryDetails {
     details: Category;
@@ -55,8 +61,6 @@ export interface CategoryDetails {
 /** Which field a 409 was about, so the form marks the input the person has to change. */
 export type CategoryField = 'name' | 'category_code';
 
-/** A duplicate the server refused, naming the field the form has to mark. */
-export interface CategoryConflict {
-    field: CategoryField;
-    message: string;
-}
+/** Every control on the category form, so the aria helpers cannot be asked about a field that is not there. */
+export type CategoryFormField = 'name' | 'category_code' | 'description' | 'status';
+

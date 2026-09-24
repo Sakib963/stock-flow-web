@@ -37,7 +37,7 @@
             @for (row of rows(); track idOf(row)) {
                 <tr class="odd:[&>td]:bg-row-zebra hover:[&>td]:bg-primary-wash" [class.cursor-pointer]="!!openRoute()" data-table="row" (click)="onRowClick(row, $event)">
                     @if (serial()) {
-                        <td nzAlign="right" class="text-ink-soft tabular-nums">{{ numberOf($index) }}</td>
+                        <td nzAlign="right" class="text-ink-soft tabular-nums">{{ numberOf($index) | digits }}</td>
                     }
                     @for (column of columns(); track column.key) {
                         <td [nzAlign]="align(column)">

@@ -7,6 +7,7 @@ import { ActiveSession, AuthStatus, LoginFailure, PendingSignOut, RefusalDetail,
 import { ApiResponse } from '@app/core/models/api.model';
 import { environment } from '@env/environment';
 import { Observable, defer, finalize, firstValueFrom, map, shareReplay, tap } from 'rxjs';
+import { TtlCache } from '@app/shared/utils/ttl-cache/ttl-cache';
 
 const RENEWAL_LOCK = 'stockflow-token-renewal';
 
@@ -280,6 +281,7 @@ export class AuthService {
         this._accessToken = null;
         this._sessionId = null;
         this.clearStored();
+        TtlCache.clearAll();
         this._status.set('anonymous');
     }
 

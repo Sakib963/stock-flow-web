@@ -9,7 +9,7 @@ export interface Crumb {
     route?: string;
 }
 
-/** Where the header's back arrow goes. `history` steps back; a route goes somewhere definite. */
+/** Where the header's Back button goes. `history` steps back; a route goes somewhere definite. */
 export type PageBack = 'history' | { route: string };
 
 export interface PageHeaderConfig {

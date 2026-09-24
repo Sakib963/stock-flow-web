@@ -54,7 +54,7 @@
             @for (group of search.groups(); track group.id) {
                 <div class="sf-group-head">
                     <span>{{ group.label ?? (group.labelKey! | translate) }}</span>
-                    <span class="font-mono text-shell-micro/none font-semibold text-ink-faint">{{ group.count }}</span>
+                    <span class="font-mono text-shell-micro/none font-semibold text-ink-muted">{{ group.count | digits }}</span>
                 </div>
 
                 @for (row of group.rows; track row.item.id) {

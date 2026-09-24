@@ -1,0 +1,80 @@
+<!-- Three columns from a tablet up, so a long form reads across instead of down. Description spans
+     the row: it is the one field whose answer is sentences. -->
+<form nz-form nzLayout="vertical" class="grid grid-cols-1 items-start gap-x-4 md:grid-cols-3" [id]="formId" [formGroup]="form" (ngSubmit)="submitted.emit()">
+    <!-- The helpers are in the label's tooltip, one hover away, so they stop costing a line under
+         every field. The tooltip icon cannot take focus, so each helper is also in the page as
+         screen reader text and still named by the field's aria-describedby. -->
+    <nz-form-item>
+        <nz-form-label nzRequired nzFor="category-name" [nzTooltipTitle]="'configuration.category.nameHelper' | translate">{{ 'configuration.category.name' | translate }}</nz-form-label>
+        <!-- nzHasFeedback turns the control's own PENDING state into the spinner, so the async
+             validator is the only thing that has to know a check is running. -->
+        <nz-form-control nzHasFeedback [nzErrorTip]="nameError" [nzValidatingTip]="'form.checking' | translate">
+            <input nz-input id="category-name" formControlName="name" autocomplete="off" [attr.placeholder]="'configuration.category.namePlaceholder' | translate" [attr.aria-invalid]="invalid('name')" [attr.aria-describedby]="describedBy('name')" />
+        </nz-form-control>
+        <span id="category-name-help" class="sr-only">{{ 'configuration.category.nameHelper' | translate }}</span>
+        <ng-template #nameError let-control>
+            <span id="category-name-error">
+                @if (control.hasError('taken')) {
+                    {{ 'configuration.category.nameTaken' | translate }}
+                } @else if (control.hasError('required')) {
+                    {{ 'form.required' | translate }}
+                } @else if (control.hasError('maxlength')) {
+                    {{ 'form.tooLong' | translate: { max: 255 } | digits }}
+                }
+            </span>
+        </ng-template>
+    </nz-form-item>
+
+    <nz-form-item>
+        <nz-form-label nzRequired nzFor="category-code">{{ 'configuration.category.code' | translate }}</nz-form-label>
+        <nz-form-control nzHasFeedback [nzErrorTip]="codeError" [nzValidatingTip]="'form.checking' | translate" [nzExtra]="codeHelp">
+            <input nz-input id="category-code" class="font-mono uppercase" formControlName="category_code" autocomplete="off" [attr.placeholder]="'configuration.category.codePlaceholder' | translate" [attr.aria-invalid]="invalid('category_code')" [attr.aria-describedby]="describedBy('category_code')" />
+        </nz-form-control>
+        <!-- The one helper that stays visible: it carries the generator, and the offer sits with the
+             field it fills, which is where someone looks when they have no code of their own. -->
+        <ng-template #codeHelp>
+            <span id="category-code-help">{{ 'configuration.category.codeHelper' | translate }}</span>
+            <button nz-button nzType="link" nzSize="small" type="button" class="inline-flex items-center gap-1 px-1 align-baseline" (click)="generateCode()">
+                <ng-icon name="lucideSparkles" size="12px" aria-hidden="true" />
+                <span>{{ 'codeGenerator.hint' | translate }}</span>
+            </button>
+        </ng-template>
+        <ng-template #codeError let-control>
+            <span id="category-code-error">
+                @if (control.hasError('taken')) {
+                    {{ 'configuration.category.codeTaken' | translate }}
+                } @else if (control.hasError('required')) {
+                    {{ 'form.required' | translate }}
+                } @else if (control.hasError('maxlength')) {
+                    {{ 'form.tooLong' | translate: { max: 50 } | digits }}
+                }
+            </span>
+        </ng-template>
+    </nz-form-item>
+
+    <nz-form-item>
+        <nz-form-label nzRequired nzFor="category-status" [nzTooltipTitle]="'configuration.category.statusHelper' | translate">{{ 'configuration.category.status.label' | translate }}</nz-form-label>
+        <nz-form-control>
+            <!-- nzId, not a plain id: ng-zorro puts it on the input inside the select, which is what
+                 the label can point at. On the host it landed on <nz-select>, an element no label
+                 may be `for`, so the label was attached to nothing. The same input gets its
+                 aria-describedby from the component, because nz-select passes nothing else through. -->
+            <nz-select nzId="category-status" formControlName="status" [nzPlaceHolder]="'configuration.category.statusPlaceholder' | translate">
+                <nz-option nzValue="Active" [nzLabel]="'configuration.category.status.active' | translate" />
+                <nz-option nzValue="Inactive" [nzLabel]="'configuration.category.status.inactive' | translate" />
+            </nz-select>
+        </nz-form-control>
+        <span id="category-status-help" class="sr-only">{{ 'configuration.category.statusHelper' | translate }}</span>
+    </nz-form-item>
+
+    <nz-form-item class="md:col-span-3">
+        <nz-form-label nzFor="category-description" [nzTooltipTitle]="'configuration.category.descriptionHelper' | translate">{{ 'configuration.category.description' | translate }}</nz-form-label>
+        <nz-form-control [nzErrorTip]="descriptionError">
+            <textarea nz-input id="category-description" formControlName="description" rows="3" [attr.placeholder]="'configuration.category.descriptionPlaceholder' | translate" [attr.aria-invalid]="invalid('description')" [attr.aria-describedby]="describedBy('description')"></textarea>
+        </nz-form-control>
+        <span id="category-description-help" class="sr-only">{{ 'configuration.category.descriptionHelper' | translate }}</span>
+        <ng-template #descriptionError
+            ><span id="category-description-error">{{ 'form.tooLong' | translate: { max: 1000 } | digits }}</span></ng-template
+        >
+    </nz-form-item>
+</form>

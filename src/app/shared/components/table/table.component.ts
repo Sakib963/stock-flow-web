@@ -25,6 +25,7 @@ import { matches } from '@app/shared/utils/condition/condition';
 import { fillRoute } from '@app/shared/utils/fill-route/fill-route';
 import { resolveText } from '@app/shared/utils/resolve-text/resolve-text';
 import { isPhoneWidth, viewportWidth } from '@app/shared/utils/viewport/viewport';
+import { DigitsPipe } from '@app/shared/pipes/digits/digits.pipe';
 
 /** A layout's stable name: the built-ins are known by their type, a registered one by its key. */
 const layoutKey = (layout: Layout): string => (layout.type === 'component' ? layout.key : layout.type);
@@ -49,7 +50,7 @@ const GENERIC_CONFIRM = { title: 'list.confirmTitle', body: 'list.confirmBody', 
     selector: 'list-table',
     // NzModalModule is imported for its provider, not its template: NzModalService has no root
     // provider of its own, and a confirmation that cannot open is a confirmation that never asks.
-    imports: [NgIcon, NzButtonModule, NzModalModule, NzPaginationModule, TranslatePipe, TextPipe, MoneyPipe, ColumnPickerComponent, CardLayoutComponent, TableLayoutComponent, RendererOutletComponent],
+    imports: [DigitsPipe, NgIcon, NzButtonModule, NzModalModule, NzPaginationModule, TranslatePipe, TextPipe, MoneyPipe, ColumnPickerComponent, CardLayoutComponent, TableLayoutComponent, RendererOutletComponent],
     providers: [ListStore, provideIcons({ ...LIST_ICONS, lucideRefreshCw })],
     templateUrl: './table.component.html',
     styleUrl: './table.component.scss',
@@ -295,7 +296,9 @@ export class TableComponent {
     private dispatch(action: RowAction, row: Row): void {
         if (action.run.kind === 'navigate') {
             const route = fillRoute(action.run.route, row);
-            if (route) void this._router.navigateByUrl(route);
+            // The row goes along as navigation state, so a record page can draw what the list
+            // already showed while it fetches the rest. Opened from a link it is simply absent.
+            if (route) void this._router.navigateByUrl(route, { state: { row } });
             return;
         }
         // A registered action handler has nowhere to run until provideActionHandlers exists.
@@ -310,7 +313,7 @@ export class TableComponent {
     open(row: Row): void {
         const route = this.config().open?.route;
         const filled = route ? fillRoute(route, row) : null;
-        if (filled) void this._router.navigateByUrl(filled);
+        if (filled) void this._router.navigateByUrl(filled, { state: { row } });
     }
 
     onPage(page: number): void {

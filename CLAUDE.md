@@ -4,7 +4,10 @@ The Angular app, rebuilt from a fresh scaffold on `feat/app-revamp`. The workspa
 (`../CLAUDE.md`) holds the business rules, access control, engineering practice and writing style;
 this file holds what is specific to the web app. Both apply.
 
-`modules/auth` and `layout/` are the only built references for how the new app is written. The old
+**`modules/configuration/category/` is the reference feature**: every other feature copies its
+folder layout, list config, create and edit pages over one form component, record page, and how
+each loads, confirms, saves and fails. `stock-flow-documents/docs/category/category.md` says why.
+`modules/auth` and `layout/` are the references for the shell. The old
 generations (`refactor/order-sales-core`, `dev`) are read for business logic only, never for
 structure or UI. The one exception is the list page config, whose contract lives in
 `stock-flow-documents/docs/list-page/list-page.md` and learns from the old `TableConfig`.
@@ -23,10 +26,11 @@ structure or UI. The one exception is the list page config, whose contract lives
 | Where | What |
 | --- | --- |
 | `src/app/core/` | Cross-cutting: `constants/`, `models/`, `guards/`, `interceptors/`, `services/` |
-| `src/app/modules/<feature>/` | A feature: `pages/`, `components/`, `services/`, `config/`, `<feature>.routes.ts` |
+| `src/app/modules/<module>/` | A menu module (`configuration`, `inventory`, `sales`): `<module>.routes.ts` and one folder per feature. A module that is one feature and always will be (`auth`, `dashboard`) keeps `pages/`, `components/` and `services/` at its root |
+| `src/app/modules/<module>/<feature>/` | A feature: `pages/`, `components/`, `services/`, `config/`, `constants/`. Nothing of one feature sits beside another's: `configuration/category/` next to `configuration/brand/` |
 | `src/app/shared/` | Components used by more than one feature (`page-header`) |
 | `src/app/layout/` | The shell: sider, header bar, panels, `constants/`, `services/` |
-| `src/app/app-routes/app.routes.ts` | The map of the app. A feature owns its own routes file |
+| `src/app/app-routes/app.routes.ts` | The map of the app. A module owns its own routes file |
 | `public/assets/i18n/en.json`, `bn.json` | The only translation files loaded. The subfolders beside them are from the old app |
 | `tools/` | `check-utilities.js`, `check-tokens.js`, `verify-values.js`, and `cdp.mjs` for driving Chrome |
 
@@ -42,7 +46,7 @@ structure or UI. The one exception is the list page config, whose contract lives
   - **Two or more: every one of them gets a folder**, named for the unit without the kind suffix,
     and nothing stays loose beside them. `shared/pipes/money/money.pipe.ts` +
     `money.pipe.spec.ts`, `core/guards/auth/auth.guard.ts`, `shared/utils/tone-map/tone-map.ts`,
-    `modules/configuration/config/category-list/category-list.config.ts`.
+    `modules/configuration/category/pages/category-list/category-list.component.ts`.
   - Adding the second unit to a flat folder is what triggers the split, and moving the first one is
     part of that change, not a later tidy-up.
   - **A unit that owns private children keeps them in its own `components/`**, which is then a kind
@@ -55,7 +59,7 @@ structure or UI. The one exception is the list page config, whose contract lives
   shape is consumed by guards, the shell and pages; importing a service to describe a shape couples
   them for no reason. There is no `core/interfaces/`.
 - **All endpoints in `core/constants/api-endpoint.ts`.** No inline URLs.
-- **Pages call a module service** (`modules/<feature>/services/`), which calls `HttpClient` with
+- **Pages call their feature service** (`modules/<module>/<feature>/services/`), which calls `HttpClient` with
   `environment.baseUrl` and an `APIEndpoint` constant, as `RecoveryService` does. Components do not
   inject `HttpClient`.
 
@@ -145,8 +149,8 @@ structure or UI. The one exception is the list page config, whose contract lives
 
 ## Routing, access and i18n
 
-- A feature's routes live in `modules/<feature>/<feature>.routes.ts` and are loaded as children of
-  the `app` shell route in `app.routes.ts`. Every signed-in route carries
+- A module's routes live in `modules/<module>/<module>.routes.ts`, lazy-loading each feature's pages
+  from `./<feature>/pages/`, and are loaded as children of the `app` shell route in `app.routes.ts`. Every signed-in route carries
   `canActivate: [permissionGuard]` and `data: { permission: 'module.feature.view' }`.
 - `SessionService.can(code)` hides what a person may not do. **It is UX only.** The endpoint behind
   it checks the same code; assume every request is hand-written.
@@ -198,7 +202,10 @@ invent it inside a feature: raise it for the next brief with the `design-brief` 
 - Mulish for Latin and **Hind Siliguri for Bengali at identical sizes**, so switching language never
   moves the layout. Bengali labels are longer: nothing that matters may truncate.
 - IBM Plex Mono for codes, batch numbers, invoice numbers and money columns.
-- Keep Western digits for codes in both languages: staff cross-reference them against a phone.
+- Numbers follow the language: in Bengali, counts, money and dates are written in Bengali digits.
+  `money` and `recordDate` do it themselves; print any other number through the `digits` pipe,
+  never raw. Codes, batch and invoice numbers stay Western in both languages: staff cross-reference
+  them against a phone.
 
 ### States
 

@@ -10,6 +10,7 @@ import { BadgeComponent } from '@app/layout/components/badge/badge.component';
 import { ShellNavService } from '@app/layout/services/shell-nav/shell-nav.service';
 import { ShellSearchService } from '@app/layout/services/shell-search/shell-search.service';
 import { ShellStateService } from '@app/layout/services/shell-state/shell-state.service';
+import { DigitsPipe } from '@app/shared/pipes/digits/digits.pipe';
 
 /**
  * The header search: the field, and the results hanging off it.
@@ -20,7 +21,7 @@ import { ShellStateService } from '@app/layout/services/shell-state/shell-state.
  */
 @Component({
     selector: 'search-panel',
-    imports: [NgTemplateOutlet, FormsModule, NzInputModule, TranslatePipe, NgIcon, BadgeComponent],
+    imports: [DigitsPipe, NgTemplateOutlet, FormsModule, NzInputModule, TranslatePipe, NgIcon, BadgeComponent],
     providers: [provideIcons({ ...SHELL_MENU_ICONS, lucideArrowDown, lucideArrowUp, lucideCommand, lucideCornerDownLeft, lucideSearch, lucideX })],
     host: {
         class: 'contents',

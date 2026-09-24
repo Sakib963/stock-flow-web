@@ -9,6 +9,7 @@ import { TableCellComponent } from '@app/shared/components/table/components/tabl
 import { TextPipe } from '@app/shared/pipes/text/text.pipe';
 import { fillRoute } from '@app/shared/utils/fill-route/fill-route';
 import { readPath } from '@app/shared/utils/read-path/read-path';
+import { DigitsPipe } from '@app/shared/pipes/digits/digits.pipe';
 
 const DEFAULT_GRID_MIN_PX = 240;
 
@@ -18,7 +19,7 @@ const DEFAULT_GRID_MIN_PX = 240;
  */
 @Component({
     selector: 'card-layout',
-    imports: [NzCardModule, NzSkeletonModule, RowActionsComponent, TableCellComponent, TextPipe],
+    imports: [DigitsPipe, NzCardModule, NzSkeletonModule, RowActionsComponent, TableCellComponent, TextPipe],
     templateUrl: './card-layout.component.html',
     styleUrl: './card-layout.component.scss',
     changeDetection: ChangeDetectionStrategy.OnPush,

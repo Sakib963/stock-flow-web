@@ -16,7 +16,7 @@
 
                 <header class="flex items-start gap-2 px-3 pt-2.5">
                     @if (context().serial()) {
-                        <span class="mt-0.5 font-mono text-[11px] tabular-nums text-ink-soft" aria-hidden="true">{{ numberOf(index) }}</span>
+                        <span class="mt-0.5 font-mono text-[11px] tabular-nums text-ink-soft" aria-hidden="true">{{ numberOf(index) | digits }}</span>
                     }
                     <div class="min-w-0 flex-1">
                         @if (titleColumn(); as title) {

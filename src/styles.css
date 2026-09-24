@@ -7,6 +7,11 @@
 
 @import 'tailwindcss';
 
+/* Applies while the page is in Bengali (LanguageService sets <html lang>). Bengali vowel signs
+   reach above and below the line, so a line-height of 1 that suits Latin crops them: pair a
+   `/none` size with `bn:leading-normal` on anything that shows translated copy. */
+@custom-variant bn (&:lang(bn));
+
 /* `static` emits every variable below, used or not.
    Tailwind only keeps a theme token when a utility that references it survives scanning, and it
    scans templates for class names, never stylesheets for var(). A token used only from a component

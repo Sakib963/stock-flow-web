@@ -33,6 +33,13 @@ export class CodeGeneratorModalComponent {
     readonly code = signal<string | null>(null);
     readonly error = signal<string | null>(null);
 
+    /**
+     * There is no name to build a code from, so trying again would ask the same unanswerable
+     * question. The name is on the page behind this modal and cannot be typed while it is open, so
+     * the only way forward is to close it.
+     */
+    readonly needsName = signal(false);
+
     constructor() {
         this.generate();
     }
@@ -41,8 +48,10 @@ export class CodeGeneratorModalComponent {
         const name = this._request.name.trim();
         this.code.set(null);
         this.error.set(null);
+        this.needsName.set(false);
 
         if (!name) {
+            this.needsName.set(true);
             this.error.set('codeGenerator.needsName');
             return;
         }

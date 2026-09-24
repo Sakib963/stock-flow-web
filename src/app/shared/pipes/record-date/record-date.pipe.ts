@@ -31,8 +31,7 @@ const FORMATS: Record<Exclude<DateFormat, 'relative'>, Intl.DateTimeFormatOption
 };
 
 /**
- * A list date: 24 Aug 2026 by default, with the month in the reader's language and Western digits
- * in both, because staff cross-reference dates against paper and phones. `relative` applies only
+ * A list date: 24 Aug 2026 by default, month and digits both in the reader's language. `relative` applies only
  * under 24 hours ("4 hours ago"); anything older falls back to the plain date, since "12 days ago"
  * makes a person count. The language is an argument so the pipe stays pure.
  */
@@ -43,7 +42,7 @@ export class RecordDatePipe implements PipeTransform {
         const date = new Date(value as string);
         if (Number.isNaN(date.getTime())) return String(value);
 
-        const locale = language === 'bn' ? 'bn-BD-u-nu-latn' : 'en-GB';
+        const locale = language === 'bn' ? 'bn-BD' : 'en-GB';
         const elapsed = Date.now() - date.getTime();
 
         if (format === 'relative' && elapsed >= 0 && elapsed < DAY_MS) {

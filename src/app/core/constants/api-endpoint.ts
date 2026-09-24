@@ -23,4 +23,6 @@ export class APIEndpoint {
     static readonly UPDATE_CATEGORY_DETAILS = '/api/v1/configuration/category/update-category-details';
     static readonly CHECK_CATEGORY_AVAILABILITY = '/api/v1/configuration/category/check-category-availability';
     static readonly GENERATE_CATEGORY_CODE = '/api/v1/configuration/category/generate-category-code';
+    static readonly GENERATE_PRODUCT_LIST_REPORT_BY_CATEGORY = '/api/v1/configuration/category/generate-product-list-report-by-category';
+    static readonly GENERATE_INVENTORY_REPORT_BY_CATEGORY = '/api/v1/configuration/category/generate-inventory-report-by-category';
 }

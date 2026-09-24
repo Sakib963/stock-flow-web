@@ -16,6 +16,7 @@ import { NotificationService } from '@app/core/services/notification/notificatio
 import { ShellNavService } from '@app/layout/services/shell-nav/shell-nav.service';
 import { ShellSearchService } from '@app/layout/services/shell-search/shell-search.service';
 import { ShellStateService } from '@app/layout/services/shell-state/shell-state.service';
+import { DigitsPipe } from '@app/shared/pipes/digits/digits.pipe';
 
 /**
  * The application shell: the frame, the phone overlays, and the keys that work anywhere in the app.
@@ -30,7 +31,7 @@ import { ShellStateService } from '@app/layout/services/shell-state/shell-state.
  */
 @Component({
     selector: 'layout',
-    imports: [RouterOutlet, NzDrawerModule, NzModalModule, TranslatePipe, HeaderBarComponent, SiderComponent, SearchPanelComponent, NotificationPanelComponent, AccountMenuComponent, ShortcutsDialogComponent, SessionsDialogComponent],
+    imports: [DigitsPipe, RouterOutlet, NzDrawerModule, NzModalModule, TranslatePipe, HeaderBarComponent, SiderComponent, SearchPanelComponent, NotificationPanelComponent, AccountMenuComponent, ShortcutsDialogComponent, SessionsDialogComponent],
     host: {
         class: 'block h-dvh',
         '(document:keydown)': 'onGlobalKey($event)',

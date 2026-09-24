@@ -19,7 +19,10 @@
         <span>{{ 'form.cancel' | translate }}</span>
     </button>
     @if (error() && !loading()) {
-        <button nz-button nzType="primary" type="button" class="inline-flex items-center gap-1.5" (click)="generate()">
+        <!-- Disabled when there is no name: the answer cannot change until one is typed, and the
+             field for that is on the page behind this modal. Offering a live button that reruns the
+             same refusal reads as the app being broken rather than as the name being missing. -->
+        <button nz-button nzType="primary" type="button" class="inline-flex items-center gap-1.5" [disabled]="needsName()" (click)="generate()">
             <ng-icon name="lucideRotateCw" size="14px" aria-hidden="true" />
             <span>{{ 'codeGenerator.retry' | translate }}</span>
         </button>

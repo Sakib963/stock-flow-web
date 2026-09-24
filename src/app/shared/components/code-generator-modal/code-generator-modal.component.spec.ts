@@ -54,6 +54,29 @@ describe('CodeGeneratorModalComponent', () => {
         expect(fixture.componentInstance.error()).toBe('codeGenerator.needsName');
     });
 
+    // Trying again would ask the same unanswerable question: the name is on the page behind this
+    // modal and cannot be typed while it is open. A live button that reruns the same refusal reads
+    // as the app being broken rather than as the name being missing.
+    it('will not let someone try again when there is no name to build a code from', async () => {
+        const { fixture } = await open({ name: '   ', generate: () => of('X') });
+        fixture.detectChanges();
+
+        const retry = [...(fixture.nativeElement as HTMLElement).querySelectorAll('button')].find((b) => b.textContent?.includes('codeGenerator.retry'));
+
+        expect(fixture.componentInstance.needsName()).toBe(true);
+        expect(retry?.disabled).toBe(true);
+    });
+
+    it('lets someone try again when the request is what failed', async () => {
+        const { fixture } = await open({ generate: () => throwError(() => new Error('offline')) });
+        fixture.detectChanges();
+
+        const retry = [...(fixture.nativeElement as HTMLElement).querySelectorAll('button')].find((b) => b.textContent?.includes('codeGenerator.retry'));
+
+        expect(fixture.componentInstance.needsName()).toBe(false);
+        expect(retry?.disabled).toBe(false);
+    });
+
     it('offers another go when the request failed, and applies nothing meanwhile', async () => {
         let attempt = 0;
         const generate = (): Observable<string> => {
