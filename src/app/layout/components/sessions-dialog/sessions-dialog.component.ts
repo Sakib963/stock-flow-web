@@ -5,15 +5,15 @@ import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzModalModule, NzModalService } from 'ng-zorro-antd/modal';
-import { NzPopconfirmModule } from 'ng-zorro-antd/popconfirm';
 import { NzSkeletonModule } from 'ng-zorro-antd/skeleton';
 import { NzTagModule } from 'ng-zorro-antd/tag';
 import { NgIcon, provideIcons } from '@ng-icons/core';
-import { lucideMonitor, lucideSmartphone, lucideTablet } from '@ng-icons/lucide';
+import { lucideLogOut, lucideMonitor, lucideMonitorX, lucideRefreshCw, lucideSmartphone, lucideTablet } from '@ng-icons/lucide';
 import { ActiveSession } from '@app/core/models/auth.model';
 import { AuthService } from '@app/core/services/auth/auth.service';
 import { LanguageService } from '@app/core/services/language/language.service';
 import { SessionService } from '@app/core/services/session/session.service';
+import { confirmAction } from '@app/shared/utils/confirm-action/confirm-action';
 
 const ICONS: Record<ActiveSession['device']['type'], string> = { desktop: 'lucideMonitor', phone: 'lucideSmartphone', tablet: 'lucideTablet' };
 
@@ -47,13 +47,13 @@ const labelOf = ({ device }: ActiveSession): { key: string; params: Record<strin
  * a person finds a device they do not recognise and ends it, on its own or together with every
  * other one, without being thrown off the device they are holding.
  *
- * The dialog is `nz-modal`, the confirmations are `nz-popconfirm` and the modal service, and only
+ * The dialog is `nz-modal`, the confirmations go through `confirmAction`, and only
  * the rows are ours.
  */
 @Component({
     selector: 'sessions-dialog',
-    imports: [TranslatePipe, NzButtonModule, NzModalModule, NzPopconfirmModule, NzSkeletonModule, NzTagModule, NgIcon],
-    providers: [provideIcons({ lucideMonitor, lucideSmartphone, lucideTablet })],
+    imports: [TranslatePipe, NzButtonModule, NzModalModule, NzSkeletonModule, NzTagModule, NgIcon],
+    providers: [provideIcons({ lucideLogOut, lucideMonitor, lucideMonitorX, lucideRefreshCw, lucideSmartphone, lucideTablet })],
     templateUrl: './sessions-dialog.component.html',
     styleUrl: './sessions-dialog.component.scss',
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -111,6 +111,25 @@ export class SessionsDialogComponent {
             });
     }
 
+    confirmSignOutDevice(session: ActiveSession): void {
+        this.confirm('shell.sessions.confirmOneTitle', 'shell.sessions.confirmOneBody', 'shell.sessions.signOut', () => this.signOutDevice(session));
+    }
+
+    confirmSignOutOthers(): void {
+        this.confirm('shell.sessions.confirmOthersTitle', 'shell.sessions.confirmOthersBody', 'shell.sessions.signOutOthers', () => this.signOutOthers());
+    }
+
+    confirmSignOutEverywhere(): void {
+        this.confirm('shell.signOutEverywhereTitle', 'shell.signOutEverywhereBody', 'shell.signOutEverywhereConfirm', () => this.signOutEverywhere());
+    }
+
+    private confirm(title: string, body: string, ok: string, then: () => void): void {
+        const t = (key: string) => this._translate.instant(key);
+        confirmAction(this._modal, { title: t(title), body: t(body), ok: t(ok), cancel: t('shell.cancel'), danger: true })
+            .pipe(takeUntilDestroyed(this._destroyRef))
+            .subscribe((confirmed) => confirmed && then());
+    }
+
     signOutDevice(session: ActiveSession): void {
         const { key, params } = labelOf(session);
         const remove = () => this._sessions.update((sessions) => sessions.filter((s) => s.id !== session.id));
@@ -150,17 +169,6 @@ export class SessionsDialogComponent {
                     this.busy.set(null);
                 },
             });
-    }
-
-    confirmSignOutEverywhere(): void {
-        this._modal.confirm({
-            nzTitle: this._translate.instant('shell.signOutEverywhereTitle'),
-            nzContent: this._translate.instant('shell.signOutEverywhereBody'),
-            nzOkText: this._translate.instant('shell.signOutEverywhereConfirm'),
-            nzOkDanger: true,
-            nzCancelText: this._translate.instant('shell.cancel'),
-            nzOnOk: () => this.signOutEverywhere(),
-        });
     }
 
     private async signOutEverywhere(): Promise<void> {

@@ -4,6 +4,8 @@ export interface ConfirmCopy {
     body: string;
     ok: string;
     cancel: string;
+    /** The confirming button in red, for an action that ends something, like signing a device out. */
+    danger?: boolean;
 }
 
 export interface UniqueValueOptions {

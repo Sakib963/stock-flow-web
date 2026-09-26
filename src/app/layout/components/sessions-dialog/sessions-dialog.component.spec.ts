@@ -4,6 +4,8 @@ import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { provideNzI18n, en_US } from 'ng-zorro-antd/i18n';
 import { NzMessageService } from 'ng-zorro-antd/message';
+import { NzModalService } from 'ng-zorro-antd/modal';
+import { of } from 'rxjs';
 import { provideTranslateService } from '@ngx-translate/core';
 import { APIEndpoint } from '@app/core/constants/api-endpoint';
 import { ActiveSession } from '@app/core/models/auth.model';
@@ -31,7 +33,10 @@ describe('SessionsDialogComponent', () => {
         vi.spyOn(message, 'error').mockImplementation((() => ({ messageId: 'x' })) as never);
     });
 
-    afterEach(() => localStorage.clear());
+    afterEach(() => {
+        localStorage.clear();
+        vi.restoreAllMocks();
+    });
 
     async function open(sessions: ActiveSession[] | 'fail' = [here, phone]) {
         const fixture = TestBed.createComponent(SessionsDialogComponent);
@@ -81,6 +86,28 @@ describe('SessionsDialogComponent', () => {
         TestBed.inject(LanguageService).use('bn');
 
         expect(cmp.rows()[0].lastActive).toMatch(/মিনিট/);
+    });
+
+    it('draws an icon beside the words on every button', async () => {
+        await open();
+
+        const buttons = [...document.querySelectorAll('.ant-modal button[nz-button]')];
+        expect(buttons.length).toBe(3);
+        expect(buttons.every((button) => button.querySelector('ng-icon'))).toBe(true);
+    });
+
+    it('asks before signing a device out, in red, and a No asks the server nothing', async () => {
+        await open();
+        const answers = [false, true];
+        const confirm = vi.spyOn(NzModalService.prototype, 'confirm').mockImplementation(() => ({ afterClose: of(answers.shift()) }) as never);
+        const signOut = () => (document.querySelector('[data-session="session-phone"] button') as HTMLButtonElement).click();
+
+        signOut();
+        expect(confirm.mock.calls[0][0]?.nzData).toMatchObject({ title: 'shell.sessions.confirmOneTitle', ok: 'shell.sessions.signOut', danger: true });
+        http.expectNone((r) => r.url.includes(APIEndpoint.SIGN_OUT_SESSION));
+
+        signOut();
+        http.expectOne((r) => r.url.includes(APIEndpoint.SIGN_OUT_SESSION)).flush({ code: 200, data: { session_id: 'session-phone' } });
     });
 
     it('signs out another device and takes it off the list', async () => {
