@@ -6,7 +6,7 @@ import { Row } from '@app/core/models/config.model';
 import { Column } from '@app/core/models/table.model';
 import { TableCellComponent } from './table-cell.component';
 
-const PERSON: Column = { key: 'actor', label: 'Last updated by', type: 'user', name: 'actor_name' };
+const PERSON: Column = { key: 'actor', label: 'Last updated by', type: 'user', name: 'actor_name', width: 20 };
 
 describe('TableCellComponent', () => {
     // Reset first: a cell is cheap to draw, so some of these compare two rows in one test, and a
@@ -48,7 +48,7 @@ describe('TableCellComponent', () => {
     });
 
     it('writes a date in the format its column asked for', async () => {
-        const slashed: Column = { key: 'created_on', label: 'Added', type: 'date', format: 'slashed' };
+        const slashed: Column = { key: 'created_on', label: 'Added', type: 'date', format: 'slashed', width: 12 };
         const { el } = await render(slashed, { created_on: new Date(2026, 0, 7, 10, 0).toISOString() });
 
         expect(el.textContent?.trim()).toBe('07/01/2026');

@@ -6,8 +6,12 @@ interface ColumnBase {
     key: string;
     /** Money columns carry the currency: 'Total ৳'. */
     label: Text;
-    /** px in the table layout. Exactly one column has none and takes the slack. */
-    width?: number;
+    /**
+     * Percent of the table's width. The columns shown by default add up to 100, so the table fills
+     * its card on first draw; a hidden column picked in Columns adds its share and the table
+     * scrolls, and hiding one lets the rest widen to fill the gap.
+     */
+    width: number;
     /** Numbers and money default right. */
     align?: 'left' | 'center' | 'right';
     sortable?: boolean;

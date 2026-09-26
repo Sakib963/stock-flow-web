@@ -24,7 +24,7 @@ const CONFIG: ListShellPageConfig = {
         key: 'test.list',
         rowKey: 'oid',
         source: { endpoint: APIEndpoint.GET_CATEGORY_LIST },
-        columns: [{ key: 'name', label: { en: 'Name', bn: 'নাম' }, type: 'name' }],
+        columns: [{ key: 'name', label: { en: 'Name', bn: 'নাম' }, type: 'name', width: 100 }],
         layouts: [{ type: 'table' }],
         empty: { icon: 'lucideFolderTree', title: { en: 'Nothing yet', bn: 'কিছু নেই' }, body: { en: 'Add one', bn: 'একটি যোগ করুন' } },
     },

@@ -19,8 +19,8 @@ describe('the categories list config', () => {
         expect(table.phoneLayout).toBeUndefined();
     });
 
-    it('lets exactly one column take the slack, and it is the description', () => {
-        expect(table.columns.filter((c) => !c.width).map((c) => c.key)).toEqual(['description']);
+    it('fills the full width with the columns shown by default', () => {
+        expect(table.columns.filter((c) => !c.hidden).reduce((sum, c) => sum + c.width, 0)).toBe(100);
     });
 
     it('sorts the person column by when they touched the row, which is what the server offers', () => {

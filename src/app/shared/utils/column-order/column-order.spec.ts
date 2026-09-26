@@ -125,6 +125,20 @@ describe('mergePreferences', () => {
         expect(mergePreferences(COLUMNS, ['table'], { hidden: ['name', 'supplier'] }, fallback).hidden).toEqual(['supplier']);
     });
 
+    it('keeps a column added to the config since hidden, when the config hides it', () => {
+        const columns = [...COLUMNS, column('description', { hidden: true })];
+        const stored = { order: keys(COLUMNS), hidden: ['supplier'] };
+
+        expect(mergePreferences(columns, ['table'], stored, fallback).hidden).toEqual(['supplier', 'description']);
+    });
+
+    it('keeps showing a hidden-by-default column someone picked', () => {
+        const columns = [...COLUMNS, column('description', { hidden: true })];
+        const stored = { order: keys(columns), hidden: [] };
+
+        expect(mergePreferences(columns, ['table'], stored, fallback).hidden).toEqual([]);
+    });
+
     it('drops a hidden key for a column that no longer exists', () => {
         expect(mergePreferences(COLUMNS, ['table'], { hidden: ['cost_price', 'supplier'] }, fallback).hidden).toEqual(['supplier']);
     });

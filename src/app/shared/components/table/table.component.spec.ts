@@ -24,10 +24,10 @@ const CATEGORIES: TableConfig = {
     source: { endpoint: APIEndpoint.GET_CATEGORY_LIST },
     open: { route: '/app/configuration/categories/:oid' },
     columns: [
-        { key: 'category_code', label: 'Code', type: 'identifier', width: 110 },
-        { key: 'name', label: 'Name', type: 'name', sub: 'description' },
-        { key: 'margin', label: 'Margin', type: 'percent', width: 90, permission: 'configuration.category.margin' },
-        { key: 'status', label: 'Status', type: 'status', width: 110, tones: { Active: { label: 'Active', tone: 'success' }, Inactive: { label: 'Inactive', tone: 'neutral' } } },
+        { key: 'category_code', label: 'Code', type: 'identifier', width: 20 },
+        { key: 'name', label: 'Name', type: 'name', sub: 'description', width: 40 },
+        { key: 'margin', label: 'Margin', type: 'percent', width: 15, permission: 'configuration.category.margin' },
+        { key: 'status', label: 'Status', type: 'status', width: 25, tones: { Active: { label: 'Active', tone: 'success' }, Inactive: { label: 'Inactive', tone: 'neutral' } } },
     ],
     layouts: [{ type: 'table' }],
     rowActions: [
@@ -93,7 +93,7 @@ describe('TableComponent', () => {
         expect(el.querySelector('[data-table="range"]')?.textContent).toContain('list.range');
     });
 
-it('numbers every row from the page offset, so row one of page three is not called one', async () => {
+    it('numbers every row from the page offset, so row one of page three is not called one', async () => {
         await setup([]);
         const { fixture, el, cmp } = await render();
         await respond(fixture, { code: 200, message: 'ok', data: { rows: ROWS }, total: 44 });
@@ -197,6 +197,124 @@ it('numbers every row from the page offset, so row one of page three is not call
 
         http.expectNone((r) => r.url.endsWith(APIEndpoint.GET_CATEGORY_LIST));
         expect(el.querySelectorAll('[data-table="row"]').length).toBe(2);
+    });
+
+    describe('column widths', () => {
+        const WIDE: TableConfig = {
+            ...PASSED,
+            rowActions: [],
+            columns: [
+                { key: 'category_code', label: 'Code', type: 'identifier', width: 20 },
+                { key: 'name', label: 'Name', type: 'name', width: 50 },
+                { key: 'status', label: 'Status', type: 'status', width: 30, tones: {} },
+                { key: 'created_on', label: 'Added', type: 'date', width: 20, hidden: true },
+            ],
+        };
+
+        /** The card reports this width, as the browser's observer would once the table is laid out. */
+        function measured(width: number): void {
+            vi.stubGlobal(
+                'ResizeObserver',
+                class {
+                    constructor(private readonly report: ResizeObserverCallback) {}
+                    observe(): void {
+                        this.report([{ contentRect: { width } } as ResizeObserverEntry], this as unknown as ResizeObserver);
+                    }
+                    disconnect(): void {}
+                }
+            );
+        }
+
+        const widthsOf = (el: HTMLElement) => [...el.querySelectorAll('table colgroup col')].map((col) => (col as HTMLElement).style.width);
+        const tableWidth = (el: HTMLElement) => el.querySelector('table')?.style.width;
+
+        // A column picked or hidden is remembered on the device, and would carry into the next test.
+        afterEach(() => {
+            vi.unstubAllGlobals();
+            localStorage.clear();
+        });
+
+        it('fills the card exactly on first draw, sharing it by each column percent', async () => {
+            measured(1052);
+            await setup([]);
+            const { fixture, el } = await render(WIDE, { rows: ROWS });
+            fixture.detectChanges();
+
+            expect(widthsOf(el)).toEqual(['52px', '200px', '500px', '300px']);
+            expect(tableWidth(el)).toBe('1052px');
+        });
+
+        it('grows past the card when a hidden column is picked, so the table scrolls', async () => {
+            measured(1052);
+            await setup([]);
+            const { fixture, el, cmp } = await render(WIDE, { rows: ROWS });
+            cmp.onPreferences({ ...cmp.preferences(), hidden: [] });
+            fixture.detectChanges();
+
+            expect(widthsOf(el)).toEqual(['52px', '200px', '500px', '300px', '200px']);
+            expect(tableWidth(el)).toBe('1252px');
+        });
+
+        it('opens without a scroll even when a column picked on an earlier visit is remembered', async () => {
+            measured(1052);
+            localStorage.setItem('sf.table.configuration.category', JSON.stringify({ layout: 'table', order: ['category_code', 'name', 'status', 'created_on'], hidden: [] }));
+            await setup([]);
+            const { fixture, el, cmp } = await render(WIDE, { rows: ROWS });
+            fixture.detectChanges();
+
+            expect(widthsOf(el)).toEqual(['52px', '166px', '416px', '250px', '166px']);
+            expect(tableWidth(el)).toBe('1052px');
+
+            cmp.onPreferences({ ...cmp.preferences(), hidden: ['created_on'] });
+            fixture.detectChanges();
+            expect(tableWidth(el)).toBe('1052px');
+        });
+
+        it('lets the rest widen to fill the gap when a default column is hidden', async () => {
+            measured(1052);
+            await setup([]);
+            const { fixture, el, cmp } = await render(WIDE, { rows: ROWS });
+            cmp.onPreferences({ ...cmp.preferences(), hidden: ['status', 'created_on'] });
+            fixture.detectChanges();
+
+            expect(widthsOf(el)).toEqual(['52px', '285px', '714px']);
+            expect(tableWidth(el)).toBe('1052px');
+        });
+
+        it('never scrolls sideways on first draw, however narrow the card', async () => {
+            measured(300);
+            await setup([]);
+            const { fixture, el } = await render(WIDE, { rows: ROWS });
+            fixture.detectChanges();
+
+            expect(widthsOf(el)).toEqual(['52px', '49px', '124px', '74px']);
+            expect(tableWidth(el)).toBe('300px');
+        });
+
+        it('gives columns fixed laptop widths on a phone and scrolls there instead', async () => {
+            const width = window.innerWidth;
+            Object.defineProperty(window, 'innerWidth', { value: 390, configurable: true });
+            try {
+                measured(300);
+                await setup([]);
+                const { fixture, el } = await render(WIDE, { rows: ROWS });
+                fixture.detectChanges();
+
+                expect(widthsOf(el)).toEqual(['52px', '205px', '514px', '308px']);
+                expect(tableWidth(el)).toBe('1079px');
+            } finally {
+                Object.defineProperty(window, 'innerWidth', { value: width, configurable: true });
+            }
+        });
+
+        it('draws no wider than the card before it has been measured', async () => {
+            measured(0);
+            await setup([]);
+            const { fixture, el } = await render(WIDE, { rows: ROWS });
+            fixture.detectChanges();
+
+            expect(tableWidth(el)).toBe('52px');
+        });
     });
 
     it('draws a registered layout with the same rows the table would show', async () => {

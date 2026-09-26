@@ -94,12 +94,16 @@ export function moveColumn(columns: readonly Column[], order: readonly string[],
 export function mergePreferences(columns: readonly Column[], layouts: readonly string[], stored: Partial<TablePreferences> | null, fallback: { layout: string }): TablePreferences {
     const present = new Set(columns.map((c) => c.key));
     const lockedNow = new Set(columns.filter((c) => c.locked).map((c) => c.key));
+    // A column the stored order has never seen was added to the config since, so nobody chose to
+    // show it: it starts hidden when the config says so, like it would for someone new.
+    const seen = new Set(stored?.order ?? []);
+    const hiddenSince = stored?.hidden ? columns.filter((c) => c.hidden && !seen.has(c.key)).map((c) => c.key) : [];
 
     return {
         layout: stored?.layout && layouts.includes(stored.layout) ? stored.layout : fallback.layout,
         order: mergeOrder(columns, stored?.order),
         // A column locked since the preference was stored stops being hidden, rather than being
         // both locked and absent.
-        hidden: (stored?.hidden ?? columns.filter((c) => c.hidden).map((c) => c.key)).filter((key) => present.has(key) && !lockedNow.has(key)),
+        hidden: [...(stored?.hidden ?? columns.filter((c) => c.hidden).map((c) => c.key)), ...hiddenSince].filter((key, i, all) => present.has(key) && !lockedNow.has(key) && all.indexOf(key) === i),
     };
 }

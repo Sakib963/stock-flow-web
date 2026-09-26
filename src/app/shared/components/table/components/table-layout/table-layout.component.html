@@ -5,7 +5,7 @@
                 <th [nzWidth]="serialWidth" nzAlign="right" class="text-ink-muted" [attr.aria-label]="'list.serial' | translate" scope="col">#</th>
             }
             @for (column of columns(); track column.key) {
-                <th [nzWidth]="width(column)" [nzAlign]="align(column)" [nzColumnKey]="column.key" [nzShowSort]="!!column.sortable" [nzSortFn]="!!column.sortable" [nzSortOrder]="sortOrder(column)" (nzSortOrderChange)="onSort(column, $event)" cdkDrag [cdkDragDisabled]="!isMovable(column)" [class.cursor-grab]="isMovable(column)">
+                <th [nzWidth]="width(column)" [nzAlign]="align(column)" [nzColumnKey]="column.key" [nzShowSort]="!!column.sortable" [nzSortFn]="!!column.sortable" [nzSortOrder]="sortOrder(column)" (nzSortOrderChange)="onSort(column, $event)" cdkDrag [cdkDragDisabled]="!isMovable(column)" [class.cursor-grab]="isMovable(column)" class="overflow-hidden">
                     {{ column.label | text }}
                 </th>
             }
@@ -40,7 +40,7 @@
                         <td nzAlign="right" class="text-ink-soft tabular-nums">{{ numberOf($index) | digits }}</td>
                     }
                     @for (column of columns(); track column.key) {
-                        <td [nzAlign]="align(column)">
+                        <td [nzAlign]="align(column)" class="overflow-hidden">
                             <table-cell [column]="column" [row]="row" [openRoute]="routeFor(row)" [where]="where()" />
                         </td>
                     }
