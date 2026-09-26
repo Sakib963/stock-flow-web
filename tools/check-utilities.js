@@ -53,6 +53,8 @@ const OURS = /^(is-|has-|lang-|ng-|ant-|sf-drawer|sf-sheet|sf-flyout|sf-tip|sf-s
 // Marker classes Tailwind reads but never emits a rule for: they exist so a variant on a
 // descendant can target them.
 const MARKERS = new Set(['group', 'peer']);
+// A named marker, `group/copy`, is the same thing.
+const isMarker = (c) => MARKERS.has(c.split('/')[0]);
 
 const files = [];
 for (const r of ROOTS) walk(r, files);
@@ -78,7 +80,7 @@ for (const f of files.filter((f) => f.endsWith('.html') || f.endsWith('.ts'))) {
     for (const chunk of chunks) {
         for (const c of chunk.split(/\s+/)) {
             if (!c) continue;
-            if (OURS.test(c) || MARKERS.has(c) || componentClasses.has(c)) continue;
+            if (OURS.test(c) || isMarker(c) || componentClasses.has(c)) continue;
             if (/[{}()?]/.test(c)) continue; // interpolation or expression fragment
             if (!candidates.has(c)) candidates.set(c, new Set());
             candidates.get(c).add(rel);
@@ -92,8 +94,9 @@ const escapeClass = (c) => c.replace(/[.:/[\]()%,#!*+~='"^$|@&<>{}]/g, (ch) => '
 const missing = [];
 for (const [c, where] of candidates) {
     const selector = '.' + escapeClass(c);
-    // A rule for the class exists if the escaped selector appears followed by a delimiter.
-    const re = new RegExp(selector.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '(?=[\\s,{:>+~])');
+    // A rule for the class exists if the escaped selector appears followed by a delimiter, or by
+    // another class: `[&.is-active]:transition-none` compiles to `.x.is-active{`.
+    const re = new RegExp(selector.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '(?=[\\s,{:>+~.])');
     if (!re.test(css)) missing.push([c, [...where].join(', ')]);
 }
 

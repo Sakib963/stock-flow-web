@@ -103,14 +103,14 @@
             <input nz-input type="text" class="text-xs" [class.w-40]="!block" [class.w-full]="block" [disabled]="disabled(field)" [ngModel]="valueOf(field, draft)" (ngModelChange)="set(field, $event, draft)" [attr.placeholder]="(field.placeholder ?? field.label) | text" [attr.aria-label]="field.label | text" />
         }
         @case ('select') {
-            <nz-select class="text-xs" [class.w-40]="!block" [class.w-full]="block" [nzAllowClear]="!field.required" [nzDisabled]="disabled(field)" [nzPlaceHolder]="field.label | text" [ngModel]="valueOf(field, draft)" (ngModelChange)="set(field, $event, draft)">
+            <nz-select class="text-xs" [class.w-40]="!block" [class.w-full]="block" [nzShowSearch]="isRemoteChoices(field)" [nzLoading]="remoteLoading(field)" [nzAllowClear]="!field.required" [nzDisabled]="disabled(field)" [nzPlaceHolder]="field.label | text" [ngModel]="valueOf(field, draft)" (ngModelChange)="set(field, $event, draft)" (nzOpenChange)="$event && loadRemoteFor(field)">
                 @for (choice of choicesOf(field); track choice.value) {
                     <nz-option [nzValue]="choice.value" [nzLabel]="choice.label | text" />
                 }
             </nz-select>
         }
         @case ('multi-select') {
-            <nz-select class="text-xs" [class.min-w-44]="!block" [class.w-full]="block" nzMode="multiple" [nzMaxTagCount]="field.maxTags ?? 2" [nzAllowClear]="!field.required" [nzDisabled]="disabled(field)" [nzPlaceHolder]="field.label | text" [ngModel]="listOf(field, draft)" (ngModelChange)="setList(field, $event, draft)">
+            <nz-select class="text-xs" [class.min-w-44]="!block" [class.w-full]="block" nzMode="multiple" [nzLoading]="remoteLoading(field)" (nzOpenChange)="$event && loadRemoteFor(field)" [nzMaxTagCount]="field.maxTags ?? 2" [nzAllowClear]="!field.required" [nzDisabled]="disabled(field)" [nzPlaceHolder]="field.label | text" [ngModel]="listOf(field, draft)" (ngModelChange)="setList(field, $event, draft)">
                 @for (choice of choicesOf(field); track choice.value) {
                     <nz-option [nzValue]="choice.value" [nzLabel]="choice.label | text" />
                 }

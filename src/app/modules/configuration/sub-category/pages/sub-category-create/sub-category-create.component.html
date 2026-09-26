@@ -1,0 +1,5 @@
+<page-header [back]="back" [title]="'configuration.subCategory.createTitle' | translate" [lead]="'configuration.subCategory.formLead' | translate" />
+
+<form-page [formId]="editor()?.formId ?? ''" [saving]="saving()" [remaining]="editor()?.remaining() ?? 0" (cancel)="cancel()">
+    <sub-category-form (submitted)="save()" />
+</form-page>

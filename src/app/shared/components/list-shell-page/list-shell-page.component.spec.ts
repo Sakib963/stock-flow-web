@@ -5,6 +5,7 @@ import { provideRouter } from '@angular/router';
 import { provideNzI18n, en_US } from 'ng-zorro-antd/i18n';
 import { provideTranslateService } from '@ngx-translate/core';
 import { APIEndpoint } from '@app/core/constants/api-endpoint';
+import { LIST_TIMING } from '@app/shared/constants/list-timing';
 import { ListShellPageConfig } from '@app/core/models/list-shell-page.model';
 import { ListShellPageComponent } from './list-shell-page.component';
 
@@ -91,12 +92,47 @@ describe('ListShellPageComponent', () => {
 
         // Nothing goes out while someone is still typing.
         http.expectNone((r) => r.url.endsWith(APIEndpoint.GET_CATEGORY_LIST));
-        await vi.advanceTimersByTimeAsync(300);
+        await vi.advanceTimersByTimeAsync(LIST_TIMING.searchDebounceMs);
 
         const sent = http.expectOne((r) => r.url.endsWith(APIEndpoint.GET_CATEGORY_LIST));
         expect(sent.request.params.get('search')).toBe('sar');
         expect(sent.request.params.get('offset')).toBe('0');
         sent.flush(PAGE);
+    });
+
+    it('waits through the pause between two keys of ordinary typing', async () => {
+        const { fixture, http, el } = await open();
+        const box = el.querySelector('[data-filter="search"] input') as HTMLInputElement;
+
+        for (const text of ['s', 'sa', 'sar']) {
+            box.value = text;
+            box.dispatchEvent(new Event('input'));
+            fixture.detectChanges();
+            await vi.advanceTimersByTimeAsync(350);
+        }
+        http.expectNone((r) => r.url.endsWith(APIEndpoint.GET_CATEGORY_LIST));
+
+        await vi.advanceTimersByTimeAsync(LIST_TIMING.searchDebounceMs);
+        const sent = http.match((r) => r.url.endsWith(APIEndpoint.GET_CATEGORY_LIST));
+        expect(sent.map((r) => r.request.params.get('search'))).toEqual(['sar']);
+        sent.forEach((r) => r.flush(PAGE));
+    });
+
+    it('sends nothing for a space, which changes nothing about the search', async () => {
+        const { fixture, http, el } = await open();
+        const box = el.querySelector('[data-filter="search"] input') as HTMLInputElement;
+        box.value = 'sar';
+        box.dispatchEvent(new Event('input'));
+        fixture.detectChanges();
+        await vi.advanceTimersByTimeAsync(LIST_TIMING.searchDebounceMs);
+        http.expectOne((r) => r.url.endsWith(APIEndpoint.GET_CATEGORY_LIST)).flush(PAGE);
+
+        box.value = 'sar ';
+        box.dispatchEvent(new Event('input'));
+        fixture.detectChanges();
+        await vi.advanceTimersByTimeAsync(LIST_TIMING.searchDebounceMs);
+
+        http.expectNone((r) => r.url.endsWith(APIEndpoint.GET_CATEGORY_LIST));
     });
 
     it('sends a chosen filter as its own parameter, and reads it back as a chip', async () => {

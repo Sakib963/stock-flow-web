@@ -47,13 +47,13 @@ export const CATEGORY_LIST: ListShellPageConfig = {
         source: { endpoint: APIEndpoint.GET_CATEGORY_LIST },
         sort: { key: 'name', order: 'asc' },
         columns: [
-            { key: 'category_code', label: 'configuration.category.code', type: 'identifier', width: 110, sortable: true, locked: true, pin: 'start' },
-            { key: 'name', label: 'configuration.category.name', type: 'name', width: 200, sortable: true, locked: true },
+            { key: 'category_code', label: 'configuration.category.code', type: 'identifier', copy: true, width: 134, sortable: true, locked: true, pin: 'start' },
+            { key: 'name', label: 'configuration.category.name', type: 'name', width: 190, sortable: true, locked: true },
             // The slack column: a description is the one value here with no natural width, and it is
             // the first thing to cut short rather than the name it belongs to.
             { key: 'description', label: 'configuration.category.description', type: 'long-text' },
             { key: 'status', label: 'configuration.category.status.label', type: 'status', width: 120, sortable: true, tones: CATEGORY_STATUS },
-            { key: 'last_action_by', label: 'configuration.category.lastTouched', type: 'user', width: 170, sortable: true, sortKey: 'last_action_on', name: 'last_action_by_name' },
+            { key: 'last_action_by', label: 'configuration.category.lastTouched', type: 'user', width: 160, sortable: true, sortKey: 'last_action_on', name: 'last_action_by_name' },
             { key: 'last_action_on', label: 'configuration.category.lastTouchedOn', type: 'date', format: 'date', width: 120, sortable: true, sortKey: 'last_action_on' },
             { key: 'created_on', label: 'configuration.category.created', type: 'date', format: 'date', width: 120, sortable: true, hidden: true },
         ],

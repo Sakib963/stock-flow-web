@@ -203,9 +203,6 @@
         "serverBody": "Something went wrong on our side. Try again in a moment. Your filters and page are kept.",
         "forbiddenTitle": "You cannot see this list",
         "forbiddenBody": "Your role does not include it. Ask the business admin if you need it.",
-        "copy": "Copy",
-        "copied": "Copied",
-        "copyFailed": "Could not copy. Select the text and copy it instead.",
         "columns": "Columns",
         "resetColumns": "Reset",
         "reorderHint": "Drag to reorder, or hold Alt and press the up or down arrow.",
@@ -334,6 +331,111 @@
                 "title": "Save changes to this category?",
                 "body": "The changes show everywhere {{name}} appears, including on the products already in it."
             }
+        },
+        "subCategory": {
+            "code": "Code",
+            "name": "Sub-category",
+            "category": "Category",
+            "created": "Added",
+            "status": {
+                "label": "Status",
+                "active": "Active",
+                "inactive": "Inactive"
+            },
+            "emptyTitle": "No sub-categories yet",
+            "emptyBody": "Sub-categories split a category into smaller groups, such as Sarees and Kurtis under Clothing.",
+            "add": "Add sub-category",
+            "description": "Description",
+            "lastTouched": "Last updated by",
+            "searchPlaceholder": "Search name, code, description or category",
+            "view": "View",
+            "edit": "Edit",
+            "lastTouchedOn": "Last updated",
+            "stat": {
+                "active": "Active sub-categories",
+                "inactive": "Inactive sub-categories",
+                "products": "Products in them",
+                "empty": "Without products"
+            },
+            "createTitle": "Add sub-category",
+            "editTitle": "Edit sub-category",
+            "formLead": "Sub-categories split a category into smaller groups, so products are easier to find and report on.",
+            "categoryHelper": "The category this group belongs to. Not in the list? Add it from the bottom of the list without leaving this page.",
+            "nameHelper": "What you would call this group of products when talking to a customer. It must differ from the other sub-categories in the same category.",
+            "codeHelper": "A short code for reports and labels. Use your own, or have one made for you.",
+            "descriptionHelper": "Optional. What belongs in this sub-category, for whoever adds products later.",
+            "statusHelper": "Inactive keeps the sub-category and its history, and stops it being offered on new products.",
+            "categoryPlaceholder": "Pick a category",
+            "namePlaceholder": "Sarees, Sneakers, Serums",
+            "codePlaceholder": "SARE",
+            "descriptionPlaceholder": "What belongs in this sub-category",
+            "statusPlaceholder": "Pick a status",
+            "addCategory": "Can't find it? Add a category",
+            "addNamedCategory": "Add \"{{name}}\" as a category",
+            "noCategories": "No categories yet. Add the first one below.",
+            "noCategoryMatch": "No category by that name.",
+            "categoriesFailed": "Categories could not be loaded.",
+            "categoryInactive": "That category has been turned off. Pick an active one.",
+            "quickAdd": {
+                "title": "Add category",
+                "lead": "It is added to your categories and picked for this sub-category. What you typed on the page stays as it is."
+            },
+            "updated": "Sub-category saved.",
+            "createdMessage": "Sub-category added.",
+            "loadFailed": {
+                "network": "Could not reach the server. Check your connection and try again.",
+                "forbidden": "You do not have permission to see this sub-category.",
+                "server": "This sub-category could not be loaded. Try again in a moment."
+            },
+            "backToList": "Back to sub-categories",
+            "noDescription": "No description yet.",
+            "activity": "Recent activity",
+            "noActivity": "Nothing has happened to this sub-category yet.",
+            "detailStat": {
+                "products": "Products",
+                "stock": "Units in stock",
+                "spent": "Spent on stock in hand",
+                "lowStock": "Low on stock",
+                "outOfStock": "Out of stock",
+                "averagePrice": "Average price"
+            },
+            "nameTaken": "This category already has a sub-category with this name.",
+            "codeTaken": "Another sub-category already has this code.",
+            "notSet": "Not set",
+            "fact": {
+                "activeProducts": "Active products"
+            },
+            "report": {
+                "products": "Export products to Excel",
+                "inventory": "Download inventory report",
+                "empty": "There is nothing in this sub-category to report on yet.",
+                "failed": {
+                    "network": "The report could not be downloaded. Check your connection and try again.",
+                    "forbidden": "You do not have access to download this report.",
+                    "server": "The report could not be built just now. Try again in a moment."
+                }
+            },
+            "detailTitle": "Sub-category details",
+            "detailLead": "What this sub-category holds, how its stock stands, and what has changed in it.",
+            "section": {
+                "details": "Details"
+            },
+            "addDescription": "Add a description",
+            "quickActions": "Quick actions",
+            "quick": {
+                "products": "View all products",
+                "lowStock": "View low stock products",
+                "analytics": "View analytics",
+                "notReady": "Products and analytics open from here once those pages are part of the app."
+            },
+            "confirmCreate": {
+                "title": "Add this sub-category?",
+                "body": "{{name}} ({{code}}) will be added to your sub-categories."
+            },
+            "confirmEdit": {
+                "title": "Save changes to this sub-category?",
+                "body": "The changes show everywhere {{name}} appears, including on the products already in it."
+            }
         }
     },
     "form": {
@@ -371,5 +473,10 @@
         "retry": "Try again",
         "needsName": "Type the name first, then a code can be built from it.",
         "failed": "A code could not be built just now. Type one yourself, or try again."
+    },
+    "copy": {
+        "hint": "Click to copy",
+        "copied": "Copied",
+        "failed": "Could not copy. Select the text and copy it instead."
     }
 }

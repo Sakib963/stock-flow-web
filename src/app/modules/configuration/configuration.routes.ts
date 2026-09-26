@@ -3,6 +3,7 @@ import { OVERLAY_PROVIDERS } from '@app/shared/constants/overlay-providers';
 import { permissionGuard } from '@app/core/guards/permission/permission.guard';
 import { unsavedChangesGuard } from '@app/core/guards/unsaved-changes/unsaved-changes.guard';
 import { CATEGORY_LIST } from '@app/modules/configuration/category/config/category-list.config';
+import { SUB_CATEGORY_LIST } from '@app/modules/configuration/sub-category/config/sub-category-list.config';
 
 /** Everything under /app/configuration. Each URL is the route of its menu item. */
 export const CONFIGURATION_ROUTES: Routes = [
@@ -38,6 +39,32 @@ export const CONFIGURATION_ROUTES: Routes = [
                 canActivate: [permissionGuard],
                 data: { permission: CATEGORY_LIST.permission },
                 loadComponent: () => import('./category/pages/category-detail/category-detail.component').then((m) => m.CategoryDetailComponent),
+            },
+            {
+                path: 'sub-categories',
+                canActivate: [permissionGuard],
+                data: { permission: SUB_CATEGORY_LIST.permission },
+                loadComponent: () => import('./sub-category/pages/sub-category-list/sub-category-list.component').then((m) => m.SubCategoryListComponent),
+            },
+            {
+                path: 'sub-categories/new',
+                canActivate: [permissionGuard],
+                canDeactivate: [unsavedChangesGuard],
+                data: { permission: 'configuration.sub-category.create' },
+                loadComponent: () => import('./sub-category/pages/sub-category-create/sub-category-create.component').then((m) => m.SubCategoryCreateComponent),
+            },
+            {
+                path: 'sub-categories/:oid/edit',
+                canActivate: [permissionGuard],
+                canDeactivate: [unsavedChangesGuard],
+                data: { permission: 'configuration.sub-category.edit' },
+                loadComponent: () => import('./sub-category/pages/sub-category-edit/sub-category-edit.component').then((m) => m.SubCategoryEditComponent),
+            },
+            {
+                path: 'sub-categories/:oid',
+                canActivate: [permissionGuard],
+                data: { permission: SUB_CATEGORY_LIST.permission },
+                loadComponent: () => import('./sub-category/pages/sub-category-detail/sub-category-detail.component').then((m) => m.SubCategoryDetailComponent),
             },
         ],
     },

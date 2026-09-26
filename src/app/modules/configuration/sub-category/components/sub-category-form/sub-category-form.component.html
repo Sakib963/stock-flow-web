@@ -1,0 +1,116 @@
+<!-- Category, name and code across; status beside the description under them. -->
+<form nz-form nzLayout="vertical" class="grid grid-cols-1 items-start gap-x-4 md:grid-cols-3" [id]="formId" [formGroup]="form" (ngSubmit)="submitted.emit()">
+    <nz-form-item>
+        <nz-form-label nzRequired nzFor="sub-category-parent" [nzTooltipTitle]="'configuration.subCategory.categoryHelper' | translate">{{ 'configuration.subCategory.category' | translate }}</nz-form-label>
+        <nz-form-control [nzErrorTip]="parentError">
+            <!-- The footer under the options is how a missing category gets added without leaving
+                 this form. It is absent for someone who may not add categories. -->
+            <nz-select nzId="sub-category-parent" formControlName="category_oid" nzShowSearch [nzLoading]="categoriesLoading()" [nzPlaceHolder]="'configuration.subCategory.categoryPlaceholder' | translate" [nzNotFoundContent]="noCategory" [nzDropdownRender]="canAddCategory() ? addCategory : null" (nzOnSearch)="categorySearch.set($event)" [nzOpen]="parentOpen()" (nzOpenChange)="parentOpenChanged($event)">
+                @for (category of categories(); track category.value) {
+                    <nz-option [nzValue]="category.value" [nzLabel]="category.label | text" />
+                }
+            </nz-select>
+        </nz-form-control>
+        <span id="sub-category-parent-help" class="sr-only">{{ 'configuration.subCategory.categoryHelper' | translate }}</span>
+        <ng-template #parentError let-control>
+            <span id="sub-category-parent-error">
+                @if (control.hasError('inactive')) {
+                    {{ 'configuration.subCategory.categoryInactive' | translate }}
+                } @else {
+                    {{ 'form.required' | translate }}
+                }
+            </span>
+        </ng-template>
+        <ng-template #noCategory>
+            <p class="m-0 py-2 text-center text-xs text-ink-muted">
+                @if (categoriesFailed()) {
+                    {{ 'configuration.subCategory.categoriesFailed' | translate }}
+                    <button nz-button nzType="link" nzSize="small" type="button" (click)="loadCategories()">{{ 'form.retry' | translate }}</button>
+                } @else if (categorySearch()) {
+                    {{ 'configuration.subCategory.noCategoryMatch' | translate }}
+                } @else {
+                    {{ 'configuration.subCategory.noCategories' | translate }}
+                }
+            </p>
+        </ng-template>
+        <ng-template #addCategory>
+            <nz-divider class="my-1" />
+            <button nz-button nzType="link" nzBlock type="button" class="inline-flex items-center justify-start gap-1.5" (click)="openQuickAdd()" data-parent="add-category">
+                <ng-icon name="lucidePlus" size="14px" aria-hidden="true" />
+                @if (categorySearch().trim()) {
+                    <span class="truncate">{{ 'configuration.subCategory.addNamedCategory' | translate: { name: categorySearch().trim() } }}</span>
+                } @else {
+                    <span>{{ 'configuration.subCategory.addCategory' | translate }}</span>
+                }
+            </button>
+        </ng-template>
+    </nz-form-item>
+
+    <nz-form-item>
+        <nz-form-label nzRequired nzFor="sub-category-name" [nzTooltipTitle]="'configuration.subCategory.nameHelper' | translate">{{ 'configuration.subCategory.name' | translate }}</nz-form-label>
+        <nz-form-control nzHasFeedback [nzErrorTip]="nameError" [nzValidatingTip]="'form.checking' | translate">
+            <input nz-input id="sub-category-name" formControlName="name" autocomplete="off" [attr.placeholder]="'configuration.subCategory.namePlaceholder' | translate" [attr.aria-invalid]="invalid('name')" [attr.aria-describedby]="describedBy('name')" />
+        </nz-form-control>
+        <span id="sub-category-name-help" class="sr-only">{{ 'configuration.subCategory.nameHelper' | translate }}</span>
+        <ng-template #nameError let-control>
+            <span id="sub-category-name-error">
+                @if (control.hasError('taken')) {
+                    {{ 'configuration.subCategory.nameTaken' | translate }}
+                } @else if (control.hasError('required')) {
+                    {{ 'form.required' | translate }}
+                } @else if (control.hasError('maxlength')) {
+                    {{ 'form.tooLong' | translate: { max: 255 } | digits }}
+                }
+            </span>
+        </ng-template>
+    </nz-form-item>
+
+    <nz-form-item>
+        <nz-form-label nzRequired nzFor="sub-category-code">{{ 'configuration.subCategory.code' | translate }}</nz-form-label>
+        <nz-form-control nzHasFeedback [nzErrorTip]="codeError" [nzValidatingTip]="'form.checking' | translate" [nzExtra]="codeHelp">
+            <input nz-input id="sub-category-code" class="font-mono uppercase" formControlName="category_code" autocomplete="off" [attr.placeholder]="'configuration.subCategory.codePlaceholder' | translate" [attr.aria-invalid]="invalid('category_code')" [attr.aria-describedby]="describedBy('category_code')" />
+        </nz-form-control>
+        <ng-template #codeHelp>
+            <span id="sub-category-code-help">{{ 'configuration.subCategory.codeHelper' | translate }}</span>
+            <button nz-button nzType="link" nzSize="small" type="button" class="inline-flex items-center gap-1 px-1 align-baseline" (click)="generateCode()">
+                <ng-icon name="lucideSparkles" size="12px" aria-hidden="true" />
+                <span>{{ 'codeGenerator.hint' | translate }}</span>
+            </button>
+        </ng-template>
+        <ng-template #codeError let-control>
+            <span id="sub-category-code-error">
+                @if (control.hasError('taken')) {
+                    {{ 'configuration.subCategory.codeTaken' | translate }}
+                } @else if (control.hasError('required')) {
+                    {{ 'form.required' | translate }}
+                } @else if (control.hasError('maxlength')) {
+                    {{ 'form.tooLong' | translate: { max: 50 } | digits }}
+                }
+            </span>
+        </ng-template>
+    </nz-form-item>
+
+    <nz-form-item>
+        <nz-form-label nzRequired nzFor="sub-category-status" [nzTooltipTitle]="'configuration.subCategory.statusHelper' | translate">{{ 'configuration.subCategory.status.label' | translate }}</nz-form-label>
+        <nz-form-control>
+            <nz-select nzId="sub-category-status" formControlName="status" [nzPlaceHolder]="'configuration.subCategory.statusPlaceholder' | translate">
+                <nz-option nzValue="Active" [nzLabel]="'configuration.subCategory.status.active' | translate" />
+                <nz-option nzValue="Inactive" [nzLabel]="'configuration.subCategory.status.inactive' | translate" />
+            </nz-select>
+        </nz-form-control>
+        <span id="sub-category-status-help" class="sr-only">{{ 'configuration.subCategory.statusHelper' | translate }}</span>
+    </nz-form-item>
+
+    <nz-form-item class="md:col-span-2">
+        <nz-form-label nzFor="sub-category-description" [nzTooltipTitle]="'configuration.subCategory.descriptionHelper' | translate">{{ 'configuration.subCategory.description' | translate }}</nz-form-label>
+        <nz-form-control [nzErrorTip]="descriptionError">
+            <textarea nz-input id="sub-category-description" formControlName="description" rows="3" [attr.placeholder]="'configuration.subCategory.descriptionPlaceholder' | translate" [attr.aria-invalid]="invalid('description')" [attr.aria-describedby]="describedBy('description')"></textarea>
+        </nz-form-control>
+        <span id="sub-category-description-help" class="sr-only">{{ 'configuration.subCategory.descriptionHelper' | translate }}</span>
+        <ng-template #descriptionError
+            ><span id="sub-category-description-error">{{ 'form.tooLong' | translate: { max: 1000 } | digits }}</span></ng-template
+        >
+    </nz-form-item>
+</form>
+
+<category-quick-add [startingName]="quickAddName()" (created)="categoryAdded($event)" (closed)="quickAddName.set(null)" />

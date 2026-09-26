@@ -1,3 +1,4 @@
+import { LIST_TIMING } from '@app/shared/constants/list-timing';
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, TestRequest, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
@@ -73,7 +74,7 @@ describe('ListStore', () => {
         store.setSearch('Ra');
         vi.advanceTimersByTime(200);
         store.setSearch('Rahim');
-        vi.advanceTimersByTime(299);
+        vi.advanceTimersByTime(LIST_TIMING.searchDebounceMs - 1);
         expect(pending().length).toBe(0);
 
         vi.advanceTimersByTime(1);

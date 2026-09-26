@@ -1,11 +1,9 @@
 import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
+import { NgTemplateOutlet } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { NgIcon, provideIcons } from '@ng-icons/core';
-import { lucideCopy } from '@ng-icons/lucide';
-import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzPopoverModule } from 'ng-zorro-antd/popover';
 import { NzTooltipModule } from 'ng-zorro-antd/tooltip';
-import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import { DateFormat, Row, Tone } from '@app/core/models/config.model';
 import { Column } from '@app/core/models/table.model';
 import { LanguageService } from '@app/core/services/language/language.service';
@@ -14,6 +12,7 @@ import { StatusTagComponent } from '@app/shared/components/status-tag/status-tag
 import { MoneyPipe } from '@app/shared/pipes/money/money.pipe';
 import { RecordDatePipe } from '@app/shared/pipes/record-date/record-date.pipe';
 import { UserCardComponent } from '@app/shared/components/user-card/user-card.component';
+import { CopyableDirective } from '@app/shared/directives/copyable/copyable.directive';
 import { TextPipe } from '@app/shared/pipes/text/text.pipe';
 import { fillRoute } from '@app/shared/utils/fill-route/fill-route';
 import { readPath } from '@app/shared/utils/read-path/read-path';
@@ -38,15 +37,12 @@ const DOT: Record<Tone, string> = {
  */
 @Component({
     selector: 'table-cell',
-    imports: [RouterLink, NgIcon, NzPopoverModule, NzTooltipModule, TranslatePipe, TextPipe, MoneyPipe, RecordDatePipe, StatusTagComponent, UserCardComponent, RendererOutletComponent],
-    providers: [provideIcons({ lucideCopy })],
+    imports: [NgTemplateOutlet, RouterLink, CopyableDirective, NzPopoverModule, NzTooltipModule, TranslatePipe, TextPipe, MoneyPipe, RecordDatePipe, StatusTagComponent, UserCardComponent, RendererOutletComponent],
     templateUrl: './table-cell.component.html',
     styleUrl: './table-cell.component.scss',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TableCellComponent {
-    private readonly _message = inject(NzMessageService);
-    private readonly _translate = inject(TranslateService);
     readonly language = inject(LanguageService).current;
 
     readonly column = input.required<Column>();
@@ -141,16 +137,6 @@ export class TableCellComponent {
         const column = this.column();
         return { row: this.row(), column, inputs: column.type === 'component' ? (column.inputs ?? {}) : {} };
     });
-
-    async copy(event: Event): Promise<void> {
-        event.stopPropagation();
-        try {
-            await navigator.clipboard.writeText(String(this.value()));
-            this._message.success(this._translate.instant('list.copied'));
-        } catch {
-            this._message.error(this._translate.instant('list.copyFailed'));
-        }
-    }
 
     stopRow(event: Event): void {
         event.stopPropagation();

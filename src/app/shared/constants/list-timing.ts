@@ -4,7 +4,7 @@
  */
 export const LIST_TIMING = {
     /** Quiet time after the last key before a search is sent. */
-    searchDebounceMs: 300,
+    searchDebounceMs: 500,
     /** Page, size, sort, a filter or a chip: rapid changes collapse into one request. */
     triggerDebounceMs: 150,
     /** Once shown, a loading state stays this long, so a fast response never flashes. */

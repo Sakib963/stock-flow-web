@@ -13,6 +13,7 @@ import { Observable, filter, map, startWith, take } from 'rxjs';
 import { Category, CategoryField, CategoryFormField, CategoryPayload, CategoryStatus } from '@app/core/models/category.model';
 import { CategoryService } from '@app/modules/configuration/category/services/category.service';
 import { CodeGeneratorService } from '@app/shared/services/code-generator/code-generator.service';
+import { revealErrors } from '@app/shared/utils/reveal-errors/reveal-errors';
 import { uniqueValue } from '@app/shared/utils/unique-value/unique-value';
 import { DigitsPipe } from '@app/shared/pipes/digits/digits.pipe';
 
@@ -53,6 +54,9 @@ export class CategoryFormComponent {
 
     /** The category being edited, so its own name and code are not reported as taken. */
     readonly editing = input<Category | null>(null);
+
+    /** One field per row, for a narrow surface such as the quick-add drawer on the sub-category form. */
+    readonly stacked = input(false);
 
     readonly submitted = output<void>();
 
@@ -115,7 +119,7 @@ export class CategoryFormComponent {
      * for the checks in flight and then answers.
      */
     ready(): Observable<boolean> {
-        this.form.markAllAsTouched();
+        revealErrors(this.form);
 
         return this.form.statusChanges.pipe(
             startWith(this.form.status),

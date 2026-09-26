@@ -246,6 +246,21 @@ body.lang-bn {
     overflow-x: hidden;
 }
 
+/* A white icon on a filled button. At the app's 1.75 stroke a 14px line is thinner than a pixel,
+   so its edges blend into the fill and it reads a shade paler than the semibold label beside it.
+   Declared on the svg, which is where the icon's own stroke-width reads the variable. */
+.ant-btn-primary ng-icon svg {
+    --ng-icon__stroke-width: 2.25;
+}
+
+/* A button's loading spinner. Ant sets it on a text line with vertical-align: -0.125em, which is
+   right beside inline text but drops it about 3px below centre in our flex buttons, where the icon
+   it replaces sits exactly on centre. A flex box of its own ignores vertical-align. */
+.ant-btn .ant-btn-loading-icon {
+    display: inline-flex;
+    align-items: center;
+}
+
 /* Lists, from the records handoff. A skeleton bar the height of a line of 13px text, so skeleton rows are exactly as tall as real ones. */
 .sf-cell-skeleton .ant-skeleton-title {
     height: 12px;
@@ -438,4 +453,9 @@ body.lang-bn {
     font-size: 12px;
     line-height: 15px;
     color: var(--color-danger);
+}
+
+/* `confirmAction` draws its buttons in the body, with icons, and leaves ng-zorro's own row empty. */
+.ant-modal-confirm-btns:empty {
+    display: none;
 }

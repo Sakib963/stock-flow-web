@@ -30,9 +30,8 @@ const open = async (): Promise<ComponentFixture<CategoryCreateComponent>> => {
  * Returns the spy so a test can see what was asked.
  */
 const answerConfirm = (yes: boolean) =>
-    vi.spyOn(TestBed.inject(NzModalService), 'confirm').mockImplementation((options) => {
-        if (yes) (options?.nzOnOk as (() => void) | undefined)?.();
-        return { afterClose: of(undefined) } as unknown as NzModalRef;
+    vi.spyOn(TestBed.inject(NzModalService), 'confirm').mockImplementation(() => {
+        return { afterClose: of(yes) } as unknown as NzModalRef;
     });
 
 const settle = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));

@@ -1,5 +1,5 @@
 import { NgTemplateOutlet } from '@angular/common';
-import { ChangeDetectionStrategy, Component, TemplateRef, computed, inject, input, model, signal, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, TemplateRef, computed, effect, inject, input, model, signal, untracked, viewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideCheck, lucideEraser, lucideListFilter, lucideRotateCcw, lucideSearch, lucideX } from '@ng-icons/lucide';
@@ -13,8 +13,10 @@ import { NzSwitchModule } from 'ng-zorro-antd/switch';
 import { NzTooltipModule } from 'ng-zorro-antd/tooltip';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { Text } from '@app/core/models/config.model';
-import { Choice, FilterField, FilterConfig, FilterValues } from '@app/core/models/filter.model';
+import { Choice, FilterField, FilterConfig, FilterValues, RemoteChoices } from '@app/core/models/filter.model';
 import { LanguageService } from '@app/core/services/language/language.service';
+import { SessionService } from '@app/core/services/session/session.service';
+import { ChoicesService } from '@app/shared/services/choices/choices.service';
 import { TextPipe } from '@app/shared/pipes/text/text.pipe';
 import { resolveText } from '@app/shared/utils/resolve-text/resolve-text';
 import { matches } from '@app/shared/utils/condition/condition';
@@ -26,6 +28,14 @@ const SEPARATOR = ',';
 const DRAWN: ReadonlySet<FilterField['type']> = new Set(['text', 'select', 'multi-select', 'segmented', 'toggle']);
 
 const warned = new Set<string>();
+
+/**
+ * Remote choices this build can load: an endpoint and fixed params. Server search, paging, label
+ * resolution and a param that follows another filter are not built yet, and a picker loading the
+ * wrong list is worse than no picker.
+ */
+const drawsRemote = (source: RemoteChoices): boolean =>
+    !source.search && !source.pageSize && !source.resolve && !source.group && !source.sub && Object.values(source.params ?? {}).every((param) => typeof param !== 'object');
 
 /**
  * Search and the fields that narrow a list, with what is applied read back as chips.
@@ -44,7 +54,7 @@ const warned = new Set<string>();
 @Component({
     selector: 'list-filter',
     imports: [NgTemplateOutlet, FormsModule, NgIcon, NzButtonModule, NzInputModule, NzModalModule, NzPopoverModule, NzSegmentedModule, NzSelectModule, NzSwitchModule, NzTooltipModule, TranslatePipe, TextPipe],
-    providers: [provideIcons({ lucideCheck, lucideEraser, lucideListFilter, lucideRotateCcw, lucideSearch, lucideX })],
+    providers: [ChoicesService, provideIcons({ lucideCheck, lucideEraser, lucideListFilter, lucideRotateCcw, lucideSearch, lucideX })],
     templateUrl: './filter.component.html',
     styleUrl: './filter.component.scss',
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -53,6 +63,8 @@ export class FilterComponent {
     private readonly _language = inject(LanguageService);
     private readonly _translate = inject(TranslateService);
     private readonly _modal = inject(NzModalService);
+    private readonly _choices = inject(ChoicesService);
+    private readonly _session = inject(SessionService);
 
     readonly config = input.required<FilterConfig>();
     /** Exactly what goes in the query string: strings or null, never objects. */
@@ -79,8 +91,10 @@ export class FilterComponent {
      */
     readonly fields = computed(() =>
         this.config().fields.filter((field) => {
-            const inlineChoices = !('choices' in field) || Array.isArray(field.choices);
-            if (DRAWN.has(field.type) && inlineChoices) return true;
+            // A remote field someone cannot load is absent, not an empty picker that answers 403.
+            if (field.permission && !this._session.can(field.permission)) return false;
+            const drawnChoices = !('choices' in field) || Array.isArray(field.choices) || ((field.type === 'select' || field.type === 'multi-select') && drawsRemote(field.choices as RemoteChoices));
+            if (DRAWN.has(field.type) && drawnChoices) return true;
             const id = `${field.key}:${field.type}`;
             if (!warned.has(id)) {
                 warned.add(id);
@@ -103,8 +117,63 @@ export class FilterComponent {
     readonly showsChips = computed(() => this.config().chips !== false);
     readonly hasSearch = computed(() => !!this.config().search);
 
+    /** Choices loaded from an endpoint, by field key. Absent until the field is first needed. */
+    private readonly _remote = signal<Readonly<Record<string, readonly Choice[]>>>({});
+    private readonly _remoteLoading = signal<ReadonlySet<string>>(new Set());
+
     choicesOf(field: FilterField): readonly Choice[] {
-        return 'choices' in field && Array.isArray(field.choices) ? field.choices : [];
+        if (!('choices' in field)) return [];
+        return Array.isArray(field.choices) ? field.choices : (this._remote()[field.key] ?? []);
+    }
+
+    remoteLoading(field: FilterField): boolean {
+        return this._remoteLoading().has(field.key);
+    }
+
+    isRemoteChoices(field: FilterField): boolean {
+        return !!this.remoteOf(field);
+    }
+
+    private remoteOf(field: FilterField): RemoteChoices | null {
+        return 'choices' in field && !Array.isArray(field.choices) ? (field.choices as RemoteChoices) : null;
+    }
+
+    /**
+     * Loads a remote field's choices the first time they are needed: when the panel opens, or when
+     * a value arrived from the URL and its chip needs a name. Nothing is asked when the page opens.
+     */
+    loadRemoteFor(field: FilterField): void {
+        const source = this.remoteOf(field);
+        if (!source || this._remote()[field.key] || this._remoteLoading().has(field.key)) return;
+
+        this._remoteLoading.update((keys) => new Set(keys).add(field.key));
+        const done = () =>
+            this._remoteLoading.update((keys) => {
+                const next = new Set(keys);
+                next.delete(field.key);
+                return next;
+            });
+        this._choices.load(source).subscribe({
+            next: (choices) => {
+                this._remote.update((all) => ({ ...all, [field.key]: choices }));
+                done();
+            },
+            // The picker stays empty and says it found nothing; the list itself is unaffected, and
+            // opening the panel again asks again.
+            error: () => done(),
+        });
+    }
+
+    private loadAllRemote(): void {
+        for (const field of this.fields()) this.loadRemoteFor(field);
+    }
+
+    constructor() {
+        effect(() => {
+            const values = this.values();
+            const pending = this.fields().filter((field) => this.remoteOf(field) && !isEmptyValue(values[field.key]));
+            untracked(() => pending.forEach((field) => this.loadRemoteFor(field)));
+        });
     }
 
     /** A field can be turned off by what another field holds: a sub-category under no category. */
@@ -174,6 +243,7 @@ export class FilterComponent {
     }
 
     openPanel(): void {
+        this.loadAllRemote();
         if (!this.isModal()) {
             this.popoverOpen.set(true);
             return;

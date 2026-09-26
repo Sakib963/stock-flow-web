@@ -1,0 +1,21 @@
+<!-- Hidden until the text is hovered, but always taking its place, so the text never shifts when it
+     appears. Keyboard focus shows it too, and the tick stays visible after the mouse has left. The
+     colour is on the button: ng-icon's own host style would override a class on the icon. -->
+<button
+    type="button"
+    class="ml-1 inline-flex size-5 cursor-pointer items-center justify-center rounded-control border-0 bg-transparent p-0 align-middle opacity-0 transition-opacity group-hover/copy:opacity-100 hover:bg-surface-page focus-visible:opacity-100"
+    [class.opacity-100]="copied()"
+    [class.text-success]="copied()"
+    [class.text-ink-muted]="!copied()"
+    [class.hover:text-ink]="!copied()"
+    [nz-tooltip]="(copied() ? 'copy.copied' : 'copy.hint') | translate"
+    [attr.aria-label]="'copy.hint' | translate"
+    data-copy="button"
+    (click)="copy($event)"
+>
+    @if (copied()) {
+        <ng-icon name="lucideCheck" size="12px" aria-hidden="true" />
+    } @else {
+        <ng-icon name="lucideCopy" size="12px" aria-hidden="true" />
+    }
+</button>

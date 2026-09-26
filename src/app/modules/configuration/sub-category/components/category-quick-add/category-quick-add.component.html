@@ -1,0 +1,25 @@
+<!-- Wrapped whole rather than bound through nzVisible, because nz-drawer builds its content as soon as
+     it exists: each opening gets a fresh form, and a closed drawer holds nothing. -->
+@if (startingName() !== null) {
+    <nz-drawer [nzVisible]="true" nzPlacement="right" [nzWidth]="shell.isPhone() ? '100%' : 480" [nzTitle]="'configuration.subCategory.quickAdd.title' | translate" [nzFooter]="footer" [nzMaskClosable]="false" (nzOnClose)="close()">
+        <ng-template nzDrawerContent>
+            <p class="mt-0 mb-4 text-xs text-ink-muted">{{ 'configuration.subCategory.quickAdd.lead' | translate }}</p>
+            <category-form [stacked]="true" (submitted)="save()" />
+        </ng-template>
+    </nz-drawer>
+}
+
+<ng-template #footer>
+    <div class="flex items-center justify-end gap-2">
+        <button nz-button nzType="default" type="button" class="inline-flex items-center gap-1.5" [disabled]="saving()" (click)="close()">
+            <ng-icon name="lucideX" size="14px" aria-hidden="true" />
+            <span>{{ 'form.cancel' | translate }}</span>
+        </button>
+        <button nz-button nzType="primary" type="submit" class="inline-flex items-center gap-1.5" [attr.form]="editor()?.formId" [nzLoading]="saving()" [disabled]="saving()" data-quick-add="submit">
+            @if (!saving()) {
+                <ng-icon name="lucideCheck" size="14px" aria-hidden="true" />
+            }
+            <span>{{ 'configuration.category.add' | translate }}</span>
+        </button>
+    </div>
+</ng-template>

@@ -28,7 +28,7 @@ structure or UI. The one exception is the list page config, whose contract lives
 | `src/app/core/` | Cross-cutting: `constants/`, `models/`, `guards/`, `interceptors/`, `services/` |
 | `src/app/modules/<module>/` | A menu module (`configuration`, `inventory`, `sales`): `<module>.routes.ts` and one folder per feature. A module that is one feature and always will be (`auth`, `dashboard`) keeps `pages/`, `components/` and `services/` at its root |
 | `src/app/modules/<module>/<feature>/` | A feature: `pages/`, `components/`, `services/`, `config/`, `constants/`. Nothing of one feature sits beside another's: `configuration/category/` next to `configuration/brand/` |
-| `src/app/shared/` | Components used by more than one feature (`page-header`) |
+| `src/app/shared/` | Components used by more than one feature (`page-header`). One exception: a child feature's quick-add of its missing parent renders the parent feature's own form in place (sub-category's drawer renders `CategoryFormComponent`), so the parent's checks come with it |
 | `src/app/layout/` | The shell: sider, header bar, panels, `constants/`, `services/` |
 | `src/app/app-routes/app.routes.ts` | The map of the app. A module owns its own routes file |
 | `public/assets/i18n/en.json`, `bn.json` | The only translation files loaded. The subfolders beside them are from the old app |
@@ -223,6 +223,13 @@ went wrong and what to do.
 - Rules are shown **before** the person types (a checklist that ticks off), not as an error after.
 - Errors sit inline under the field that failed, with `aria-invalid` and `aria-describedby`. The
   outcome of submitting (saved, failed) is an `NzMessageService` message as well.
+- **A Save that is refused shows every field's error.** Call `revealErrors(form)`
+  (`shared/utils/reveal-errors`), never `markAllAsTouched()` alone: `nz-form-control` redraws its
+  tip only when the status changes, so touching leaves the fields blank under a "check the fields"
+  message. Every `nz-form-control` on a validated field has an `nzErrorTip`.
+- **A confirmation's buttons carry icons**, like every other action button. Ask with
+  `confirmAction` (`shared/utils/confirm-action`), which draws them; `NzModalService.confirm`'s own
+  buttons take text only.
 - **Never clear what someone typed because a request failed.** The password recovery screen keeps
   the code and the password on one screen for exactly this reason.
 - A mismatch that is normal halfway through typing (confirm password) reports on blur or submit,
@@ -233,7 +240,7 @@ went wrong and what to do.
 ### Actions and feedback
 
 - **Mutating actions ask first.** The shared confirmation component arrives with the design rounds;
-  until it exists, use `NzModalService.confirm`, never a hand-rolled dialog. An action that cannot
+  until it exists, use `confirmAction`, never a hand-rolled dialog. An action that cannot
   be undone says so in the confirmation.
 - A button that starts a round trip shows that it is working and cannot be pressed twice.
 - Copy names things the way a shopkeeper would. An error says what went wrong and what to do next.

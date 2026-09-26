@@ -25,11 +25,11 @@ interface ColumnBase {
 }
 
 export type Column =
-    | (ColumnBase & { type: 'text' })
+    | (ColumnBase & { type: 'text'; /** Click to copy on hover, as on an identifier. */ copy?: boolean })
     /** Prose that will not fit: the cell clamps and the full value opens in a popover, not a tooltip. */
     | (ColumnBase & { type: 'long-text'; lines?: 1 | 2 })
     | (ColumnBase & { type: 'name'; sub?: string; thumb?: string })
-    | (ColumnBase & { type: 'identifier'; copy?: boolean })
+    | (ColumnBase & { type: 'identifier'; /** Click to copy on hover, through the `copyable` directive. Give the column about 24px more. */ copy?: boolean })
     | (ColumnBase & { type: 'number' })
     | (ColumnBase & { type: 'quantity'; unit?: string })
     | (ColumnBase & { type: 'stock'; restockAt: string })

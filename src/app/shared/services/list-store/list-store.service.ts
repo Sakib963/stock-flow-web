@@ -209,7 +209,10 @@ export class ListStore {
     }
 
     setSearch(text: string): void {
+        // A space, or typing back to what was already searched, would send the same query again.
+        const unchanged = text.trim() === this.search().trim();
         this.search.set(text);
+        if (unchanged) return;
         this.page.set(1);
         this.remember();
         this._requests.next(LIST_TIMING.searchDebounceMs);

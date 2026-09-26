@@ -25,4 +25,14 @@ export class APIEndpoint {
     static readonly GENERATE_CATEGORY_CODE = '/api/v1/configuration/category/generate-category-code';
     static readonly GENERATE_PRODUCT_LIST_REPORT_BY_CATEGORY = '/api/v1/configuration/category/generate-product-list-report-by-category';
     static readonly GENERATE_INVENTORY_REPORT_BY_CATEGORY = '/api/v1/configuration/category/generate-inventory-report-by-category';
+    static readonly GET_CATEGORY_LIST_FOR_DROPDOWN = '/api/v1/configuration/category/get-category-list-for-dropdown';
+
+    static readonly GET_SUB_CATEGORY_LIST = '/api/v1/configuration/sub-category/get-sub-category-list';
+    static readonly GET_SUB_CATEGORY_DETAILS = '/api/v1/configuration/sub-category/get-sub-category-details';
+    static readonly CREATE_SUB_CATEGORY = '/api/v1/configuration/sub-category/create-sub-category';
+    static readonly UPDATE_SUB_CATEGORY_DETAILS = '/api/v1/configuration/sub-category/update-sub-category-details';
+    static readonly CHECK_SUB_CATEGORY_AVAILABILITY = '/api/v1/configuration/sub-category/check-sub-category-availability';
+    static readonly GENERATE_SUB_CATEGORY_CODE = '/api/v1/configuration/sub-category/generate-sub-category-code';
+    static readonly GENERATE_PRODUCT_LIST_REPORT_BY_SUB_CATEGORY = '/api/v1/configuration/sub-category/generate-product-list-report-by-sub-category';
+    static readonly GENERATE_INVENTORY_REPORT_BY_SUB_CATEGORY = '/api/v1/configuration/sub-category/generate-inventory-report-by-sub-category';
 }

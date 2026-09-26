@@ -51,7 +51,7 @@ const GENERIC_CONFIRM = { title: 'list.confirmTitle', body: 'list.confirmBody', 
     // NzModalModule is imported for its provider, not its template: NzModalService has no root
     // provider of its own, and a confirmation that cannot open is a confirmation that never asks.
     imports: [DigitsPipe, NgIcon, NzButtonModule, NzModalModule, NzPaginationModule, TranslatePipe, TextPipe, MoneyPipe, ColumnPickerComponent, CardLayoutComponent, TableLayoutComponent, RendererOutletComponent],
-    providers: [ListStore, provideIcons({ ...LIST_ICONS, lucideRefreshCw })],
+    providers: [ListStore, provideIcons({ ...LIST_ICONS, lucideRefreshCw, lucideRotateCcw })],
     templateUrl: './table.component.html',
     styleUrl: './table.component.scss',
     changeDetection: ChangeDetectionStrategy.OnPush,

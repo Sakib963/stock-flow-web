@@ -1,6 +1,6 @@
 <!-- Three columns from a tablet up, so a long form reads across instead of down. Description spans
      the row: it is the one field whose answer is sentences. -->
-<form nz-form nzLayout="vertical" class="grid grid-cols-1 items-start gap-x-4 md:grid-cols-3" [id]="formId" [formGroup]="form" (ngSubmit)="submitted.emit()">
+<form nz-form nzLayout="vertical" class="grid grid-cols-1 items-start gap-x-4" [class.md:grid-cols-3]="!stacked()" [id]="formId" [formGroup]="form" (ngSubmit)="submitted.emit()">
     <!-- The helpers are in the label's tooltip, one hover away, so they stop costing a line under
          every field. The tooltip icon cannot take focus, so each helper is also in the page as
          screen reader text and still named by the field's aria-describedby. -->
@@ -67,7 +67,7 @@
         <span id="category-status-help" class="sr-only">{{ 'configuration.category.statusHelper' | translate }}</span>
     </nz-form-item>
 
-    <nz-form-item class="md:col-span-3">
+    <nz-form-item [class.md:col-span-3]="!stacked()">
         <nz-form-label nzFor="category-description" [nzTooltipTitle]="'configuration.category.descriptionHelper' | translate">{{ 'configuration.category.description' | translate }}</nz-form-label>
         <nz-form-control [nzErrorTip]="descriptionError">
             <textarea nz-input id="category-description" formControlName="description" rows="3" [attr.placeholder]="'configuration.category.descriptionPlaceholder' | translate" [attr.aria-invalid]="invalid('description')" [attr.aria-describedby]="describedBy('description')"></textarea>
