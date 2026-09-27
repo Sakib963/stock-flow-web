@@ -427,6 +427,125 @@
                 "body": "The changes show everywhere {{name}} appears, including on the products already under it."
             }
         },
+        "supplier": {
+            "name": "Supplier",
+            "contactPerson": "Contact person",
+            "phone": "Phone",
+            "whatsapp": "WhatsApp",
+            "email": "Email",
+            "address": "Address",
+            "paymentDetails": "Payment details",
+            "created": "Added",
+            "lastPurchase": "Last purchase",
+            "neverBought": "Nothing bought yet",
+            "status": {
+                "label": "Status",
+                "active": "Active",
+                "inactive": "Inactive"
+            },
+            "emptyTitle": "No suppliers yet",
+            "emptyBody": "Suppliers are who you buy stock from, so every purchase, due and delivery can be traced back to them.",
+            "add": "Add supplier",
+            "lastTouched": "Last updated by",
+            "lastTouchedOn": "Last updated",
+            "searchPlaceholder": "Search name, contact, phone or email",
+            "view": "View",
+            "edit": "Edit",
+            "stat": {
+                "active": "Active suppliers",
+                "inactive": "Inactive suppliers",
+                "owing": "Still owed money",
+                "unused": "Never bought from"
+            },
+            "createTitle": "Add supplier",
+            "editTitle": "Edit supplier",
+            "formLead": "Who you buy stock from, how to reach them, and where to send what you owe.",
+            "nameHelper": "The business name, as it appears on their invoice.",
+            "namePlaceholder": "Business name on their invoice",
+            "contactPersonHelper": "Optional. Who you talk to there.",
+            "contactPersonPlaceholder": "Name of the person you deal with",
+            "phoneHelper": "The number you call. No two suppliers can share one.",
+            "phonePlaceholder": "01XXXXXXXXX",
+            "phoneInvalid": "Enter a phone number: digits, with spaces, dashes or a leading +.",
+            "phoneTaken": "Another supplier already has this phone number.",
+            "whatsappHelper": "Optional. Only if orders go to a different number from the phone.",
+            "emailHelper": "Optional. Many suppliers have none.",
+            "emailPlaceholder": "sales@example.com",
+            "emailInvalid": "Enter an email address, such as sales@example.com.",
+            "addressHelper": "Optional. Where their showroom or warehouse is.",
+            "addressPlaceholder": "House, road, area, city",
+            "paymentDetailsHelper": "Optional. Where you send payments: a bank account, a bKash or Nagad number. StockFlow only records it.",
+            "paymentDetailsPlaceholder": "bKash, Nagad or bank account number",
+            "statusHelper": "Inactive keeps the supplier and its history, and stops it being offered on new purchase orders.",
+            "statusPlaceholder": "Pick a status",
+            "nameTaken": "Another supplier already has this name.",
+            "updated": "Supplier saved.",
+            "createdMessage": "Supplier added.",
+            "loadFailed": {
+                "network": "Could not reach the server. Check your connection and try again.",
+                "forbidden": "You do not have permission to see this supplier.",
+                "server": "This supplier could not be loaded. Try again in a moment."
+            },
+            "backToList": "Back to suppliers",
+            "notSet": "Not set",
+            "notEnough": "Not enough data yet",
+            "activity": "Recent activity",
+            "noActivity": "Nothing has happened to this supplier yet.",
+            "statGroup": {
+                "money": "Money and buying",
+                "quality": "Quality and selling"
+            },
+            "detailStat": {
+                "spent": "Spent",
+                "arrivedWorth": "{{count}} worth arrived",
+                "paid": "Paid",
+                "owed": "Still owed",
+                "orders": "Orders received",
+                "openOrders": "{{count}} still on order",
+                "leadDays": "Days to arrive",
+                "onTime": "Arrived on time",
+                "promised": "Of {{count}} with a promised date",
+                "short": "Arrived short",
+                "received": "{{count}} units received",
+                "faulty": "Quality rejects",
+                "faultyUnits": "{{count}} units written off",
+                "sold": "Units sold",
+                "sellThrough": "Sold of what came in",
+                "sales": "Sales",
+                "profit": "Profit on sales"
+            },
+            "unit": {
+                "days": "days"
+            },
+            "report": {
+                "performance": "Download performance report",
+                "data": "Export supplier data",
+                "failed": {
+                    "network": "The report could not be downloaded. Check your connection and try again.",
+                    "forbidden": "You do not have access to download this report.",
+                    "server": "The report could not be built just now. Try again in a moment."
+                }
+            },
+            "detailTitle": "Supplier details",
+            "detailLead": "Who they are, what you owe them, and how their stock arrives and sells.",
+            "section": {
+                "details": "Details"
+            },
+            "quickActions": "Quick actions",
+            "quick": {
+                "purchaseOrders": "View purchase orders",
+                "products": "View supplied products",
+                "notReady": "Purchase orders and products open from here once those pages are part of the app."
+            },
+            "confirmCreate": {
+                "title": "Add this supplier?",
+                "body": "{{name}} will be added to your suppliers."
+            },
+            "confirmEdit": {
+                "title": "Save changes to this supplier?",
+                "body": "The changes show everywhere {{name}} appears, including on purchase orders already made."
+            }
+        },
         "subCategory": {
             "code": "Code",
             "name": "Sub-category",

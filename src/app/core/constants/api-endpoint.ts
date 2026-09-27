@@ -43,4 +43,12 @@ export class APIEndpoint {
     static readonly CHECK_BRAND_AVAILABILITY = '/api/v1/configuration/brands/check-brand-availability';
     static readonly GENERATE_PRODUCT_LIST_REPORT_BY_BRAND = '/api/v1/configuration/brands/generate-product-list-report-by-brand';
     static readonly GENERATE_INVENTORY_REPORT_BY_BRAND = '/api/v1/configuration/brands/generate-inventory-report-by-brand';
+
+    static readonly GET_SUPPLIER_LIST = '/api/v1/configuration/supplier/get-supplier-list';
+    static readonly GET_SUPPLIER_DETAILS = '/api/v1/configuration/supplier/get-supplier-details';
+    static readonly CREATE_SUPPLIER = '/api/v1/configuration/supplier/create-supplier';
+    static readonly UPDATE_SUPPLIER_DETAILS = '/api/v1/configuration/supplier/update-supplier-details';
+    static readonly CHECK_SUPPLIER_AVAILABILITY = '/api/v1/configuration/supplier/check-supplier-availability';
+    static readonly GENERATE_SUPPLIER_PERFORMANCE_REPORT = '/api/v1/configuration/supplier/generate-supplier-performance-report';
+    static readonly EXPORT_SUPPLIER_DATA = '/api/v1/configuration/supplier/export-supplier-data';
 }

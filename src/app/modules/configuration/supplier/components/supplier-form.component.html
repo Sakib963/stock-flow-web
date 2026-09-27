@@ -1,0 +1,133 @@
+<!-- Three columns from a tablet up: who the supplier is, how to reach them, then the two answers
+     that run to sentences, each across the row. -->
+<form nz-form nzLayout="vertical" class="grid grid-cols-1 items-start gap-x-4 md:grid-cols-3" [id]="formId" [formGroup]="form" (ngSubmit)="submitted.emit()">
+    <!-- The helpers are in the label's tooltip, one hover away. The tooltip icon cannot take focus,
+         so each helper is also in the page as screen reader text, named by aria-describedby. -->
+    <nz-form-item>
+        <nz-form-label nzRequired nzFor="supplier-name" [nzTooltipTitle]="'configuration.supplier.nameHelper' | translate">{{ 'configuration.supplier.name' | translate }}</nz-form-label>
+        <nz-form-control nzHasFeedback [nzErrorTip]="nameError" [nzValidatingTip]="'form.checking' | translate">
+            <input nz-input id="supplier-name" formControlName="name" type="text" autocomplete="off" [attr.placeholder]="'configuration.supplier.namePlaceholder' | translate" [attr.aria-invalid]="invalid('name')" [attr.aria-describedby]="describedBy('name')" />
+        </nz-form-control>
+        <span id="supplier-name-help" class="sr-only">{{ 'configuration.supplier.nameHelper' | translate }}</span>
+        <ng-template #nameError let-control>
+            <span id="supplier-name-error">
+                @if (control.hasError('taken')) {
+                    {{ 'configuration.supplier.nameTaken' | translate }}
+                } @else if (control.hasError('required')) {
+                    {{ 'form.required' | translate }}
+                } @else if (control.hasError('maxlength')) {
+                    {{ 'form.tooLong' | translate: { max: 255 } | digits }}
+                }
+            </span>
+        </ng-template>
+    </nz-form-item>
+
+    <nz-form-item>
+        <nz-form-label nzFor="supplier-contact" [nzTooltipTitle]="'configuration.supplier.contactPersonHelper' | translate">{{ 'configuration.supplier.contactPerson' | translate }}</nz-form-label>
+        <nz-form-control [nzErrorTip]="contact_personError">
+            <input nz-input id="supplier-contact" formControlName="contact_person" type="text" autocomplete="off" [attr.placeholder]="'configuration.supplier.contactPersonPlaceholder' | translate" [attr.aria-invalid]="invalid('contact_person')" [attr.aria-describedby]="describedBy('contact_person')" />
+        </nz-form-control>
+        <span id="supplier-contact-help" class="sr-only">{{ 'configuration.supplier.contactPersonHelper' | translate }}</span>
+        <ng-template #contact_personError let-control>
+            <span id="supplier-contact-error">
+                @if (control.hasError('maxlength')) {
+                    {{ 'form.tooLong' | translate: { max: 255 } | digits }}
+                }
+            </span>
+        </ng-template>
+    </nz-form-item>
+
+    <nz-form-item>
+        <nz-form-label nzRequired nzFor="supplier-status" [nzTooltipTitle]="'configuration.supplier.statusHelper' | translate">{{ 'configuration.supplier.status.label' | translate }}</nz-form-label>
+        <nz-form-control>
+            <!-- nzId, not a plain id: ng-zorro puts it on the input inside the select, which is what
+                 the label can point at. -->
+            <nz-select nzId="supplier-status" formControlName="status" [nzPlaceHolder]="'configuration.supplier.statusPlaceholder' | translate">
+                <nz-option nzValue="Active" [nzLabel]="'configuration.supplier.status.active' | translate" />
+                <nz-option nzValue="Inactive" [nzLabel]="'configuration.supplier.status.inactive' | translate" />
+            </nz-select>
+        </nz-form-control>
+        <span id="supplier-status-help" class="sr-only">{{ 'configuration.supplier.statusHelper' | translate }}</span>
+    </nz-form-item>
+
+    <nz-form-item>
+        <nz-form-label nzRequired nzFor="supplier-phone" [nzTooltipTitle]="'configuration.supplier.phoneHelper' | translate">{{ 'configuration.supplier.phone' | translate }}</nz-form-label>
+        <nz-form-control nzHasFeedback [nzErrorTip]="phone_numberError" [nzValidatingTip]="'form.checking' | translate">
+            <input nz-input id="supplier-phone" formControlName="phone_number" type="tel" autocomplete="off" class="font-mono" [attr.placeholder]="'configuration.supplier.phonePlaceholder' | translate" [attr.aria-invalid]="invalid('phone_number')" [attr.aria-describedby]="describedBy('phone_number')" />
+        </nz-form-control>
+        <span id="supplier-phone-help" class="sr-only">{{ 'configuration.supplier.phoneHelper' | translate }}</span>
+        <ng-template #phone_numberError let-control>
+            <span id="supplier-phone-error">
+                @if (control.hasError('taken')) {
+                    {{ 'configuration.supplier.phoneTaken' | translate }}
+                } @else if (control.hasError('required')) {
+                    {{ 'form.required' | translate }}
+                } @else if (control.hasError('pattern')) {
+                    {{ 'configuration.supplier.phoneInvalid' | translate }}
+                }
+            </span>
+        </ng-template>
+    </nz-form-item>
+
+    <nz-form-item>
+        <nz-form-label nzFor="supplier-whatsapp" [nzTooltipTitle]="'configuration.supplier.whatsappHelper' | translate">{{ 'configuration.supplier.whatsapp' | translate }}</nz-form-label>
+        <nz-form-control [nzErrorTip]="whatsapp_numberError">
+            <input nz-input id="supplier-whatsapp" formControlName="whatsapp_number" type="tel" autocomplete="off" class="font-mono" [attr.placeholder]="'configuration.supplier.phonePlaceholder' | translate" [attr.aria-invalid]="invalid('whatsapp_number')" [attr.aria-describedby]="describedBy('whatsapp_number')" />
+        </nz-form-control>
+        <span id="supplier-whatsapp-help" class="sr-only">{{ 'configuration.supplier.whatsappHelper' | translate }}</span>
+        <ng-template #whatsapp_numberError let-control>
+            <span id="supplier-whatsapp-error">
+                @if (control.hasError('pattern')) {
+                    {{ 'configuration.supplier.phoneInvalid' | translate }}
+                }
+            </span>
+        </ng-template>
+    </nz-form-item>
+
+    <nz-form-item>
+        <nz-form-label nzFor="supplier-email" [nzTooltipTitle]="'configuration.supplier.emailHelper' | translate">{{ 'configuration.supplier.email' | translate }}</nz-form-label>
+        <nz-form-control [nzErrorTip]="emailError">
+            <input nz-input id="supplier-email" formControlName="email" type="email" autocomplete="off" [attr.placeholder]="'configuration.supplier.emailPlaceholder' | translate" [attr.aria-invalid]="invalid('email')" [attr.aria-describedby]="describedBy('email')" />
+        </nz-form-control>
+        <span id="supplier-email-help" class="sr-only">{{ 'configuration.supplier.emailHelper' | translate }}</span>
+        <ng-template #emailError let-control>
+            <span id="supplier-email-error">
+                @if (control.hasError('email')) {
+                    {{ 'configuration.supplier.emailInvalid' | translate }}
+                } @else if (control.hasError('maxlength')) {
+                    {{ 'form.tooLong' | translate: { max: 128 } | digits }}
+                }
+            </span>
+        </ng-template>
+    </nz-form-item>
+
+    <nz-form-item class="md:col-span-3">
+        <nz-form-label nzFor="supplier-address" [nzTooltipTitle]="'configuration.supplier.addressHelper' | translate">{{ 'configuration.supplier.address' | translate }}</nz-form-label>
+        <nz-form-control [nzErrorTip]="addressError">
+            <textarea nz-input id="supplier-address" formControlName="address" rows="3" [attr.placeholder]="'configuration.supplier.addressPlaceholder' | translate" [attr.aria-invalid]="invalid('address')" [attr.aria-describedby]="describedBy('address')"></textarea>
+        </nz-form-control>
+        <span id="supplier-address-help" class="sr-only">{{ 'configuration.supplier.addressHelper' | translate }}</span>
+        <ng-template #addressError let-control>
+            <span id="supplier-address-error">
+                @if (control.hasError('maxlength')) {
+                    {{ 'form.tooLong' | translate: { max: 1000 } | digits }}
+                }
+            </span>
+        </ng-template>
+    </nz-form-item>
+
+    <nz-form-item class="md:col-span-3">
+        <nz-form-label nzFor="supplier-payment" [nzTooltipTitle]="'configuration.supplier.paymentDetailsHelper' | translate">{{ 'configuration.supplier.paymentDetails' | translate }}</nz-form-label>
+        <nz-form-control [nzErrorTip]="payment_detailsError">
+            <textarea nz-input id="supplier-payment" formControlName="payment_details" rows="3" [attr.placeholder]="'configuration.supplier.paymentDetailsPlaceholder' | translate" [attr.aria-invalid]="invalid('payment_details')" [attr.aria-describedby]="describedBy('payment_details')"></textarea>
+        </nz-form-control>
+        <span id="supplier-payment-help" class="sr-only">{{ 'configuration.supplier.paymentDetailsHelper' | translate }}</span>
+        <ng-template #payment_detailsError let-control>
+            <span id="supplier-payment-error">
+                @if (control.hasError('maxlength')) {
+                    {{ 'form.tooLong' | translate: { max: 1000 } | digits }}
+                }
+            </span>
+        </ng-template>
+    </nz-form-item>
+</form>

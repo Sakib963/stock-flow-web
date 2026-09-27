@@ -53,7 +53,7 @@ const MENU = [
         isDisabled: false,
         disabledMessage: { en: null, bn: null },
         isNew: false,
-        children: [{ id: 'brands', label: { en: 'Brands', bn: 'ব্র্যান্ড' }, description: { en: null, bn: null }, tags: [], icon: 'lucideTag', order: 2, route: '/app/configuration/brands', permission: 'configuration.brands.view', isDisabled: false, disabledMessage: { en: null, bn: null }, isNew: false, children: [] }, { id: 'categories', label: { en: 'Categories', bn: 'ক্যাটাগরি' }, description: { en: 'Create the product groups, like Saree or Cosmetics, that every product is filed under.', bn: 'পণ্যের গ্রুপ তৈরি করুন।' }, tags: [], icon: 'lucideFolderTree', order: 1, route: '/app/configuration/categories', permission: 'configuration.category.view', isDisabled: false, disabledMessage: { en: null, bn: null }, isNew: false, children: [] }],
+        children: [{ id: 'suppliers', label: { en: 'Suppliers', bn: 'সাপ্লায়ার' }, description: { en: null, bn: null }, tags: [], icon: 'lucideFactory', order: 3, route: '/app/configuration/suppliers', permission: 'configuration.supplier.view', isDisabled: false, disabledMessage: { en: null, bn: null }, isNew: false, children: [] }, { id: 'brands', label: { en: 'Brands', bn: 'ব্র্যান্ড' }, description: { en: null, bn: null }, tags: [], icon: 'lucideTag', order: 2, route: '/app/configuration/brands', permission: 'configuration.brands.view', isDisabled: false, disabledMessage: { en: null, bn: null }, isNew: false, children: [] }, { id: 'categories', label: { en: 'Categories', bn: 'ক্যাটাগরি' }, description: { en: 'Create the product groups, like Saree or Cosmetics, that every product is filed under.', bn: 'পণ্যের গ্রুপ তৈরি করুন।' }, tags: [], icon: 'lucideFolderTree', order: 1, route: '/app/configuration/categories', permission: 'configuration.category.view', isDisabled: false, disabledMessage: { en: null, bn: null }, isNew: false, children: [] }],
     },
 ];
 
@@ -61,12 +61,20 @@ const SESSION = {
     version: '1',
     user: { name: 'Nazmus Sakib', email: 'owner@samiha.test', mobile_number: null, photo: null, designation: 'Owner', role: 'Owner' },
     business: { name: 'Samiha Style Studio', logoUrl: null, orderSystem: 'BOTH' },
-    permissions: ['dashboard.overview.view', 'configuration.category.view', 'configuration.category.create', 'configuration.category.edit', 'configuration.category.export', 'configuration.brands.view', 'configuration.brands.create', 'configuration.brands.edit', 'configuration.brands.export'],
+    permissions: ['dashboard.overview.view', 'configuration.category.view', 'configuration.category.create', 'configuration.category.edit', 'configuration.category.export', 'configuration.brands.view', 'configuration.brands.create', 'configuration.brands.edit', 'configuration.brands.export', 'configuration.supplier.view', 'configuration.supplier.create', 'configuration.supplier.edit', 'configuration.supplier.export'],
     menu: MENU,
     counters: { notifications: 0 },
 };
 
 const NAMES = ['Accessories', 'Clothing', 'Cosmetics', 'Delivery', 'Footwear', 'Inventory', 'Jersey', 'Packaging', 'Skincare', 'Test Category One', 'Traditional Clothing', 'Winterwear'];
+
+const SUPPLIERS = [
+    ['Bengal Traditional Garments Ltd.', 'Mahfuz Rahman', '01712345678', 'sales@bengalclothing.com'],
+    ['Dhaka Saree House', 'Ritu Akter', '01911223344', 'info@dhakasaree.com'],
+    ['Islampur Fabrics', null, '01815667788', null],
+    ['Jutti Heaven', 'Fahim Shahriar', '01812997744', 'order@juttibd.com'],
+    ['Rajshahi Silk Exporters', 'Farhana Jahan', '01711882299', null],
+].map(([name, contact_person, phone_number, email], i) => ({ oid: 'sup-' + i, name, contact_person, phone_number, whatsapp_number: i === 1 ? '01811223344' : null, email, status: 'Active', created_on: '2026-01-17T10:00:00Z', last_action_on: '2026-01-17T10:00:00Z', last_action_by: 'owner@samiha.test', last_action_by_name: 'Nazmus Sakib', last_action_by_role: 'Owner', last_action_is_edit: true }));
 
 const ROWS = NAMES.map((name, i) => ({
     oid: 'oid-' + i,
@@ -108,6 +116,14 @@ function handle(request) {
     if (request.method === 'OPTIONS') return { status: 204, headers: cors(request), body: '' };
     if (url.includes('/refresh-token')) return answer(request, { access_token: 'access-1', refresh_token: 'refresh-1', refresh_transport: 'body', session_id: 'session-1' });
     if (url.includes('/get-user-info')) return answer(request, SESSION);
+    if (url.includes('/get-supplier-list')) return answer(request, { rows: SUPPLIERS, stats: { active: 5, inactive: 0, owing: 2, unused: 1 } }, { total: SUPPLIERS.length });
+    if (url.includes('/get-supplier-details'))
+        return answer(request, {
+            details: { ...SUPPLIERS[1], address: '12/B, New Market, Dhaka-1205', payment_details: 'bKash 01911-223344, Dutch-Bangla Bank, A/C 123.456.7890', created_by: 'owner@samiha.test' },
+            stats: { orders: 3, openOrders: 1, spent: 66319, paid: 40069, owed: 26250, receivedValue: 62119, lastPurchaseOn: '2026-03-20T05:06:12Z', leadDays: 2, promisedOrders: 0, onTimeRate: null, unitsOrdered: 123, unitsReceived: 117, shortRate: 4.9, faultyUnits: 0, faultyRate: 0, unitsSold: 10, sellThrough: 8.5, sales: 9740, profit: 3040 },
+            activity: [{ oid: 'log-1', date: '2026-09-20T14:22:18Z', user: 'owner@samiha.test', action: 'Created supplier', description: 'Created supplier "Dhaka Saree House" with phone number 01911223344' }],
+        });
+    if (url.includes('/check-supplier-availability')) return answer(request, { field: 'name', available: true });
     if (url.includes('/get-brand-list')) return answer(request, { rows: ROWS, stats: { active: 11, inactive: 1, products: 40, empty: 2 } }, { total: ROWS.length });
     if (url.includes('/get-brand-details')) return answer(request, { details: { ...ROWS[1], origin_country: 'KR', created_by: 'owner@samiha.test' }, stats: { totalProducts: 12, activeProducts: 11, amountSpent: 48250, totalAvailableQuantity: 340, lowStockItems: 2, outOfStockItems: 1, averageProductPrice: 1250 }, activity: [] });
     if (url.includes('/check-brand-availability')) return answer(request, { field: 'name', available: true });

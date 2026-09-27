@@ -5,6 +5,7 @@ import { unsavedChangesGuard } from '@app/core/guards/unsaved-changes/unsaved-ch
 import { CATEGORY_LIST } from '@app/modules/configuration/category/config/category-list.config';
 import { SUB_CATEGORY_LIST } from '@app/modules/configuration/sub-category/config/sub-category-list.config';
 import { BRAND_LIST } from '@app/modules/configuration/brand/config/brand-list.config';
+import { SUPPLIER_LIST } from '@app/modules/configuration/supplier/config/supplier-list.config';
 
 /** Everything under /app/configuration. Each URL is the route of its menu item. */
 export const CONFIGURATION_ROUTES: Routes = [
@@ -92,6 +93,32 @@ export const CONFIGURATION_ROUTES: Routes = [
                 canActivate: [permissionGuard],
                 data: { permission: BRAND_LIST.permission },
                 loadComponent: () => import('./brand/pages/brand-detail/brand-detail.component').then((m) => m.BrandDetailComponent),
+            },
+            {
+                path: 'suppliers',
+                canActivate: [permissionGuard],
+                data: { permission: SUPPLIER_LIST.permission },
+                loadComponent: () => import('./supplier/pages/supplier-list/supplier-list.component').then((m) => m.SupplierListComponent),
+            },
+            {
+                path: 'suppliers/new',
+                canActivate: [permissionGuard],
+                canDeactivate: [unsavedChangesGuard],
+                data: { permission: 'configuration.supplier.create' },
+                loadComponent: () => import('./supplier/pages/supplier-create/supplier-create.component').then((m) => m.SupplierCreateComponent),
+            },
+            {
+                path: 'suppliers/:oid/edit',
+                canActivate: [permissionGuard],
+                canDeactivate: [unsavedChangesGuard],
+                data: { permission: 'configuration.supplier.edit' },
+                loadComponent: () => import('./supplier/pages/supplier-edit/supplier-edit.component').then((m) => m.SupplierEditComponent),
+            },
+            {
+                path: 'suppliers/:oid',
+                canActivate: [permissionGuard],
+                data: { permission: SUPPLIER_LIST.permission },
+                loadComponent: () => import('./supplier/pages/supplier-detail/supplier-detail.component').then((m) => m.SupplierDetailComponent),
             },
         ],
     },
