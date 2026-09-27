@@ -51,4 +51,14 @@ export class APIEndpoint {
     static readonly CHECK_SUPPLIER_AVAILABILITY = '/api/v1/configuration/supplier/check-supplier-availability';
     static readonly GENERATE_SUPPLIER_PERFORMANCE_REPORT = '/api/v1/configuration/supplier/generate-supplier-performance-report';
     static readonly EXPORT_SUPPLIER_DATA = '/api/v1/configuration/supplier/export-supplier-data';
+
+    static readonly GET_WAREHOUSE_LIST = '/api/v1/configuration/warehouse/get-warehouse-list';
+    static readonly GET_WAREHOUSE_DETAILS = '/api/v1/configuration/warehouse/get-warehouse-details';
+    static readonly CREATE_WAREHOUSE = '/api/v1/configuration/warehouse/create-warehouse';
+    static readonly UPDATE_WAREHOUSE_DETAILS = '/api/v1/configuration/warehouse/update-warehouse-details';
+    static readonly CHECK_WAREHOUSE_AVAILABILITY = '/api/v1/configuration/warehouse/check-warehouse-availability';
+    static readonly GENERATE_WAREHOUSE_CODE = '/api/v1/configuration/warehouse/generate-warehouse-code';
+    static readonly GENERATE_PRODUCT_LIST_REPORT_BY_WAREHOUSE = '/api/v1/configuration/warehouse/generate-product-list-report-by-warehouse';
+    static readonly GENERATE_INVENTORY_REPORT_BY_WAREHOUSE = '/api/v1/configuration/warehouse/generate-inventory-report-by-warehouse';
+    static readonly GET_WAREHOUSE_LIST_FOR_DROPDOWN = '/api/v1/configuration/warehouse/get-warehouse-list-for-dropdown';
 }

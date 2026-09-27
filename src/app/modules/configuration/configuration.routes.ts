@@ -6,6 +6,7 @@ import { CATEGORY_LIST } from '@app/modules/configuration/category/config/catego
 import { SUB_CATEGORY_LIST } from '@app/modules/configuration/sub-category/config/sub-category-list.config';
 import { BRAND_LIST } from '@app/modules/configuration/brand/config/brand-list.config';
 import { SUPPLIER_LIST } from '@app/modules/configuration/supplier/config/supplier-list.config';
+import { WAREHOUSE_LIST } from '@app/modules/configuration/warehouse/config/warehouse-list.config';
 
 /** Everything under /app/configuration. Each URL is the route of its menu item. */
 export const CONFIGURATION_ROUTES: Routes = [
@@ -119,6 +120,32 @@ export const CONFIGURATION_ROUTES: Routes = [
                 canActivate: [permissionGuard],
                 data: { permission: SUPPLIER_LIST.permission },
                 loadComponent: () => import('./supplier/pages/supplier-detail/supplier-detail.component').then((m) => m.SupplierDetailComponent),
+            },
+            {
+                path: 'warehouses',
+                canActivate: [permissionGuard],
+                data: { permission: WAREHOUSE_LIST.permission },
+                loadComponent: () => import('./warehouse/pages/warehouse-list/warehouse-list.component').then((m) => m.WarehouseListComponent),
+            },
+            {
+                path: 'warehouses/new',
+                canActivate: [permissionGuard],
+                canDeactivate: [unsavedChangesGuard],
+                data: { permission: 'configuration.warehouse.create' },
+                loadComponent: () => import('./warehouse/pages/warehouse-create/warehouse-create.component').then((m) => m.WarehouseCreateComponent),
+            },
+            {
+                path: 'warehouses/:oid/edit',
+                canActivate: [permissionGuard],
+                canDeactivate: [unsavedChangesGuard],
+                data: { permission: 'configuration.warehouse.edit' },
+                loadComponent: () => import('./warehouse/pages/warehouse-edit/warehouse-edit.component').then((m) => m.WarehouseEditComponent),
+            },
+            {
+                path: 'warehouses/:oid',
+                canActivate: [permissionGuard],
+                data: { permission: WAREHOUSE_LIST.permission },
+                loadComponent: () => import('./warehouse/pages/warehouse-detail/warehouse-detail.component').then((m) => m.WarehouseDetailComponent),
             },
         ],
     },

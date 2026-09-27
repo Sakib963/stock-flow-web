@@ -24,6 +24,7 @@ import {
     lucideStore,
     lucideTrash2,
     lucideTruck,
+    lucideWarehouse,
     lucideUndo2,
     lucideWifiOff,
     lucideLock,
@@ -63,6 +64,7 @@ export const LIST_ICONS = {
     lucideStore,
     lucideTrash2,
     lucideTruck,
+    lucideWarehouse,
     lucideUndo2,
     lucideWifiOff,
 };
