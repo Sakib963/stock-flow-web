@@ -35,4 +35,12 @@ export class APIEndpoint {
     static readonly GENERATE_SUB_CATEGORY_CODE = '/api/v1/configuration/sub-category/generate-sub-category-code';
     static readonly GENERATE_PRODUCT_LIST_REPORT_BY_SUB_CATEGORY = '/api/v1/configuration/sub-category/generate-product-list-report-by-sub-category';
     static readonly GENERATE_INVENTORY_REPORT_BY_SUB_CATEGORY = '/api/v1/configuration/sub-category/generate-inventory-report-by-sub-category';
+
+    static readonly GET_BRAND_LIST = '/api/v1/configuration/brands/get-brand-list';
+    static readonly GET_BRAND_DETAILS = '/api/v1/configuration/brands/get-brand-details';
+    static readonly CREATE_BRAND = '/api/v1/configuration/brands/create-brand';
+    static readonly UPDATE_BRAND_DETAILS = '/api/v1/configuration/brands/update-brand-details';
+    static readonly CHECK_BRAND_AVAILABILITY = '/api/v1/configuration/brands/check-brand-availability';
+    static readonly GENERATE_PRODUCT_LIST_REPORT_BY_BRAND = '/api/v1/configuration/brands/generate-product-list-report-by-brand';
+    static readonly GENERATE_INVENTORY_REPORT_BY_BRAND = '/api/v1/configuration/brands/generate-inventory-report-by-brand';
 }

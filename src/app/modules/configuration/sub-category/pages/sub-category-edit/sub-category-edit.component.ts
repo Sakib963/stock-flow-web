@@ -74,6 +74,10 @@ export class SubCategoryEditComponent implements HasUnsavedChanges {
     save(): void {
         const editor = this.editor();
         if (!editor || this.saving()) return;
+        if (!editor.form.dirty) {
+            this._message.info(this._translate.instant('form.nothingChanged'));
+            return;
+        }
 
         this._submitting.set(true);
         editor.ready().subscribe((ready) => {
@@ -91,10 +95,11 @@ export class SubCategoryEditComponent implements HasUnsavedChanges {
                 if (!confirmed) return;
                 this._submitting.set(true);
                 this._subCategories.update(payload).subscribe({
-                    next: () => {
+                    next: (changed) => {
                         this._submitting.set(false);
                         editor.form.markAsPristine();
-                        this._message.success(this._translate.instant('configuration.subCategory.updated'));
+                        if (changed) this._message.success(this._translate.instant('configuration.subCategory.updated'));
+                        else this._message.info(this._translate.instant('form.nothingChanged'));
                         void this._router.navigateByUrl(SUB_CATEGORY_ROUTES.detail(this._oid));
                     },
                     error: (error: unknown) => {

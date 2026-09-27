@@ -336,6 +336,97 @@
                 "body": "The changes show everywhere {{name}} appears, including on the products already in it."
             }
         },
+        "brand": {
+            "name": "Brand",
+            "created": "Added",
+            "status": {
+                "label": "Status",
+                "active": "Active",
+                "inactive": "Inactive"
+            },
+            "emptyTitle": "No brands yet",
+            "emptyBody": "Brands name who made the products you sell, so stock and reports can be read by maker.",
+            "add": "Add brand",
+            "description": "Description",
+            "lastTouched": "Last updated by",
+            "searchPlaceholder": "Search name or description",
+            "view": "View",
+            "edit": "Edit",
+            "lastTouchedOn": "Last updated",
+            "stat": {
+                "active": "Active brands",
+                "inactive": "Inactive brands",
+                "products": "Products under them",
+                "empty": "Without products"
+            },
+            "createTitle": "Add brand",
+            "editTitle": "Edit brand",
+            "formLead": "Brands name who made the products you sell, so stock and reports can be read by maker.",
+            "nameHelper": "The name printed on the product or its box.",
+            "origin": "Country of origin",
+            "originHelper": "Optional. Where the brand comes from, which customers often ask about.",
+            "originPlaceholder": "Pick a country",
+            "descriptionHelper": "Optional. Anything worth knowing about this brand, for whoever adds products later.",
+            "statusHelper": "Inactive keeps the brand and its history, and stops it being offered on new products.",
+            "updated": "Brand saved.",
+            "createdMessage": "Brand added.",
+            "loadFailed": {
+                "network": "Could not reach the server. Check your connection and try again.",
+                "forbidden": "You do not have permission to see this brand.",
+                "server": "This brand could not be loaded. Try again in a moment."
+            },
+            "backToList": "Back to brands",
+            "noDescription": "No description yet.",
+            "activity": "Recent activity",
+            "noActivity": "Nothing has happened to this brand yet.",
+            "detailStat": {
+                "products": "Products",
+                "stock": "Units in stock",
+                "spent": "Spent on stock in hand",
+                "lowStock": "Low on stock",
+                "outOfStock": "Out of stock",
+                "averagePrice": "Average price"
+            },
+            "nameTaken": "Another brand already has this name.",
+            "namePlaceholder": "Aarong, Lakme, Bata",
+            "descriptionPlaceholder": "What this brand makes",
+            "statusPlaceholder": "Pick a status",
+            "notSet": "Not set",
+            "fact": {
+                "activeProducts": "Active products"
+            },
+            "report": {
+                "products": "Export products to Excel",
+                "inventory": "Download inventory report",
+                "empty": "There is nothing under this brand to report on yet.",
+                "failed": {
+                    "network": "The report could not be downloaded. Check your connection and try again.",
+                    "forbidden": "You do not have access to download this report.",
+                    "server": "The report could not be built just now. Try again in a moment."
+                }
+            },
+            "detailTitle": "Brand details",
+            "detailLead": "What this brand holds, how its stock stands, and what has changed in it.",
+            "section": {
+                "details": "Details"
+            },
+            "addDescription": "Add a description",
+            "quickActions": "Quick actions",
+            "quick": {
+                "products": "View all products",
+                "lowStock": "View low stock products",
+                "analytics": "View analytics",
+                "notReady": "Products and analytics open from here once those pages are part of the app."
+            },
+            "confirmCreate": {
+                "title": "Add this brand?",
+                "body": "{{name}} will be added to your brands."
+            },
+            "confirmEdit": {
+                "title": "Save changes to this brand?",
+                "body": "The changes show everywhere {{name}} appears, including on the products already under it."
+            }
+        },
         "subCategory": {
             "code": "Code",
             "name": "Sub-category",
@@ -452,6 +543,7 @@
         "tooLong": "Keep this to {{max}} characters or fewer.",
         "remaining": "{{count}} still to fill in",
         "fixErrors": "Check the fields marked below.",
+        "nothingChanged": "Nothing changed, so nothing was saved.",
         "saveFailed": {
             "network": "Could not reach the server. Check your connection and try again.",
             "forbidden": "You do not have permission to save this. Ask your admin if you should.",

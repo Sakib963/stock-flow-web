@@ -4,6 +4,7 @@ import { permissionGuard } from '@app/core/guards/permission/permission.guard';
 import { unsavedChangesGuard } from '@app/core/guards/unsaved-changes/unsaved-changes.guard';
 import { CATEGORY_LIST } from '@app/modules/configuration/category/config/category-list.config';
 import { SUB_CATEGORY_LIST } from '@app/modules/configuration/sub-category/config/sub-category-list.config';
+import { BRAND_LIST } from '@app/modules/configuration/brand/config/brand-list.config';
 
 /** Everything under /app/configuration. Each URL is the route of its menu item. */
 export const CONFIGURATION_ROUTES: Routes = [
@@ -65,6 +66,32 @@ export const CONFIGURATION_ROUTES: Routes = [
                 canActivate: [permissionGuard],
                 data: { permission: SUB_CATEGORY_LIST.permission },
                 loadComponent: () => import('./sub-category/pages/sub-category-detail/sub-category-detail.component').then((m) => m.SubCategoryDetailComponent),
+            },
+            {
+                path: 'brands',
+                canActivate: [permissionGuard],
+                data: { permission: BRAND_LIST.permission },
+                loadComponent: () => import('./brand/pages/brand-list/brand-list.component').then((m) => m.BrandListComponent),
+            },
+            {
+                path: 'brands/new',
+                canActivate: [permissionGuard],
+                canDeactivate: [unsavedChangesGuard],
+                data: { permission: 'configuration.brands.create' },
+                loadComponent: () => import('./brand/pages/brand-create/brand-create.component').then((m) => m.BrandCreateComponent),
+            },
+            {
+                path: 'brands/:oid/edit',
+                canActivate: [permissionGuard],
+                canDeactivate: [unsavedChangesGuard],
+                data: { permission: 'configuration.brands.edit' },
+                loadComponent: () => import('./brand/pages/brand-edit/brand-edit.component').then((m) => m.BrandEditComponent),
+            },
+            {
+                path: 'brands/:oid',
+                canActivate: [permissionGuard],
+                data: { permission: BRAND_LIST.permission },
+                loadComponent: () => import('./brand/pages/brand-detail/brand-detail.component').then((m) => m.BrandDetailComponent),
             },
         ],
     },

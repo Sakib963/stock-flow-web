@@ -1,0 +1,5 @@
+<page-header [back]="back" [title]="'configuration.brand.createTitle' | translate" [lead]="'configuration.brand.formLead' | translate" />
+
+<form-page [formId]="editor()?.formId ?? ''" [saving]="saving()" [remaining]="editor()?.remaining() ?? 0" (cancel)="cancel()">
+    <brand-form (submitted)="save()" />
+</form-page>

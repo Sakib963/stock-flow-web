@@ -27,9 +27,13 @@ export class CategoryService {
         );
     }
 
-    update(payload: CategoryPayload): Observable<void> {
+    /** Whether anything changed: the server writes nothing when the record already says this. */
+    update(payload: CategoryPayload): Observable<boolean> {
         this.saving.set(true);
-        return this._http.post<void>(`${environment.baseUrl}${APIEndpoint.UPDATE_CATEGORY_DETAILS}`, payload).pipe(finalize(() => this.saving.set(false)));
+        return this._http.post<{ data?: { changed?: boolean } }>(`${environment.baseUrl}${APIEndpoint.UPDATE_CATEGORY_DETAILS}`, payload).pipe(
+            map((response) => response?.data?.changed !== false),
+            finalize(() => this.saving.set(false))
+        );
     }
 
     /**

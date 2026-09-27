@@ -68,6 +68,7 @@ describe('SubCategoryEditComponent', () => {
         const fixture = await open();
         await loaded(fixture);
 
+        fixture.componentInstance.editor()!.form.markAsDirty();
         fixture.componentInstance.save();
         await fixture.whenStable();
 
@@ -84,6 +85,7 @@ describe('SubCategoryEditComponent', () => {
         await loaded(fixture);
         const asked = answerConfirm(false);
 
+        fixture.componentInstance.editor()!.form.markAsDirty();
         fixture.componentInstance.save();
         await fixture.whenStable();
 
