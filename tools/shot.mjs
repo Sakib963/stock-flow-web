@@ -5,7 +5,10 @@
  * what is photographed is what a person gets. Nothing reaches a real backend. A session is seeded
  * into storage before bootstrap and every call to environment.baseUrl is answered from here.
  *
- *   node tools/shot.mjs [route] [out-dir]
+ *   node tools/shot.mjs [route] [out-dir] [ready-selector] [click-selector]
+ *
+ * A click selector is pressed once the page is ready, for a state only a click reaches, such as an
+ * image preview; the shot waits for `.cdk-overlay-pane` after it.
  */
 import { createServer } from 'node:http';
 import { readFileSync, existsSync, mkdirSync } from 'node:fs';
@@ -19,6 +22,7 @@ const ROUTE = (process.argv[2] ?? '/app/configuration/categories').replace(/^.*?
 const OUT = process.argv[3] ?? 'tools/shots';
 /** What to wait for before the shot. A form or a record page has no table row to wait on. */
 const READY = process.argv[4] ?? '[data-table="row"]';
+const CLICK = process.argv[5];
 const PORT = 4321;
 const SIZES = [
     ['desktop', 1366, 768],
@@ -53,7 +57,7 @@ const MENU = [
         isDisabled: false,
         disabledMessage: { en: null, bn: null },
         isNew: false,
-        children: [{ id: 'aisles', label: { en: 'Aisles / Zones', bn: 'আইল' }, description: { en: null, bn: null }, tags: [], icon: 'lucideRows3', order: 7, route: '/app/configuration/aisles', permission: 'configuration.aisle.view', isDisabled: false, disabledMessage: { en: null, bn: null }, isNew: false, children: [] }, { id: 'warehouses', label: { en: 'Warehouses', bn: 'ওয়্যারহাউজ' }, description: { en: null, bn: null }, tags: [], icon: 'lucideWarehouse', order: 6, route: '/app/configuration/warehouses', permission: 'configuration.warehouse.view', isDisabled: false, disabledMessage: { en: null, bn: null }, isNew: false, children: [] }, { id: 'suppliers', label: { en: 'Suppliers', bn: 'সাপ্লায়ার' }, description: { en: null, bn: null }, tags: [], icon: 'lucideFactory', order: 3, route: '/app/configuration/suppliers', permission: 'configuration.supplier.view', isDisabled: false, disabledMessage: { en: null, bn: null }, isNew: false, children: [] }, { id: 'brands', label: { en: 'Brands', bn: 'ব্র্যান্ড' }, description: { en: null, bn: null }, tags: [], icon: 'lucideTag', order: 2, route: '/app/configuration/brands', permission: 'configuration.brands.view', isDisabled: false, disabledMessage: { en: null, bn: null }, isNew: false, children: [] }, { id: 'categories', label: { en: 'Categories', bn: 'ক্যাটাগরি' }, description: { en: 'Create the product groups, like Saree or Cosmetics, that every product is filed under.', bn: 'পণ্যের গ্রুপ তৈরি করুন।' }, tags: [], icon: 'lucideFolderTree', order: 1, route: '/app/configuration/categories', permission: 'configuration.category.view', isDisabled: false, disabledMessage: { en: null, bn: null }, isNew: false, children: [] }],
+        children: [{ id: 'products', label: { en: 'Products', bn: 'পণ্য' }, description: { en: null, bn: null }, tags: [], icon: 'lucidePackage', order: 0, route: '/app/configuration/products', permission: 'configuration.product.view', isDisabled: false, disabledMessage: { en: null, bn: null }, isNew: false, children: [] }, { id: 'aisles', label: { en: 'Aisles / Zones', bn: 'আইল' }, description: { en: null, bn: null }, tags: [], icon: 'lucideRows3', order: 7, route: '/app/configuration/aisles', permission: 'configuration.aisle.view', isDisabled: false, disabledMessage: { en: null, bn: null }, isNew: false, children: [] }, { id: 'warehouses', label: { en: 'Warehouses', bn: 'ওয়্যারহাউজ' }, description: { en: null, bn: null }, tags: [], icon: 'lucideWarehouse', order: 6, route: '/app/configuration/warehouses', permission: 'configuration.warehouse.view', isDisabled: false, disabledMessage: { en: null, bn: null }, isNew: false, children: [] }, { id: 'suppliers', label: { en: 'Suppliers', bn: 'সাপ্লায়ার' }, description: { en: null, bn: null }, tags: [], icon: 'lucideFactory', order: 3, route: '/app/configuration/suppliers', permission: 'configuration.supplier.view', isDisabled: false, disabledMessage: { en: null, bn: null }, isNew: false, children: [] }, { id: 'brands', label: { en: 'Brands', bn: 'ব্র্যান্ড' }, description: { en: null, bn: null }, tags: [], icon: 'lucideTag', order: 2, route: '/app/configuration/brands', permission: 'configuration.brands.view', isDisabled: false, disabledMessage: { en: null, bn: null }, isNew: false, children: [] }, { id: 'categories', label: { en: 'Categories', bn: 'ক্যাটাগরি' }, description: { en: 'Create the product groups, like Saree or Cosmetics, that every product is filed under.', bn: 'পণ্যের গ্রুপ তৈরি করুন।' }, tags: [], icon: 'lucideFolderTree', order: 1, route: '/app/configuration/categories', permission: 'configuration.category.view', isDisabled: false, disabledMessage: { en: null, bn: null }, isNew: false, children: [] }],
     },
 ];
 
@@ -61,10 +65,18 @@ const SESSION = {
     version: '1',
     user: { name: 'Nazmus Sakib', email: 'owner@samiha.test', mobile_number: null, photo: null, designation: 'Owner', role: 'Owner' },
     business: { name: 'Samiha Style Studio', logoUrl: null, orderSystem: 'BOTH' },
-    permissions: ['dashboard.overview.view', 'configuration.category.view', 'configuration.category.create', 'configuration.category.edit', 'configuration.category.export', 'configuration.brands.view', 'configuration.brands.create', 'configuration.brands.edit', 'configuration.brands.export', 'configuration.supplier.view', 'configuration.supplier.create', 'configuration.supplier.edit', 'configuration.supplier.export', 'configuration.warehouse.view', 'configuration.warehouse.create', 'configuration.warehouse.edit', 'configuration.warehouse.export', 'configuration.aisle.view', 'configuration.aisle.create', 'configuration.aisle.edit', 'configuration.aisle.export'],
+    permissions: ['dashboard.overview.view', 'configuration.category.view', 'configuration.category.create', 'configuration.category.edit', 'configuration.category.export', 'configuration.brands.view', 'configuration.brands.create', 'configuration.brands.edit', 'configuration.brands.export', 'configuration.supplier.view', 'configuration.supplier.create', 'configuration.supplier.edit', 'configuration.supplier.export', 'configuration.warehouse.view', 'configuration.warehouse.create', 'configuration.warehouse.edit', 'configuration.warehouse.export', 'configuration.aisle.view', 'configuration.aisle.create', 'configuration.aisle.edit', 'configuration.aisle.export', 'configuration.product.view', 'configuration.product.create', 'configuration.product.edit', 'configuration.product.delete'],
     menu: MENU,
     counters: { notifications: 0 },
 };
+
+const PHOTO = 'https://res.cloudinary.com/stockflow/image/upload/v1737223331/stockflow/kurti_uozfxa.png';
+const thumb = (url) => url.replace('/image/upload/', '/image/upload/c_fill,w_48,h_48,f_auto,q_auto/');
+const PRODUCTS = [
+    { oid: 'p-1', name: 'Cotton Kurti, maroon', sku: 'COTTKUR', photo: PHOTO, photo_thumb: thumb(PHOTO), unit_type: 'pcs', restock_threshold: 5, status: 'Active', category_oid: 'c-1', category_name: 'Clothing', sub_category_oid: 'sc-1', sub_category_name: 'Kurti', brand_oid: 'b-1', brand_name: 'Aarong', sellable: 4, description: 'Pure cotton, hand block print, free size.', created_on: '2026-09-01T10:00:00.000', last_action_by: 'owner@samiha.test', last_action_by_name: 'Nazmus Sakib', last_action_on: '2026-09-20T10:00:00.000' },
+    { oid: 'p-2', name: 'Woolen Scarf', sku: 'WSC002', photo: null, photo_thumb: null, unit_type: 'pcs', restock_threshold: 3, status: 'Active', category_oid: 'c-2', category_name: 'Winterwear', sub_category_oid: 'sc-2', sub_category_name: 'Scarf', brand_oid: null, brand_name: null, sellable: 0, description: null, created_on: '2026-09-02T10:00:00.000', last_action_by: 'owner@samiha.test', last_action_by_name: 'Nazmus Sakib', last_action_on: '2026-09-18T10:00:00.000' },
+    { oid: 'p-3', name: 'Aloe Vera Moisturiser', sku: '8901030704284', photo: null, photo_thumb: null, unit_type: 'box', restock_threshold: 10, status: 'Active', category_oid: 'c-3', category_name: 'Skincare', sub_category_oid: 'sc-3', sub_category_name: 'Moisturiser', brand_oid: 'b-2', brand_name: 'Cosrx', sellable: 42, description: null, created_on: '2026-09-03T10:00:00.000', last_action_by: 'owner@samiha.test', last_action_by_name: 'Nazmus Sakib', last_action_on: '2026-09-10T10:00:00.000' },
+];
 
 const NAMES = ['Accessories', 'Clothing', 'Cosmetics', 'Delivery', 'Footwear', 'Inventory', 'Jersey', 'Packaging', 'Skincare', 'Test Category One', 'Traditional Clothing', 'Winterwear'];
 
@@ -179,12 +191,24 @@ function handle(request) {
         });
     }
     if (url.includes('/check-category-availability')) return answer(request, { field: 'name', available: true });
+    if (url.includes('/get-product-list')) return answer(request, { rows: PRODUCTS, stats: { active: 3, inactive: 0, low: 1, out: 1 } }, { total: PRODUCTS.length });
+    if (url.includes('/get-product-details'))
+        return answer(request, {
+            details: { ...PRODUCTS[0], created_by: 'owner@samiha.test' },
+            stock: { on_hand: 12, held: 8, sellable: 4, batches: [{ oid: 'i-1', batch_code: 'B-240917-01', warehouse_name: 'Main showroom', received_on: '2026-09-17T10:00:00.000', on_hand: 9, held: 8, sellable: 1, cost_price: 450, selling_price: 890 }, { oid: 'i-2', batch_code: 'B-240922-03', warehouse_name: 'Online store room', received_on: '2026-09-22T10:00:00.000', on_hand: 3, held: 0, sellable: 3, cost_price: 470, selling_price: null }] },
+            lifetime: { sold: 31, returned: 2, damaged: 1, last_sold_on: '2026-09-25T15:30:00.000' },
+            activity: [{ oid: 'log-1', date: '2026-09-20T10:00:00.000', user: 'owner@samiha.test', action: 'Updated product', description: 'Restock level changed from "3" to "5"' }],
+        });
+    if (url.includes('/get-sub-category-list-for-dropdown')) return answer(request, [{ value: 'sc-1', label: 'Kurti', groupLabel: 'Clothing' }, { value: 'sc-3', label: 'Moisturiser', groupLabel: 'Skincare' }]);
+    if (url.includes('/get-brand-list-for-dropdown')) return answer(request, [{ value: 'b-1', label: 'Aarong' }, { value: 'b-2', label: 'Cosrx' }]);
+    if (url.includes('/check-product-availability')) return answer(request, { field: 'sku', available: true });
     if (url.includes('/get-user-card')) return answer(request, { name: 'Ahmad Saif', email: 'ahmad@samiha.test', designation: 'Manager', role: 'Manager', photo: null, active: true });
     console.log('  unmocked API call:', url);
     return answer(request, {});
 }
 
-const seed = "try { localStorage.setItem('__x9f4c2e8a1b7d6f3c0a5e9b2d4f8a11__', JSON.stringify({ transport: 'body', refresh_token: 'refresh-1', session_id: 'session-1', remember: true })); localStorage.setItem('__x7d2a9f4e1c8b3d6a0f5e2c9b7a41__', 'session-1'); } catch (e) {}";
+const LANG = process.env.SHOT_LANG === 'bn' ? "localStorage.setItem('app_lang', 'bn'); " : '';
+const seed = "try { " + LANG + "localStorage.setItem('__x9f4c2e8a1b7d6f3c0a5e9b2d4f8a11__', JSON.stringify({ transport: 'body', refresh_token: 'refresh-1', session_id: 'session-1', remember: true })); localStorage.setItem('__x7d2a9f4e1c8b3d6a0f5e2c9b7a41__', 'session-1'); } catch (e) {}";
 
 const PROBE = `(() => {
     const row = document.querySelector('[data-table="row"]');
@@ -219,6 +243,11 @@ try {
         await browser.setViewport(w, h);
         await browser.goto('http://127.0.0.1:' + PORT + BASE + ROUTE);
         await browser.waitFor(READY);
+        if (CLICK) {
+            await browser.eval(`document.querySelector(${JSON.stringify(CLICK)}).click()`);
+            await browser.waitFor('.cdk-overlay-pane');
+            await new Promise((resolve) => setTimeout(resolve, 600));
+        }
         await browser.screenshot(join(OUT, label + '.png'));
         console.log(label.padEnd(8), await browser.eval(PROBE));
     }
