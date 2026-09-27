@@ -100,7 +100,12 @@ export class PageHeaderComponent {
 
         const path = this._menuPath();
         if (!path.length) return [];
-        const trail = path.map((item) => ({ label: item.label, route: item.route ?? undefined }));
+        const trail: Crumb[] = path.map((item) => ({ label: item.label, route: item.route ?? undefined }));
+        // A record or form page sits below its menu item's route, so the menu alone would end the
+        // trail on the list and leave it unclickable. The page's own title ends it instead.
+        const own = this.title() ?? this.config()?.title;
+        const listRoute = path.at(-1)?.route;
+        if (own && listRoute && this._url().split(/[?#]/)[0] !== listRoute) trail.push({ label: own });
         // A Home link someone cannot follow would be a crumb that does nothing when clicked.
         return this._session.can('dashboard.overview.view') ? [HOME, ...trail] : trail;
     });

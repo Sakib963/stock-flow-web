@@ -45,10 +45,10 @@ const HEADER: PageHeaderConfig = {
 };
 
 describe('PageHeaderComponent', () => {
-    async function render(permissions: string[], inputs: Record<string, unknown> = { config: HEADER, count: 12 }) {
+    async function render(permissions: string[], inputs: Record<string, unknown> = { config: HEADER, count: 12 }, url = '/app/configuration/categories') {
         await TestBed.configureTestingModule({
             imports: [PageHeaderComponent],
-            providers: [provideRouter([{ path: 'app/configuration/categories', children: [] }, { path: 'app/configuration/categories/new', children: [] }, { path: 'app/dashboard', children: [] }]), provideHttpClient(), provideHttpClientTesting(), provideNzI18n(en_US), provideTranslateService({ fallbackLang: 'en' })],
+            providers: [provideRouter([{ path: 'app/configuration/categories', children: [] }, { path: 'app/configuration/categories/new', children: [] }, { path: 'app/configuration/categories/:oid', children: [] }, { path: 'app/configuration/categories/:oid/edit', children: [] }, { path: 'app/dashboard', children: [] }]), provideHttpClient(), provideHttpClientTesting(), provideNzI18n(en_US), provideTranslateService({ fallbackLang: 'en' })],
         }).compileComponents();
 
         const payload: SessionPayload = { version: 'v1', user: { name: 'Samiha', email: 's@x.com', mobile_number: null, photo: null, designation: null, role: 'Owner' }, business: { name: null, logoUrl: null, orderSystem: 'both' }, permissions, menu, counters: { notifications: 0 } };
@@ -57,7 +57,7 @@ describe('PageHeaderComponent', () => {
             .expectOne((r) => r.url.includes(APIEndpoint.GET_USER_INFO))
             .flush({ code: 200, data: payload });
         await load;
-        await TestBed.inject(Router).navigateByUrl('/app/configuration/categories');
+        await TestBed.inject(Router).navigateByUrl(url);
 
         const fixture = TestBed.createComponent(PageHeaderComponent);
         for (const [key, value] of Object.entries(inputs)) fixture.componentRef.setInput(key, value);
@@ -76,6 +76,29 @@ describe('PageHeaderComponent', () => {
         const crumbs = el.querySelector('[data-page-header="breadcrumb"]')?.textContent ?? '';
         expect(crumbs).toContain('Configuration');
         expect(crumbs).toContain('Categories');
+    });
+
+    const crumbsOf = (el: HTMLElement) => Array.from(el.querySelectorAll('[data-page-header="breadcrumb"] nz-breadcrumb-item')).map((item) => ({ text: item.querySelector('a, span')?.textContent?.trim(), link: !!item.querySelector('a') }));
+
+    it('ends the trail on the list, unlinked, when the list is the page', async () => {
+        const { el } = await render([]);
+
+        expect(crumbsOf(el).at(-1)).toEqual({ text: 'Categories', link: false });
+    });
+
+    it('ends the trail on a record page with its own title, and links back to the list', async () => {
+        const { el } = await render([], { title: 'Category details' }, '/app/configuration/categories/c-1');
+
+        expect(crumbsOf(el).slice(-2)).toEqual([
+            { text: 'Categories', link: true },
+            { text: 'Category details', link: false },
+        ]);
+    });
+
+    it('ends the trail on an edit page with its own title', async () => {
+        const { el } = await render([], { title: 'Edit category' }, '/app/configuration/categories/c-1/edit');
+
+        expect(crumbsOf(el).map((c) => c.text)).toEqual(['Configuration', 'Categories', 'Edit category']);
     });
 
     it('leaves Home out of the breadcrumb for someone who cannot open the dashboard', async () => {
