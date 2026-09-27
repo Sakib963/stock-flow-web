@@ -85,6 +85,24 @@ export function moveColumn(columns: readonly Column[], order: readonly string[],
     return [...moved, ...pinned];
 }
 
+/** The order and hidden set the config itself gives, which is what Reset puts back. */
+export function defaultColumns(columns: readonly Column[]): Pick<TablePreferences, 'order' | 'hidden'> {
+    return { order: mergeOrder(columns, undefined), hidden: columns.filter((c) => c.hidden && !c.locked).map((c) => c.key) };
+}
+
+/**
+ * Whether the columns on screen are the person's own rather than the config's: shown, hidden or
+ * moved. Only what a person can see counts, so a pinned key sitting elsewhere in the stored order
+ * is not a difference.
+ */
+export function isCustomised(columns: readonly Column[], preferences: TablePreferences): boolean {
+    const shown = (prefs: Pick<TablePreferences, 'order' | 'hidden'>) =>
+        visibleColumns(columns, { ...preferences, ...prefs })
+            .map((c) => c.key)
+            .join();
+    return shown(preferences) !== shown(defaultColumns(columns));
+}
+
 /**
  * The preferences a table starts from: what was stored, reconciled with the config.
  *

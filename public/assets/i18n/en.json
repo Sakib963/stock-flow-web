@@ -207,6 +207,8 @@
         "forbiddenBody": "Your role does not include it. Ask the business admin if you need it.",
         "columns": "Columns",
         "resetColumns": "Reset",
+        "resetToDefault": "Reset columns",
+        "columnsCustomised": "This list shows the columns you chose on this device. Reset to see the default.",
         "reorderHint": "Drag to reorder, or hold Alt and press the up or down arrow.",
         "columnFixed": "Fixed",
         "columnMoved": "{{column}} moved to position {{position}} of {{total}}",

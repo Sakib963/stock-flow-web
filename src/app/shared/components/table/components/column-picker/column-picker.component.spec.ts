@@ -112,6 +112,32 @@ describe('ColumnPickerComponent', () => {
         expect(picker.preferences().hidden).toEqual([]);
     });
 
+    it('offers no reset beside the button while the columns are the default', () => {
+        const el = fixture.nativeElement as HTMLElement;
+
+        expect(picker.customised()).toBe(false);
+        expect(el.querySelector('[data-picker="quick-reset"]')).toBeNull();
+    });
+
+    it('offers a one-click reset beside the button once a column is hidden, and it puts the default back', () => {
+        picker.toggle(COLUMNS[2]);
+        fixture.detectChanges();
+        const el = fixture.nativeElement as HTMLElement;
+
+        expect(picker.customised()).toBe(true);
+        el.querySelector<HTMLButtonElement>('[data-picker="quick-reset"]')!.click();
+        fixture.detectChanges();
+
+        expect(picker.preferences().hidden).toEqual([]);
+        expect(el.querySelector('[data-picker="quick-reset"]')).toBeNull();
+    });
+
+    it('counts a reordered list as customised, too', () => {
+        picker.onKeydown(0, new KeyboardEvent('keydown', { key: 'ArrowDown', altKey: true }));
+
+        expect(picker.customised()).toBe(true);
+    });
+
     it('resets back to the columns the config hides, not to all of them showing', () => {
         const columns = [...COLUMNS, column('cost', { hidden: true })];
         fixture.componentRef.setInput('columns', columns);

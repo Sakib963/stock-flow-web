@@ -1,5 +1,5 @@
 import { Column, TablePreferences } from '@app/core/models/table.model';
-import { mergeOrder, mergePreferences, moveColumn, orderedColumns, visibleColumns } from '@app/shared/utils/column-order/column-order';
+import { isCustomised, mergeOrder, mergePreferences, moveColumn, orderedColumns, visibleColumns } from '@app/shared/utils/column-order/column-order';
 
 const column = (key: string, extra: Partial<Column> = {}): Column => ({ key, label: key, type: 'text', ...extra }) as Column;
 
@@ -141,5 +141,31 @@ describe('mergePreferences', () => {
 
     it('drops a hidden key for a column that no longer exists', () => {
         expect(mergePreferences(COLUMNS, ['table'], { hidden: ['cost_price', 'supplier'] }, fallback).hidden).toEqual(['supplier']);
+    });
+});
+
+describe('isCustomised', () => {
+    const columns = [...COLUMNS, column('cost', { hidden: true })];
+    const prefs = (over: Partial<TablePreferences> = {}): TablePreferences => ({ layout: 'table', order: ['code', 'name', 'supplier', 'stock', 'status', 'actions', 'cost'], hidden: ['cost'], ...over });
+
+    it('is false for the columns the config gives', () => {
+        expect(isCustomised(columns, prefs())).toBe(false);
+    });
+
+    it('is true once a column is hidden, or a hidden one shown', () => {
+        expect(isCustomised(columns, prefs({ hidden: ['cost', 'stock'] }))).toBe(true);
+        expect(isCustomised(columns, prefs({ hidden: [] }))).toBe(true);
+    });
+
+    it('is true once the columns are moved', () => {
+        expect(isCustomised(columns, prefs({ order: ['code', 'stock', 'name', 'supplier', 'status', 'actions', 'cost'] }))).toBe(true);
+    });
+
+    it('ignores where a pinned column sits in the stored order, since it never moves on screen', () => {
+        expect(isCustomised(columns, prefs({ order: ['name', 'supplier', 'stock', 'status', 'cost', 'code', 'actions'] }))).toBe(false);
+    });
+
+    it('ignores a hidden column moved around, since nobody can see where it went', () => {
+        expect(isCustomised(columns, prefs({ order: ['code', 'cost', 'name', 'supplier', 'stock', 'status', 'actions'] }))).toBe(false);
     });
 });

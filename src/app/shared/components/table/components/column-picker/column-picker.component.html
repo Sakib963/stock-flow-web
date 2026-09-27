@@ -1,16 +1,31 @@
-<button nz-button type="button" class="inline-flex items-center gap-1.5" nz-popover nzPopoverTrigger="click" nzPopoverPlacement="bottomRight" [nzPopoverContent]="panel" [(nzPopoverVisible)]="open" [attr.aria-expanded]="open()" data-picker="button">
+<!-- Left of Columns rather than right, so the Columns button stays where the hand expects it. -->
+@if (customised()) {
+    <button nz-button nzType="text" type="button" class="inline-flex items-center gap-1.5 text-ink-muted hover:text-primary" nz-tooltip nzTooltipPlacement="bottom" [nzTooltipTitle]="'list.columnsCustomised' | translate" (click)="reset()" data-picker="quick-reset">
+        <ng-icon name="lucideRotateCcw" size="14px" aria-hidden="true" />
+        <span class="text-xs">{{ 'list.resetToDefault' | translate }}</span>
+    </button>
+}
+
+<!-- The Filters button's applied look, so both say "this list is narrowed or changed" the same way. -->
+<button nz-button type="button" class="inline-flex items-center gap-1.5" [class.border-primary]="customised()" nz-popover nzPopoverTrigger="click" nzPopoverPlacement="bottomRight" [nzPopoverContent]="panel" [(nzPopoverVisible)]="open" [attr.aria-expanded]="open()" data-picker="button">
     <ng-icon name="lucideColumns3" size="14px" aria-hidden="true" />
     <span class="text-xs">{{ 'list.columns' | translate }}</span>
+    @if (customised()) {
+        <span class="ml-0.5 size-1.5 rounded-full bg-primary" data-picker="customised" aria-hidden="true"></span>
+    }
 </button>
 
 <ng-template #panel>
     <div class="w-64 max-w-[calc(100vw-2rem)]">
-        <header class="flex items-center gap-2 px-1 pb-2">
+        <!-- min-h holds the header still when Reset comes and goes. -->
+        <header class="flex min-h-8 items-center gap-2 px-1 pb-2">
             <p class="m-0 flex-1 text-xs font-bold text-ink-body">{{ 'list.columns' | translate }}</p>
-            <button nz-button nzType="text" nzSize="small" type="button" class="text-xs text-ink-muted hover:text-primary" (click)="reset()" data-picker="reset">
-                <ng-icon name="lucideRotateCcw" size="13px" aria-hidden="true" />
-                <span class="ml-1">{{ 'list.resetColumns' | translate }}</span>
-            </button>
+            @if (customised()) {
+                <button nz-button nzType="text" nzSize="small" type="button" class="inline-flex items-center gap-1 text-xs text-ink-muted hover:text-primary" (click)="reset()" data-picker="reset">
+                    <ng-icon name="lucideRotateCcw" size="13px" aria-hidden="true" />
+                    <span>{{ 'list.resetColumns' | translate }}</span>
+                </button>
+            }
         </header>
 
         @if (canReorder()) {

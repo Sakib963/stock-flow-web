@@ -5,10 +5,11 @@ import { lucideCheck, lucideColumns3, lucideGripVertical, lucideRotateCcw } from
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzCheckboxModule } from 'ng-zorro-antd/checkbox';
 import { NzPopoverModule } from 'ng-zorro-antd/popover';
+import { NzTooltipModule } from 'ng-zorro-antd/tooltip';
 import { TranslatePipe } from '@ngx-translate/core';
 import { Column, TablePreferences } from '@app/core/models/table.model';
 import { TextPipe } from '@app/shared/pipes/text/text.pipe';
-import { mergeOrder, moveColumn, orderedColumns } from '@app/shared/utils/column-order/column-order';
+import { defaultColumns, isCustomised, moveColumn, orderedColumns } from '@app/shared/utils/column-order/column-order';
 
 /**
  * Columns: which ones are shown and in what order (REQ-22).
@@ -22,11 +23,12 @@ import { mergeOrder, moveColumn, orderedColumns } from '@app/shared/utils/column
  */
 @Component({
     selector: 'column-picker',
-    imports: [CdkDrag, CdkDragHandle, CdkDropList, NgIcon, NzButtonModule, NzCheckboxModule, NzPopoverModule, TranslatePipe, TextPipe],
+    imports: [CdkDrag, CdkDragHandle, CdkDropList, NgIcon, NzButtonModule, NzCheckboxModule, NzPopoverModule, NzTooltipModule, TranslatePipe, TextPipe],
     providers: [provideIcons({ lucideCheck, lucideColumns3, lucideGripVertical, lucideRotateCcw })],
     templateUrl: './column-picker.component.html',
     styleUrl: './column-picker.component.scss',
     changeDetection: ChangeDetectionStrategy.OnPush,
+    host: { class: 'inline-flex items-center gap-2' },
 })
 export class ColumnPickerComponent {
     /** Already filtered by permission: a column nobody may see is not offered here either. */
@@ -87,9 +89,12 @@ export class ColumnPickerComponent {
         if (list) queueMicrotask(() => list.querySelectorAll<HTMLElement>('[data-picker="row"]')[to]?.focus());
     }
 
+    /** Said beside the button, so nobody wonders why their list differs from a colleague's. */
+    readonly customised = computed(() => isCustomised(this.columns(), this.preferences()));
+
     /** Back to what the config says, order and hidden together: a half reset leaves a stranger state. */
     reset(): void {
-        this.preferences.update((p) => ({ ...p, order: mergeOrder(this.columns(), undefined), hidden: this.columns().filter((c) => c.hidden && !c.locked).map((c) => c.key) }));
+        this.preferences.update((p) => ({ ...p, ...defaultColumns(this.columns()) }));
     }
 
     private move(from: number, to: number): void {
