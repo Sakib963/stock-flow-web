@@ -1046,6 +1046,127 @@
                 "in_stock": "It still has stock in the warehouse. Dispose of that stock first, or set the product Inactive.",
                 "held": "Online orders are holding it. Deliver or cancel them first, or set the product Inactive."
             }
+        },
+        "analytics": {
+            "title": "Configuration analytics",
+            "lead": "How your catalogue is set up: what is missing, what nothing uses, and how full each warehouse is.",
+            "tile": {
+                "product": "Products",
+                "category": "Categories",
+                "brand": "Brands",
+                "supplier": "Suppliers",
+                "warehouse": "Warehouses",
+                "child": {
+                    "subCategory": "{{count}} sub-categories",
+                    "aisle": "{{count}} aisles or zones"
+                },
+                "added": "+{{count}} this month",
+                "noneAdded": "None added this month"
+            },
+            "attention": {
+                "title": "Needs attention",
+                "summary": "{{count}} to look at",
+                "allClear": "Nothing to fix. Your catalogue is set up well.",
+                "more": "And {{count}} more.",
+                "openList": "Open the list"
+            },
+            "check": {
+                "productsWithoutPhoto": {
+                    "issue": "Products with no photo",
+                    "why": "Online buyers pass over a listing with no picture, and staff can pick the wrong item when packing.",
+                    "clear": "Every product has a photo"
+                },
+                "productsWithoutBrand": {
+                    "issue": "Products with no brand",
+                    "why": "They are left out whenever you look at products by brand.",
+                    "clear": "Every product has a brand"
+                },
+                "productsWithoutThreshold": {
+                    "issue": "Products with no restock level",
+                    "why": "With the level at 0, nobody is warned before they run out.",
+                    "clear": "Every product has a restock level"
+                },
+                "emptyCategories": {
+                    "issue": "Categories with no products",
+                    "why": "Add products to them, or turn them off so they leave the pickers.",
+                    "clear": "Every category has products"
+                },
+                "emptySubCategories": {
+                    "issue": "Sub-categories with no products",
+                    "why": "Add products to them, or turn them off so they leave the pickers.",
+                    "clear": "Every sub-category has products"
+                },
+                "emptyBrands": {
+                    "issue": "Brands with no products",
+                    "why": "Add products to them, or turn them off so they leave the pickers.",
+                    "clear": "Every brand has products"
+                },
+                "emptyAisles": {
+                    "issue": "Aisles or zones with nothing on them",
+                    "why": "No stock is kept there. Use them, or turn them off.",
+                    "clear": "Every aisle holds stock"
+                },
+                "suppliersNeverBoughtFrom": {
+                    "issue": "Suppliers you have never bought from",
+                    "why": "No purchase order from them has been received yet.",
+                    "clear": "You have bought from every supplier"
+                },
+                "inactiveCategoriesInUse": {
+                    "issue": "Turned off categories still in use",
+                    "why": "Active products are still sold under them. Turn the category back on, or move its products.",
+                    "clear": "No turned off category holds active products"
+                },
+                "inactiveBrandsInUse": {
+                    "issue": "Turned off brands still in use",
+                    "why": "Active products are still sold under them. Turn the brand back on, or change their brand.",
+                    "clear": "No turned off brand holds active products"
+                }
+            },
+            "spread": {
+                "title": "How your products are spread",
+                "by": "Group products by",
+                "group": {
+                    "category": "Category",
+                    "brand": "Brand",
+                    "supplier": "Supplier"
+                },
+                "concentrated": {
+                    "category": "{{name}} holds {{share}}% of your products.",
+                    "brand": "{{share}}% of your products are {{name}}.",
+                    "supplier": "{{share}}% of the products you buy come from {{name}}. If they stop supplying, that much of your range goes with them."
+                },
+                "unbranded": {
+                    "brand": "{{share}}% of your products have no brand."
+                },
+                "even": {
+                    "category": "Your products are spread well: no category holds more than {{share}}%.",
+                    "brand": "Your products are spread well: no brand holds more than {{share}}%.",
+                    "supplier": "No supplier provides more than {{share}}% of the products you buy."
+                },
+                "other": "{{count}} others",
+                "noBrand": "No brand",
+                "overlap": "A product bought from more than one supplier counts under each, so these can add up to more than 100%.",
+                "empty": {
+                    "category": "No active products yet.",
+                    "brand": "No active products yet.",
+                    "supplier": "Nothing has been bought from a supplier yet."
+                }
+            },
+            "warehouses": {
+                "title": "How full each warehouse is",
+                "units": "{{onHand}} of {{capacity}} units",
+                "noCapacity": "{{onHand}} units. Give it a capacity to see how full it is.",
+                "empty": "No active warehouse yet."
+            },
+            "changes": {
+                "title": "Recent changes",
+                "empty": "Nothing has been changed yet."
+            },
+            "loadFailed": {
+                "network": "Could not reach the server. Check your connection and try again.",
+                "forbidden": "You do not have permission to see configuration analytics.",
+                "server": "Analytics could not be loaded. Try again in a moment."
+            }
         }
     },
     "form": {

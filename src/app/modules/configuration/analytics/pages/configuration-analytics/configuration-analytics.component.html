@@ -1,0 +1,229 @@
+<page-header [title]="'configuration.analytics.title' | translate" [lead]="'configuration.analytics.lead' | translate" />
+
+@if (failed(); as failure) {
+    <div class="sf-empty" role="alert">
+        <p class="m-0 text-sm text-ink-body">{{ 'configuration.analytics.loadFailed.' + failure | translate }}</p>
+        <div class="mt-3 flex items-center justify-center">
+            <button nz-button nzType="primary" type="button" class="inline-flex items-center gap-1.5" (click)="load()">
+                <ng-icon name="lucideRotateCw" size="14px" aria-hidden="true" />
+                <span>{{ 'form.retry' | translate }}</span>
+            </button>
+        </div>
+    </div>
+} @else {
+    @if (loading()) {
+        <span class="sr-only" role="status">{{ 'form.loading' | translate }}</span>
+    }
+
+    @if (loading() || tiles().length) {
+        <div class="grid grid-cols-2 gap-px overflow-hidden rounded-container border border-line bg-line xl:auto-cols-fr xl:grid-flow-col" data-analytics="tiles">
+            @for (tile of tiles(); track tile.feature) {
+                <a class="flex flex-col bg-white px-4 py-3 no-underline hover:bg-primary-wash focus-visible:bg-primary-wash max-xl:last:odd:col-span-2" [routerLink]="tile.routes.list" [attr.data-tile]="tile.feature">
+                    <p class="m-0 flex items-center gap-1.5 text-xs font-semibold text-ink-muted">
+                        <ng-icon [name]="tile.icon" size="13px" aria-hidden="true" />
+                        {{ 'configuration.analytics.tile.' + tile.feature | translate }}
+                    </p>
+                    <p class="mt-1 mb-0 font-mono text-xl font-bold text-ink tabular-nums">{{ tile.count.active | money: 'number' }}</p>
+                    @if (tile.childCount; as child) {
+                        <p class="mt-0.5 mb-0 text-xs text-ink-body">{{ 'configuration.analytics.tile.child.' + tile.child | translate: { count: (child.active | money: 'number') } | digits }}</p>
+                    }
+                    <p class="mt-0.5 mb-0 text-xs" [class.text-success-ink]="tile.count.added > 0" [class.text-ink-muted]="!tile.count.added">
+                        @if (tile.count.added) {
+                            {{ 'configuration.analytics.tile.added' | translate: { count: (tile.count.added | money: 'number') } | digits }}
+                        } @else {
+                            {{ 'configuration.analytics.tile.noneAdded' | translate }}
+                        }
+                    </p>
+                </a>
+            } @empty {
+                @for (cell of [1, 2, 3, 4, 5]; track cell) {
+                    <div class="bg-white px-4 py-3"><nz-skeleton nzActive [nzTitle]="false" [nzParagraph]="{ rows: 2 }" /></div>
+                }
+            }
+        </div>
+    }
+
+    <!-- What needs fixing leads, so a phone reads it before the charts. -->
+    <div class="mt-2 grid grid-cols-1 items-start gap-2 md:mt-4 md:gap-4 lg:grid-cols-3">
+        @if (loading() || data()?.attention?.length) {
+            <nz-card class="lg:col-span-2" [nzTitle]="attentionTitle" [nzExtra]="attentionCount" data-analytics="attention">
+                <ng-template #attentionTitle
+                    ><h2 class="m-0 flex items-center gap-1.5 text-sm font-bold text-ink"><ng-icon name="lucideListChecks" size="14px" class="text-ink-muted" aria-hidden="true" />{{ 'configuration.analytics.attention.title' | translate }}</h2></ng-template
+                >
+                <ng-template #attentionCount>
+                    @if (data() && toFix().length) {
+                        <span class="text-xs font-semibold text-warning-ink">{{ 'configuration.analytics.attention.summary' | translate: { count: (toFix().length | money: 'number') } | digits }}</span>
+                    }
+                </ng-template>
+                @if (data()) {
+                    @if (toFix().length) {
+                        <nz-collapse nzGhost [nzBordered]="false">
+                            @for (check of toFix(); track check.key; let first = $first) {
+                                <nz-collapse-panel [nzHeader]="checkHeader" [nzActive]="first" [attr.data-check]="check.key">
+                                    <ng-template #checkHeader>
+                                        <span class="flex w-full items-center gap-2">
+                                            <ng-icon [name]="checks[check.key].icon" size="15px" class="shrink-0 text-warning-ink" aria-hidden="true" />
+                                            <span class="min-w-0 flex-1">
+                                                <span class="block text-[13px] font-semibold text-ink">{{ 'configuration.analytics.check.' + check.key + '.issue' | translate }}</span>
+                                                <span class="block text-xs text-ink-muted">{{ 'configuration.analytics.check.' + check.key + '.why' | translate }}</span>
+                                            </span>
+                                            <span class="min-w-7 shrink-0 rounded-full text-center bg-warning-bg px-2 font-mono text-xs font-bold text-warning-ink tabular-nums">{{ check.total | money: 'number' }}</span>
+                                        </span>
+                                    </ng-template>
+                                    <ul class="m-0 flex list-none flex-wrap gap-1.5 p-0">
+                                        @for (item of check.items; track item.oid) {
+                                            <li>
+                                                <a class="inline-flex items-center gap-1 rounded-control border border-line px-2 py-0.5 text-xs text-ink no-underline hover:border-primary hover:text-primary focus-visible:border-primary focus-visible:text-primary" [routerLink]="checks[check.key].routes.detail(item.oid)"
+                                                    >{{ item.name }}
+                                                    @if (item.detail) {
+                                                        <span class="text-ink-muted">&middot; {{ item.detail }}</span>
+                                                    }
+                                                </a>
+                                            </li>
+                                        }
+                                    </ul>
+                                    @if (more(check) > 0) {
+                                        <p class="mt-2 mb-0 text-xs text-ink-muted">
+                                            {{ 'configuration.analytics.attention.more' | translate: { count: (more(check) | money: 'number') } | digits }}
+                                            <a class="font-semibold" [routerLink]="checks[check.key].routes.list">{{ 'configuration.analytics.attention.openList' | translate }}</a>
+                                        </p>
+                                    }
+                                </nz-collapse-panel>
+                            }
+                        </nz-collapse>
+                    } @else if (clear().length) {
+                        <p class="m-0 flex items-center gap-2 text-sm font-semibold text-success-ink" data-analytics="all-clear"><ng-icon name="lucideCircleCheck" size="16px" aria-hidden="true" />{{ 'configuration.analytics.attention.allClear' | translate }}</p>
+                    }
+                    @if (clear().length) {
+                        <ul class="m-0 mt-3 grid list-none grid-cols-1 gap-x-4 gap-y-1.5 border-t border-line-soft p-0 pt-3 sm:grid-cols-2" data-analytics="clear">
+                            @for (check of clear(); track check.key) {
+                                <li class="flex items-center gap-1.5 text-xs text-ink-body" [attr.data-clear]="check.key"><ng-icon name="lucideCircleCheck" size="13px" class="shrink-0 text-success-ink" aria-hidden="true" />{{ 'configuration.analytics.check.' + check.key + '.clear' | translate }}</li>
+                            }
+                        </ul>
+                    }
+                } @else {
+                    <nz-skeleton nzActive [nzTitle]="false" [nzParagraph]="{ rows: 5 }" />
+                }
+            </nz-card>
+        }
+
+        <nz-card [nzTitle]="changesTitle" data-analytics="changes">
+            <ng-template #changesTitle
+                ><h2 class="m-0 flex items-center gap-1.5 text-sm font-bold text-ink"><ng-icon name="lucideHistory" size="14px" class="text-ink-muted" aria-hidden="true" />{{ 'configuration.analytics.changes.title' | translate }}</h2></ng-template
+            >
+            @if (data(); as loaded) {
+                @if (loaded.activity.length) {
+                    <nz-timeline>
+                        @for (entry of loaded.activity; track entry.oid; let first = $first) {
+                            <nz-timeline-item [nzColor]="first ? 'blue' : 'gray'">
+                                @if (changeRoute(entry); as route) {
+                                    <a class="m-0 text-[13px] font-semibold" [routerLink]="route">{{ entry.action }}</a>
+                                } @else {
+                                    <p class="m-0 text-[13px] font-semibold text-ink">{{ entry.action }}</p>
+                                }
+                                @if (entry.description) {
+                                    <p class="mt-0.5 mb-0 text-xs text-ink-body">{{ entry.description }}</p>
+                                }
+                                <p class="mt-0.5 mb-0 text-xs text-ink-muted">{{ entry.user }} &middot; {{ entry.date | recordDate: language() : 'date-time-12' }}</p>
+                            </nz-timeline-item>
+                        }
+                    </nz-timeline>
+                } @else {
+                    <p class="m-0 text-xs text-ink-muted">{{ 'configuration.analytics.changes.empty' | translate }}</p>
+                }
+            } @else {
+                <nz-skeleton nzActive [nzTitle]="false" [nzParagraph]="{ rows: 4 }" />
+            }
+        </nz-card>
+    </div>
+
+    @if (loading() || groups().length || data()?.warehouses) {
+        <div class="mt-2 grid grid-cols-1 items-start gap-2 md:mt-4 md:gap-4 lg:grid-cols-3">
+            @if (loading() || groups().length) {
+                <nz-card class="lg:col-span-2" [nzTitle]="spreadTitle" [nzExtra]="spreadPicker" data-analytics="spread">
+                    <ng-template #spreadTitle
+                        ><h2 class="m-0 flex items-center gap-1.5 text-sm font-bold text-ink"><ng-icon name="lucideChartBar" size="14px" class="text-ink-muted" aria-hidden="true" />{{ 'configuration.analytics.spread.title' | translate }}</h2></ng-template
+                    >
+                    <ng-template #spreadPicker>
+                        @if (groups().length > 1) {
+                            <nz-segmented [ngModel]="group()" (ngModelChange)="pick($event)" [attr.aria-label]="'configuration.analytics.spread.by' | translate">
+                                @for (g of groups(); track g) {
+                                    <label nz-segmented-item [nzValue]="g">{{ 'configuration.analytics.spread.group.' + g | translate }}</label>
+                                }
+                            </nz-segmented>
+                        }
+                    </ng-template>
+                    @if (data()) {
+                        @if (spread(); as s) {
+                            <p class="mt-0 mb-3 text-sm text-ink-body" data-analytics="headline">{{ s.headline.key | translate: { name: s.headline.name, share: (s.headline.share | digits) } }}</p>
+                            <ul class="m-0 flex list-none flex-col gap-2 p-0">
+                                @for (row of s.rows; track row.oid) {
+                                    <!-- The name column is capped so a long category does not squeeze the bar away. -->
+                                    <li class="grid grid-cols-[minmax(0,10rem)_1fr_auto] items-center gap-x-3" [attr.data-spread-row]="row.name">
+                                        <span class="truncate text-xs text-ink">
+                                            @if (row.oid) {
+                                                <a [routerLink]="spreadRoutes[s.group].detail(row.oid)">{{ row.name }}</a>
+                                            } @else {
+                                                <span class="text-ink-muted">{{ 'configuration.analytics.spread.noBrand' | translate }}</span>
+                                            }
+                                        </span>
+                                        <nz-progress [nzPercent]="width(row.products, s.widest)" [nzShowInfo]="false" nzSize="small" nzStrokeColor="var(--color-primary)" aria-hidden="true" />
+                                        <span class="text-right font-mono text-xs text-ink-body tabular-nums">{{ row.products | money: 'number' }} &middot; {{ row.share | digits }}%</span>
+                                    </li>
+                                }
+                                @if (s.other; as other) {
+                                    <li class="grid grid-cols-[minmax(0,10rem)_1fr_auto] items-center gap-x-3" data-spread-row="other">
+                                        <span class="truncate text-xs text-ink-muted">{{ 'configuration.analytics.spread.other' | translate: { count: (other.groups | money: 'number') } | digits }}</span>
+                                        <nz-progress [nzPercent]="width(other.products, s.widest)" [nzShowInfo]="false" nzSize="small" nzStrokeColor="var(--color-ink-faint)" aria-hidden="true" />
+                                        <span class="text-right font-mono text-xs text-ink-muted tabular-nums">{{ other.products | money: 'number' }} &middot; {{ other.share | digits }}%</span>
+                                    </li>
+                                }
+                            </ul>
+                            @if (s.group === 'supplier') {
+                                <p class="mt-3 mb-0 text-xs text-ink-muted">{{ 'configuration.analytics.spread.overlap' | translate }}</p>
+                            }
+                        } @else {
+                            <p class="m-0 text-xs text-ink-muted">{{ 'configuration.analytics.spread.empty.' + group() | translate }}</p>
+                        }
+                    } @else {
+                        <nz-skeleton nzActive [nzTitle]="false" [nzParagraph]="{ rows: 6 }" />
+                    }
+                </nz-card>
+            }
+
+            @if (loading() || data()?.warehouses) {
+                <nz-card [nzTitle]="storageTitle" data-analytics="warehouses">
+                    <ng-template #storageTitle
+                        ><h2 class="m-0 flex items-center gap-1.5 text-sm font-bold text-ink"><ng-icon name="lucideGauge" size="14px" class="text-ink-muted" aria-hidden="true" />{{ 'configuration.analytics.warehouses.title' | translate }}</h2></ng-template
+                    >
+                    @if (data()?.warehouses; as warehouses) {
+                        @if (warehouses.length) {
+                            <ul class="m-0 flex list-none flex-col gap-3 p-0">
+                                @for (w of warehouses; track w.oid) {
+                                    <li [attr.data-warehouse]="w.name">
+                                        <div class="flex items-baseline justify-between gap-2">
+                                            <a class="truncate text-[13px] font-semibold" [routerLink]="warehouseRoute(w.oid)">{{ w.name }}</a>
+                                            @if (w.fullRate !== null) {
+                                                <span class="font-mono text-xs font-bold text-ink tabular-nums">{{ w.fullRate | digits }}%</span>
+                                            }
+                                        </div>
+                                        @if (w.fullRate !== null) {
+                                            <nz-progress class="mt-1 block" role="meter" aria-valuemin="0" aria-valuemax="100" [attr.aria-valuenow]="w.fullRate" [attr.aria-label]="w.name" [attr.data-tone]="fullnessTone(w.fullRate)" [nzPercent]="w.fullRate > 100 ? 100 : w.fullRate" [nzShowInfo]="false" nzSize="small" [nzStrokeColor]="'var(--color-' + fullnessTone(w.fullRate) + ')'" />
+                                            <p class="mt-1 mb-0 text-xs text-ink-muted">{{ 'configuration.analytics.warehouses.units' | translate: { onHand: (w.onHand | money: 'number'), capacity: (w.capacity | money: 'number') } | digits }}</p>
+                                        } @else {
+                                            <p class="mt-1 mb-0 text-xs text-ink-muted">{{ 'configuration.analytics.warehouses.noCapacity' | translate: { onHand: (w.onHand | money: 'number') } | digits }}</p>
+                                        }
+                                    </li>
+                                }
+                            </ul>
+                        } @else {
+                            <p class="m-0 text-xs text-ink-muted">{{ 'configuration.analytics.warehouses.empty' | translate }}</p>
+                        }
+                    } @else {
+                        <nz-skeleton nzActive [nzTitle]="false" [nzParagraph]="{ rows: 4 }" />
+                    }
+                </nz-card>
+            }
+        </div>
+    }
+}

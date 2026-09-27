@@ -18,6 +18,13 @@ export const CONFIGURATION_ROUTES: Routes = [
         path: '',
         providers: [...OVERLAY_PROVIDERS],
         children: [
+            { path: '', pathMatch: 'full', redirectTo: 'analytics' },
+            {
+                path: 'analytics',
+                canActivate: [permissionGuard],
+                data: { permission: 'configuration.analytics.view' },
+                loadComponent: () => import('./analytics/pages/configuration-analytics/configuration-analytics.component').then((m) => m.ConfigurationAnalyticsComponent),
+            },
             {
                 path: 'products',
                 canActivate: [permissionGuard],

@@ -84,4 +84,6 @@ export class APIEndpoint {
     static readonly GENERATE_PRODUCT_LIST_REPORT_BY_AISLE = '/api/v1/configuration/aisle/generate-product-list-report-by-aisle';
     static readonly GENERATE_INVENTORY_REPORT_BY_AISLE = '/api/v1/configuration/aisle/generate-inventory-report-by-aisle';
     static readonly GET_AISLE_LIST_FOR_DROPDOWN = '/api/v1/configuration/aisle/get-aisle-list-for-dropdown';
+
+    static readonly GET_CONFIGURATION_ANALYTICS = '/api/v1/configuration/analytics/get-configuration-analytics';
 }

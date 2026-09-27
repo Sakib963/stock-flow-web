@@ -57,7 +57,7 @@ const MENU = [
         isDisabled: false,
         disabledMessage: { en: null, bn: null },
         isNew: false,
-        children: [{ id: 'products', label: { en: 'Products', bn: 'পণ্য' }, description: { en: null, bn: null }, tags: [], icon: 'lucidePackage', order: 0, route: '/app/configuration/products', permission: 'configuration.product.view', isDisabled: false, disabledMessage: { en: null, bn: null }, isNew: false, children: [] }, { id: 'aisles', label: { en: 'Aisles / Zones', bn: 'আইল' }, description: { en: null, bn: null }, tags: [], icon: 'lucideRows3', order: 7, route: '/app/configuration/aisles', permission: 'configuration.aisle.view', isDisabled: false, disabledMessage: { en: null, bn: null }, isNew: false, children: [] }, { id: 'warehouses', label: { en: 'Warehouses', bn: 'ওয়্যারহাউজ' }, description: { en: null, bn: null }, tags: [], icon: 'lucideWarehouse', order: 6, route: '/app/configuration/warehouses', permission: 'configuration.warehouse.view', isDisabled: false, disabledMessage: { en: null, bn: null }, isNew: false, children: [] }, { id: 'suppliers', label: { en: 'Suppliers', bn: 'সাপ্লায়ার' }, description: { en: null, bn: null }, tags: [], icon: 'lucideFactory', order: 3, route: '/app/configuration/suppliers', permission: 'configuration.supplier.view', isDisabled: false, disabledMessage: { en: null, bn: null }, isNew: false, children: [] }, { id: 'brands', label: { en: 'Brands', bn: 'ব্র্যান্ড' }, description: { en: null, bn: null }, tags: [], icon: 'lucideTag', order: 2, route: '/app/configuration/brands', permission: 'configuration.brands.view', isDisabled: false, disabledMessage: { en: null, bn: null }, isNew: false, children: [] }, { id: 'categories', label: { en: 'Categories', bn: 'ক্যাটাগরি' }, description: { en: 'Create the product groups, like Saree or Cosmetics, that every product is filed under.', bn: 'পণ্যের গ্রুপ তৈরি করুন।' }, tags: [], icon: 'lucideFolderTree', order: 1, route: '/app/configuration/categories', permission: 'configuration.category.view', isDisabled: false, disabledMessage: { en: null, bn: null }, isNew: false, children: [] }],
+        children: [{ id: 'analytics', label: { en: 'Analytics', bn: 'বিশ্লেষণ' }, description: { en: null, bn: null }, tags: [], icon: 'lucideChartLine', order: 8, route: '/app/configuration/analytics', permission: 'configuration.analytics.view', isDisabled: false, disabledMessage: { en: null, bn: null }, isNew: false, children: [] }, { id: 'products', label: { en: 'Products', bn: 'পণ্য' }, description: { en: null, bn: null }, tags: [], icon: 'lucidePackage', order: 0, route: '/app/configuration/products', permission: 'configuration.product.view', isDisabled: false, disabledMessage: { en: null, bn: null }, isNew: false, children: [] }, { id: 'aisles', label: { en: 'Aisles / Zones', bn: 'আইল' }, description: { en: null, bn: null }, tags: [], icon: 'lucideRows3', order: 7, route: '/app/configuration/aisles', permission: 'configuration.aisle.view', isDisabled: false, disabledMessage: { en: null, bn: null }, isNew: false, children: [] }, { id: 'warehouses', label: { en: 'Warehouses', bn: 'ওয়্যারহাউজ' }, description: { en: null, bn: null }, tags: [], icon: 'lucideWarehouse', order: 6, route: '/app/configuration/warehouses', permission: 'configuration.warehouse.view', isDisabled: false, disabledMessage: { en: null, bn: null }, isNew: false, children: [] }, { id: 'suppliers', label: { en: 'Suppliers', bn: 'সাপ্লায়ার' }, description: { en: null, bn: null }, tags: [], icon: 'lucideFactory', order: 3, route: '/app/configuration/suppliers', permission: 'configuration.supplier.view', isDisabled: false, disabledMessage: { en: null, bn: null }, isNew: false, children: [] }, { id: 'brands', label: { en: 'Brands', bn: 'ব্র্যান্ড' }, description: { en: null, bn: null }, tags: [], icon: 'lucideTag', order: 2, route: '/app/configuration/brands', permission: 'configuration.brands.view', isDisabled: false, disabledMessage: { en: null, bn: null }, isNew: false, children: [] }, { id: 'categories', label: { en: 'Categories', bn: 'ক্যাটাগরি' }, description: { en: 'Create the product groups, like Saree or Cosmetics, that every product is filed under.', bn: 'পণ্যের গ্রুপ তৈরি করুন।' }, tags: [], icon: 'lucideFolderTree', order: 1, route: '/app/configuration/categories', permission: 'configuration.category.view', isDisabled: false, disabledMessage: { en: null, bn: null }, isNew: false, children: [] }],
     },
 ];
 
@@ -65,7 +65,7 @@ const SESSION = {
     version: '1',
     user: { name: 'Nazmus Sakib', email: 'owner@samiha.test', mobile_number: null, photo: null, designation: 'Owner', role: 'Owner' },
     business: { name: 'Samiha Style Studio', logoUrl: null, orderSystem: 'BOTH' },
-    permissions: ['dashboard.overview.view', 'configuration.category.view', 'configuration.category.create', 'configuration.category.edit', 'configuration.category.export', 'configuration.brands.view', 'configuration.brands.create', 'configuration.brands.edit', 'configuration.brands.export', 'configuration.supplier.view', 'configuration.supplier.create', 'configuration.supplier.edit', 'configuration.supplier.export', 'configuration.warehouse.view', 'configuration.warehouse.create', 'configuration.warehouse.edit', 'configuration.warehouse.export', 'configuration.aisle.view', 'configuration.aisle.create', 'configuration.aisle.edit', 'configuration.aisle.export', 'configuration.product.view', 'configuration.product.create', 'configuration.product.edit', 'configuration.product.delete'],
+    permissions: ['dashboard.overview.view', 'configuration.category.view', 'configuration.category.create', 'configuration.category.edit', 'configuration.category.export', 'configuration.brands.view', 'configuration.brands.create', 'configuration.brands.edit', 'configuration.brands.export', 'configuration.supplier.view', 'configuration.supplier.create', 'configuration.supplier.edit', 'configuration.supplier.export', 'configuration.warehouse.view', 'configuration.warehouse.create', 'configuration.warehouse.edit', 'configuration.warehouse.export', 'configuration.aisle.view', 'configuration.aisle.create', 'configuration.aisle.edit', 'configuration.aisle.export', 'configuration.product.view', 'configuration.product.create', 'configuration.product.edit', 'configuration.product.delete', 'configuration.analytics.view'],
     menu: MENU,
     counters: { notifications: 0 },
 };
@@ -130,6 +130,38 @@ const cors = (request) => ({
     'access-control-allow-headers': request?.headers?.['Access-Control-Request-Headers'] ?? request?.headers?.['access-control-request-headers'] ?? 'authorization,content-type',
     'access-control-allow-methods': 'GET,POST,PUT,PATCH,DELETE,OPTIONS',
 });
+
+
+const ANALYTICS = {
+    counts: { product: { active: 26, added: 3 }, category: { active: 11, added: 0 }, subCategory: { active: 45, added: 1 }, brand: { active: 2, added: 0 }, supplier: { active: 13, added: 0 }, warehouse: { active: 3, added: 0 }, aisle: { active: 10, added: 0 } },
+    attention: [
+        { key: 'productsWithoutPhoto', total: 15, items: [{ oid: 'p-1', name: 'Aloe Vera Face Wash', detail: null }, { oid: 'p-2', name: 'Anti-Aging Serum', detail: null }, { oid: 'p-3', name: 'Beard Oil', detail: null }, { oid: 'p-4', name: 'Cotton Crew Neck T-Shirt', detail: null }, { oid: 'p-5', name: 'Floral Maxi Dress', detail: null }] },
+        { key: 'productsWithoutBrand', total: 25, items: [{ oid: 'p-1', name: 'Aloe Vera Face Wash', detail: null }, { oid: 'p-6', name: 'Aloe Vera Moisturizer', detail: null }] },
+        { key: 'productsWithoutThreshold', total: 1, items: [{ oid: 'p-7', name: 'Handmade Gift Box', detail: null }] },
+        { key: 'emptyCategories', total: 4, items: [{ oid: 'c-1', name: 'Footwear', detail: null }, { oid: 'c-2', name: 'Jersey', detail: null }] },
+        { key: 'emptySubCategories', total: 23, items: [{ oid: 's-1', name: 'Cleanser', detail: 'Skincare' }, { oid: 's-2', name: 'Courier Bags', detail: 'Delivery' }] },
+        { key: 'emptyBrands', total: 1, items: [{ oid: 'b-2', name: 'COSRX', detail: null }] },
+        { key: 'emptyAisles', total: 7, items: [{ oid: 'a-1', name: 'Anchol (আঁচল)', detail: 'Kanthasheelan' }] },
+        { key: 'suppliersNeverBoughtFrom', total: 8, items: [{ oid: 'su-1', name: 'Jutti Heaven', detail: null }, { oid: 'su-2', name: 'Leather Craft BD', detail: null }] },
+        { key: 'inactiveCategoriesInUse', total: 0, items: [] },
+        { key: 'inactiveBrandsInUse', total: 0, items: [] },
+    ],
+    spread: {
+        category: { total: 26, rows: [{ oid: 'c-3', name: 'Accessories', products: 7 }, { oid: 'c-4', name: 'Skincare', products: 6 }, { oid: 'c-5', name: 'Traditional Clothing', products: 4 }, { oid: 'c-6', name: 'Cosmetics', products: 3 }, { oid: 'c-7', name: 'Clothing', products: 2 }, { oid: 'c-8', name: 'Delivery', products: 2 }, { oid: 'c-9', name: 'Packaging', products: 2 }], other: null },
+        brand: { total: 26, rows: [{ oid: null, name: null, products: 25 }, { oid: 'b-1', name: "skin'O", products: 1 }], other: null },
+        supplier: { total: 23, rows: [{ oid: 'su-3', name: 'Bengal Traditional Garments Ltd.', products: 18 }, { oid: 'su-4', name: 'Global Distributor Ltd', products: 18 }, { oid: 'su-5', name: 'Deshi Kurtis Co.', products: 5 }, { oid: 'su-6', name: 'Dhaka Saree House', products: 3 }], other: null },
+    },
+    warehouses: [
+        { oid: 'w-1', name: 'Chandrabindu', onHand: 1608, capacity: 2000, fullRate: 80.4 },
+        { oid: 'w-2', name: 'Kanthasheelan', onHand: 0, capacity: 85000, fullRate: 0 },
+        { oid: 'w-3', name: 'Shop floor', onHand: 42, capacity: null, fullRate: null },
+    ],
+    activity: [
+        { oid: 'l-1', type: 'brand', recordOid: 'b-1', date: '2026-09-27T10:00:00.000', user: 'owner@samiha.test', action: 'Updated brand', description: 'Origin country set to KR' },
+        { oid: 'l-2', type: 'sub-category', recordOid: 's-1', date: '2026-09-26T15:20:00.000', user: 'owner@samiha.test', action: 'Created sub-category', description: null },
+        { oid: 'l-3', type: 'category', recordOid: 'c-3', date: '2026-09-25T09:10:00.000', user: 'manager@samiha.test', action: 'Updated category', description: 'Status changed from "Inactive" to "Active"' },
+    ],
+};
 
 const answer = (request, data, extra = {}) => ({ status: 200, headers: cors(request), body: JSON.stringify({ code: 200, message: 'ok', data, ...extra }) });
 
@@ -202,6 +234,7 @@ function handle(request) {
     if (url.includes('/get-sub-category-list-for-dropdown')) return answer(request, [{ value: 'sc-1', label: 'Kurti', groupLabel: 'Clothing' }, { value: 'sc-3', label: 'Moisturiser', groupLabel: 'Skincare' }]);
     if (url.includes('/get-brand-list-for-dropdown')) return answer(request, [{ value: 'b-1', label: 'Aarong' }, { value: 'b-2', label: 'Cosrx' }]);
     if (url.includes('/check-product-availability')) return answer(request, { field: 'sku', available: true });
+    if (url.includes('/get-configuration-analytics')) return answer(request, ANALYTICS);
     if (url.includes('/get-user-card')) return answer(request, { name: 'Ahmad Saif', email: 'ahmad@samiha.test', designation: 'Manager', role: 'Manager', photo: null, active: true });
     console.log('  unmocked API call:', url);
     return answer(request, {});
