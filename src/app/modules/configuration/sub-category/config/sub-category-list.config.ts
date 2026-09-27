@@ -58,6 +58,7 @@ export const SUB_CATEGORY_LIST: ListShellPageConfig = {
             { key: 'view', label: 'configuration.subCategory.view', icon: 'lucideEye', permission: 'configuration.sub-category.view', stateful: false, run: { kind: 'navigate', route: SUB_CATEGORY_ROUTES.detailPattern } },
             { key: 'edit', label: 'configuration.subCategory.edit', icon: 'lucidePencil', permission: 'configuration.sub-category.edit', stateful: false, run: { kind: 'navigate', route: SUB_CATEGORY_ROUTES.editPattern } },
         ],
+        phoneRowActionStyle: 'menu',
         empty: { icon: 'lucideFolderTree', title: 'configuration.subCategory.emptyTitle', body: 'configuration.subCategory.emptyBody' },
     },
 };

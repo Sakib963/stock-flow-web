@@ -132,6 +132,37 @@ describe('TableComponent', () => {
         expect(el.querySelectorAll('[data-row="actions"]').length).toBe(2);
     });
 
+    it('turns the row icons into one menu per row on a phone, when the table asks for it', async () => {
+        const width = window.innerWidth;
+        Object.defineProperty(window, 'innerWidth', { value: 390, configurable: true });
+        try {
+            await setup(['configuration.category.view', 'configuration.category.edit']);
+            const { el } = await render({ ...PASSED, phoneRowActionStyle: 'menu' }, { rows: ROWS });
+
+            expect(el.querySelectorAll('[data-row="actions"]').length).toBe(2);
+            expect(el.querySelectorAll('button[data-action]').length).toBe(0);
+        } finally {
+            Object.defineProperty(window, 'innerWidth', { value: width, configurable: true });
+        }
+    });
+
+    it('keeps the row icons on a wider screen, whatever the phone gets', async () => {
+        await setup(['configuration.category.view', 'configuration.category.edit']);
+        const { el } = await render({ ...PASSED, phoneRowActionStyle: 'menu' }, { rows: ROWS });
+
+        expect(el.querySelector('[data-row="actions"]')).toBeNull();
+        expect(el.querySelectorAll('button[data-action]').length).toBe(3);
+    });
+
+    it('holds the action column at the right edge while the table scrolls sideways', async () => {
+        await setup(['configuration.category.view']);
+        const { el } = await render(PASSED, { rows: ROWS });
+
+        const header = [...el.querySelectorAll('th')].at(-1)!;
+        expect(header.classList).toContain('ant-table-cell-fix-right');
+        expect([...el.querySelectorAll('[data-table="row"]')].every((row) => row.lastElementChild?.classList.contains('ant-table-cell-fix-right'))).toBe(true);
+    });
+
     it('leaves out a column the person may not see, such as a margin', async () => {
         await setup([]);
         const { fixture, el, cmp } = await render();

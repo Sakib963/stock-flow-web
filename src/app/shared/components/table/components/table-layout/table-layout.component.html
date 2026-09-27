@@ -10,7 +10,7 @@
                 </th>
             }
             @if (hasActions()) {
-                <th [nzWidth]="actionsWidth" nzAlign="center" scope="col">{{ 'list.action' | translate }}</th>
+                <th [nzWidth]="actionsWidth" nzAlign="center" [nzRight]="true" scope="col">{{ 'list.action' | translate }}</th>
             }
         </tr>
     </thead>
@@ -29,7 +29,7 @@
                         </td>
                     }
                     @if (hasActions()) {
-                        <td nzAlign="center"></td>
+                        <td nzAlign="center" [nzRight]="true"></td>
                     }
                 </tr>
             }
@@ -45,7 +45,7 @@
                         </td>
                     }
                     @if (hasActions()) {
-                        <td nzAlign="center">
+                        <td nzAlign="center" [nzRight]="true">
                             @let actions = context().actionsFor(row);
                             @if (actions.length) {
                                 <row-actions [actions]="actions" [label]="labelOf(row)" [mode]="actionStyle()" (run)="context().run($event, row)" />

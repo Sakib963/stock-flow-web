@@ -65,6 +65,7 @@ export const CATEGORY_LIST: ListShellPageConfig = {
             { key: 'view', label: 'configuration.category.view', icon: 'lucideEye', permission: 'configuration.category.view', stateful: false, run: { kind: 'navigate', route: CATEGORY_ROUTES.detailPattern } },
             { key: 'edit', label: 'configuration.category.edit', icon: 'lucidePencil', permission: 'configuration.category.edit', stateful: false, run: { kind: 'navigate', route: CATEGORY_ROUTES.editPattern } },
         ],
+        phoneRowActionStyle: 'menu',
         empty: { icon: 'lucideFolderTree', title: 'configuration.category.emptyTitle', body: 'configuration.category.emptyBody' },
     },
 };

@@ -122,6 +122,8 @@ export interface TableConfig {
     rowActions?: readonly RowAction[];
     /** 'auto' is icon buttons up to two actions and a menu above that. */
     rowActionStyle?: RowActionStyle;
+    /** Below 768px, in place of `rowActionStyle`: 'menu' turns a row's icons into one tap target. */
+    phoneRowActionStyle?: RowActionStyle;
     bulkActions?: readonly BulkAction[];
     selection?: 'none' | 'multiple';
     /** The # column, counted from the page offset. On unless a table says otherwise. */
