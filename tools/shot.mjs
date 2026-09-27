@@ -13,7 +13,9 @@ import { join, extname } from 'node:path';
 import { launch } from './cdp.mjs';
 
 const DIST = 'dist/stock-flow-web/browser';
-const ROUTE = process.argv[2] ?? '/app/configuration/categories';
+// Git Bash rewrites an argument starting with / into a Windows path (C:/Program Files/Git/app/...),
+// which the app does not know and redirects to the root, so only the part from /app/ is kept.
+const ROUTE = (process.argv[2] ?? '/app/configuration/categories').replace(/^.*?(?=\/app\/)/, '');
 const OUT = process.argv[3] ?? 'tools/shots';
 /** What to wait for before the shot. A form or a record page has no table row to wait on. */
 const READY = process.argv[4] ?? '[data-table="row"]';
@@ -51,7 +53,7 @@ const MENU = [
         isDisabled: false,
         disabledMessage: { en: null, bn: null },
         isNew: false,
-        children: [{ id: 'categories', label: { en: 'Categories', bn: 'ক্যাটাগরি' }, description: { en: 'Create the product groups, like Saree or Cosmetics, that every product is filed under.', bn: 'পণ্যের গ্রুপ তৈরি করুন।' }, tags: [], icon: 'lucideFolderTree', order: 1, route: '/app/configuration/categories', permission: 'configuration.category.view', isDisabled: false, disabledMessage: { en: null, bn: null }, isNew: false, children: [] }],
+        children: [{ id: 'brands', label: { en: 'Brands', bn: 'ব্র্যান্ড' }, description: { en: null, bn: null }, tags: [], icon: 'lucideTag', order: 2, route: '/app/configuration/brands', permission: 'configuration.brands.view', isDisabled: false, disabledMessage: { en: null, bn: null }, isNew: false, children: [] }, { id: 'categories', label: { en: 'Categories', bn: 'ক্যাটাগরি' }, description: { en: 'Create the product groups, like Saree or Cosmetics, that every product is filed under.', bn: 'পণ্যের গ্রুপ তৈরি করুন।' }, tags: [], icon: 'lucideFolderTree', order: 1, route: '/app/configuration/categories', permission: 'configuration.category.view', isDisabled: false, disabledMessage: { en: null, bn: null }, isNew: false, children: [] }],
     },
 ];
 
@@ -59,7 +61,7 @@ const SESSION = {
     version: '1',
     user: { name: 'Nazmus Sakib', email: 'owner@samiha.test', mobile_number: null, photo: null, designation: 'Owner', role: 'Owner' },
     business: { name: 'Samiha Style Studio', logoUrl: null, orderSystem: 'BOTH' },
-    permissions: ['dashboard.overview.view', 'configuration.category.view', 'configuration.category.create', 'configuration.category.edit', 'configuration.category.export'],
+    permissions: ['dashboard.overview.view', 'configuration.category.view', 'configuration.category.create', 'configuration.category.edit', 'configuration.category.export', 'configuration.brands.view', 'configuration.brands.create', 'configuration.brands.edit', 'configuration.brands.export'],
     menu: MENU,
     counters: { notifications: 0 },
 };
@@ -106,6 +108,9 @@ function handle(request) {
     if (request.method === 'OPTIONS') return { status: 204, headers: cors(request), body: '' };
     if (url.includes('/refresh-token')) return answer(request, { access_token: 'access-1', refresh_token: 'refresh-1', refresh_transport: 'body', session_id: 'session-1' });
     if (url.includes('/get-user-info')) return answer(request, SESSION);
+    if (url.includes('/get-brand-list')) return answer(request, { rows: ROWS, stats: { active: 11, inactive: 1, products: 40, empty: 2 } }, { total: ROWS.length });
+    if (url.includes('/get-brand-details')) return answer(request, { details: { ...ROWS[1], origin_country: 'KR', created_by: 'owner@samiha.test' }, stats: { totalProducts: 12, activeProducts: 11, amountSpent: 48250, totalAvailableQuantity: 340, lowStockItems: 2, outOfStockItems: 1, averageProductPrice: 1250 }, activity: [] });
+    if (url.includes('/check-brand-availability')) return answer(request, { field: 'name', available: true });
     if (url.includes('/get-category-list')) {
         // Counted here the way the endpoint counts them, so the stat strip is photographed with real numbers.
         const stats = { active: ROWS.filter((r) => r.status === 'Active').length, inactive: ROWS.filter((r) => r.status === 'Inactive').length };
