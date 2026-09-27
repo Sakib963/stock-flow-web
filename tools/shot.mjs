@@ -53,7 +53,7 @@ const MENU = [
         isDisabled: false,
         disabledMessage: { en: null, bn: null },
         isNew: false,
-        children: [{ id: 'warehouses', label: { en: 'Warehouses', bn: 'ওয়্যারহাউজ' }, description: { en: null, bn: null }, tags: [], icon: 'lucideWarehouse', order: 6, route: '/app/configuration/warehouses', permission: 'configuration.warehouse.view', isDisabled: false, disabledMessage: { en: null, bn: null }, isNew: false, children: [] }, { id: 'suppliers', label: { en: 'Suppliers', bn: 'সাপ্লায়ার' }, description: { en: null, bn: null }, tags: [], icon: 'lucideFactory', order: 3, route: '/app/configuration/suppliers', permission: 'configuration.supplier.view', isDisabled: false, disabledMessage: { en: null, bn: null }, isNew: false, children: [] }, { id: 'brands', label: { en: 'Brands', bn: 'ব্র্যান্ড' }, description: { en: null, bn: null }, tags: [], icon: 'lucideTag', order: 2, route: '/app/configuration/brands', permission: 'configuration.brands.view', isDisabled: false, disabledMessage: { en: null, bn: null }, isNew: false, children: [] }, { id: 'categories', label: { en: 'Categories', bn: 'ক্যাটাগরি' }, description: { en: 'Create the product groups, like Saree or Cosmetics, that every product is filed under.', bn: 'পণ্যের গ্রুপ তৈরি করুন।' }, tags: [], icon: 'lucideFolderTree', order: 1, route: '/app/configuration/categories', permission: 'configuration.category.view', isDisabled: false, disabledMessage: { en: null, bn: null }, isNew: false, children: [] }],
+        children: [{ id: 'aisles', label: { en: 'Aisles / Zones', bn: 'আইল' }, description: { en: null, bn: null }, tags: [], icon: 'lucideRows3', order: 7, route: '/app/configuration/aisles', permission: 'configuration.aisle.view', isDisabled: false, disabledMessage: { en: null, bn: null }, isNew: false, children: [] }, { id: 'warehouses', label: { en: 'Warehouses', bn: 'ওয়্যারহাউজ' }, description: { en: null, bn: null }, tags: [], icon: 'lucideWarehouse', order: 6, route: '/app/configuration/warehouses', permission: 'configuration.warehouse.view', isDisabled: false, disabledMessage: { en: null, bn: null }, isNew: false, children: [] }, { id: 'suppliers', label: { en: 'Suppliers', bn: 'সাপ্লায়ার' }, description: { en: null, bn: null }, tags: [], icon: 'lucideFactory', order: 3, route: '/app/configuration/suppliers', permission: 'configuration.supplier.view', isDisabled: false, disabledMessage: { en: null, bn: null }, isNew: false, children: [] }, { id: 'brands', label: { en: 'Brands', bn: 'ব্র্যান্ড' }, description: { en: null, bn: null }, tags: [], icon: 'lucideTag', order: 2, route: '/app/configuration/brands', permission: 'configuration.brands.view', isDisabled: false, disabledMessage: { en: null, bn: null }, isNew: false, children: [] }, { id: 'categories', label: { en: 'Categories', bn: 'ক্যাটাগরি' }, description: { en: 'Create the product groups, like Saree or Cosmetics, that every product is filed under.', bn: 'পণ্যের গ্রুপ তৈরি করুন।' }, tags: [], icon: 'lucideFolderTree', order: 1, route: '/app/configuration/categories', permission: 'configuration.category.view', isDisabled: false, disabledMessage: { en: null, bn: null }, isNew: false, children: [] }],
     },
 ];
 
@@ -61,7 +61,7 @@ const SESSION = {
     version: '1',
     user: { name: 'Nazmus Sakib', email: 'owner@samiha.test', mobile_number: null, photo: null, designation: 'Owner', role: 'Owner' },
     business: { name: 'Samiha Style Studio', logoUrl: null, orderSystem: 'BOTH' },
-    permissions: ['dashboard.overview.view', 'configuration.category.view', 'configuration.category.create', 'configuration.category.edit', 'configuration.category.export', 'configuration.brands.view', 'configuration.brands.create', 'configuration.brands.edit', 'configuration.brands.export', 'configuration.supplier.view', 'configuration.supplier.create', 'configuration.supplier.edit', 'configuration.supplier.export', 'configuration.warehouse.view', 'configuration.warehouse.create', 'configuration.warehouse.edit', 'configuration.warehouse.export'],
+    permissions: ['dashboard.overview.view', 'configuration.category.view', 'configuration.category.create', 'configuration.category.edit', 'configuration.category.export', 'configuration.brands.view', 'configuration.brands.create', 'configuration.brands.edit', 'configuration.brands.export', 'configuration.supplier.view', 'configuration.supplier.create', 'configuration.supplier.edit', 'configuration.supplier.export', 'configuration.warehouse.view', 'configuration.warehouse.create', 'configuration.warehouse.edit', 'configuration.warehouse.export', 'configuration.aisle.view', 'configuration.aisle.create', 'configuration.aisle.edit', 'configuration.aisle.export'],
     menu: MENU,
     counters: { notifications: 0 },
 };
@@ -73,6 +73,13 @@ const WAREHOUSES = [
     ['Kanthasheelan', 'W-KANTHA', 'Mohammadpur, Dhaka', 85000],
     ['Nilanjana', 'W-NILANJ', null, null],
 ].map(([name, code, location, capacity_units], i) => ({ oid: 'wh-' + i, name, code, location, capacity_units, status: 'Active', created_on: '2026-01-17T10:00:00Z', last_action_on: '2026-01-17T10:00:00Z', last_action_by: 'owner@samiha.test', last_action_by_name: 'Nazmus Sakib', last_action_by_role: 'Owner', last_action_is_edit: true }));
+
+const AISLES = [
+    ['Alokdhara', 'A-ALOK', 'rack', 30000],
+    ['Chandrika', 'A-CHANDRIKA', 'shelf', 20000],
+    ['Jyotsna', 'A-JYOTSNA', 'other', 30000],
+    ['Test Aisle', 'TST', null, null],
+].map(([name, code, storage_type, capacity_units], i) => ({ oid: 'ai-' + i, name, code, warehouse_oid: 'wh-0', warehouse_name: 'Chandrabindu', storage_type, capacity_units, special_notes: null, status: 'Active', created_on: '2026-01-17T10:00:00Z', last_action_on: '2026-01-17T10:00:00Z', last_action_by: 'owner@samiha.test', last_action_by_name: 'Nazmus Sakib', last_action_by_role: 'Owner', last_action_is_edit: true }));
 
 const SUPPLIERS = [
     ['Bengal Traditional Garments Ltd.', 'Mahfuz Rahman', '01712345678', 'sales@bengalclothing.com'],
@@ -122,6 +129,20 @@ function handle(request) {
     if (request.method === 'OPTIONS') return { status: 204, headers: cors(request), body: '' };
     if (url.includes('/refresh-token')) return answer(request, { access_token: 'access-1', refresh_token: 'refresh-1', refresh_transport: 'body', session_id: 'session-1' });
     if (url.includes('/get-user-info')) return answer(request, SESSION);
+    if (url.includes('/get-warehouse-list-for-dropdown')) return answer(request, WAREHOUSES.map((w) => ({ value: w.oid, label: w.name })));
+    if (url.includes('/get-aisle-list')) return answer(request, { rows: AISLES, stats: { active: 4, inactive: 0, stocked: 3, empty: 1 } }, { total: AISLES.length });
+    if (url.includes('/get-aisle-details'))
+        return answer(request, {
+            details: { ...AISLES[1], special_notes: 'Ground floor, left of the door. Skincare only.', created_by: 'owner@samiha.test' },
+            stats: { products: 19, onHand: 1339, sellable: 1338, value: 535508, lowStock: 1, fullRate: 6.7 },
+            items: [
+                { product_oid: 'p1', name: 'Aloe Vera Face Wash', onHand: 34, sellable: 34, low: false },
+                { product_oid: 'p2', name: 'Aloe Vera Moisturizer', onHand: 83, sellable: 82, low: false },
+                { product_oid: 'p3', name: 'Rose Water Toner', onHand: 3, sellable: 3, low: true },
+            ],
+            activity: [],
+        });
+    if (url.includes('/check-aisle-availability')) return answer(request, { field: 'name', available: true });
     if (url.includes('/get-warehouse-list')) return answer(request, { rows: WAREHOUSES, stats: { active: 3, inactive: 0, stocked: 2, empty: 1 } }, { total: WAREHOUSES.length });
     if (url.includes('/get-warehouse-details'))
         return answer(request, {

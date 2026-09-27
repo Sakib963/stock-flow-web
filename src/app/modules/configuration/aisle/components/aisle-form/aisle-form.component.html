@@ -1,0 +1,139 @@
+<!-- Warehouse, name and code across; status, storage type and capacity under them; notes across the row. -->
+<form nz-form nzLayout="vertical" class="grid grid-cols-1 items-start gap-x-4 md:grid-cols-3" [id]="formId" [formGroup]="form" (ngSubmit)="submitted.emit()">
+    <nz-form-item>
+        <nz-form-label nzRequired nzFor="aisle-parent" [nzTooltipTitle]="'configuration.aisle.warehouseHelper' | translate">{{ 'configuration.aisle.warehouse' | translate }}</nz-form-label>
+        <nz-form-control [nzErrorTip]="parentError">
+            <!-- The footer under the options is how a missing warehouse gets added without leaving
+                 this form. It is absent for someone who may not add warehouses. -->
+            <nz-select nzId="aisle-parent" formControlName="warehouse_oid" nzShowSearch [nzLoading]="warehousesLoading()" [nzPlaceHolder]="'configuration.aisle.warehousePlaceholder' | translate" [nzNotFoundContent]="noWarehouse" [nzDropdownRender]="canAddWarehouse() ? addWarehouse : null" (nzOnSearch)="warehouseSearch.set($event)" [nzOpen]="parentOpen()" (nzOpenChange)="parentOpenChanged($event)">
+                @for (warehouse of warehouses(); track warehouse.value) {
+                    <nz-option [nzValue]="warehouse.value" [nzLabel]="warehouse.label | text" />
+                }
+            </nz-select>
+        </nz-form-control>
+        <span id="aisle-parent-help" class="sr-only">{{ 'configuration.aisle.warehouseHelper' | translate }}</span>
+        <ng-template #parentError let-control>
+            <span id="aisle-parent-error">
+                @if (control.hasError('inactive')) {
+                    {{ 'configuration.aisle.warehouseInactive' | translate }}
+                } @else {
+                    {{ 'form.required' | translate }}
+                }
+            </span>
+        </ng-template>
+        <ng-template #noWarehouse>
+            <p class="m-0 py-2 text-center text-xs text-ink-muted">
+                @if (warehousesFailed()) {
+                    {{ 'configuration.aisle.warehousesFailed' | translate }}
+                    <button nz-button nzType="link" nzSize="small" type="button" (click)="loadWarehouses()">{{ 'form.retry' | translate }}</button>
+                } @else if (warehouseSearch()) {
+                    {{ 'configuration.aisle.noWarehouseMatch' | translate }}
+                } @else {
+                    {{ 'configuration.aisle.noWarehouses' | translate }}
+                }
+            </p>
+        </ng-template>
+        <ng-template #addWarehouse>
+            <nz-divider class="my-1" />
+            <button nz-button nzType="link" nzBlock type="button" class="inline-flex items-center justify-start gap-1.5" (click)="openQuickAdd()" data-parent="add-warehouse">
+                <ng-icon name="lucidePlus" size="14px" aria-hidden="true" />
+                @if (warehouseSearch().trim()) {
+                    <span class="truncate">{{ 'configuration.aisle.addNamedWarehouse' | translate: { name: warehouseSearch().trim() } }}</span>
+                } @else {
+                    <span>{{ 'configuration.aisle.addWarehouse' | translate }}</span>
+                }
+            </button>
+        </ng-template>
+    </nz-form-item>
+
+    <nz-form-item>
+        <nz-form-label nzRequired nzFor="aisle-name" [nzTooltipTitle]="'configuration.aisle.nameHelper' | translate">{{ 'configuration.aisle.name' | translate }}</nz-form-label>
+        <nz-form-control nzHasFeedback [nzErrorTip]="nameError" [nzValidatingTip]="'form.checking' | translate">
+            <input nz-input id="aisle-name" formControlName="name" autocomplete="off" [attr.placeholder]="'configuration.aisle.namePlaceholder' | translate" [attr.aria-invalid]="invalid('name')" [attr.aria-describedby]="describedBy('name')" />
+        </nz-form-control>
+        <span id="aisle-name-help" class="sr-only">{{ 'configuration.aisle.nameHelper' | translate }}</span>
+        <ng-template #nameError let-control>
+            <span id="aisle-name-error">
+                @if (control.hasError('taken')) {
+                    {{ 'configuration.aisle.nameTaken' | translate }}
+                } @else if (control.hasError('required')) {
+                    {{ 'form.required' | translate }}
+                } @else if (control.hasError('maxlength')) {
+                    {{ 'form.tooLong' | translate: { max: 255 } | digits }}
+                }
+            </span>
+        </ng-template>
+    </nz-form-item>
+
+    <nz-form-item>
+        <nz-form-label nzRequired nzFor="aisle-code">{{ 'configuration.aisle.code' | translate }}</nz-form-label>
+        <nz-form-control nzHasFeedback [nzErrorTip]="codeError" [nzValidatingTip]="'form.checking' | translate" [nzExtra]="codeHelp">
+            <input nz-input id="aisle-code" class="font-mono uppercase" formControlName="code" autocomplete="off" [attr.placeholder]="'configuration.aisle.codePlaceholder' | translate" [attr.aria-invalid]="invalid('code')" [attr.aria-describedby]="describedBy('code')" />
+        </nz-form-control>
+        <ng-template #codeHelp>
+            <span id="aisle-code-help">{{ 'configuration.aisle.codeHelper' | translate }}</span>
+            <button nz-button nzType="link" nzSize="small" type="button" class="inline-flex items-center gap-1 px-1 align-baseline" (click)="generateCode()">
+                <ng-icon name="lucideSparkles" size="12px" aria-hidden="true" />
+                <span>{{ 'codeGenerator.hint' | translate }}</span>
+            </button>
+        </ng-template>
+        <ng-template #codeError let-control>
+            <span id="aisle-code-error">
+                @if (control.hasError('taken')) {
+                    {{ 'configuration.aisle.codeTaken' | translate }}
+                } @else if (control.hasError('required')) {
+                    {{ 'form.required' | translate }}
+                } @else if (control.hasError('maxlength')) {
+                    {{ 'form.tooLong' | translate: { max: 50 } | digits }}
+                }
+            </span>
+        </ng-template>
+    </nz-form-item>
+
+    <nz-form-item>
+        <nz-form-label nzRequired nzFor="aisle-status" [nzTooltipTitle]="'configuration.aisle.statusHelper' | translate">{{ 'configuration.aisle.status.label' | translate }}</nz-form-label>
+        <nz-form-control>
+            <nz-select nzId="aisle-status" formControlName="status" [nzPlaceHolder]="'configuration.aisle.statusPlaceholder' | translate">
+                <nz-option nzValue="Active" [nzLabel]="'configuration.aisle.status.active' | translate" />
+                <nz-option nzValue="Inactive" [nzLabel]="'configuration.aisle.status.inactive' | translate" />
+            </nz-select>
+        </nz-form-control>
+        <span id="aisle-status-help" class="sr-only">{{ 'configuration.aisle.statusHelper' | translate }}</span>
+    </nz-form-item>
+
+    <nz-form-item>
+        <nz-form-label nzFor="aisle-storage" [nzTooltipTitle]="'configuration.aisle.storageHelper' | translate">{{ 'configuration.aisle.storage' | translate }}</nz-form-label>
+        <nz-form-control>
+            <nz-select nzId="aisle-storage" formControlName="storage_type" nzAllowClear [nzPlaceHolder]="'configuration.aisle.storagePlaceholder' | translate">
+                @for (type of storageTypes; track type) {
+                    <nz-option [nzValue]="type" [nzLabel]="'configuration.aisle.storageType.' + type | translate" />
+                }
+            </nz-select>
+        </nz-form-control>
+        <span id="aisle-storage-help" class="sr-only">{{ 'configuration.aisle.storageHelper' | translate }}</span>
+    </nz-form-item>
+
+    <nz-form-item>
+        <nz-form-label nzFor="aisle-capacity" [nzTooltipTitle]="'configuration.aisle.capacityHelper' | translate">{{ 'configuration.aisle.capacity' | translate }}</nz-form-label>
+        <nz-form-control [nzErrorTip]="capacityError">
+            <input nz-input id="aisle-capacity" formControlName="capacity_units" type="number" min="1" step="1" inputmode="numeric" [attr.placeholder]="'configuration.aisle.capacityPlaceholder' | translate" [attr.aria-invalid]="invalid('capacity_units')" [attr.aria-describedby]="describedBy('capacity_units')" />
+        </nz-form-control>
+        <span id="aisle-capacity-help" class="sr-only">{{ 'configuration.aisle.capacityHelper' | translate }}</span>
+        <ng-template #capacityError
+            ><span id="aisle-capacity-error">{{ 'configuration.aisle.capacityInvalid' | translate }}</span></ng-template
+        >
+    </nz-form-item>
+
+    <nz-form-item class="md:col-span-3">
+        <nz-form-label nzFor="aisle-notes" [nzTooltipTitle]="'configuration.aisle.notesHelper' | translate">{{ 'configuration.aisle.notes' | translate }}</nz-form-label>
+        <nz-form-control [nzErrorTip]="notesError">
+            <textarea nz-input id="aisle-notes" formControlName="special_notes" rows="3" [attr.placeholder]="'configuration.aisle.notesPlaceholder' | translate" [attr.aria-invalid]="invalid('special_notes')" [attr.aria-describedby]="describedBy('special_notes')"></textarea>
+        </nz-form-control>
+        <span id="aisle-notes-help" class="sr-only">{{ 'configuration.aisle.notesHelper' | translate }}</span>
+        <ng-template #notesError
+            ><span id="aisle-notes-error">{{ 'form.tooLong' | translate: { max: 1000 } | digits }}</span></ng-template
+        >
+    </nz-form-item>
+</form>
+
+<warehouse-quick-add [startingName]="quickAddName()" (created)="warehouseAdded($event)" (closed)="quickAddName.set(null)" />

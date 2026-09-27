@@ -61,4 +61,14 @@ export class APIEndpoint {
     static readonly GENERATE_PRODUCT_LIST_REPORT_BY_WAREHOUSE = '/api/v1/configuration/warehouse/generate-product-list-report-by-warehouse';
     static readonly GENERATE_INVENTORY_REPORT_BY_WAREHOUSE = '/api/v1/configuration/warehouse/generate-inventory-report-by-warehouse';
     static readonly GET_WAREHOUSE_LIST_FOR_DROPDOWN = '/api/v1/configuration/warehouse/get-warehouse-list-for-dropdown';
+
+    static readonly GET_AISLE_LIST = '/api/v1/configuration/aisle/get-aisle-list';
+    static readonly GET_AISLE_DETAILS = '/api/v1/configuration/aisle/get-aisle-details';
+    static readonly CREATE_AISLE = '/api/v1/configuration/aisle/create-aisle';
+    static readonly UPDATE_AISLE_DETAILS = '/api/v1/configuration/aisle/update-aisle-details';
+    static readonly CHECK_AISLE_AVAILABILITY = '/api/v1/configuration/aisle/check-aisle-availability';
+    static readonly GENERATE_AISLE_CODE = '/api/v1/configuration/aisle/generate-aisle-code';
+    static readonly GENERATE_PRODUCT_LIST_REPORT_BY_AISLE = '/api/v1/configuration/aisle/generate-product-list-report-by-aisle';
+    static readonly GENERATE_INVENTORY_REPORT_BY_AISLE = '/api/v1/configuration/aisle/generate-inventory-report-by-aisle';
+    static readonly GET_AISLE_LIST_FOR_DROPDOWN = '/api/v1/configuration/aisle/get-aisle-list-for-dropdown';
 }

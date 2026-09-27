@@ -1,0 +1,5 @@
+<page-header [back]="back" [title]="'configuration.aisle.createTitle' | translate" [lead]="'configuration.aisle.formLead' | translate" />
+
+<form-page [formId]="editor()?.formId ?? ''" [saving]="saving()" [remaining]="editor()?.remaining() ?? 0" (cancel)="cancel()">
+    <aisle-form (submitted)="save()" />
+</form-page>

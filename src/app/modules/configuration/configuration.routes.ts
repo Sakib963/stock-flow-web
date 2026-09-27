@@ -7,6 +7,7 @@ import { SUB_CATEGORY_LIST } from '@app/modules/configuration/sub-category/confi
 import { BRAND_LIST } from '@app/modules/configuration/brand/config/brand-list.config';
 import { SUPPLIER_LIST } from '@app/modules/configuration/supplier/config/supplier-list.config';
 import { WAREHOUSE_LIST } from '@app/modules/configuration/warehouse/config/warehouse-list.config';
+import { AISLE_LIST } from '@app/modules/configuration/aisle/config/aisle-list.config';
 
 /** Everything under /app/configuration. Each URL is the route of its menu item. */
 export const CONFIGURATION_ROUTES: Routes = [
@@ -146,6 +147,32 @@ export const CONFIGURATION_ROUTES: Routes = [
                 canActivate: [permissionGuard],
                 data: { permission: WAREHOUSE_LIST.permission },
                 loadComponent: () => import('./warehouse/pages/warehouse-detail/warehouse-detail.component').then((m) => m.WarehouseDetailComponent),
+            },
+            {
+                path: 'aisles',
+                canActivate: [permissionGuard],
+                data: { permission: AISLE_LIST.permission },
+                loadComponent: () => import('./aisle/pages/aisle-list/aisle-list.component').then((m) => m.AisleListComponent),
+            },
+            {
+                path: 'aisles/new',
+                canActivate: [permissionGuard],
+                canDeactivate: [unsavedChangesGuard],
+                data: { permission: 'configuration.aisle.create' },
+                loadComponent: () => import('./aisle/pages/aisle-create/aisle-create.component').then((m) => m.AisleCreateComponent),
+            },
+            {
+                path: 'aisles/:oid/edit',
+                canActivate: [permissionGuard],
+                canDeactivate: [unsavedChangesGuard],
+                data: { permission: 'configuration.aisle.edit' },
+                loadComponent: () => import('./aisle/pages/aisle-edit/aisle-edit.component').then((m) => m.AisleEditComponent),
+            },
+            {
+                path: 'aisles/:oid',
+                canActivate: [permissionGuard],
+                data: { permission: AISLE_LIST.permission },
+                loadComponent: () => import('./aisle/pages/aisle-detail/aisle-detail.component').then((m) => m.AisleDetailComponent),
             },
         ],
     },

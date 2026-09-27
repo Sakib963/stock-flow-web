@@ -642,6 +642,133 @@
                 "body": "The changes show everywhere {{name}} appears, including on stock already kept there."
             }
         },
+        "aisle": {
+            "name": "Aisle",
+            "code": "Code",
+            "created": "Added",
+            "warehouse": "Warehouse",
+            "storage": "Storage type",
+            "capacity": "Capacity (units)",
+            "notes": "Notes",
+            "storageType": {
+                "shelf": "Shelf",
+                "rack": "Rack",
+                "cupboard": "Cupboard",
+                "box": "Box or bin",
+                "hanger": "Hanger",
+                "showcase": "Showcase",
+                "cold": "Cold storage",
+                "other": "Other"
+            },
+            "status": {
+                "label": "Status",
+                "active": "Active",
+                "inactive": "Inactive"
+            },
+            "emptyTitle": "No aisles yet",
+            "emptyBody": "Aisles are the shelves, racks and cupboards inside a warehouse, so anyone can be sent to the right place for a product.",
+            "add": "Add aisle",
+            "lastTouched": "Last updated by",
+            "lastTouchedOn": "Last updated",
+            "searchPlaceholder": "Search name, code or warehouse",
+            "view": "View",
+            "edit": "Edit",
+            "stat": {
+                "active": "Active aisles",
+                "inactive": "Inactive aisles",
+                "stocked": "Holding stock",
+                "empty": "Empty"
+            },
+            "createTitle": "Add aisle",
+            "editTitle": "Edit aisle",
+            "formLead": "A shelf, rack or cupboard inside a warehouse, so you know exactly where each product sits.",
+            "nameHelper": "What your staff call this shelf or rack.",
+            "namePlaceholder": "Name on the shelf label",
+            "codeHelper": "A short code for shelf labels. Use your own, or have one made for you.",
+            "codePlaceholder": "SHLF",
+            "warehouseHelper": "The warehouse this aisle is in. Not in the list? Add it from the bottom of the list without leaving this page.",
+            "warehousePlaceholder": "Pick a warehouse",
+            "warehouseInactive": "That warehouse has been turned off. Pick an active one.",
+            "moveWithStock": "Stock has been received into this aisle, so it cannot move to another warehouse. Add a new aisle there instead.",
+            "warehousesFailed": "Warehouses could not be loaded.",
+            "addNamedWarehouse": "Add \"{{name}}\" as a warehouse",
+            "addWarehouse": "Can't find it? Add a warehouse",
+            "noWarehouseMatch": "No warehouse by that name.",
+            "noWarehouses": "No warehouses yet. Add the first one below.",
+            "quickAdd": {
+                "title": "Add warehouse",
+                "lead": "It is added to your warehouses and picked for this aisle. What you typed on the page stays as it is."
+            },
+            "storageHelper": "Optional. What kind of place this is.",
+            "storagePlaceholder": "Pick a type",
+            "capacityHelper": "Optional. Roughly how many units fit, so the page can say how full it is.",
+            "capacityPlaceholder": "Number of units",
+            "capacityInvalid": "Enter a whole number of units, more than zero.",
+            "notesHelper": "Optional. Anything a new staff member should know, like which floor or which side.",
+            "notesPlaceholder": "Where it is, what goes on it",
+            "statusHelper": "Inactive keeps the aisle and its history, and stops it being offered for new stock.",
+            "statusPlaceholder": "Pick a status",
+            "nameTaken": "This warehouse already has an aisle with this name.",
+            "codeTaken": "Another aisle already has this code.",
+            "updated": "Aisle saved.",
+            "createdMessage": "Aisle added.",
+            "loadFailed": {
+                "network": "Could not reach the server. Check your connection and try again.",
+                "forbidden": "You do not have permission to see this aisle.",
+                "server": "This aisle could not be loaded. Try again in a moment."
+            },
+            "backToList": "Back to aisles",
+            "notSet": "Not set",
+            "noCapacity": "No capacity set",
+            "activity": "Recent activity",
+            "noActivity": "Nothing has happened to this aisle yet.",
+            "detailStat": {
+                "products": "Products here",
+                "onHand": "Units on hand",
+                "sellable": "{{count}} can be sold",
+                "value": "Stock value at cost",
+                "lowStock": "Low on stock",
+                "full": "How full"
+            },
+            "items": {
+                "title": "On this aisle",
+                "product": "Product",
+                "onHand": "On hand",
+                "sellable": "Can be sold",
+                "low": "Low",
+                "empty": "Nothing is kept on this aisle yet."
+            },
+            "report": {
+                "products": "Export products to Excel",
+                "inventory": "Download inventory report",
+                "empty": "There is nothing on this aisle to report on yet.",
+                "failed": {
+                    "network": "The report could not be downloaded. Check your connection and try again.",
+                    "forbidden": "You do not have access to download this report.",
+                    "server": "The report could not be built just now. Try again in a moment."
+                }
+            },
+            "detailTitle": "Aisle details",
+            "detailLead": "What is kept on it, what it is worth, and what is running low.",
+            "section": {
+                "details": "Details"
+            },
+            "quickActions": "Quick actions",
+            "quick": {
+                "products": "View all products",
+                "lowStock": "View low stock products",
+                "analytics": "View analytics",
+                "notReady": "Products and analytics open from here once those pages are part of the app."
+            },
+            "confirmCreate": {
+                "title": "Add this aisle?",
+                "body": "{{name}} ({{code}}) will be added to your aisles."
+            },
+            "confirmEdit": {
+                "title": "Save changes to this aisle?",
+                "body": "The changes show everywhere {{name}} appears, including on stock already kept there."
+            }
+        },
         "subCategory": {
             "code": "Code",
             "name": "Sub-category",
