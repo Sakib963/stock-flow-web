@@ -8,6 +8,7 @@ import { BRAND_LIST } from '@app/modules/configuration/brand/config/brand-list.c
 import { SUPPLIER_LIST } from '@app/modules/configuration/supplier/config/supplier-list.config';
 import { WAREHOUSE_LIST } from '@app/modules/configuration/warehouse/config/warehouse-list.config';
 import { AISLE_LIST } from '@app/modules/configuration/aisle/config/aisle-list.config';
+import { PRODUCT_LIST } from '@app/modules/configuration/product/config/product-list.config';
 
 /** Everything under /app/configuration. Each URL is the route of its menu item. */
 export const CONFIGURATION_ROUTES: Routes = [
@@ -17,6 +18,32 @@ export const CONFIGURATION_ROUTES: Routes = [
         path: '',
         providers: [...OVERLAY_PROVIDERS],
         children: [
+            {
+                path: 'products',
+                canActivate: [permissionGuard],
+                data: { permission: PRODUCT_LIST.permission },
+                loadComponent: () => import('./product/pages/product-list/product-list.component').then((m) => m.ProductListComponent),
+            },
+            {
+                path: 'products/new',
+                canActivate: [permissionGuard],
+                canDeactivate: [unsavedChangesGuard],
+                data: { permission: 'configuration.product.create' },
+                loadComponent: () => import('./product/pages/product-create/product-create.component').then((m) => m.ProductCreateComponent),
+            },
+            {
+                path: 'products/:oid/edit',
+                canActivate: [permissionGuard],
+                canDeactivate: [unsavedChangesGuard],
+                data: { permission: 'configuration.product.edit' },
+                loadComponent: () => import('./product/pages/product-edit/product-edit.component').then((m) => m.ProductEditComponent),
+            },
+            {
+                path: 'products/:oid',
+                canActivate: [permissionGuard],
+                data: { permission: PRODUCT_LIST.permission },
+                loadComponent: () => import('./product/pages/product-detail/product-detail.component').then((m) => m.ProductDetailComponent),
+            },
             {
                 path: 'categories',
                 canActivate: [permissionGuard],

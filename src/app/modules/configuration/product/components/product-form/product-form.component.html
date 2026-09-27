@@ -1,0 +1,155 @@
+<!-- The photo takes the first column and the fields fill the other two beside it; on a phone the photo
+     comes first, then the fields. The photo is optional, so nothing here waits for it. -->
+<form nz-form nzLayout="vertical" class="grid grid-cols-1 items-start gap-x-4 md:grid-cols-3" [id]="formId" [formGroup]="form" (ngSubmit)="submitted.emit()">
+    <nz-form-item class="md:row-span-5">
+        <nz-form-label [nzTooltipTitle]="'configuration.product.photo.helper' | translate">{{ 'configuration.product.photo.label' | translate }}</nz-form-label>
+        <nz-form-control [nzErrorTip]="'configuration.product.photo.stillUploading' | translate" [nzValidateStatus]="form.controls.photo">
+            <product-photo [url]="form.controls.photo.value" (changed)="photoChanged($event)" (busy)="photoBusyChanged($event)" />
+        </nz-form-control>
+    </nz-form-item>
+
+    <nz-form-item>
+        <nz-form-label nzRequired nzFor="product-name" [nzTooltipTitle]="'configuration.product.nameHelper' | translate">{{ 'configuration.product.name' | translate }}</nz-form-label>
+        <nz-form-control [nzErrorTip]="nameError">
+            <input nz-input id="product-name" formControlName="name" autocomplete="off" [attr.placeholder]="'configuration.product.namePlaceholder' | translate" [attr.aria-invalid]="invalid('name')" [attr.aria-describedby]="describedBy('name')" />
+        </nz-form-control>
+        <span id="product-name-help" class="sr-only">{{ 'configuration.product.nameHelper' | translate }}</span>
+        <ng-template #nameError let-control>
+            <span id="product-name-error">
+                @if (control.hasError('required')) {
+                    {{ 'form.required' | translate }}
+                } @else if (control.hasError('maxlength')) {
+                    {{ 'form.tooLong' | translate: { max: 255 } | digits }}
+                }
+            </span>
+        </ng-template>
+    </nz-form-item>
+
+    <nz-form-item>
+        <nz-form-label nzFor="product-sku">{{ 'configuration.product.sku' | translate }}</nz-form-label>
+        <nz-form-control nzHasFeedback [nzErrorTip]="skuError" [nzValidatingTip]="'form.checking' | translate" [nzExtra]="skuHelp">
+            <input nz-input id="product-sku" class="font-mono uppercase placeholder:font-sans placeholder:normal-case" formControlName="sku" autocomplete="off" [attr.placeholder]="'configuration.product.skuPlaceholder' | translate" [attr.aria-invalid]="invalid('sku')" [attr.aria-describedby]="describedBy('sku')" />
+        </nz-form-control>
+        <!-- Visible, because it carries the generator and says what a blank field does. -->
+        <ng-template #skuHelp>
+            <span id="product-sku-help">{{ 'configuration.product.skuHelper' | translate }}</span>
+            <button nz-button nzType="link" nzSize="small" type="button" class="inline-flex items-center gap-1 px-1 align-baseline" (click)="generateSku()">
+                <ng-icon name="lucideSparkles" size="12px" aria-hidden="true" />
+                <span>{{ 'codeGenerator.hint' | translate }}</span>
+            </button>
+        </ng-template>
+        <ng-template #skuError let-control>
+            <span id="product-sku-error">
+                @if (control.hasError('taken')) {
+                    {{ 'configuration.product.skuTaken' | translate }}
+                } @else if (control.hasError('pattern')) {
+                    {{ 'configuration.product.skuInvalid' | translate }}
+                } @else if (control.hasError('maxlength')) {
+                    {{ 'form.tooLong' | translate: { max: 64 } | digits }}
+                }
+            </span>
+        </ng-template>
+    </nz-form-item>
+
+    <nz-form-item>
+        <nz-form-label nzRequired nzFor="product-sub-category" [nzTooltipTitle]="'configuration.product.subCategoryHelper' | translate">{{ 'configuration.product.subCategory' | translate }}</nz-form-label>
+        <nz-form-control [nzErrorTip]="subCategoryError">
+            <nz-select nzId="product-sub-category" formControlName="sub_category_oid" nzShowSearch [nzLoading]="pickersLoading()" [nzPlaceHolder]="'configuration.product.subCategoryPlaceholder' | translate" [nzNotFoundContent]="noChoices">
+                @for (group of subCategoryGroups(); track group.label) {
+                    <nz-option-group [nzLabel]="group.label | text">
+                        @for (choice of group.options; track choice.value) {
+                            <nz-option [nzValue]="choice.value" [nzLabel]="choice.label | text" />
+                        }
+                    </nz-option-group>
+                }
+            </nz-select>
+        </nz-form-control>
+        <span id="product-sub-category-help" class="sr-only">{{ 'configuration.product.subCategoryHelper' | translate }}</span>
+        <ng-template #subCategoryError let-control>
+            <span id="product-sub-category-error">
+                @if (control.hasError('inactive')) {
+                    {{ 'configuration.product.subCategoryInactive' | translate }}
+                } @else {
+                    {{ 'form.required' | translate }}
+                }
+            </span>
+        </ng-template>
+    </nz-form-item>
+
+    <nz-form-item>
+        <nz-form-label nzFor="product-brand" [nzTooltipTitle]="'configuration.product.brandHelper' | translate">{{ 'configuration.product.brand' | translate }}</nz-form-label>
+        <nz-form-control [nzErrorTip]="brandError">
+            <nz-select nzId="product-brand" formControlName="brand_oid" nzShowSearch nzAllowClear [nzLoading]="pickersLoading()" [nzPlaceHolder]="'configuration.product.brandPlaceholder' | translate" [nzNotFoundContent]="noChoices">
+                @for (brand of brands(); track brand.value) {
+                    <nz-option [nzValue]="brand.value" [nzLabel]="brand.label | text" />
+                }
+            </nz-select>
+        </nz-form-control>
+        <span id="product-brand-help" class="sr-only">{{ 'configuration.product.brandHelper' | translate }}</span>
+        <ng-template #brandError
+            ><span id="product-brand-error">{{ 'configuration.product.brandInactive' | translate }}</span></ng-template
+        >
+    </nz-form-item>
+
+    <nz-form-item>
+        <nz-form-label nzFor="product-unit" [nzTooltipTitle]="'configuration.product.unitHelper' | translate">{{ 'configuration.product.unit.label' | translate }}</nz-form-label>
+        <nz-form-control>
+            <nz-select nzId="product-unit" formControlName="unit_type" nzAllowClear [nzPlaceHolder]="'configuration.product.unitPlaceholder' | translate">
+                @for (unit of units; track unit) {
+                    <nz-option [nzValue]="unit" [nzLabel]="'configuration.product.unit.' + unit | translate" />
+                }
+            </nz-select>
+        </nz-form-control>
+        <span id="product-unit-help" class="sr-only">{{ 'configuration.product.unitHelper' | translate }}</span>
+    </nz-form-item>
+
+    <nz-form-item>
+        <nz-form-label nzRequired nzFor="product-restock" [nzTooltipTitle]="'configuration.product.restockHelper' | translate">{{ 'configuration.product.restock' | translate }}</nz-form-label>
+        <nz-form-control [nzErrorTip]="restockError">
+            <input nz-input id="product-restock" formControlName="restock_threshold" type="number" min="0" max="9999" step="1" inputmode="numeric" [attr.aria-invalid]="invalid('restock_threshold')" [attr.aria-describedby]="describedBy('restock_threshold')" />
+        </nz-form-control>
+        <span id="product-restock-help" class="sr-only">{{ 'configuration.product.restockHelper' | translate }}</span>
+        <ng-template #restockError let-control>
+            <span id="product-restock-error">
+                @if (control.hasError('required')) {
+                    {{ 'form.required' | translate }}
+                } @else {
+                    {{ 'configuration.product.restockInvalid' | translate: { max: 9999 } | digits }}
+                }
+            </span>
+        </ng-template>
+    </nz-form-item>
+
+    <nz-form-item>
+        <nz-form-label nzRequired nzFor="product-status" [nzTooltipTitle]="'configuration.product.statusHelper' | translate">{{ 'configuration.product.status.label' | translate }}</nz-form-label>
+        <nz-form-control>
+            <nz-select nzId="product-status" formControlName="status" [nzPlaceHolder]="'configuration.product.statusPlaceholder' | translate">
+                <nz-option nzValue="Active" [nzLabel]="'configuration.product.status.active' | translate" />
+                <nz-option nzValue="Inactive" [nzLabel]="'configuration.product.status.inactive' | translate" />
+            </nz-select>
+        </nz-form-control>
+        <span id="product-status-help" class="sr-only">{{ 'configuration.product.statusHelper' | translate }}</span>
+    </nz-form-item>
+
+    <nz-form-item class="md:col-span-2">
+        <nz-form-label nzFor="product-description" [nzTooltipTitle]="'configuration.product.descriptionHelper' | translate">{{ 'configuration.product.description' | translate }}</nz-form-label>
+        <nz-form-control [nzErrorTip]="descriptionError">
+            <textarea nz-input id="product-description" formControlName="description" rows="3" [attr.placeholder]="'configuration.product.descriptionPlaceholder' | translate" [attr.aria-invalid]="invalid('description')" [attr.aria-describedby]="describedBy('description')"></textarea>
+        </nz-form-control>
+        <span id="product-description-help" class="sr-only">{{ 'configuration.product.descriptionHelper' | translate }}</span>
+        <ng-template #descriptionError
+            ><span id="product-description-error">{{ 'form.tooLong' | translate: { max: 1000 } | digits }}</span></ng-template
+        >
+    </nz-form-item>
+</form>
+
+<ng-template #noChoices>
+    <p class="m-0 py-2 text-center text-xs text-ink-muted">
+        @if (pickersFailed()) {
+            {{ 'configuration.product.pickersFailed' | translate }}
+            <button nz-button nzType="link" nzSize="small" type="button" (click)="loadPickers()">{{ 'form.retry' | translate }}</button>
+        } @else {
+            {{ 'configuration.product.noMatch' | translate }}
+        }
+    </p>
+</ng-template>

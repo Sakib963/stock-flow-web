@@ -261,6 +261,13 @@ body.lang-bn {
     align-items: center;
 }
 
+/* The image preview centres its picture as an inline-block beside a 50% tall ::before strut.
+   Tailwind's preflight makes every img a block, which drops the picture under the strut, so a
+   zoomed product photo landed small in the bottom left corner. */
+.ant-image-preview-img {
+    display: inline-block;
+}
+
 /* Lists, from the records handoff. A skeleton bar the height of a line of 13px text, so skeleton rows are exactly as tall as real ones. */
 .sf-cell-skeleton .ant-skeleton-title {
     height: 12px;

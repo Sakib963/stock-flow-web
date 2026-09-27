@@ -1,0 +1,283 @@
+<page-header [back]="back" [title]="'configuration.product.detailTitle' | translate" [lead]="'configuration.product.detailLead' | translate">
+    @if (canDelete()) {
+        <!-- Disabled with its reason when the page already shows what the server would refuse. The span
+             carries the tooltip, because a disabled button fires no pointer events. -->
+        <span class="inline-flex" nz-tooltip [nzTooltipTitle]="deleteBlockedBy() ? ('configuration.product.deleteDisabled.' + deleteBlockedBy() | translate) : null">
+            <button nz-button nzDanger type="button" class="inline-flex items-center gap-1.5" [nzLoading]="deleting()" [disabled]="!!deleteBlockedBy()" (click)="remove()">
+                @if (!deleting()) {
+                    <ng-icon name="lucideTrash2" size="14px" aria-hidden="true" />
+                }
+                <span>{{ 'configuration.product.delete' | translate }}</span>
+            </button>
+        </span>
+    }
+    @if (canEdit()) {
+        <button nz-button nzType="primary" type="button" class="inline-flex items-center gap-1.5" (click)="edit()">
+            <ng-icon name="lucidePencil" size="14px" aria-hidden="true" />
+            <span>{{ 'configuration.product.edit' | translate }}</span>
+        </button>
+    }
+</page-header>
+
+@if (failed(); as failure) {
+    <div class="sf-empty" role="alert">
+        <p class="m-0 text-sm text-ink-body">{{ 'configuration.product.loadFailed.' + failure | translate }}</p>
+        <div class="mt-3 flex items-center justify-center gap-2">
+            <button nz-button nzType="default" type="button" class="inline-flex items-center gap-1.5" (click)="backToList()">
+                <ng-icon name="lucideArrowLeft" size="14px" aria-hidden="true" />
+                <span>{{ 'configuration.product.backToList' | translate }}</span>
+            </button>
+            <button nz-button nzType="primary" type="button" class="inline-flex items-center gap-1.5" (click)="load()">
+                <ng-icon name="lucideRotateCw" size="14px" aria-hidden="true" />
+                <span>{{ 'form.retry' | translate }}</span>
+            </button>
+        </div>
+    </div>
+} @else {
+    @if (loading()) {
+        <span class="sr-only" role="status">{{ 'form.loading' | translate }}</span>
+    }
+
+    <nz-card [nzTitle]="detailsTitle" data-detail="details">
+        <ng-template #detailsTitle
+            ><h2 class="m-0 flex items-center gap-1.5 text-sm font-bold text-ink"><ng-icon name="lucideInfo" size="14px" class="text-ink-muted" aria-hidden="true" />{{ 'configuration.product.section.details' | translate }}</h2></ng-template
+        >
+        @if (product(); as details) {
+            <div class="flex flex-col gap-5 sm:flex-row">
+                <!-- A fixed square, the photo contained: nothing is cropped and the card never jumps. -->
+                <div class="aspect-square w-full max-w-60 flex-none overflow-hidden rounded-container border border-line bg-line-soft sm:w-44" data-detail="photo">
+                    @if (photoCard(); as src) {
+                        <img nz-image [nzSrc]="src" [alt]="details.name" class="size-full cursor-zoom-in object-contain" />
+                    } @else {
+                        <div class="flex size-full flex-col items-center justify-center gap-1 text-ink-muted">
+                            <ng-icon name="lucideImageOff" size="24px" aria-hidden="true" />
+                            <span class="text-xs">{{ 'configuration.product.noPhoto' | translate }}</span>
+                            @if (canEdit()) {
+                                <button nz-button nzType="link" nzSize="small" type="button" (click)="edit()">{{ 'configuration.product.addPhoto' | translate }}</button>
+                            }
+                        </div>
+                    }
+                </div>
+
+                <dl class="m-0 grid min-w-0 flex-1 grid-cols-2 gap-x-6 gap-y-4 md:grid-cols-3">
+                    <div class="col-span-2 md:col-span-1">
+                        <dt class="text-xs text-ink-muted">{{ 'configuration.product.name' | translate }}</dt>
+                        <dd class="mt-1 mb-0 text-sm font-semibold text-ink">{{ details.name }}</dd>
+                    </div>
+                    <div>
+                        <dt class="text-xs text-ink-muted">{{ 'configuration.product.sku' | translate }}</dt>
+                        <dd class="mt-1 mb-0 font-mono text-sm font-semibold text-ink">{{ details.sku || ('configuration.product.notSet' | translate) }}</dd>
+                    </div>
+                    <div>
+                        <dt class="text-xs text-ink-muted">{{ 'configuration.product.status.label' | translate }}</dt>
+                        <dd class="mt-1 mb-0">
+                            @if (tone(); as style) {
+                                <status-tag [label]="style.label" [tone]="style.tone" [icon]="style.icon" size="standard" />
+                            }
+                        </dd>
+                    </div>
+                    <div>
+                        <dt class="text-xs text-ink-muted">{{ 'configuration.product.category' | translate }}</dt>
+                        <dd class="mt-1 mb-0 text-sm font-semibold text-ink" data-detail="category">
+                            @if (canViewCategory() && details.category_oid) {
+                                <a class="text-primary hover:underline" [routerLink]="categoryRoute(details.category_oid)">{{ details.category_name }}</a>
+                            } @else {
+                                {{ details.category_name }}
+                            }
+                            &rsaquo;
+                            @if (canViewSubCategory() && details.sub_category_oid) {
+                                <a class="text-primary hover:underline" [routerLink]="subCategoryRoute(details.sub_category_oid)">{{ details.sub_category_name }}</a>
+                            } @else {
+                                {{ details.sub_category_name }}
+                            }
+                        </dd>
+                    </div>
+                    <div>
+                        <dt class="text-xs text-ink-muted">{{ 'configuration.product.brand' | translate }}</dt>
+                        <dd class="mt-1 mb-0 text-sm font-semibold text-ink">{{ details.brand_name || ('configuration.product.notSet' | translate) }}</dd>
+                    </div>
+                    <div>
+                        <dt class="text-xs text-ink-muted">{{ 'configuration.product.unit.label' | translate }}</dt>
+                        <dd class="mt-1 mb-0 text-sm font-semibold text-ink">
+                            @if (details.unit_type) {
+                                {{ 'configuration.product.unit.' + details.unit_type | translate }}
+                            } @else {
+                                {{ 'configuration.product.notSet' | translate }}
+                            }
+                        </dd>
+                    </div>
+                    <div>
+                        <dt class="text-xs text-ink-muted">{{ 'configuration.product.restock' | translate }}</dt>
+                        <dd class="mt-1 mb-0 font-mono text-sm font-semibold text-ink tabular-nums">
+                            @if (details.restock_threshold) {
+                                {{ details.restock_threshold | money: 'number' }}
+                            } @else {
+                                <span class="font-sans">{{ 'configuration.product.noRestockWarning' | translate }}</span>
+                            }
+                        </dd>
+                    </div>
+                    <div>
+                        <dt class="text-xs text-ink-muted">{{ 'configuration.product.lastSold' | translate }}</dt>
+                        <dd class="mt-1 mb-0 text-sm font-semibold text-ink">
+                            @if (record(); as loaded) {
+                                @if (loaded.lifetime.last_sold_on) {
+                                    {{ loaded.lifetime.last_sold_on | recordDate: language() : 'date' }}
+                                } @else {
+                                    {{ 'configuration.product.neverSold' | translate }}
+                                }
+                            } @else {
+                                <span class="inline-block h-4 w-20 animate-pulse rounded bg-line-soft align-middle motion-reduce:animate-none" aria-hidden="true"></span>
+                            }
+                        </dd>
+                    </div>
+                    <div>
+                        <dt class="text-xs text-ink-muted">{{ 'configuration.product.lastTouchedOn' | translate }}</dt>
+                        <dd class="mt-1 mb-0 text-sm font-semibold text-ink">
+                            @if (details.last_action_on) {
+                                {{ details.last_action_on | recordDate: language() : 'date' }}
+                            } @else {
+                                {{ 'configuration.product.notSet' | translate }}
+                            }
+                        </dd>
+                        <dd class="mt-0.5 mb-0 text-xs text-ink-muted">{{ details.last_action_by || ('configuration.product.notSet' | translate) }}</dd>
+                    </div>
+                    <div class="col-span-2 border-t border-line-soft pt-4 md:col-span-3" data-detail="description">
+                        <dt class="text-xs text-ink-muted">{{ 'configuration.product.description' | translate }}</dt>
+                        <dd class="mt-1 mb-0">
+                            @if (details.description) {
+                                <p class="m-0 max-w-[75ch] text-sm leading-relaxed whitespace-pre-line text-ink-body">{{ details.description }}</p>
+                            } @else {
+                                <span class="text-sm text-ink-muted">{{ 'configuration.product.noDescription' | translate }}</span>
+                            }
+                        </dd>
+                    </div>
+                </dl>
+            </div>
+        } @else {
+            <nz-skeleton nzActive [nzTitle]="false" [nzParagraph]="{ rows: 5 }" />
+        }
+    </nz-card>
+
+    <div class="mt-2 grid grid-cols-2 gap-px overflow-hidden rounded-container border border-line bg-line md:mt-4 md:grid-cols-3 xl:grid-cols-6" data-detail="stats">
+        @for (stat of stats(); track stat.key) {
+            <div class="flex flex-col justify-between bg-white px-4 py-3">
+                <p class="m-0 flex items-center gap-1.5 text-xs font-semibold text-ink-muted">
+                    <ng-icon [name]="stat.icon" size="13px" aria-hidden="true" />
+                    {{ stat.label | translate }}
+                </p>
+                <p class="mt-1 mb-0 font-mono text-xl font-bold tabular-nums" [class.text-danger-ink]="stat.key === 'sellable' && stockState() === 'out'" [class.text-warning-ink]="stat.key === 'sellable' && stockState() === 'low'" [class.text-ink]="stat.key !== 'sellable' || !stockState()">
+                    {{ stat.value | money: 'number' }}
+                </p>
+                @if (stat.key === 'sellable' && stockState(); as state) {
+                    <p class="m-0 text-[11px]" [class.text-danger-ink]="state === 'out'" [class.text-warning-ink]="state === 'low'">{{ 'configuration.product.stockState.' + state | translate }}</p>
+                }
+            </div>
+        } @empty {
+            @for (cell of [1, 2, 3, 4, 5, 6]; track cell) {
+                <div class="bg-white px-4 py-3">
+                    <nz-skeleton nzActive [nzTitle]="false" [nzParagraph]="{ rows: 2 }" />
+                </div>
+            }
+        }
+    </div>
+
+    <nz-card class="mt-2 md:mt-4" [nzTitle]="batchesTitle" data-detail="batches">
+        <ng-template #batchesTitle
+            ><h2 class="m-0 flex items-center gap-1.5 text-sm font-bold text-ink"><ng-icon name="lucideBoxes" size="14px" class="text-ink-muted" aria-hidden="true" />{{ 'configuration.product.section.batches' | translate }}</h2></ng-template
+        >
+        @if (record(); as loaded) {
+            @if (loaded.stock.batches.length) {
+                <!-- Oldest first, the order stock leaves in. Scrolls inside the card on a phone. -->
+                <nz-table #batches [nzData]="loaded.stock.batches" [nzShowPagination]="false" [nzFrontPagination]="false" nzSize="small" [nzScroll]="{ x: '720px' }">
+                    <thead>
+                        <tr>
+                            <th>{{ 'configuration.product.batch.code' | translate }}</th>
+                            <th>{{ 'configuration.product.batch.warehouse' | translate }}</th>
+                            <th>{{ 'configuration.product.batch.received' | translate }}</th>
+                            <th nzAlign="right">{{ 'configuration.product.batch.onHand' | translate }}</th>
+                            <th nzAlign="right">{{ 'configuration.product.batch.held' | translate }}</th>
+                            <th nzAlign="right">{{ 'configuration.product.batch.sellable' | translate }}</th>
+                            <th nzAlign="right">{{ 'configuration.product.batch.cost' | translate }}</th>
+                            <th nzAlign="right">{{ 'configuration.product.batch.price' | translate }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (batch of batches.data; track batch.oid) {
+                            <tr>
+                                <td class="font-mono text-xs">
+                                    <span class="inline-flex items-center whitespace-nowrap" [copyable]="batch.batch_code">{{ batch.batch_code }}</span>
+                                </td>
+                                <td>{{ batch.warehouse_name || ('configuration.product.notSet' | translate) }}</td>
+                                <td>{{ batch.received_on | recordDate: language() : 'date' }}</td>
+                                <td nzAlign="right" class="font-mono tabular-nums">{{ batch.on_hand | money: 'number' }}</td>
+                                <td nzAlign="right" class="font-mono tabular-nums">{{ batch.held | money: 'number' }}</td>
+                                <td nzAlign="right" class="font-mono font-semibold tabular-nums">{{ batch.sellable | money: 'number' }}</td>
+                                <td nzAlign="right" class="font-mono tabular-nums">{{ batch.cost_price | money }}</td>
+                                <td nzAlign="right" class="font-mono tabular-nums">
+                                    @if (batch.selling_price !== null) {
+                                        {{ batch.selling_price | money }}
+                                    } @else {
+                                        <span class="font-sans text-xs text-ink-muted">{{ 'configuration.product.batch.noPrice' | translate }}</span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </nz-table>
+            } @else {
+                <p class="m-0 text-xs text-ink-muted">{{ 'configuration.product.batch.none' | translate }}</p>
+            }
+        } @else {
+            <nz-skeleton nzActive [nzTitle]="false" [nzParagraph]="{ rows: 3 }" />
+        }
+    </nz-card>
+
+    <div class="mt-2 grid grid-cols-1 items-start gap-2 md:mt-4 md:gap-4 lg:grid-cols-3">
+        <nz-card class="lg:col-start-3 lg:row-start-1" [nzTitle]="quickTitle" data-detail="quick-actions">
+            <ng-template #quickTitle
+                ><h2 class="m-0 flex items-center gap-1.5 text-sm font-bold text-ink"><ng-icon name="lucideZap" size="14px" class="text-ink-muted" aria-hidden="true" />{{ 'configuration.product.quickActions' | translate }}</h2></ng-template
+            >
+            <div class="flex flex-col gap-2">
+                @for (action of comingActions; track action.key) {
+                    <button nz-button nzBlock type="button" class="inline-flex items-center justify-start gap-2" disabled [attr.data-quick]="action.key" aria-describedby="product-quick-reason">
+                        <ng-icon [name]="action.icon" size="14px" aria-hidden="true" />
+                        <span>{{ action.label | translate }}</span>
+                    </button>
+                }
+                <p id="product-quick-reason" class="m-0 text-xs text-ink-muted">{{ 'configuration.product.quick.notReady' | translate }}</p>
+            </div>
+        </nz-card>
+
+        <nz-card class="lg:col-span-2 lg:row-start-1" [nzTitle]="activityTitle" data-detail="activity">
+            <ng-template #activityTitle
+                ><h2 class="m-0 flex items-center gap-1.5 text-sm font-bold text-ink"><ng-icon name="lucideHistory" size="14px" class="text-ink-muted" aria-hidden="true" />{{ 'configuration.product.activity' | translate }}</h2></ng-template
+            >
+            @if (record(); as loaded) {
+                @if (loaded.activity.length) {
+                    <nz-timeline>
+                        @for (entry of loaded.activity; track entry.oid; let first = $first) {
+                            <nz-timeline-item [nzColor]="first ? 'blue' : 'gray'">
+                                <p class="m-0 text-[13px] font-semibold text-ink">{{ entry.action }}</p>
+                                @if (entry.description) {
+                                    <p class="mt-0.5 mb-0 text-xs break-words text-ink-body">{{ entry.description }}</p>
+                                }
+                                <p class="mt-0.5 mb-0 text-xs text-ink-muted">{{ entry.user }} &middot; {{ entry.date | recordDate: language() : 'date-time-12' }}</p>
+                            </nz-timeline-item>
+                        }
+                    </nz-timeline>
+                } @else {
+                    <p class="m-0 text-xs text-ink-muted">{{ 'configuration.product.noActivity' | translate }}</p>
+                }
+            } @else {
+                <nz-skeleton nzActive [nzTitle]="false" [nzParagraph]="{ rows: 4 }" />
+            }
+        </nz-card>
+    </div>
+
+    <action-footer>
+        <button nz-button nzType="default" type="button" class="inline-flex items-center gap-1.5" (click)="backToList()">
+            <ng-icon name="lucideArrowLeft" size="14px" aria-hidden="true" />
+            <span>{{ 'configuration.product.backToList' | translate }}</span>
+        </button>
+    </action-footer>
+}

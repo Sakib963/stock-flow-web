@@ -1,0 +1,38 @@
+<!-- A file picker closed without choosing fires a native `cancel` that bubbles. The form page has an
+     output of the same name, and Angular hears the DOM event on it too, so cancelling the picker left
+     the form. It stops here. -->
+<div class="flex w-full max-w-60 flex-col gap-2 md:max-w-none" (cancel)="$event.stopPropagation()">
+    @if (shown(); as src) {
+        <div class="relative aspect-square w-full overflow-hidden rounded-container border border-line bg-line-soft" data-photo="filled">
+            <!-- The photo fades in as it goes up: its opacity is the real upload percentage. The words
+                 and the number are in the message at the top of the page. -->
+            <img [src]="src" [alt]="'configuration.product.photo.alt' | translate" class="size-full object-contain transition-opacity duration-200 motion-reduce:transition-none" [style.opacity]="opacity()" />
+        </div>
+        <div class="flex items-center gap-2">
+            <nz-upload [nzAccept]="accept" [nzBeforeUpload]="pick" [nzShowUploadList]="false" [nzDisabled]="uploading()">
+                <button nz-button nzSize="small" type="button" class="inline-flex items-center gap-1.5" [disabled]="uploading()">
+                    <ng-icon name="lucideRefreshCw" size="13px" aria-hidden="true" />
+                    <span>{{ 'configuration.product.photo.replace' | translate }}</span>
+                </button>
+            </nz-upload>
+            <button nz-button nzSize="small" nzDanger type="button" class="inline-flex items-center gap-1.5" (click)="remove()">
+                <ng-icon name="lucideTrash2" size="13px" aria-hidden="true" />
+                <span>{{ (uploading() ? 'configuration.product.photo.cancel' : 'configuration.product.photo.remove') | translate }}</span>
+            </button>
+        </div>
+    } @else {
+        <nz-upload class="block aspect-square w-full" nzType="drag" [nzAccept]="accept" [nzBeforeUpload]="pick" [nzShowUploadList]="false" data-photo="empty">
+            <div class="flex flex-col items-center justify-center gap-1.5 px-4">
+                <ng-icon name="lucideImagePlus" size="28px" class="text-ink-muted" aria-hidden="true" />
+                <p class="m-0 text-sm font-semibold text-ink">{{ 'configuration.product.photo.add' | translate }}</p>
+                <p class="m-0 text-xs text-ink-muted">{{ 'configuration.product.photo.rules' | translate: { size: 15 } | digits }}</p>
+            </div>
+        </nz-upload>
+    }
+    @if (failed(); as key) {
+        <p class="m-0 text-xs text-danger-ink" role="alert">{{ key | translate: { size: 15 } | digits }}</p>
+    }
+</div>
+
+<ng-template #uploadMessage>{{ uploadLabel() | translate: { percent: percentText(progress() ?? 0) } }}</ng-template>
+

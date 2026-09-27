@@ -35,6 +35,7 @@ export class APIEndpoint {
     static readonly GENERATE_SUB_CATEGORY_CODE = '/api/v1/configuration/sub-category/generate-sub-category-code';
     static readonly GENERATE_PRODUCT_LIST_REPORT_BY_SUB_CATEGORY = '/api/v1/configuration/sub-category/generate-product-list-report-by-sub-category';
     static readonly GENERATE_INVENTORY_REPORT_BY_SUB_CATEGORY = '/api/v1/configuration/sub-category/generate-inventory-report-by-sub-category';
+    static readonly GET_SUB_CATEGORY_LIST_FOR_DROPDOWN = '/api/v1/configuration/sub-category/get-sub-category-list-for-dropdown';
 
     static readonly GET_BRAND_LIST = '/api/v1/configuration/brands/get-brand-list';
     static readonly GET_BRAND_DETAILS = '/api/v1/configuration/brands/get-brand-details';
@@ -43,6 +44,18 @@ export class APIEndpoint {
     static readonly CHECK_BRAND_AVAILABILITY = '/api/v1/configuration/brands/check-brand-availability';
     static readonly GENERATE_PRODUCT_LIST_REPORT_BY_BRAND = '/api/v1/configuration/brands/generate-product-list-report-by-brand';
     static readonly GENERATE_INVENTORY_REPORT_BY_BRAND = '/api/v1/configuration/brands/generate-inventory-report-by-brand';
+    static readonly GET_BRAND_LIST_FOR_DROPDOWN = '/api/v1/configuration/brands/get-brand-list-for-dropdown';
+
+    static readonly GET_PRODUCT_LIST = '/api/v1/configuration/product/get-product-list';
+    static readonly GET_PRODUCT_DETAILS = '/api/v1/configuration/product/get-product-details';
+    static readonly CREATE_PRODUCT = '/api/v1/configuration/product/create-product';
+    static readonly UPDATE_PRODUCT_DETAILS = '/api/v1/configuration/product/update-product-details';
+    static readonly DELETE_PRODUCT = '/api/v1/configuration/product/delete-product';
+    static readonly CHECK_PRODUCT_AVAILABILITY = '/api/v1/configuration/product/check-product-availability';
+    static readonly GENERATE_PRODUCT_SKU = '/api/v1/configuration/product/generate-product-sku';
+    static readonly SIGN_PRODUCT_PHOTO_UPLOAD = '/api/v1/configuration/product/sign-product-photo-upload';
+    /** Cloudinary itself, not our API: `{cloud}` is filled from the signature the server hands back. */
+    static readonly CLOUDINARY_UPLOAD = 'https://api.cloudinary.com/v1_1/{cloud}/image/upload';
 
     static readonly GET_SUPPLIER_LIST = '/api/v1/configuration/supplier/get-supplier-list';
     static readonly GET_SUPPLIER_DETAILS = '/api/v1/configuration/supplier/get-supplier-details';

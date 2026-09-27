@@ -873,6 +873,179 @@
                 "title": "Save changes to this sub-category?",
                 "body": "The changes show everywhere {{name}} appears, including on the products already in it."
             }
+        },
+        "product": {
+            "name": "Product",
+            "sku": "SKU",
+            "category": "Category",
+            "subCategory": "Sub-category",
+            "brand": "Brand",
+            "stock": "Available",
+            "description": "Description",
+            "restock": "Restock level",
+            "status": {
+                "label": "Status",
+                "active": "Active",
+                "inactive": "Inactive"
+            },
+            "unit": {
+                "label": "Unit",
+                "pcs": "Piece",
+                "pair": "Pair",
+                "set": "Set",
+                "dozen": "Dozen",
+                "box": "Box",
+                "pack": "Pack",
+                "kg": "Kilogram",
+                "g": "Gram",
+                "l": "Litre",
+                "m": "Metre"
+            },
+            "add": "Add product",
+            "view": "View",
+            "edit": "Edit",
+            "delete": "Delete",
+            "lastTouched": "Last updated by",
+            "lastTouchedOn": "Last updated",
+            "searchPlaceholder": "Search name, SKU or description",
+            "emptyTitle": "No products yet",
+            "emptyBody": "Add what you sell, and what you keep for packing and delivery, so stock can be counted against it.",
+            "stat": {
+                "active": "Active products",
+                "inactive": "Inactive products",
+                "low": "Running low",
+                "out": "Out of stock"
+            },
+            "createTitle": "Add product",
+            "editTitle": "Edit product",
+            "formLead": "What the product is and when to reorder it. Prices and stock come in with each purchase.",
+            "nameHelper": "The name your staff and customers know it by.",
+            "namePlaceholder": "Cotton kurti, maroon",
+            "skuPlaceholder": "Scan or type, or leave blank",
+            "skuHelper": "Leave blank and one is made from the name. Scan the barcode on the box to use that instead.",
+            "skuTaken": "Another product already has this SKU.",
+            "skuInvalid": "Use letters, digits, dot, dash or underscore only.",
+            "subCategoryHelper": "Where it sits in your catalogue. The category comes with it.",
+            "subCategoryPlaceholder": "Pick a sub-category",
+            "subCategoryInactive": "This sub-category has been turned off. Pick an active one.",
+            "brandHelper": "Optional. Who makes it.",
+            "brandPlaceholder": "Pick a brand",
+            "brandInactive": "This brand has been turned off. Pick an active one, or leave it empty.",
+            "unitHelper": "Optional. How it is counted when it is bought and sold.",
+            "unitPlaceholder": "Pick a unit",
+            "restockHelper": "When what can be sold falls to this number, the product shows as running low. 0 means never warn.",
+            "restockInvalid": "A whole number from 0 to {{max}}.",
+            "statusHelper": "Inactive keeps the product and its history, and stops it being offered for new sales and purchases.",
+            "statusPlaceholder": "Pick a status",
+            "descriptionHelper": "Optional. Fabric, size, care, anything a customer asks about.",
+            "descriptionPlaceholder": "Pure cotton, hand block print, free size",
+            "pickersFailed": "The list could not be loaded.",
+            "noMatch": "Nothing matches.",
+            "photo": {
+                "label": "Photo",
+                "helper": "Optional. So staff can tell products apart at the counter and when packing.",
+                "add": "Drop a photo here or click to choose",
+                "rules": "JPG, PNG or WebP, up to {{size}} MB",
+                "alt": "Product photo",
+                "uploading": "Uploading",
+                "replace": "Replace",
+                "remove": "Remove",
+                "cancel": "Cancel upload",
+                "stillUploading": "Wait for the photo to finish uploading, or cancel it.",
+                "wrongType": "That file is not a JPG, PNG or WebP photo.",
+                "tooLarge": "That photo is larger than {{size}} MB. Pick a smaller one.",
+                "notSetUp": "Photo upload is not set up yet. Save the product without a photo and add one later.",
+                "failed": {
+                    "network": "The photo could not be uploaded. Check your connection and try again.",
+                    "forbidden": "You do not have permission to upload photos.",
+                    "server": "The photo could not be uploaded just now. Try again in a moment."
+                },
+                "finishing": "Finishing",
+                "uploadingPercent": "Uploading photo {{percent}}",
+                "uploaded": "Photo uploaded.",
+                "preparing": "Preparing photo"
+            },
+            "confirmCreate": {
+                "title": "Add this product?",
+                "body": "{{name}} will be added to your products."
+            },
+            "confirmEdit": {
+                "title": "Save changes to this product?",
+                "body": "The changes show everywhere {{name}} appears."
+            },
+            "confirmDelete": {
+                "title": "Delete this product?",
+                "body": "{{name}} will no longer appear in lists or be offered for sale. Its orders and history are kept. This cannot be undone from the app."
+            },
+            "createdMessage": "Product added.",
+            "updated": "Product saved.",
+            "deleted": "{{name}} deleted.",
+            "deleteBlocked": {
+                "in_stock": "This product still has {{count}} in stock. Dispose of that stock first, or set the product Inactive.",
+                "held": "{{count}} of this product are promised to online orders. Deliver or cancel them first, or set the product Inactive.",
+                "on_order": "This product is on {{count}} purchase order(s) not yet received. Receive or cancel them first, or set the product Inactive."
+            },
+            "deleteFailed": {
+                "network": "Could not reach the server. Check your connection and try again.",
+                "forbidden": "You do not have permission to delete products.",
+                "server": "The product could not be deleted just now. Try again in a moment."
+            },
+            "loadFailed": {
+                "network": "Could not reach the server. Check your connection and try again.",
+                "forbidden": "You do not have permission to see this product.",
+                "server": "This product could not be loaded. Try again in a moment."
+            },
+            "backToList": "Back to products",
+            "detailTitle": "Product details",
+            "detailLead": "What this product is, whether it can be sold right now, and where its stock sits.",
+            "section": {
+                "details": "Details",
+                "batches": "Stock by batch"
+            },
+            "noPhoto": "No photo",
+            "addPhoto": "Add a photo",
+            "notSet": "Not set",
+            "noDescription": "No description yet.",
+            "noRestockWarning": "No warning",
+            "lastSold": "Last sold",
+            "neverSold": "Not sold yet",
+            "detailStat": {
+                "sellable": "Can be sold now",
+                "onHand": "In the warehouse",
+                "held": "Held for online orders",
+                "sold": "Sold, all time",
+                "returned": "Returned, all time",
+                "damaged": "Damaged, all time"
+            },
+            "stockState": {
+                "low": "Running low, time to reorder",
+                "out": "Nothing left to sell"
+            },
+            "batch": {
+                "code": "Batch",
+                "warehouse": "Warehouse",
+                "received": "Received",
+                "onHand": "In warehouse",
+                "held": "Held",
+                "sellable": "Can sell",
+                "cost": "Cost",
+                "price": "Price",
+                "noPrice": "Not priced",
+                "none": "No stock yet. Stock arrives with a purchase."
+            },
+            "quickActions": "Quick actions",
+            "quick": {
+                "receive": "Receive stock",
+                "sales": "View sales",
+                "analytics": "View analytics",
+                "notReady": "Purchases, sales and analytics open from here once those pages are part of the app."
+            },
+            "activity": "Recent activity",
+            "noActivity": "Nothing has happened to this product yet.",
+            "deleteDisabled": {
+                "in_stock": "It still has stock in the warehouse. Dispose of that stock first, or set the product Inactive.",
+                "held": "Online orders are holding it. Deliver or cancel them first, or set the product Inactive."
+            }
         }
     },
     "form": {

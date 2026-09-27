@@ -1,0 +1,5 @@
+<page-header [back]="back" [title]="'configuration.product.createTitle' | translate" [lead]="'configuration.product.formLead' | translate" />
+
+<form-page [formId]="editor()?.formId ?? ''" [saving]="saving()" [remaining]="editor()?.remaining() ?? 0" (cancel)="cancel()">
+    <product-form (submitted)="save()" />
+</form-page>
