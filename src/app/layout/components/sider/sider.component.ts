@@ -6,7 +6,7 @@ import { TranslatePipe } from '@ngx-translate/core';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideChevronDown, lucideX } from '@ng-icons/lucide';
 import { MenuItem } from '@app/core/models/session.model';
-import { MENU_ICON_FALLBACK, SHELL_MENU_ICONS } from '@app/layout/constants/shell-icons';
+import { MENU_ICON_FALLBACK, SHELL_MENU_ICONS, SHOW_CHILD_ICONS } from '@app/layout/constants/shell-icons';
 import { BadgeComponent } from '@app/layout/components/badge/badge.component';
 import { ShellNavService } from '@app/layout/services/shell-nav/shell-nav.service';
 import { ShellStateService } from '@app/layout/services/shell-state/shell-state.service';
@@ -43,6 +43,7 @@ export class SiderComponent {
     readonly session = this.nav.session;
     readonly version = environment.version;
     readonly iconFallback = MENU_ICON_FALLBACK;
+    readonly showChildIcons = SHOW_CHILD_ICONS;
 
     /**
      * The tones a rail row takes, as opposed to the shape it always has.

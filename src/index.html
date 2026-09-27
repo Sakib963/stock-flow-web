@@ -68,12 +68,13 @@
                 height: 24px;
                 display: block;
             }
+            /* The business name, drawn as strongly as the real one reads: the one emphasised bar in the rail. */
             .app-boot__brand-bar {
                 display: block;
-                height: 11px;
-                width: 84px;
-                border-radius: 3px;
-                background: #e0daf7;
+                height: 14px;
+                width: 150px;
+                border-radius: 4px;
+                background: #c9c0f0;
             }
             .app-boot__header-rest {
                 flex: 1;
@@ -166,15 +167,11 @@
                 flex-direction: column;
                 gap: 2px;
             }
-            .app-boot__nav-active {
-                height: 38px;
-                border-radius: 6px;
-                background: #ddd7f6;
-            }
+            /* Translucent, so a row reads the same over every band of the rail's wave behind it. */
             .app-boot__nav {
                 height: 38px;
                 border-radius: 6px;
-                background: #eeebfa;
+                background: rgba(255, 255, 255, 0.55);
             }
             .app-boot__nav-group {
                 height: 10px;
@@ -304,7 +301,7 @@
                         <span class="app-boot__brand-bar"></span>
                     </div>
                     <div class="app-boot__nav-list">
-                        <span class="app-boot__nav-active"></span>
+                        <span class="app-boot__nav"></span>
                         <span class="app-boot__nav-group" style="width: 62px"></span>
                         <span class="app-boot__nav"></span>
                         <span class="app-boot__nav"></span>

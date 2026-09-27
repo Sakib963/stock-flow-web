@@ -80,3 +80,6 @@ export const SHELL_MENU_ICONS = {
 
 /** What a menu row falls back to when the payload names an icon this build does not carry. */
 export const MENU_ICON_FALLBACK = 'lucideLayers';
+
+/** Whether a child row under a group shows its own icon before its label. Turn off for a text-only tree. */
+export const SHOW_CHILD_ICONS = true;

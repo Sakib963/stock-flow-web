@@ -94,6 +94,9 @@
                                         nzTooltipPlacement="right"
                                         [nzTooltipTitle]="child.isDisabled ? session.disabledMessage(child) : session.description(child)"
                                     >
+                                        @if (showChildIcons) {
+                                            <ng-icon [name]="child.icon || iconFallback" size="15px" strokeWidth="1.8" class="flex-none" aria-hidden="true" />
+                                        }
                                         <span class="flex-1 overflow-hidden text-ellipsis">{{ session.label(child) }}</span>
                                         @if (child.isDisabled) {
                                             <badge>{{ 'shell.soon' | translate }}</badge>
@@ -152,6 +155,9 @@
             <div class="mb-1.25 truncate border-b border-line-soft px-2.5 pt-1.25 pb-1.75 text-shell-hint/none font-bold text-ink">{{ session.label(group) }}</div>
             @for (child of group.children; track child.id) {
                 <a class="flex h-7.75 items-center gap-2 rounded-control px-2.5 text-shell-row/none font-medium bn:leading-normal whitespace-nowrap no-underline" [class]="flyoutClasses(child, rla.isActive)" [routerLink]="child.isDisabled ? null : child.route" routerLinkActive="is-active" #rla="routerLinkActive" (click)="child.isDisabled && nav.explainDisabled(child, $event)" nz-tooltip nzTooltipPlacement="right" [nzTooltipTitle]="child.isDisabled ? session.disabledMessage(child) : session.description(child)">
+                    @if (showChildIcons) {
+                        <ng-icon [name]="child.icon || iconFallback" size="15px" strokeWidth="1.8" class="flex-none" aria-hidden="true" />
+                    }
                     <span class="flex-1 overflow-hidden text-ellipsis">{{ session.label(child) }}</span>
                     @if (child.isDisabled) {
                         <badge>{{ 'shell.soon' | translate }}</badge>
