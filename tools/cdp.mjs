@@ -1,16 +1,19 @@
 /**
  * A browser harness over the Chrome DevTools Protocol, with no dependencies.
  *
- * Node 24 ships a global WebSocket and this machine already has Chrome and Edge, so driving a
- * browser needs nothing installed: no Playwright, no 1.2GB of downloaded builds. Everything the
- * shell checks needs is here - navigate, seed storage, fulfil a request, evaluate, screenshot.
+ * Node 24 ships a global WebSocket and a development machine already has Chrome, Chromium or Edge,
+ * so driving a browser needs nothing installed: no Playwright, no 1.2GB of downloaded builds.
+ * Everything the shell checks needs is here - navigate, seed storage, fulfil a request, evaluate,
+ * screenshot.
  */
 import { spawn } from 'node:child_process';
 import { existsSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
-const BROWSERS = ['C:/Program Files/Google/Chrome/Application/chrome.exe', 'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe'];
+// Windows first, then Linux, so the same script shoots on either. The workspace is developed on
+// both, and a list of one platform's paths fails with "no Chrome found" on the other.
+const BROWSERS = ['C:/Program Files/Google/Chrome/Application/chrome.exe', 'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe', '/usr/bin/google-chrome', '/usr/bin/chromium', '/usr/bin/chromium-browser', '/usr/bin/microsoft-edge'];
 
 export async function launch({ width = 1440, height = 900, port = 9222 } = {}) {
     const profile = mkdtempSync(join(tmpdir(), 'cdp-'));
