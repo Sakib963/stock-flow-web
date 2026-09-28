@@ -12,14 +12,14 @@ const DETAILS = {
     code: 200,
     message: 'ok',
     data: {
-        details: { oid: 'cat-1', name: 'Saree', contact_person: 'Ritu', phone_number: '01911223344', whatsapp_number: null, email: null, address: 'New Market', payment_details: 'bKash 01911223344', status: 'Active', created_by: 'owner@samiha.test', created_on: '2026-09-01T10:00:00.000', last_action_by: 'owner@samiha.test', last_action_on: '2026-09-20T10:00:00.000' },
+        details: { oid: 'cat-1', name: 'Saree', contact_person: 'Ritu', phone_number: '01911223344', whatsapp_number: null, email: null, address: 'New Market', payment_details: 'bKash 01911223344', status: 'Active', created_by: 'owner@arithmalabs.test', created_on: '2026-09-01T10:00:00.000', last_action_by: 'owner@arithmalabs.test', last_action_on: '2026-09-20T10:00:00.000' },
         stats: { orders: 3, openOrders: 1, spent: 66319, paid: 40069, owed: 26250, receivedValue: 62119, lastPurchaseOn: '2026-03-20T05:06:12.000', leadDays: 2, promisedOrders: 0, onTimeRate: null, unitsOrdered: 123, unitsReceived: 117, shortRate: 4.9, faultyUnits: 0, faultyRate: 0, unitsSold: 10, sellThrough: 8.5, sales: 9740, profit: 3040 },
-        activity: [{ oid: 'log-1', date: '2026-09-20T10:00:00.000', user: 'owner@samiha.test', action: 'Updated supplier', description: 'Status changed from "Inactive" to "Active"' }],
+        activity: [{ oid: 'log-1', date: '2026-09-20T10:00:00.000', user: 'owner@arithmalabs.test', action: 'Updated supplier', description: 'Status changed from "Inactive" to "Active"' }],
     },
 };
 
 /** The row the list hands over when a supplier is opened from it: no stats, no activity, no creator. */
-const LIST_ROW = { oid: 'cat-1', name: 'Saree', contact_person: 'Ritu', phone_number: '01911223344', status: 'Active', created_on: '2026-09-01T10:00:00.000', last_action_by: 'owner@samiha.test', last_action_on: '2026-09-20T10:00:00.000' };
+const LIST_ROW = { oid: 'cat-1', name: 'Saree', contact_person: 'Ritu', phone_number: '01911223344', status: 'Active', created_on: '2026-09-01T10:00:00.000', last_action_by: 'owner@arithmalabs.test', last_action_on: '2026-09-20T10:00:00.000' };
 
 const open = async (permissions: string[] = ['configuration.supplier.view', 'configuration.supplier.edit'], row?: object) => {
     await TestBed.configureTestingModule({

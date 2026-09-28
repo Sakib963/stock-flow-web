@@ -38,7 +38,7 @@ const DATA: ConfigurationAnalytics = {
         { oid: 'w-1', name: 'Main', onHand: 190, capacity: 200, fullRate: 95 },
         { oid: 'w-2', name: 'Shop floor', onHand: 40, capacity: null, fullRate: null },
     ],
-    activity: [{ oid: 'log-1', type: 'category', recordOid: 'c-1', date: '2026-09-27T10:00:00.000', user: 'owner@samiha.test', action: 'Created category', description: null }],
+    activity: [{ oid: 'log-1', type: 'category', recordOid: 'c-1', date: '2026-09-27T10:00:00.000', user: 'owner@arithmalabs.test', action: 'Created category', description: null }],
 };
 
 const open = async () => {

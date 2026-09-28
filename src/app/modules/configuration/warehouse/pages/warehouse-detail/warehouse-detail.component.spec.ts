@@ -12,14 +12,14 @@ const DETAILS = {
     code: 200,
     message: 'ok',
     data: {
-        details: { oid: 'cat-1', name: 'Saree', code: 'SARE', location: 'Mohammadpur', capacity_units: 80000, status: 'Active', created_by: 'owner@samiha.test', created_on: '2026-09-01T10:00:00.000', last_action_by: 'owner@samiha.test', last_action_on: '2026-09-20T10:00:00.000' },
+        details: { oid: 'cat-1', name: 'Saree', code: 'SARE', location: 'Mohammadpur', capacity_units: 80000, status: 'Active', created_by: 'owner@arithmalabs.test', created_on: '2026-09-01T10:00:00.000', last_action_by: 'owner@arithmalabs.test', last_action_on: '2026-09-20T10:00:00.000' },
         stats: { products: 12, onHand: 340, sellable: 336, value: 48250, unplaced: 7, lowStock: 2, zones: 3, fullRate: null },
-        activity: [{ oid: 'log-1', date: '2026-09-20T10:00:00.000', user: 'owner@samiha.test', action: 'Updated warehouse', description: 'Status changed from "Inactive" to "Active"' }],
+        activity: [{ oid: 'log-1', date: '2026-09-20T10:00:00.000', user: 'owner@arithmalabs.test', action: 'Updated warehouse', description: 'Status changed from "Inactive" to "Active"' }],
     },
 };
 
 /** The row the list hands over when a warehouse is opened from it: no stats, no activity, no creator. */
-const LIST_ROW = { oid: 'cat-1', name: 'Saree', code: 'SARE', location: 'Mohammadpur', status: 'Active', created_on: '2026-09-01T10:00:00.000', last_action_by: 'owner@samiha.test', last_action_on: '2026-09-20T10:00:00.000' };
+const LIST_ROW = { oid: 'cat-1', name: 'Saree', code: 'SARE', location: 'Mohammadpur', status: 'Active', created_on: '2026-09-01T10:00:00.000', last_action_by: 'owner@arithmalabs.test', last_action_on: '2026-09-20T10:00:00.000' };
 
 const open = async (permissions: string[] = ['configuration.warehouse.view', 'configuration.warehouse.edit'], row?: object) => {
     await TestBed.configureTestingModule({

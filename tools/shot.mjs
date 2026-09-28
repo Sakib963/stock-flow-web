@@ -63,8 +63,8 @@ const MENU = [
 
 const SESSION = {
     version: '1',
-    user: { name: 'Nazmus Sakib', email: 'owner@samiha.test', mobile_number: null, photo: null, designation: 'Owner', role: 'Owner' },
-    business: { name: 'Samiha Style Studio', logoUrl: null, orderSystem: 'BOTH' },
+    user: { name: 'Nazmus Sakib', email: 'owner@arithmalabs.test', mobile_number: null, photo: null, designation: 'Owner', role: 'Owner' },
+    business: { name: 'Arithma Labs', logoUrl: null, orderSystem: 'BOTH' },
     permissions: ['dashboard.overview.view', 'configuration.category.view', 'configuration.category.create', 'configuration.category.edit', 'configuration.category.export', 'configuration.brands.view', 'configuration.brands.create', 'configuration.brands.edit', 'configuration.brands.export', 'configuration.supplier.view', 'configuration.supplier.create', 'configuration.supplier.edit', 'configuration.supplier.export', 'configuration.warehouse.view', 'configuration.warehouse.create', 'configuration.warehouse.edit', 'configuration.warehouse.export', 'configuration.aisle.view', 'configuration.aisle.create', 'configuration.aisle.edit', 'configuration.aisle.export', 'configuration.product.view', 'configuration.product.create', 'configuration.product.edit', 'configuration.product.delete', 'configuration.analytics.view'],
     menu: MENU,
     counters: { notifications: 0 },
@@ -73,9 +73,9 @@ const SESSION = {
 const PHOTO = 'https://res.cloudinary.com/stockflow/image/upload/v1737223331/stockflow/kurti_uozfxa.png';
 const thumb = (url) => url.replace('/image/upload/', '/image/upload/c_fill,w_48,h_48,f_auto,q_auto/');
 const PRODUCTS = [
-    { oid: 'p-1', name: 'Cotton Kurti, maroon', sku: 'COTTKUR', photo: PHOTO, photo_thumb: thumb(PHOTO), unit_type: 'pcs', restock_threshold: 5, status: 'Active', category_oid: 'c-1', category_name: 'Clothing', sub_category_oid: 'sc-1', sub_category_name: 'Kurti', brand_oid: 'b-1', brand_name: 'Aarong', sellable: 4, description: 'Pure cotton, hand block print, free size.', created_on: '2026-09-01T10:00:00.000', last_action_by: 'owner@samiha.test', last_action_by_name: 'Nazmus Sakib', last_action_on: '2026-09-20T10:00:00.000' },
-    { oid: 'p-2', name: 'Woolen Scarf', sku: 'WSC002', photo: null, photo_thumb: null, unit_type: 'pcs', restock_threshold: 3, status: 'Active', category_oid: 'c-2', category_name: 'Winterwear', sub_category_oid: 'sc-2', sub_category_name: 'Scarf', brand_oid: null, brand_name: null, sellable: 0, description: null, created_on: '2026-09-02T10:00:00.000', last_action_by: 'owner@samiha.test', last_action_by_name: 'Nazmus Sakib', last_action_on: '2026-09-18T10:00:00.000' },
-    { oid: 'p-3', name: 'Aloe Vera Moisturiser', sku: '8901030704284', photo: null, photo_thumb: null, unit_type: 'box', restock_threshold: 10, status: 'Active', category_oid: 'c-3', category_name: 'Skincare', sub_category_oid: 'sc-3', sub_category_name: 'Moisturiser', brand_oid: 'b-2', brand_name: 'Cosrx', sellable: 42, description: null, created_on: '2026-09-03T10:00:00.000', last_action_by: 'owner@samiha.test', last_action_by_name: 'Nazmus Sakib', last_action_on: '2026-09-10T10:00:00.000' },
+    { oid: 'p-1', name: 'Cotton Kurti, maroon', sku: 'COTTKUR', photo: PHOTO, photo_thumb: thumb(PHOTO), unit_type: 'pcs', restock_threshold: 5, status: 'Active', category_oid: 'c-1', category_name: 'Clothing', sub_category_oid: 'sc-1', sub_category_name: 'Kurti', brand_oid: 'b-1', brand_name: 'Aarong', sellable: 4, description: 'Pure cotton, hand block print, free size.', created_on: '2026-09-01T10:00:00.000', last_action_by: 'owner@arithmalabs.test', last_action_by_name: 'Nazmus Sakib', last_action_on: '2026-09-20T10:00:00.000' },
+    { oid: 'p-2', name: 'Woolen Scarf', sku: 'WSC002', photo: null, photo_thumb: null, unit_type: 'pcs', restock_threshold: 3, status: 'Active', category_oid: 'c-2', category_name: 'Winterwear', sub_category_oid: 'sc-2', sub_category_name: 'Scarf', brand_oid: null, brand_name: null, sellable: 0, description: null, created_on: '2026-09-02T10:00:00.000', last_action_by: 'owner@arithmalabs.test', last_action_by_name: 'Nazmus Sakib', last_action_on: '2026-09-18T10:00:00.000' },
+    { oid: 'p-3', name: 'Aloe Vera Moisturiser', sku: '8901030704284', photo: null, photo_thumb: null, unit_type: 'box', restock_threshold: 10, status: 'Active', category_oid: 'c-3', category_name: 'Skincare', sub_category_oid: 'sc-3', sub_category_name: 'Moisturiser', brand_oid: 'b-2', brand_name: 'Cosrx', sellable: 42, description: null, created_on: '2026-09-03T10:00:00.000', last_action_by: 'owner@arithmalabs.test', last_action_by_name: 'Nazmus Sakib', last_action_on: '2026-09-10T10:00:00.000' },
 ];
 
 const NAMES = ['Accessories', 'Clothing', 'Cosmetics', 'Delivery', 'Footwear', 'Inventory', 'Jersey', 'Packaging', 'Skincare', 'Test Category One', 'Traditional Clothing', 'Winterwear'];
@@ -84,14 +84,14 @@ const WAREHOUSES = [
     ['Chandrabindu', 'W-CHANDRA', 'Mohammadpur, Dhaka', 80000],
     ['Kanthasheelan', 'W-KANTHA', 'Mohammadpur, Dhaka', 85000],
     ['Nilanjana', 'W-NILANJ', null, null],
-].map(([name, code, location, capacity_units], i) => ({ oid: 'wh-' + i, name, code, location, capacity_units, status: 'Active', created_on: '2026-01-17T10:00:00Z', last_action_on: '2026-01-17T10:00:00Z', last_action_by: 'owner@samiha.test', last_action_by_name: 'Nazmus Sakib', last_action_by_role: 'Owner', last_action_is_edit: true }));
+].map(([name, code, location, capacity_units], i) => ({ oid: 'wh-' + i, name, code, location, capacity_units, status: 'Active', created_on: '2026-01-17T10:00:00Z', last_action_on: '2026-01-17T10:00:00Z', last_action_by: 'owner@arithmalabs.test', last_action_by_name: 'Nazmus Sakib', last_action_by_role: 'Owner', last_action_is_edit: true }));
 
 const AISLES = [
     ['Alokdhara', 'A-ALOK', 'rack', 30000],
     ['Chandrika', 'A-CHANDRIKA', 'shelf', 20000],
     ['Jyotsna', 'A-JYOTSNA', 'other', 30000],
     ['Test Aisle', 'TST', null, null],
-].map(([name, code, storage_type, capacity_units], i) => ({ oid: 'ai-' + i, name, code, warehouse_oid: 'wh-0', warehouse_name: 'Chandrabindu', storage_type, capacity_units, special_notes: null, status: 'Active', created_on: '2026-01-17T10:00:00Z', last_action_on: '2026-01-17T10:00:00Z', last_action_by: 'owner@samiha.test', last_action_by_name: 'Nazmus Sakib', last_action_by_role: 'Owner', last_action_is_edit: true }));
+].map(([name, code, storage_type, capacity_units], i) => ({ oid: 'ai-' + i, name, code, warehouse_oid: 'wh-0', warehouse_name: 'Chandrabindu', storage_type, capacity_units, special_notes: null, status: 'Active', created_on: '2026-01-17T10:00:00Z', last_action_on: '2026-01-17T10:00:00Z', last_action_by: 'owner@arithmalabs.test', last_action_by_name: 'Nazmus Sakib', last_action_by_role: 'Owner', last_action_is_edit: true }));
 
 const SUPPLIERS = [
     ['Bengal Traditional Garments Ltd.', 'Mahfuz Rahman', '01712345678', 'sales@bengalclothing.com'],
@@ -99,7 +99,7 @@ const SUPPLIERS = [
     ['Islampur Fabrics', null, '01815667788', null],
     ['Jutti Heaven', 'Fahim Shahriar', '01812997744', 'order@juttibd.com'],
     ['Rajshahi Silk Exporters', 'Farhana Jahan', '01711882299', null],
-].map(([name, contact_person, phone_number, email], i) => ({ oid: 'sup-' + i, name, contact_person, phone_number, whatsapp_number: i === 1 ? '01811223344' : null, email, status: 'Active', created_on: '2026-01-17T10:00:00Z', last_action_on: '2026-01-17T10:00:00Z', last_action_by: 'owner@samiha.test', last_action_by_name: 'Nazmus Sakib', last_action_by_role: 'Owner', last_action_is_edit: true }));
+].map(([name, contact_person, phone_number, email], i) => ({ oid: 'sup-' + i, name, contact_person, phone_number, whatsapp_number: i === 1 ? '01811223344' : null, email, status: 'Active', created_on: '2026-01-17T10:00:00Z', last_action_on: '2026-01-17T10:00:00Z', last_action_by: 'owner@arithmalabs.test', last_action_by_name: 'Nazmus Sakib', last_action_by_role: 'Owner', last_action_is_edit: true }));
 
 const ROWS = NAMES.map((name, i) => ({
     oid: 'oid-' + i,
@@ -109,7 +109,7 @@ const ROWS = NAMES.map((name, i) => ({
     status: i === 9 ? 'Inactive' : 'Active',
     created_on: '2026-01-17T10:00:00Z',
     last_action_on: '2026-01-17T10:00:00Z',
-    last_action_by: i % 2 ? 'owner@samiha.test' : 'ahmad@samiha.test',
+    last_action_by: i % 2 ? 'owner@arithmalabs.test' : 'ahmad@arithmalabs.test',
     last_action_by_name: i % 2 ? 'Nazmus Sakib' : 'Ahmad Saif',
     last_action_by_role: 'Owner',
     last_action_is_edit: true,
@@ -157,9 +157,9 @@ const ANALYTICS = {
         { oid: 'w-3', name: 'Shop floor', onHand: 42, capacity: null, fullRate: null },
     ],
     activity: [
-        { oid: 'l-1', type: 'brand', recordOid: 'b-1', date: '2026-09-27T10:00:00.000', user: 'owner@samiha.test', action: 'Updated brand', description: 'Origin country set to KR' },
-        { oid: 'l-2', type: 'sub-category', recordOid: 's-1', date: '2026-09-26T15:20:00.000', user: 'owner@samiha.test', action: 'Created sub-category', description: null },
-        { oid: 'l-3', type: 'category', recordOid: 'c-3', date: '2026-09-25T09:10:00.000', user: 'manager@samiha.test', action: 'Updated category', description: 'Status changed from "Inactive" to "Active"' },
+        { oid: 'l-1', type: 'brand', recordOid: 'b-1', date: '2026-09-27T10:00:00.000', user: 'owner@arithmalabs.test', action: 'Updated brand', description: 'Origin country set to KR' },
+        { oid: 'l-2', type: 'sub-category', recordOid: 's-1', date: '2026-09-26T15:20:00.000', user: 'owner@arithmalabs.test', action: 'Created sub-category', description: null },
+        { oid: 'l-3', type: 'category', recordOid: 'c-3', date: '2026-09-25T09:10:00.000', user: 'manager@arithmalabs.test', action: 'Updated category', description: 'Status changed from "Inactive" to "Active"' },
     ],
 };
 
@@ -177,7 +177,7 @@ function handle(request) {
     if (url.includes('/get-aisle-list')) return answer(request, { rows: AISLES, stats: { active: 4, inactive: 0, stocked: 3, empty: 1 } }, { total: AISLES.length });
     if (url.includes('/get-aisle-details'))
         return answer(request, {
-            details: { ...AISLES[1], special_notes: 'Ground floor, left of the door. Skincare only.', created_by: 'owner@samiha.test' },
+            details: { ...AISLES[1], special_notes: 'Ground floor, left of the door. Skincare only.', created_by: 'owner@arithmalabs.test' },
             stats: { products: 19, onHand: 1339, sellable: 1338, value: 535508, lowStock: 1, fullRate: 6.7 },
             items: [
                 { product_oid: 'p1', name: 'Aloe Vera Face Wash', onHand: 34, sellable: 34, low: false },
@@ -190,7 +190,7 @@ function handle(request) {
     if (url.includes('/get-warehouse-list')) return answer(request, { rows: WAREHOUSES, stats: { active: 3, inactive: 0, stocked: 2, empty: 1 } }, { total: WAREHOUSES.length });
     if (url.includes('/get-warehouse-details'))
         return answer(request, {
-            details: { ...WAREHOUSES[0], created_by: 'owner@samiha.test' },
+            details: { ...WAREHOUSES[0], created_by: 'owner@arithmalabs.test' },
             stats: { products: 23, onHand: 1608, sellable: 1605, value: 650650, unplaced: 164, lowStock: 1, zones: 4, fullRate: 2 },
             activity: [],
         });
@@ -198,13 +198,13 @@ function handle(request) {
     if (url.includes('/get-supplier-list')) return answer(request, { rows: SUPPLIERS, stats: { active: 5, inactive: 0, owing: 2, unused: 1 } }, { total: SUPPLIERS.length });
     if (url.includes('/get-supplier-details'))
         return answer(request, {
-            details: { ...SUPPLIERS[1], address: '12/B, New Market, Dhaka-1205', payment_details: 'bKash 01911-223344, Dutch-Bangla Bank, A/C 123.456.7890', created_by: 'owner@samiha.test' },
+            details: { ...SUPPLIERS[1], address: '12/B, New Market, Dhaka-1205', payment_details: 'bKash 01911-223344, Dutch-Bangla Bank, A/C 123.456.7890', created_by: 'owner@arithmalabs.test' },
             stats: { orders: 3, openOrders: 1, spent: 66319, paid: 40069, owed: 26250, receivedValue: 62119, lastPurchaseOn: '2026-03-20T05:06:12Z', leadDays: 2, promisedOrders: 0, onTimeRate: null, unitsOrdered: 123, unitsReceived: 117, shortRate: 4.9, faultyUnits: 0, faultyRate: 0, unitsSold: 10, sellThrough: 8.5, sales: 9740, profit: 3040 },
-            activity: [{ oid: 'log-1', date: '2026-09-20T14:22:18Z', user: 'owner@samiha.test', action: 'Created supplier', description: 'Created supplier "Dhaka Saree House" with phone number 01911223344' }],
+            activity: [{ oid: 'log-1', date: '2026-09-20T14:22:18Z', user: 'owner@arithmalabs.test', action: 'Created supplier', description: 'Created supplier "Dhaka Saree House" with phone number 01911223344' }],
         });
     if (url.includes('/check-supplier-availability')) return answer(request, { field: 'name', available: true });
     if (url.includes('/get-brand-list')) return answer(request, { rows: ROWS, stats: { active: 11, inactive: 1, products: 40, empty: 2 } }, { total: ROWS.length });
-    if (url.includes('/get-brand-details')) return answer(request, { details: { ...ROWS[1], origin_country: 'KR', created_by: 'owner@samiha.test' }, stats: { totalProducts: 12, activeProducts: 11, amountSpent: 48250, totalAvailableQuantity: 340, lowStockItems: 2, outOfStockItems: 1, averageProductPrice: 1250 }, activity: [] });
+    if (url.includes('/get-brand-details')) return answer(request, { details: { ...ROWS[1], origin_country: 'KR', created_by: 'owner@arithmalabs.test' }, stats: { totalProducts: 12, activeProducts: 11, amountSpent: 48250, totalAvailableQuantity: 340, lowStockItems: 2, outOfStockItems: 1, averageProductPrice: 1250 }, activity: [] });
     if (url.includes('/check-brand-availability')) return answer(request, { field: 'name', available: true });
     if (url.includes('/get-category-list')) {
         // Counted here the way the endpoint counts them, so the stat strip is photographed with real numbers.
@@ -214,11 +214,11 @@ function handle(request) {
     if (url.includes('/get-category-details')) {
         const row = ROWS[1];
         return answer(request, {
-            details: { ...row, created_by: 'owner@samiha.test' },
+            details: { ...row, created_by: 'owner@arithmalabs.test' },
             stats: { totalProducts: 12, activeProducts: 11, amountSpent: 48250, totalAvailableQuantity: 340, lowStockItems: 2, outOfStockItems: 1, averageProductPrice: 1250 },
             activity: [
-                { oid: 'log-1', date: '2026-09-20T14:22:18Z', user: 'owner@samiha.test', action: 'Updated category', description: 'Status changed from "Inactive" to "Active"' },
-                { oid: 'log-2', date: '2026-09-01T10:00:00Z', user: 'ahmad@samiha.test', action: 'Created category', description: 'Created category "Clothing" with code CODE-002' },
+                { oid: 'log-1', date: '2026-09-20T14:22:18Z', user: 'owner@arithmalabs.test', action: 'Updated category', description: 'Status changed from "Inactive" to "Active"' },
+                { oid: 'log-2', date: '2026-09-01T10:00:00Z', user: 'ahmad@arithmalabs.test', action: 'Created category', description: 'Created category "Clothing" with code CODE-002' },
             ],
         });
     }
@@ -226,16 +226,16 @@ function handle(request) {
     if (url.includes('/get-product-list')) return answer(request, { rows: PRODUCTS, stats: { active: 3, inactive: 0, low: 1, out: 1 } }, { total: PRODUCTS.length });
     if (url.includes('/get-product-details'))
         return answer(request, {
-            details: { ...PRODUCTS[0], created_by: 'owner@samiha.test' },
+            details: { ...PRODUCTS[0], created_by: 'owner@arithmalabs.test' },
             stock: { on_hand: 12, held: 8, sellable: 4, batches: [{ oid: 'i-1', batch_code: 'B-240917-01', warehouse_name: 'Main showroom', received_on: '2026-09-17T10:00:00.000', on_hand: 9, held: 8, sellable: 1, cost_price: 450, selling_price: 890 }, { oid: 'i-2', batch_code: 'B-240922-03', warehouse_name: 'Online store room', received_on: '2026-09-22T10:00:00.000', on_hand: 3, held: 0, sellable: 3, cost_price: 470, selling_price: null }] },
             lifetime: { sold: 31, returned: 2, damaged: 1, last_sold_on: '2026-09-25T15:30:00.000' },
-            activity: [{ oid: 'log-1', date: '2026-09-20T10:00:00.000', user: 'owner@samiha.test', action: 'Updated product', description: 'Restock level changed from "3" to "5"' }],
+            activity: [{ oid: 'log-1', date: '2026-09-20T10:00:00.000', user: 'owner@arithmalabs.test', action: 'Updated product', description: 'Restock level changed from "3" to "5"' }],
         });
     if (url.includes('/get-sub-category-list-for-dropdown')) return answer(request, [{ value: 'sc-1', label: 'Kurti', groupLabel: 'Clothing' }, { value: 'sc-3', label: 'Moisturiser', groupLabel: 'Skincare' }]);
     if (url.includes('/get-brand-list-for-dropdown')) return answer(request, [{ value: 'b-1', label: 'Aarong' }, { value: 'b-2', label: 'Cosrx' }]);
     if (url.includes('/check-product-availability')) return answer(request, { field: 'sku', available: true });
     if (url.includes('/get-configuration-analytics')) return answer(request, ANALYTICS);
-    if (url.includes('/get-user-card')) return answer(request, { name: 'Ahmad Saif', email: 'ahmad@samiha.test', designation: 'Manager', role: 'Manager', photo: null, active: true });
+    if (url.includes('/get-user-card')) return answer(request, { name: 'Ahmad Saif', email: 'ahmad@arithmalabs.test', designation: 'Manager', role: 'Manager', photo: null, active: true });
     console.log('  unmocked API call:', url);
     return answer(request, {});
 }

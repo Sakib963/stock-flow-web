@@ -61,7 +61,7 @@ const item = (id: string): MenuItem => menu.find((i) => i.id === id)!;
 const payload: SessionPayload = {
     version: 'v1',
     user: { name: 'Samiha Rahman', email: 'samiha@shop.com', mobile_number: null, photo: null, designation: 'Owner', role: 'Admin' },
-    business: { name: 'Samiha Style Studio', logoUrl: null, orderSystem: 'both' },
+    business: { name: 'Arithma Labs', logoUrl: null, orderSystem: 'both' },
     permissions: [],
     menu,
     counters: { notifications: 0 },
@@ -145,7 +145,7 @@ describe('LayoutComponent', () => {
 
     it('keeps the business name binding in the restyled brand row', async () => {
         const { el } = await render();
-        expect(el.querySelector('[data-shell=business]')?.textContent?.trim()).toBe('Samiha Style Studio');
+        expect(el.querySelector('[data-shell=business]')?.textContent?.trim()).toBe('Arithma Labs');
     });
 
     it('paints the full-column wash and nothing behind the logo', async () => {
@@ -373,7 +373,7 @@ describe('LayoutComponent', () => {
             // The same brand row the rail carries at a wide window, plus the way out.
             const head = overlay('[data-shell=brand]');
             expect(head).toBeTruthy();
-            expect(head?.querySelector('[data-shell=business]')?.textContent?.trim()).toBe('Samiha Style Studio');
+            expect(head?.querySelector('[data-shell=business]')?.textContent?.trim()).toBe('Arithma Labs');
             expect(head?.querySelector('button')).toBeTruthy();
         });
     });

@@ -13,7 +13,7 @@ import { sessionGuard } from './session.guard';
 const payload = (name: string): SessionPayload => ({
     version: 'v1',
     user: { name, email: `${name}@shop.com`, mobile_number: null, photo: null, designation: null, role: 'Owner' },
-    business: { name: 'Samiha Style Studio', logoUrl: null, orderSystem: 'both' },
+    business: { name: 'Arithma Labs', logoUrl: null, orderSystem: 'both' },
     permissions: ['dashboard.overview.view'],
     menu: [],
     counters: { notifications: 0 },

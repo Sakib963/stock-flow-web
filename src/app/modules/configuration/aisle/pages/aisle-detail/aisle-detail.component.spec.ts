@@ -12,13 +12,13 @@ const DETAILS = {
     code: 200,
     message: 'ok',
     data: {
-        details: { oid: 'sc-1', name: 'Sarees', code: 'SARE', warehouse_oid: 'c1', warehouse_name: 'Clothing', storage_type: 'shelf', capacity_units: null, special_notes: null, status: 'Active', created_by: 'owner@samiha.test', created_on: '2026-09-01T10:00:00.000', last_action_by: 'owner@samiha.test', last_action_on: '2026-09-20T10:00:00.000' },
+        details: { oid: 'sc-1', name: 'Sarees', code: 'SARE', warehouse_oid: 'c1', warehouse_name: 'Clothing', storage_type: 'shelf', capacity_units: null, special_notes: null, status: 'Active', created_by: 'owner@arithmalabs.test', created_on: '2026-09-01T10:00:00.000', last_action_by: 'owner@arithmalabs.test', last_action_on: '2026-09-20T10:00:00.000' },
         stats: { products: 2, onHand: 140, sellable: 136, value: 48250, lowStock: 1, fullRate: null },
         items: [
             { product_oid: 'p1', name: 'Rose Water Toner', onHand: 3, sellable: 3, low: true },
             { product_oid: 'p2', name: 'Saree', onHand: 137, sellable: 133, low: false },
         ],
-        activity: [{ oid: 'log-1', date: '2026-09-20T10:00:00.000', user: 'owner@samiha.test', action: 'Created aisle', description: 'Created aisle "Sarees" with code SARE' }],
+        activity: [{ oid: 'log-1', date: '2026-09-20T10:00:00.000', user: 'owner@arithmalabs.test', action: 'Created aisle', description: 'Created aisle "Sarees" with code SARE' }],
     },
 };
 

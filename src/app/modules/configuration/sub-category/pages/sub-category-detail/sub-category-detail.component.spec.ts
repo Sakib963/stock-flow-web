@@ -12,9 +12,9 @@ const DETAILS = {
     code: 200,
     message: 'ok',
     data: {
-        details: { oid: 'sc-1', name: 'Sarees', category_code: 'SARE', category_oid: 'c1', category_name: 'Clothing', description: null, status: 'Active', created_by: 'owner@samiha.test', created_on: '2026-09-01T10:00:00.000', last_action_by: 'owner@samiha.test', last_action_on: '2026-09-20T10:00:00.000' },
+        details: { oid: 'sc-1', name: 'Sarees', category_code: 'SARE', category_oid: 'c1', category_name: 'Clothing', description: null, status: 'Active', created_by: 'owner@arithmalabs.test', created_on: '2026-09-01T10:00:00.000', last_action_by: 'owner@arithmalabs.test', last_action_on: '2026-09-20T10:00:00.000' },
         stats: { totalProducts: 8, activeProducts: 7, amountSpent: 48250, totalAvailableQuantity: 140, lowStockItems: 2, outOfStockItems: 1, averageProductPrice: 3250 },
-        activity: [{ oid: 'log-1', date: '2026-09-20T10:00:00.000', user: 'owner@samiha.test', action: 'Created sub-category', description: 'Created sub-category "Sarees" with code SARE' }],
+        activity: [{ oid: 'log-1', date: '2026-09-20T10:00:00.000', user: 'owner@arithmalabs.test', action: 'Created sub-category', description: 'Created sub-category "Sarees" with code SARE' }],
     },
 };
 

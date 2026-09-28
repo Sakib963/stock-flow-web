@@ -12,7 +12,7 @@ import { AuthService } from '@app/core/services/auth/auth.service';
 const payload = (permissions: string[]): SessionPayload => ({
     version: 'v1',
     user: { name: 'Samiha', email: 'owner@shop.com', mobile_number: null, photo: null, designation: null, role: 'Owner' },
-    business: { name: 'Samiha Style Studio', logoUrl: null, orderSystem: 'both' },
+    business: { name: 'Arithma Labs', logoUrl: null, orderSystem: 'both' },
     permissions,
     menu: [],
     counters: { notifications: 0 },

@@ -13,7 +13,7 @@ const DETAILS = {
     code: 200,
     message: 'ok',
     data: {
-        details: { oid: 'p-1', category_oid: 'c-1', sub_category_oid: 'sc-1', name: 'Cotton Kurti', sku: 'COTTKUR', photo: null, unit_type: 'pcs', description: null, restock_threshold: 5, status: 'Active', category_name: 'Women', sub_category_name: 'Kurti', brand_name: null, last_action_by: 'owner@samiha.test', last_action_on: '2026-09-20T10:00:00.000' },
+        details: { oid: 'p-1', category_oid: 'c-1', sub_category_oid: 'sc-1', name: 'Cotton Kurti', sku: 'COTTKUR', photo: null, unit_type: 'pcs', description: null, restock_threshold: 5, status: 'Active', category_name: 'Women', sub_category_name: 'Kurti', brand_name: null, last_action_by: 'owner@arithmalabs.test', last_action_on: '2026-09-20T10:00:00.000' },
         stock: {
             on_hand: 12,
             held: 8,
