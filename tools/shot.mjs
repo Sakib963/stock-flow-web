@@ -59,13 +59,27 @@ const MENU = [
         isNew: false,
         children: [{ id: 'analytics', label: { en: 'Analytics', bn: 'বিশ্লেষণ' }, description: { en: null, bn: null }, tags: [], icon: 'lucideChartLine', order: 8, route: '/app/configuration/analytics', permission: 'configuration.analytics.view', isDisabled: false, disabledMessage: { en: null, bn: null }, isNew: false, children: [] }, { id: 'products', label: { en: 'Products', bn: 'পণ্য' }, description: { en: null, bn: null }, tags: [], icon: 'lucidePackage', order: 0, route: '/app/configuration/products', permission: 'configuration.product.view', isDisabled: false, disabledMessage: { en: null, bn: null }, isNew: false, children: [] }, { id: 'aisles', label: { en: 'Aisles / Zones', bn: 'আইল' }, description: { en: null, bn: null }, tags: [], icon: 'lucideRows3', order: 7, route: '/app/configuration/aisles', permission: 'configuration.aisle.view', isDisabled: false, disabledMessage: { en: null, bn: null }, isNew: false, children: [] }, { id: 'warehouses', label: { en: 'Warehouses', bn: 'ওয়্যারহাউজ' }, description: { en: null, bn: null }, tags: [], icon: 'lucideWarehouse', order: 6, route: '/app/configuration/warehouses', permission: 'configuration.warehouse.view', isDisabled: false, disabledMessage: { en: null, bn: null }, isNew: false, children: [] }, { id: 'suppliers', label: { en: 'Suppliers', bn: 'সাপ্লায়ার' }, description: { en: null, bn: null }, tags: [], icon: 'lucideFactory', order: 3, route: '/app/configuration/suppliers', permission: 'configuration.supplier.view', isDisabled: false, disabledMessage: { en: null, bn: null }, isNew: false, children: [] }, { id: 'brands', label: { en: 'Brands', bn: 'ব্র্যান্ড' }, description: { en: null, bn: null }, tags: [], icon: 'lucideTag', order: 2, route: '/app/configuration/brands', permission: 'configuration.brands.view', isDisabled: false, disabledMessage: { en: null, bn: null }, isNew: false, children: [] }, { id: 'categories', label: { en: 'Categories', bn: 'ক্যাটাগরি' }, description: { en: 'Create the product groups, like Saree or Cosmetics, that every product is filed under.', bn: 'পণ্যের গ্রুপ তৈরি করুন।' }, tags: [], icon: 'lucideFolderTree', order: 1, route: '/app/configuration/categories', permission: 'configuration.category.view', isDisabled: false, disabledMessage: { en: null, bn: null }, isNew: false, children: [] }],
     },
+    {
+        id: 'inventory',
+        label: { en: 'Inventory', bn: 'ইনভেন্টরি' },
+        description: { en: null, bn: null },
+        tags: [],
+        icon: 'lucideBoxes',
+        order: 3,
+        route: null,
+        permission: null,
+        isDisabled: false,
+        disabledMessage: { en: null, bn: null },
+        isNew: false,
+        children: [{ id: 'purchase-orders', label: { en: 'Purchase orders', bn: 'ক্রয় আদেশ' }, description: { en: null, bn: null }, tags: [], icon: 'lucideTruck', order: 10, route: '/app/inventory/purchase-orders', permission: 'inventory.purchase-order.view', isDisabled: false, disabledMessage: { en: null, bn: null }, isNew: false, children: [] }],
+    },
 ];
 
 const SESSION = {
     version: '1',
     user: { name: 'Nazmus Sakib', email: 'owner@arithmalabs.test', mobile_number: null, photo: null, designation: 'Owner', role: 'Owner' },
     business: { name: 'Arithma Labs', logoUrl: null, orderSystem: 'BOTH' },
-    permissions: ['dashboard.overview.view', 'configuration.category.view', 'configuration.category.create', 'configuration.category.edit', 'configuration.category.export', 'configuration.brands.view', 'configuration.brands.create', 'configuration.brands.edit', 'configuration.brands.export', 'configuration.supplier.view', 'configuration.supplier.create', 'configuration.supplier.edit', 'configuration.supplier.export', 'configuration.warehouse.view', 'configuration.warehouse.create', 'configuration.warehouse.edit', 'configuration.warehouse.export', 'configuration.aisle.view', 'configuration.aisle.create', 'configuration.aisle.edit', 'configuration.aisle.export', 'configuration.product.view', 'configuration.product.create', 'configuration.product.edit', 'configuration.product.delete', 'configuration.analytics.view'],
+    permissions: ['dashboard.overview.view', 'configuration.category.view', 'configuration.category.create', 'configuration.category.edit', 'configuration.category.export', 'configuration.brands.view', 'configuration.brands.create', 'configuration.brands.edit', 'configuration.brands.export', 'configuration.supplier.view', 'configuration.supplier.create', 'configuration.supplier.edit', 'configuration.supplier.export', 'configuration.warehouse.view', 'configuration.warehouse.create', 'configuration.warehouse.edit', 'configuration.warehouse.export', 'configuration.aisle.view', 'configuration.aisle.create', 'configuration.aisle.edit', 'configuration.aisle.export', 'configuration.product.view', 'configuration.product.create', 'configuration.product.edit', 'configuration.product.delete', 'configuration.analytics.view', 'inventory.purchase-order.view', 'inventory.purchase-order.create', 'inventory.purchase-order.edit', 'inventory.purchase-order.approve', 'inventory.purchase-order.cancel', 'inventory.purchase-order.export'],
     menu: MENU,
     counters: { notifications: 0 },
 };
@@ -163,6 +177,92 @@ const ANALYTICS = {
     ],
 };
 
+// Purchase orders: one order in each state, so every record page can be photographed.
+const PO_LINES = [
+    ['l-1', 'p-1', 'Cotton Kurti, maroon', 'COTTKUR', 'wh-0', 'Chandrabindu', 'ai-0', 'Alokdhara', 80, 450, 76, 450, 890, 50, 20, 'Eid campaign stock'],
+    ['l-2', 'p-2', 'Woolen Scarf', 'WSC002', 'wh-0', 'Chandrabindu', 'ai-1', 'Chandrika', 40, 620, 40, 600, 1250, 100, null, null],
+    ['l-3', 'p-3', 'Aloe Vera Moisturiser', '8901030704284', 'wh-1', 'Kanthasheelan', null, null, 60, 540, 60, 540, null, null, null, null],
+    ['l-4', 'p-4', 'Courier Bags, medium', 'CBAG-M', 'wh-2', 'Nilanjana', null, null, 500, 12, 500, 12, null, null, null, null],
+];
+const poLines = (verified) =>
+    PO_LINES.map(([oid, product_oid, product_name, sku, warehouse_oid, warehouse_name, aisle_oid, aisle_name, ordered, price, received, billed, selling, discount, ad, remarks], i) => ({
+        oid,
+        product_oid,
+        product_name,
+        sku,
+        restock_threshold: 20,
+        photo_thumb: null,
+        warehouse_oid,
+        warehouse_name,
+        aisle_oid,
+        aisle_name,
+        ordered_quantity: ordered,
+        ordered_unit_price: String(price),
+        received_quantity: verified ? received : null,
+        received_unit_price: verified ? String(billed) : null,
+        sellable: [4, 0, 42, 300][i],
+        current_selling_price: selling ? String(selling) : null,
+        current_maximum_discount: discount ? String(discount) : null,
+        ad_run_cost: verified ? ad : null,
+        packaging_cost: null,
+        gift_cost: null,
+        content_creation_cost: null,
+        influencer_cost: null,
+        cost_remarks: verified ? remarks : null,
+        batches: verified ? [{ oid: 'b-' + i, batch_code: 'B-261002-014' + i, intended_use: i === 3 ? 'internal_use' : 'for_sale', status: i === 3 ? 'internal_use' : 'ready_for_sale', initial_quantity: received, quantity_available: received, selling_price: i === 3 ? null : String(selling ?? 980), maximum_discount: i === 3 ? null : String(discount ?? 60) }] : [],
+    }));
+const PO_HEADER = {
+    po_number: 'PO-2609-0142',
+    purchase_type: 'advance',
+    special_notes: 'Call Rafiq before unloading',
+    payment_status: 'partially_paid',
+    total_amount: '94600',
+    paid_amount: '50000',
+    expected_delivery_date: '2026-10-02',
+    supplier_oid: 'sup-0',
+    supplier_name: 'Bengal Traditional Garments Ltd.',
+    supplier_phone: '01711-402233',
+    supplier_status: 'Active',
+    supplier_orders_this_year: 14,
+    created_on: '2026-09-26T11:42:00.000',
+    created_by: 'owner@arithmalabs.test',
+    created_by_name: 'Nusrat Sultana',
+    verified_on: null,
+    verified_by: null,
+    verified_by_name: null,
+    cancelled_on: null,
+    cancelled_by: null,
+    cancelled_by_name: null,
+    cancel_reason: null,
+};
+const PO_OPEN = { received_total: null, received_units: null, lines_short: null, units_short: null, price_changed: null, batches: 0, budgets_total: null };
+const PO = {
+    'po-sub': { details: { ...PO_HEADER, oid: 'po-sub', status: 'Submitted' }, lines: poLines(false), stats: { ordered_total: 94600, ordered_units: 680, warehouses: 3, ...PO_OPEN } },
+    'po-ver': { details: { ...PO_HEADER, oid: 'po-ver', status: 'Verified', verified_on: '2026-10-02T16:05:00.000', verified_by: 'rafiq@arithmalabs.test', verified_by_name: 'Rafiq Hasan' }, lines: poLines(true), stats: { ordered_total: 94600, ordered_units: 680, received_total: 92400, received_units: 676, lines_short: 1, units_short: 4, price_changed: 1, batches: 4, budgets_total: 1520, warehouses: 3 } },
+    'po-can': { details: { ...PO_HEADER, oid: 'po-can', status: 'Cancelled', cancelled_on: '2026-09-27T10:18:00.000', cancelled_by: 'owner@arithmalabs.test', cancelled_by_name: 'Nusrat Sultana', cancel_reason: 'The supplier could not deliver before Eid' }, lines: poLines(false), stats: { ordered_total: 94600, ordered_units: 680, warehouses: 3, ...PO_OPEN } },
+};
+const PO_ACTIVITY = [
+    { oid: 'a-2', date: '2026-09-26T11:43:00.000', user: 'owner@arithmalabs.test', action: 'Payment recorded', description: 'PO-2609-0142: Unpaid 0 to Partially paid 50000' },
+    { oid: 'a-1', date: '2026-09-26T11:42:00.000', user: 'owner@arithmalabs.test', action: 'Raised and submitted', description: 'PO-2609-0142: 4 products, total 94600, partially paid 50000' },
+];
+const PO_ROWS = ['po-sub', 'po-ver', 'po-can'].map((oid, i) => ({
+    oid,
+    po_number: 'PO-2609-014' + (2 - i),
+    supplier_oid: 'sup-' + i,
+    supplier_name: SUPPLIERS[i].name,
+    purchase_type: 'advance',
+    status: PO[oid].details.status,
+    payment_status: ['partially_paid', 'paid', 'unpaid'][i],
+    total_amount: '94600',
+    paid_amount: ['50000', '94600', '0'][i],
+    expected_delivery_date: '2026-10-02',
+    product_count: 4,
+    created_on: '2026-09-26T11:42:00.000',
+    last_action_by: 'owner@arithmalabs.test',
+    last_action_by_name: 'Nusrat Sultana',
+}));
+const PO_PICKER = PRODUCTS.map((p, i) => ({ oid: p.oid, name: p.name, sku: p.sku, restock_threshold: p.restock_threshold, photo_thumb: p.photo_thumb, sellable: p.sellable, sold_30_days: [12, 0, 31][i], last_unit_price: ['450', '620', null][i], last_supplier_name: ['Bengal Traditional Garments Ltd.', 'Dhaka Saree House', null][i], last_bought_on: null }));
+
 const answer = (request, data, extra = {}) => ({ status: 200, headers: cors(request), body: JSON.stringify({ code: 200, message: 'ok', data, ...extra }) });
 
 // Matched on the API path, not the host: a production build points at the deployed server, so
@@ -173,6 +273,11 @@ function handle(request) {
     if (request.method === 'OPTIONS') return { status: 204, headers: cors(request), body: '' };
     if (url.includes('/refresh-token')) return answer(request, { access_token: 'access-1', refresh_token: 'refresh-1', refresh_transport: 'body', session_id: 'session-1' });
     if (url.includes('/get-user-info')) return answer(request, SESSION);
+    if (url.includes('/get-purchase-list')) return answer(request, { rows: PO_ROWS, stats: { submitted: 1, overdue: 0, verified: 1, cancelled: 1 } }, { total: PO_ROWS.length });
+    if (url.includes('/get-purchase-details/')) return answer(request, { ...PO[url.split('/').pop().split('?')[0]], activity: PO_ACTIVITY });
+    if (url.includes('/get-product-list-for-purchase')) return answer(request, PO_PICKER);
+    if (url.includes('/get-supplier-list-for-dropdown')) return answer(request, SUPPLIERS.map((s) => ({ value: s.oid, label: s.name, phone_number: s.phone_number })));
+    if (url.includes('/get-aisle-list-for-dropdown')) return answer(request, AISLES.map((a) => ({ value: a.oid, label: a.name, warehouse_oid: a.warehouse_oid })));
     if (url.includes('/get-warehouse-list-for-dropdown')) return answer(request, WAREHOUSES.map((w) => ({ value: w.oid, label: w.name })));
     if (url.includes('/get-aisle-list')) return answer(request, { rows: AISLES, stats: { active: 4, inactive: 0, stocked: 3, empty: 1 } }, { total: AISLES.length });
     if (url.includes('/get-aisle-details'))
