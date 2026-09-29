@@ -1,0 +1,5 @@
+<page-header [back]="back" [title]="'inventory.purchaseOrder.createTitle' | translate" [lead]="'inventory.purchaseOrder.formLead' | translate" />
+
+<form-page [formId]="editor()?.formId ?? ''" [saving]="saving()" [remaining]="editor()?.remaining() ?? 0" saveLabel="inventory.purchaseOrder.submit" (cancel)="cancel()">
+    <purchase-order-form (submitted)="save()" />
+</form-page>

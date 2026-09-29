@@ -1,0 +1,471 @@
+<page-header [back]="back" [title]="'inventory.purchaseOrder.detailTitle' | translate" [lead]="'inventory.purchaseOrder.detailLead' | translate">
+    @if (canCancel()) {
+        <button nz-button nzDanger type="button" class="inline-flex items-center gap-1.5" (click)="openCancel()">
+            <ng-icon name="lucideBan" size="14px" aria-hidden="true" />
+            <span>{{ 'inventory.purchaseOrder.cancelOrder' | translate }}</span>
+        </button>
+    }
+    @if (canEdit()) {
+        <button nz-button type="button" class="inline-flex items-center gap-1.5" (click)="edit()">
+            <ng-icon name="lucidePencil" size="14px" aria-hidden="true" />
+            <span>{{ 'inventory.purchaseOrder.edit' | translate }}</span>
+        </button>
+    }
+    @if (canVerify()) {
+        <button nz-button nzType="primary" type="button" class="inline-flex items-center gap-1.5" (click)="verify()">
+            <ng-icon name="lucidePackageCheck" size="14px" aria-hidden="true" />
+            <span>{{ 'inventory.purchaseOrder.verify' | translate }}</span>
+        </button>
+    }
+</page-header>
+
+@if (failed(); as failure) {
+    <div class="sf-empty" role="alert">
+        <p class="m-0 text-sm text-ink-body">{{ 'inventory.purchaseOrder.loadFailed.' + failure | translate }}</p>
+        <div class="mt-3 flex items-center justify-center gap-2">
+            <button nz-button nzType="default" type="button" class="inline-flex items-center gap-1.5" (click)="backToList()">
+                <ng-icon name="lucideArrowLeft" size="14px" aria-hidden="true" />
+                <span>{{ 'inventory.purchaseOrder.backToList' | translate }}</span>
+            </button>
+            <button nz-button nzType="primary" type="button" class="inline-flex items-center gap-1.5" (click)="load()">
+                <ng-icon name="lucideRotateCw" size="14px" aria-hidden="true" />
+                <span>{{ 'form.retry' | translate }}</span>
+            </button>
+        </div>
+    </div>
+} @else {
+    @if (loading()) {
+        <span class="sr-only" role="status">{{ 'form.loading' | translate }}</span>
+    }
+
+    @if (record(); as loaded) {
+        <!-- What happened to the order, said once, before anything else. -->
+        @if (verified()) {
+            <div class="mb-2 flex items-start gap-2 rounded-container border border-success-border bg-success-bg px-4 py-3 md:mb-4" data-detail="banner">
+                <ng-icon name="lucideBadgeCheck" size="16px" class="mt-0.5 text-success-ink" aria-hidden="true" />
+                <div>
+                    <p class="m-0 text-[13px] font-semibold text-success-ink">{{ 'inventory.purchaseOrder.banner.verified' | translate: { date: (loaded.details.verified_on | recordDate: language() : 'date-time-12'), name: loaded.details.verified_by_name || loaded.details.verified_by } }}</p>
+                    <p class="mt-0.5 mb-0 text-xs text-ink-body">{{ 'inventory.purchaseOrder.banner.verifiedBody' | translate: { units: loaded.stats.received_units, batches: loaded.stats.batches, short: loaded.stats.units_short } | digits }}</p>
+                </div>
+            </div>
+        } @else if (cancelled()) {
+            <div class="mb-2 flex items-start gap-2 rounded-container border border-line bg-surface-sunken px-4 py-3 md:mb-4" data-detail="banner">
+                <ng-icon name="lucideBan" size="16px" class="mt-0.5 text-ink-muted" aria-hidden="true" />
+                <div>
+                    <p class="m-0 text-[13px] font-semibold text-ink">{{ 'inventory.purchaseOrder.banner.cancelled' | translate: { date: (loaded.details.cancelled_on | recordDate: language() : 'date-time-12'), name: loaded.details.cancelled_by_name || loaded.details.cancelled_by } }}</p>
+                    <p class="mt-0.5 mb-0 text-xs text-ink-body">{{ 'inventory.purchaseOrder.banner.reason' | translate: { reason: loaded.details.cancel_reason || '–' } }}</p>
+                </div>
+            </div>
+        } @else if (overdue()) {
+            <div class="mb-2 flex items-start gap-2 rounded-container border border-warning-border bg-warning-bg px-4 py-3 md:mb-4" data-detail="banner">
+                <ng-icon name="lucideClock" size="16px" class="mt-0.5 text-warning-ink" aria-hidden="true" />
+                <p class="m-0 text-[13px] font-semibold text-warning-ink">{{ 'inventory.purchaseOrder.banner.overdue' | translate: { date: (loaded.details.expected_delivery_date | recordDate: language() : 'date') } }}</p>
+            </div>
+        }
+    }
+
+    <nz-card [nzTitle]="detailsTitle" data-detail="details">
+        <ng-template #detailsTitle
+            ><h2 class="m-0 flex items-center gap-1.5 text-sm font-bold text-ink"><ng-icon name="lucideInfo" size="14px" class="text-ink-muted" aria-hidden="true" />{{ 'inventory.purchaseOrder.section.details' | translate }}</h2></ng-template
+        >
+        @if (order(); as o) {
+            <dl class="m-0 grid grid-cols-2 gap-x-6 gap-y-4 md:grid-cols-4">
+                <div>
+                    <dt class="text-xs text-ink-muted">{{ 'inventory.purchaseOrder.number' | translate }}</dt>
+                    <dd class="mt-1 mb-0 font-mono text-sm font-semibold text-ink">{{ o.po_number }}</dd>
+                </div>
+                <div>
+                    <dt class="text-xs text-ink-muted">{{ 'inventory.purchaseOrder.status.label' | translate }}</dt>
+                    <dd class="mt-1 mb-0">
+                        @if (statusTone(); as style) {
+                            <status-tag [label]="style.label" [tone]="style.tone" [icon]="style.icon" size="standard" />
+                        }
+                    </dd>
+                </div>
+                <div>
+                    <dt class="text-xs text-ink-muted">{{ 'inventory.purchaseOrder.supplier' | translate }}</dt>
+                    <dd class="mt-1 mb-0 text-sm font-semibold text-ink">{{ o.supplier_name }}</dd>
+                    @if (record(); as loaded) {
+                        <dd class="mt-0.5 mb-0 text-xs text-ink-muted">
+                            <span class="font-mono">{{ loaded.details.supplier_phone }}</span> &middot; {{ 'inventory.purchaseOrder.ordersThisYear' | translate: { count: loaded.details.supplier_orders_this_year } | digits }}
+                        </dd>
+                    }
+                </div>
+                <div>
+                    <dt class="text-xs text-ink-muted">{{ 'inventory.purchaseOrder.type.label' | translate }}</dt>
+                    <dd class="mt-1 mb-0 text-sm font-semibold text-ink">
+                        @if (o.purchase_type) {
+                            {{ 'inventory.purchaseOrder.type.' + o.purchase_type | translate }}
+                        }
+                    </dd>
+                </div>
+                <div>
+                    <dt class="text-xs text-ink-muted">{{ 'inventory.purchaseOrder.expected' | translate }}</dt>
+                    <dd class="mt-1 mb-0 text-sm font-semibold text-ink">
+                        @if (o.expected_delivery_date) {
+                            {{ o.expected_delivery_date | recordDate: language() : 'date' }}
+                        } @else {
+                            {{ 'inventory.purchaseOrder.notSet' | translate }}
+                        }
+                    </dd>
+                </div>
+                <div>
+                    <dt class="text-xs text-ink-muted">{{ 'inventory.purchaseOrder.payment.label' | translate }}</dt>
+                    <dd class="mt-1 mb-0">
+                        @if (paymentTone(); as style) {
+                            <status-tag [label]="style.label" [tone]="style.tone" [icon]="style.icon" size="standard" />
+                        }
+                    </dd>
+                </div>
+                <div>
+                    <dt class="text-xs text-ink-muted">{{ 'inventory.purchaseOrder.paid' | translate }}</dt>
+                    <dd class="mt-1 mb-0 font-mono text-sm font-semibold text-ink">{{ o.paid_amount | money }}</dd>
+                </div>
+                <div>
+                    <dt class="text-xs text-ink-muted">{{ 'inventory.purchaseOrder.raised' | translate }}</dt>
+                    <dd class="mt-1 mb-0 text-sm font-semibold text-ink">
+                        @if (o.created_on) {
+                            {{ o.created_on | recordDate: language() : 'date' }}
+                        }
+                    </dd>
+                    @if (record(); as loaded) {
+                        <dd class="mt-0.5 mb-0 text-xs text-ink-muted">{{ loaded.details.created_by_name || loaded.details.created_by }}</dd>
+                    }
+                </div>
+                @if (record(); as loaded) {
+                    <div class="col-span-2 border-t border-line-soft pt-4 md:col-span-4" data-detail="notes">
+                        <dt class="text-xs text-ink-muted">{{ 'inventory.purchaseOrder.notes' | translate }}</dt>
+                        <dd class="mt-1 mb-0 text-sm whitespace-pre-line text-ink-body">{{ loaded.details.special_notes || ('inventory.purchaseOrder.notSet' | translate) }}</dd>
+                    </div>
+                }
+            </dl>
+        } @else {
+            <nz-skeleton nzActive [nzTitle]="false" [nzParagraph]="{ rows: 4 }" />
+        }
+    </nz-card>
+
+    @if (stats().length) {
+        <div class="mt-2 grid grid-cols-2 gap-px overflow-hidden rounded-container border border-line bg-line md:mt-4" [class]="stats().length === 4 ? 'md:grid-cols-4' : 'md:grid-cols-3'" data-detail="stats">
+            @for (stat of stats(); track stat.key) {
+                <div class="flex flex-col justify-between bg-white px-4 py-3" [attr.data-stat]="stat.key">
+                    <p class="m-0 flex items-center gap-1.5 text-xs font-semibold text-ink-muted">
+                        <ng-icon [name]="stat.icon" size="13px" aria-hidden="true" />
+                        {{ stat.label | translate }}
+                    </p>
+                    <p class="mt-1 mb-0 font-mono text-xl font-bold tabular-nums" [class.text-danger]="stat.tone === 'danger'" [class.text-warning-ink]="stat.tone === 'warning'" [class.text-ink]="!stat.tone">
+                        @if (stat.format === 'text') {
+                            {{ stat.value | digits }}
+                        } @else {
+                            {{ stat.value | money: stat.format }}
+                        }
+                    </p>
+                    @if (stat.note; as note) {
+                        <p class="mt-0.5 mb-0 text-xs text-ink-muted">{{ note.key | translate: note.params ?? {} | digits }}</p>
+                    }
+                </div>
+            }
+        </div>
+    } @else if (loading()) {
+        <div class="mt-2 grid grid-cols-2 gap-px overflow-hidden rounded-container border border-line bg-line md:mt-4 md:grid-cols-4">
+            @for (cell of [1, 2, 3, 4]; track cell) {
+                <div class="bg-white px-4 py-3"><nz-skeleton nzActive [nzTitle]="false" [nzParagraph]="{ rows: 2 }" /></div>
+            }
+        </div>
+    }
+
+    <nz-card class="mt-2 block md:mt-4" [nzTitle]="linesTitle" [nzExtra]="linesExtra" [nzBodyStyle]="{ padding: '0' }" data-detail="lines">
+        <ng-template #linesTitle
+            ><h2 class="m-0 flex items-center gap-1.5 text-sm font-bold text-ink"><ng-icon name="lucideListOrdered" size="14px" class="text-ink-muted" aria-hidden="true" />{{ 'inventory.purchaseOrder.products' | translate }}</h2></ng-template
+        >
+        <ng-template #linesExtra>
+            @if (verified()) {
+                <button nz-button nzSize="small" type="button" class="inline-flex items-center gap-1.5" (click)="toggleAll()">
+                    <ng-icon name="lucideChevronsUpDown" size="13px" aria-hidden="true" />
+                    <span>{{ (expanded().size === (record()?.lines?.length ?? 0) ? 'inventory.purchaseOrder.collapseAll' : 'inventory.purchaseOrder.expandAll') | translate }}</span>
+                </button>
+            }
+        </ng-template>
+
+        @if (record(); as loaded) {
+            @if (verified()) {
+                <nz-table nzTemplateMode nzSize="small" [nzScroll]="{ x: '1000px' }">
+                    <thead>
+                        <tr>
+                            <th nzWidth="36px">
+                                <span class="sr-only">{{ 'inventory.purchaseOrder.expandLine' | translate }}</span>
+                            </th>
+                            <th>{{ 'inventory.purchaseOrder.productBatch' | translate }}</th>
+                            <th nzWidth="110px" class="text-right">{{ 'inventory.purchaseOrder.received' | translate }}</th>
+                            <th nzWidth="120px" class="text-right">{{ 'inventory.purchaseOrder.unitPrice' | translate }}</th>
+                            <th nzWidth="100px">{{ 'inventory.purchaseOrder.use.label' | translate }}</th>
+                            <th nzWidth="100px" class="text-right">{{ 'inventory.purchaseOrder.selling' | translate }}</th>
+                            <th nzWidth="90px" class="text-right">{{ 'inventory.purchaseOrder.maxDiscount' | translate }}</th>
+                            <th nzWidth="110px" class="text-right">{{ 'inventory.purchaseOrder.marginPerUnit' | translate }}</th>
+                            <th nzWidth="130px" class="text-right">{{ 'inventory.purchaseOrder.receivedTotal' | translate }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (line of loaded.lines; track line.oid) {
+                            @let batch = line.batches[0];
+                            @let margin = marginOf(line);
+                            <tr class="cursor-pointer" (click)="toggle(line)">
+                                <td>
+                                    <button nz-button nzType="text" nzSize="small" type="button" [attr.aria-expanded]="expanded().has(line.oid)" [attr.aria-label]="'inventory.purchaseOrder.expandLine' | translate">
+                                        <ng-icon name="lucideChevronsUpDown" size="13px" class="text-ink-muted" aria-hidden="true" />
+                                    </button>
+                                </td>
+                                <td>
+                                    <span class="block text-[13px] font-semibold text-ink">{{ line.product_name }}</span>
+                                    <span class="block text-xs text-ink-muted">
+                                        @for (b of line.batches; track b.oid) {
+                                            <span class="font-mono">{{ b.batch_code }}</span> &middot;
+                                        } @empty {
+                                            {{ 'inventory.purchaseOrder.noBatch' | translate }} &middot;
+                                        }
+                                        {{ line.warehouse_name }}
+                                        @if (line.aisle_name) {
+                                            &rsaquo; {{ line.aisle_name }}
+                                        }
+                                    </span>
+                                </td>
+                                <td class="text-right">
+                                    <span class="block font-mono text-[13px] text-ink">{{ line.received_quantity | digits }}</span>
+                                    @if ((line.received_quantity ?? 0) < line.ordered_quantity) {
+                                        <span class="block text-xs text-warning-ink">{{ 'inventory.purchaseOrder.ofShort' | translate: { ordered: line.ordered_quantity, short: line.ordered_quantity - (line.received_quantity ?? 0) } | digits }}</span>
+                                    } @else {
+                                        <span class="block text-xs text-ink-muted">{{ 'inventory.purchaseOrder.asOrdered' | translate }}</span>
+                                    }
+                                </td>
+                                <td class="text-right">
+                                    <span class="block font-mono text-[13px] text-ink">{{ line.received_unit_price | money }}</span>
+                                    @if (line.received_unit_price !== line.ordered_unit_price) {
+                                        <span class="block text-xs text-warning-ink">{{ 'inventory.purchaseOrder.orderedAt' | translate: { price: (line.ordered_unit_price | money) } }}</span>
+                                    }
+                                </td>
+                                <td class="text-xs">
+                                    @if (batch) {
+                                        {{ 'inventory.purchaseOrder.use.' + batch.intended_use | translate }}
+                                    }
+                                </td>
+                                <td class="text-right font-mono text-[13px]">{{ batch?.selling_price | money }}</td>
+                                <td class="text-right font-mono text-[13px]">{{ batch?.maximum_discount | money }}</td>
+                                <td class="text-right font-mono text-[13px]" [class.text-danger]="(margin ?? 0) < 0">
+                                    @if (margin !== null) {
+                                        {{ margin | money }}
+                                    } @else {
+                                        <span class="text-ink-muted">&ndash;</span>
+                                    }
+                                </td>
+                                <td class="text-right font-mono text-[13px] font-semibold text-ink">{{ lineTotal(line.received_quantity, line.received_unit_price) | money }}</td>
+                            </tr>
+                            <tr [nzExpand]="expanded().has(line.oid)">
+                                <div class="grid grid-cols-2 gap-x-6 gap-y-2 py-1 text-xs md:grid-cols-4" [attr.data-expanded]="line.oid">
+                                    @for (key of budgetKeys; track key) {
+                                        <div>
+                                            <span class="block text-ink-muted">{{ 'inventory.purchaseOrder.budgets.' + key | translate }}</span>
+                                            <span class="font-mono text-ink">{{ line[key] | money }}</span>
+                                        </div>
+                                    }
+                                    <div>
+                                        <span class="block text-ink-muted">{{ 'inventory.purchaseOrder.batchCost' | translate }}</span>
+                                        <span class="font-mono text-ink">{{ lineTotal(1, line.received_unit_price) + budgetOf(line) | money }}</span>
+                                    </div>
+                                    <div>
+                                        <span class="block text-ink-muted">{{ 'inventory.purchaseOrder.orderedLineTotal' | translate }}</span>
+                                        <span class="font-mono text-ink">{{ lineTotal(line.ordered_quantity, line.ordered_unit_price) | money }}</span>
+                                    </div>
+                                    <div class="col-span-2">
+                                        <span class="block text-ink-muted">{{ 'inventory.purchaseOrder.budgets.remarks' | translate }}</span>
+                                        <span class="text-ink">{{ line.cost_remarks || '–' }}</span>
+                                    </div>
+                                </div>
+                            </tr>
+                        }
+                    </tbody>
+                </nz-table>
+            } @else {
+                <nz-table nzTemplateMode nzSize="small" [nzScroll]="{ x: '820px' }">
+                    <thead>
+                        <tr>
+                            <th nzWidth="40px" class="text-center">#</th>
+                            <th>{{ 'inventory.purchaseOrder.product' | translate }}</th>
+                            <th>{{ 'inventory.purchaseOrder.goesTo' | translate }}</th>
+                            <th nzWidth="130px" class="text-right">{{ 'inventory.purchaseOrder.inStockNow' | translate }}</th>
+                            <th nzWidth="80px" class="text-right">{{ 'inventory.purchaseOrder.quantity' | translate }}</th>
+                            <th nzWidth="120px" class="text-right">{{ 'inventory.purchaseOrder.unitPrice' | translate }}</th>
+                            <th nzWidth="130px" class="text-right">{{ 'inventory.purchaseOrder.lineTotal' | translate }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (line of loaded.lines; track line.oid; let i = $index) {
+                            <tr>
+                                <td class="text-center font-mono text-xs text-ink-muted">{{ i + 1 | digits }}</td>
+                                <td>
+                                    <span class="block text-[13px] font-semibold text-ink">{{ line.product_name }}</span>
+                                    <span class="block font-mono text-xs text-ink-muted">{{ line.sku }}</span>
+                                </td>
+                                <td class="text-[13px] text-ink-body">
+                                    {{ line.warehouse_name }}
+                                    @if (line.aisle_name) {
+                                        &rsaquo; {{ line.aisle_name }}
+                                    }
+                                </td>
+                                <td class="text-right font-mono text-[13px]" [class.text-danger]="line.sellable === 0" [class.text-warning-ink]="line.sellable > 0 && line.sellable <= line.restock_threshold">
+                                    {{ 'inventory.purchaseOrder.stockAgainst' | translate: { stock: line.sellable, restock: line.restock_threshold } | digits }}
+                                </td>
+                                <td class="text-right font-mono text-[13px]">{{ line.ordered_quantity | digits }}</td>
+                                <td class="text-right font-mono text-[13px]">{{ line.ordered_unit_price | money }}</td>
+                                <td class="text-right font-mono text-[13px] font-semibold text-ink">{{ lineTotal(line.ordered_quantity, line.ordered_unit_price) | money }}</td>
+                            </tr>
+                        }
+                    </tbody>
+                </nz-table>
+            }
+
+            <dl class="m-0 flex flex-wrap justify-end gap-x-8 gap-y-2 border-t border-line px-4 py-3 md:px-5" data-detail="totals">
+                <div class="text-right">
+                    <dt class="text-xs text-ink-muted">{{ 'inventory.purchaseOrder.stat.orderedTotal' | translate }}</dt>
+                    <dd class="m-0 font-mono text-sm text-ink">{{ loaded.stats.ordered_total | money }}</dd>
+                </div>
+                <div class="text-right">
+                    <dt class="text-xs text-ink-muted">{{ 'inventory.purchaseOrder.paid' | translate }}</dt>
+                    <dd class="m-0 font-mono text-sm text-ink">{{ loaded.details.paid_amount | money }}</dd>
+                </div>
+                @if (verified()) {
+                    <div class="text-right">
+                        <dt class="text-xs text-ink-muted">{{ 'inventory.purchaseOrder.receivedTotal' | translate }}</dt>
+                        <dd class="m-0 font-mono text-lg font-bold text-ink">{{ loaded.stats.received_total | money }}</dd>
+                    </div>
+                }
+            </dl>
+        } @else {
+            <div class="px-4 py-4"><nz-skeleton nzActive [nzTitle]="false" [nzParagraph]="{ rows: 4 }" /></div>
+        }
+    </nz-card>
+
+    <!-- Quick actions beside the activity, first in the markup so a phone reads them before a long history. -->
+    <div class="mt-2 grid grid-cols-1 items-start gap-2 md:mt-4 md:gap-4 lg:grid-cols-3">
+        <nz-card class="lg:col-start-3 lg:row-start-1" [nzTitle]="quickTitle" data-detail="quick-actions">
+            <ng-template #quickTitle
+                ><h2 class="m-0 flex items-center gap-1.5 text-sm font-bold text-ink"><ng-icon name="lucideZap" size="14px" class="text-ink-muted" aria-hidden="true" />{{ 'inventory.purchaseOrder.quickActions' | translate }}</h2></ng-template
+            >
+            <div class="flex flex-col gap-2">
+                @if (canPay()) {
+                    <button nz-button nzBlock type="button" class="inline-flex items-center justify-start gap-2" data-quick="payment" (click)="openPayment()">
+                        <ng-icon name="lucideHandCoins" size="14px" aria-hidden="true" />
+                        <span>{{ 'inventory.purchaseOrder.recordPayment' | translate }}</span>
+                    </button>
+                }
+                @if (canExport()) {
+                    @for (report of reports; track report.kind) {
+                        <button nz-button nzBlock type="button" class="inline-flex items-center justify-start gap-2" [attr.data-report]="report.kind" [nzLoading]="downloading() === report.kind" [disabled]="!!downloading()" (click)="download(report.kind)">
+                            @if (downloading() !== report.kind) {
+                                <ng-icon name="lucideFileSpreadsheet" size="14px" aria-hidden="true" />
+                            }
+                            <span>{{ report.label | translate }}</span>
+                        </button>
+                    }
+                }
+                @if (!canPay() && !canExport()) {
+                    <p class="m-0 text-xs text-ink-muted">{{ 'inventory.purchaseOrder.noQuickActions' | translate }}</p>
+                }
+            </div>
+        </nz-card>
+
+        <nz-card class="lg:col-span-2 lg:row-start-1" [nzTitle]="activityTitle" data-detail="activity">
+            <ng-template #activityTitle
+                ><h2 class="m-0 flex items-center gap-1.5 text-sm font-bold text-ink"><ng-icon name="lucideHistory" size="14px" class="text-ink-muted" aria-hidden="true" />{{ 'inventory.purchaseOrder.activity' | translate }}</h2></ng-template
+            >
+            @if (record(); as loaded) {
+                @if (loaded.activity.length) {
+                    <nz-timeline>
+                        @for (entry of loaded.activity; track entry.oid; let first = $first) {
+                            <nz-timeline-item [nzColor]="first ? 'blue' : 'gray'">
+                                <p class="m-0 text-[13px] font-semibold text-ink">{{ entry.action }}</p>
+                                @if (entry.description) {
+                                    <p class="mt-0.5 mb-0 text-xs text-ink-body">{{ entry.description }}</p>
+                                }
+                                <p class="mt-0.5 mb-0 text-xs text-ink-muted">{{ entry.user }} &middot; {{ entry.date | recordDate: language() : 'date-time-12' }}</p>
+                            </nz-timeline-item>
+                        }
+                    </nz-timeline>
+                } @else {
+                    <p class="m-0 text-xs text-ink-muted">{{ 'inventory.purchaseOrder.noActivity' | translate }}</p>
+                }
+            } @else {
+                <nz-skeleton nzActive [nzTitle]="false" [nzParagraph]="{ rows: 4 }" />
+            }
+        </nz-card>
+    </div>
+
+    <action-footer>
+        <button nz-button nzType="default" type="button" class="inline-flex items-center gap-1.5" (click)="backToList()">
+            <ng-icon name="lucideArrowLeft" size="14px" aria-hidden="true" />
+            <span>{{ 'inventory.purchaseOrder.backToList' | translate }}</span>
+        </button>
+    </action-footer>
+}
+
+<nz-modal [nzVisible]="paymentOpen()" [nzTitle]="'inventory.purchaseOrder.recordPayment' | translate" [nzContent]="paymentBody" [nzFooter]="paymentFooter" nzCentered (nzOnCancel)="paymentOpen.set(false)">
+    <ng-template #paymentBody>
+        <form nz-form nzLayout="vertical" [formGroup]="paymentForm" (ngSubmit)="savePayment()">
+            <p class="mt-0 mb-3 text-xs text-ink-muted">{{ 'inventory.purchaseOrder.paymentLead' | translate: { total: (record()?.details?.total_amount | money) } }}</p>
+            <nz-form-item>
+                <nz-form-label nzRequired>{{ 'inventory.purchaseOrder.payment.label' | translate }}</nz-form-label>
+                <nz-form-control>
+                    <nz-radio-group formControlName="payment_status" nzButtonStyle="solid" class="flex w-full" [attr.aria-label]="'inventory.purchaseOrder.payment.label' | translate">
+                        @for (status of paymentStatuses; track status) {
+                            <label nz-radio-button class="flex-1 px-2 text-center whitespace-nowrap" [nzValue]="status">{{ 'inventory.purchaseOrder.payment.' + status | translate }}</label>
+                        }
+                    </nz-radio-group>
+                </nz-form-control>
+            </nz-form-item>
+            @if (paymentForm.controls.payment_status.value === 'partially_paid') {
+                <nz-form-item>
+                    <nz-form-label nzRequired nzFor="pay-amount">{{ 'inventory.purchaseOrder.paid' | translate }}</nz-form-label>
+                    <nz-form-control [nzErrorTip]="'inventory.purchaseOrder.paidRequired' | translate">
+                        <nz-input-number nzId="pay-amount" class="w-full font-mono" formControlName="paid_amount" [nzMin]="1" [nzPrecision]="0" />
+                    </nz-form-control>
+                </nz-form-item>
+            }
+        </form>
+    </ng-template>
+    <ng-template #paymentFooter>
+        <button nz-button type="button" class="inline-flex items-center gap-1.5" (click)="paymentOpen.set(false)">
+            <ng-icon name="lucideX" size="14px" aria-hidden="true" />
+            <span>{{ 'form.cancel' | translate }}</span>
+        </button>
+        <button nz-button nzType="primary" type="button" class="inline-flex items-center gap-1.5" [nzLoading]="saving()" (click)="savePayment()">
+            @if (!saving()) {
+                <ng-icon name="lucideHandCoins" size="14px" aria-hidden="true" />
+            }
+            <span>{{ 'inventory.purchaseOrder.recordPayment' | translate }}</span>
+        </button>
+    </ng-template>
+</nz-modal>
+
+<nz-modal [nzVisible]="cancelOpen()" [nzTitle]="'inventory.purchaseOrder.cancelTitle' | translate" [nzContent]="cancelBody" [nzFooter]="cancelFooter" nzCentered (nzOnCancel)="cancelOpen.set(false)">
+    <ng-template #cancelBody>
+        <form nz-form nzLayout="vertical" [formGroup]="cancelForm" (ngSubmit)="confirmCancel()">
+            <p class="mt-0 mb-3 text-[13px] text-ink-body">{{ 'inventory.purchaseOrder.cancelBody' | translate }}</p>
+            <nz-form-item>
+                <nz-form-label nzRequired nzFor="cancel-reason">{{ 'inventory.purchaseOrder.cancelReason' | translate }}</nz-form-label>
+                <nz-form-control [nzErrorTip]="'inventory.purchaseOrder.cancelReasonRequired' | translate">
+                    <textarea nz-input id="cancel-reason" formControlName="reason" rows="3" [attr.placeholder]="'inventory.purchaseOrder.cancelReasonPlaceholder' | translate"></textarea>
+                </nz-form-control>
+            </nz-form-item>
+        </form>
+    </ng-template>
+    <ng-template #cancelFooter>
+        <button nz-button type="button" class="inline-flex items-center gap-1.5" (click)="cancelOpen.set(false)">
+            <ng-icon name="lucideArrowLeft" size="14px" aria-hidden="true" />
+            <span>{{ 'inventory.purchaseOrder.keepOrder' | translate }}</span>
+        </button>
+        <button nz-button nzType="primary" nzDanger type="button" class="inline-flex items-center gap-1.5" [nzLoading]="saving()" (click)="confirmCancel()">
+            @if (!saving()) {
+                <ng-icon name="lucideBan" size="14px" aria-hidden="true" />
+            }
+            <span>{{ 'inventory.purchaseOrder.cancelOrder' | translate }}</span>
+        </button>
+    </ng-template>
+</nz-modal>

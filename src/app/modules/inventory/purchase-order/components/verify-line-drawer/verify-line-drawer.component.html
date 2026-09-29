@@ -1,0 +1,119 @@
+<!-- Never wider than the screen: on a phone the drawer is the whole width. -->
+<nz-drawer [nzVisible]="!!line()" nzWidth="min(480px, 100vw)" nzPlacement="right" [nzTitle]="drawerTitle" [nzContent]="drawerBody" [nzFooter]="drawerFooter" (nzOnClose)="closed.emit()" />
+<ng-template #drawerTitle>
+    @if (line(); as current) {
+        <span class="block text-sm font-bold text-ink">{{ current.product_name }}</span>
+        <span class="block text-xs font-normal text-ink-muted">{{ 'inventory.purchaseOrder.verifyDrawer.ordered' | translate: { quantity: current.ordered_quantity, price: (current.ordered_unit_price | money) } | digits }}</span>
+    }
+</ng-template>
+
+<ng-template #drawerBody>
+    @if (line(); as current) {
+        <form nz-form nzLayout="vertical" [formGroup]="form" (ngSubmit)="save(hasNext())">
+            <div class="grid grid-cols-2 gap-x-3">
+                <nz-form-item>
+                    <nz-form-label nzRequired nzFor="vl-received">{{ 'inventory.purchaseOrder.verifyDrawer.arrived' | translate }}</nz-form-label>
+                    <nz-form-control [nzErrorTip]="'inventory.purchaseOrder.verifyDrawer.arrivedError' | translate: { max: current.ordered_quantity } | digits">
+                        <nz-input-number nzId="vl-received" class="w-full font-mono" formControlName="received_quantity" [nzMin]="0" [nzMax]="current.ordered_quantity" [nzPrecision]="0" [attr.aria-invalid]="invalid('received_quantity')" />
+                    </nz-form-control>
+                    @if (short() > 0) {
+                        <p class="-mt-5 mb-4 text-xs text-warning-ink">{{ 'inventory.purchaseOrder.verifyDrawer.short' | translate: { count: short() } | digits }}</p>
+                    }
+                </nz-form-item>
+                <nz-form-item>
+                    <nz-form-label nzRequired nzFor="vl-price" [nzTooltipTitle]="'inventory.purchaseOrder.verifyDrawer.billedHelper' | translate">{{ 'inventory.purchaseOrder.verifyDrawer.billed' | translate }}</nz-form-label>
+                    <nz-form-control [nzErrorTip]="'form.required' | translate">
+                        <nz-input-number nzId="vl-price" class="w-full font-mono" formControlName="unit_price" [nzMin]="0" [nzPrecision]="0" [attr.aria-invalid]="invalid('unit_price')" />
+                    </nz-form-control>
+                </nz-form-item>
+            </div>
+
+            <nz-form-item>
+                <nz-form-label nzRequired>{{ 'inventory.purchaseOrder.use.label' | translate }}</nz-form-label>
+                <nz-form-control>
+                    <nz-radio-group formControlName="intended_use" nzButtonStyle="solid" class="flex w-full" [attr.aria-label]="'inventory.purchaseOrder.use.label' | translate">
+                        <label nz-radio-button class="flex-1 px-2 text-center whitespace-nowrap" nzValue="for_sale">{{ 'inventory.purchaseOrder.use.for_sale' | translate }}</label>
+                        <label nz-radio-button class="flex-1 px-2 text-center whitespace-nowrap" nzValue="internal_use">{{ 'inventory.purchaseOrder.use.internal_use' | translate }}</label>
+                    </nz-radio-group>
+                </nz-form-control>
+            </nz-form-item>
+
+            @if (forSale()) {
+                <div class="grid grid-cols-2 gap-x-3">
+                    <nz-form-item>
+                        <nz-form-label nzRequired nzFor="vl-selling">{{ 'inventory.purchaseOrder.verifyDrawer.selling' | translate }}</nz-form-label>
+                        <nz-form-control [nzErrorTip]="'inventory.purchaseOrder.verifyDrawer.sellingError' | translate">
+                            <nz-input-number nzId="vl-selling" class="w-full font-mono" formControlName="selling_price" [nzMin]="1" [nzPrecision]="0" [attr.aria-invalid]="invalid('selling_price')" />
+                        </nz-form-control>
+                    </nz-form-item>
+                    <nz-form-item>
+                        <nz-form-label nzRequired nzFor="vl-discount" [nzTooltipTitle]="'inventory.purchaseOrder.verifyDrawer.discountHelper' | translate">{{ 'inventory.purchaseOrder.verifyDrawer.discount' | translate }}</nz-form-label>
+                        <nz-form-control [nzErrorTip]="'form.required' | translate">
+                            <nz-input-number nzId="vl-discount" class="w-full font-mono" formControlName="maximum_discount" [nzMin]="0" [nzPrecision]="0" [attr.aria-invalid]="invalid('maximum_discount')" />
+                        </nz-form-control>
+                    </nz-form-item>
+                </div>
+                @if (form.hasError('discountAbovePrice')) {
+                    <p class="-mt-4 mb-4 text-xs text-danger" role="alert">{{ 'inventory.purchaseOrder.verifyDrawer.discountAbovePrice' | translate }}</p>
+                }
+            }
+
+            <fieldset class="m-0 border-0 border-t border-line p-0 pt-4">
+                <legend class="mb-1 text-[13px] font-semibold text-ink">{{ 'inventory.purchaseOrder.budgets.title' | translate }}</legend>
+                <p class="mt-0 mb-3 text-xs text-ink-muted">{{ 'inventory.purchaseOrder.budgets.lead' | translate }}</p>
+                <div class="grid grid-cols-2 gap-x-3">
+                    @for (key of budgetKeys; track key) {
+                        <nz-form-item>
+                            <nz-form-label [nzFor]="'vl-' + key">{{ 'inventory.purchaseOrder.budgets.' + key | translate }}</nz-form-label>
+                            <nz-form-control>
+                                <nz-input-number class="w-full font-mono" [nzId]="'vl-' + key" [formControlName]="key" [nzMin]="0" [nzPrecision]="0" />
+                            </nz-form-control>
+                        </nz-form-item>
+                    }
+                </div>
+                <nz-form-item>
+                    <nz-form-label nzFor="vl-remarks">{{ 'inventory.purchaseOrder.budgets.remarks' | translate }}</nz-form-label>
+                    <nz-form-control [nzErrorTip]="'form.tooLong' | translate: { max: 500 } | digits">
+                        <input nz-input id="vl-remarks" formControlName="cost_remarks" type="text" autocomplete="off" [attr.placeholder]="'inventory.purchaseOrder.budgets.remarksPlaceholder' | translate" />
+                    </nz-form-control>
+                </nz-form-item>
+            </fieldset>
+
+            <dl class="m-0 grid grid-cols-2 gap-3 rounded-control bg-surface-sunken px-3 py-2 text-xs" data-drawer="summary">
+                <div>
+                    <dt class="text-ink-muted">{{ 'inventory.purchaseOrder.receivedTotal' | translate }}</dt>
+                    <dd class="m-0 font-mono text-sm font-semibold text-ink">{{ receivedTotal() | money }}</dd>
+                </div>
+                <div>
+                    <dt class="text-ink-muted">{{ 'inventory.purchaseOrder.marginPerUnit' | translate }}</dt>
+                    <dd class="m-0 font-mono text-sm font-semibold" [class.text-danger]="(margin() ?? 0) < 0" [class.text-ink]="(margin() ?? 0) >= 0">
+                        @if (margin() !== null) {
+                            {{ margin() | money }}
+                        } @else {
+                            @if (forSale()) {
+                                <span class="text-ink-muted">&ndash;</span>
+                            } @else {
+                                <span class="font-sans text-ink-muted">{{ 'inventory.purchaseOrder.notForSale' | translate }}</span>
+                            }
+                        }
+                    </dd>
+                </div>
+            </dl>
+        </form>
+    }
+</ng-template>
+
+<ng-template #drawerFooter>
+    <div class="flex justify-end gap-2">
+        <button nz-button nzType="default" type="button" class="inline-flex items-center gap-1.5" (click)="save(false)">
+            <ng-icon name="lucideCheck" size="14px" aria-hidden="true" />
+            <span>{{ 'inventory.purchaseOrder.verifyDrawer.save' | translate }}</span>
+        </button>
+        @if (hasNext()) {
+            <button nz-button nzType="primary" type="button" class="inline-flex items-center gap-1.5" (click)="save(true)">
+                <ng-icon name="lucideArrowRight" size="14px" aria-hidden="true" />
+                <span>{{ 'inventory.purchaseOrder.verifyDrawer.saveNext' | translate }}</span>
+            </button>
+        }
+    </div>
+</ng-template>

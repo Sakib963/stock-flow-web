@@ -64,6 +64,7 @@ export class APIEndpoint {
     static readonly CHECK_SUPPLIER_AVAILABILITY = '/api/v1/configuration/supplier/check-supplier-availability';
     static readonly GENERATE_SUPPLIER_PERFORMANCE_REPORT = '/api/v1/configuration/supplier/generate-supplier-performance-report';
     static readonly EXPORT_SUPPLIER_DATA = '/api/v1/configuration/supplier/export-supplier-data';
+    static readonly GET_SUPPLIER_LIST_FOR_DROPDOWN = '/api/v1/configuration/supplier/get-supplier-list-for-dropdown';
 
     static readonly GET_WAREHOUSE_LIST = '/api/v1/configuration/warehouse/get-warehouse-list';
     static readonly GET_WAREHOUSE_DETAILS = '/api/v1/configuration/warehouse/get-warehouse-details';
@@ -86,4 +87,16 @@ export class APIEndpoint {
     static readonly GET_AISLE_LIST_FOR_DROPDOWN = '/api/v1/configuration/aisle/get-aisle-list-for-dropdown';
 
     static readonly GET_CONFIGURATION_ANALYTICS = '/api/v1/configuration/analytics/get-configuration-analytics';
+
+    // Inventory
+    static readonly GET_PURCHASE_ORDER_LIST = '/api/v1/inventory/purchase-order/get-purchase-list';
+    static readonly GET_PURCHASE_ORDER_DETAILS = '/api/v1/inventory/purchase-order/get-purchase-details';
+    static readonly GET_PRODUCT_LIST_FOR_PURCHASE = '/api/v1/inventory/purchase-order/get-product-list-for-purchase';
+    static readonly CREATE_PURCHASE_ORDER = '/api/v1/inventory/purchase-order/create-purchase';
+    static readonly UPDATE_PURCHASE_ORDER = '/api/v1/inventory/purchase-order/update-purchase-details';
+    static readonly UPDATE_PURCHASE_ORDER_PAYMENT = '/api/v1/inventory/purchase-order/update-purchase-payment';
+    static readonly VERIFY_PURCHASE_ORDER = '/api/v1/inventory/purchase-order/verify-purchase';
+    static readonly CANCEL_PURCHASE_ORDER = '/api/v1/inventory/purchase-order/cancel-purchase';
+    static readonly GET_PURCHASE_ORDER_REPORT = '/api/v1/inventory/purchase-order/get-purchase-order-report';
+    static readonly GET_PURCHASE_ORDER_PRODUCTS_REPORT = '/api/v1/inventory/purchase-order/get-purchase-order-products-report';
 }
