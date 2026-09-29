@@ -19,12 +19,10 @@ describe('the purchase orders list config', () => {
         expect(table.columns.filter((c) => !c.hidden).reduce((sum, c) => sum + c.width, 0)).toBe(100);
     });
 
-    it('offers edit and verify only on an order still waiting for its delivery', () => {
-        const gated = (table.rowActions ?? []).filter((a) => a.key !== 'view');
-        expect(gated.map((a) => a.when)).toEqual([
-            { field: 'status', in: ['Submitted'] },
-            { field: 'status', in: ['Submitted'] },
-        ]);
+    it('offers edit on a draft or a submitted order, and verify only once it is submitted', () => {
+        const when = Object.fromEntries((table.rowActions ?? []).map((a) => [a.key, a.when]));
+        expect(when['edit']).toEqual({ field: 'status', in: ['Draft', 'Submitted'] });
+        expect(when['verify']).toEqual({ field: 'status', in: ['Submitted'] });
     });
 
     it('names the permission each action needs, verify being approval', () => {

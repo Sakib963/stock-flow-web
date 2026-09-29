@@ -1251,7 +1251,8 @@
             },
             "notVerifiable": {
                 "verified": "This delivery was already verified.",
-                "cancelled": "This order was cancelled, so there is nothing to receive."
+                "cancelled": "This order was cancelled, so there is nothing to receive.",
+                "draft": "This order is still a draft. Submit it first, then verify its delivery."
             },
             "backToOrder": "Back to the order",
             "backToList": "Back to purchase orders",
@@ -1264,13 +1265,13 @@
                 "label": "Status",
                 "submitted": "Submitted",
                 "verified": "Verified",
-                "cancelled": "Cancelled"
+                "cancelled": "Cancelled",
+                "draft": "Draft"
             },
             "stat": {
                 "submitted": "Waiting for delivery",
                 "overdue": "Past the promised date",
                 "verified": "Received",
-                "cancelled": "Cancelled",
                 "orderedTotal": "Ordered total",
                 "productsUnits": "{{products}} products, {{units}} units",
                 "receivedTotal": "Received total",
@@ -1286,7 +1287,8 @@
                 "received": "Received",
                 "nothingArrived": "Nothing arrived",
                 "warehouses": "Going to warehouses",
-                "unitsShort": "Short by {{count}} units"
+                "unitsShort": "Short by {{count}} units",
+                "draft": "Drafts"
             },
             "searchPlaceholder": "Order number, supplier or phone",
             "totalColumn": "Total ৳",
@@ -1309,7 +1311,9 @@
                 "verifiedBody": "{{units}} units added as {{batches}} new batches, {{short}} units short. This order is final and can no longer be edited or cancelled.",
                 "cancelled": "Cancelled on {{date}} by {{name}}",
                 "reason": "Reason given: {{reason}}. No stock moved.",
-                "overdue": "The supplier promised this for {{date}} and it has not been verified yet."
+                "overdue": "The supplier promised this for {{date}} and it has not been verified yet.",
+                "draft": "This order is still a draft",
+                "draftBody": "It has not been sent to the supplier and counts nowhere yet. Continue the draft to finish it and submit it."
             },
             "products": "Products",
             "productBatch": "Product, batch and where it went",
@@ -1409,7 +1413,20 @@
                 "forbidden": "You do not have permission to verify deliveries.",
                 "server": "The delivery could not be verified. Nothing was added to stock. Try again in a moment."
             },
-            "paymentOnRecord": "Change it with Record payment on the order."
+            "paymentOnRecord": "Change it with Record payment on the order.",
+            "saveDraft": "Save as draft",
+            "draftNeedsSupplier": "Pick the supplier first. A draft needs only that.",
+            "draftSavedMessage": "Draft {{number}} saved. Carry on, or come back to it later.",
+            "draftSaved": "Draft saved.",
+            "submittedMessage": "Purchase order submitted.",
+            "resubmit": "Resubmit order",
+            "draftTitle": "Draft purchase order",
+            "confirmSubmitDraft": {
+                "title": "Submit {{number}}?",
+                "body": "It is checked in full and becomes a submitted order. Nothing is added to stock until the delivery is verified."
+            },
+            "continueDraft": "Continue the draft",
+            "notChosen": "Not chosen yet"
         }
     },
     "form": {

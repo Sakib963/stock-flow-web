@@ -13,7 +13,7 @@ export const allArrived = (line: PurchaseOrderLine): VerifyLinePayload | null =>
     if (line.current_selling_price === null) return null;
     return {
         oid: line.oid,
-        received_quantity: line.ordered_quantity,
+        received_quantity: line.ordered_quantity ?? 0,
         unit_price: Number(line.ordered_unit_price),
         intended_use: 'for_sale',
         selling_price: Number(line.current_selling_price),
@@ -30,7 +30,7 @@ export const allArrived = (line: PurchaseOrderLine): VerifyLinePayload | null =>
 /** The rules the server holds for a line, so Verify is not offered for a count it would refuse. */
 export const lineReady = (value: VerifyLinePayload | undefined, line: PurchaseOrderLine): boolean => {
     if (!value) return false;
-    if (value.received_quantity < 0 || value.received_quantity > line.ordered_quantity || value.unit_price < 0) return false;
+    if (value.received_quantity < 0 || value.received_quantity > (line.ordered_quantity ?? 0) || value.unit_price < 0) return false;
     if (value.intended_use === 'internal_use') return true;
     return (value.selling_price ?? 0) >= 1 && value.maximum_discount !== undefined && value.maximum_discount >= 0 && value.maximum_discount <= (value.selling_price ?? 0);
 };

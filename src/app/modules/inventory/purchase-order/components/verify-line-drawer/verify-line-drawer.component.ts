@@ -72,7 +72,7 @@ export class VerifyLineDrawerComponent {
 
     readonly short = computed(() => {
         const line = this.line();
-        return line ? Math.max(line.ordered_quantity - Number(this._value().received_quantity ?? 0), 0) : 0;
+        return line ? Math.max((line.ordered_quantity ?? 0) - Number(this._value().received_quantity ?? 0), 0) : 0;
     });
 
     readonly receivedTotal = computed(() => Number(this._value().received_quantity ?? 0) * Number(this._value().unit_price ?? 0));
@@ -93,7 +93,7 @@ export class VerifyLineDrawerComponent {
             if (!line) return;
             const recorded = this.value();
             this.form.reset({
-                received_quantity: recorded?.received_quantity ?? line.ordered_quantity,
+                received_quantity: recorded?.received_quantity ?? line.ordered_quantity ?? 0,
                 unit_price: recorded?.unit_price ?? Number(line.ordered_unit_price),
                 intended_use: recorded?.intended_use ?? 'for_sale',
                 selling_price: recorded ? (recorded.selling_price ?? null) : line.current_selling_price !== null ? Number(line.current_selling_price) : null,
@@ -105,7 +105,7 @@ export class VerifyLineDrawerComponent {
                 influencer_cost: recorded?.influencer_cost ?? null,
                 cost_remarks: recorded?.cost_remarks ?? '',
             });
-            this.form.controls.received_quantity.setValidators([Validators.required, Validators.min(0), Validators.max(line.ordered_quantity)]);
+            this.form.controls.received_quantity.setValidators([Validators.required, Validators.min(0), Validators.max(line.ordered_quantity ?? 0)]);
             this.form.controls.received_quantity.updateValueAndValidity();
             this.applyUse(this.form.controls.intended_use.value);
         });

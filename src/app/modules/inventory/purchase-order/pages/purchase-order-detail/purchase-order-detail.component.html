@@ -8,7 +8,7 @@
     @if (canEdit()) {
         <button nz-button type="button" class="inline-flex items-center gap-1.5" (click)="edit()">
             <ng-icon name="lucidePencil" size="14px" aria-hidden="true" />
-            <span>{{ 'inventory.purchaseOrder.edit' | translate }}</span>
+            <span>{{ (draft() ? 'inventory.purchaseOrder.continueDraft' : 'inventory.purchaseOrder.edit') | translate }}</span>
         </button>
     }
     @if (canVerify()) {
@@ -56,6 +56,14 @@
                     <p class="mt-0.5 mb-0 text-xs text-ink-body">{{ 'inventory.purchaseOrder.banner.reason' | translate: { reason: loaded.details.cancel_reason || '–' } }}</p>
                 </div>
             </div>
+        } @else if (draft()) {
+            <div class="mb-2 flex items-start gap-2 rounded-container border border-warning-border bg-warning-bg px-4 py-3 md:mb-4" data-detail="banner">
+                <ng-icon name="lucideFilePen" size="16px" class="mt-0.5 text-warning-ink" aria-hidden="true" />
+                <div>
+                    <p class="m-0 text-[13px] font-semibold text-warning-ink">{{ 'inventory.purchaseOrder.banner.draft' | translate }}</p>
+                    <p class="mt-0.5 mb-0 text-xs text-ink-body">{{ 'inventory.purchaseOrder.banner.draftBody' | translate }}</p>
+                </div>
+            </div>
         } @else if (overdue()) {
             <div class="mb-2 flex items-start gap-2 rounded-container border border-warning-border bg-warning-bg px-4 py-3 md:mb-4" data-detail="banner">
                 <ng-icon name="lucideClock" size="16px" class="mt-0.5 text-warning-ink" aria-hidden="true" />
@@ -96,6 +104,8 @@
                     <dd class="mt-1 mb-0 text-sm font-semibold text-ink">
                         @if (o.purchase_type) {
                             {{ 'inventory.purchaseOrder.type.' + o.purchase_type | translate }}
+                        } @else {
+                            {{ 'inventory.purchaseOrder.notSet' | translate }}
                         }
                     </dd>
                 </div>
@@ -114,6 +124,8 @@
                     <dd class="mt-1 mb-0">
                         @if (paymentTone(); as style) {
                             <status-tag [label]="style.label" [tone]="style.tone" [icon]="style.icon" size="standard" />
+                        } @else if (record()) {
+                            <span class="text-sm font-semibold text-ink">{{ 'inventory.purchaseOrder.notSet' | translate }}</span>
                         }
                     </dd>
                 </div>
@@ -230,8 +242,8 @@
                                 </td>
                                 <td class="text-right">
                                     <span class="block font-mono text-[13px] text-ink">{{ line.received_quantity | digits }}</span>
-                                    @if ((line.received_quantity ?? 0) < line.ordered_quantity) {
-                                        <span class="block text-xs text-warning-ink">{{ 'inventory.purchaseOrder.ofShort' | translate: { ordered: line.ordered_quantity, short: line.ordered_quantity - (line.received_quantity ?? 0) } | digits }}</span>
+                                    @if ((line.received_quantity ?? 0) < (line.ordered_quantity ?? 0)) {
+                                        <span class="block text-xs text-warning-ink">{{ 'inventory.purchaseOrder.ofShort' | translate: { ordered: line.ordered_quantity ?? 0, short: (line.ordered_quantity ?? 0) - (line.received_quantity ?? 0) } | digits }}</span>
                                     } @else {
                                         <span class="block text-xs text-ink-muted">{{ 'inventory.purchaseOrder.asOrdered' | translate }}</span>
                                     }
@@ -305,7 +317,7 @@
                                     <span class="block font-mono text-xs text-ink-muted">{{ line.sku }}</span>
                                 </td>
                                 <td class="text-[13px] text-ink-body">
-                                    {{ line.warehouse_name }}
+                                    {{ line.warehouse_name || ('inventory.purchaseOrder.notChosen' | translate) }}
                                     @if (line.aisle_name) {
                                         &rsaquo; {{ line.aisle_name }}
                                     }
@@ -313,9 +325,9 @@
                                 <td class="text-right font-mono text-[13px]" [class.text-danger]="line.sellable === 0" [class.text-warning-ink]="line.sellable > 0 && line.sellable <= line.restock_threshold">
                                     {{ 'inventory.purchaseOrder.stockAgainst' | translate: { stock: line.sellable, restock: line.restock_threshold } | digits }}
                                 </td>
-                                <td class="text-right font-mono text-[13px]">{{ line.ordered_quantity | digits }}</td>
-                                <td class="text-right font-mono text-[13px]">{{ line.ordered_unit_price | money }}</td>
-                                <td class="text-right font-mono text-[13px] font-semibold text-ink">{{ lineTotal(line.ordered_quantity, line.ordered_unit_price) | money }}</td>
+                                <td class="text-right font-mono text-[13px]">{{ line.ordered_quantity ?? '–' | digits }}</td>
+                                <td class="text-right font-mono text-[13px]">{{ line.ordered_unit_price === null ? '–' : (line.ordered_unit_price | money) }}</td>
+                                <td class="text-right font-mono text-[13px] font-semibold text-ink">{{ line.ordered_quantity === null || line.ordered_unit_price === null ? '–' : (lineTotal(line.ordered_quantity, line.ordered_unit_price) | money) }}</td>
                             </tr>
                         }
                     </tbody>

@@ -241,17 +241,24 @@ export class PurchaseOrderFormComponent {
         return !!line.controls.product_oid.value && line.invalid && line.touched;
     }
 
-    payload(): PurchaseOrderPayload {
+    /** Whether the order being edited has been submitted: its payment is then shown, never sent. */
+    readonly submittedOrder = computed(() => !!this.editing() && this.editing()!.details.status !== 'Draft');
+
+    /** As a draft, a half typed line is sent as it is; the server checks it on submit. */
+    payload(draft = false): PurchaseOrderPayload {
         const raw = this.form.getRawValue();
-        const payment = this.editing() ? {} : { payment_status: raw.payment_status as PaymentStatus, paid_amount: raw.payment_status === 'partially_paid' ? Number(raw.paid_amount ?? 0) : 0 };
+        const status = (raw.payment_status || null) as PaymentStatus | null;
+        const payment = this.submittedOrder() ? {} : { payment_status: status, paid_amount: status === 'partially_paid' ? Number(raw.paid_amount ?? 0) : 0 };
+        const number = (value: number | null) => (value === null || value === undefined || (value as unknown) === '' ? null : Number(value));
         return {
             ...(this.editing() ? { oid: this.editing()!.details.oid } : {}),
+            draft,
             ...payment,
             supplier_oid: raw.supplier_oid,
-            purchase_type: raw.purchase_type as PurchaseType,
+            purchase_type: (raw.purchase_type || null) as PurchaseType | null,
             expected_delivery_date: toDay(raw.expected_delivery_date),
             special_notes: raw.special_notes.trim() || null,
-            products: raw.lines.filter((line) => !!line.product_oid).map((line) => ({ product_oid: line.product_oid, warehouse_oid: line.warehouse_oid, aisle_oid: line.aisle_oid || null, quantity: Number(line.quantity), unit_price: Number(line.unit_price) })),
+            products: raw.lines.filter((line) => !!line.product_oid).map((line) => ({ product_oid: line.product_oid, warehouse_oid: line.warehouse_oid || null, aisle_oid: line.aisle_oid || null, quantity: number(line.quantity), unit_price: number(line.unit_price) })),
         };
     }
 
@@ -262,6 +269,14 @@ export class PurchaseOrderFormComponent {
         const lines = this.lines.controls.filter((line) => !!line.controls.product_oid.value);
         const header = ['supplier_oid', 'purchase_type', 'payment_status', 'paid_amount', 'special_notes'].every((key) => this.form.get(key)!.valid);
         return header && lines.length > 0 && lines.every((line) => line.valid);
+    }
+
+    /** A draft needs only its supplier: 20 or 30 lines are rarely typed in one sitting. */
+    validDraft(): boolean {
+        const supplier = this.form.controls.supplier_oid;
+        supplier.markAsTouched();
+        supplier.updateValueAndValidity();
+        return supplier.valid;
     }
 
     invalid(field: 'supplier_oid' | 'purchase_type' | 'payment_status' | 'paid_amount'): boolean | null {
@@ -293,22 +308,24 @@ export class PurchaseOrderFormComponent {
         this.lines.clear();
         for (const line of lines) {
             this.addBlankLine();
-            this.lines.at(this.lines.length - 1).setValue({ product_oid: line.product_oid, warehouse_oid: line.warehouse_oid, aisle_oid: line.aisle_oid, quantity: line.ordered_quantity, unit_price: Number(line.ordered_unit_price) }, { emitEvent: false });
+            this.lines.at(this.lines.length - 1).setValue({ product_oid: line.product_oid, warehouse_oid: line.warehouse_oid ?? '', aisle_oid: line.aisle_oid, quantity: line.ordered_quantity, unit_price: line.ordered_unit_price === null ? null : Number(line.ordered_unit_price) }, { emitEvent: false });
         }
         this.addBlankLine(this.lines.at(this.lines.length - 1));
 
         this.form.patchValue({
             supplier_oid: details.supplier_oid,
-            purchase_type: details.purchase_type,
+            purchase_type: details.purchase_type ?? '',
             expected_delivery_date: fromDay(details.expected_delivery_date),
-            payment_status: details.payment_status,
+            payment_status: details.payment_status ?? '',
             paid_amount: details.payment_status === 'partially_paid' ? Number(details.paid_amount) : null,
             special_notes: details.special_notes ?? '',
         });
-        // Payment is shown, not edited: it changes through Record payment, so an edit opened before a
-        // payment was recorded cannot put the old one back.
-        this.form.controls.payment_status.disable({ emitEvent: false });
-        this.form.controls.paid_amount.disable({ emitEvent: false });
+        // Once submitted, payment is shown, not edited: it changes through Record payment, so an edit
+        // opened before a payment was recorded cannot put the old one back. A draft's is still its own.
+        if (details.status !== 'Draft') {
+            this.form.controls.payment_status.disable({ emitEvent: false });
+            this.form.controls.paid_amount.disable({ emitEvent: false });
+        }
         // Loading a record is not someone typing, so leaving straight after must not ask.
         this.form.markAsPristine();
     }

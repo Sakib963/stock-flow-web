@@ -1,4 +1,4 @@
-export type PurchaseOrderStatus = 'Submitted' | 'Verified' | 'Cancelled';
+export type PurchaseOrderStatus = 'Draft' | 'Submitted' | 'Verified' | 'Cancelled';
 export type PaymentStatus = 'paid' | 'partially_paid' | 'unpaid';
 export type PurchaseType = 'instant' | 'advance' | 'overseas';
 export type IntendedUse = 'for_sale' | 'internal_use';
@@ -17,9 +17,9 @@ export interface PurchaseOrderRow {
     po_number: string;
     supplier_oid: string;
     supplier_name: string;
-    purchase_type: PurchaseType;
+    purchase_type: PurchaseType | null;
     status: PurchaseOrderStatus;
-    payment_status: PaymentStatus;
+    payment_status: PaymentStatus | null;
     total_amount: string;
     /** Follows payment_status, never the stored figure alone. */
     paid_amount: string;
@@ -32,10 +32,11 @@ export interface PurchaseOrderHeader {
     oid: string;
     po_number: string;
     status: PurchaseOrderStatus;
-    purchase_type: PurchaseType;
+    /** Empty only on a Draft. */
+    purchase_type: PurchaseType | null;
     special_notes: string | null;
     cancel_reason: string | null;
-    payment_status: PaymentStatus;
+    payment_status: PaymentStatus | null;
     total_amount: string;
     paid_amount: string;
     expected_delivery_date: string | null;
@@ -73,12 +74,13 @@ export interface PurchaseOrderLine extends Budgets {
     sku: string | null;
     restock_threshold: number;
     photo_thumb: string | null;
-    warehouse_oid: string;
-    warehouse_name: string;
+    /** A Draft line may still lack its warehouse, quantity or price. */
+    warehouse_oid: string | null;
+    warehouse_name: string | null;
     aisle_oid: string | null;
     aisle_name: string | null;
-    ordered_quantity: number;
-    ordered_unit_price: string;
+    ordered_quantity: number | null;
+    ordered_unit_price: string | null;
     received_quantity: number | null;
     received_unit_price: string | null;
     sellable: number;
@@ -118,20 +120,22 @@ export interface PurchaseOrderDetails {
 
 export interface PurchaseOrderLinePayload {
     product_oid: string;
-    warehouse_oid: string;
+    warehouse_oid: string | null;
     aisle_oid: string | null;
-    quantity: number;
-    unit_price: number;
+    quantity: number | null;
+    unit_price: number | null;
 }
 
 export interface PurchaseOrderPayload {
     oid?: string;
+    /** Saved as, or kept as, a Draft: only the supplier is required. */
+    draft: boolean;
     supplier_oid: string;
-    purchase_type: PurchaseType;
+    purchase_type: PurchaseType | null;
     expected_delivery_date: string | null;
     special_notes: string | null;
-    /** Sent on create only. An edit never carries payment: it changes through Record payment alone. */
-    payment_status?: PaymentStatus;
+    /** Sent on create and while a Draft. A submitted order's payment changes through Record payment alone. */
+    payment_status?: PaymentStatus | null;
     paid_amount?: number;
     products: PurchaseOrderLinePayload[];
 }

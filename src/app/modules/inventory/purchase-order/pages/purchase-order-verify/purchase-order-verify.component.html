@@ -91,7 +91,7 @@
                         </td>
                         <td class="text-right font-mono text-[13px]">
                             @if (value) {
-                                <span [class.text-warning-ink]="value.received_quantity < line.ordered_quantity">{{ value.received_quantity | digits }}</span>
+                                <span [class.text-warning-ink]="value.received_quantity < (line.ordered_quantity ?? 0)">{{ value.received_quantity | digits }}</span>
                             } @else {
                                 <span class="font-sans text-xs text-ink-muted">{{ 'inventory.purchaseOrder.notChecked' | translate }}</span>
                             }

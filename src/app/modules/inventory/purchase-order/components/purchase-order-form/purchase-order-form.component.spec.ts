@@ -91,4 +91,18 @@ describe('PurchaseOrderFormComponent', () => {
         expect(payload.paid_amount).toBeUndefined();
         expect(payload.products).toHaveLength(1);
     });
+
+    it('saves a draft with only the supplier, sending half typed lines as they are', async () => {
+        const form = (await open()).componentInstance;
+        expect(form.validDraft()).toBe(false);
+
+        form.form.patchValue({ supplier_oid: 's-1' });
+        pick(form, 0, KURTI);
+        form.lines.at(0).controls.unit_price.setValue(null);
+
+        expect(form.validDraft()).toBe(true);
+        const payload = form.payload(true);
+        expect(payload.draft).toBe(true);
+        expect(payload.products).toEqual([{ product_oid: 'p-1', warehouse_oid: null, aisle_oid: null, quantity: null, unit_price: null }]);
+    });
 });

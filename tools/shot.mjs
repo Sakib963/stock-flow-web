@@ -241,6 +241,12 @@ const PO = {
     'po-ver': { details: { ...PO_HEADER, oid: 'po-ver', status: 'Verified', verified_on: '2026-10-02T16:05:00.000', verified_by: 'rafiq@arithmalabs.test', verified_by_name: 'Rafiq Hasan' }, lines: poLines(true), stats: { ordered_total: 94600, ordered_units: 680, received_total: 92400, received_units: 676, lines_short: 1, units_short: 4, price_changed: 1, batches: 4, budgets_total: 1520, warehouses: 3 } },
     'po-can': { details: { ...PO_HEADER, oid: 'po-can', status: 'Cancelled', cancelled_on: '2026-09-27T10:18:00.000', cancelled_by: 'owner@arithmalabs.test', cancelled_by_name: 'Nusrat Sultana', cancel_reason: 'The supplier could not deliver before Eid' }, lines: poLines(false), stats: { ordered_total: 94600, ordered_units: 680, warehouses: 3, ...PO_OPEN } },
 };
+// A draft half typed: the scarf has no warehouse, quantity or price yet, and no payment is set.
+PO['po-dra'] = {
+    details: { ...PO_HEADER, oid: 'po-dra', status: 'Draft', purchase_type: 'overseas', payment_status: null, paid_amount: '0', total_amount: '36000' },
+    lines: poLines(false).slice(0, 2).map((line, i) => (i === 1 ? { ...line, warehouse_oid: null, warehouse_name: null, aisle_oid: null, aisle_name: null, ordered_quantity: null, ordered_unit_price: null } : line)),
+    stats: { ordered_total: 36000, ordered_units: 80, warehouses: 1, ...PO_OPEN },
+};
 const PO_ACTIVITY = [
     { oid: 'a-2', date: '2026-09-26T11:43:00.000', user: 'owner@arithmalabs.test', action: 'Payment recorded', description: 'PO-2609-0142: Unpaid 0 to Partially paid 50000' },
     { oid: 'a-1', date: '2026-09-26T11:42:00.000', user: 'owner@arithmalabs.test', action: 'Raised and submitted', description: 'PO-2609-0142: 4 products, total 94600, partially paid 50000' },

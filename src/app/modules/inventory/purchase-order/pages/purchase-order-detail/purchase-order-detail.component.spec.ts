@@ -56,4 +56,9 @@ describe('PurchaseOrderDetailComponent', () => {
         const page = await open('Submitted', ['inventory.purchase-order.view']);
         expect([page.canVerify(), page.canEdit(), page.canCancel(), page.canPay(), page.canExport()]).toEqual([false, false, false, false, false]);
     });
+
+    it('offers to continue or cancel a draft, but not to verify it or record a payment', async () => {
+        const page = await open('Draft');
+        expect([page.canVerify(), page.canEdit(), page.canCancel(), page.canPay()]).toEqual([false, true, true, false]);
+    });
 });

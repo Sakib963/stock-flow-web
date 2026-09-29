@@ -3,8 +3,9 @@ import { ToneMap } from '@app/core/models/config.model';
 import { ListShellPageConfig } from '@app/core/models/list-shell-page.model';
 import { PURCHASE_ORDER_ROUTES } from '@app/modules/inventory/purchase-order/constants/purchase-order-routes';
 
-/** Brand tint while in flight, success once received, the quiet treatment once cancelled. */
+/** Amber while still being typed, brand tint while in flight, success once received, quiet once cancelled. */
 export const PURCHASE_ORDER_STATUS: ToneMap = {
+    Draft: { label: 'inventory.purchaseOrder.status.draft', tone: 'warning', icon: 'lucideFilePen' },
     Submitted: { label: 'inventory.purchaseOrder.status.submitted', tone: 'progress', icon: 'lucideSend' },
     Verified: { label: 'inventory.purchaseOrder.status.verified', tone: 'success', icon: 'lucideBadgeCheck' },
     Cancelled: { label: 'inventory.purchaseOrder.status.cancelled', tone: 'neutral', icon: 'lucideBan' },
@@ -17,6 +18,7 @@ export const PAYMENT_STATUS: ToneMap = {
 };
 
 const SUBMITTED = { field: 'status', in: ['Submitted'] } as const;
+const EDITABLE = { field: 'status', in: ['Draft', 'Submitted'] } as const;
 
 export const PURCHASE_ORDER_LIST: ListShellPageConfig = {
     permission: 'inventory.purchase-order.view',
@@ -26,10 +28,10 @@ export const PURCHASE_ORDER_LIST: ListShellPageConfig = {
     },
     // A card here reports, it does not narrow the list: the status filter is one click away.
     stats: [
+        { key: 'draft', label: 'inventory.purchaseOrder.stat.draft', icon: 'lucideFilePen', tone: 'warning' },
         { key: 'submitted', label: 'inventory.purchaseOrder.stat.submitted', icon: 'lucideSend' },
         { key: 'overdue', label: 'inventory.purchaseOrder.stat.overdue', icon: 'lucideClock', tone: 'warning' },
         { key: 'verified', label: 'inventory.purchaseOrder.stat.verified', icon: 'lucideBadgeCheck', tone: 'success' },
-        { key: 'cancelled', label: 'inventory.purchaseOrder.stat.cancelled', icon: 'lucideBan' },
     ],
     filter: {
         render: 'modal',
@@ -40,6 +42,7 @@ export const PURCHASE_ORDER_LIST: ListShellPageConfig = {
                 label: 'inventory.purchaseOrder.status.label',
                 type: 'select',
                 choices: [
+                    { value: 'Draft', label: 'inventory.purchaseOrder.status.draft' },
                     { value: 'Submitted', label: 'inventory.purchaseOrder.status.submitted' },
                     { value: 'Verified', label: 'inventory.purchaseOrder.status.verified' },
                     { value: 'Cancelled', label: 'inventory.purchaseOrder.status.cancelled' },
@@ -79,8 +82,8 @@ export const PURCHASE_ORDER_LIST: ListShellPageConfig = {
         layouts: [{ type: 'table' }],
         rowActions: [
             { key: 'view', label: 'inventory.purchaseOrder.view', icon: 'lucideEye', permission: 'inventory.purchase-order.view', stateful: false, run: { kind: 'navigate', route: PURCHASE_ORDER_ROUTES.detailPattern } },
-            // Only a Submitted order can be edited or received. The server refuses the rest whatever this shows.
-            { key: 'edit', label: 'inventory.purchaseOrder.edit', icon: 'lucidePencil', permission: 'inventory.purchase-order.edit', stateful: false, when: SUBMITTED, run: { kind: 'navigate', route: PURCHASE_ORDER_ROUTES.editPattern } },
+            // A Draft or Submitted order can be edited, only a Submitted one received. The server refuses the rest whatever this shows.
+            { key: 'edit', label: 'inventory.purchaseOrder.edit', icon: 'lucidePencil', permission: 'inventory.purchase-order.edit', stateful: false, when: EDITABLE, run: { kind: 'navigate', route: PURCHASE_ORDER_ROUTES.editPattern } },
             { key: 'verify', label: 'inventory.purchaseOrder.verify', icon: 'lucidePackageCheck', permission: 'inventory.purchase-order.approve', stateful: false, when: SUBMITTED, run: { kind: 'navigate', route: PURCHASE_ORDER_ROUTES.verifyPattern } },
         ],
         rowActionStyle: 'menu',

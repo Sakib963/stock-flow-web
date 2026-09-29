@@ -2,4 +2,8 @@
 
 <form-page [formId]="editor()?.formId ?? ''" [saving]="saving()" [remaining]="editor()?.remaining() ?? 0" saveLabel="inventory.purchaseOrder.submit" (cancel)="cancel()">
     <purchase-order-form (submitted)="save()" />
+    <button formAction nz-button type="button" class="inline-flex items-center gap-1.5" [disabled]="saving()" (click)="saveDraft()">
+        <ng-icon name="lucideSave" size="14px" aria-hidden="true" />
+        <span>{{ 'inventory.purchaseOrder.saveDraft' | translate }}</span>
+    </button>
 </form-page>

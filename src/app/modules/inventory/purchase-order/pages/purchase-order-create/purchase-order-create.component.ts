@@ -1,4 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal, viewChild } from '@angular/core';
+import { NgIcon, provideIcons } from '@ng-icons/core';
+import { lucideSave } from '@ng-icons/lucide';
+import { NzButtonModule } from 'ng-zorro-antd/button';
 import { Router } from '@angular/router';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzModalService } from 'ng-zorro-antd/modal';
@@ -17,8 +20,8 @@ import { confirmAction } from '@app/shared/utils/confirm-action/confirm-action';
 /** Raising a purchase order. Nothing reaches a warehouse until its delivery is verified. */
 @Component({
     selector: 'purchase-order-create',
-    imports: [TranslatePipe, PageHeaderComponent, FormPageComponent, PurchaseOrderFormComponent],
-    providers: [MoneyPipe],
+    imports: [NgIcon, NzButtonModule, TranslatePipe, PageHeaderComponent, FormPageComponent, PurchaseOrderFormComponent],
+    providers: [MoneyPipe, provideIcons({ lucideSave })],
     templateUrl: './purchase-order-create.component.html',
     styleUrl: './purchase-order-create.component.scss',
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -48,7 +51,7 @@ export class PurchaseOrderCreateComponent implements HasUnsavedChanges {
             return;
         }
 
-        const payload = editor.payload();
+        const payload = editor.payload(false);
         this._asking.set(true);
         confirmAction(this._modal, {
             title: this._translate.instant('inventory.purchaseOrder.confirmCreate.title'),
@@ -66,6 +69,30 @@ export class PurchaseOrderCreateComponent implements HasUnsavedChanges {
                 },
                 error: (error: unknown) => this._message.error(this._translate.instant(orderFailureKey(error, 'form.saveFailed'))),
             });
+        });
+    }
+
+    /**
+     * Saves what is typed so far as a Draft, needing only the supplier, and carries on in that draft's
+     * edit page so the next save updates it rather than raising a second order.
+     *
+     * No confirmation, unlike every other save: a draft moves nothing and is saved again and again
+     * over a long order, and a question each time would train people to click through questions.
+     */
+    saveDraft(): void {
+        const editor = this.editor();
+        if (!editor || this.saving()) return;
+        if (!editor.validDraft()) {
+            this._message.error(this._translate.instant('inventory.purchaseOrder.draftNeedsSupplier'));
+            return;
+        }
+        this._orders.create(editor.payload(true)).subscribe({
+            next: ({ oid, po_number }) => {
+                editor.form.markAsPristine();
+                this._message.success(this._translate.instant('inventory.purchaseOrder.draftSavedMessage', { number: po_number }));
+                void this._router.navigateByUrl(PURCHASE_ORDER_ROUTES.edit(oid), { replaceUrl: true });
+            },
+            error: (error: unknown) => this._message.error(this._translate.instant(orderFailureKey(error, 'form.saveFailed'))),
         });
     }
 

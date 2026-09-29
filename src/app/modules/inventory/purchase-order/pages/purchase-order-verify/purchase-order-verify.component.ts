@@ -76,7 +76,7 @@ export class PurchaseOrderVerifyComponent implements HasUnsavedChanges {
 
     readonly checked = computed(() => this.lines().filter((line) => lineReady(this.counted()[line.oid], line)).length);
     readonly progress = computed(() => (this.lines().length ? Math.round((this.checked() / this.lines().length) * 100) : 0));
-    readonly unitsShort = computed(() => this.lines().reduce((sum, line) => sum + Math.max(line.ordered_quantity - (this.counted()[line.oid]?.received_quantity ?? line.ordered_quantity), 0), 0));
+    readonly unitsShort = computed(() => this.lines().reduce((sum, line) => sum + Math.max((line.ordered_quantity ?? 0) - (this.counted()[line.oid]?.received_quantity ?? line.ordered_quantity ?? 0), 0), 0));
     readonly priceChanged = computed(() => this.lines().filter((line) => this.counted()[line.oid] && this.counted()[line.oid].unit_price !== Number(line.ordered_unit_price)).length);
     readonly receivedTotal = computed(() => this.lines().reduce((sum, line) => sum + (this.counted()[line.oid] ? this.counted()[line.oid].received_quantity * this.counted()[line.oid].unit_price : 0), 0));
     readonly orderedTotal = computed(() => this.record()?.stats.ordered_total ?? 0);

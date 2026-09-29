@@ -13,6 +13,8 @@
             <ng-icon name="lucideX" size="14px" aria-hidden="true" />
             <span>{{ 'form.cancel' | translate }}</span>
         </button>
+        <!-- A page's own extra action, such as saving a purchase order as a draft, sits before Save. -->
+        <ng-content select="[formAction]" />
         <!-- Submit only, with no click handler: carrying both meant one press ran the handler and
              then the form's submit default, and the record was written twice. It reaches a form
              outside this component through HTML's own `form` attribute.

@@ -42,7 +42,7 @@
                     }
                 </nz-radio-group>
             </nz-form-control>
-            @if (editing()) {
+            @if (submittedOrder()) {
                 <p class="-mt-4 mb-4 text-xs text-ink-muted">{{ 'inventory.purchaseOrder.paymentOnRecord' | translate }}</p>
             }
         </nz-form-item>

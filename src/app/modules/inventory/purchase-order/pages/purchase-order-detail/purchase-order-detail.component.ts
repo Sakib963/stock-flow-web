@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@a
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgIcon, provideIcons } from '@ng-icons/core';
-import { lucideArrowLeft, lucideBadgeCheck, lucideBan, lucideBanknote, lucideBoxes, lucideChevronsUpDown, lucideCircleAlert, lucideClock, lucideFileSpreadsheet, lucideHandCoins, lucideHistory, lucideInfo, lucideListOrdered, lucidePackage, lucidePackageCheck, lucidePencil, lucideRotateCw, lucideWallet, lucideX, lucideZap } from '@ng-icons/lucide';
+import { lucideArrowLeft, lucideBadgeCheck, lucideBan, lucideBanknote, lucideBoxes, lucideChevronsUpDown, lucideCircleAlert, lucideClock, lucideFilePen, lucideFileSpreadsheet, lucideHandCoins, lucideHistory, lucideInfo, lucideListOrdered, lucidePackage, lucidePackageCheck, lucidePencil, lucideRotateCw, lucideWallet, lucideX, lucideZap } from '@ng-icons/lucide';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzCardModule } from 'ng-zorro-antd/card';
 import { NzFormModule } from 'ng-zorro-antd/form';
@@ -65,6 +65,7 @@ interface OrderStat {
             lucideChevronsUpDown,
             lucideCircleAlert,
             lucideClock,
+            lucideFilePen,
             lucideFileSpreadsheet,
             lucideHandCoins,
             lucideHistory,
@@ -113,14 +114,18 @@ export class PurchaseOrderDetailComponent {
     readonly statusTone = computed(() => (this.status() ? resolveTone(PURCHASE_ORDER_STATUS, this.status()!, undefined, 'the purchase order status')?.style : null));
     readonly paymentTone = computed(() => (this.order()?.payment_status ? resolveTone(PAYMENT_STATUS, this.order()!.payment_status!, undefined, 'the payment status')?.style : null));
 
+    readonly draft = computed(() => this.status() === 'Draft');
     readonly submitted = computed(() => this.status() === 'Submitted');
+    /** A Draft or a Submitted order: nothing has arrived, so it can still change or be called off. */
+    readonly open = computed(() => this.draft() || this.submitted());
     readonly verified = computed(() => this.status() === 'Verified');
     readonly cancelled = computed(() => this.status() === 'Cancelled');
 
     readonly canVerify = computed(() => this.submitted() && this._session.can('inventory.purchase-order.approve'));
-    readonly canEdit = computed(() => this.submitted() && this._session.can('inventory.purchase-order.edit'));
-    readonly canCancel = computed(() => this.submitted() && this._session.can('inventory.purchase-order.cancel'));
-    readonly canPay = computed(() => !!this.record() && !this.cancelled() && this._session.can('inventory.purchase-order.edit'));
+    readonly canEdit = computed(() => this.open() && this._session.can('inventory.purchase-order.edit'));
+    readonly canCancel = computed(() => this.open() && this._session.can('inventory.purchase-order.cancel'));
+    // A draft's payment is part of its form until it is submitted.
+    readonly canPay = computed(() => !!this.record() && (this.submitted() || this.verified()) && this._session.can('inventory.purchase-order.edit'));
     readonly canExport = computed(() => this._session.can('inventory.purchase-order.export'));
 
     readonly overdue = computed(() => {
@@ -138,7 +143,7 @@ export class PurchaseOrderDetailComponent {
             return [
                 { key: 'received', label: 'inventory.purchaseOrder.stat.receivedTotal', value: s.received_total ?? 0, icon: 'lucideBanknote', format: 'money', note: difference ? { key: difference > 0 ? 'inventory.purchaseOrder.stat.lessThanOrdered' : 'inventory.purchaseOrder.stat.moreThanOrdered', params: { amount: this._money.transform(Math.abs(difference)) } } : { key: 'inventory.purchaseOrder.stat.asOrdered' } },
                 { key: 'units', label: 'inventory.purchaseOrder.stat.unitsReceived', value: `${s.received_units} / ${s.ordered_units}`, icon: 'lucidePackageCheck', format: 'text', tone: s.lines_short ? 'warning' : undefined, note: s.units_short ? { key: 'inventory.purchaseOrder.stat.unitsShort', params: { count: s.units_short } } : { key: 'inventory.purchaseOrder.stat.allArrived' } },
-                { key: 'paid', label: 'inventory.purchaseOrder.paid', value: paid, icon: 'lucideWallet', format: 'money', note: { key: 'inventory.purchaseOrder.payment.' + d.payment_status } },
+                { key: 'paid', label: 'inventory.purchaseOrder.paid', value: paid, icon: 'lucideWallet', format: 'money', note: d.payment_status ? { key: 'inventory.purchaseOrder.payment.' + d.payment_status } : null },
                 { key: 'budgets', label: 'inventory.purchaseOrder.stat.budgets', value: s.budgets_total ?? 0, icon: 'lucideHandCoins', format: 'money', note: { key: 'inventory.purchaseOrder.stat.acrossBatches', params: { count: s.batches } } },
             ];
         }
@@ -151,7 +156,7 @@ export class PurchaseOrderDetailComponent {
         }
         return [
             { key: 'ordered', label: 'inventory.purchaseOrder.stat.orderedTotal', value: s.ordered_total, icon: 'lucideBanknote', format: 'money', note: { key: 'inventory.purchaseOrder.stat.productsUnits', params: { products: loaded.lines.length, units: s.ordered_units } } },
-            { key: 'paid', label: 'inventory.purchaseOrder.paid', value: paid, icon: 'lucideWallet', format: 'money', note: { key: 'inventory.purchaseOrder.payment.' + d.payment_status } },
+            { key: 'paid', label: 'inventory.purchaseOrder.paid', value: paid, icon: 'lucideWallet', format: 'money', note: d.payment_status ? { key: 'inventory.purchaseOrder.payment.' + d.payment_status } : null },
             { key: 'warehouses', label: 'inventory.purchaseOrder.stat.warehouses', value: s.warehouses, icon: 'lucideBoxes', format: 'number' },
         ];
     });
@@ -237,7 +242,7 @@ export class PurchaseOrderDetailComponent {
     openPayment(): void {
         const d = this.record()?.details;
         if (!d) return;
-        this.paymentForm.reset({ payment_status: d.payment_status, paid_amount: d.payment_status === 'partially_paid' ? Number(d.paid_amount) : null });
+        this.paymentForm.reset({ payment_status: d.payment_status ?? 'unpaid', paid_amount: d.payment_status === 'partially_paid' ? Number(d.paid_amount) : null });
         this.paymentOpen.set(true);
     }
 

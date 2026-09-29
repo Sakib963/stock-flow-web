@@ -1,4 +1,4 @@
-<page-header [back]="back" [title]="'inventory.purchaseOrder.editTitle' | translate" [lead]="'inventory.purchaseOrder.formLead' | translate" />
+<page-header [back]="back" [title]="(draft() ? 'inventory.purchaseOrder.draftTitle' : 'inventory.purchaseOrder.editTitle') | translate" [lead]="'inventory.purchaseOrder.formLead' | translate" />
 
 @if (closed(); as status) {
     <div class="sf-empty" role="alert">
@@ -11,8 +11,14 @@
         </div>
     </div>
 } @else if (record(); as loaded) {
-    <form-page [formId]="editor()?.formId ?? ''" [saving]="saving()" [remaining]="editor()?.remaining() ?? 0" saveLabel="form.saveChanges" (cancel)="cancel()">
+    <form-page [formId]="editor()?.formId ?? ''" [saving]="saving()" [remaining]="editor()?.remaining() ?? 0" [saveLabel]="saveLabel()" (cancel)="cancel()">
         <purchase-order-form [editing]="loaded" (submitted)="save()" />
+        @if (draft()) {
+            <button formAction nz-button type="button" class="inline-flex items-center gap-1.5" [disabled]="saving()" (click)="saveDraft()">
+                <ng-icon name="lucideSave" size="14px" aria-hidden="true" />
+                <span>{{ 'inventory.purchaseOrder.saveDraft' | translate }}</span>
+            </button>
+        }
     </form-page>
 } @else if (loading()) {
     <!-- Shaped like the form that is coming, so the page does not jump when it lands. -->
