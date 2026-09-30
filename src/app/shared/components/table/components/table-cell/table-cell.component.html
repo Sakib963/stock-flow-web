@@ -74,11 +74,12 @@
         }
         @case ('stock') {
             @if (stock(); as s) {
-                <span class="block leading-tight">
-                    <span class="font-semibold tabular-nums" [class]="s.ink">{{ value() | money: 'number' }}</span>
-                    @if (s.key) {
-                        <span class="block text-[11px]" [class]="s.key === 'list.stock.restockAt' ? 'text-ink-muted' : s.ink">{{ s.key | translate: { level: s.level } }}</span>
+                <!-- Badge first, number last, so the numbers line up at the right edge. -->
+                <span class="inline-flex w-full items-center justify-end gap-1.5 whitespace-nowrap" [nz-tooltip]="s.known ? ('list.stock.hint' | translate: { on: amount(), level: s.level } | digits) : null">
+                    @if (s.badge) {
+                        <status-tag [label]="'list.stock.' + s.badge" [tone]="s.tone!" />
                     }
+                    <span class="font-semibold tabular-nums" [class]="s.ink">{{ value() | money: 'number' }}</span>
                 </span>
             }
         }

@@ -225,7 +225,7 @@
                                 </td>
                                 @if (loaded.details.has_expiry) {
                                     <td>
-                                        <batch-expiry [batchOid]="batch.oid" [batchCode]="batch.batch_code" [day]="batch.expiry_date" [canEdit]="canEditExpiry()" (changed)="load()" />
+                                        <batch-expiry [batchOid]="batch.oid" [batchCode]="batch.batch_code" [day]="batch.expiry_date" />
                                     </td>
                                 }
                             </tr>

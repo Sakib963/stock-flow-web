@@ -1,0 +1,56 @@
+<nz-modal [nzVisible]="!!batch()" [nzTitle]="'inventory.stockOverview.price.title' | translate: { batch: batch()?.batch_code }" [nzContent]="priceBody" [nzFooter]="priceFooter" nzCentered (nzOnCancel)="closed.emit()">
+    <ng-template #priceBody>
+        @if (batch(); as current) {
+            @if (confirming()) {
+                <p class="m-0 text-sm text-ink" data-price="confirm">
+                    {{ 'inventory.stockOverview.price.confirm' | translate: { batch: current.batch_code, fromPrice: current.selling_price === null ? ('inventory.stockOverview.price.none' | translate) : (current.selling_price | money), fromDiscount: (current.maximum_discount ?? 0 | money), toPrice: (form.controls.selling_price.value | money), toDiscount: (form.controls.maximum_discount.value | money) } }}
+                </p>
+                <p class="mt-2 mb-0 text-xs text-ink-muted">{{ 'inventory.stockOverview.price.confirmLead' | translate }}</p>
+            } @else {
+                <form nz-form nzLayout="vertical" [formGroup]="form" (ngSubmit)="review()">
+                    <div class="grid grid-cols-2 gap-x-3">
+                        <nz-form-item>
+                            <nz-form-label nzRequired nzFor="bp-price">{{ 'inventory.stockOverview.price.selling' | translate }}</nz-form-label>
+                            <nz-form-control [nzErrorTip]="'inventory.stockOverview.price.sellingError' | translate">
+                                <nz-input-number nzId="bp-price" class="w-full font-mono" formControlName="selling_price" [nzMin]="1" [nzPrecision]="0" />
+                            </nz-form-control>
+                        </nz-form-item>
+                        <nz-form-item>
+                            <nz-form-label nzRequired nzFor="bp-discount" [nzTooltipTitle]="'inventory.stockOverview.price.discountHelper' | translate">{{ 'inventory.stockOverview.price.discount' | translate }}</nz-form-label>
+                            <nz-form-control [nzValidateStatus]="discountTooHigh() ? 'error' : ''" [nzErrorTip]="'inventory.stockOverview.price.discountError' | translate">
+                                <nz-input-number nzId="bp-discount" class="w-full font-mono" formControlName="maximum_discount" [nzMin]="0" [nzPrecision]="0" />
+                            </nz-form-control>
+                        </nz-form-item>
+                    </div>
+                    @if (margin() !== null) {
+                        <p class="m-0 text-xs" [class.text-danger-ink]="margin()! < 0" [class.text-ink-muted]="margin()! >= 0">{{ 'inventory.stockOverview.price.margin' | translate: { margin: (margin() | money) } }}</p>
+                    }
+                    <p class="mt-2 mb-0 text-xs text-ink-muted">{{ 'inventory.stockOverview.price.lead' | translate }}</p>
+                </form>
+            }
+        }
+    </ng-template>
+    <ng-template #priceFooter>
+        @if (confirming()) {
+            <button nz-button type="button" class="inline-flex items-center gap-1.5" [disabled]="saving()" (click)="confirming.set(false)">
+                <ng-icon name="lucideArrowLeft" size="14px" aria-hidden="true" />
+                <span>{{ 'inventory.stockOverview.back' | translate }}</span>
+            </button>
+            <button nz-button nzType="primary" type="button" class="inline-flex items-center gap-1.5" [nzLoading]="saving()" (click)="save()">
+                @if (!saving()) {
+                    <ng-icon name="lucideCheck" size="14px" aria-hidden="true" />
+                }
+                <span>{{ 'inventory.stockOverview.price.yes' | translate }}</span>
+            </button>
+        } @else {
+            <button nz-button type="button" class="inline-flex items-center gap-1.5" (click)="closed.emit()">
+                <ng-icon name="lucideX" size="14px" aria-hidden="true" />
+                <span>{{ 'form.cancel' | translate }}</span>
+            </button>
+            <button nz-button nzType="primary" type="button" class="inline-flex items-center gap-1.5" (click)="review()">
+                <ng-icon name="lucideCheck" size="14px" aria-hidden="true" />
+                <span>{{ 'inventory.stockOverview.price.save' | translate }}</span>
+            </button>
+        }
+    </ng-template>
+</nz-modal>

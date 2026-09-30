@@ -54,6 +54,21 @@ describe('TableCellComponent', () => {
         expect(el.textContent?.trim()).toBe('07/01/2026');
     });
 
+    it('shows stock with a Low or Out badge beside it, and never prints the restock level', async () => {
+        const stock: Column = { key: 'sellable', label: 'Can sell', type: 'stock', restockAt: 'restock_threshold', width: 9 };
+
+        const low = await render(stock, { sellable: 4, restock_threshold: 12 });
+        expect(low.el.textContent).toContain('list.stock.low');
+        expect(low.el.textContent).not.toContain('12');
+
+        const out = await render(stock, { sellable: 0, restock_threshold: 12 });
+        expect(out.el.textContent).toContain('list.stock.out');
+
+        const fine = await render(stock, { sellable: 36, restock_threshold: 12 });
+        expect(fine.el.querySelector('status-tag')).toBeNull();
+        expect(fine.el.textContent?.trim()).toBe('36');
+    });
+
     it('writes a signed number as a change: a plus and success ink in, danger ink out', async () => {
         const change: Column = { key: 'quantity', label: 'In / out', type: 'number', signed: true, width: 8 };
 

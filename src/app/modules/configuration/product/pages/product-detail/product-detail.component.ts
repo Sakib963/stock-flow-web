@@ -81,7 +81,6 @@ export class ProductDetailComponent {
     readonly canViewSubCategory = computed(() => this._session.can('configuration.sub-category.view'));
     readonly categoryRoute = CATEGORY_ROUTES.detail;
 
-    readonly canEditExpiry = computed(() => this._session.can('inventory.purchase-order.edit'));
     /** The latest movements, for someone who may see the ledger; the card is absent otherwise. */
     readonly canViewMovements = computed(() => this._session.can('inventory.stock-movement.view'));
     readonly movements = signal<StockMovementRow[] | null>(null);

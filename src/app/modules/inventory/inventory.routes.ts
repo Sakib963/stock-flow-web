@@ -4,6 +4,7 @@ import { permissionGuard } from '@app/core/guards/permission/permission.guard';
 import { unsavedChangesGuard } from '@app/core/guards/unsaved-changes/unsaved-changes.guard';
 import { PURCHASE_ORDER_LIST } from '@app/modules/inventory/purchase-order/config/purchase-order-list.config';
 import { STOCK_MOVEMENT_LIST } from '@app/modules/inventory/stock-movement/config/stock-movement-list.config';
+import { STOCK_OVERVIEW_LIST } from '@app/modules/inventory/stock-overview/config/stock-overview-list.config';
 
 /** Everything under /app/inventory. Each URL is the route of its menu item. */
 export const INVENTORY_ROUTES: Routes = [
@@ -11,6 +12,18 @@ export const INVENTORY_ROUTES: Routes = [
         path: '',
         providers: [...OVERLAY_PROVIDERS],
         children: [
+            {
+                path: 'overview',
+                canActivate: [permissionGuard],
+                data: { permission: STOCK_OVERVIEW_LIST.permission },
+                loadComponent: () => import('./stock-overview/pages/stock-overview-list/stock-overview-list.component').then((m) => m.StockOverviewListComponent),
+            },
+            {
+                path: 'overview/:oid',
+                canActivate: [permissionGuard],
+                data: { permission: STOCK_OVERVIEW_LIST.permission },
+                loadComponent: () => import('./stock-overview/pages/product-stock/product-stock.component').then((m) => m.ProductStockComponent),
+            },
             {
                 path: 'stock-movements',
                 canActivate: [permissionGuard],

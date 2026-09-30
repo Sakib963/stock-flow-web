@@ -9,6 +9,7 @@ import { Column } from '@app/core/models/table.model';
 import { LanguageService } from '@app/core/services/language/language.service';
 import { RendererOutletComponent } from '@app/shared/components/renderer-outlet/renderer-outlet.component';
 import { StatusTagComponent } from '@app/shared/components/status-tag/status-tag.component';
+import { DigitsPipe } from '@app/shared/pipes/digits/digits.pipe';
 import { MoneyPipe } from '@app/shared/pipes/money/money.pipe';
 import { RecordDatePipe } from '@app/shared/pipes/record-date/record-date.pipe';
 import { UserCardComponent } from '@app/shared/components/user-card/user-card.component';
@@ -37,7 +38,7 @@ const DOT: Record<Tone, string> = {
  */
 @Component({
     selector: 'table-cell',
-    imports: [NgTemplateOutlet, RouterLink, CopyableDirective, NzPopoverModule, NzTooltipModule, TranslatePipe, TextPipe, MoneyPipe, RecordDatePipe, StatusTagComponent, UserCardComponent, RendererOutletComponent],
+    imports: [NgTemplateOutlet, RouterLink, CopyableDirective, NzPopoverModule, NzTooltipModule, TranslatePipe, TextPipe, MoneyPipe, DigitsPipe, RecordDatePipe, StatusTagComponent, UserCardComponent, RendererOutletComponent],
     templateUrl: './table-cell.component.html',
     styleUrl: './table-cell.component.scss',
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -98,15 +99,16 @@ export class TableCellComponent {
         return amount < 0 || (column.type === 'money' && column.due && amount > 0);
     });
 
-    /** Stock reads as ink and a sub line, never a chip: the chip belongs to the record's own state. */
+    /** The quantity with a Low or Out badge beside it; the restock level is on hover, never printed (decided by the user, 2026-09-30). */
     readonly stock = computed(() => {
         const column = this.column();
         if (column.type !== 'stock') return null;
         const level = Number(readPath(this.row(), column.restockAt));
         const on = this.amount();
-        if (on <= 0) return { ink: 'text-danger-ink', key: 'list.stock.out', level };
-        if (!Number.isNaN(level) && on <= level) return { ink: 'text-warning-ink', key: 'list.stock.below', level };
-        return { ink: 'text-ink', key: Number.isNaN(level) ? null : 'list.stock.restockAt', level };
+        const known = !Number.isNaN(level);
+        if (on <= 0) return { ink: 'text-danger-ink', badge: 'out' as const, tone: 'danger' as const, level, known };
+        if (known && on <= level) return { ink: 'text-warning-ink', badge: 'low' as const, tone: 'warning' as const, level, known };
+        return { ink: 'text-ink', badge: null, tone: null, level, known };
     });
 
     readonly linkRoute = computed(() => {
