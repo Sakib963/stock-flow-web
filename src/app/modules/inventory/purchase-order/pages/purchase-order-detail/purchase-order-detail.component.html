@@ -451,39 +451,55 @@
 
 <nz-modal [nzVisible]="paymentOpen()" [nzTitle]="'inventory.purchaseOrder.recordPayment' | translate" [nzContent]="paymentBody" [nzFooter]="paymentFooter" nzCentered (nzOnCancel)="paymentOpen.set(false)">
     <ng-template #paymentBody>
-        <form nz-form nzLayout="vertical" [formGroup]="paymentForm" (ngSubmit)="savePayment()">
-            <p class="mt-0 mb-3 text-xs text-ink-muted">{{ 'inventory.purchaseOrder.paymentLead' | translate: { total: (record()?.details?.total_amount | money) } }}</p>
-            <nz-form-item>
-                <nz-form-label nzRequired>{{ 'inventory.purchaseOrder.payment.label' | translate }}</nz-form-label>
-                <nz-form-control>
-                    <nz-radio-group formControlName="payment_status" nzButtonStyle="solid" class="flex w-full" [attr.aria-label]="'inventory.purchaseOrder.payment.label' | translate">
-                        @for (status of paymentStatuses; track status) {
-                            <label nz-radio-button class="flex-1 px-2 text-center whitespace-nowrap" [nzValue]="status">{{ 'inventory.purchaseOrder.payment.' + status | translate }}</label>
-                        }
-                    </nz-radio-group>
-                </nz-form-control>
-            </nz-form-item>
-            @if (paymentForm.controls.payment_status.value === 'partially_paid') {
+        @if (paymentReview(); as review) {
+            <p class="m-0 text-sm text-ink">{{ 'inventory.purchaseOrder.paymentConfirm' | translate: { number: record()?.details?.po_number, fromStatus: ('inventory.purchaseOrder.payment.' + review.from.status | translate), fromAmount: (review.from.amount | money), toStatus: ('inventory.purchaseOrder.payment.' + review.to.status | translate), toAmount: (review.to.amount | money) } }}</p>
+            <p class="mt-2 mb-0 text-xs text-ink-muted">{{ 'inventory.purchaseOrder.paymentConfirmLead' | translate }}</p>
+        } @else {
+            <form nz-form nzLayout="vertical" [formGroup]="paymentForm" (ngSubmit)="reviewPayment()">
+                <p class="mt-0 mb-3 text-xs text-ink-muted">{{ 'inventory.purchaseOrder.paymentLead' | translate: { total: (record()?.details?.total_amount | money) } }}</p>
                 <nz-form-item>
-                    <nz-form-label nzRequired nzFor="pay-amount">{{ 'inventory.purchaseOrder.paid' | translate }}</nz-form-label>
-                    <nz-form-control [nzErrorTip]="'inventory.purchaseOrder.paidRequired' | translate">
-                        <nz-input-number nzId="pay-amount" class="w-full font-mono" formControlName="paid_amount" [nzMin]="1" [nzPrecision]="0" />
+                    <nz-form-label nzRequired>{{ 'inventory.purchaseOrder.payment.label' | translate }}</nz-form-label>
+                    <nz-form-control>
+                        <nz-radio-group formControlName="payment_status" nzButtonStyle="solid" class="flex w-full" [attr.aria-label]="'inventory.purchaseOrder.payment.label' | translate">
+                            @for (status of paymentStatuses; track status) {
+                                <label nz-radio-button class="flex-1 px-2 text-center whitespace-nowrap" [nzValue]="status">{{ 'inventory.purchaseOrder.payment.' + status | translate }}</label>
+                            }
+                        </nz-radio-group>
                     </nz-form-control>
                 </nz-form-item>
-            }
-        </form>
+                @if (paymentForm.controls.payment_status.value === 'partially_paid') {
+                    <nz-form-item>
+                        <nz-form-label nzRequired nzFor="pay-amount">{{ 'inventory.purchaseOrder.paid' | translate }}</nz-form-label>
+                        <nz-form-control [nzErrorTip]="'inventory.purchaseOrder.paidRequired' | translate">
+                            <nz-input-number nzId="pay-amount" class="w-full font-mono" formControlName="paid_amount" [nzMin]="1" [nzPrecision]="0" />
+                        </nz-form-control>
+                    </nz-form-item>
+                }
+            </form>
+        }
     </ng-template>
     <ng-template #paymentFooter>
-        <button nz-button type="button" class="inline-flex items-center gap-1.5" (click)="paymentOpen.set(false)">
-            <ng-icon name="lucideX" size="14px" aria-hidden="true" />
-            <span>{{ 'form.cancel' | translate }}</span>
-        </button>
-        <button nz-button nzType="primary" type="button" class="inline-flex items-center gap-1.5" [nzLoading]="saving()" (click)="savePayment()">
-            @if (!saving()) {
+        @if (paymentReview()) {
+            <button nz-button type="button" class="inline-flex items-center gap-1.5" [disabled]="saving()" (click)="paymentReview.set(null)">
+                <ng-icon name="lucideArrowLeft" size="14px" aria-hidden="true" />
+                <span>{{ 'inventory.purchaseOrder.paymentBack' | translate }}</span>
+            </button>
+            <button nz-button nzType="primary" type="button" class="inline-flex items-center gap-1.5" [nzLoading]="saving()" (click)="savePayment()">
+                @if (!saving()) {
+                    <ng-icon name="lucideHandCoins" size="14px" aria-hidden="true" />
+                }
+                <span>{{ 'inventory.purchaseOrder.paymentConfirmSave' | translate }}</span>
+            </button>
+        } @else {
+            <button nz-button type="button" class="inline-flex items-center gap-1.5" (click)="paymentOpen.set(false)">
+                <ng-icon name="lucideX" size="14px" aria-hidden="true" />
+                <span>{{ 'form.cancel' | translate }}</span>
+            </button>
+            <button nz-button nzType="primary" type="button" class="inline-flex items-center gap-1.5" (click)="reviewPayment()">
                 <ng-icon name="lucideHandCoins" size="14px" aria-hidden="true" />
-            }
-            <span>{{ 'inventory.purchaseOrder.recordPayment' | translate }}</span>
-        </button>
+                <span>{{ 'inventory.purchaseOrder.recordPayment' | translate }}</span>
+            </button>
+        }
     </ng-template>
 </nz-modal>
 

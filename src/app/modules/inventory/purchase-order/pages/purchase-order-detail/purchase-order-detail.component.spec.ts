@@ -37,6 +37,26 @@ const open = async (status: PurchaseOrderStatus, permissions = ALL) => {
 describe('PurchaseOrderDetailComponent', () => {
     afterEach(() => TestBed.inject(HttpTestingController).verify());
 
+    it('asks in the payment dialog before recording, and sends nothing until confirmed', async () => {
+        const page = await open('Verified');
+        page.openPayment();
+        page.paymentForm.setValue({ payment_status: 'paid', paid_amount: null });
+        page.reviewPayment();
+
+        expect(page.paymentReview()).toEqual({ from: { status: 'unpaid', amount: 0 }, to: { status: 'paid', amount: 36000 } });
+        expect(page.paymentOpen()).toBe(true);
+        TestBed.inject(HttpTestingController).expectNone((r) => r.url.includes(APIEndpoint.UPDATE_PURCHASE_ORDER_PAYMENT));
+    });
+
+    it('closes the payment dialog without asking when nothing changed', async () => {
+        const page = await open('Verified');
+        page.openPayment();
+        page.reviewPayment();
+
+        expect(page.paymentReview()).toBeNull();
+        expect(page.paymentOpen()).toBe(false);
+    });
+
     it('offers verify, edit, cancel and payment while the order waits for its delivery', async () => {
         const page = await open('Submitted');
         expect([page.canVerify(), page.canEdit(), page.canCancel(), page.canPay()]).toEqual([true, true, true, true]);

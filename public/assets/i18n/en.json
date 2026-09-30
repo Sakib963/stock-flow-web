@@ -1441,7 +1441,11 @@
                 "label": "Check",
                 "asOrdered": "As ordered",
                 "differs": "Differs"
-            }
+            },
+            "paymentConfirm": "Change the payment of {{number}} from {{fromStatus}}, {{fromAmount}}, to {{toStatus}}, {{toAmount}}?",
+            "paymentConfirmLead": "The change is logged on the order. The app records what was paid; it never moves money.",
+            "paymentConfirmSave": "Yes, record payment",
+            "paymentBack": "Back"
         },
         "stockMovement": {
             "searchPlaceholder": "Product, batch or document",

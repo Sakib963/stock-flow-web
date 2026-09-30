@@ -1441,7 +1441,11 @@
                 "label": "মিলানো",
                 "asOrdered": "অর্ডার অনুযায়ী",
                 "differs": "মেলেনি"
-            }
+            },
+            "paymentConfirm": "{{number}}-এর পরিশোধ {{fromStatus}}, {{fromAmount}} থেকে বদলে {{toStatus}}, {{toAmount}} করবেন?",
+            "paymentConfirmLead": "পরিবর্তনটি ক্রয়াদেশে লেখা থাকবে। অ্যাপ শুধু কত পরিশোধ হয়েছে তা লিখে রাখে, টাকা লেনদেন করে না।",
+            "paymentConfirmSave": "হ্যাঁ, পরিশোধ লিখুন",
+            "paymentBack": "ফিরে যান"
         },
         "stockMovement": {
             "searchPlaceholder": "পণ্য, ব্যাচ বা রেফারেন্স",

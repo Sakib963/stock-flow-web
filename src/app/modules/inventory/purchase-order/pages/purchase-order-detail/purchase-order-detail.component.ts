@@ -169,6 +169,8 @@ export class PurchaseOrderDetailComponent {
 
     // Record payment.
     readonly paymentOpen = signal(false);
+    /** The confirmation, drawn in the same dialog so a second modal never opens over the first. */
+    readonly paymentReview = signal<{ from: { status: PaymentStatus; amount: number }; to: { status: PaymentStatus; amount: number } } | null>(null);
     readonly paymentForm = this._builder.group({
         payment_status: ['unpaid' as PaymentStatus, [Validators.required]],
         paid_amount: [null as number | null],
@@ -249,7 +251,28 @@ export class PurchaseOrderDetailComponent {
         const d = this.record()?.details;
         if (!d) return;
         this.paymentForm.reset({ payment_status: d.payment_status ?? 'unpaid', paid_amount: d.payment_status === 'partially_paid' ? Number(d.paid_amount) : null });
+        this.paymentReview.set(null);
         this.paymentOpen.set(true);
+    }
+
+    /** Asks before recording; a payment that says what the order already says closes without asking or saving. */
+    reviewPayment(): void {
+        const d = this.record()?.details;
+        if (!d) return;
+        if (this.paymentForm.invalid) {
+            revealErrors(this.paymentForm);
+            return;
+        }
+        const { payment_status, paid_amount } = this.paymentForm.getRawValue();
+        const total = Number(d.total_amount);
+        const to = { status: payment_status, amount: payment_status === 'paid' ? total : payment_status === 'partially_paid' ? Number(paid_amount) : 0 };
+        const from = { status: d.payment_status ?? 'unpaid', amount: Number(d.paid_amount) };
+        if (from.status === to.status && from.amount === to.amount) {
+            this.paymentOpen.set(false);
+            this._message.info(this._translate.instant('form.nothingChanged'));
+            return;
+        }
+        this.paymentReview.set({ from, to });
     }
 
     savePayment(): void {
