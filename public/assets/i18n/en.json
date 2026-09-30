@@ -1426,7 +1426,20 @@
                 "body": "It is checked in full and becomes a submitted order. Nothing is added to stock until the delivery is verified."
             },
             "continueDraft": "Continue the draft",
-            "notChosen": "Not chosen yet"
+            "notChosen": "Not chosen yet",
+            "noMatch": "Nothing matches what you typed.",
+            "lastOrdered": "Last ordered {{date}}",
+            "neverOrdered": "Never ordered from",
+            "needsProduct": "Add at least one product to the order.",
+            "confirmDraft": {
+                "title": "Save as a draft?",
+                "body": "It stays a draft until you submit it: the supplier is not sent anything and no stock moves."
+            },
+            "lineCheck": {
+                "label": "Check",
+                "asOrdered": "As ordered",
+                "differs": "Differs"
+            }
         }
     },
     "form": {

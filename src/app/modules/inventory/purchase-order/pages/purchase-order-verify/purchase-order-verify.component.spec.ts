@@ -3,7 +3,7 @@ import { HttpTestingController, provideHttpClientTesting } from '@angular/common
 import { TestBed } from '@angular/core/testing';
 import { ActivatedRoute, provideRouter } from '@angular/router';
 import { provideNzI18n, en_US } from 'ng-zorro-antd/i18n';
-import { provideTranslateService } from '@ngx-translate/core';
+import { TranslateService, provideTranslateService } from '@ngx-translate/core';
 import { APIEndpoint } from '@app/core/constants/api-endpoint';
 import { PurchaseOrderLine } from '@app/core/models/purchase-order.model';
 import { SessionService } from '@app/core/services/session/session.service';
@@ -49,5 +49,25 @@ describe('PurchaseOrderVerifyComponent', () => {
         expect(page.ready()).toBe(true);
         expect(page.unitsShort()).toBe(2);
         expect(page.receivedTotal()).toBe(1800);
+    });
+
+    it('marks a checked line as differing when it came short or at another price, and as ordered otherwise', async () => {
+        const page = await open();
+        const [priced, unpriced] = page.lines();
+
+        page.arrived(priced, click);
+        expect(page.differs(priced)).toBe(false);
+
+        page.saved({ next: false, value: { oid: 'l-2', received_quantity: 10, unit_price: 120, intended_use: 'internal_use', ad_run_cost: null, packaging_cost: null, gift_cost: null, content_creation_cost: null, influencer_cost: null, cost_remarks: null } });
+        expect(page.differs(unpriced)).toBe(true);
+    });
+
+    it('names the order in the confirmation title, not a placeholder', async () => {
+        const page = await open();
+        for (const line of page.lines()) page.saved({ next: false, value: { oid: line.oid, received_quantity: 10, unit_price: 100, intended_use: 'internal_use', ad_run_cost: null, packaging_cost: null, gift_cost: null, content_creation_cost: null, influencer_cost: null, cost_remarks: null } });
+
+        const instant = vi.spyOn(TestBed.inject(TranslateService), 'instant');
+        page.verify();
+        expect(instant).toHaveBeenCalledWith('inventory.purchaseOrder.confirmVerify.title', { number: 'PO-2609-0142' });
     });
 });

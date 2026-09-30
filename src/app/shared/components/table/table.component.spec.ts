@@ -125,6 +125,14 @@ describe('TableComponent', () => {
         expect(perRow).toEqual([2, 1]);
     });
 
+    it('widens the action column to fit every button when a list shows more than two inline', async () => {
+        await setup(['configuration.category.view', 'configuration.category.edit']);
+        const three = [...(PASSED.rowActions ?? []), { ...PASSED.rowActions![0], key: 'again' }];
+        const { cmp } = await render({ ...PASSED, rowActions: three, rowActionStyle: 'inline' }, { rows: ROWS });
+
+        expect(cmp.inlineActions()).toBe(3);
+    });
+
     it('puts the actions behind one menu where the config asks for it', async () => {
         await setup(['configuration.category.view', 'configuration.category.edit']);
         const { el } = await render({ ...PASSED, rowActionStyle: 'menu' }, { rows: ROWS });

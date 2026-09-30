@@ -7,6 +7,7 @@ import { NzSkeletonModule } from 'ng-zorro-antd/skeleton';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzModalService } from 'ng-zorro-antd/modal';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { finalize } from 'rxjs';
 import { RequestFailure } from '@app/core/models/api.model';
 import { HasUnsavedChanges } from '@app/core/guards/unsaved-changes/unsaved-changes.guard';
 import { PageBack } from '@app/core/models/page-header.model';
@@ -45,6 +46,9 @@ export class PurchaseOrderEditComponent implements HasUnsavedChanges {
     readonly editor = viewChild(PurchaseOrderFormComponent);
     private readonly _asking = signal(false);
     readonly saving = computed(() => this._asking() || this._orders.saving());
+    /** A draft save, confirmation included, so its button spins rather than Submit. */
+    readonly drafting = signal(false);
+    readonly submitting = computed(() => this.saving() && !this.drafting());
 
     readonly record = signal<PurchaseOrderDetails | null>(null);
     readonly loading = signal(true);
@@ -90,7 +94,8 @@ export class PurchaseOrderEditComponent implements HasUnsavedChanges {
             return;
         }
         if (!editor.valid()) {
-            this._message.error(this._translate.instant('form.fixErrors'));
+            // With no product picked there is no field to mark, so say what is missing.
+            this._message.error(this._translate.instant(editor.started().length ? 'form.fixErrors' : 'inventory.purchaseOrder.needsProduct'));
             return;
         }
 
@@ -125,12 +130,30 @@ export class PurchaseOrderEditComponent implements HasUnsavedChanges {
             this._message.error(this._translate.instant('inventory.purchaseOrder.draftNeedsSupplier'));
             return;
         }
-        this._orders.update(editor.payload(true)).subscribe({
-            next: (changed) => {
-                editor.form.markAsPristine();
-                this._message[changed ? 'success' : 'info'](this._translate.instant(changed ? 'inventory.purchaseOrder.draftSaved' : 'form.nothingChanged'));
-            },
-            error: (error: unknown) => this._message.error(this._translate.instant(orderFailureKey(error, 'form.saveFailed'))),
+        const payload = editor.payload(true);
+        this.drafting.set(true);
+        this._asking.set(true);
+        confirmAction(this._modal, {
+            title: this._translate.instant('inventory.purchaseOrder.confirmDraft.title'),
+            body: this._translate.instant('inventory.purchaseOrder.confirmDraft.body'),
+            ok: this._translate.instant('inventory.purchaseOrder.saveDraft'),
+            cancel: this._translate.instant('form.confirm.cancel'),
+        }).subscribe((confirmed) => {
+            this._asking.set(false);
+            if (!confirmed) {
+                this.drafting.set(false);
+                return;
+            }
+            this._orders
+                .update(payload)
+                .pipe(finalize(() => this.drafting.set(false)))
+                .subscribe({
+                    next: (changed) => {
+                        editor.form.markAsPristine();
+                        this._message[changed ? 'success' : 'info'](this._translate.instant(changed ? 'inventory.purchaseOrder.draftSaved' : 'form.nothingChanged'));
+                    },
+                    error: (error: unknown) => this._message.error(this._translate.instant(orderFailureKey(error, 'form.saveFailed'))),
+                });
         });
     }
 

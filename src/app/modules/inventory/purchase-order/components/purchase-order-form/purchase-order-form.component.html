@@ -4,11 +4,18 @@
         <nz-form-item>
             <nz-form-label nzRequired nzFor="po-supplier" [nzTooltipTitle]="'inventory.purchaseOrder.supplierHelper' | translate">{{ 'inventory.purchaseOrder.supplier' | translate }}</nz-form-label>
             <nz-form-control [nzErrorTip]="'inventory.purchaseOrder.supplierRequired' | translate">
-                <nz-select nzId="po-supplier" formControlName="supplier_oid" nzShowSearch nzAllowClear [nzFilterOption]="matchSupplier" [nzPlaceHolder]="'inventory.purchaseOrder.supplierPlaceholder' | translate" [attr.aria-invalid]="invalid('supplier_oid')">
+                <nz-select nzId="po-supplier" formControlName="supplier_oid" nzShowSearch nzAllowClear [nzFilterOption]="matchSupplier" [nzLoading]="suppliersLoading()" [nzNotFoundContent]="suppliersLoading() ? loadingChoices : noMatch" [nzPlaceHolder]="'inventory.purchaseOrder.supplierPlaceholder' | translate" [attr.aria-invalid]="invalid('supplier_oid')">
                     @for (supplier of suppliers(); track supplier.value) {
                         <nz-option nzCustomContent [nzValue]="supplier.value" [nzLabel]="supplier.label">
                             <span class="block text-[13px] text-ink">{{ supplier.label }}</span>
-                            <span class="block font-mono text-xs text-ink-muted">{{ supplier.phone_number }}</span>
+                            <span class="block text-xs text-ink-muted">
+                                <span class="font-mono">{{ supplier.phone_number }}</span> &middot;
+                                @if (supplier.last_ordered_on) {
+                                    {{ 'inventory.purchaseOrder.lastOrdered' | translate: { date: (supplier.last_ordered_on | recordDate: language() : 'date') } }}
+                                } @else {
+                                    {{ 'inventory.purchaseOrder.neverOrdered' | translate }}
+                                }
+                            </span>
                         </nz-option>
                     }
                 </nz-select>
@@ -117,7 +124,18 @@
                     <tr [formGroupName]="i" [class.bg-danger-bg]="lineInvalid(i)" [attr.data-line]="i">
                         <td class="text-center font-mono text-xs text-ink-muted">{{ i + 1 | digits }}</td>
                         <td>
-                            <nz-select class="w-full" formControlName="product_oid" nzShowSearch nzServerSearch [nzLoading]="searching() && searchRow() === i" [nzPlaceHolder]="'inventory.purchaseOrder.productPlaceholder' | translate" [nzNotFoundContent]="'inventory.purchaseOrder.productNotFound' | translate" [attr.aria-label]="'inventory.purchaseOrder.product' | translate" (nzOnSearch)="search(i, $event)" (nzOpenChange)="$event && search(i, '')">
+                            <nz-select
+                                class="w-full"
+                                formControlName="product_oid"
+                                nzShowSearch
+                                nzServerSearch
+                                [nzLoading]="searching() && searchRow() === i"
+                                [nzPlaceHolder]="'inventory.purchaseOrder.productPlaceholder' | translate"
+                                [nzNotFoundContent]="searching() && searchRow() === i ? loadingChoices : ('inventory.purchaseOrder.productNotFound' | translate)"
+                                [attr.aria-label]="'inventory.purchaseOrder.product' | translate"
+                                (nzOnSearch)="search(i, $event)"
+                                (nzOpenChange)="$event && search(i, '')"
+                            >
                                 @for (product of optionsFor(i); track product.oid) {
                                     <nz-option nzCustomContent [nzValue]="product.oid" [nzLabel]="product.name">
                                         <div class="flex items-start justify-between gap-3 py-0.5">
@@ -145,14 +163,14 @@
                             </nz-select>
                         </td>
                         <td>
-                            <nz-select class="w-full" formControlName="warehouse_oid" nzShowSearch [nzPlaceHolder]="'inventory.purchaseOrder.choose' | translate" [attr.aria-label]="'inventory.purchaseOrder.warehouse' | translate" [attr.aria-invalid]="lineInvalid(i) || null">
+                            <nz-select class="w-full" formControlName="warehouse_oid" nzShowSearch [nzLoading]="warehousesLoading()" [nzNotFoundContent]="warehousesLoading() ? loadingChoices : noMatch" [nzPlaceHolder]="'inventory.purchaseOrder.choose' | translate" [attr.aria-label]="'inventory.purchaseOrder.warehouse' | translate" [attr.aria-invalid]="lineInvalid(i) || null">
                                 @for (warehouse of warehouses(); track warehouse.value) {
                                     <nz-option [nzValue]="warehouse.value" [nzLabel]="warehouse.label" />
                                 }
                             </nz-select>
                         </td>
                         <td>
-                            <nz-select class="w-full" formControlName="aisle_oid" [nzDisabled]="!line.controls.warehouse_oid.value" [nzPlaceHolder]="'inventory.purchaseOrder.noAisle' | translate" [attr.aria-label]="'inventory.purchaseOrder.aisle' | translate">
+                            <nz-select class="w-full" formControlName="aisle_oid" [nzDisabled]="!line.controls.warehouse_oid.value" [nzLoading]="aislesLoading()" [nzPlaceHolder]="'inventory.purchaseOrder.noAisle' | translate" [attr.aria-label]="'inventory.purchaseOrder.aisle' | translate">
                                 <nz-option [nzValue]="null" [nzLabel]="'inventory.purchaseOrder.noAisle' | translate" />
                                 @for (aisle of aislesOf(line.controls.warehouse_oid.value); track aisle.value) {
                                     <nz-option [nzValue]="aisle.value" [nzLabel]="aisle.label" />
@@ -195,3 +213,13 @@
         </div>
     </section>
 </form>
+
+<ng-template #loadingChoices>
+    <p class="m-0 flex items-center justify-center gap-2 py-2 text-xs text-ink-muted" role="status">
+        <nz-spin nzSimple nzSize="small" />
+        {{ 'form.loading' | translate }}
+    </p>
+</ng-template>
+<ng-template #noMatch>
+    <p class="m-0 py-2 text-center text-xs text-ink-muted">{{ 'inventory.purchaseOrder.noMatch' | translate }}</p>
+</ng-template>

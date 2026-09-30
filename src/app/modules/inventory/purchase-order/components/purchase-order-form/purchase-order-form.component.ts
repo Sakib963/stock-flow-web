@@ -10,15 +10,18 @@ import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzInputNumberModule } from 'ng-zorro-antd/input-number';
 import { NzRadioModule } from 'ng-zorro-antd/radio';
 import { NzSelectModule } from 'ng-zorro-antd/select';
+import { NzSpinModule } from 'ng-zorro-antd/spin';
 import { NzTableModule } from 'ng-zorro-antd/table';
 import { NzTooltipModule } from 'ng-zorro-antd/tooltip';
 import { TranslatePipe } from '@ngx-translate/core';
-import { Subject, debounceTime, switchMap, catchError, of } from 'rxjs';
+import { Subject, debounceTime, finalize, switchMap, catchError, of } from 'rxjs';
 
 import { AisleChoice, PAYMENT_STATUSES, PURCHASE_TYPES, PaymentStatus, PurchasableProduct, PurchaseOrderDetails, PurchaseOrderPayload, PurchaseType, SupplierChoice, WarehouseChoice } from '@app/core/models/purchase-order.model';
+import { LanguageService } from '@app/core/services/language/language.service';
 import { PurchaseOrderService } from '@app/modules/inventory/purchase-order/services/purchase-order.service';
 import { DigitsPipe } from '@app/shared/pipes/digits/digits.pipe';
 import { MoneyPipe } from '@app/shared/pipes/money/money.pipe';
+import { RecordDatePipe } from '@app/shared/pipes/record-date/record-date.pipe';
 import { revealErrors } from '@app/shared/utils/reveal-errors/reveal-errors';
 
 /** What a product looks like on a line: enough to draw it without asking the server again. */
@@ -54,7 +57,7 @@ const fromDay = (day: string | null): Date | null => (day ? new Date(`${day}T00:
  */
 @Component({
     selector: 'purchase-order-form',
-    imports: [DigitsPipe, MoneyPipe, NgIcon, ReactiveFormsModule, NzButtonModule, NzDatePickerModule, NzFormModule, NzInputModule, NzInputNumberModule, NzRadioModule, NzSelectModule, NzTableModule, NzTooltipModule, TranslatePipe],
+    imports: [DigitsPipe, MoneyPipe, RecordDatePipe, NgIcon, ReactiveFormsModule, NzButtonModule, NzDatePickerModule, NzFormModule, NzInputModule, NzInputNumberModule, NzRadioModule, NzSelectModule, NzSpinModule, NzTableModule, NzTooltipModule, TranslatePipe],
     providers: [provideIcons({ lucideListOrdered, lucideRotateCw, lucideTrash2 })],
     templateUrl: './purchase-order-form.component.html',
     styleUrl: './purchase-order-form.component.scss',
@@ -66,6 +69,7 @@ export class PurchaseOrderFormComponent {
     private readonly _host = inject<ElementRef<HTMLElement>>(ElementRef);
     private readonly _destroy = inject(DestroyRef);
 
+    readonly language = inject(LanguageService).current;
     readonly formId = 'purchase-order-form';
     readonly purchaseTypes = PURCHASE_TYPES;
     readonly paymentStatuses = PAYMENT_STATUSES;
@@ -93,6 +97,9 @@ export class PurchaseOrderFormComponent {
     readonly warehouses = signal<WarehouseChoice[]>([]);
     readonly aisles = signal<AisleChoice[]>([]);
     readonly choicesFailed = signal(false);
+    readonly suppliersLoading = signal(true);
+    readonly warehousesLoading = signal(true);
+    readonly aislesLoading = signal(true);
 
     /** Every product a line has picked, by oid, so a row draws its name, stock and last price. */
     readonly products = signal<Record<string, LineProduct>>({});
@@ -138,10 +145,7 @@ export class PurchaseOrderFormComponent {
         this._search
             .pipe(
                 debounceTime(250),
-                switchMap((term) => {
-                    this.searching.set(true);
-                    return this._orders.searchProducts(term).pipe(catchError(() => of([] as PurchasableProduct[])));
-                }),
+                switchMap((term) => this._orders.searchProducts(term).pipe(catchError(() => of([] as PurchasableProduct[])))),
                 takeUntilDestroyed(this._destroy)
             )
             .subscribe((found) => {
@@ -167,9 +171,21 @@ export class PurchaseOrderFormComponent {
     loadChoices(): void {
         this.choicesFailed.set(false);
         const fail = () => this.choicesFailed.set(true);
-        this._orders.suppliers().subscribe({ next: (rows) => this.suppliers.set(rows), error: fail });
-        this._orders.warehouses().subscribe({ next: (rows) => this.warehouses.set(rows), error: fail });
-        this._orders.aisles().subscribe({ next: (rows) => this.aisles.set(rows), error: fail });
+        this.suppliersLoading.set(true);
+        this.warehousesLoading.set(true);
+        this.aislesLoading.set(true);
+        this._orders
+            .suppliers()
+            .pipe(finalize(() => this.suppliersLoading.set(false)))
+            .subscribe({ next: (rows) => this.suppliers.set(rows), error: fail });
+        this._orders
+            .warehouses()
+            .pipe(finalize(() => this.warehousesLoading.set(false)))
+            .subscribe({ next: (rows) => this.warehouses.set(rows), error: fail });
+        this._orders
+            .aisles()
+            .pipe(finalize(() => this.aislesLoading.set(false)))
+            .subscribe({ next: (rows) => this.aisles.set(rows), error: fail });
     }
 
     /** Name or phone, the way someone finds a supplier they know by either. */
@@ -187,6 +203,8 @@ export class PurchaseOrderFormComponent {
 
     search(row: number, term: string): void {
         this.searchRow.set(row);
+        // From the keystroke, not after the debounce, so the picker never says nothing matches while it is still asking.
+        this.searching.set(true);
         this._search.next(term);
     }
 

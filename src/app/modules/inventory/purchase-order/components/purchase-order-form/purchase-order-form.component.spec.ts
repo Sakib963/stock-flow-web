@@ -34,6 +34,30 @@ const pick = (form: PurchaseOrderFormComponent, row: number, product: Purchasabl
 describe('PurchaseOrderFormComponent', () => {
     afterEach(() => TestBed.inject(HttpTestingController).verify({ ignoreCancelled: true }));
 
+    it('shows each picker loading until its choices arrive', async () => {
+        await TestBed.configureTestingModule({
+            imports: [PurchaseOrderFormComponent],
+            providers: [provideHttpClient(), provideHttpClientTesting(), provideNzI18n(en_US), provideNzDateFnsAdapter(), provideTranslateService({ fallbackLang: 'en' })],
+        }).compileComponents();
+        const fixture = TestBed.createComponent(PurchaseOrderFormComponent);
+        fixture.detectChanges();
+        const form = fixture.componentInstance;
+        expect([form.suppliersLoading(), form.warehousesLoading(), form.aislesLoading()]).toEqual([true, true, true]);
+
+        const http = TestBed.inject(HttpTestingController);
+        http.expectOne((r) => r.url.endsWith(APIEndpoint.GET_SUPPLIER_LIST_FOR_DROPDOWN)).flush({ data: [] });
+        http.expectOne((r) => r.url.endsWith(APIEndpoint.GET_WAREHOUSE_LIST_FOR_DROPDOWN)).flush({ data: [] });
+        http.expectOne((r) => r.url.endsWith(APIEndpoint.GET_AISLE_LIST_FOR_DROPDOWN)).flush('down', { status: 500, statusText: 'Server Error' });
+        expect([form.suppliersLoading(), form.warehousesLoading(), form.aislesLoading()]).toEqual([false, false, false]);
+        expect(form.choicesFailed()).toBe(true);
+    });
+
+    it('shows the product search loading from the first keystroke, not after the pause', async () => {
+        const form = (await open()).componentInstance;
+        form.search(0, 'kur');
+        expect(form.searching()).toBe(true);
+    });
+
     it('always keeps one blank line last, carrying the warehouse and aisle down', async () => {
         const form = (await open()).componentInstance;
         expect(form.lines.length).toBe(1);

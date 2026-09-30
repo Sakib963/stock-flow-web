@@ -8,7 +8,8 @@
  *   node tools/shot.mjs [route] [out-dir] [ready-selector] [click-selector]
  *
  * A click selector is pressed once the page is ready, for a state only a click reaches, such as an
- * image preview; the shot waits for `.cdk-overlay-pane` after it.
+ * image preview; the shot waits for `.cdk-overlay-pane` after it, or for SHOT_AFTER_CLICK when set.
+ * Several clicks are joined with ` && `. SHOT_EVAL, when set, is an expression whose result is printed per size.
  */
 import { createServer } from 'node:http';
 import { readFileSync, existsSync, mkdirSync } from 'node:fs';
@@ -71,7 +72,7 @@ const MENU = [
         isDisabled: false,
         disabledMessage: { en: null, bn: null },
         isNew: false,
-        children: [{ id: 'purchase-orders', label: { en: 'Purchase orders', bn: 'ক্রয় আদেশ' }, description: { en: null, bn: null }, tags: [], icon: 'lucideTruck', order: 10, route: '/app/inventory/purchase-orders', permission: 'inventory.purchase-order.view', isDisabled: false, disabledMessage: { en: null, bn: null }, isNew: false, children: [] }],
+        children: [{ id: 'purchase-orders', label: { en: 'Purchase orders', bn: 'ক্রয়াদেশ' }, description: { en: null, bn: null }, tags: [], icon: 'lucideTruck', order: 10, route: '/app/inventory/purchase-orders', permission: 'inventory.purchase-order.view', isDisabled: false, disabledMessage: { en: null, bn: null }, isNew: false, children: [] }],
     },
 ];
 
@@ -209,7 +210,7 @@ const poLines = (verified) =>
         content_creation_cost: null,
         influencer_cost: null,
         cost_remarks: verified ? remarks : null,
-        batches: verified ? [{ oid: 'b-' + i, batch_code: 'B-261002-014' + i, intended_use: i === 3 ? 'internal_use' : 'for_sale', status: i === 3 ? 'internal_use' : 'ready_for_sale', initial_quantity: received, quantity_available: received, selling_price: i === 3 ? null : String(selling ?? 980), maximum_discount: i === 3 ? null : String(discount ?? 60) }] : [],
+        batches: verified ? [{ oid: 'b-' + i, batch_code: ['B-7KQ4-M2XH', 'B-D9TW-3FRA', 'B-XC5N-8PEJ', 'B-2HVB-QK6M'][i] ?? 'B-R4ZS-9WDN', intended_use: i === 3 ? 'internal_use' : 'for_sale', status: i === 3 ? 'internal_use' : 'ready_for_sale', initial_quantity: received, quantity_available: received, selling_price: i === 3 ? null : String(selling ?? 980), maximum_discount: i === 3 ? null : String(discount ?? 60) }] : [],
     }));
 const PO_HEADER = {
     po_number: 'PO-2609-0142',
@@ -282,7 +283,7 @@ function handle(request) {
     if (url.includes('/get-purchase-list')) return answer(request, { rows: PO_ROWS, stats: { submitted: 1, overdue: 0, verified: 1, cancelled: 1 } }, { total: PO_ROWS.length });
     if (url.includes('/get-purchase-details/')) return answer(request, { ...PO[url.split('/').pop().split('?')[0]], activity: PO_ACTIVITY });
     if (url.includes('/get-product-list-for-purchase')) return answer(request, PO_PICKER);
-    if (url.includes('/get-supplier-list-for-dropdown')) return answer(request, SUPPLIERS.map((s) => ({ value: s.oid, label: s.name, phone_number: s.phone_number })));
+    if (url.includes('/get-supplier-list-for-dropdown')) return answer(request, SUPPLIERS.map((s, i) => ({ value: s.oid, label: s.name, phone_number: s.phone_number, last_ordered_on: i === 0 ? null : '2026-09-12T10:00:00.000' })));
     if (url.includes('/get-aisle-list-for-dropdown')) return answer(request, AISLES.map((a) => ({ value: a.oid, label: a.name, warehouse_oid: a.warehouse_oid })));
     if (url.includes('/get-warehouse-list-for-dropdown')) return answer(request, WAREHOUSES.map((w) => ({ value: w.oid, label: w.name })));
     if (url.includes('/get-aisle-list')) return answer(request, { rows: AISLES, stats: { active: 4, inactive: 0, stocked: 3, empty: 1 } }, { total: AISLES.length });
@@ -388,12 +389,14 @@ try {
         await browser.goto('http://127.0.0.1:' + PORT + BASE + ROUTE);
         await browser.waitFor(READY);
         if (CLICK) {
-            await browser.eval(`document.querySelector(${JSON.stringify(CLICK)}).click()`);
-            await browser.waitFor('.cdk-overlay-pane');
+            for (const selector of CLICK.split(' && ')) await browser.eval(`document.querySelector(${JSON.stringify(selector)}).click()`);
+            await browser.waitFor(process.env.SHOT_AFTER_CLICK ?? '.cdk-overlay-pane');
+            if (process.env.SHOT_AFTER_CLICK) await browser.eval(`document.querySelector(${JSON.stringify(process.env.SHOT_AFTER_CLICK)}).scrollIntoView({ block: 'center' })`);
             await new Promise((resolve) => setTimeout(resolve, 600));
         }
         await browser.screenshot(join(OUT, label + '.png'));
         console.log(label.padEnd(8), await browser.eval(PROBE));
+        if (process.env.SHOT_EVAL) console.log(label.padEnd(8), await browser.eval(process.env.SHOT_EVAL));
     }
 
     if (browser.errors.length) console.log('\nconsole errors:', browser.errors);

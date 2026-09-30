@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgIcon, provideIcons } from '@ng-icons/core';
-import { lucideArrowLeft, lucideCheck, lucideChevronsUpDown, lucideListChecks, lucidePackageCheck, lucidePencil, lucideRotateCw, lucideX } from '@ng-icons/lucide';
+import { lucideArrowLeft, lucideCheck, lucideChevronDown, lucideChevronUp, lucideChevronsUpDown, lucideListChecks, lucidePackageCheck, lucidePencil, lucideRotateCw, lucideX } from '@ng-icons/lucide';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzModalService } from 'ng-zorro-antd/modal';
@@ -21,6 +21,7 @@ import { orderFailureKey } from '@app/modules/inventory/purchase-order/utils/ord
 import { allArrived, budgetPerUnit, lineReady, marginPerUnit } from '@app/modules/inventory/purchase-order/utils/verify-line/verify-line';
 import { ActionFooterComponent } from '@app/shared/components/action-footer/action-footer.component';
 import { PageHeaderComponent } from '@app/shared/components/page-header/page-header.component';
+import { StatusTagComponent } from '@app/shared/components/status-tag/status-tag.component';
 import { DigitsPipe } from '@app/shared/pipes/digits/digits.pipe';
 import { MoneyPipe } from '@app/shared/pipes/money/money.pipe';
 import { RecordDatePipe } from '@app/shared/pipes/record-date/record-date.pipe';
@@ -30,14 +31,14 @@ import { failureOf } from '@app/shared/utils/request-failure/request-failure';
 /**
  * Receiving a delivery, counted by hand.
  *
- * Each line is ticked "All arrived" when it came as ordered, or opened with Edit (or a click on the
- * row) when something differs. An expanded row only shows what was recorded. Nothing moves until
+ * Each line is ticked "All arrived" when it came as ordered, or opened with Edit when something
+ * differs. An expanded row only shows what was recorded. Nothing moves until
  * Verify, which adds every batch in one step and cannot be undone.
  */
 @Component({
     selector: 'purchase-order-verify',
-    imports: [NgIcon, NzButtonModule, NzProgressModule, NzSkeletonModule, NzTableModule, TranslatePipe, PageHeaderComponent, ActionFooterComponent, VerifyLineDrawerComponent, MoneyPipe, DigitsPipe, RecordDatePipe],
-    providers: [MoneyPipe, provideIcons({ lucideArrowLeft, lucideCheck, lucideChevronsUpDown, lucideListChecks, lucidePackageCheck, lucidePencil, lucideRotateCw, lucideX })],
+    imports: [NgIcon, NzButtonModule, NzProgressModule, NzSkeletonModule, NzTableModule, TranslatePipe, PageHeaderComponent, ActionFooterComponent, StatusTagComponent, VerifyLineDrawerComponent, MoneyPipe, DigitsPipe, RecordDatePipe],
+    providers: [MoneyPipe, provideIcons({ lucideArrowLeft, lucideCheck, lucideChevronDown, lucideChevronUp, lucideChevronsUpDown, lucideListChecks, lucidePackageCheck, lucidePencil, lucideRotateCw, lucideX })],
     templateUrl: './purchase-order-verify.component.html',
     styleUrl: './purchase-order-verify.component.scss',
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -116,6 +117,12 @@ export class PurchaseOrderVerifyComponent implements HasUnsavedChanges {
         return lineReady(this.counted()[line.oid], line);
     }
 
+    /** A checked line that came short or at another price than ordered. */
+    differs(line: PurchaseOrderLine): boolean {
+        const value = this.counted()[line.oid];
+        return !!value && (value.received_quantity !== line.ordered_quantity || value.unit_price !== Number(line.ordered_unit_price));
+    }
+
     valueOf(line: PurchaseOrderLine): VerifyLinePayload | null {
         return this.counted()[line.oid] ?? null;
     }
@@ -165,7 +172,7 @@ export class PurchaseOrderVerifyComponent implements HasUnsavedChanges {
         if (!record || !this.ready() || this.verifying()) return;
 
         confirmAction(this._modal, {
-            title: this._translate.instant('inventory.purchaseOrder.confirmVerify.title'),
+            title: this._translate.instant('inventory.purchaseOrder.confirmVerify.title', { number: record.details.po_number }),
             body: this._translate.instant('inventory.purchaseOrder.confirmVerify.body', { number: record.details.po_number, total: this._money.transform(this.receivedTotal()) }),
             ok: this._translate.instant('inventory.purchaseOrder.verifyAndAdd'),
             cancel: this._translate.instant('form.confirm.cancel'),

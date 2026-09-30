@@ -136,6 +136,7 @@ export class TableComponent {
 
     /** The actions column exists when this person has any row action at all, not per row. */
     readonly hasActions = computed(() => this._rowActions().length > 0);
+    readonly inlineActions = computed(() => (this.actionStyle() === 'inline' ? this._rowActions().length : 0));
 
     readonly actionStyle = computed(() => (this.isPhone() ? this.config().phoneRowActionStyle : undefined) ?? this.config().rowActionStyle ?? 'auto');
 

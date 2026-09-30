@@ -10,7 +10,7 @@
                 </th>
             }
             @if (hasActions()) {
-                <th [nzWidth]="actionsWidth" nzAlign="center" [nzRight]="true" scope="col">{{ 'list.action' | translate }}</th>
+                <th [nzWidth]="actionsWidth()" nzAlign="center" [nzRight]="true" scope="col">{{ 'list.action' | translate }}</th>
             }
         </tr>
     </thead>

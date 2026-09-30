@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@a
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgIcon, provideIcons } from '@ng-icons/core';
-import { lucideArrowLeft, lucideBadgeCheck, lucideBan, lucideBanknote, lucideBoxes, lucideChevronsUpDown, lucideCircleAlert, lucideClock, lucideFilePen, lucideFileSpreadsheet, lucideHandCoins, lucideHistory, lucideInfo, lucideListOrdered, lucidePackage, lucidePackageCheck, lucidePencil, lucideRotateCw, lucideWallet, lucideX, lucideZap } from '@ng-icons/lucide';
+import { lucideArrowLeft, lucideBadgeCheck, lucideBan, lucideBanknote, lucideBoxes, lucideChevronDown, lucideChevronUp, lucideChevronsUpDown, lucideCircleAlert, lucideClock, lucideFilePen, lucideFileSpreadsheet, lucideHandCoins, lucideHistory, lucideInfo, lucideListOrdered, lucidePackage, lucidePackageCheck, lucidePencil, lucideRotateCw, lucideWallet, lucideX, lucideZap } from '@ng-icons/lucide';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzCardModule } from 'ng-zorro-antd/card';
 import { NzFormModule } from 'ng-zorro-antd/form';
@@ -28,6 +28,7 @@ import { budgetPerUnit, marginPerUnit } from '@app/modules/inventory/purchase-or
 import { ActionFooterComponent } from '@app/shared/components/action-footer/action-footer.component';
 import { PageHeaderComponent } from '@app/shared/components/page-header/page-header.component';
 import { StatusTagComponent } from '@app/shared/components/status-tag/status-tag.component';
+import { CopyableDirective } from '@app/shared/directives/copyable/copyable.directive';
 import { DigitsPipe } from '@app/shared/pipes/digits/digits.pipe';
 import { MoneyPipe } from '@app/shared/pipes/money/money.pipe';
 import { RecordDatePipe } from '@app/shared/pipes/record-date/record-date.pipe';
@@ -53,7 +54,7 @@ interface OrderStat {
  */
 @Component({
     selector: 'purchase-order-detail',
-    imports: [NgIcon, ReactiveFormsModule, NzButtonModule, NzCardModule, NzFormModule, NzInputModule, NzInputNumberModule, NzModalModule, NzRadioModule, NzSkeletonModule, NzTableModule, NzTimelineModule, TranslatePipe, PageHeaderComponent, StatusTagComponent, ActionFooterComponent, MoneyPipe, RecordDatePipe, DigitsPipe],
+    imports: [NgIcon, ReactiveFormsModule, NzButtonModule, NzCardModule, NzFormModule, NzInputModule, NzInputNumberModule, NzModalModule, NzRadioModule, NzSkeletonModule, NzTableModule, NzTimelineModule, TranslatePipe, PageHeaderComponent, StatusTagComponent, ActionFooterComponent, CopyableDirective, MoneyPipe, RecordDatePipe, DigitsPipe],
     providers: [
         MoneyPipe,
         provideIcons({
@@ -62,6 +63,8 @@ interface OrderStat {
             lucideBan,
             lucideBanknote,
             lucideBoxes,
+            lucideChevronDown,
+            lucideChevronUp,
             lucideChevronsUpDown,
             lucideCircleAlert,
             lucideClock,

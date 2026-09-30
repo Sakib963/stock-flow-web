@@ -217,6 +217,10 @@ went wrong and what to do.
   exists. Disabled means the feature exists and is not usable yet, and it carries a reason.
 - Tell a refusal (403), a network failure and a server fault apart. They ask different things of the
   person: "you cannot do that", "check the connection", "try again in a moment".
+- **Every dropdown whose choices come from an API shows it is loading**: `[nzLoading]` on the
+  `nz-select` while the request is in flight, and a `nzNotFoundContent` that says it is loading
+  rather than "nothing matches". For a server search, set the loading flag on the keystroke, not
+  after the debounce, or the picker claims nothing matches while it is still asking.
 
 ### Forms
 

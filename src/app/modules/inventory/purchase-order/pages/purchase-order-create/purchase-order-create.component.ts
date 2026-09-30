@@ -6,6 +6,7 @@ import { Router } from '@angular/router';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzModalService } from 'ng-zorro-antd/modal';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { finalize } from 'rxjs';
 import { HasUnsavedChanges } from '@app/core/guards/unsaved-changes/unsaved-changes.guard';
 import { PageBack } from '@app/core/models/page-header.model';
 import { PurchaseOrderFormComponent } from '@app/modules/inventory/purchase-order/components/purchase-order-form/purchase-order-form.component';
@@ -38,6 +39,9 @@ export class PurchaseOrderCreateComponent implements HasUnsavedChanges {
     readonly editor = viewChild(PurchaseOrderFormComponent);
     private readonly _asking = signal(false);
     readonly saving = computed(() => this._asking() || this._orders.saving());
+    /** A draft save, confirmation included, so its button spins rather than Submit. */
+    readonly drafting = signal(false);
+    readonly submitting = computed(() => this.saving() && !this.drafting());
 
     hasUnsavedChanges(): boolean {
         return !!this.editor()?.form.dirty;
@@ -47,7 +51,8 @@ export class PurchaseOrderCreateComponent implements HasUnsavedChanges {
         const editor = this.editor();
         if (!editor || this.saving()) return;
         if (!editor.valid()) {
-            this._message.error(this._translate.instant('form.fixErrors'));
+            // With no product picked there is no field to mark, so say what is missing.
+            this._message.error(this._translate.instant(editor.started().length ? 'form.fixErrors' : 'inventory.purchaseOrder.needsProduct'));
             return;
         }
 
@@ -75,9 +80,6 @@ export class PurchaseOrderCreateComponent implements HasUnsavedChanges {
     /**
      * Saves what is typed so far as a Draft, needing only the supplier, and carries on in that draft's
      * edit page so the next save updates it rather than raising a second order.
-     *
-     * No confirmation, unlike every other save: a draft moves nothing and is saved again and again
-     * over a long order, and a question each time would train people to click through questions.
      */
     saveDraft(): void {
         const editor = this.editor();
@@ -86,13 +88,31 @@ export class PurchaseOrderCreateComponent implements HasUnsavedChanges {
             this._message.error(this._translate.instant('inventory.purchaseOrder.draftNeedsSupplier'));
             return;
         }
-        this._orders.create(editor.payload(true)).subscribe({
-            next: ({ oid, po_number }) => {
-                editor.form.markAsPristine();
-                this._message.success(this._translate.instant('inventory.purchaseOrder.draftSavedMessage', { number: po_number }));
-                void this._router.navigateByUrl(PURCHASE_ORDER_ROUTES.edit(oid), { replaceUrl: true });
-            },
-            error: (error: unknown) => this._message.error(this._translate.instant(orderFailureKey(error, 'form.saveFailed'))),
+        const payload = editor.payload(true);
+        this.drafting.set(true);
+        this._asking.set(true);
+        confirmAction(this._modal, {
+            title: this._translate.instant('inventory.purchaseOrder.confirmDraft.title'),
+            body: this._translate.instant('inventory.purchaseOrder.confirmDraft.body'),
+            ok: this._translate.instant('inventory.purchaseOrder.saveDraft'),
+            cancel: this._translate.instant('form.confirm.cancel'),
+        }).subscribe((confirmed) => {
+            this._asking.set(false);
+            if (!confirmed) {
+                this.drafting.set(false);
+                return;
+            }
+            this._orders
+                .create(payload)
+                .pipe(finalize(() => this.drafting.set(false)))
+                .subscribe({
+                    next: ({ oid, po_number }) => {
+                        editor.form.markAsPristine();
+                        this._message.success(this._translate.instant('inventory.purchaseOrder.draftSavedMessage', { number: po_number }));
+                        void this._router.navigateByUrl(PURCHASE_ORDER_ROUTES.edit(oid), { replaceUrl: true });
+                    },
+                    error: (error: unknown) => this._message.error(this._translate.instant(orderFailureKey(error, 'form.saveFailed'))),
+                });
         });
     }
 

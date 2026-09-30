@@ -26,6 +26,8 @@ export class FormPageComponent {
     readonly formId = input.required<string>();
     readonly saveLabel = input<string>('form.save');
     readonly saving = input(false);
+    /** Whether Save itself is in flight, when a page's own action can be the one saving. Defaults to `saving`. */
+    readonly submitting = input<boolean | null>(null);
     /** How many required fields are still not filled. Zero hides the note. */
     readonly remaining = input(0);
 

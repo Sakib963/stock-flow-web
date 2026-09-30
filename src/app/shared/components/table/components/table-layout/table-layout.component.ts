@@ -24,6 +24,8 @@ const PHONE_TABLE_PX = 1080;
 /** Wide enough for a four figure serial, and no wider: it is the least interesting column on screen. */
 const SERIAL_PX = 52;
 const ACTIONS_PX = 76;
+/** One 26px icon button and its 2px gap, for a list that shows more than two actions inline. */
+const ACTION_PX = 28;
 
 /**
  * The table layout: columns across, one row per record. It takes the same LayoutContext a
@@ -47,6 +49,8 @@ export class TableLayoutComponent {
     /** Off when the config refuses reorder, and on a phone, where a drag is a scroll. */
     readonly canReorder = input(false);
     readonly actionStyle = input<RowActionStyle>('auto');
+    /** How many actions a row shows as buttons, when the list asks for them inline. */
+    readonly inlineActions = input(0);
 
     /** Indexes into the movable columns, which is what the header shows once pins are at the edges. */
     readonly reorder = output<{ from: number; to: number }>();
@@ -64,7 +68,9 @@ export class TableLayoutComponent {
 
     private readonly _isPhone = isPhoneWidth(viewportWidth());
 
-    private readonly _fixed = computed(() => (this.serial() ? SERIAL_PX : 0) + (this.hasActions() ? ACTIONS_PX : 0));
+    private readonly _actionsPx = computed(() => (this.hasActions() ? Math.max(ACTIONS_PX, this.inlineActions() * ACTION_PX + 20) : 0));
+
+    private readonly _fixed = computed(() => (this.serial() ? SERIAL_PX : 0) + this._actionsPx());
 
     /**
      * The shares the table opened with, at least 100. Columns remembered from an earlier visit are
@@ -94,7 +100,7 @@ export class TableLayoutComponent {
     });
 
     readonly serialWidth = `${SERIAL_PX}px`;
-    readonly actionsWidth = `${ACTIONS_PX}px`;
+    readonly actionsWidth = computed(() => `${this._actionsPx()}px`);
 
     constructor() {
         const host = inject<ElementRef<HTMLElement>>(ElementRef).nativeElement;

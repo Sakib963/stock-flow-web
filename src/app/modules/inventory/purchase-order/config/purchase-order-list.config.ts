@@ -66,7 +66,6 @@ export const PURCHASE_ORDER_LIST: ListShellPageConfig = {
         rowKey: 'oid',
         source: { endpoint: APIEndpoint.GET_PURCHASE_ORDER_LIST },
         sort: { key: 'created_on', order: 'desc' },
-        open: { route: PURCHASE_ORDER_ROUTES.detailPattern },
         columns: [
             { key: 'po_number', label: 'inventory.purchaseOrder.number', type: 'identifier', width: 14, sortable: true, locked: true, pin: 'start', copy: true },
             { key: 'supplier_name', label: 'inventory.purchaseOrder.supplier', type: 'text', width: 20, sortable: true },
@@ -86,7 +85,8 @@ export const PURCHASE_ORDER_LIST: ListShellPageConfig = {
             { key: 'edit', label: 'inventory.purchaseOrder.edit', icon: 'lucidePencil', permission: 'inventory.purchase-order.edit', stateful: false, when: EDITABLE, run: { kind: 'navigate', route: PURCHASE_ORDER_ROUTES.editPattern } },
             { key: 'verify', label: 'inventory.purchaseOrder.verify', icon: 'lucidePackageCheck', permission: 'inventory.purchase-order.approve', stateful: false, when: SUBMITTED, run: { kind: 'navigate', route: PURCHASE_ORDER_ROUTES.verifyPattern } },
         ],
-        rowActionStyle: 'menu',
+        // Buttons on a desktop like every configuration list, even with three actions; a menu only on a phone.
+        rowActionStyle: 'inline',
         phoneRowActionStyle: 'menu',
         empty: { icon: 'lucideTruck', title: 'inventory.purchaseOrder.emptyTitle', body: 'inventory.purchaseOrder.emptyBody', action: 'create' },
     },

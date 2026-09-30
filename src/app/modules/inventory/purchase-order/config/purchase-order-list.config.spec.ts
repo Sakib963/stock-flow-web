@@ -19,6 +19,15 @@ describe('the purchase orders list config', () => {
         expect(table.columns.filter((c) => !c.hidden).reduce((sum, c) => sum + c.width, 0)).toBe(100);
     });
 
+    it('shows row actions as buttons on a desktop, like every configuration list, and as a menu only on a phone', () => {
+        expect(table.rowActionStyle).toBe('inline');
+        expect(table.phoneRowActionStyle).toBe('menu');
+    });
+
+    it('opens nothing on a row click, like every configuration list: the actions are the way in', () => {
+        expect(table.open).toBeUndefined();
+    });
+
     it('offers edit on a draft or a submitted order, and verify only once it is submitted', () => {
         const when = Object.fromEntries((table.rowActions ?? []).map((a) => [a.key, a.when]));
         expect(when['edit']).toEqual({ field: 'status', in: ['Draft', 'Submitted'] });

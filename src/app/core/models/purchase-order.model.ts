@@ -181,6 +181,7 @@ export interface SupplierChoice {
     value: string;
     label: string;
     phone_number: string;
+    last_ordered_on: string | null;
 }
 
 export interface WarehouseChoice {

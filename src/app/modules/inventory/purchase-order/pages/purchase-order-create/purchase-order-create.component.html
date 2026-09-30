@@ -1,9 +1,11 @@
 <page-header [back]="back" [title]="'inventory.purchaseOrder.createTitle' | translate" [lead]="'inventory.purchaseOrder.formLead' | translate" />
 
-<form-page [formId]="editor()?.formId ?? ''" [saving]="saving()" [remaining]="editor()?.remaining() ?? 0" saveLabel="inventory.purchaseOrder.submit" (cancel)="cancel()">
+<form-page [formId]="editor()?.formId ?? ''" [saving]="saving()" [submitting]="submitting()" [remaining]="editor()?.remaining() ?? 0" saveLabel="inventory.purchaseOrder.submit" (cancel)="cancel()">
     <purchase-order-form (submitted)="save()" />
-    <button formAction nz-button type="button" class="inline-flex items-center gap-1.5" [disabled]="saving()" (click)="saveDraft()">
-        <ng-icon name="lucideSave" size="14px" aria-hidden="true" />
+    <button formAction nz-button type="button" class="inline-flex items-center gap-1.5" [nzLoading]="drafting()" [disabled]="saving()" (click)="saveDraft()">
+        @if (!drafting()) {
+            <ng-icon name="lucideSave" size="14px" aria-hidden="true" />
+        }
         <span>{{ 'inventory.purchaseOrder.saveDraft' | translate }}</span>
     </button>
 </form-page>

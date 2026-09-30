@@ -200,40 +200,38 @@
 
         @if (record(); as loaded) {
             @if (verified()) {
-                <nz-table nzTemplateMode nzSize="small" [nzScroll]="{ x: '1000px' }">
+                <nz-table nzTemplateMode nzSize="small" [nzScroll]="{ x: '1050px' }">
                     <thead>
                         <tr>
-                            <th nzWidth="36px">
-                                <span class="sr-only">{{ 'inventory.purchaseOrder.expandLine' | translate }}</span>
-                            </th>
-                            <th>{{ 'inventory.purchaseOrder.productBatch' | translate }}</th>
+                            <th nzWidth="40px" class="text-center">#</th>
+                            <th nzWidth="230px">{{ 'inventory.purchaseOrder.productBatch' | translate }}</th>
                             <th nzWidth="110px" class="text-right">{{ 'inventory.purchaseOrder.received' | translate }}</th>
-                            <th nzWidth="120px" class="text-right">{{ 'inventory.purchaseOrder.unitPrice' | translate }}</th>
+                            <th nzWidth="110px" class="text-right">{{ 'inventory.purchaseOrder.unitPrice' | translate }}</th>
                             <th nzWidth="100px">{{ 'inventory.purchaseOrder.use.label' | translate }}</th>
                             <th nzWidth="100px" class="text-right">{{ 'inventory.purchaseOrder.selling' | translate }}</th>
                             <th nzWidth="90px" class="text-right">{{ 'inventory.purchaseOrder.maxDiscount' | translate }}</th>
                             <th nzWidth="110px" class="text-right">{{ 'inventory.purchaseOrder.marginPerUnit' | translate }}</th>
-                            <th nzWidth="130px" class="text-right">{{ 'inventory.purchaseOrder.receivedTotal' | translate }}</th>
+                            <th nzWidth="120px" class="text-right">{{ 'inventory.purchaseOrder.receivedTotal' | translate }}</th>
+                            <th nzWidth="44px">
+                                <span class="sr-only">{{ 'inventory.purchaseOrder.expandLine' | translate }}</span>
+                            </th>
                         </tr>
                     </thead>
                     <tbody>
-                        @for (line of loaded.lines; track line.oid) {
+                        @for (line of loaded.lines; track line.oid; let i = $index) {
                             @let batch = line.batches[0];
                             @let margin = marginOf(line);
-                            <tr class="cursor-pointer" (click)="toggle(line)">
+                            @let shown = expanded().has(line.oid);
+                            <tr>
+                                <td class="text-center font-mono text-xs text-ink-muted">{{ i + 1 | digits }}</td>
                                 <td>
-                                    <button nz-button nzType="text" nzSize="small" type="button" [attr.aria-expanded]="expanded().has(line.oid)" [attr.aria-label]="'inventory.purchaseOrder.expandLine' | translate">
-                                        <ng-icon name="lucideChevronsUpDown" size="13px" class="text-ink-muted" aria-hidden="true" />
-                                    </button>
-                                </td>
-                                <td>
-                                    <span class="block text-[13px] font-semibold text-ink">{{ line.product_name }}</span>
-                                    <span class="block text-xs text-ink-muted">
-                                        @for (b of line.batches; track b.oid) {
-                                            <span class="font-mono">{{ b.batch_code }}</span> &middot;
-                                        } @empty {
-                                            {{ 'inventory.purchaseOrder.noBatch' | translate }} &middot;
-                                        }
+                                    <span class="block truncate text-[13px] font-semibold text-ink">{{ line.product_name }}</span>
+                                    @for (b of line.batches; track b.oid) {
+                                        <span class="block font-mono text-xs text-ink-body" [copyable]="b.batch_code">{{ b.batch_code }}</span>
+                                    } @empty {
+                                        <span class="block text-xs text-ink-muted">{{ 'inventory.purchaseOrder.noBatch' | translate }}</span>
+                                    }
+                                    <span class="block truncate text-xs text-ink-muted">
                                         {{ line.warehouse_name }}
                                         @if (line.aisle_name) {
                                             &rsaquo; {{ line.aisle_name }}
@@ -259,8 +257,20 @@
                                         {{ 'inventory.purchaseOrder.use.' + batch.intended_use | translate }}
                                     }
                                 </td>
-                                <td class="text-right font-mono text-[13px]">{{ batch?.selling_price | money }}</td>
-                                <td class="text-right font-mono text-[13px]">{{ batch?.maximum_discount | money }}</td>
+                                <td class="text-right font-mono text-[13px]">
+                                    @if (batch?.selling_price != null) {
+                                        {{ batch?.selling_price | money }}
+                                    } @else {
+                                        <span class="text-ink-muted">&ndash;</span>
+                                    }
+                                </td>
+                                <td class="text-right font-mono text-[13px]">
+                                    @if (batch?.maximum_discount != null) {
+                                        {{ batch?.maximum_discount | money }}
+                                    } @else {
+                                        <span class="text-ink-muted">&ndash;</span>
+                                    }
+                                </td>
                                 <td class="text-right font-mono text-[13px]" [class.text-danger]="(margin ?? 0) < 0">
                                     @if (margin !== null) {
                                         {{ margin | money }}
@@ -269,26 +279,44 @@
                                     }
                                 </td>
                                 <td class="text-right font-mono text-[13px] font-semibold text-ink">{{ lineTotal(line.received_quantity, line.received_unit_price) | money }}</td>
+                                <td class="text-center">
+                                    <button nz-button nzType="text" nzSize="small" type="button" [attr.aria-expanded]="shown" [attr.aria-label]="'inventory.purchaseOrder.expandLine' | translate" (click)="toggle(line)">
+                                        <ng-icon [name]="shown ? 'lucideChevronUp' : 'lucideChevronDown'" size="14px" class="text-ink-muted" aria-hidden="true" />
+                                    </button>
+                                </td>
                             </tr>
-                            <tr [nzExpand]="expanded().has(line.oid)">
-                                <div class="grid grid-cols-2 gap-x-6 gap-y-2 py-1 text-xs md:grid-cols-4" [attr.data-expanded]="line.oid">
-                                    @for (key of budgetKeys; track key) {
+                            <tr [nzExpand]="shown">
+                                <div class="rounded-container border border-line bg-surface-sunken px-4 py-3" [attr.data-expanded]="line.oid">
+                                    <p class="mt-0 mb-2 text-xs font-semibold text-ink">{{ 'inventory.purchaseOrder.budgets.title' | translate }}</p>
+                                    <div class="grid grid-cols-2 gap-x-6 gap-y-3 text-xs md:grid-cols-5">
+                                        @for (key of budgetKeys; track key) {
+                                            <div>
+                                                <span class="block text-ink-muted">{{ 'inventory.purchaseOrder.budgets.' + key | translate }}</span>
+                                                @if (line[key] !== null && line[key] !== undefined) {
+                                                    <span class="font-mono text-ink">{{ line[key] | money }}</span>
+                                                } @else {
+                                                    <span class="text-ink-muted">{{ 'inventory.purchaseOrder.notSet' | translate }}</span>
+                                                }
+                                            </div>
+                                        }
+                                    </div>
+                                    <div class="mt-3 grid grid-cols-2 gap-x-6 gap-y-3 border-t border-line-soft pt-3 text-xs md:grid-cols-4">
                                         <div>
-                                            <span class="block text-ink-muted">{{ 'inventory.purchaseOrder.budgets.' + key | translate }}</span>
-                                            <span class="font-mono text-ink">{{ line[key] | money }}</span>
+                                            <span class="block text-ink-muted">{{ 'inventory.purchaseOrder.batchCost' | translate }}</span>
+                                            <span class="font-mono text-ink">{{ lineTotal(1, line.received_unit_price) + budgetOf(line) | money }}</span>
                                         </div>
-                                    }
-                                    <div>
-                                        <span class="block text-ink-muted">{{ 'inventory.purchaseOrder.batchCost' | translate }}</span>
-                                        <span class="font-mono text-ink">{{ lineTotal(1, line.received_unit_price) + budgetOf(line) | money }}</span>
-                                    </div>
-                                    <div>
-                                        <span class="block text-ink-muted">{{ 'inventory.purchaseOrder.orderedLineTotal' | translate }}</span>
-                                        <span class="font-mono text-ink">{{ lineTotal(line.ordered_quantity, line.ordered_unit_price) | money }}</span>
-                                    </div>
-                                    <div class="col-span-2">
-                                        <span class="block text-ink-muted">{{ 'inventory.purchaseOrder.budgets.remarks' | translate }}</span>
-                                        <span class="text-ink">{{ line.cost_remarks || '–' }}</span>
+                                        <div>
+                                            <span class="block text-ink-muted">{{ 'inventory.purchaseOrder.orderedLineTotal' | translate }}</span>
+                                            <span class="font-mono text-ink">{{ lineTotal(line.ordered_quantity, line.ordered_unit_price) | money }}</span>
+                                        </div>
+                                        <div class="col-span-2">
+                                            <span class="block text-ink-muted">{{ 'inventory.purchaseOrder.budgets.remarks' | translate }}</span>
+                                            @if (line.cost_remarks) {
+                                                <span class="text-ink">{{ line.cost_remarks }}</span>
+                                            } @else {
+                                                <span class="text-ink-muted">{{ 'inventory.purchaseOrder.notSet' | translate }}</span>
+                                            }
+                                        </div>
                                     </div>
                                 </div>
                             </tr>

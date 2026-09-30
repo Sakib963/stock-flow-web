@@ -81,7 +81,7 @@
                 } @else if (current.type === 'cards' || current.type === 'grid') {
                     <card-layout [context]="layoutContext" [layout]="current" [rowKey]="config().rowKey" [openRoute]="openRoute()" [skeletonCards]="size()" [where]="config().key" [actionStyle]="actionStyle()" />
                 } @else {
-                    <table-layout [context]="layoutContext" [rowKey]="config().rowKey" [openRoute]="openRoute()" [skeletonRows]="size()" [where]="config().key" [actionStyle]="actionStyle()" [canReorder]="canDragHeaders()" (reorder)="onReorder($event)" />
+                    <table-layout [context]="layoutContext" [rowKey]="config().rowKey" [openRoute]="openRoute()" [skeletonRows]="size()" [where]="config().key" [actionStyle]="actionStyle()" [inlineActions]="inlineActions()" [canReorder]="canDragHeaders()" (reorder)="onReorder($event)" />
                 }
             </div>
         }

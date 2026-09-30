@@ -201,6 +201,14 @@ body.lang-bn {
     border-color: var(--color-primary-6);
 }
 
+/* A composite control rings its wrapper when focused; a second ring on the input inside it drew a box within the box. */
+.ant-picker input:focus-visible,
+.ant-input-number-input:focus-visible,
+.ant-select-selection-search-input:focus-visible,
+.ant-input-affix-wrapper input:focus-visible {
+    box-shadow: none;
+}
+
 /* Overlay chrome.
 
    An ng-zorro overlay renders into the CDK container at body level, which is the point: nothing in
@@ -300,8 +308,6 @@ body.lang-bn {
     padding-top: 5px;
     padding-bottom: 5px;
 }
-
-
 
 /* The sort arrows sit inside that height rather than growing it. */
 .sf-list-table .ant-table-column-sorter {

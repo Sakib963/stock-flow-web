@@ -59,32 +59,29 @@
             </button>
         </div>
 
-        <nz-table nzTemplateMode nzSize="small" [nzScroll]="{ x: '900px' }">
+        <nz-table nzTemplateMode nzSize="small" [nzScroll]="{ x: '980px' }">
             <thead>
                 <tr>
-                    <th nzWidth="36px">
-                        <span class="sr-only">{{ 'inventory.purchaseOrder.expandLine' | translate }}</span>
-                    </th>
                     <th>{{ 'inventory.purchaseOrder.productAsOrdered' | translate }}</th>
-                    <th nzWidth="110px" class="text-right">{{ 'inventory.purchaseOrder.arrived' | translate }}</th>
-                    <th nzWidth="120px" class="text-right">{{ 'inventory.purchaseOrder.unitPrice' | translate }}</th>
-                    <th nzWidth="110px">{{ 'inventory.purchaseOrder.use.label' | translate }}</th>
+                    <th nzWidth="100px" class="text-right">{{ 'inventory.purchaseOrder.arrived' | translate }}</th>
+                    <th nzWidth="130px">{{ 'inventory.purchaseOrder.lineCheck.label' | translate }}</th>
+                    <th nzWidth="110px" class="text-right">{{ 'inventory.purchaseOrder.unitPrice' | translate }}</th>
+                    <th nzWidth="100px">{{ 'inventory.purchaseOrder.use.label' | translate }}</th>
                     <th nzWidth="110px" class="text-right">{{ 'inventory.purchaseOrder.selling' | translate }}</th>
                     <th nzWidth="130px" class="text-right">{{ 'inventory.purchaseOrder.receivedTotal' | translate }}</th>
-                    <th nzWidth="200px">
+                    <th nzWidth="80px">
                         <span class="sr-only">{{ 'inventory.purchaseOrder.actions' | translate }}</span>
+                    </th>
+                    <th nzWidth="44px">
+                        <span class="sr-only">{{ 'inventory.purchaseOrder.expandLine' | translate }}</span>
                     </th>
                 </tr>
             </thead>
             <tbody>
                 @for (line of lines(); track line.oid) {
                     @let value = valueOf(line);
-                    <tr class="cursor-pointer" [class.bg-success-bg]="isChecked(line)" [attr.data-line]="line.oid" (click)="open(line)">
-                        <td>
-                            <button nz-button nzType="text" nzSize="small" type="button" [attr.aria-expanded]="expanded().has(line.oid)" [attr.aria-label]="'inventory.purchaseOrder.expandLine' | translate" (click)="toggle(line, $event)">
-                                <ng-icon name="lucideChevronsUpDown" size="13px" class="text-ink-muted" aria-hidden="true" />
-                            </button>
-                        </td>
+                    @let shown = expanded().has(line.oid);
+                    <tr [attr.data-line]="line.oid">
                         <td>
                             <span class="block text-[13px] font-semibold text-ink">{{ line.product_name }}</span>
                             <span class="block font-mono text-xs text-ink-muted">{{ 'inventory.purchaseOrder.orderedLine' | translate: { quantity: line.ordered_quantity, price: (line.ordered_unit_price | money) } | digits }}</span>
@@ -94,6 +91,18 @@
                                 <span [class.text-warning-ink]="value.received_quantity < (line.ordered_quantity ?? 0)">{{ value.received_quantity | digits }}</span>
                             } @else {
                                 <span class="font-sans text-xs text-ink-muted">{{ 'inventory.purchaseOrder.notChecked' | translate }}</span>
+                            }
+                        </td>
+                        <td [attr.data-check]="line.oid">
+                            @if (!isChecked(line)) {
+                                <button nz-button nzSize="small" type="button" class="inline-flex items-center gap-1" (click)="arrived(line, $event)">
+                                    <ng-icon name="lucideCheck" size="13px" aria-hidden="true" />
+                                    <span>{{ 'inventory.purchaseOrder.allArrived' | translate }}</span>
+                                </button>
+                            } @else if (differs(line)) {
+                                <status-tag label="inventory.purchaseOrder.lineCheck.differs" tone="warning" icon="lucideCircleAlert" />
+                            } @else {
+                                <status-tag label="inventory.purchaseOrder.lineCheck.asOrdered" tone="success" icon="lucideBadgeCheck" />
                             }
                         </td>
                         <td class="text-right font-mono text-[13px]">
@@ -114,51 +123,67 @@
                                 {{ value.received_quantity * value.unit_price | money }}
                             }
                         </td>
-                        <td>
-                            <div class="flex justify-end gap-1.5">
-                                @if (!isChecked(line)) {
-                                    <button nz-button nzSize="small" type="button" class="inline-flex items-center gap-1" (click)="arrived(line, $event)">
-                                        <ng-icon name="lucideCheck" size="13px" aria-hidden="true" />
-                                        <span>{{ 'inventory.purchaseOrder.allArrived' | translate }}</span>
-                                    </button>
-                                }
-                                <button nz-button nzSize="small" nzType="link" type="button" class="inline-flex items-center gap-1" (click)="open(line, $event)">
-                                    <ng-icon name="lucidePencil" size="13px" aria-hidden="true" />
-                                    <span>{{ 'inventory.purchaseOrder.edit' | translate }}</span>
-                                </button>
-                            </div>
+                        <td class="text-right">
+                            <button nz-button nzSize="small" nzType="link" type="button" class="inline-flex items-center gap-1" (click)="open(line, $event)">
+                                <ng-icon name="lucidePencil" size="13px" aria-hidden="true" />
+                                <span>{{ 'inventory.purchaseOrder.edit' | translate }}</span>
+                            </button>
+                        </td>
+                        <td class="text-center">
+                            <button nz-button nzType="text" nzSize="small" type="button" [attr.aria-expanded]="shown" [attr.aria-label]="'inventory.purchaseOrder.expandLine' | translate" (click)="toggle(line, $event)">
+                                <ng-icon [name]="shown ? 'lucideChevronUp' : 'lucideChevronDown'" size="14px" class="text-ink-muted" aria-hidden="true" />
+                            </button>
                         </td>
                     </tr>
-                    <tr [nzExpand]="expanded().has(line.oid)">
+                    <tr [nzExpand]="shown">
                         <!-- Read only: every change goes through the drawer, so there is one place to edit a line. -->
-                        <div class="grid grid-cols-2 gap-x-6 gap-y-2 py-1 text-xs md:grid-cols-4" [attr.data-expanded]="line.oid">
-                            <div>
-                                <span class="block text-ink-muted">{{ 'inventory.purchaseOrder.goesTo' | translate }}</span>
-                                <span class="text-ink"
-                                    >{{ line.warehouse_name }}
-                                    @if (line.aisle_name) {
-                                        &rsaquo; {{ line.aisle_name }}
-                                    }
-                                </span>
-                            </div>
-                            <div>
-                                <span class="block text-ink-muted">{{ 'inventory.purchaseOrder.verifyDrawer.discount' | translate }}</span>
-                                <span class="font-mono text-ink">{{ value?.maximum_discount ?? line.current_maximum_discount | money }}</span>
-                            </div>
-                            <div>
-                                <span class="block text-ink-muted">{{ 'inventory.purchaseOrder.marginPerUnit' | translate }}</span>
-                                <span class="font-mono text-ink">{{ margin(line) | money }}</span>
-                            </div>
-                            <div>
-                                <span class="block text-ink-muted">{{ 'inventory.purchaseOrder.budgets.remarks' | translate }}</span>
-                                <span class="text-ink">{{ value?.cost_remarks || '–' }}</span>
-                            </div>
-                            @for (key of budgetKeys; track key) {
+                        <div class="rounded-container border border-line bg-surface-sunken px-4 py-3" [attr.data-expanded]="line.oid">
+                            <div class="grid grid-cols-2 gap-x-6 gap-y-3 text-xs md:grid-cols-4">
                                 <div>
-                                    <span class="block text-ink-muted">{{ 'inventory.purchaseOrder.budgets.' + key | translate }}</span>
-                                    <span class="font-mono text-ink">{{ value?.[key] ?? null | money }}</span>
+                                    <span class="block text-ink-muted">{{ 'inventory.purchaseOrder.goesTo' | translate }}</span>
+                                    <span class="text-ink"
+                                        >{{ line.warehouse_name }}
+                                        @if (line.aisle_name) {
+                                            &rsaquo; {{ line.aisle_name }}
+                                        }
+                                    </span>
                                 </div>
-                            }
+                                <div>
+                                    <span class="block text-ink-muted">{{ 'inventory.purchaseOrder.verifyDrawer.discount' | translate }}</span>
+                                    <span class="font-mono text-ink">{{ value?.maximum_discount ?? line.current_maximum_discount | money }}</span>
+                                </div>
+                                <div>
+                                    <span class="block text-ink-muted">{{ 'inventory.purchaseOrder.marginPerUnit' | translate }}</span>
+                                    @let perUnit = margin(line);
+                                    @if (perUnit !== null) {
+                                        <span class="font-mono text-ink" [class.text-danger]="perUnit < 0">{{ perUnit | money }}</span>
+                                    } @else {
+                                        <span class="text-ink-muted">{{ 'inventory.purchaseOrder.notSet' | translate }}</span>
+                                    }
+                                </div>
+                                <div>
+                                    <span class="block text-ink-muted">{{ 'inventory.purchaseOrder.budgets.remarks' | translate }}</span>
+                                    @if (value?.cost_remarks; as remarks) {
+                                        <span class="text-ink">{{ remarks }}</span>
+                                    } @else {
+                                        <span class="text-ink-muted">{{ 'inventory.purchaseOrder.notSet' | translate }}</span>
+                                    }
+                                </div>
+                            </div>
+                            <p class="mt-3 mb-2 text-xs font-semibold text-ink">{{ 'inventory.purchaseOrder.budgets.title' | translate }}</p>
+                            <div class="grid grid-cols-2 gap-x-6 gap-y-3 text-xs md:grid-cols-5">
+                                @for (key of budgetKeys; track key) {
+                                    <div>
+                                        <span class="block text-ink-muted">{{ 'inventory.purchaseOrder.budgets.' + key | translate }}</span>
+                                        @let amount = value?.[key] ?? null;
+                                        @if (amount !== null) {
+                                            <span class="font-mono text-ink">{{ amount | money }}</span>
+                                        } @else {
+                                            <span class="text-ink-muted">{{ 'inventory.purchaseOrder.notSet' | translate }}</span>
+                                        }
+                                    </div>
+                                }
+                            </div>
                         </div>
                     </tr>
                 }

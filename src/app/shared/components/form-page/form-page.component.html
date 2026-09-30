@@ -21,8 +21,8 @@
 
              nzLoading draws its own spinner where the icon sits, so the icon is dropped while the
              write is in flight rather than standing beside a second spinner. -->
-        <button nz-button nzType="primary" type="submit" class="inline-flex items-center gap-1.5" [attr.form]="formId()" [nzLoading]="saving()" [disabled]="saving()">
-            @if (!saving()) {
+        <button nz-button nzType="primary" type="submit" class="inline-flex items-center gap-1.5" [attr.form]="formId()" [nzLoading]="submitting() ?? saving()" [disabled]="saving()">
+            @if (!(submitting() ?? saving())) {
                 <ng-icon name="lucideCheck" size="14px" aria-hidden="true" />
             }
             <span>{{ saveLabel() | translate }}</span>
