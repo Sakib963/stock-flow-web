@@ -1440,6 +1440,43 @@
                 "asOrdered": "As ordered",
                 "differs": "Differs"
             }
+        },
+        "stockMovement": {
+            "searchPlaceholder": "Product, batch or document",
+            "when": "When",
+            "product": "Product",
+            "batch": "Batch",
+            "quantity": "In / out",
+            "balanceAfter": "Left after",
+            "document": "Document",
+            "by": "By",
+            "warehouse": "Warehouse",
+            "stat": {
+                "in": "Units in",
+                "out": "Units out"
+            },
+            "reason": {
+                "label": "Movement",
+                "carried_over": "Carried over",
+                "received": "Received",
+                "sold": "Counter sale",
+                "dispatched": "Dispatched online",
+                "returned": "Returned",
+                "disposed": "Disposed",
+                "dispose_reversed": "Disposal reversed"
+            },
+            "emptyTitle": "No stock movements yet",
+            "emptyBody": "Every time stock comes in or goes out, it is written here with the document behind it. Verify a purchase order to see the first one.",
+            "card": {
+                "title": "Stock movements",
+                "openList": "Open the full list",
+                "none": "No stock has come in or gone out for this product yet.",
+                "failed": {
+                    "network": "Could not reach the server, so the movements are not shown. Check your connection and try again.",
+                    "forbidden": "You do not have permission to see stock movements.",
+                    "server": "The movements could not be loaded. Try again in a moment."
+                }
+            }
         }
     },
     "form": {

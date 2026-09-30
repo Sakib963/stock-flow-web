@@ -90,6 +90,7 @@ export class APIEndpoint {
 
     // Inventory
     static readonly GET_PURCHASE_ORDER_LIST = '/api/v1/inventory/purchase-order/get-purchase-list';
+    static readonly GET_STOCK_MOVEMENT_LIST = '/api/v1/inventory/stock-movement/get-stock-movement-list';
     static readonly GET_PURCHASE_ORDER_DETAILS = '/api/v1/inventory/purchase-order/get-purchase-details';
     static readonly GET_PRODUCT_LIST_FOR_PURCHASE = '/api/v1/inventory/purchase-order/get-product-list-for-purchase';
     static readonly CREATE_PURCHASE_ORDER = '/api/v1/inventory/purchase-order/create-purchase';

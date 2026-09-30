@@ -57,7 +57,11 @@
             </ng-template>
         }
         @case ('number') {
-            <span class="tabular-nums">{{ value() | money: 'number' }}</span>
+            @if (signed()) {
+                <span class="font-semibold tabular-nums" [class.text-success-ink]="amount() > 0" [class.text-danger-ink]="amount() < 0">{{ amount() > 0 ? '+' : '' }}{{ value() | money: 'number' }}</span>
+            } @else {
+                <span class="tabular-nums">{{ value() | money: 'number' }}</span>
+            }
         }
         @case ('quantity') {
             <span class="tabular-nums">{{ value() | money: 'number' }}</span>

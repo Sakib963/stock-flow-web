@@ -2,6 +2,7 @@ import { HttpClient, HttpErrorResponse, HttpEventType, HttpXhrBackend } from '@a
 import { Injectable, inject, signal } from '@angular/core';
 import { APIEndpoint } from '@app/core/constants/api-endpoint';
 import { PhotoUpload, PhotoUploadSignature, ProductDetails, ProductField, ProductPayload, SubCategoryChoice } from '@app/core/models/product.model';
+import { StockMovementRow } from '@app/core/models/stock-movement.model';
 import { environment } from '@env/environment';
 import { Observable, filter, finalize, from, map, switchMap } from 'rxjs';
 
@@ -22,6 +23,11 @@ export class ProductService {
     /** Never cached: the record carries the product's stock by batch, which moves with every sale. */
     details(oid: string): Observable<ProductDetails> {
         return this._http.get<{ data: ProductDetails }>(`${environment.baseUrl}${APIEndpoint.GET_PRODUCT_DETAILS}/${oid}`).pipe(map((response) => response.data));
+    }
+
+    /** The product's latest stock movements, newest first. Never cached, for the same reason as details. */
+    movements(oid: string, limit = 10): Observable<StockMovementRow[]> {
+        return this._http.get<{ data: { rows: StockMovementRow[] } }>(`${environment.baseUrl}${APIEndpoint.GET_STOCK_MOVEMENT_LIST}`, { params: { product_oid: oid, limit } }).pipe(map((response) => response.data.rows));
     }
 
     create(payload: ProductPayload): Observable<string> {

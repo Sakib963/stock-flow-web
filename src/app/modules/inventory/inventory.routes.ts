@@ -3,6 +3,7 @@ import { OVERLAY_PROVIDERS } from '@app/shared/constants/overlay-providers';
 import { permissionGuard } from '@app/core/guards/permission/permission.guard';
 import { unsavedChangesGuard } from '@app/core/guards/unsaved-changes/unsaved-changes.guard';
 import { PURCHASE_ORDER_LIST } from '@app/modules/inventory/purchase-order/config/purchase-order-list.config';
+import { STOCK_MOVEMENT_LIST } from '@app/modules/inventory/stock-movement/config/stock-movement-list.config';
 
 /** Everything under /app/inventory. Each URL is the route of its menu item. */
 export const INVENTORY_ROUTES: Routes = [
@@ -10,6 +11,12 @@ export const INVENTORY_ROUTES: Routes = [
         path: '',
         providers: [...OVERLAY_PROVIDERS],
         children: [
+            {
+                path: 'stock-movements',
+                canActivate: [permissionGuard],
+                data: { permission: STOCK_MOVEMENT_LIST.permission },
+                loadComponent: () => import('./stock-movement/pages/stock-movement-list/stock-movement-list.component').then((m) => m.StockMovementListComponent),
+            },
             {
                 path: 'purchase-orders',
                 canActivate: [permissionGuard],

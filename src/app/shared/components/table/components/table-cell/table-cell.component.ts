@@ -87,6 +87,11 @@ export class TableCellComponent {
 
     readonly amount = computed(() => Number(this.value()));
 
+    readonly signed = computed(() => {
+        const column = this.column();
+        return column.type === 'number' && !!column.signed;
+    });
+
     readonly moneyInk = computed(() => {
         const column = this.column();
         const amount = this.amount();

@@ -53,4 +53,16 @@ describe('TableCellComponent', () => {
 
         expect(el.textContent?.trim()).toBe('07/01/2026');
     });
+
+    it('writes a signed number as a change: a plus and success ink in, danger ink out', async () => {
+        const change: Column = { key: 'quantity', label: 'In / out', type: 'number', signed: true, width: 8 };
+
+        const inward = await render(change, { quantity: 50 });
+        expect(inward.el.textContent?.trim()).toBe('+50');
+        expect(inward.el.querySelector('.text-success-ink')).not.toBeNull();
+
+        const outward = await render(change, { quantity: -3 });
+        expect(outward.el.textContent?.trim()).toBe('-3');
+        expect(outward.el.querySelector('.text-danger-ink')).not.toBeNull();
+    });
 });

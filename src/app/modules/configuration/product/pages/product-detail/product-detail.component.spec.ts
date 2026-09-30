@@ -28,16 +28,7 @@ const DETAILS = {
 const open = async (permissions: string[] = ['configuration.product.view']) => {
     await TestBed.configureTestingModule({
         imports: [ProductDetailComponent],
-        providers: [
-            provideRouter([]),
-            provideHttpClient(),
-            provideHttpClientTesting(),
-            provideNzI18n(en_US),
-            provideTranslateService({ fallbackLang: 'en' }),
-            ...OVERLAY_PROVIDERS,
-            { provide: ActivatedRoute, useValue: { snapshot: { paramMap: new Map([['oid', 'p-1']]) } } },
-            { provide: SessionService, useValue: { can: (code: string) => permissions.includes(code), menu: () => [] } },
-        ],
+        providers: [provideRouter([]), provideHttpClient(), provideHttpClientTesting(), provideNzI18n(en_US), provideTranslateService({ fallbackLang: 'en' }), ...OVERLAY_PROVIDERS, { provide: ActivatedRoute, useValue: { snapshot: { paramMap: new Map([['oid', 'p-1']]) } } }, { provide: SessionService, useValue: { can: (code: string) => permissions.includes(code), menu: () => [] } }],
     }).compileComponents();
 
     const fixture = TestBed.createComponent(ProductDetailComponent);
@@ -89,5 +80,46 @@ describe('ProductDetailComponent', () => {
         const buttons = [...((await open(['configuration.product.view', 'configuration.product.delete'])).nativeElement as HTMLElement).querySelectorAll('page-header button')].map((b) => b.textContent?.trim());
 
         expect(buttons).toContain('configuration.product.delete');
+    });
+
+    it('leaves the stock movements card out for someone who may not see the ledger, and never asks for it', async () => {
+        const fixture = await open();
+        expect((fixture.nativeElement as HTMLElement).querySelector('[data-detail="movements"]')).toBeNull();
+        TestBed.inject(HttpTestingController).expectNone((r) => r.url.includes(APIEndpoint.GET_STOCK_MOVEMENT_LIST));
+    });
+
+    it("shows this product's latest movements, newest first, each signed and with its document", async () => {
+        const fixture = await open(['configuration.product.view', 'inventory.stock-movement.view']);
+        const request = TestBed.inject(HttpTestingController).expectOne((r) => r.url.includes(APIEndpoint.GET_STOCK_MOVEMENT_LIST));
+        expect(request.request.params.get('product_oid')).toBe('p-1');
+        request.flush({
+            data: {
+                rows: [
+                    { oid: 'm-2', created_on: '2026-10-03T10:00:00.000', reason: 'sold', quantity: -2, balance_after: 74, batch_code: 'B-7KQ4-M2XH', reference: 'INV-1203', purchase_oid: null },
+                    { oid: 'm-1', created_on: '2026-10-02T10:00:00.000', reason: 'received', quantity: 76, balance_after: 76, batch_code: 'B-7KQ4-M2XH', reference: 'PO-2609-0142', purchase_oid: 'po-1' },
+                ],
+            },
+        });
+        fixture.detectChanges();
+        await fixture.whenStable();
+        fixture.detectChanges();
+
+        const card = (fixture.nativeElement as HTMLElement).querySelector('[data-detail="movements"]')!;
+        const rows = [...card.querySelectorAll('tbody tr:not([nz-table-measure-row])')].map((row) => row.textContent?.replace(/\s+/g, ' ').trim());
+        expect(rows[0]).toContain('-2');
+        expect(rows[1]).toContain('+76');
+        expect(card.querySelector('a[href*="purchase-orders/po-1"]')?.textContent?.trim()).toBe('PO-2609-0142');
+    });
+
+    it('says the movements could not be loaded and offers to try again, without losing the rest of the page', async () => {
+        const fixture = await open(['configuration.product.view', 'inventory.stock-movement.view']);
+        TestBed.inject(HttpTestingController)
+            .expectOne((r) => r.url.includes(APIEndpoint.GET_STOCK_MOVEMENT_LIST))
+            .flush('down', { status: 500, statusText: 'Server Error' });
+        fixture.detectChanges();
+
+        expect(fixture.componentInstance.movementsFailed()).toBe('server');
+        expect((fixture.nativeElement as HTMLElement).querySelector('[data-detail="movements"] [role="alert"]')).not.toBeNull();
+        expect((fixture.nativeElement as HTMLElement).querySelector('[data-detail="batches"]')).not.toBeNull();
     });
 });

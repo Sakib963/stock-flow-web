@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { NgIcon, provideIcons } from '@ng-icons/core';
-import { lucideArrowLeft, lucideBoxes, lucideChartColumn, lucideHandCoins, lucideHistory, lucideImageOff, lucideInfo, lucideLock, lucidePackageCheck, lucidePencil, lucideRotateCw, lucideShoppingCart, lucideTrash2, lucideTruck, lucideUndo2, lucideZap, lucideCircleX } from '@ng-icons/lucide';
+import { lucideArrowLeft, lucideArrowLeftRight, lucideBoxes, lucideChartColumn, lucideHandCoins, lucideHistory, lucideImageOff, lucideInfo, lucideLock, lucidePackageCheck, lucidePencil, lucideRotateCw, lucideShoppingCart, lucideTrash2, lucideTruck, lucideUndo2, lucideZap, lucideCircleX } from '@ng-icons/lucide';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzCardModule } from 'ng-zorro-antd/card';
 import { NzImageModule } from 'ng-zorro-antd/image';
@@ -15,17 +15,22 @@ import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { RequestFailure } from '@app/core/models/api.model';
 import { PageBack } from '@app/core/models/page-header.model';
 import { Product, ProductDetails } from '@app/core/models/product.model';
+import { StockMovementRow } from '@app/core/models/stock-movement.model';
 import { LanguageService } from '@app/core/services/language/language.service';
 import { SessionService } from '@app/core/services/session/session.service';
 import { PRODUCT_STATUS } from '@app/modules/configuration/product/config/product-list.config';
 import { CATEGORY_ROUTES } from '@app/modules/configuration/category/constants/category-routes';
 import { PRODUCT_ROUTES } from '@app/modules/configuration/product/constants/product-routes';
 import { SUB_CATEGORY_ROUTES } from '@app/modules/configuration/sub-category/constants/sub-category-routes';
+import { PURCHASE_ORDER_ROUTES } from '@app/modules/inventory/purchase-order/constants/purchase-order-routes';
+import { STOCK_MOVEMENT_REASON } from '@app/modules/inventory/stock-movement/config/stock-movement-list.config';
+import { STOCK_MOVEMENT_ROUTES } from '@app/modules/inventory/stock-movement/constants/stock-movement-routes';
 import { ProductService } from '@app/modules/configuration/product/services/product.service';
 import { ActionFooterComponent } from '@app/shared/components/action-footer/action-footer.component';
 import { PageHeaderComponent } from '@app/shared/components/page-header/page-header.component';
 import { StatusTagComponent } from '@app/shared/components/status-tag/status-tag.component';
 import { CopyableDirective } from '@app/shared/directives/copyable/copyable.directive';
+import { DigitsPipe } from '@app/shared/pipes/digits/digits.pipe';
 import { MoneyPipe } from '@app/shared/pipes/money/money.pipe';
 import { RecordDatePipe } from '@app/shared/pipes/record-date/record-date.pipe';
 import { confirmAction } from '@app/shared/utils/confirm-action/confirm-action';
@@ -39,8 +44,8 @@ import { resolveTone } from '@app/shared/utils/tone-map/tone-map';
  */
 @Component({
     selector: 'product-detail',
-    imports: [NgIcon, NzButtonModule, NzCardModule, NzImageModule, NzSkeletonModule, NzTableModule, NzTimelineModule, NzTooltipModule, RouterLink, TranslatePipe, PageHeaderComponent, StatusTagComponent, ActionFooterComponent, CopyableDirective, MoneyPipe, RecordDatePipe],
-    providers: [provideIcons({ lucideArrowLeft, lucideBoxes, lucideChartColumn, lucideCircleX, lucideHandCoins, lucideHistory, lucideImageOff, lucideInfo, lucideLock, lucidePackageCheck, lucidePencil, lucideRotateCw, lucideShoppingCart, lucideTrash2, lucideTruck, lucideUndo2, lucideZap })],
+    imports: [NgIcon, NzButtonModule, NzCardModule, NzImageModule, NzSkeletonModule, NzTableModule, NzTimelineModule, NzTooltipModule, RouterLink, TranslatePipe, PageHeaderComponent, StatusTagComponent, ActionFooterComponent, CopyableDirective, DigitsPipe, MoneyPipe, RecordDatePipe],
+    providers: [provideIcons({ lucideArrowLeft, lucideArrowLeftRight, lucideBoxes, lucideChartColumn, lucideCircleX, lucideHandCoins, lucideHistory, lucideImageOff, lucideInfo, lucideLock, lucidePackageCheck, lucidePencil, lucideRotateCw, lucideShoppingCart, lucideTrash2, lucideTruck, lucideUndo2, lucideZap })],
     templateUrl: './product-detail.component.html',
     styleUrl: './product-detail.component.scss',
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -74,6 +79,13 @@ export class ProductDetailComponent {
     readonly canViewCategory = computed(() => this._session.can('configuration.category.view'));
     readonly canViewSubCategory = computed(() => this._session.can('configuration.sub-category.view'));
     readonly categoryRoute = CATEGORY_ROUTES.detail;
+
+    /** The latest movements, for someone who may see the ledger; the card is absent otherwise. */
+    readonly canViewMovements = computed(() => this._session.can('inventory.stock-movement.view'));
+    readonly movements = signal<StockMovementRow[] | null>(null);
+    readonly movementsFailed = signal<RequestFailure | null>(null);
+    readonly movementListRoute = STOCK_MOVEMENT_ROUTES.list;
+    readonly purchaseRoute = PURCHASE_ORDER_ROUTES.detail;
     readonly subCategoryRoute = SUB_CATEGORY_ROUTES.detail;
 
     /**
@@ -129,6 +141,7 @@ export class ProductDetailComponent {
     }
 
     load(): void {
+        this.loadMovements();
         this.loading.set(true);
         this.failed.set(null);
         this._products.details(this.oid).subscribe({
@@ -141,6 +154,20 @@ export class ProductDetailComponent {
                 this.failed.set(failureOf(error));
             },
         });
+    }
+
+    loadMovements(): void {
+        if (!this.canViewMovements()) return;
+        this.movements.set(null);
+        this.movementsFailed.set(null);
+        this._products.movements(this.oid).subscribe({
+            next: (rows) => this.movements.set(rows),
+            error: (error: unknown) => this.movementsFailed.set(failureOf(error)),
+        });
+    }
+
+    reasonOf(reason: string) {
+        return resolveTone(STOCK_MOVEMENT_REASON, reason, undefined, 'a stock movement reason')?.style ?? null;
     }
 
     edit(): void {

@@ -72,7 +72,7 @@ const MENU = [
         isDisabled: false,
         disabledMessage: { en: null, bn: null },
         isNew: false,
-        children: [{ id: 'purchase-orders', label: { en: 'Purchase orders', bn: 'ক্রয়াদেশ' }, description: { en: null, bn: null }, tags: [], icon: 'lucideTruck', order: 10, route: '/app/inventory/purchase-orders', permission: 'inventory.purchase-order.view', isDisabled: false, disabledMessage: { en: null, bn: null }, isNew: false, children: [] }],
+        children: [{ id: 'stock-movements', label: { en: 'Stock movements', bn: 'স্টকের গতিবিধি' }, description: { en: null, bn: null }, tags: [], icon: 'lucideArrowLeftRight', order: 5, route: '/app/inventory/stock-movements', permission: 'inventory.stock-movement.view', isDisabled: false, disabledMessage: { en: null, bn: null }, isNew: false, children: [] }, { id: 'purchase-orders', label: { en: 'Purchase orders', bn: 'ক্রয়াদেশ' }, description: { en: null, bn: null }, tags: [], icon: 'lucideTruck', order: 10, route: '/app/inventory/purchase-orders', permission: 'inventory.purchase-order.view', isDisabled: false, disabledMessage: { en: null, bn: null }, isNew: false, children: [] }],
     },
 ];
 
@@ -80,7 +80,7 @@ const SESSION = {
     version: '1',
     user: { name: 'Nazmus Sakib', email: 'owner@arithmalabs.test', mobile_number: null, photo: null, designation: 'Owner', role: 'Owner' },
     business: { name: 'Arithma Labs', logoUrl: null, orderSystem: 'BOTH' },
-    permissions: ['dashboard.overview.view', 'configuration.category.view', 'configuration.category.create', 'configuration.category.edit', 'configuration.category.export', 'configuration.brands.view', 'configuration.brands.create', 'configuration.brands.edit', 'configuration.brands.export', 'configuration.supplier.view', 'configuration.supplier.create', 'configuration.supplier.edit', 'configuration.supplier.export', 'configuration.warehouse.view', 'configuration.warehouse.create', 'configuration.warehouse.edit', 'configuration.warehouse.export', 'configuration.aisle.view', 'configuration.aisle.create', 'configuration.aisle.edit', 'configuration.aisle.export', 'configuration.product.view', 'configuration.product.create', 'configuration.product.edit', 'configuration.product.delete', 'configuration.analytics.view', 'inventory.purchase-order.view', 'inventory.purchase-order.create', 'inventory.purchase-order.edit', 'inventory.purchase-order.approve', 'inventory.purchase-order.cancel', 'inventory.purchase-order.export'],
+    permissions: ['dashboard.overview.view', 'configuration.category.view', 'configuration.category.create', 'configuration.category.edit', 'configuration.category.export', 'configuration.brands.view', 'configuration.brands.create', 'configuration.brands.edit', 'configuration.brands.export', 'configuration.supplier.view', 'configuration.supplier.create', 'configuration.supplier.edit', 'configuration.supplier.export', 'configuration.warehouse.view', 'configuration.warehouse.create', 'configuration.warehouse.edit', 'configuration.warehouse.export', 'configuration.aisle.view', 'configuration.aisle.create', 'configuration.aisle.edit', 'configuration.aisle.export', 'configuration.product.view', 'configuration.product.create', 'configuration.product.edit', 'configuration.product.delete', 'configuration.analytics.view', 'inventory.purchase-order.view', 'inventory.purchase-order.create', 'inventory.purchase-order.edit', 'inventory.purchase-order.approve', 'inventory.purchase-order.cancel', 'inventory.purchase-order.export', 'inventory.stock-movement.view'],
     menu: MENU,
     counters: { notifications: 0 },
 };
@@ -270,6 +270,19 @@ const PO_ROWS = ['po-sub', 'po-ver', 'po-can'].map((oid, i) => ({
 }));
 const PO_PICKER = PRODUCTS.map((p, i) => ({ oid: p.oid, name: p.name, sku: p.sku, restock_threshold: p.restock_threshold, photo_thumb: p.photo_thumb, sellable: p.sellable, sold_30_days: [12, 0, 31][i], last_unit_price: ['450', '620', null][i], last_supplier_name: ['Bengal Traditional Garments Ltd.', 'Dhaka Saree House', null][i], last_bought_on: null }));
 
+// One batch received, then every kind of movement against it and a second batch, newest first.
+const MOVE = (oid, created_on, reason, quantity, balance_after, reference, extra = {}) => ({ oid, created_on, reason, quantity, balance_after, product_oid: 'p-1', product_name: 'Cotton Kurti, maroon', sku: 'COTTKUR-MRN', batch_code: 'B-7KQ4-M2XH', warehouse_name: 'Chandrabindu', reference, purchase_oid: null, created_by: 'rafiq@arithmalabs.test', created_by_name: 'Rafiq Hasan', ...extra });
+const MOVES = [
+    MOVE('m-8', '2026-10-09T17:20:00.000', 'dispose_reversed', 1, 72, 'DSP-0014'),
+    MOVE('m-7', '2026-10-09T11:05:00.000', 'disposed', -1, 71, 'DSP-0014'),
+    MOVE('m-6', '2026-10-06T15:40:00.000', 'returned', 1, 72, 'INV-1210'),
+    MOVE('m-5', '2026-10-05T12:10:00.000', 'dispatched', -1, 71, 'INV-1210'),
+    MOVE('m-4', '2026-10-03T18:30:00.000', 'sold', -2, 72, 'INV-1203', { created_by: 'counter@arithmalabs.test', created_by_name: 'Nusrat Sultana' }),
+    MOVE('m-3', '2026-10-02T16:05:00.000', 'received', 40, 40, 'PO-2609-0142', { product_oid: 'p-2', product_name: 'Woolen Scarf', sku: 'WOOLSCRF', batch_code: 'B-D9TW-3FRA', purchase_oid: 'po-ver' }),
+    MOVE('m-2', '2026-10-02T16:05:00.000', 'received', 74, 74, 'PO-2609-0142', { purchase_oid: 'po-ver' }),
+    MOVE('m-1', '2026-09-30T09:00:00.000', 'carried_over', 12, 12, null, { batch_code: 'B-R4ZS-9WDN', warehouse_name: 'Online store room', created_by: 'System', created_by_name: null }),
+];
+
 const answer = (request, data, extra = {}) => ({ status: 200, headers: cors(request), body: JSON.stringify({ code: 200, message: 'ok', data, ...extra }) });
 
 // Matched on the API path, not the host: a production build points at the deployed server, so
@@ -280,6 +293,11 @@ function handle(request) {
     if (request.method === 'OPTIONS') return { status: 204, headers: cors(request), body: '' };
     if (url.includes('/refresh-token')) return answer(request, { access_token: 'access-1', refresh_token: 'refresh-1', refresh_transport: 'body', session_id: 'session-1' });
     if (url.includes('/get-user-info')) return answer(request, SESSION);
+    if (url.includes('/get-stock-movement-list')) {
+        const product = new URL(url).searchParams.get('product_oid');
+        const rows = product ? MOVES.filter((m) => m.product_oid === product) : MOVES;
+        return answer(request, { rows, stats: { units_in: 128, units_out: 4, movements: rows.length } }, { total: rows.length });
+    }
     if (url.includes('/get-purchase-list')) return answer(request, { rows: PO_ROWS, stats: { submitted: 1, overdue: 0, verified: 1, cancelled: 1 } }, { total: PO_ROWS.length });
     if (url.includes('/get-purchase-details/')) return answer(request, { ...PO[url.split('/').pop().split('?')[0]], activity: PO_ACTIVITY });
     if (url.includes('/get-product-list-for-purchase')) return answer(request, PO_PICKER);

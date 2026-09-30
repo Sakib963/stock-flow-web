@@ -232,6 +232,77 @@
         }
     </nz-card>
 
+    @if (canViewMovements()) {
+        <nz-card class="mt-2 block md:mt-4" [nzTitle]="movementsTitle" [nzExtra]="movementsExtra" data-detail="movements">
+            <ng-template #movementsTitle
+                ><h2 class="m-0 flex items-center gap-1.5 text-sm font-bold text-ink"><ng-icon name="lucideArrowLeftRight" size="14px" class="text-ink-muted" aria-hidden="true" />{{ 'inventory.stockMovement.card.title' | translate }}</h2></ng-template
+            >
+            <ng-template #movementsExtra>
+                <a nz-button nzType="link" nzSize="small" class="inline-flex items-center" [routerLink]="movementListRoute">{{ 'inventory.stockMovement.card.openList' | translate }}</a>
+            </ng-template>
+            @if (movementsFailed(); as failure) {
+                <div class="flex flex-wrap items-center justify-between gap-2" role="alert">
+                    <p class="m-0 text-xs text-ink-body">{{ 'inventory.stockMovement.card.failed.' + failure | translate }}</p>
+                    <!-- A refusal will not change on a second try, so only a network or server failure offers one. -->
+                    @if (failure !== 'forbidden') {
+                        <button nz-button nzSize="small" type="button" class="inline-flex items-center gap-1.5" (click)="loadMovements()">
+                            <ng-icon name="lucideRotateCw" size="13px" aria-hidden="true" />
+                            <span>{{ 'form.retry' | translate }}</span>
+                        </button>
+                    }
+                </div>
+            } @else if (movements(); as rows) {
+                @if (rows.length) {
+                    <!-- Newest first: the question is almost always what just happened. -->
+                    <nz-table #moves [nzData]="rows" [nzShowPagination]="false" [nzFrontPagination]="false" nzSize="small" [nzScroll]="{ x: '820px' }">
+                        <thead>
+                            <tr>
+                                <th nzWidth="40px" nzAlign="right" class="text-ink-muted" [attr.aria-label]="'list.serial' | translate" scope="col">#</th>
+                                <th nzWidth="190px">{{ 'inventory.stockMovement.when' | translate }}</th>
+                                <th nzWidth="130px">{{ 'inventory.stockMovement.batch' | translate }}</th>
+                                <th nzWidth="160px">{{ 'inventory.stockMovement.reason.label' | translate }}</th>
+                                <th nzWidth="80px" nzAlign="right">{{ 'inventory.stockMovement.quantity' | translate }}</th>
+                                <th nzWidth="90px" nzAlign="right">{{ 'inventory.stockMovement.balanceAfter' | translate }}</th>
+                                <th nzWidth="130px">{{ 'inventory.stockMovement.document' | translate }}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for (move of moves.data; track move.oid; let i = $index) {
+                                <tr>
+                                    <td nzAlign="right" class="text-ink-soft tabular-nums">{{ i + 1 | digits }}</td>
+                                    <td class="whitespace-nowrap tabular-nums text-ink-muted">{{ move.created_on | recordDate: language() : 'date-time-12' }}</td>
+                                    <td>
+                                        <span class="inline-flex items-center whitespace-nowrap font-mono text-xs text-ink-body" [copyable]="move.batch_code">{{ move.batch_code }}</span>
+                                    </td>
+                                    <td>
+                                        @if (reasonOf(move.reason); as style) {
+                                            <status-tag [label]="style.label" [tone]="style.tone" [icon]="style.icon" />
+                                        }
+                                    </td>
+                                    <td nzAlign="right" class="font-semibold tabular-nums" [class.text-success-ink]="move.quantity > 0" [class.text-danger-ink]="move.quantity < 0">{{ move.quantity > 0 ? '+' : '' }}{{ move.quantity | money: 'number' }}</td>
+                                    <td nzAlign="right" class="tabular-nums">{{ move.balance_after | money: 'number' }}</td>
+                                    <td>
+                                        @if (move.purchase_oid) {
+                                            <a class="text-primary hover:underline" [routerLink]="purchaseRoute(move.purchase_oid)">{{ move.reference }}</a>
+                                        } @else if (move.reference) {
+                                            {{ move.reference }}
+                                        } @else {
+                                            <span class="text-ink-faint" aria-hidden="true">&middot;</span>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </nz-table>
+                } @else {
+                    <p class="m-0 text-xs text-ink-muted">{{ 'inventory.stockMovement.card.none' | translate }}</p>
+                }
+            } @else {
+                <nz-skeleton nzActive [nzTitle]="false" [nzParagraph]="{ rows: 3 }" />
+            }
+        </nz-card>
+    }
+
     <div class="mt-2 grid grid-cols-1 items-start gap-2 md:mt-4 md:gap-4 lg:grid-cols-3">
         <nz-card class="lg:col-start-3 lg:row-start-1" [nzTitle]="quickTitle" data-detail="quick-actions">
             <ng-template #quickTitle

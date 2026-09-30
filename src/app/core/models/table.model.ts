@@ -34,7 +34,7 @@ export type Column =
     | (ColumnBase & { type: 'long-text'; lines?: 1 | 2 })
     | (ColumnBase & { type: 'name'; sub?: string; thumb?: string })
     | (ColumnBase & { type: 'identifier'; /** Click to copy on hover, through the `copyable` directive. Give the column about 24px more. */ copy?: boolean })
-    | (ColumnBase & { type: 'number' })
+    | (ColumnBase & { type: 'number'; /** A change rather than an amount: +50 in success ink, -3 in danger ink. */ signed?: boolean })
     | (ColumnBase & { type: 'quantity'; unit?: string })
     | (ColumnBase & { type: 'stock'; restockAt: string })
     | (ColumnBase & { type: 'money'; due?: boolean })
@@ -66,11 +66,7 @@ interface LayoutBase {
 }
 
 /** Where columns go. Every value named here is a column key, drawn by that column's own type. */
-export type Layout =
-    | (LayoutBase & { type: 'table' })
-    | (LayoutBase & { type: 'cards'; title: string; subtitle?: string; badge?: string; meta?: readonly string[] })
-    | (LayoutBase & { type: 'grid'; media?: string; title: string; subtitle?: string; badge?: string; meta?: readonly string[]; minWidth?: number })
-    | (LayoutBase & RendererRef & { type: 'component'; key: string; label: Text; icon: string; skeleton: 'rows' | 'cards' | 'grid'; columns?: readonly string[] });
+export type Layout = (LayoutBase & { type: 'table' }) | (LayoutBase & { type: 'cards'; title: string; subtitle?: string; badge?: string; meta?: readonly string[] }) | (LayoutBase & { type: 'grid'; media?: string; title: string; subtitle?: string; badge?: string; meta?: readonly string[]; minWidth?: number }) | (LayoutBase & RendererRef & { type: 'component'; key: string; label: Text; icon: string; skeleton: 'rows' | 'cards' | 'grid'; columns?: readonly string[] });
 
 export interface TableSource {
     endpoint: Endpoint;
