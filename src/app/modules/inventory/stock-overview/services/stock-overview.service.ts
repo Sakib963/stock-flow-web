@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpResponse } from '@angular/common/http';
 import { Injectable, inject, signal } from '@angular/core';
 import { APIEndpoint } from '@app/core/constants/api-endpoint';
 import { StockMovementRow } from '@app/core/models/stock-movement.model';
@@ -15,6 +15,11 @@ export class StockOverviewService {
 
     productStock(oid: string): Observable<ProductStock> {
         return this._http.get<{ data: ProductStock }>(`${environment.baseUrl}${APIEndpoint.GET_PRODUCT_STOCK}/${oid}`).pipe(map((response) => response.data));
+    }
+
+    /** The spreadsheet itself, not the envelope; its name travels in `X-Filename`. */
+    report(oid: string): Observable<HttpResponse<Blob>> {
+        return this._http.get(`${environment.baseUrl}${APIEndpoint.GENERATE_PRODUCT_STOCK_REPORT}/${oid}`, { observe: 'response', responseType: 'blob' });
     }
 
     /** The product's latest stock movements, newest first, for someone who may see the ledger. */

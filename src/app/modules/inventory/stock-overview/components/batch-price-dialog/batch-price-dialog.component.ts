@@ -12,6 +12,7 @@ import { NzModalModule } from 'ng-zorro-antd/modal';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { StockBatch } from '@app/core/models/stock-overview.model';
 import { StockOverviewService } from '@app/modules/inventory/stock-overview/services/stock-overview.service';
+import { amount } from '@app/modules/inventory/stock-overview/utils/amount/amount';
 import { MoneyPipe } from '@app/shared/pipes/money/money.pipe';
 import { failureKey } from '@app/shared/utils/request-failure/request-failure';
 import { revealErrors } from '@app/shared/utils/reveal-errors/reveal-errors';
@@ -63,7 +64,7 @@ export class BatchPriceDialogComponent {
             const batch = this.batch();
             if (!batch) return;
             this.confirming.set(false);
-            this.form.reset({ selling_price: batch.selling_price ?? 0, maximum_discount: batch.maximum_discount ?? 0 });
+            this.form.reset({ selling_price: amount(batch.selling_price) ?? 0, maximum_discount: amount(batch.maximum_discount) ?? 0 });
         });
     }
 
@@ -73,7 +74,7 @@ export class BatchPriceDialogComponent {
         revealErrors(this.form);
         if (this.form.invalid || this.discountTooHigh()) return;
         const { selling_price, maximum_discount } = this.form.getRawValue();
-        if (batch.selling_price === selling_price && (batch.maximum_discount ?? 0) === maximum_discount) {
+        if (amount(batch.selling_price) === selling_price && (amount(batch.maximum_discount) ?? 0) === maximum_discount) {
             this._message.info(this._translate.instant('form.nothingChanged'));
             this.closed.emit();
             return;

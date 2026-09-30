@@ -1529,8 +1529,8 @@
             "back": "Back",
             "backToList": "Back to stock overview",
             "actions": "Actions",
-            "activity": "Price and budget changes",
-            "noActivity": "No price or budget has been changed here yet.",
+            "activity": "Recent activity",
+            "noActivity": "Nothing has been changed here yet.",
             "emptyTitle": "No stock yet",
             "emptyBody": "A product appears here with its first verified delivery. Verify a purchase order to see it.",
             "status": {
@@ -1626,10 +1626,22 @@
             "canSell": "{{count}} can sell",
             "plusBudget": "+ {{budget}} budget",
             "upToOff": "up to {{discount}} off",
-            "activityPrices": "Price changes",
             "subCategory": "Sub-category",
             "actionsFor": "Actions for batch {{batch}}",
-            "perUnit": "{{margin}} a unit"
+            "perUnit": "{{margin}} a unit",
+            "quickActions": "Quick actions",
+            "quick": {
+                "purchaseOrder": "New purchase order",
+                "adjust": "Adjust stock",
+                "dispose": "Dispose stock",
+                "notReady": "Stock adjustment and disposal open from here once those pages are part of the app.",
+                "report": "Download stock report",
+                "reportFailed": {
+                    "network": "The report could not be downloaded. Check your connection and try again.",
+                    "forbidden": "You do not have access to download this report.",
+                    "server": "The report could not be built just now. Try again in a moment."
+                }
+            }
         }
     },
     "form": {

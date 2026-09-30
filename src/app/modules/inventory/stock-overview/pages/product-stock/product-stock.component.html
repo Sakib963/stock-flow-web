@@ -206,7 +206,7 @@
                                     </td>
                                 }
                                 <td nzRight nzAlign="center">
-                                    <button type="button" class="sf-icon-btn size-6.5 items-center justify-center p-0" nz-dropdown nzTrigger="click" nzPlacement="bottomRight" [nzDropdownMenu]="batchMenu" [attr.aria-label]="'inventory.stockOverview.actionsFor' | translate: { batch: batch.batch_code }" data-batch-actions>
+                                    <button type="button" class="sf-icon-btn size-6.5 items-center justify-center p-0" nz-dropdown nzTrigger="hover" nzPlacement="bottomRight" [nzDropdownMenu]="batchMenu" [nzVisible]="menuOpen() === batch.oid" (nzVisibleChange)="menuOpen.set($event ? batch.oid : null)" (click)="menuOpen.set(batch.oid)" [attr.aria-label]="'inventory.stockOverview.actionsFor' | translate: { batch: batch.batch_code }" data-batch-actions>
                                         <ng-icon name="lucideEllipsis" size="15px" aria-hidden="true" />
                                     </button>
                                     <nz-dropdown-menu #batchMenu="nzDropdownMenu">
@@ -240,6 +240,62 @@
             <div class="p-4"><nz-skeleton nzActive [nzTitle]="false" [nzParagraph]="{ rows: 3 }" /></div>
         }
     </nz-card>
+
+    <div class="mt-2 grid grid-cols-1 items-start gap-2 md:mt-4 md:gap-4 lg:grid-cols-3">
+        <nz-card class="lg:col-start-3 lg:row-start-1" [nzTitle]="quickTitle" data-stock="quick-actions">
+            <ng-template #quickTitle
+                ><h2 class="m-0 flex items-center gap-1.5 text-sm font-bold text-ink"><ng-icon name="lucideZap" size="14px" class="text-ink-muted" aria-hidden="true" />{{ 'inventory.stockOverview.quickActions' | translate }}</h2></ng-template
+            >
+            <div class="flex flex-col gap-2">
+                @if (canOrder()) {
+                    <a nz-button nzBlock class="inline-flex items-center justify-start gap-2" [routerLink]="purchaseCreateRoute" data-quick="purchase-order">
+                        <ng-icon name="lucideShoppingCart" size="14px" aria-hidden="true" />
+                        <span>{{ 'inventory.stockOverview.quick.purchaseOrder' | translate }}</span>
+                    </a>
+                }
+                @if (canExport()) {
+                    <button nz-button nzBlock type="button" class="inline-flex items-center justify-start gap-2" data-quick="report" [nzLoading]="downloading()" (click)="download()">
+                        @if (!downloading()) {
+                            <ng-icon name="lucideFileSpreadsheet" size="14px" aria-hidden="true" />
+                        }
+                        <span>{{ 'inventory.stockOverview.quick.report' | translate }}</span>
+                    </button>
+                }
+                @for (action of comingActions; track action.key) {
+                    <button nz-button nzBlock type="button" class="inline-flex items-center justify-start gap-2" disabled [attr.data-quick]="action.key" aria-describedby="stock-quick-reason">
+                        <ng-icon [name]="action.icon" size="14px" aria-hidden="true" />
+                        <span>{{ action.label | translate }}</span>
+                    </button>
+                }
+                <p id="stock-quick-reason" class="m-0 text-xs text-ink-muted">{{ 'inventory.stockOverview.quick.notReady' | translate }}</p>
+            </div>
+        </nz-card>
+
+        <nz-card class="lg:col-span-2 lg:row-start-1" [nzTitle]="activityTitle" data-stock="activity">
+            <ng-template #activityTitle
+                ><h2 class="m-0 flex items-center gap-1.5 text-sm font-bold text-ink"><ng-icon name="lucideHistory" size="14px" class="text-ink-muted" aria-hidden="true" />{{ 'inventory.stockOverview.activity' | translate }}</h2></ng-template
+            >
+            @if (record(); as loaded) {
+                @if (loaded.activity.length) {
+                    <nz-timeline>
+                        @for (entry of loaded.activity; track entry.oid; let first = $first) {
+                            <nz-timeline-item [nzColor]="first ? 'blue' : 'gray'">
+                                <p class="m-0 text-[13px] font-semibold text-ink">{{ entry.action }}</p>
+                                @if (entry.description) {
+                                    <p class="mt-0.5 mb-0 text-xs break-words text-ink-body">{{ entry.description }}</p>
+                                }
+                                <p class="mt-0.5 mb-0 text-xs text-ink-muted">{{ entry.user }} &middot; {{ entry.date | recordDate: language() : 'date-time-12' }}</p>
+                            </nz-timeline-item>
+                        }
+                    </nz-timeline>
+                } @else {
+                    <p class="m-0 text-xs text-ink-muted">{{ 'inventory.stockOverview.noActivity' | translate }}</p>
+                }
+            } @else {
+                <nz-skeleton nzActive [nzTitle]="false" [nzParagraph]="{ rows: 3 }" />
+            }
+        </nz-card>
+    </div>
 
     @if (canViewMovements()) {
         <nz-card class="mt-2 block md:mt-4" [nzTitle]="movementsTitle" [nzExtra]="movementsExtra" data-stock="movements">
@@ -307,31 +363,6 @@
             }
         </nz-card>
     }
-
-    <nz-card class="mt-2 block md:mt-4" [nzTitle]="activityTitle" data-stock="activity">
-        <ng-template #activityTitle
-            ><h2 class="m-0 flex items-center gap-1.5 text-sm font-bold text-ink"><ng-icon name="lucideHistory" size="14px" class="text-ink-muted" aria-hidden="true" />{{ (seesMoney() ? 'inventory.stockOverview.activity' : 'inventory.stockOverview.activityPrices') | translate }}</h2></ng-template
-        >
-        @if (record(); as loaded) {
-            @if (loaded.activity.length) {
-                <nz-timeline>
-                    @for (entry of loaded.activity; track entry.oid; let first = $first) {
-                        <nz-timeline-item [nzColor]="first ? 'blue' : 'gray'">
-                            <p class="m-0 text-[13px] font-semibold text-ink">{{ entry.action }}</p>
-                            @if (entry.description) {
-                                <p class="mt-0.5 mb-0 text-xs break-words text-ink-body">{{ entry.description }}</p>
-                            }
-                            <p class="mt-0.5 mb-0 text-xs text-ink-muted">{{ entry.user }} &middot; {{ entry.date | recordDate: language() : 'date-time-12' }}</p>
-                        </nz-timeline-item>
-                    }
-                </nz-timeline>
-            } @else {
-                <p class="m-0 text-xs text-ink-muted">{{ 'inventory.stockOverview.noActivity' | translate }}</p>
-            }
-        } @else {
-            <nz-skeleton nzActive [nzTitle]="false" [nzParagraph]="{ rows: 3 }" />
-        }
-    </nz-card>
 
     <action-footer>
         <button nz-button nzType="default" type="button" class="inline-flex items-center gap-1.5" (click)="backToList()">

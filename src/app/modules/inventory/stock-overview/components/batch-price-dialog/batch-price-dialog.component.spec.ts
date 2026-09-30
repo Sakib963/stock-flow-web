@@ -10,13 +10,13 @@ import { BatchPriceDialogComponent } from './batch-price-dialog.component';
 
 const BATCH = { oid: 'i-1', batch_code: 'B-7KQ4-M2XH', intended_use: 'for_sale', status: 'ready_for_sale', selling_price: 500, maximum_discount: 50, cost_price: 300, budget_per_unit: 20 } as StockBatch;
 
-const open = async () => {
+const open = async (batch: StockBatch = BATCH) => {
     await TestBed.configureTestingModule({
         imports: [BatchPriceDialogComponent],
         providers: [provideHttpClient(), provideHttpClientTesting(), provideNzI18n(en_US), provideTranslateService({ fallbackLang: 'en' }), ...OVERLAY_PROVIDERS],
     }).compileComponents();
     const fixture = TestBed.createComponent(BatchPriceDialogComponent);
-    fixture.componentRef.setInput('batch', BATCH);
+    fixture.componentRef.setInput('batch', batch);
     fixture.detectChanges();
     return fixture.componentInstance;
 };
@@ -48,6 +48,15 @@ describe('BatchPriceDialogComponent', () => {
         dialog.form.setValue({ selling_price: 100, maximum_discount: 150 });
         dialog.review();
         expect(dialog.confirming()).toBe(false);
+    });
+
+    it('fills in the current price and discount when the server sends them as text, and knows they are unchanged', async () => {
+        const dialog = await open({ ...BATCH, selling_price: '1250.00', maximum_discount: '100.00' } as unknown as StockBatch);
+        expect(dialog.form.getRawValue()).toEqual({ selling_price: 1250, maximum_discount: 100 });
+        const closed: boolean[] = [];
+        dialog.closed.subscribe(() => closed.push(true));
+        dialog.review();
+        expect(closed).toEqual([true]);
     });
 
     it('closes without asking when the price is unchanged', async () => {

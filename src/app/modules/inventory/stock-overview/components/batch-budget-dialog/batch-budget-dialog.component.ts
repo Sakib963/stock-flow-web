@@ -12,6 +12,7 @@ import { NzModalModule } from 'ng-zorro-antd/modal';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { BUDGET_KEYS, BudgetKey } from '@app/core/models/purchase-order.model';
 import { StockBatch } from '@app/core/models/stock-overview.model';
+import { amount } from '@app/modules/inventory/stock-overview/utils/amount/amount';
 import { StockOverviewService } from '@app/modules/inventory/stock-overview/services/stock-overview.service';
 import { DigitsPipe } from '@app/shared/pipes/digits/digits.pipe';
 import { MoneyPipe } from '@app/shared/pipes/money/money.pipe';
@@ -62,11 +63,11 @@ export class BatchBudgetDialogComponent {
             if (!batch) return;
             this.confirming.set(false);
             this.form.reset({
-                ad_run_cost: batch.ad_run_cost ?? null,
-                packaging_cost: batch.packaging_cost ?? null,
-                gift_cost: batch.gift_cost ?? null,
-                content_creation_cost: batch.content_creation_cost ?? null,
-                influencer_cost: batch.influencer_cost ?? null,
+                ad_run_cost: amount(batch.ad_run_cost),
+                packaging_cost: amount(batch.packaging_cost),
+                gift_cost: amount(batch.gift_cost),
+                content_creation_cost: amount(batch.content_creation_cost),
+                influencer_cost: amount(batch.influencer_cost),
                 cost_remarks: batch.cost_remarks ?? '',
             });
         });
@@ -78,7 +79,7 @@ export class BatchBudgetDialogComponent {
         revealErrors(this.form);
         if (this.form.invalid) return;
         const raw = this.form.getRawValue();
-        const same = BUDGET_KEYS.every((key) => (raw[key] ?? null) === (batch[key] ?? null)) && (raw.cost_remarks.trim() || null) === (batch.cost_remarks ?? null);
+        const same = BUDGET_KEYS.every((key) => (raw[key] ?? null) === amount(batch[key])) && (raw.cost_remarks.trim() || null) === (batch.cost_remarks ?? null);
         if (same) {
             this._message.info(this._translate.instant('form.nothingChanged'));
             this.closed.emit();

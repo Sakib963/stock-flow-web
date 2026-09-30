@@ -93,6 +93,7 @@ export class APIEndpoint {
     static readonly GET_STOCK_MOVEMENT_LIST = '/api/v1/inventory/stock-movement/get-stock-movement-list';
     static readonly GET_STOCK_OVERVIEW_LIST = '/api/v1/inventory/inventory-overview/get-stock-overview-list';
     static readonly GET_PRODUCT_STOCK = '/api/v1/inventory/inventory-overview/get-product-stock';
+    static readonly GENERATE_PRODUCT_STOCK_REPORT = '/api/v1/inventory/inventory-overview/generate-product-stock-report';
     static readonly UPDATE_BATCH_PRICING = '/api/v1/inventory/inventory-overview/update-batch-pricing';
     static readonly UPDATE_BATCH_BUDGET = '/api/v1/inventory/inventory-overview/update-batch-budget';
     static readonly GET_PURCHASE_ORDER_DETAILS = '/api/v1/inventory/purchase-order/get-purchase-details';

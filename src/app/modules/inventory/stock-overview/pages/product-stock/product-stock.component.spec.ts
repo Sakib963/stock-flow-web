@@ -78,4 +78,20 @@ describe('ProductStockComponent', () => {
         expect(page.canPrice(OWNER_VIEW.batches[1])).toBe(false);
         expect(page.canPrice(OWNER_VIEW.batches[0])).toBe(true);
     });
+
+    it('offers the stock report only with the export permission, and asks the server for this product', async () => {
+        const owner = await open(OWNER_VIEW, ['inventory.overview.view', 'inventory.stock-value.view']);
+        expect((owner.nativeElement as HTMLElement).querySelector('[data-quick="report"]')).toBeNull();
+        TestBed.resetTestingModule();
+
+        const exporter = await open(OWNER_VIEW, ['inventory.overview.view', 'inventory.stock-value.view', 'inventory.overview.export']);
+        const button = (exporter.nativeElement as HTMLElement).querySelector('[data-quick="report"]') as HTMLButtonElement;
+        expect(button).not.toBeNull();
+        button.click();
+        const request = TestBed.inject(HttpTestingController).expectOne((r) => r.url.endsWith(`${APIEndpoint.GENERATE_PRODUCT_STOCK_REPORT}/p-1`));
+        expect(request.request.responseType).toBe('blob');
+        expect(exporter.componentInstance.downloading()).toBe(true);
+        request.flush(new Blob(['x']));
+        expect(exporter.componentInstance.downloading()).toBe(false);
+    });
 });

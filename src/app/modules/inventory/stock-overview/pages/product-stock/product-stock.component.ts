@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { NgIcon, provideIcons } from '@ng-icons/core';
-import { lucideArrowLeft, lucideArrowLeftRight, lucideBadgeDollarSign, lucideBoxes, lucideCalendarClock, lucideEllipsis, lucideHistory, lucideInfo, lucideLock, lucidePackageCheck, lucidePercent, lucidePrinter, lucideRotateCw, lucideTag, lucideTrendingDown, lucideTrendingUp, lucideWallet, lucideBanknote, lucideWrench } from '@ng-icons/lucide';
+import { lucideArrowLeft, lucideArrowLeftRight, lucideBadgeDollarSign, lucideBoxes, lucideCalendarClock, lucideEllipsis, lucideFileSpreadsheet, lucideHistory, lucideInfo, lucideLock, lucidePackageCheck, lucidePercent, lucidePrinter, lucideRotateCw, lucideShoppingCart, lucideTag, lucideTrendingDown, lucideTrendingUp, lucideWallet, lucideBanknote, lucideWrench, lucideZap, lucideSlidersHorizontal, lucideTrash2 } from '@ng-icons/lucide';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzCardModule } from 'ng-zorro-antd/card';
 import { NzDropdownModule } from 'ng-zorro-antd/dropdown';
@@ -12,7 +12,8 @@ import { NzTableModule } from 'ng-zorro-antd/table';
 import { NzTimelineModule } from 'ng-zorro-antd/timeline';
 import { NzTooltipModule } from 'ng-zorro-antd/tooltip';
 import { FormsModule } from '@angular/forms';
-import { TranslatePipe } from '@ngx-translate/core';
+import { NzMessageService } from 'ng-zorro-antd/message';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { RequestFailure } from '@app/core/models/api.model';
 import { PageBack } from '@app/core/models/page-header.model';
 import { StockMovementRow } from '@app/core/models/stock-movement.model';
@@ -37,7 +38,8 @@ import { CopyableDirective } from '@app/shared/directives/copyable/copyable.dire
 import { DigitsPipe } from '@app/shared/pipes/digits/digits.pipe';
 import { MoneyPipe } from '@app/shared/pipes/money/money.pipe';
 import { RecordDatePipe } from '@app/shared/pipes/record-date/record-date.pipe';
-import { failureOf } from '@app/shared/utils/request-failure/request-failure';
+import { saveDownload } from '@app/shared/utils/download-file/download-file';
+import { failureKey, failureOf } from '@app/shared/utils/request-failure/request-failure';
 import { resolveTone } from '@app/shared/utils/tone-map/tone-map';
 
 interface Figure {
@@ -56,7 +58,7 @@ interface Figure {
 @Component({
     selector: 'product-stock',
     imports: [FormsModule, NgIcon, NzButtonModule, NzCardModule, NzDropdownModule, NzMenuModule, NzSkeletonModule, NzSwitchModule, NzTableModule, NzTimelineModule, NzTooltipModule, RouterLink, TranslatePipe, PageHeaderComponent, StatusTagComponent, ActionFooterComponent, BatchExpiryComponent, BatchPriceDialogComponent, BatchBudgetDialogComponent, StickerDialogComponent, CopyableDirective, DigitsPipe, MoneyPipe, RecordDatePipe],
-    providers: [provideIcons({ lucideArrowLeft, lucideArrowLeftRight, lucideBadgeDollarSign, lucideBanknote, lucideBoxes, lucideCalendarClock, lucideEllipsis, lucideHistory, lucideInfo, lucideLock, lucidePackageCheck, lucidePercent, lucidePrinter, lucideRotateCw, lucideTag, lucideTrendingDown, lucideTrendingUp, lucideWallet, lucideWrench })],
+    providers: [provideIcons({ lucideArrowLeft, lucideArrowLeftRight, lucideBadgeDollarSign, lucideBanknote, lucideBoxes, lucideCalendarClock, lucideEllipsis, lucideFileSpreadsheet, lucideHistory, lucideInfo, lucideLock, lucidePackageCheck, lucidePercent, lucidePrinter, lucideRotateCw, lucideShoppingCart, lucideSlidersHorizontal, lucideTag, lucideTrash2, lucideTrendingDown, lucideTrendingUp, lucideWallet, lucideWrench, lucideZap })],
     templateUrl: './product-stock.component.html',
     styleUrl: './product-stock.component.scss',
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -66,6 +68,8 @@ export class ProductStockComponent {
     private readonly _router = inject(Router);
     private readonly _stock = inject(StockOverviewService);
     private readonly _session = inject(SessionService);
+    private readonly _message = inject(NzMessageService);
+    private readonly _translate = inject(TranslateService);
 
     readonly language = inject(LanguageService).current;
     readonly oid = this._route.snapshot.paramMap.get('oid') ?? '';
@@ -84,11 +88,21 @@ export class ProductStockComponent {
     readonly canViewOrders = computed(() => this._session.can('inventory.purchase-order.view'));
     readonly catalogueRoute = PRODUCT_ROUTES.detail;
     readonly purchaseRoute = PURCHASE_ORDER_ROUTES.detail;
+    readonly purchaseCreateRoute = PURCHASE_ORDER_ROUTES.create;
+    readonly canExport = computed(() => this._session.can('inventory.overview.export'));
+    readonly downloading = signal(false);
+    readonly canOrder = computed(() => this._session.can('inventory.purchase-order.create'));
+    readonly comingActions = [
+        { key: 'adjust', label: 'inventory.stockOverview.quick.adjust', icon: 'lucideSlidersHorizontal' },
+        { key: 'dispose', label: 'inventory.stockOverview.quick.dispose', icon: 'lucideTrash2' },
+    ];
 
     readonly showSoldOut = signal(false);
     readonly batches = computed(() => (this.record()?.batches ?? []).filter((batch) => this.showSoldOut() || batch.on_hand > 0 || batch.held > 0));
     readonly soldOut = computed(() => (this.record()?.batches ?? []).filter((batch) => batch.on_hand === 0 && batch.held === 0).length);
 
+    /** The batch whose menu is open: it opens on hover, and on a click for touch and keyboard. */
+    readonly menuOpen = signal<string | null>(null);
     readonly pricing = signal<StockBatch | null>(null);
     readonly budgeting = signal<StockBatch | null>(null);
     readonly labelling = signal<StockBatch | null>(null);
@@ -181,6 +195,21 @@ export class ProductStockComponent {
         this.pricing.set(null);
         this.budgeting.set(null);
         this.load();
+    }
+
+    download(): void {
+        if (this.downloading()) return;
+        this.downloading.set(true);
+        this._stock.report(this.oid).subscribe({
+            next: (response) => {
+                this.downloading.set(false);
+                saveDownload(response, `${this.product()?.sku ?? 'product'}-stock.xlsx`);
+            },
+            error: (error: unknown) => {
+                this.downloading.set(false);
+                this._message.error(this._translate.instant(failureKey(error, 'inventory.stockOverview.quick.reportFailed')));
+            },
+        });
     }
 
     backToList(): void {
