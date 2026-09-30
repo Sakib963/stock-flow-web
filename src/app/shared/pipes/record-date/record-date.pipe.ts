@@ -1,6 +1,7 @@
 import { Pipe, PipeTransform } from '@angular/core';
 import { DateFormat } from '@app/core/models/config.model';
 import { AppLanguage } from '@app/core/models/language.model';
+import { environment } from '@env/environment';
 
 const DAY_MS = 86_400_000;
 
@@ -14,6 +15,9 @@ const DATE_PARTS: Intl.DateTimeFormatOptions = { day: 'numeric', month: 'short',
 const SLASHED_PARTS: Intl.DateTimeFormatOptions = { day: '2-digit', month: '2-digit', year: 'numeric' };
 const TIME_24: Intl.DateTimeFormatOptions = { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' };
 const TIME_12: Intl.DateTimeFormatOptions = { hour: 'numeric', minute: '2-digit', hour12: true };
+
+/** Used only when the deployment sets `bengaliTimeInWords`; the browser's Bengali keeps AM and PM. Each deployment writes its own environment file, so a missing key means AM and PM. */
+const BN_DAY_PERIOD: Record<string, string> = { AM: 'পূর্বাহ্ণ', PM: 'অপরাহ্ণ' };
 
 /**
  * Every shape a date takes in a list, keyed by what a person sees. A config names one of these
@@ -51,6 +55,11 @@ export class RecordDatePipe implements PipeTransform {
             return new Intl.RelativeTimeFormat(locale, { numeric: 'auto' }).format(-Math.floor(seconds / size), unit);
         }
 
-        return new Intl.DateTimeFormat(locale, FORMATS[format === 'relative' ? 'date' : format]).format(date);
+        const formatter = new Intl.DateTimeFormat(locale, FORMATS[format === 'relative' ? 'date' : format]);
+        if (language !== 'bn' || !(environment as { bengaliTimeInWords?: boolean }).bengaliTimeInWords) return formatter.format(date);
+        return formatter
+            .formatToParts(date)
+            .map((part) => (part.type === 'dayPeriod' ? (BN_DAY_PERIOD[part.value.toUpperCase()] ?? part.value) : part.value))
+            .join('');
     }
 }

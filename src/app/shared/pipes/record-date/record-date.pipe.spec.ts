@@ -1,4 +1,5 @@
 import { RecordDatePipe } from '@app/shared/pipes/record-date/record-date.pipe';
+import { environment } from '@env/environment';
 
 describe('RecordDatePipe', () => {
     const pipe = new RecordDatePipe();
@@ -30,5 +31,18 @@ describe('RecordDatePipe', () => {
         expect(pipe.transform(afternoon, 'en', 'date-time')).toMatch(/24 Aug 2026.*14:05/);
         expect(pipe.transform(afternoon, 'en', 'date-time-12')).toMatch(/24 Aug 2026.*2:05/);
         expect(pipe.transform(afternoon, 'en', 'time')).toBe('14:05');
+    });
+
+    it('keeps AM and PM in a Bengali 12 hour time, unless the deployment asks for words', () => {
+        const morning = new Date(2026, 8, 30, 11, 35).toISOString();
+        expect(pipe.transform(morning, 'bn', 'date-time-12')).toMatch(/১১:৩৫\s?AM$/);
+
+        (environment as { bengaliTimeInWords?: boolean }).bengaliTimeInWords = true;
+        try {
+            expect(pipe.transform(morning, 'bn', 'date-time-12')).toMatch(/১১:৩৫ পূর্বাহ্ণ$/);
+            expect(pipe.transform(afternoon, 'bn', 'time-12')).toMatch(/২:০৫ অপরাহ্ণ$/);
+        } finally {
+            (environment as { bengaliTimeInWords?: boolean }).bengaliTimeInWords = false;
+        }
     });
 });
