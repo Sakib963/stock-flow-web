@@ -18,6 +18,7 @@ const KURTI: Product = {
     description: null,
     restock_threshold: 5,
     status: 'Active',
+    has_expiry: true,
     category_oid: 'c-1',
     category_name: 'Women',
     sub_category_oid: 'sc-old',
@@ -50,6 +51,17 @@ describe('ProductFormComponent', () => {
 
         form.form.controls.sku.setValue('bag-01');
         expect(form.payload().sku).toBe('BAG-01');
+    });
+
+    it("leaves a new product without an expiry date unless it is switched on, and keeps an edited product's setting", async () => {
+        const fixture = await open();
+        const form = fixture.componentInstance;
+        expect(form.payload().has_expiry).toBe(false);
+
+        fixture.componentRef.setInput('editing', KURTI);
+        fixture.detectChanges();
+        expect(form.payload().has_expiry).toBe(true);
+        expect((fixture.nativeElement as HTMLElement).querySelector('#product-expiry')).not.toBeNull();
     });
 
     it('keeps an edited product under its sub-category even after that has been turned off', async () => {

@@ -7,6 +7,7 @@ import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzFormModule } from 'ng-zorro-antd/form';
 import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzSelectModule } from 'ng-zorro-antd/select';
+import { NzSwitchModule } from 'ng-zorro-antd/switch';
 import { TranslatePipe } from '@ngx-translate/core';
 import { Observable, filter, map, startWith, take } from 'rxjs';
 
@@ -34,6 +35,7 @@ const FIELD_ID: Record<ProductFormField, string> = {
     restock_threshold: 'product-restock',
     description: 'product-description',
     status: 'product-status',
+    has_expiry: 'product-expiry',
 };
 
 /** The selects, whose input is inside ng-zorro's component, so their descriptions are attached once rendered. */
@@ -42,7 +44,7 @@ const SELECTS: readonly ProductFormField[] = ['sub_category_oid', 'brand_oid', '
 /** The product form, rendered by both the create page and the edit page. */
 @Component({
     selector: 'product-form',
-    imports: [DigitsPipe, ReactiveFormsModule, NgIcon, NzButtonModule, NzFormModule, NzInputModule, NzSelectModule, TranslatePipe, TextPipe, ProductPhotoComponent],
+    imports: [DigitsPipe, ReactiveFormsModule, NgIcon, NzButtonModule, NzFormModule, NzInputModule, NzSelectModule, NzSwitchModule, TranslatePipe, TextPipe, ProductPhotoComponent],
     providers: [ChoicesService, provideIcons({ lucideSparkles })],
     templateUrl: './product-form.component.html',
     styleUrl: './product-form.component.scss',
@@ -76,6 +78,7 @@ export class ProductFormComponent {
         // Invalid while a photo uploads, so Save cannot send the form without it.
         photo: [null as string | null, [() => (this.photoBusy() ? { uploading: true } : null)]],
         status: ['Active' as ProductStatus, [Validators.required]],
+        has_expiry: [false],
     });
 
     private readonly _status = toSignal(this.form.statusChanges, { initialValue: this.form.status });
@@ -134,6 +137,7 @@ export class ProductFormComponent {
                 description: record.description ?? '',
                 photo: record.photo,
                 status: record.status,
+                has_expiry: record.has_expiry ?? false,
             });
             this.form.markAsPristine();
         });
@@ -178,6 +182,7 @@ export class ProductFormComponent {
             description: raw.description.trim() || null,
             photo: raw.photo,
             status: raw.status,
+            has_expiry: raw.has_expiry,
         };
     }
 

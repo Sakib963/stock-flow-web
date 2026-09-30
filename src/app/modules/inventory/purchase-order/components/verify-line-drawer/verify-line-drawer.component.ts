@@ -4,6 +4,7 @@ import { AbstractControl, FormBuilder, ReactiveFormsModule, ValidationErrors, Va
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideArrowRight, lucideCheck } from '@ng-icons/lucide';
 import { NzButtonModule } from 'ng-zorro-antd/button';
+import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
 import { NzDrawerModule } from 'ng-zorro-antd/drawer';
 import { NzFormModule } from 'ng-zorro-antd/form';
 import { NzInputModule } from 'ng-zorro-antd/input';
@@ -13,6 +14,7 @@ import { TranslatePipe } from '@ngx-translate/core';
 import { BUDGET_KEYS, BudgetKey, Budgets, IntendedUse, PurchaseOrderLine, VerifyLinePayload } from '@app/core/models/purchase-order.model';
 import { DigitsPipe } from '@app/shared/pipes/digits/digits.pipe';
 import { MoneyPipe } from '@app/shared/pipes/money/money.pipe';
+import { fromDay, toDay } from '@app/shared/utils/calendar-day/calendar-day';
 import { revealErrors } from '@app/shared/utils/reveal-errors/reveal-errors';
 import { budgetPerUnit, marginPerUnit } from '@app/modules/inventory/purchase-order/utils/verify-line/verify-line';
 
@@ -29,7 +31,7 @@ const discountWithinPrice = (group: AbstractControl): ValidationErrors | null =>
  */
 @Component({
     selector: 'verify-line-drawer',
-    imports: [DigitsPipe, MoneyPipe, NgIcon, ReactiveFormsModule, NzButtonModule, NzDrawerModule, NzFormModule, NzInputModule, NzInputNumberModule, NzRadioModule, TranslatePipe],
+    imports: [DigitsPipe, MoneyPipe, NgIcon, ReactiveFormsModule, NzButtonModule, NzDatePickerModule, NzDrawerModule, NzFormModule, NzInputModule, NzInputNumberModule, NzRadioModule, TranslatePipe],
     providers: [provideIcons({ lucideArrowRight, lucideCheck })],
     templateUrl: './verify-line-drawer.component.html',
     styleUrl: './verify-line-drawer.component.scss',
@@ -62,6 +64,7 @@ export class VerifyLineDrawerComponent {
             content_creation_cost: [null as number | null],
             influencer_cost: [null as number | null],
             cost_remarks: ['', [Validators.maxLength(500)]],
+            expiry_date: [null as Date | null],
         },
         { validators: [discountWithinPrice] }
     );
@@ -104,6 +107,7 @@ export class VerifyLineDrawerComponent {
                 content_creation_cost: recorded?.content_creation_cost ?? null,
                 influencer_cost: recorded?.influencer_cost ?? null,
                 cost_remarks: recorded?.cost_remarks ?? '',
+                expiry_date: fromDay(recorded?.expiry_date ?? null),
             });
             this.form.controls.received_quantity.setValidators([Validators.required, Validators.min(0), Validators.max(line.ordered_quantity ?? 0)]);
             this.form.controls.received_quantity.updateValueAndValidity();
@@ -129,6 +133,7 @@ export class VerifyLineDrawerComponent {
                 ...(raw.intended_use === 'for_sale' ? { selling_price: Number(raw.selling_price), maximum_discount: Number(raw.maximum_discount) } : {}),
                 ...budgets,
                 cost_remarks: raw.cost_remarks.trim() || null,
+                ...(line.has_expiry ? { expiry_date: toDay(raw.expiry_date) } : {}),
             },
         });
     }

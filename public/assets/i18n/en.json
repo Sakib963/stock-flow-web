@@ -1045,7 +1045,9 @@
             "deleteDisabled": {
                 "in_stock": "It still has stock in the warehouse. Dispose of that stock first, or set the product Inactive.",
                 "held": "Online orders are holding it. Deliver or cancel them first, or set the product Inactive."
-            }
+            },
+            "expiry": "Has an expiry date",
+            "expiryHelper": "Turn on for products that go off, such as creams or food. Each batch can then carry its expiry date, entered when it is received or later."
         },
         "analytics": {
             "title": "Configuration analytics",
@@ -1477,6 +1479,27 @@
                     "server": "The movements could not be loaded. Try again in a moment."
                 }
             }
+        },
+        "expiry": {
+            "label": "Expiry date",
+            "placeholder": "Pick a date, or leave it empty",
+            "verifyHelper": "Optional. If the date is not to hand now, add it on the verified order later.",
+            "expires": "Expires",
+            "expired": "Expired",
+            "soon": "Expires soon",
+            "none": "No expiry date",
+            "edit": "Edit expiry date",
+            "editTitle": "Expiry date of batch {{batch}}",
+            "editLead": "Clear the date if this batch does not expire. Changing it moves no stock.",
+            "save": "Save date",
+            "saved": "Expiry date saved",
+            "notExpiring": "This product is not marked as one that expires. Turn on \"Has an expiry date\" on the product first.",
+            "back": "Back",
+            "confirmSave": "Yes, save date",
+            "confirmLead": "The change is logged on the purchase order. Stock is not moved.",
+            "confirmSet": "Set the expiry date of batch {{batch}} to {{to}}?",
+            "confirmChange": "Change the expiry date of batch {{batch}} from {{from}} to {{to}}?",
+            "confirmClear": "Remove the expiry date of batch {{batch}}, {{from}}?"
         }
     },
     "form": {

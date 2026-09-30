@@ -85,6 +85,9 @@
                         <td>
                             <span class="block text-[13px] font-semibold text-ink">{{ line.product_name }}</span>
                             <span class="block font-mono text-xs text-ink-muted">{{ 'inventory.purchaseOrder.orderedLine' | translate: { quantity: line.ordered_quantity, price: (line.ordered_unit_price | money) } | digits }}</span>
+                            @if (line.has_expiry && value) {
+                                <batch-expiry class="block" [day]="value.expiry_date ?? null" />
+                            }
                         </td>
                         <td class="text-right font-mono text-[13px]">
                             @if (value) {

@@ -188,7 +188,7 @@
         @if (record(); as loaded) {
             @if (loaded.stock.batches.length) {
                 <!-- Oldest first, the order stock leaves in. Scrolls inside the card on a phone. -->
-                <nz-table #batches [nzData]="loaded.stock.batches" [nzShowPagination]="false" [nzFrontPagination]="false" nzSize="small" [nzScroll]="{ x: '720px' }">
+                <nz-table #batches [nzData]="loaded.stock.batches" [nzShowPagination]="false" [nzFrontPagination]="false" nzSize="small" [nzScroll]="{ x: loaded.details.has_expiry ? '960px' : '720px' }">
                     <thead>
                         <tr>
                             <th>{{ 'configuration.product.batch.code' | translate }}</th>
@@ -199,6 +199,9 @@
                             <th nzAlign="right">{{ 'configuration.product.batch.sellable' | translate }}</th>
                             <th nzAlign="right">{{ 'configuration.product.batch.cost' | translate }}</th>
                             <th nzAlign="right">{{ 'configuration.product.batch.price' | translate }}</th>
+                            @if (loaded.details.has_expiry) {
+                                <th nzWidth="190px">{{ 'inventory.expiry.label' | translate }}</th>
+                            }
                         </tr>
                     </thead>
                     <tbody>
@@ -220,6 +223,11 @@
                                         <span class="font-sans text-xs text-ink-muted">{{ 'configuration.product.batch.noPrice' | translate }}</span>
                                     }
                                 </td>
+                                @if (loaded.details.has_expiry) {
+                                    <td>
+                                        <batch-expiry [batchOid]="batch.oid" [batchCode]="batch.batch_code" [day]="batch.expiry_date" [canEdit]="canEditExpiry()" (changed)="load()" />
+                                    </td>
+                                }
                             </tr>
                         }
                     </tbody>

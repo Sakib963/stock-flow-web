@@ -38,6 +38,15 @@
                 </nz-form-control>
             </nz-form-item>
 
+            @if (current.has_expiry) {
+                <nz-form-item>
+                    <nz-form-label nzFor="vl-expiry" [nzTooltipTitle]="'inventory.expiry.verifyHelper' | translate">{{ 'inventory.expiry.label' | translate }}</nz-form-label>
+                    <nz-form-control>
+                        <nz-date-picker nzId="vl-expiry" class="w-full" formControlName="expiry_date" nzFormat="dd MMM yyyy" [nzPlaceHolder]="'inventory.expiry.placeholder' | translate" />
+                    </nz-form-control>
+                </nz-form-item>
+            }
+
             @if (forSale()) {
                 <div class="grid grid-cols-2 gap-x-3">
                     <nz-form-item>

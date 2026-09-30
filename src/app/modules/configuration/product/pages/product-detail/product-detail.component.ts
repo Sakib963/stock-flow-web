@@ -22,6 +22,7 @@ import { PRODUCT_STATUS } from '@app/modules/configuration/product/config/produc
 import { CATEGORY_ROUTES } from '@app/modules/configuration/category/constants/category-routes';
 import { PRODUCT_ROUTES } from '@app/modules/configuration/product/constants/product-routes';
 import { SUB_CATEGORY_ROUTES } from '@app/modules/configuration/sub-category/constants/sub-category-routes';
+import { BatchExpiryComponent } from '@app/shared/components/batch-expiry/batch-expiry.component';
 import { PURCHASE_ORDER_ROUTES } from '@app/modules/inventory/purchase-order/constants/purchase-order-routes';
 import { STOCK_MOVEMENT_REASON } from '@app/modules/inventory/stock-movement/config/stock-movement-list.config';
 import { STOCK_MOVEMENT_ROUTES } from '@app/modules/inventory/stock-movement/constants/stock-movement-routes';
@@ -44,7 +45,7 @@ import { resolveTone } from '@app/shared/utils/tone-map/tone-map';
  */
 @Component({
     selector: 'product-detail',
-    imports: [NgIcon, NzButtonModule, NzCardModule, NzImageModule, NzSkeletonModule, NzTableModule, NzTimelineModule, NzTooltipModule, RouterLink, TranslatePipe, PageHeaderComponent, StatusTagComponent, ActionFooterComponent, CopyableDirective, DigitsPipe, MoneyPipe, RecordDatePipe],
+    imports: [NgIcon, NzButtonModule, NzCardModule, NzImageModule, NzSkeletonModule, NzTableModule, NzTimelineModule, NzTooltipModule, RouterLink, TranslatePipe, PageHeaderComponent, StatusTagComponent, ActionFooterComponent, CopyableDirective, BatchExpiryComponent, DigitsPipe, MoneyPipe, RecordDatePipe],
     providers: [provideIcons({ lucideArrowLeft, lucideArrowLeftRight, lucideBoxes, lucideChartColumn, lucideCircleX, lucideHandCoins, lucideHistory, lucideImageOff, lucideInfo, lucideLock, lucidePackageCheck, lucidePencil, lucideRotateCw, lucideShoppingCart, lucideTrash2, lucideTruck, lucideUndo2, lucideZap })],
     templateUrl: './product-detail.component.html',
     styleUrl: './product-detail.component.scss',
@@ -80,6 +81,7 @@ export class ProductDetailComponent {
     readonly canViewSubCategory = computed(() => this._session.can('configuration.sub-category.view'));
     readonly categoryRoute = CATEGORY_ROUTES.detail;
 
+    readonly canEditExpiry = computed(() => this._session.can('inventory.purchase-order.edit'));
     /** The latest movements, for someone who may see the ledger; the card is absent otherwise. */
     readonly canViewMovements = computed(() => this._session.can('inventory.stock-movement.view'));
     readonly movements = signal<StockMovementRow[] | null>(null);

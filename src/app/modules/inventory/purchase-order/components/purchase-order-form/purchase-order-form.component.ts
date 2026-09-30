@@ -23,6 +23,7 @@ import { DigitsPipe } from '@app/shared/pipes/digits/digits.pipe';
 import { MoneyPipe } from '@app/shared/pipes/money/money.pipe';
 import { RecordDatePipe } from '@app/shared/pipes/record-date/record-date.pipe';
 import { revealErrors } from '@app/shared/utils/reveal-errors/reveal-errors';
+import { fromDay, toDay } from '@app/shared/utils/calendar-day/calendar-day';
 
 /** What a product looks like on a line: enough to draw it without asking the server again. */
 interface LineProduct {
@@ -43,10 +44,6 @@ type LineGroup = FormGroup<{
     quantity: FormControl<number | null>;
     unit_price: FormControl<number | null>;
 }>;
-
-/** A local calendar day as YYYY-MM-DD, never through toISOString, which shifts it by the timezone. */
-const toDay = (date: Date | null): string | null => (date ? `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}` : null);
-const fromDay = (day: string | null): Date | null => (day ? new Date(`${day}T00:00:00`) : null);
 
 /**
  * The purchase order form, rendered by both the create page and the edit page.

@@ -65,6 +65,8 @@ export interface PurchaseBatch {
     quantity_available: number;
     selling_price: string | null;
     maximum_discount: string | null;
+    /** A plain day, `2027-03-31`, or none. */
+    expiry_date: string | null;
 }
 
 export interface PurchaseOrderLine extends Budgets {
@@ -73,6 +75,8 @@ export interface PurchaseOrderLine extends Budgets {
     product_name: string;
     sku: string | null;
     restock_threshold: number;
+    /** The product's batches carry an expiry date, so verify offers one. */
+    has_expiry: boolean;
     photo_thumb: string | null;
     /** A Draft line may still lack its warehouse, quantity or price. */
     warehouse_oid: string | null;
@@ -155,6 +159,8 @@ export interface VerifyLinePayload extends Budgets {
     selling_price?: number;
     maximum_discount?: number;
     cost_remarks: string | null;
+    /** Optional, and kept only for a product that expires. */
+    expiry_date?: string | null;
 }
 
 export interface VerifyResult {

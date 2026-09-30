@@ -96,6 +96,7 @@ export class APIEndpoint {
     static readonly CREATE_PURCHASE_ORDER = '/api/v1/inventory/purchase-order/create-purchase';
     static readonly UPDATE_PURCHASE_ORDER = '/api/v1/inventory/purchase-order/update-purchase-details';
     static readonly UPDATE_PURCHASE_ORDER_PAYMENT = '/api/v1/inventory/purchase-order/update-purchase-payment';
+    static readonly UPDATE_BATCH_EXPIRY = '/api/v1/inventory/purchase-order/update-batch-expiry';
     static readonly VERIFY_PURCHASE_ORDER = '/api/v1/inventory/purchase-order/verify-purchase';
     static readonly CANCEL_PURCHASE_ORDER = '/api/v1/inventory/purchase-order/cancel-purchase';
     static readonly GET_PURCHASE_ORDER_REPORT = '/api/v1/inventory/purchase-order/get-purchase-order-report';

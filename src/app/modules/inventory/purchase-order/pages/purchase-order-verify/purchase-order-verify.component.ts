@@ -14,6 +14,7 @@ import { HasUnsavedChanges } from '@app/core/guards/unsaved-changes/unsaved-chan
 import { PageBack } from '@app/core/models/page-header.model';
 import { BUDGET_KEYS, PurchaseOrderDetails, PurchaseOrderLine, VerifyLinePayload } from '@app/core/models/purchase-order.model';
 import { LanguageService } from '@app/core/services/language/language.service';
+import { BatchExpiryComponent } from '@app/shared/components/batch-expiry/batch-expiry.component';
 import { VerifyLineDrawerComponent } from '@app/modules/inventory/purchase-order/components/verify-line-drawer/verify-line-drawer.component';
 import { PURCHASE_ORDER_ROUTES } from '@app/modules/inventory/purchase-order/constants/purchase-order-routes';
 import { PurchaseOrderService } from '@app/modules/inventory/purchase-order/services/purchase-order.service';
@@ -37,7 +38,7 @@ import { failureOf } from '@app/shared/utils/request-failure/request-failure';
  */
 @Component({
     selector: 'purchase-order-verify',
-    imports: [NgIcon, NzButtonModule, NzProgressModule, NzSkeletonModule, NzTableModule, TranslatePipe, PageHeaderComponent, ActionFooterComponent, StatusTagComponent, VerifyLineDrawerComponent, MoneyPipe, DigitsPipe, RecordDatePipe],
+    imports: [NgIcon, NzButtonModule, NzProgressModule, NzSkeletonModule, NzTableModule, TranslatePipe, PageHeaderComponent, ActionFooterComponent, StatusTagComponent, VerifyLineDrawerComponent, MoneyPipe, DigitsPipe, RecordDatePipe, BatchExpiryComponent],
     providers: [MoneyPipe, provideIcons({ lucideArrowLeft, lucideCheck, lucideChevronDown, lucideChevronUp, lucideChevronsUpDown, lucideListChecks, lucidePackageCheck, lucidePencil, lucideRotateCw, lucideX })],
     templateUrl: './purchase-order-verify.component.html',
     styleUrl: './purchase-order-verify.component.scss',

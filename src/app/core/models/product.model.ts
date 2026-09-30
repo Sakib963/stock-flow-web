@@ -10,6 +10,8 @@ export interface Product {
     description: string | null;
     restock_threshold: number;
     status: ProductStatus;
+    /** Whether its batches carry an expiry date. */
+    has_expiry: boolean;
     category_oid: string;
     category_name?: string | null;
     sub_category_oid: string;
@@ -38,6 +40,7 @@ export interface ProductPayload {
     description: string | null;
     photo: string | null;
     status: ProductStatus;
+    has_expiry: boolean;
 }
 
 /** One batch still holding or promising stock. `sellable` is on hand less what online orders hold. */
@@ -51,7 +54,12 @@ export interface ProductBatch {
     sellable: number;
     cost_price: number;
     selling_price: number | null;
+    /** A plain day, `2027-03-31`, or none. */
+    expiry_date: string | null;
 }
+
+/** Where a batch stands against its expiry date. */
+export type ExpiryState = 'none' | 'expired' | 'soon' | 'fresh';
 
 export interface ProductStock {
     on_hand: number;
@@ -105,4 +113,4 @@ export type PhotoUpload = { state: 'uploading'; progress: number } | { state: 'd
 /** Which field a 409 or 400 was about, so the form marks the input the person has to change. */
 export type ProductField = 'sku' | 'sub_category_oid' | 'brand_oid';
 
-export type ProductFormField = 'name' | 'sku' | 'sub_category_oid' | 'brand_oid' | 'unit_type' | 'restock_threshold' | 'description' | 'status';
+export type ProductFormField = 'name' | 'sku' | 'sub_category_oid' | 'brand_oid' | 'unit_type' | 'restock_threshold' | 'description' | 'status' | 'has_expiry';

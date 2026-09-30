@@ -131,6 +131,14 @@
         <span id="product-status-help" class="sr-only">{{ 'configuration.product.statusHelper' | translate }}</span>
     </nz-form-item>
 
+    <nz-form-item>
+        <nz-form-label nzFor="product-expiry" [nzTooltipTitle]="'configuration.product.expiryHelper' | translate">{{ 'configuration.product.expiry' | translate }}</nz-form-label>
+        <nz-form-control>
+            <nz-switch nzId="product-expiry" formControlName="has_expiry" [attr.aria-describedby]="'product-expiry-help'" />
+        </nz-form-control>
+        <span id="product-expiry-help" class="sr-only">{{ 'configuration.product.expiryHelper' | translate }}</span>
+    </nz-form-item>
+
     <nz-form-item class="md:col-span-2">
         <nz-form-label nzFor="product-description" [nzTooltipTitle]="'configuration.product.descriptionHelper' | translate">{{ 'configuration.product.description' | translate }}</nz-form-label>
         <nz-form-control [nzErrorTip]="descriptionError">

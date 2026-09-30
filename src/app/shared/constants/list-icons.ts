@@ -1,5 +1,7 @@
 import {
     lucideArchive,
+    lucideCalendarClock,
+    lucideCalendarX,
     lucideBadgeCheck,
     lucideBan,
     lucideBanknote,
@@ -42,6 +44,8 @@ import {
  */
 export const LIST_ICONS = {
     lucideArchive,
+    lucideCalendarClock,
+    lucideCalendarX,
     lucideBadgeCheck,
     lucideBan,
     lucideBanknote,

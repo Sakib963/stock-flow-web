@@ -24,6 +24,7 @@ import { PAYMENT_STATUS, PURCHASE_ORDER_STATUS } from '@app/modules/inventory/pu
 import { PURCHASE_ORDER_ROUTES } from '@app/modules/inventory/purchase-order/constants/purchase-order-routes';
 import { PurchaseOrderService } from '@app/modules/inventory/purchase-order/services/purchase-order.service';
 import { orderFailureKey } from '@app/modules/inventory/purchase-order/utils/order-failure/order-failure';
+import { BatchExpiryComponent } from '@app/shared/components/batch-expiry/batch-expiry.component';
 import { budgetPerUnit, marginPerUnit } from '@app/modules/inventory/purchase-order/utils/verify-line/verify-line';
 import { ActionFooterComponent } from '@app/shared/components/action-footer/action-footer.component';
 import { PageHeaderComponent } from '@app/shared/components/page-header/page-header.component';
@@ -54,7 +55,7 @@ interface OrderStat {
  */
 @Component({
     selector: 'purchase-order-detail',
-    imports: [NgIcon, ReactiveFormsModule, NzButtonModule, NzCardModule, NzFormModule, NzInputModule, NzInputNumberModule, NzModalModule, NzRadioModule, NzSkeletonModule, NzTableModule, NzTimelineModule, TranslatePipe, PageHeaderComponent, StatusTagComponent, ActionFooterComponent, CopyableDirective, MoneyPipe, RecordDatePipe, DigitsPipe],
+    imports: [NgIcon, ReactiveFormsModule, NzButtonModule, NzCardModule, NzFormModule, NzInputModule, NzInputNumberModule, NzModalModule, NzRadioModule, NzSkeletonModule, NzTableModule, NzTimelineModule, TranslatePipe, PageHeaderComponent, StatusTagComponent, ActionFooterComponent, CopyableDirective, MoneyPipe, RecordDatePipe, DigitsPipe, BatchExpiryComponent],
     providers: [
         MoneyPipe,
         provideIcons({
@@ -127,6 +128,8 @@ export class PurchaseOrderDetailComponent {
     readonly canVerify = computed(() => this.submitted() && this._session.can('inventory.purchase-order.approve'));
     readonly canEdit = computed(() => this.open() && this._session.can('inventory.purchase-order.edit'));
     readonly canCancel = computed(() => this.open() && this._session.can('inventory.purchase-order.cancel'));
+    /** A verified batch's expiry stays editable: a date missed or typed wrong at verify is fixed here. */
+    readonly canEditExpiry = computed(() => this.verified() && this._session.can('inventory.purchase-order.edit'));
     // A draft's payment is part of its form until it is submitted.
     readonly canPay = computed(() => !!this.record() && (this.submitted() || this.verified()) && this._session.can('inventory.purchase-order.edit'));
     readonly canExport = computed(() => this._session.can('inventory.purchase-order.export'));

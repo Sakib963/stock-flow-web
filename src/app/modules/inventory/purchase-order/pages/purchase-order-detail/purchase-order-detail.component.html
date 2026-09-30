@@ -228,6 +228,9 @@
                                     <span class="block truncate text-[13px] font-semibold text-ink">{{ line.product_name }}</span>
                                     @for (b of line.batches; track b.oid) {
                                         <span class="block font-mono text-xs text-ink-body" [copyable]="b.batch_code">{{ b.batch_code }}</span>
+                                        @if (line.has_expiry) {
+                                            <batch-expiry class="block" [batchOid]="b.oid" [batchCode]="b.batch_code" [day]="b.expiry_date" [canEdit]="canEditExpiry()" (changed)="load()" />
+                                        }
                                     } @empty {
                                         <span class="block text-xs text-ink-muted">{{ 'inventory.purchaseOrder.noBatch' | translate }}</span>
                                     }
