@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal, viewChild } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideSave } from '@ng-icons/lucide';
 import { NzButtonModule } from 'ng-zorro-antd/button';
@@ -10,41 +10,39 @@ import { finalize } from 'rxjs';
 import { HasUnsavedChanges } from '@app/core/guards/unsaved-changes/unsaved-changes.guard';
 import { PageBack } from '@app/core/models/page-header.model';
 import { SessionService } from '@app/core/services/session/session.service';
-import { ADJUSTMENT_REASONS, AdjustmentReason } from '@app/core/models/stock-adjustment.model';
-import { StockAdjustmentFormComponent } from '@app/modules/inventory/stock-adjustment/components/stock-adjustment-form/stock-adjustment-form.component';
-import { STOCK_ADJUSTMENT_ROUTES } from '@app/modules/inventory/stock-adjustment/constants/stock-adjustment-routes';
-import { StockAdjustmentService } from '@app/modules/inventory/stock-adjustment/services/stock-adjustment.service';
-import { adjustmentFailure } from '@app/modules/inventory/stock-adjustment/utils/adjustment-failure/adjustment-failure';
+import { DisposalFormComponent } from '@app/modules/inventory/disposal/components/disposal-form/disposal-form.component';
+import { DISPOSAL_ROUTES } from '@app/modules/inventory/disposal/constants/disposal-routes';
+import { DisposalService } from '@app/modules/inventory/disposal/services/disposal.service';
+import { disposalFailure } from '@app/modules/inventory/disposal/utils/disposal-failure/disposal-failure';
 import { DigitsPipe } from '@app/shared/pipes/digits/digits.pipe';
 import { FormPageComponent } from '@app/shared/components/form-page/form-page.component';
 import { PageHeaderComponent } from '@app/shared/components/page-header/page-header.component';
 import { confirmAction } from '@app/shared/utils/confirm-action/confirm-action';
 
-/** A new adjustment. Submitting moves nothing: stock changes only when it is verified, in a separate click. */
+/** A new disposal. Submitting moves nothing: stock changes only when it is approved, in a separate click. */
 @Component({
-    selector: 'stock-adjustment-create',
-    imports: [NgIcon, NzButtonModule, TranslatePipe, PageHeaderComponent, FormPageComponent, StockAdjustmentFormComponent],
+    selector: 'disposal-create',
+    imports: [NgIcon, NzButtonModule, TranslatePipe, PageHeaderComponent, FormPageComponent, DisposalFormComponent],
     providers: [DigitsPipe, provideIcons({ lucideSave })],
-    templateUrl: './stock-adjustment-create.component.html',
-    styleUrl: './stock-adjustment-create.component.scss',
+    templateUrl: './disposal-create.component.html',
+    styleUrl: './disposal-create.component.scss',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class StockAdjustmentCreateComponent implements HasUnsavedChanges {
+export class DisposalCreateComponent implements HasUnsavedChanges {
     private readonly _router = inject(Router);
-    private readonly _adjustments = inject(StockAdjustmentService);
+    private readonly _disposals = inject(DisposalService);
     private readonly _message = inject(NzMessageService);
     private readonly _translate = inject(TranslateService);
     private readonly _modal = inject(NzModalService);
     private readonly _digits = inject(DigitsPipe);
     private readonly _session = inject(SessionService);
 
-    readonly back: PageBack = { route: STOCK_ADJUSTMENT_ROUTES.list };
-    readonly editor = viewChild(StockAdjustmentFormComponent);
-    readonly presetReason = this.reasonFromLink();
+    readonly back: PageBack = { route: DISPOSAL_ROUTES.list };
+    readonly editor = viewChild(DisposalFormComponent);
     private readonly _asking = signal(false);
     /** Set once a save succeeds and stays set until the page has gone, so nothing can be pressed in between. */
     private readonly _leaving = signal(false);
-    readonly saving = computed(() => this._asking() || this._leaving() || this._adjustments.saving());
+    readonly saving = computed(() => this._asking() || this._leaving() || this._disposals.saving());
     readonly drafting = signal(false);
     readonly submitting = computed(() => this.saving() && !this.drafting());
 
@@ -56,46 +54,46 @@ export class StockAdjustmentCreateComponent implements HasUnsavedChanges {
         const editor = this.editor();
         if (!editor || this.saving()) return;
         if (!editor.valid()) {
-            this._message.error(this._translate.instant(editor.started().length ? 'form.fixErrors' : 'inventory.stockAdjustment.needsLine'));
+            this._message.error(this._translate.instant(editor.started().length ? 'form.fixErrors' : 'inventory.disposal.needsLine'));
             return;
         }
         const payload = editor.payload(false);
         this._asking.set(true);
         confirmAction(this._modal, {
-            title: this._translate.instant('inventory.stockAdjustment.confirmSubmit.title'),
-            body: this._translate.instant('inventory.stockAdjustment.confirmSubmit.body', this.localDigits({ count: payload.lines.length, in: editor.unitsIn(), out: editor.unitsOut() })),
-            ok: this._translate.instant('inventory.stockAdjustment.submit'),
+            title: this._translate.instant('inventory.disposal.confirmSubmit.title'),
+            body: this._translate.instant('inventory.disposal.confirmSubmit.body', this.localDigits({ count: payload.lines.length, units: editor.units() })),
+            ok: this._translate.instant('inventory.disposal.submit'),
             cancel: this._translate.instant('form.confirm.cancel'),
         }).subscribe((confirmed) => {
             this._asking.set(false);
             if (!confirmed) return;
-            this._adjustments.create(payload).subscribe({
-                next: ({ oid, adjustment_number }) => {
+            this._disposals.create(payload).subscribe({
+                next: ({ oid, dispose_no }) => {
                     editor.form.markAsPristine();
-                    this._message.success(this._translate.instant('inventory.stockAdjustment.submittedMessage', { number: adjustment_number }));
+                    this._message.success(this._translate.instant('inventory.disposal.submittedMessage', { number: dispose_no }));
                     this._leaving.set(true);
-                    void this._router.navigateByUrl(STOCK_ADJUSTMENT_ROUTES.detail(oid));
+                    void this._router.navigateByUrl(DISPOSAL_ROUTES.detail(oid));
                 },
                 error: (error: unknown) => this.fail(error),
             });
         });
     }
 
-    /** Saves what is typed so far, needing only the reason, and carries on in that draft's edit page. */
+    /** Saves what is typed so far, needing nothing more, and carries on in that draft's edit page. */
     saveDraft(): void {
         const editor = this.editor();
         if (!editor || this.saving()) return;
         if (!editor.validDraft()) {
-            this._message.error(this._translate.instant('inventory.stockAdjustment.draftNeedsReason'));
+            this._message.error(this._translate.instant('form.fixErrors'));
             return;
         }
         const payload = editor.payload(true);
         this.drafting.set(true);
         this._asking.set(true);
         confirmAction(this._modal, {
-            title: this._translate.instant('inventory.stockAdjustment.confirmDraft.title'),
-            body: this._translate.instant('inventory.stockAdjustment.confirmDraft.body'),
-            ok: this._translate.instant('inventory.stockAdjustment.saveDraft'),
+            title: this._translate.instant('inventory.disposal.confirmDraft.title'),
+            body: this._translate.instant('inventory.disposal.confirmDraft.body'),
+            ok: this._translate.instant('inventory.disposal.saveDraft'),
             cancel: this._translate.instant('form.confirm.cancel'),
         }).subscribe((confirmed) => {
             this._asking.set(false);
@@ -103,16 +101,16 @@ export class StockAdjustmentCreateComponent implements HasUnsavedChanges {
                 this.drafting.set(false);
                 return;
             }
-            this._adjustments
+            this._disposals
                 .create(payload)
                 .pipe(finalize(() => this.drafting.set(false)))
                 .subscribe({
-                    next: ({ oid, adjustment_number }) => {
+                    next: ({ oid, dispose_no }) => {
                         editor.form.markAsPristine();
-                        this._message.success(this._translate.instant('inventory.stockAdjustment.draftSavedMessage', { number: adjustment_number }));
+                        this._message.success(this._translate.instant('inventory.disposal.draftSavedMessage', { number: dispose_no }));
                         // Carry on in the draft, or open its record for someone who may create but not edit.
                         this._leaving.set(true);
-                        void this._router.navigateByUrl(this._session.can('inventory.stock-adjustment.edit') ? STOCK_ADJUSTMENT_ROUTES.edit(oid) : STOCK_ADJUSTMENT_ROUTES.detail(oid), { replaceUrl: true });
+                        void this._router.navigateByUrl(this._session.can('inventory.product-dispose.edit') ? DISPOSAL_ROUTES.edit(oid) : DISPOSAL_ROUTES.detail(oid), { replaceUrl: true });
                     },
                     error: (error: unknown) => this.fail(error),
                 });
@@ -120,20 +118,15 @@ export class StockAdjustmentCreateComponent implements HasUnsavedChanges {
     }
 
     cancel(): void {
-        void this._router.navigateByUrl(STOCK_ADJUSTMENT_ROUTES.list);
+        void this._router.navigateByUrl(DISPOSAL_ROUTES.list);
     }
 
     private fail(error: unknown): void {
-        const { key, params } = adjustmentFailure(error, 'form.saveFailed');
+        const { key, params } = disposalFailure(error, 'form.saveFailed');
         this._message.error(this._translate.instant(key, this.localDigits(params)));
     }
 
-    private reasonFromLink(): AdjustmentReason | null {
-        const reason = inject(ActivatedRoute).snapshot.queryParamMap.get('reason');
-        return (ADJUSTMENT_REASONS as readonly string[]).includes(reason ?? '') ? (reason as AdjustmentReason) : null;
-    }
-
-    /** Counts in a message follow the language on screen; codes such as ADJ-2609-0001 are left alone. */
+    /** Counts in a message follow the language on screen; codes such as DSP-2610-0001 are left alone. */
     private localDigits(params: Record<string, unknown>): Record<string, unknown> {
         return Object.fromEntries(Object.entries(params).map(([key, value]) => [key, typeof value === 'number' ? this._digits.transform(value) : value]));
     }

@@ -3,6 +3,7 @@ import { OVERLAY_PROVIDERS } from '@app/shared/constants/overlay-providers';
 import { permissionGuard } from '@app/core/guards/permission/permission.guard';
 import { unsavedChangesGuard } from '@app/core/guards/unsaved-changes/unsaved-changes.guard';
 import { PURCHASE_ORDER_LIST } from '@app/modules/inventory/purchase-order/config/purchase-order-list.config';
+import { DISPOSAL_LIST } from '@app/modules/inventory/disposal/config/disposal-list.config';
 import { STOCK_ADJUSTMENT_LIST } from '@app/modules/inventory/stock-adjustment/config/stock-adjustment-list.config';
 import { STOCK_MOVEMENT_LIST } from '@app/modules/inventory/stock-movement/config/stock-movement-list.config';
 import { STOCK_OVERVIEW_LIST } from '@app/modules/inventory/stock-overview/config/stock-overview-list.config';
@@ -91,6 +92,33 @@ export const INVENTORY_ROUTES: Routes = [
                 canActivate: [permissionGuard],
                 data: { permission: STOCK_ADJUSTMENT_LIST.permission },
                 loadComponent: () => import('./stock-adjustment/pages/stock-adjustment-detail/stock-adjustment-detail.component').then((m) => m.StockAdjustmentDetailComponent),
+            },
+            {
+                path: 'disposals',
+                canActivate: [permissionGuard],
+                data: { permission: DISPOSAL_LIST.permission },
+                loadComponent: () => import('./disposal/pages/disposal-list/disposal-list.component').then((m) => m.DisposalListComponent),
+            },
+            // Before ':oid', or "new" is read as an adjustment's id.
+            {
+                path: 'disposals/new',
+                canActivate: [permissionGuard],
+                canDeactivate: [unsavedChangesGuard],
+                data: { permission: 'inventory.product-dispose.create' },
+                loadComponent: () => import('./disposal/pages/disposal-create/disposal-create.component').then((m) => m.DisposalCreateComponent),
+            },
+            {
+                path: 'disposals/:oid/edit',
+                canActivate: [permissionGuard],
+                canDeactivate: [unsavedChangesGuard],
+                data: { permission: 'inventory.product-dispose.edit' },
+                loadComponent: () => import('./disposal/pages/disposal-edit/disposal-edit.component').then((m) => m.DisposalEditComponent),
+            },
+            {
+                path: 'disposals/:oid',
+                canActivate: [permissionGuard],
+                data: { permission: DISPOSAL_LIST.permission },
+                loadComponent: () => import('./disposal/pages/disposal-detail/disposal-detail.component').then((m) => m.DisposalDetailComponent),
             },
         ],
     },

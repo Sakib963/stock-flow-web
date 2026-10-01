@@ -100,6 +100,15 @@ export class APIEndpoint {
     static readonly REJECT_STOCK_ADJUSTMENT = '/api/v1/inventory/stock-adjustment/reject-stock-adjustment';
     static readonly CANCEL_STOCK_ADJUSTMENT = '/api/v1/inventory/stock-adjustment/cancel-stock-adjustment';
     static readonly GENERATE_STOCK_ADJUSTMENT_REPORT = '/api/v1/inventory/stock-adjustment/generate-stock-adjustment-report';
+    static readonly GET_DISPOSAL_LIST = '/api/v1/inventory/product-dispose/get-product-dispose-list';
+    static readonly GET_DISPOSAL_DETAILS = '/api/v1/inventory/product-dispose/get-product-dispose-details';
+    static readonly GET_PRODUCT_LIST_FOR_DISPOSAL = '/api/v1/inventory/product-dispose/get-product-list-for-dispose';
+    static readonly CREATE_DISPOSAL = '/api/v1/inventory/product-dispose/create-product-dispose';
+    static readonly UPDATE_DISPOSAL = '/api/v1/inventory/product-dispose/update-product-dispose';
+    static readonly APPROVE_DISPOSAL = '/api/v1/inventory/product-dispose/approve-product-dispose';
+    static readonly REJECT_DISPOSAL = '/api/v1/inventory/product-dispose/reject-product-dispose';
+    static readonly CANCEL_DISPOSAL = '/api/v1/inventory/product-dispose/cancel-product-dispose';
+    static readonly GENERATE_DISPOSAL_REPORT = '/api/v1/inventory/product-dispose/generate-product-dispose-report';
     static readonly GET_STOCK_OVERVIEW_LIST = '/api/v1/inventory/inventory-overview/get-stock-overview-list';
     static readonly GET_PRODUCT_STOCK = '/api/v1/inventory/inventory-overview/get-product-stock';
     static readonly GENERATE_PRODUCT_STOCK_REPORT = '/api/v1/inventory/inventory-overview/generate-product-stock-report';

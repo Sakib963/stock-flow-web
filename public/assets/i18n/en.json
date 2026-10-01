@@ -1636,7 +1636,6 @@
                 "purchaseOrder": "New purchase order",
                 "adjust": "Adjust stock",
                 "dispose": "Dispose stock",
-                "notReady": "Stock adjustment and disposal open from here once those pages are part of the app.",
                 "report": "Download stock report",
                 "reportFailed": {
                     "network": "The report could not be downloaded. Check your connection and try again.",
@@ -1846,6 +1845,183 @@
                 "budgetsLead": "Optional. Each is multiplied by the units of the new batch. Once verified, change them from the stock overview."
             },
             "budgetPerUnit": "Budget per unit"
+        },
+        "disposal": {
+            "add": "New disposal",
+            "number": "Disposal no.",
+            "date": "Date",
+            "searchPlaceholder": "Search by disposal number or note",
+            "lineCount": "Lines",
+            "units": "Units",
+            "value": "Value at cost",
+            "createdOn": "Created",
+            "createdBy": "Created by",
+            "emptyTitle": "No disposals yet",
+            "emptyBody": "Record damaged, expired or spoiled stock here. It leaves the shelf only when the disposal is approved.",
+            "status": {
+                "label": "Status",
+                "draft": "Draft",
+                "submitted": "Submitted",
+                "approved": "Approved",
+                "rejected": "Rejected",
+                "cancelled": "Cancelled"
+            },
+            "reason": {
+                "label": "Reason",
+                "choose": "Choose a reason",
+                "damaged": "Damaged",
+                "expired": "Expired",
+                "spoiled": "Spoiled",
+                "sample": "Sample",
+                "quality_reject": "Faulty from supplier",
+                "other": "Other"
+            },
+            "method": {
+                "label": "Method",
+                "choose": "Optional",
+                "discarded": "Discarded",
+                "destroyed": "Destroyed",
+                "donated": "Donated",
+                "recycled": "Recycled",
+                "other": "Other"
+            },
+            "methodHelper": "How the units were got rid of, if it matters to you. Optional.",
+            "stat": {
+                "draft": "Drafts",
+                "submitted": "Waiting to approve",
+                "approved": "Approved this month"
+            },
+            "createTitle": "New disposal",
+            "editTitle": "Edit disposal",
+            "draftTitle": "Continue draft",
+            "formLead": "Add each product that cannot be sold, with why. Nothing leaves the shelf until the disposal is approved.",
+            "note": "Note",
+            "noteHelper": "Anything the person approving should know.",
+            "notePlaceholder": "Optional",
+            "lines": "Products",
+            "product": "Product",
+            "productPlaceholder": "Search by name or SKU",
+            "productNotFound": "No active product matches.",
+            "batch": "Batch",
+            "chooseBatch": "Choose a batch",
+            "batchFree": "{{onHand}} on hand, {{free}} free",
+            "quantity": "Quantity",
+            "lineNote": "Line note",
+            "lineNotePlaceholder": "Optional",
+            "lineNoteRequired": "Say why: required when the reason is Other",
+            "cost": "Cost",
+            "price": "Selling price",
+            "expiry": "Expiry",
+            "noExpiry": "None",
+            "where": "Where",
+            "addProduct": "Add product",
+            "editLine": "Change this line",
+            "removeLine": "Remove this line",
+            "lineActions": "Change or remove",
+            "noLinesTitle": "No products yet",
+            "noLinesBody": "Add each product to dispose with Add product.",
+            "drawer": {
+                "addTitle": "Add a product",
+                "editTitle": "Change this line",
+                "batchCount": "{{count}} batches",
+                "noBatchesShort": "No batches yet",
+                "nothingFree": "Every unit of this product is held for orders, so none can be disposed now.",
+                "noStock": "This product has no stock, so there is nothing to dispose.",
+                "saveLine": "Save line",
+                "addLine": "Add line"
+            },
+            "problem": {
+                "product": "Choose a product.",
+                "batch": "Choose the batch the units come from.",
+                "quantity": "Enter the quantity.",
+                "moreThanFree": "More than this batch has free. Lower the quantity.",
+                "reason": "Choose a reason.",
+                "note": "Say why in the line note when the reason is Other."
+            },
+            "submit": "Submit disposal",
+            "saveChanges": "Save changes",
+            "saveDraft": "Save as draft",
+            "needsLine": "Add at least one product before submitting.",
+            "confirmSubmit": {
+                "title": "Submit this disposal?",
+                "body": "Products: {{count}}. Units: {{units}}. Nothing leaves the shelf until it is approved."
+            },
+            "confirmEdit": {
+                "title": "Save changes to {{number}}?",
+                "body": "Products: {{count}}. Units: {{units}}. Nothing leaves the shelf until it is approved."
+            },
+            "confirmDraft": {
+                "title": "Save as a draft?",
+                "body": "You can finish it later. A draft takes nothing off the shelf and cannot be approved."
+            },
+            "submittedMessage": "Disposal {{number}} submitted. Stock leaves once it is approved.",
+            "draftSavedMessage": "Draft {{number}} saved.",
+            "draftSaved": "Draft saved.",
+            "updated": "Disposal {{number}} saved.",
+            "refused": "The disposal could not be saved as it is. Check each line and try again.",
+            "lineRefused": "Line {{line}} cannot be saved as it is. Check its batch, quantity and reason, then try again.",
+            "lineNoLongerFits": "Line {{line}} no longer fits: its batch has less free than it takes now. Edit the line and try again.",
+            "moved": "This disposal was changed somewhere else, approved, rejected or cancelled. Open it again to see where it stands.",
+            "loadFailed": {
+                "network": "Could not reach the server. Check your connection and try again.",
+                "forbidden": "You do not have permission to see this disposal.",
+                "server": "The disposal could not be loaded. Try again in a moment."
+            },
+            "notEditable": {
+                "approved": "This disposal is approved, so it can no longer be edited.",
+                "rejected": "This disposal was rejected, so it can no longer be edited.",
+                "cancelled": "This disposal was cancelled, so it can no longer be edited."
+            },
+            "backToDisposal": "Back to the disposal",
+            "backToList": "Back to disposals",
+            "detailTitle": "Disposal",
+            "detailLead": "What leaves the shelf without being sold, and why. Stock leaves only when it is approved.",
+            "section": {
+                "details": "Disposal"
+            },
+            "notGiven": "Not given",
+            "noLinesYet": "No products on this draft yet.",
+            "banner": {
+                "approved": "Approved on {{date}} by {{name}}. Its stock has left the shelf.",
+                "rejected": "Rejected on {{date}} by {{name}}. No stock moved.",
+                "cancelled": "Cancelled on {{date}} by {{name}}. No stock moved.",
+                "because": "Reason: {{reason}}",
+                "draft": "This is a draft. Finish and submit it before it can be approved.",
+                "submitted": "Waiting to be approved. Read the lines, then Approve to take the stock off the shelf, or Reject with a reason."
+            },
+            "approve": "Approve",
+            "reject": "Reject",
+            "cancel": "Cancel disposal",
+            "continueDraft": "Continue draft",
+            "view": "Open",
+            "edit": "Edit",
+            "openToApprove": "Open to approve",
+            "confirmApprove": {
+                "title": "Approve {{number}}?",
+                "body": "{{units}} units will leave the shelf.",
+                "value": "Value at cost {{value}}."
+            },
+            "approvedMessage": "Disposal {{number}} approved. Stock has left the shelf.",
+            "rejectTitle": "Reject this disposal",
+            "rejectBody": "No stock will move. Say why, so the person who made it knows what to fix.",
+            "cancelTitle": "Cancel this disposal",
+            "cancelBody": "No stock will move, and the disposal stays in the list as cancelled.",
+            "why": "Why",
+            "whyRequired": "Write at least 3 characters.",
+            "whyPlaceholder": "For example: the units are fine, counted again",
+            "keep": "Go back",
+            "rejectedMessage": "Disposal rejected. No stock moved.",
+            "cancelledMessage": "Disposal cancelled. No stock moved.",
+            "quickActions": "Quick actions",
+            "downloadReport": "Disposal report",
+            "noQuickActions": "Nothing else to do here.",
+            "reportFailed": {
+                "network": "The report could not be downloaded. Check your connection and try again.",
+                "forbidden": "You do not have access to this report.",
+                "server": "The report could not be built just now. Try again in a moment."
+            },
+            "activity": "Recent activity",
+            "noActivity": "Nothing has happened to this disposal yet."
         }
     },
     "form": {

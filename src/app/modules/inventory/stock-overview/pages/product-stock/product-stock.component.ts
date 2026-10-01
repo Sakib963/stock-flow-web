@@ -41,6 +41,8 @@ import { RecordDatePipe } from '@app/shared/pipes/record-date/record-date.pipe';
 import { saveDownload } from '@app/shared/utils/download-file/download-file';
 import { failureKey, failureOf } from '@app/shared/utils/request-failure/request-failure';
 import { resolveTone } from '@app/shared/utils/tone-map/tone-map';
+import { DISPOSAL_ROUTES } from '@app/modules/inventory/disposal/constants/disposal-routes';
+import { STOCK_ADJUSTMENT_ROUTES } from '@app/modules/inventory/stock-adjustment/constants/stock-adjustment-routes';
 
 interface Figure {
     key: string;
@@ -92,10 +94,10 @@ export class ProductStockComponent {
     readonly canExport = computed(() => this._session.can('inventory.overview.export'));
     readonly downloading = signal(false);
     readonly canOrder = computed(() => this._session.can('inventory.purchase-order.create'));
-    readonly comingActions = [
-        { key: 'adjust', label: 'inventory.stockOverview.quick.adjust', icon: 'lucideSlidersHorizontal' },
-        { key: 'dispose', label: 'inventory.stockOverview.quick.dispose', icon: 'lucideTrash2' },
-    ];
+    readonly canAdjust = computed(() => this._session.can('inventory.stock-adjustment.create'));
+    readonly adjustRoute = STOCK_ADJUSTMENT_ROUTES.create;
+    readonly canDispose = computed(() => this._session.can('inventory.product-dispose.create'));
+    readonly disposeRoute = DISPOSAL_ROUTES.create;
 
     readonly showSoldOut = signal(false);
     readonly batches = computed(() => (this.record()?.batches ?? []).filter((batch) => this.showSoldOut() || batch.on_hand > 0 || batch.held > 0));

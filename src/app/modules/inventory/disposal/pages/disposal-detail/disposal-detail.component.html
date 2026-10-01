@@ -1,0 +1,301 @@
+<page-header [back]="back" [title]="'inventory.disposal.detailTitle' | translate" [lead]="'inventory.disposal.detailLead' | translate">
+    @if (canCancel()) {
+        <button nz-button nzDanger type="button" class="inline-flex items-center gap-1.5" [disabled]="saving()" (click)="openClosing('cancel')">
+            <ng-icon name="lucideBan" size="14px" aria-hidden="true" />
+            <span>{{ 'inventory.disposal.cancel' | translate }}</span>
+        </button>
+    }
+    @if (canEdit()) {
+        <button nz-button type="button" class="inline-flex items-center gap-1.5" [disabled]="saving()" (click)="edit()">
+            <ng-icon name="lucidePencil" size="14px" aria-hidden="true" />
+            <span>{{ (draft() ? 'inventory.disposal.continueDraft' : 'inventory.disposal.edit') | translate }}</span>
+        </button>
+    }
+    @if (canReject()) {
+        <button nz-button nzDanger type="button" class="inline-flex items-center gap-1.5" [disabled]="saving()" (click)="openClosing('reject')">
+            <ng-icon name="lucideCircleX" size="14px" aria-hidden="true" />
+            <span>{{ 'inventory.disposal.reject' | translate }}</span>
+        </button>
+    }
+    @if (canApprove()) {
+        <button nz-button nzType="primary" type="button" class="inline-flex items-center gap-1.5" [nzLoading]="saving()" [disabled]="saving()" (click)="approve()">
+            @if (!saving()) {
+                <ng-icon name="lucideBadgeCheck" size="14px" aria-hidden="true" />
+            }
+            <span>{{ 'inventory.disposal.approve' | translate }}</span>
+        </button>
+    }
+</page-header>
+
+@if (failed(); as failure) {
+    <div class="sf-empty" role="alert">
+        <p class="m-0 text-sm text-ink-body">{{ 'inventory.disposal.loadFailed.' + failure | translate }}</p>
+        <div class="mt-3 flex items-center justify-center gap-2">
+            <button nz-button nzType="default" type="button" class="inline-flex items-center gap-1.5" (click)="backToList()">
+                <ng-icon name="lucideArrowLeft" size="14px" aria-hidden="true" />
+                <span>{{ 'inventory.disposal.backToList' | translate }}</span>
+            </button>
+            <button nz-button nzType="primary" type="button" class="inline-flex items-center gap-1.5" (click)="load()">
+                <ng-icon name="lucideRotateCw" size="14px" aria-hidden="true" />
+                <span>{{ 'form.retry' | translate }}</span>
+            </button>
+        </div>
+    </div>
+} @else {
+    @if (loading()) {
+        <span class="sr-only" role="status">{{ 'form.loading' | translate }}</span>
+    }
+
+    @if (record(); as loaded) {
+        @switch (loaded.details.status) {
+            @case ('Approved') {
+                <div class="mb-2 flex items-start gap-2 rounded-container border border-success-border bg-success-bg px-4 py-3 md:mb-4" data-detail="banner">
+                    <ng-icon name="lucideBadgeCheck" size="16px" class="mt-0.5 text-success-ink" aria-hidden="true" />
+                    <p class="m-0 text-[13px] font-semibold text-success-ink">{{ 'inventory.disposal.banner.approved' | translate: { date: (loaded.details.approved_on | recordDate: language() : 'date-time-12'), name: loaded.details.approved_by_name || loaded.details.approved_by } }}</p>
+                </div>
+            }
+            @case ('Rejected') {
+                <div class="mb-2 flex items-start gap-2 rounded-container border border-danger-border bg-danger-bg px-4 py-3 md:mb-4" data-detail="banner">
+                    <ng-icon name="lucideCircleX" size="16px" class="mt-0.5 text-danger-ink" aria-hidden="true" />
+                    <div>
+                        <p class="m-0 text-[13px] font-semibold text-danger-ink">{{ 'inventory.disposal.banner.rejected' | translate: { date: (loaded.details.rejected_on | recordDate: language() : 'date-time-12'), name: loaded.details.rejected_by_name || loaded.details.rejected_by } }}</p>
+                        <p class="mt-0.5 mb-0 text-xs text-ink-body">{{ 'inventory.disposal.banner.because' | translate: { reason: loaded.details.reject_reason } }}</p>
+                    </div>
+                </div>
+            }
+            @case ('Cancelled') {
+                <div class="mb-2 flex items-start gap-2 rounded-container border border-line bg-surface-sunken px-4 py-3 md:mb-4" data-detail="banner">
+                    <ng-icon name="lucideBan" size="16px" class="mt-0.5 text-ink-muted" aria-hidden="true" />
+                    <div>
+                        <p class="m-0 text-[13px] font-semibold text-ink">{{ 'inventory.disposal.banner.cancelled' | translate: { date: (loaded.details.cancelled_on | recordDate: language() : 'date-time-12'), name: loaded.details.cancelled_by_name || loaded.details.cancelled_by } }}</p>
+                        <p class="mt-0.5 mb-0 text-xs text-ink-body">{{ 'inventory.disposal.banner.because' | translate: { reason: loaded.details.cancel_reason } }}</p>
+                    </div>
+                </div>
+            }
+            @case ('Draft') {
+                <div class="mb-2 flex items-start gap-2 rounded-container border border-warning-border bg-warning-bg px-4 py-3 md:mb-4" data-detail="banner">
+                    <ng-icon name="lucideFilePen" size="16px" class="mt-0.5 text-warning-ink" aria-hidden="true" />
+                    <p class="m-0 text-[13px] font-semibold text-warning-ink">{{ 'inventory.disposal.banner.draft' | translate }}</p>
+                </div>
+            }
+            @case ('Submitted') {
+                <div class="mb-2 flex items-start gap-2 rounded-container border border-line bg-white px-4 py-3 md:mb-4" data-detail="banner">
+                    <ng-icon name="lucideInfo" size="16px" class="mt-0.5 text-ink-muted" aria-hidden="true" />
+                    <p class="m-0 text-[13px] text-ink-body">{{ 'inventory.disposal.banner.submitted' | translate }}</p>
+                </div>
+            }
+        }
+    }
+
+    <nz-card [nzTitle]="detailsTitle" data-detail="details">
+        <ng-template #detailsTitle
+            ><h2 class="m-0 flex items-center gap-1.5 text-sm font-bold text-ink"><ng-icon name="lucideInfo" size="14px" class="text-ink-muted" aria-hidden="true" />{{ 'inventory.disposal.section.details' | translate }}</h2></ng-template
+        >
+        @if (disposal(); as a) {
+            <dl class="m-0 grid grid-cols-2 gap-x-6 gap-y-4 md:grid-cols-4">
+                <div>
+                    <dt class="text-xs text-ink-muted">{{ 'inventory.disposal.number' | translate }}</dt>
+                    <dd class="mt-1 mb-0 font-mono text-sm font-semibold text-ink" [copyable]="a.dispose_no ?? ''">{{ a.dispose_no }}</dd>
+                </div>
+                <div>
+                    <dt class="text-xs text-ink-muted">{{ 'inventory.disposal.status.label' | translate }}</dt>
+                    <dd class="mt-1 mb-0">
+                        @if (statusTone(); as style) {
+                            <status-tag [label]="style.label" [tone]="style.tone" [icon]="style.icon" size="standard" />
+                        }
+                    </dd>
+                </div>
+                <div>
+                    <dt class="text-xs text-ink-muted">{{ 'inventory.disposal.method.label' | translate }}</dt>
+                    <dd class="mt-1 mb-0 text-sm font-semibold text-ink">
+                        @if (a.method) {
+                            {{ 'inventory.disposal.method.' + a.method | translate }}
+                        } @else {
+                            <span class="font-normal text-ink-muted">{{ 'inventory.disposal.notGiven' | translate }}</span>
+                        }
+                    </dd>
+                </div>
+                <div>
+                    <dt class="text-xs text-ink-muted">{{ 'inventory.disposal.createdOn' | translate }}</dt>
+                    <dd class="mt-1 mb-0 text-sm font-semibold text-ink">
+                        @if (a.created_on) {
+                            {{ a.created_on | recordDate: language() : 'date' }}
+                        }
+                    </dd>
+                    <dd class="mt-0.5 mb-0 text-xs text-ink-muted">{{ a.created_by_name || a.created_by }}</dd>
+                </div>
+                @if (record(); as loaded) {
+                    <div class="col-span-2 border-t border-line-soft pt-4 md:col-span-4" data-detail="notes">
+                        <dt class="text-xs text-ink-muted">{{ 'inventory.disposal.note' | translate }}</dt>
+                        <dd class="mt-1 mb-0 text-sm whitespace-pre-line text-ink-body">{{ loaded.details.note || ('inventory.disposal.notGiven' | translate) }}</dd>
+                    </div>
+                }
+            </dl>
+        } @else {
+            <nz-skeleton nzActive [nzTitle]="false" [nzParagraph]="{ rows: 3 }" />
+        }
+    </nz-card>
+
+    @if (record(); as loaded) {
+        <div class="mt-2 grid grid-cols-2 gap-px overflow-hidden rounded-container border border-line bg-line md:mt-4" data-detail="stats">
+            <div class="bg-white px-4 py-3" data-stat="units">
+                <p class="m-0 flex items-center gap-1.5 text-xs font-semibold text-ink-muted"><ng-icon name="lucidePackageMinus" size="13px" aria-hidden="true" />{{ 'inventory.disposal.units' | translate }}</p>
+                <p class="mt-1 mb-0 font-mono text-xl font-bold text-ink tabular-nums">{{ loaded.details.units | digits }}</p>
+            </div>
+            @if (seesMoney()) {
+                <div class="bg-white px-4 py-3" data-stat="value">
+                    <p class="m-0 flex items-center gap-1.5 text-xs font-semibold text-ink-muted"><ng-icon name="lucideWallet" size="13px" aria-hidden="true" />{{ 'inventory.disposal.value' | translate }}</p>
+                    <p class="mt-1 mb-0 font-mono text-xl font-bold tabular-nums" [class.text-danger]="(loaded.details.value ?? 0) > 0" [class.text-ink]="!loaded.details.value">{{ loaded.details.value ?? 0 | money }}</p>
+                </div>
+            }
+        </div>
+    }
+
+    <nz-card class="mt-2 block md:mt-4" [nzTitle]="linesTitle" [nzBodyStyle]="{ padding: '0' }" data-detail="lines">
+        <ng-template #linesTitle
+            ><h2 class="m-0 flex items-center gap-1.5 text-sm font-bold text-ink"><ng-icon name="lucideListOrdered" size="14px" class="text-ink-muted" aria-hidden="true" />{{ 'inventory.disposal.lines' | translate }}</h2></ng-template
+        >
+        @if (record(); as loaded) {
+            @if (loaded.lines.length) {
+                <nz-table nzTemplateMode nzSize="small" [nzScroll]="{ x: '900px' }">
+                    <thead>
+                        <tr>
+                            <th nzWidth="40px" class="text-center">#</th>
+                            <th>{{ 'inventory.disposal.product' | translate }}</th>
+                            <th nzWidth="190px">{{ 'inventory.disposal.reason.label' | translate }}</th>
+                            <th>{{ 'inventory.disposal.batch' | translate }}</th>
+                            <th nzAlign="right" nzWidth="90px">{{ 'inventory.disposal.quantity' | translate }}</th>
+                            <th>{{ 'inventory.disposal.where' | translate }}</th>
+                            @if (seesMoney()) {
+                                <th nzAlign="right">{{ 'inventory.disposal.cost' | translate }}</th>
+                                <th nzAlign="right">{{ 'inventory.disposal.value' | translate }}</th>
+                            }
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (line of loaded.lines; track line.oid; let i = $index) {
+                            <tr [attr.data-line]="i">
+                                <td class="text-center font-mono text-xs text-ink-muted">{{ i + 1 | digits }}</td>
+                                <td>
+                                    @if (canOpenStock()) {
+                                        <a class="block text-[13px] font-semibold" [routerLink]="productStockRoute(line.product_oid)">{{ line.product_name }}</a>
+                                    } @else {
+                                        <span class="block text-[13px] font-semibold text-ink">{{ line.product_name }}</span>
+                                    }
+                                    <span class="block font-mono text-xs text-ink-muted">{{ line.sku }}</span>
+                                </td>
+                                <td class="text-xs">
+                                    @if (line.reason) {
+                                        <span class="block text-ink">{{ 'inventory.disposal.reason.' + line.reason | translate }}</span>
+                                    }
+                                    @if (line.line_note) {
+                                        <span class="block text-ink-muted">{{ line.line_note }}</span>
+                                    }
+                                </td>
+                                <td>
+                                    @if (line.batch_code) {
+                                        <span class="font-mono text-xs text-ink" [copyable]="line.batch_code">{{ line.batch_code }}</span>
+                                        @if (open() && line.free !== null) {
+                                            <span class="block text-xs text-ink-muted">{{ 'inventory.disposal.batchFree' | translate: { onHand: line.on_hand, free: line.free } | digits }}</span>
+                                        }
+                                    }
+                                </td>
+                                <td class="text-right font-mono text-[13px] text-ink tabular-nums">{{ line.quantity ?? '–' | digits }}</td>
+                                <td class="text-xs text-ink-body">
+                                    {{ line.warehouse_name || ('inventory.disposal.notGiven' | translate) }}
+                                </td>
+                                @if (seesMoney()) {
+                                    <td class="text-right font-mono text-[13px] tabular-nums">{{ line.cost_price === null ? '–' : (line.cost_price | money) }}</td>
+                                    <td class="text-right font-mono text-[13px] tabular-nums">{{ line.value === null ? '–' : (line.value | money) }}</td>
+                                }
+                            </tr>
+                        }
+                    </tbody>
+                </nz-table>
+            } @else {
+                <p class="m-0 px-4 py-3 text-xs text-ink-muted">{{ 'inventory.disposal.noLinesYet' | translate }}</p>
+            }
+        } @else {
+            <div class="p-4"><nz-skeleton nzActive [nzTitle]="false" [nzParagraph]="{ rows: 3 }" /></div>
+        }
+    </nz-card>
+
+    <!-- Quick actions beside the activity, first in the markup so a phone reads them before a long history. -->
+    <div class="mt-2 grid grid-cols-1 items-start gap-2 md:mt-4 md:gap-4 lg:grid-cols-3">
+        <nz-card class="lg:col-start-3 lg:row-start-1" [nzTitle]="quickTitle" data-detail="quick-actions">
+            <ng-template #quickTitle
+                ><h2 class="m-0 flex items-center gap-1.5 text-sm font-bold text-ink"><ng-icon name="lucideZap" size="14px" class="text-ink-muted" aria-hidden="true" />{{ 'inventory.disposal.quickActions' | translate }}</h2></ng-template
+            >
+            <div class="flex flex-col gap-2">
+                @if (canExport()) {
+                    <button nz-button nzBlock type="button" class="inline-flex items-center justify-start gap-2" data-quick="report" [nzLoading]="downloading()" (click)="download()">
+                        @if (!downloading()) {
+                            <ng-icon name="lucideFileSpreadsheet" size="14px" aria-hidden="true" />
+                        }
+                        <span>{{ 'inventory.disposal.downloadReport' | translate }}</span>
+                    </button>
+                } @else {
+                    <p class="m-0 text-xs text-ink-muted">{{ 'inventory.disposal.noQuickActions' | translate }}</p>
+                }
+            </div>
+        </nz-card>
+
+        <nz-card class="lg:col-span-2 lg:row-start-1" [nzTitle]="activityTitle" data-detail="activity">
+            <ng-template #activityTitle
+                ><h2 class="m-0 flex items-center gap-1.5 text-sm font-bold text-ink"><ng-icon name="lucideHistory" size="14px" class="text-ink-muted" aria-hidden="true" />{{ 'inventory.disposal.activity' | translate }}</h2></ng-template
+            >
+            @if (record(); as loaded) {
+                @if (loaded.activity.length) {
+                    <nz-timeline>
+                        @for (entry of loaded.activity; track entry.oid; let first = $first) {
+                            <nz-timeline-item [nzColor]="first ? 'blue' : 'gray'">
+                                <p class="m-0 text-[13px] font-semibold text-ink">{{ entry.action }}</p>
+                                @if (entry.description) {
+                                    <p class="mt-0.5 mb-0 text-xs text-ink-body">{{ entry.description }}</p>
+                                }
+                                <p class="mt-0.5 mb-0 text-xs text-ink-muted">{{ entry.user }} &middot; {{ entry.date | recordDate: language() : 'date-time-12' }}</p>
+                            </nz-timeline-item>
+                        }
+                    </nz-timeline>
+                } @else {
+                    <p class="m-0 text-xs text-ink-muted">{{ 'inventory.disposal.noActivity' | translate }}</p>
+                }
+            } @else {
+                <nz-skeleton nzActive [nzTitle]="false" [nzParagraph]="{ rows: 4 }" />
+            }
+        </nz-card>
+    </div>
+
+    <action-footer>
+        <button nz-button nzType="default" type="button" class="inline-flex items-center gap-1.5" (click)="backToList()">
+            <ng-icon name="lucideArrowLeft" size="14px" aria-hidden="true" />
+            <span>{{ 'inventory.disposal.backToList' | translate }}</span>
+        </button>
+    </action-footer>
+}
+
+<nz-modal [nzVisible]="!!closing()" [nzTitle]="(closing() === 'reject' ? 'inventory.disposal.rejectTitle' : 'inventory.disposal.cancelTitle') | translate" [nzContent]="closeBody" [nzFooter]="closeFooter" nzCentered [nzClosable]="!saving()" [nzMaskClosable]="!saving()" (nzOnCancel)="saving() || closing.set(null)">
+    <ng-template #closeBody>
+        <form nz-form nzLayout="vertical" [formGroup]="closeForm" (ngSubmit)="confirmClosing()">
+            <p class="mt-0 mb-3 text-[13px] text-ink-body">{{ (closing() === 'reject' ? 'inventory.disposal.rejectBody' : 'inventory.disposal.cancelBody') | translate }}</p>
+            <nz-form-item>
+                <nz-form-label nzRequired nzFor="close-reason">{{ 'inventory.disposal.why' | translate }}</nz-form-label>
+                <nz-form-control [nzErrorTip]="'inventory.disposal.whyRequired' | translate">
+                    <textarea nz-input id="close-reason" formControlName="reason" rows="3" [attr.placeholder]="'inventory.disposal.whyPlaceholder' | translate"></textarea>
+                </nz-form-control>
+            </nz-form-item>
+        </form>
+    </ng-template>
+    <ng-template #closeFooter>
+        <button nz-button type="button" class="inline-flex items-center gap-1.5" [disabled]="saving()" (click)="closing.set(null)">
+            <ng-icon name="lucideArrowLeft" size="14px" aria-hidden="true" />
+            <span>{{ 'inventory.disposal.keep' | translate }}</span>
+        </button>
+        <button nz-button nzType="primary" nzDanger type="button" class="inline-flex items-center gap-1.5" [nzLoading]="saving()" (click)="confirmClosing()">
+            @if (!saving()) {
+                <ng-icon [name]="closing() === 'reject' ? 'lucideCircleX' : 'lucideBan'" size="14px" aria-hidden="true" />
+            }
+            <span>{{ (closing() === 'reject' ? 'inventory.disposal.reject' : 'inventory.disposal.cancel') | translate }}</span>
+        </button>
+    </ng-template>
+</nz-modal>

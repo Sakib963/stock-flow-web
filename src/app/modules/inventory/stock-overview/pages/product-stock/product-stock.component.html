@@ -261,13 +261,18 @@
                         <span>{{ 'inventory.stockOverview.quick.report' | translate }}</span>
                     </button>
                 }
-                @for (action of comingActions; track action.key) {
-                    <button nz-button nzBlock type="button" class="inline-flex items-center justify-start gap-2" disabled [attr.data-quick]="action.key" aria-describedby="stock-quick-reason">
-                        <ng-icon [name]="action.icon" size="14px" aria-hidden="true" />
-                        <span>{{ action.label | translate }}</span>
-                    </button>
+                @if (canAdjust()) {
+                    <a nz-button nzBlock class="inline-flex items-center justify-start gap-2" [routerLink]="adjustRoute" data-quick="adjust">
+                        <ng-icon name="lucideSlidersHorizontal" size="14px" aria-hidden="true" />
+                        <span>{{ 'inventory.stockOverview.quick.adjust' | translate }}</span>
+                    </a>
                 }
-                <p id="stock-quick-reason" class="m-0 text-xs text-ink-muted">{{ 'inventory.stockOverview.quick.notReady' | translate }}</p>
+                @if (canDispose()) {
+                    <a nz-button nzBlock class="inline-flex items-center justify-start gap-2" [routerLink]="disposeRoute" data-quick="dispose">
+                        <ng-icon name="lucideTrash2" size="14px" aria-hidden="true" />
+                        <span>{{ 'inventory.stockOverview.quick.dispose' | translate }}</span>
+                    </a>
+                }
             </div>
         </nz-card>
 

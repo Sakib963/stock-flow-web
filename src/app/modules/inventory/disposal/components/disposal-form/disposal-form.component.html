@@ -1,0 +1,107 @@
+<form nz-form nzLayout="vertical" [id]="formId" [formGroup]="form" (ngSubmit)="submitted.emit()">
+    <div class="grid grid-cols-1 items-start gap-x-4 md:grid-cols-3" data-form="header">
+        <nz-form-item>
+            <nz-form-label nzFor="ds-method" [nzTooltipTitle]="'inventory.disposal.methodHelper' | translate">{{ 'inventory.disposal.method.label' | translate }}</nz-form-label>
+            <nz-form-control>
+                <nz-select nzId="ds-method" class="w-full" formControlName="method" nzAllowClear [nzPlaceHolder]="'inventory.disposal.method.choose' | translate">
+                    @for (method of methods; track method) {
+                        <nz-option [nzValue]="method" [nzLabel]="'inventory.disposal.method.' + method | translate" />
+                    }
+                </nz-select>
+            </nz-form-control>
+        </nz-form-item>
+
+        <nz-form-item class="md:col-span-2">
+            <nz-form-label nzFor="ds-note" [nzTooltipTitle]="'inventory.disposal.noteHelper' | translate">{{ 'inventory.disposal.note' | translate }}</nz-form-label>
+            <nz-form-control [nzErrorTip]="'form.tooLong' | translate: { max: 1000 } | digits">
+                <input nz-input id="ds-note" formControlName="note" type="text" autocomplete="off" [attr.placeholder]="'inventory.disposal.notePlaceholder' | translate" />
+            </nz-form-control>
+        </nz-form-item>
+    </div>
+
+    <section class="-mx-4 border-t border-line md:-mx-5" data-form="lines" [attr.aria-label]="'inventory.disposal.lines' | translate">
+        <div class="flex flex-wrap items-center justify-between gap-2 px-4 py-3 md:px-5">
+            <h2 class="m-0 flex items-center gap-1.5 text-sm font-bold text-ink">
+                <ng-icon name="lucideListOrdered" size="14px" class="text-ink-muted" aria-hidden="true" />
+                {{ 'inventory.disposal.lines' | translate }}
+                <span class="rounded-full bg-surface-sunken px-2 text-xs font-semibold text-ink-muted">{{ lines().length | digits }}</span>
+            </h2>
+            <button nz-button type="button" class="inline-flex items-center gap-1.5" data-form="add-line" (click)="addLine()">
+                <ng-icon name="lucidePlus" size="14px" aria-hidden="true" />
+                <span>{{ 'inventory.disposal.addProduct' | translate }}</span>
+            </button>
+        </div>
+
+        @if (lines().length) {
+            <nz-table nzTemplateMode nzSize="small" [nzScroll]="{ x: '820px' }">
+                <thead>
+                    <tr>
+                        <th nzWidth="40px" class="text-center">#</th>
+                        <th>{{ 'inventory.disposal.product' | translate }}</th>
+                        <th nzWidth="150px">{{ 'inventory.disposal.batch' | translate }}</th>
+                        <th nzWidth="80px" class="text-right">{{ 'inventory.disposal.quantity' | translate }}</th>
+                        <th nzWidth="170px">{{ 'inventory.disposal.reason.label' | translate }}</th>
+                        <th nzWidth="110px" class="text-right">{{ 'inventory.disposal.value' | translate }}</th>
+                        <th nzWidth="88px">
+                            <span class="sr-only">{{ 'inventory.disposal.lineActions' | translate }}</span>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (line of lines(); track $index; let i = $index) {
+                        @let problem = problems()[i];
+                        <tr [class.bg-danger-bg]="problem" [attr.data-line]="i">
+                            <td class="text-center font-mono text-xs text-ink-muted">{{ i + 1 | digits }}</td>
+                            <td>
+                                <span class="block text-[13px] font-semibold text-ink">{{ line.product.name }}</span>
+                                <span class="block font-mono text-xs text-ink-muted">{{ line.product.sku }}</span>
+                            </td>
+                            <td class="font-mono text-xs text-ink">{{ line.batch?.batch_code }}</td>
+                            <td class="text-right font-mono text-[13px] text-ink">{{ line.quantity | digits }}</td>
+                            <td class="text-xs">
+                                @if (line.reason) {
+                                    <span class="block text-ink">{{ 'inventory.disposal.reason.' + line.reason | translate }}</span>
+                                }
+                                @if (line.line_note) {
+                                    <span class="block text-ink-muted">{{ line.line_note }}</span>
+                                }
+                            </td>
+                            <td class="text-right font-mono text-[13px]">
+                                @if (valueOf(line); as value) {
+                                    {{ value | money }}
+                                } @else {
+                                    <span class="text-ink-muted">&ndash;</span>
+                                }
+                            </td>
+                            <td class="text-right whitespace-nowrap">
+                                <button nz-button nzType="text" nzSize="small" type="button" nz-tooltip [nzTooltipTitle]="'inventory.disposal.editLine' | translate" [attr.aria-label]="'inventory.disposal.editLine' | translate" data-line-action="edit" (click)="editLine(i)">
+                                    <ng-icon name="lucidePencil" size="14px" class="text-ink-muted" aria-hidden="true" />
+                                </button>
+                                <button nz-button nzType="text" nzSize="small" type="button" nz-tooltip [nzTooltipTitle]="'inventory.disposal.removeLine' | translate" [attr.aria-label]="'inventory.disposal.removeLine' | translate" data-line-action="remove" (click)="removeLine(i)">
+                                    <ng-icon name="lucideTrash2" size="14px" class="text-ink-muted" aria-hidden="true" />
+                                </button>
+                            </td>
+                        </tr>
+                        @if (problem) {
+                            <tr class="bg-danger-bg" [attr.data-line-problem]="i">
+                                <td></td>
+                                <td colspan="6" class="pt-0 text-xs text-danger-ink" role="alert">{{ problem | translate }}</td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </nz-table>
+        } @else {
+            <div class="px-4 py-8 text-center md:px-5" data-form="lines-empty">
+                <p class="m-0 text-[13px] font-semibold text-ink">{{ 'inventory.disposal.noLinesTitle' | translate }}</p>
+                <p class="mx-auto mt-1 mb-0 max-w-[48ch] text-xs text-ink-muted">{{ 'inventory.disposal.noLinesBody' | translate }}</p>
+            </div>
+        }
+
+        <div class="flex items-baseline justify-end gap-6 border-t border-line px-4 py-3 md:px-5" data-form="total">
+            <span class="text-xs text-ink-muted">{{ 'inventory.disposal.units' | translate }} <span class="ml-1 font-mono text-lg font-bold text-ink tabular-nums">{{ units() | digits }}</span></span>
+        </div>
+    </section>
+</form>
+
+<disposal-line-drawer [open]="drawerOpen()" [line]="drawerLine()" (saved)="saveLine($event)" (closed)="closeDrawer()" />

@@ -1,0 +1,141 @@
+<!-- Never wider than the screen: on a phone the drawer is the whole width. -->
+<nz-drawer [nzVisible]="open()" nzWidth="min(480px, 100vw)" nzPlacement="right" [nzTitle]="(line() ? 'inventory.disposal.drawer.editTitle' : 'inventory.disposal.drawer.addTitle') | translate" [nzContent]="drawerBody" [nzFooter]="drawerFooter" (nzOnClose)="closed.emit()" />
+
+<ng-template #drawerBody>
+    <form nz-form nzLayout="vertical" [formGroup]="form" (ngSubmit)="save()">
+        <nz-form-item>
+            <nz-form-label nzRequired nzFor="dl-product">{{ 'inventory.disposal.product' | translate }}</nz-form-label>
+            <nz-form-control>
+                <nz-select
+                    nzId="dl-product"
+                    class="w-full"
+                    nzShowSearch
+                    nzServerSearch
+                    [nzOptionHeightPx]="optionHeight"
+                    [ngModel]="product()?.oid ?? null"
+                    [ngModelOptions]="{ standalone: true }"
+                    [nzLoading]="searching()"
+                    [nzPlaceHolder]="'inventory.disposal.productPlaceholder' | translate"
+                    [nzNotFoundContent]="searching() || preloading() ? loading : ('inventory.disposal.productNotFound' | translate)"
+                    (nzOnSearch)="search($event)"
+                    (nzOpenChange)="opened($event)"
+                    (ngModelChange)="pickProduct($event)"
+                >
+                    @for (option of options(); track option.oid) {
+                        <nz-option nzCustomContent [nzValue]="option.oid" [nzLabel]="option.name">
+                            <span class="block text-[13px] font-semibold text-ink">{{ option.name }}</span>
+                            <span class="block text-xs text-ink-muted">
+                                @if (option.sku) {
+                                    <span class="font-mono">{{ option.sku }}</span> &middot;
+                                }
+                                @if (option.batches.length) {
+                                    {{ 'inventory.disposal.drawer.batchCount' | translate: { count: option.batches.length } | digits }}
+                                } @else {
+                                    {{ 'inventory.disposal.drawer.noBatchesShort' | translate }}
+                                }
+                            </span>
+                        </nz-option>
+                    }
+                </nz-select>
+            </nz-form-control>
+        </nz-form-item>
+
+        @if (product(); as current) {
+            <nz-form-item>
+                <nz-form-label nzRequired nzFor="dl-batch">{{ 'inventory.disposal.batch' | translate }}</nz-form-label>
+                @if (batches().length) {
+                    <nz-form-control>
+                        <nz-select nzId="dl-batch" class="w-full" formControlName="inventory_oid" [nzOptionHeightPx]="optionHeight" [nzPlaceHolder]="'inventory.disposal.chooseBatch' | translate">
+                            @for (option of batches(); track option.oid) {
+                                <nz-option nzCustomContent [nzValue]="option.oid" [nzLabel]="option.batch_code">
+                                    <span class="block font-mono text-xs font-semibold text-ink">{{ option.batch_code }}</span>
+                                    <span class="block text-xs text-ink-muted">{{ 'inventory.disposal.batchFree' | translate: { onHand: option.on_hand, free: option.free } | digits }}{{ option.warehouse_name ? ' · ' + option.warehouse_name : '' }}</span>
+                                </nz-option>
+                            }
+                        </nz-select>
+                    </nz-form-control>
+                } @else {
+                    <p class="m-0 mb-6 rounded-control border border-line bg-surface-sunken px-3 py-2 text-xs text-ink-body" data-drawer="no-batches">
+                        {{ (current.batches.length ? 'inventory.disposal.drawer.nothingFree' : 'inventory.disposal.drawer.noStock') | translate }}
+                    </p>
+                }
+            </nz-form-item>
+
+            <nz-form-item>
+                <nz-form-label nzRequired nzFor="dl-quantity">{{ 'inventory.disposal.quantity' | translate }}</nz-form-label>
+                <nz-form-control [nzExtra]="batch() ? ('inventory.disposal.batchFree' | translate: { onHand: batch()!.on_hand, free: batch()!.free } | digits) : ''">
+                    <nz-input-number nzId="dl-quantity" class="w-full font-mono" formControlName="quantity" [nzMin]="1" [nzMax]="9999" [nzPrecision]="0" />
+                </nz-form-control>
+            </nz-form-item>
+
+            <nz-form-item>
+                <nz-form-label nzRequired nzFor="dl-reason">{{ 'inventory.disposal.reason.label' | translate }}</nz-form-label>
+                <nz-form-control>
+                    <nz-select nzId="dl-reason" class="w-full" formControlName="reason" [nzPlaceHolder]="'inventory.disposal.reason.choose' | translate">
+                        @for (reason of reasons; track reason) {
+                            <nz-option [nzValue]="reason" [nzLabel]="'inventory.disposal.reason.' + reason | translate" />
+                        }
+                    </nz-select>
+                </nz-form-control>
+            </nz-form-item>
+
+            <nz-form-item>
+                <nz-form-label [nzRequired]="value().reason === 'other'" nzFor="dl-note">{{ 'inventory.disposal.lineNote' | translate }}</nz-form-label>
+                <nz-form-control>
+                    <input nz-input id="dl-note" formControlName="line_note" type="text" maxlength="500" autocomplete="off" [attr.placeholder]="(value().reason === 'other' ? 'inventory.disposal.lineNoteRequired' : 'inventory.disposal.lineNotePlaceholder') | translate" />
+                </nz-form-control>
+            </nz-form-item>
+
+            @if (batch(); as kept) {
+                <!-- Read only: a disposal moves quantity, never cost or price. -->
+                <dl class="m-0 grid grid-cols-2 gap-3 rounded-control bg-surface-sunken px-3 py-2 text-xs" data-drawer="kept">
+                    @if (kept.cost_price !== undefined) {
+                        <div>
+                            <dt class="text-ink-muted">{{ 'inventory.disposal.cost' | translate }}</dt>
+                            <dd class="m-0 font-mono text-ink">{{ kept.cost_price | money }}</dd>
+                        </div>
+                    }
+                    <div>
+                        <dt class="text-ink-muted">{{ 'inventory.disposal.price' | translate }}</dt>
+                        <dd class="m-0 font-mono text-ink">{{ kept.selling_price | money }}</dd>
+                    </div>
+                    <div>
+                        <dt class="text-ink-muted">{{ 'inventory.disposal.expiry' | translate }}</dt>
+                        <dd class="m-0 text-ink">{{ kept.expiry_date ? (kept.expiry_date | recordDate: language()) : ('inventory.disposal.noExpiry' | translate) }}</dd>
+                    </div>
+                    @if (kept.cost_price !== undefined && value().quantity) {
+                        <div>
+                            <dt class="text-ink-muted">{{ 'inventory.disposal.value' | translate }}</dt>
+                            <dd class="m-0 font-mono text-ink">{{ (value().quantity ?? 0) * +(kept.cost_price ?? 0) | money }}</dd>
+                        </div>
+                    }
+                </dl>
+            }
+        }
+    </form>
+</ng-template>
+
+<ng-template #drawerFooter>
+    <div class="flex flex-col gap-2">
+        @if (problem(); as key) {
+            <p class="m-0 text-xs text-danger-ink" role="alert" data-drawer="problem">{{ key | translate }}</p>
+        }
+        <div class="flex items-center justify-end gap-2">
+            <button nz-button type="button" class="inline-flex items-center gap-1.5" (click)="closed.emit()">
+                <ng-icon name="lucideX" size="14px" aria-hidden="true" />
+                <span>{{ 'form.cancel' | translate }}</span>
+            </button>
+            <button nz-button nzType="primary" type="button" class="inline-flex items-center gap-1.5" data-drawer="save" (click)="save()">
+                <ng-icon name="lucideCheck" size="14px" aria-hidden="true" />
+                <span>{{ (line() ? 'inventory.disposal.drawer.saveLine' : 'inventory.disposal.drawer.addLine') | translate }}</span>
+            </button>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #loading>
+    <p class="m-0 flex items-center justify-center gap-2 py-2 text-xs text-ink-muted" role="status">
+        <nz-spin nzSimple nzSize="small" />
+        {{ 'form.loading' | translate }}
+    </p>
+</ng-template>
