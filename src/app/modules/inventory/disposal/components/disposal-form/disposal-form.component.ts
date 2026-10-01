@@ -14,6 +14,7 @@ import { DisposalLineDrawerComponent } from '@app/modules/inventory/disposal/com
 import { lineProblem } from '@app/modules/inventory/disposal/utils/disposal-line/disposal-line';
 import { DigitsPipe } from '@app/shared/pipes/digits/digits.pipe';
 import { MoneyPipe } from '@app/shared/pipes/money/money.pipe';
+import { SessionService } from '@app/core/services/session/session.service';
 import { revealErrors } from '@app/shared/utils/reveal-errors/reveal-errors';
 
 /**
@@ -31,6 +32,8 @@ import { revealErrors } from '@app/shared/utils/reveal-errors/reveal-errors';
 export class DisposalFormComponent {
     readonly formId = 'disposal-form';
     readonly methods = DISPOSAL_METHODS;
+    private readonly _session = inject(SessionService);
+    readonly seesMoney = computed(() => this._session.can('inventory.stock-value.view'));
 
     readonly editing = input<DisposalRecord | null>(null);
     readonly submitted = output<void>();

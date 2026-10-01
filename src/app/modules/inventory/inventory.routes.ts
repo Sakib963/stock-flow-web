@@ -99,7 +99,7 @@ export const INVENTORY_ROUTES: Routes = [
                 data: { permission: DISPOSAL_LIST.permission },
                 loadComponent: () => import('./disposal/pages/disposal-list/disposal-list.component').then((m) => m.DisposalListComponent),
             },
-            // Before ':oid', or "new" is read as an adjustment's id.
+            // Before ':oid', or "new" is read as a disposal's id.
             {
                 path: 'disposals/new',
                 canActivate: [permissionGuard],

@@ -41,7 +41,9 @@
                         <th nzWidth="150px">{{ 'inventory.disposal.batch' | translate }}</th>
                         <th nzWidth="80px" class="text-right">{{ 'inventory.disposal.quantity' | translate }}</th>
                         <th nzWidth="170px">{{ 'inventory.disposal.reason.label' | translate }}</th>
-                        <th nzWidth="110px" class="text-right">{{ 'inventory.disposal.value' | translate }}</th>
+                        @if (seesMoney()) {
+                            <th nzWidth="110px" class="text-right">{{ 'inventory.disposal.value' | translate }}</th>
+                        }
                         <th nzWidth="88px">
                             <span class="sr-only">{{ 'inventory.disposal.lineActions' | translate }}</span>
                         </th>
@@ -66,13 +68,15 @@
                                     <span class="block text-ink-muted">{{ line.line_note }}</span>
                                 }
                             </td>
-                            <td class="text-right font-mono text-[13px]">
-                                @if (valueOf(line); as value) {
-                                    {{ value | money }}
-                                } @else {
-                                    <span class="text-ink-muted">&ndash;</span>
-                                }
-                            </td>
+                            @if (seesMoney()) {
+                                <td class="text-right font-mono text-[13px]">
+                                    @if (valueOf(line); as value) {
+                                        {{ value | money }}
+                                    } @else {
+                                        <span class="text-ink-muted">&ndash;</span>
+                                    }
+                                </td>
+                            }
                             <td class="text-right whitespace-nowrap">
                                 <button nz-button nzType="text" nzSize="small" type="button" nz-tooltip [nzTooltipTitle]="'inventory.disposal.editLine' | translate" [attr.aria-label]="'inventory.disposal.editLine' | translate" data-line-action="edit" (click)="editLine(i)">
                                     <ng-icon name="lucidePencil" size="14px" class="text-ink-muted" aria-hidden="true" />
@@ -85,7 +89,7 @@
                         @if (problem) {
                             <tr class="bg-danger-bg" [attr.data-line-problem]="i">
                                 <td></td>
-                                <td colspan="6" class="pt-0 text-xs text-danger-ink" role="alert">{{ problem | translate }}</td>
+                                <td [attr.colspan]="seesMoney() ? 6 : 5" class="pt-0 text-xs text-danger-ink" role="alert">{{ problem | translate }}</td>
                             </tr>
                         }
                     }
