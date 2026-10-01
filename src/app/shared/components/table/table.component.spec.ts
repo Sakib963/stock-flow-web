@@ -56,7 +56,7 @@ describe('TableComponent', () => {
         }).compileComponents();
         http = TestBed.inject(HttpTestingController);
 
-        const payload: SessionPayload = { version: 'v1', user: { name: 'Samiha', email: 's@x.com', mobile_number: null, photo: null, designation: null, role: 'Owner' }, business: { name: null, logoUrl: null, orderSystem: 'both' }, permissions, menu: [], counters: { notifications: 0 } };
+        const payload: SessionPayload = { version: 'v1', user: { name: 'Samiha', email: 's@x.com', mobile_number: null, photo: null, designation: null, role: 'Owner' }, business: { name: null, logoUrl: null, orderSystem: 'both', timeZone: 'Asia/Dhaka' }, permissions, menu: [], counters: { notifications: 0 } };
         const load = TestBed.inject(SessionService).load('session-a');
         http.expectOne((r) => r.url.includes(APIEndpoint.GET_USER_INFO)).flush({ code: 200, data: payload });
         await load;

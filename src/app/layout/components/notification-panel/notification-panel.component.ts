@@ -7,6 +7,7 @@ import { NotificationDay } from '@app/core/models/shell.model';
 import { LanguageService } from '@app/core/services/language/language.service';
 import { NotificationService } from '@app/core/services/notification/notification.service';
 import { BadgeComponent } from '@app/layout/components/badge/badge.component';
+import { addDays, businessDay, businessToday, businessZone, toMoment } from '@app/shared/utils/business-time/business-time';
 
 /** Which lucide icon stands for each kind of alert. Registered in the provider list below. */
 export const NOTIFICATION_ICON: Record<NotificationCategory, string> = {
@@ -32,8 +33,6 @@ export const CATEGORY_TONE: Record<NotificationCategory, string> = {
     return: 'bg-success-bg text-success',
     staff: 'bg-surface-page text-ink-soft',
 };
-
-const DAY = 86_400_000;
 
 /** The notifications panel: the body of the right-hand drawer, at every width. */
 @Component({
@@ -61,22 +60,22 @@ export class NotificationPanelComponent {
      */
     readonly days = computed<NotificationDay[]>(() => {
         const locale = this.language.current() === 'bn' ? 'bn-BD' : 'en-GB';
-        const midnight = (d: Date) => new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
-        const today = midnight(new Date());
+        const today = businessToday();
+        const yesterday = addDays(today, -1);
+        const zone = businessZone();
         const days: NotificationDay[] = [];
 
         for (const item of [...this.notifications.items()].sort((a, b) => b.createdAt.localeCompare(a.createdAt))) {
-            const at = new Date(item.createdAt);
-            const bucket = midnight(at);
-            const id = String(bucket);
+            const at = toMoment(item.createdAt);
+            const id = businessDay(at);
 
             let day = days.find((d) => d.id === id);
             if (!day) {
-                const named = bucket === today ? 'shell.today' : bucket === today - DAY ? 'shell.yesterday' : null;
-                day = { id, labelKey: named, label: named ? null : at.toLocaleDateString(locale, { day: 'numeric', month: 'short' }), rows: [] };
+                const named = id === today ? 'shell.today' : id === yesterday ? 'shell.yesterday' : null;
+                day = { id, labelKey: named, label: named ? null : at.toLocaleDateString(locale, { day: 'numeric', month: 'short', timeZone: zone }), rows: [] };
                 days.push(day);
             }
-            day.rows.push({ item, time: at.toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' }) });
+            day.rows.push({ item, time: at.toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit', timeZone: zone }) });
         }
         return days;
     });

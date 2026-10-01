@@ -2,6 +2,7 @@ import { Pipe, PipeTransform } from '@angular/core';
 import { DateFormat } from '@app/core/models/config.model';
 import { AppLanguage } from '@app/core/models/language.model';
 import { environment } from '@env/environment';
+import { toMoment, zoneFor } from '@app/shared/utils/business-time/business-time';
 
 const DAY_MS = 86_400_000;
 
@@ -37,13 +38,14 @@ const FORMATS: Record<Exclude<DateFormat, 'relative'>, Intl.DateTimeFormatOption
 /**
  * A list date: 24 Aug 2026 by default, month and digits both in the reader's language. `relative` applies only
  * under 24 hours ("4 hours ago"); anything older falls back to the plain date, since "12 days ago"
- * makes a person count. The language is an argument so the pipe stays pure.
+ * makes a person count. The language is an argument so the pipe stays pure. Times are shown on the
+ * business's clock (shared/utils/business-time), the same for every viewer wherever they are.
  */
 @Pipe({ name: 'recordDate' })
 export class RecordDatePipe implements PipeTransform {
     transform(value: unknown, language: AppLanguage, format: DateFormat = 'date'): string {
         if (value === null || value === undefined || value === '') return '';
-        const date = new Date(value as string);
+        const date = toMoment(value as string | Date);
         if (Number.isNaN(date.getTime())) return String(value);
 
         const locale = language === 'bn' ? 'bn-BD' : 'en-GB';
@@ -55,7 +57,7 @@ export class RecordDatePipe implements PipeTransform {
             return new Intl.RelativeTimeFormat(locale, { numeric: 'auto' }).format(-Math.floor(seconds / size), unit);
         }
 
-        const formatter = new Intl.DateTimeFormat(locale, FORMATS[format === 'relative' ? 'date' : format]);
+        const formatter = new Intl.DateTimeFormat(locale, { ...FORMATS[format === 'relative' ? 'date' : format], timeZone: zoneFor(value) });
         if (language !== 'bn' || !(environment as { bengaliTimeInWords?: boolean }).bengaliTimeInWords) return formatter.format(date);
         return formatter
             .formatToParts(date)

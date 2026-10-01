@@ -51,7 +51,7 @@ describe('PageHeaderComponent', () => {
             providers: [provideRouter([{ path: 'app/configuration/categories', children: [] }, { path: 'app/configuration/categories/new', children: [] }, { path: 'app/configuration/categories/:oid', children: [] }, { path: 'app/configuration/categories/:oid/edit', children: [] }, { path: 'app/dashboard', children: [] }]), provideHttpClient(), provideHttpClientTesting(), provideNzI18n(en_US), provideTranslateService({ fallbackLang: 'en' })],
         }).compileComponents();
 
-        const payload: SessionPayload = { version: 'v1', user: { name: 'Samiha', email: 's@x.com', mobile_number: null, photo: null, designation: null, role: 'Owner' }, business: { name: null, logoUrl: null, orderSystem: 'both' }, permissions, menu, counters: { notifications: 0 } };
+        const payload: SessionPayload = { version: 'v1', user: { name: 'Samiha', email: 's@x.com', mobile_number: null, photo: null, designation: null, role: 'Owner' }, business: { name: null, logoUrl: null, orderSystem: 'both', timeZone: 'Asia/Dhaka' }, permissions, menu, counters: { notifications: 0 } };
         const load = TestBed.inject(SessionService).load('session-a');
         TestBed.inject(HttpTestingController)
             .expectOne((r) => r.url.includes(APIEndpoint.GET_USER_INFO))

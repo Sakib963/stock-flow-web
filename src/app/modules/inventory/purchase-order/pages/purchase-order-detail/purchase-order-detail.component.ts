@@ -37,6 +37,7 @@ import { saveDownload } from '@app/shared/utils/download-file/download-file';
 import { failureKey, failureOf } from '@app/shared/utils/request-failure/request-failure';
 import { resolveTone } from '@app/shared/utils/tone-map/tone-map';
 import { revealErrors } from '@app/shared/utils/reveal-errors/reveal-errors';
+import { businessToday } from '@app/shared/utils/business-time/business-time';
 
 /** One figure in the strip under the details. `note` is a line of context under it. */
 interface OrderStat {
@@ -136,7 +137,7 @@ export class PurchaseOrderDetailComponent {
 
     readonly overdue = computed(() => {
         const expected = this.record()?.details.expected_delivery_date;
-        return this.submitted() && !!expected && new Date(`${expected}T23:59:59`) < new Date();
+        return this.submitted() && !!expected && expected < businessToday();
     });
 
     readonly stats = computed<OrderStat[]>(() => {

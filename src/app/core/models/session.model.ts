@@ -50,6 +50,8 @@ export interface SessionBusiness {
     name: string | null;
     logoUrl: string | null;
     orderSystem: string;
+    /** The IANA zone every time on screen is shown in, such as Asia/Dhaka. */
+    timeZone: string;
 }
 
 export interface SessionCounters {

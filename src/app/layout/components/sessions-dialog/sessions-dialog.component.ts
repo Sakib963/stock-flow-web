@@ -14,6 +14,7 @@ import { AuthService } from '@app/core/services/auth/auth.service';
 import { LanguageService } from '@app/core/services/language/language.service';
 import { SessionService } from '@app/core/services/session/session.service';
 import { confirmAction } from '@app/shared/utils/confirm-action/confirm-action';
+import { businessZone, toMoment } from '@app/shared/utils/business-time/business-time';
 
 const ICONS: Record<ActiveSession['device']['type'], string> = { desktop: 'lucideMonitor', phone: 'lucideSmartphone', tablet: 'lucideTablet' };
 
@@ -28,7 +29,7 @@ const RELATIVE_UNITS: [Intl.RelativeTimeFormatUnit, number][] = [
 
 /** "5 minutes ago", or "৫ মিনিট আগে": the browser already knows both languages. */
 const relativeTime = (iso: string, locale: string): string => {
-    const seconds = Math.round((new Date(iso).getTime() - Date.now()) / 1000);
+    const seconds = Math.round((toMoment(iso).getTime() - Date.now()) / 1000);
     const format = new Intl.RelativeTimeFormat(locale, { numeric: 'auto' });
     const unit = RELATIVE_UNITS.find(([, size]) => Math.abs(seconds) >= size);
     return unit ? format.format(Math.round(seconds / unit[1]), unit[0]) : format.format(0, 'minute');
@@ -79,12 +80,12 @@ export class SessionsDialogComponent {
 
     readonly rows = computed(() => {
         const locale = this._language.current() === 'bn' ? 'bn-BD' : 'en-GB';
-        const day = new Intl.DateTimeFormat(locale, { day: 'numeric', month: 'short', year: 'numeric' });
+        const day = new Intl.DateTimeFormat(locale, { day: 'numeric', month: 'short', year: 'numeric', timeZone: businessZone() });
         return this._sessions().map((session) => ({
             ...session,
             icon: ICONS[session.device.type],
             label: labelOf(session),
-            signedIn: day.format(new Date(session.signed_in_on)),
+            signedIn: day.format(toMoment(session.signed_in_on)),
             lastActive: relativeTime(session.last_used_on, locale),
         }));
     });

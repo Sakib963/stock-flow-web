@@ -5,6 +5,7 @@ import { environment } from '@env/environment';
 import { LanguageService } from '@app/core/services/language/language.service';
 import { firstValueFrom } from 'rxjs';
 import { MenuItem, SessionPayload } from '@app/core/models/session.model';
+import { setBusinessZone } from '@app/shared/utils/business-time/business-time';
 
 /**
  * Everything the shell knows about the signed-in person: who they are, the business, what they may
@@ -58,6 +59,7 @@ export class SessionService {
     async load(owner: string): Promise<void> {
         const response = await firstValueFrom(this._http.get<{ data: SessionPayload }>(`${environment.baseUrl}${APIEndpoint.GET_USER_INFO}`));
         this._payload.set(response?.data ?? null);
+        setBusinessZone(response?.data?.business?.timeZone);
         this._loadedFor.set(owner);
     }
 

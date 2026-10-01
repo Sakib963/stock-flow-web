@@ -10,7 +10,7 @@ import { APIEndpoint } from '@app/core/constants/api-endpoint';
 const payload: SessionPayload = {
     version: 'abc123',
     user: { name: 'Samiha', email: 'owner@shop.com', mobile_number: null, photo: null, designation: 'Owner', role: 'Owner' },
-    business: { name: 'Arithma Labs', logoUrl: null, orderSystem: 'both' },
+    business: { name: 'Arithma Labs', logoUrl: null, orderSystem: 'both', timeZone: 'Asia/Dhaka' },
     permissions: ['dashboard.overview.view', 'sales.order.view', 'sales.order.confirm'],
     menu: [
         { id: 'dashboard', label: { en: 'Dashboard', bn: 'ড্যাশবোর্ড' }, description: { en: 'Overview', bn: 'সারসংক্ষেপ' }, tags: ['home'], icon: 'lucideLayoutDashboard', order: 0, route: '/app/dashboard', permission: 'dashboard.overview.view', isDisabled: false, disabledMessage: { en: null, bn: null }, isNew: true, children: [] },
