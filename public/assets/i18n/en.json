@@ -1469,7 +1469,9 @@
                 "dispatched": "Dispatched online",
                 "returned": "Returned",
                 "disposed": "Disposed",
-                "dispose_reversed": "Disposal reversed"
+                "dispose_reversed": "Disposal reversed",
+                "adjusted": "Adjusted",
+                "opening_stock": "Opening stock"
             },
             "emptyTitle": "No stock movements yet",
             "emptyBody": "Every time stock comes in or goes out, it is written here with the document behind it. Verify a purchase order to see the first one.",
@@ -1641,7 +1643,209 @@
                     "forbidden": "You do not have access to download this report.",
                     "server": "The report could not be built just now. Try again in a moment."
                 }
-            }
+            },
+            "loadOpeningStock": "Load opening stock"
+        },
+        "stockAdjustment": {
+            "add": "New adjustment",
+            "view": "Open",
+            "edit": "Edit",
+            "openToVerify": "Open to verify",
+            "number": "Adjustment no.",
+            "searchPlaceholder": "Search by adjustment number or note",
+            "lineCount": "Lines",
+            "unitsIn": "Units in",
+            "unitsOut": "Units out",
+            "valueIn": "Value in",
+            "valueOut": "Value out",
+            "value": "Value",
+            "createdOn": "Created",
+            "createdBy": "Created by",
+            "emptyTitle": "No adjustments yet",
+            "emptyBody": "Load the stock you already hold, or record units found, lost or stolen. Stock changes only when an adjustment is verified.",
+            "status": {
+                "label": "Status",
+                "draft": "Draft",
+                "submitted": "Submitted",
+                "verified": "Verified",
+                "rejected": "Rejected",
+                "cancelled": "Cancelled"
+            },
+            "reason": {
+                "label": "Reason",
+                "opening_stock": "Opening stock",
+                "found": "Found",
+                "lost": "Lost",
+                "theft": "Theft",
+                "entry_error": "Entry error"
+            },
+            "reasonMeaning": {
+                "opening_stock": "Stock you held before using StockFlow. Each line creates a new batch with its cost and price.",
+                "found": "Units found that the app did not count. Add them to a batch, or create a new one.",
+                "lost": "Units that went missing. They come out of the batch you choose.",
+                "theft": "Units that were stolen. They come out of the batch you choose.",
+                "entry_error": "A number typed wrong earlier. Each line goes up or down."
+            },
+            "stat": {
+                "draft": "Drafts",
+                "submitted": "Waiting to verify",
+                "verified": "Verified this month",
+                "rejected": "Rejected this month"
+            },
+            "createTitle": "New stock adjustment",
+            "editTitle": "Edit adjustment",
+            "draftTitle": "Continue draft",
+            "formLead": "Choose why stock is changing, then add the products. Nothing changes until the adjustment is verified.",
+            "reasonHelper": "The reason decides which way stock goes: opening stock and found add, lost and theft take away, an entry error goes either way.",
+            "reasonRequired": "Choose a reason.",
+            "note": "Note",
+            "noteHelper": "Anything the person verifying should know, such as where the units were found.",
+            "notePlaceholder": "Optional",
+            "choicesFailed": "Warehouses and aisles could not be loaded.",
+            "lines": "Products",
+            "pickReasonFirst": "Choose a reason first.",
+            "product": "Product",
+            "productPlaceholder": "Search by name or SKU",
+            "productNotFound": "No active product matches.",
+            "direction": {
+                "label": "Direction",
+                "in": "In",
+                "out": "Out",
+                "inLong": "Add to stock",
+                "outLong": "Take out of stock"
+            },
+            "batch": "Batch",
+            "newBatch": "New batch",
+            "chooseBatch": "Choose a batch",
+            "batchFree": "{{onHand}} on hand, {{free}} free",
+            "quantity": "Quantity",
+            "cost": "Cost",
+            "use": "For",
+            "forSale": "For sale",
+            "internalUse": "Internal use",
+            "price": "Selling price",
+            "maxDiscount": "Max discount",
+            "warehouse": "Warehouse",
+            "aisle": "Aisle",
+            "noAisle": "No aisle",
+            "choose": "Choose",
+            "expiry": "Expiry date",
+            "expiryOptional": "Optional",
+            "keepsBatch": "Only the quantity changes. The batch keeps its cost, price and budget; budgets change from the stock overview.",
+            "removeLine": "Remove this line",
+            "noLinesTitle": "No products yet",
+            "noLinesBody": "Choose a reason, then add each product with Add product.",
+            "problem": {
+                "direction": "Choose In or Out.",
+                "quantity": "Enter the quantity.",
+                "batch": "Choose the batch the units come from.",
+                "moreThanFree": "More than this batch has free. Lower the quantity.",
+                "cost": "Enter what one unit cost.",
+                "warehouse": "Choose the warehouse.",
+                "price": "Enter the selling price.",
+                "discount": "The discount cannot be more than the price.",
+                "product": "Choose a product.",
+                "openingNewBatch": "Opening stock always makes a new batch. Open the line and enter its cost, price and warehouse."
+            },
+            "submit": "Submit adjustment",
+            "saveChanges": "Save changes",
+            "saveDraft": "Save as draft",
+            "needsLine": "Add at least one product before submitting.",
+            "draftNeedsReason": "Choose a reason before saving a draft.",
+            "confirmSubmit": {
+                "title": "Submit this adjustment?",
+                "body": "Products: {{count}}. Units in: {{in}}, units out: {{out}}. Stock will not change until it is verified."
+            },
+            "confirmEdit": {
+                "title": "Save changes to {{number}}?",
+                "body": "Products: {{count}}. Units in: {{in}}, units out: {{out}}. Stock will not change until it is verified."
+            },
+            "confirmDraft": {
+                "title": "Save as a draft?",
+                "body": "You can finish it later. A draft changes no stock and cannot be verified."
+            },
+            "submittedMessage": "Adjustment {{number}} submitted. It changes stock once verified.",
+            "draftSavedMessage": "Draft {{number}} saved.",
+            "draftSaved": "Draft saved.",
+            "updated": "Adjustment {{number}} saved.",
+            "refused": "The adjustment could not be saved as it is. Check each line and try again.",
+            "lineRefused": "Line {{line}} cannot be saved as it is. Check its batch, quantity and details, then try again.",
+            "lineNoLongerFits": "Line {{line}} no longer fits: its batch has less free than it takes now. Edit the line and try again.",
+            "moved": "This adjustment was changed somewhere else, verified, rejected or cancelled. Open it again to see where it stands.",
+            "loadFailed": {
+                "network": "Could not reach the server. Check your connection and try again.",
+                "forbidden": "You do not have permission to see this adjustment.",
+                "server": "The adjustment could not be loaded. Try again in a moment."
+            },
+            "notEditable": {
+                "verified": "This adjustment is verified, so it can no longer be edited.",
+                "rejected": "This adjustment was rejected, so it can no longer be edited.",
+                "cancelled": "This adjustment was cancelled, so it can no longer be edited."
+            },
+            "backToAdjustment": "Back to the adjustment",
+            "backToList": "Back to adjustments",
+            "detailTitle": "Stock adjustment",
+            "detailLead": "What changes on the shelf, and why. Stock moves only when it is verified.",
+            "section": {
+                "details": "Adjustment"
+            },
+            "notGiven": "Not given",
+            "where": "Where",
+            "noLinesYet": "No products on this draft yet.",
+            "banner": {
+                "verified": "Verified on {{date}} by {{name}}. Its stock has moved.",
+                "rejected": "Rejected on {{date}} by {{name}}. No stock moved.",
+                "cancelled": "Cancelled on {{date}} by {{name}}. No stock moved.",
+                "because": "Reason: {{reason}}",
+                "draft": "This is a draft. Finish and submit it before it can be verified.",
+                "submitted": "Waiting to be verified. Read the lines, then Verify to change stock, or Reject with a reason."
+            },
+            "verify": "Verify",
+            "reject": "Reject",
+            "cancel": "Cancel adjustment",
+            "continueDraft": "Continue draft",
+            "confirmVerify": {
+                "title": "Verify {{number}}?",
+                "body": "{{in}} units will come in and {{out}} will go out.",
+                "value": "Value in {{in}}, value out {{out}}."
+            },
+            "verifiedMessage": "Adjustment {{number}} verified. Stock has changed.",
+            "rejectTitle": "Reject this adjustment",
+            "rejectBody": "No stock will move. Say why, so the person who made it knows what to fix.",
+            "cancelTitle": "Cancel this adjustment",
+            "cancelBody": "No stock will move, and the adjustment stays in the list as cancelled.",
+            "why": "Why",
+            "whyRequired": "Write at least 3 characters.",
+            "whyPlaceholder": "For example: counted again, the units were on the other shelf",
+            "keep": "Go back",
+            "rejectedMessage": "Adjustment rejected. No stock moved.",
+            "cancelledMessage": "Adjustment cancelled. No stock moved.",
+            "quickActions": "Quick actions",
+            "downloadReport": "Download Excel",
+            "noQuickActions": "Nothing else to do here.",
+            "reportFailed": {
+                "network": "The report could not be downloaded. Check your connection and try again.",
+                "forbidden": "You do not have access to download this report.",
+                "server": "The report could not be built just now. Try again in a moment."
+            },
+            "activity": "Recent activity",
+            "noActivity": "Nothing has happened to this adjustment yet.",
+            "addProduct": "Add product",
+            "editLine": "Change this line",
+            "lineActions": "Change or remove",
+            "drawer": {
+                "addTitle": "Add a product",
+                "editTitle": "Change this line",
+                "batchCount": "{{count}} batches",
+                "noBatchesShort": "No batches yet",
+                "nothingFree": "Every batch of this product is held for orders, so nothing can come out of it now.",
+                "noStock": "This product has no batches yet, so there is nothing to take out.",
+                "onlyNewBatch": "This product has no batches yet. The units go into a new batch.",
+                "saveLine": "Save line",
+                "addLine": "Add line",
+                "budgetsLead": "Optional. Each is multiplied by the units of the new batch. Once verified, change them from the stock overview."
+            },
+            "budgetPerUnit": "Budget per unit"
         }
     },
     "form": {

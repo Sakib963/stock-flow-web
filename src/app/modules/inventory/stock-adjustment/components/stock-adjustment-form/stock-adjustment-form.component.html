@@ -1,0 +1,130 @@
+<form nz-form nzLayout="vertical" [id]="formId" [formGroup]="form" (ngSubmit)="submitted.emit()">
+    <div class="grid grid-cols-1 items-start gap-x-4 md:grid-cols-3" data-form="header">
+        <nz-form-item class="md:col-span-2">
+            <nz-form-label nzRequired [nzTooltipTitle]="'inventory.stockAdjustment.reasonHelper' | translate">{{ 'inventory.stockAdjustment.reason.label' | translate }}</nz-form-label>
+            <nz-form-control [nzErrorTip]="'inventory.stockAdjustment.reasonRequired' | translate" [nzExtra]="reason() ? ('inventory.stockAdjustment.reasonMeaning.' + reason() | translate) : ''">
+                <nz-radio-group formControlName="reason" nzButtonStyle="solid" class="flex w-full flex-wrap" [attr.aria-label]="'inventory.stockAdjustment.reason.label' | translate">
+                    @for (reason of reasons; track reason) {
+                        <label nz-radio-button class="flex-1 px-2 text-center whitespace-nowrap" [nzValue]="reason">{{ 'inventory.stockAdjustment.reason.' + reason | translate }}</label>
+                    }
+                </nz-radio-group>
+            </nz-form-control>
+        </nz-form-item>
+
+        <nz-form-item>
+            <nz-form-label nzFor="sa-note" [nzTooltipTitle]="'inventory.stockAdjustment.noteHelper' | translate">{{ 'inventory.stockAdjustment.note' | translate }}</nz-form-label>
+            <nz-form-control [nzErrorTip]="'form.tooLong' | translate: { max: 1000 } | digits">
+                <input nz-input id="sa-note" formControlName="note" type="text" autocomplete="off" [attr.placeholder]="'inventory.stockAdjustment.notePlaceholder' | translate" />
+            </nz-form-control>
+        </nz-form-item>
+    </div>
+
+    @if (choicesFailed()) {
+        <div class="mb-4 flex items-center justify-between gap-2 rounded-control border border-danger-border bg-danger-bg px-3 py-2 text-xs text-danger-ink" role="alert">
+            <span>{{ 'inventory.stockAdjustment.choicesFailed' | translate }}</span>
+            <button nz-button nzSize="small" type="button" class="inline-flex items-center gap-1.5" (click)="loadChoices()">
+                <ng-icon name="lucideRotateCw" size="13px" aria-hidden="true" />
+                <span>{{ 'form.retry' | translate }}</span>
+            </button>
+        </div>
+    }
+
+    <section class="-mx-4 border-t border-line md:-mx-5" data-form="lines" [attr.aria-label]="'inventory.stockAdjustment.lines' | translate">
+        <div class="flex flex-wrap items-center justify-between gap-2 px-4 py-3 md:px-5">
+            <h2 class="m-0 flex items-center gap-1.5 text-sm font-bold text-ink">
+                <ng-icon name="lucideListOrdered" size="14px" class="text-ink-muted" aria-hidden="true" />
+                {{ 'inventory.stockAdjustment.lines' | translate }}
+                <span class="rounded-full bg-surface-sunken px-2 text-xs font-semibold text-ink-muted">{{ lines().length | digits }}</span>
+            </h2>
+            <div class="flex items-center gap-3">
+                @if (!reason()) {
+                    <p class="m-0 text-xs text-ink-muted">{{ 'inventory.stockAdjustment.pickReasonFirst' | translate }}</p>
+                }
+                <button nz-button type="button" class="inline-flex items-center gap-1.5" data-form="add-line" [disabled]="!reason()" (click)="addLine()">
+                    <ng-icon name="lucidePlus" size="14px" aria-hidden="true" />
+                    <span>{{ 'inventory.stockAdjustment.addProduct' | translate }}</span>
+                </button>
+            </div>
+        </div>
+
+        @if (lines().length) {
+            <nz-table nzTemplateMode nzSize="small" [nzScroll]="{ x: '820px' }">
+                <thead>
+                    <tr>
+                        <th nzWidth="40px" class="text-center">#</th>
+                        <th>{{ 'inventory.stockAdjustment.product' | translate }}</th>
+                        <th nzWidth="80px">{{ 'inventory.stockAdjustment.direction.label' | translate }}</th>
+                        <th nzWidth="150px">{{ 'inventory.stockAdjustment.batch' | translate }}</th>
+                        <th nzWidth="80px" class="text-right">{{ 'inventory.stockAdjustment.quantity' | translate }}</th>
+                        <th nzWidth="160px">{{ 'inventory.stockAdjustment.where' | translate }}</th>
+                        <th nzWidth="100px" class="text-right">{{ 'inventory.stockAdjustment.cost' | translate }}</th>
+                        <th nzWidth="88px">
+                            <span class="sr-only">{{ 'inventory.stockAdjustment.lineActions' | translate }}</span>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (line of lines(); track $index; let i = $index) {
+                        @let problem = problems()[i];
+                        <tr [class.bg-danger-bg]="problem" [attr.data-line]="i">
+                            <td class="text-center font-mono text-xs text-ink-muted">{{ i + 1 | digits }}</td>
+                            <td>
+                                <span class="block text-[13px] font-semibold text-ink">{{ line.product.name }}</span>
+                                <span class="block font-mono text-xs text-ink-muted">{{ line.product.sku }}</span>
+                            </td>
+                            <td class="text-xs">
+                                @if (directionAt(i); as direction) {
+                                    {{ 'inventory.stockAdjustment.direction.' + direction | translate }}
+                                } @else {
+                                    <span class="text-ink-muted">&ndash;</span>
+                                }
+                            </td>
+                            <td>
+                                @if (isNewBatchAt(i)) {
+                                    <span class="text-xs text-ink-muted">{{ 'inventory.stockAdjustment.newBatch' | translate }}</span>
+                                } @else {
+                                    <span class="font-mono text-xs text-ink">{{ line.batch?.batch_code }}</span>
+                                }
+                            </td>
+                            <td class="text-right font-mono text-[13px] text-ink">{{ line.quantity | digits }}</td>
+                            <td class="text-xs text-ink-body">{{ whereAt(i) ?? '' }}</td>
+                            <td class="text-right font-mono text-[13px]">
+                                @if (isNewBatchAt(i) && line.cost_price !== null) {
+                                    {{ line.cost_price | money }}
+                                } @else {
+                                    <span class="text-ink-muted">&ndash;</span>
+                                }
+                            </td>
+                            <td class="text-right whitespace-nowrap">
+                                <button nz-button nzType="text" nzSize="small" type="button" nz-tooltip [nzTooltipTitle]="'inventory.stockAdjustment.editLine' | translate" [attr.aria-label]="'inventory.stockAdjustment.editLine' | translate" data-line-action="edit" (click)="editLine(i)">
+                                    <ng-icon name="lucidePencil" size="14px" class="text-ink-muted" aria-hidden="true" />
+                                </button>
+                                <button nz-button nzType="text" nzSize="small" type="button" nz-tooltip [nzTooltipTitle]="'inventory.stockAdjustment.removeLine' | translate" [attr.aria-label]="'inventory.stockAdjustment.removeLine' | translate" data-line-action="remove" (click)="removeLine(i)">
+                                    <ng-icon name="lucideTrash2" size="14px" class="text-ink-muted" aria-hidden="true" />
+                                </button>
+                            </td>
+                        </tr>
+                        @if (problem) {
+                            <tr class="bg-danger-bg" [attr.data-line-problem]="i">
+                                <td></td>
+                                <td colspan="7" class="pt-0 text-xs text-danger-ink" role="alert">{{ problem | translate }}</td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </nz-table>
+        } @else {
+            <div class="px-4 py-8 text-center md:px-5" data-form="lines-empty">
+                <p class="m-0 text-[13px] font-semibold text-ink">{{ 'inventory.stockAdjustment.noLinesTitle' | translate }}</p>
+                <p class="mx-auto mt-1 mb-0 max-w-[48ch] text-xs text-ink-muted">{{ 'inventory.stockAdjustment.noLinesBody' | translate }}</p>
+            </div>
+        }
+
+        <div class="flex items-baseline justify-end gap-6 border-t border-line px-4 py-3 md:px-5" data-form="total">
+            <span class="text-xs text-ink-muted">{{ 'inventory.stockAdjustment.unitsIn' | translate }} <span class="ml-1 font-mono text-lg font-bold text-ink tabular-nums">{{ unitsIn() | digits }}</span></span>
+            <span class="text-xs text-ink-muted">{{ 'inventory.stockAdjustment.unitsOut' | translate }} <span class="ml-1 font-mono text-lg font-bold text-ink tabular-nums">{{ unitsOut() | digits }}</span></span>
+        </div>
+    </section>
+</form>
+
+<adjustment-line-drawer [open]="drawerOpen()" [reason]="reason()" [line]="drawerLine()" [carry]="carry()" [warehouses]="warehouses()" [aisles]="aisles()" [choicesLoading]="choicesLoading()" (saved)="saveLine($event)" (closed)="closeDrawer()" />

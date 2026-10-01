@@ -1,0 +1,311 @@
+<page-header [back]="back" [title]="'inventory.stockAdjustment.detailTitle' | translate" [lead]="'inventory.stockAdjustment.detailLead' | translate">
+    @if (canCancel()) {
+        <button nz-button nzDanger type="button" class="inline-flex items-center gap-1.5" [disabled]="saving()" (click)="openClosing('cancel')">
+            <ng-icon name="lucideBan" size="14px" aria-hidden="true" />
+            <span>{{ 'inventory.stockAdjustment.cancel' | translate }}</span>
+        </button>
+    }
+    @if (canEdit()) {
+        <button nz-button type="button" class="inline-flex items-center gap-1.5" [disabled]="saving()" (click)="edit()">
+            <ng-icon name="lucidePencil" size="14px" aria-hidden="true" />
+            <span>{{ (draft() ? 'inventory.stockAdjustment.continueDraft' : 'inventory.stockAdjustment.edit') | translate }}</span>
+        </button>
+    }
+    @if (canReject()) {
+        <button nz-button nzDanger type="button" class="inline-flex items-center gap-1.5" [disabled]="saving()" (click)="openClosing('reject')">
+            <ng-icon name="lucideCircleX" size="14px" aria-hidden="true" />
+            <span>{{ 'inventory.stockAdjustment.reject' | translate }}</span>
+        </button>
+    }
+    @if (canVerify()) {
+        <button nz-button nzType="primary" type="button" class="inline-flex items-center gap-1.5" [nzLoading]="saving()" [disabled]="saving()" (click)="verify()">
+            @if (!saving()) {
+                <ng-icon name="lucideBadgeCheck" size="14px" aria-hidden="true" />
+            }
+            <span>{{ 'inventory.stockAdjustment.verify' | translate }}</span>
+        </button>
+    }
+</page-header>
+
+@if (failed(); as failure) {
+    <div class="sf-empty" role="alert">
+        <p class="m-0 text-sm text-ink-body">{{ 'inventory.stockAdjustment.loadFailed.' + failure | translate }}</p>
+        <div class="mt-3 flex items-center justify-center gap-2">
+            <button nz-button nzType="default" type="button" class="inline-flex items-center gap-1.5" (click)="backToList()">
+                <ng-icon name="lucideArrowLeft" size="14px" aria-hidden="true" />
+                <span>{{ 'inventory.stockAdjustment.backToList' | translate }}</span>
+            </button>
+            <button nz-button nzType="primary" type="button" class="inline-flex items-center gap-1.5" (click)="load()">
+                <ng-icon name="lucideRotateCw" size="14px" aria-hidden="true" />
+                <span>{{ 'form.retry' | translate }}</span>
+            </button>
+        </div>
+    </div>
+} @else {
+    @if (loading()) {
+        <span class="sr-only" role="status">{{ 'form.loading' | translate }}</span>
+    }
+
+    @if (record(); as loaded) {
+        @switch (loaded.details.status) {
+            @case ('Verified') {
+                <div class="mb-2 flex items-start gap-2 rounded-container border border-success-border bg-success-bg px-4 py-3 md:mb-4" data-detail="banner">
+                    <ng-icon name="lucideBadgeCheck" size="16px" class="mt-0.5 text-success-ink" aria-hidden="true" />
+                    <p class="m-0 text-[13px] font-semibold text-success-ink">{{ 'inventory.stockAdjustment.banner.verified' | translate: { date: (loaded.details.verified_on | recordDate: language() : 'date-time-12'), name: loaded.details.verified_by_name || loaded.details.verified_by } }}</p>
+                </div>
+            }
+            @case ('Rejected') {
+                <div class="mb-2 flex items-start gap-2 rounded-container border border-danger-border bg-danger-bg px-4 py-3 md:mb-4" data-detail="banner">
+                    <ng-icon name="lucideCircleX" size="16px" class="mt-0.5 text-danger-ink" aria-hidden="true" />
+                    <div>
+                        <p class="m-0 text-[13px] font-semibold text-danger-ink">{{ 'inventory.stockAdjustment.banner.rejected' | translate: { date: (loaded.details.rejected_on | recordDate: language() : 'date-time-12'), name: loaded.details.rejected_by_name || loaded.details.rejected_by } }}</p>
+                        <p class="mt-0.5 mb-0 text-xs text-ink-body">{{ 'inventory.stockAdjustment.banner.because' | translate: { reason: loaded.details.reject_reason } }}</p>
+                    </div>
+                </div>
+            }
+            @case ('Cancelled') {
+                <div class="mb-2 flex items-start gap-2 rounded-container border border-line bg-surface-sunken px-4 py-3 md:mb-4" data-detail="banner">
+                    <ng-icon name="lucideBan" size="16px" class="mt-0.5 text-ink-muted" aria-hidden="true" />
+                    <div>
+                        <p class="m-0 text-[13px] font-semibold text-ink">{{ 'inventory.stockAdjustment.banner.cancelled' | translate: { date: (loaded.details.cancelled_on | recordDate: language() : 'date-time-12'), name: loaded.details.cancelled_by_name || loaded.details.cancelled_by } }}</p>
+                        <p class="mt-0.5 mb-0 text-xs text-ink-body">{{ 'inventory.stockAdjustment.banner.because' | translate: { reason: loaded.details.cancel_reason } }}</p>
+                    </div>
+                </div>
+            }
+            @case ('Draft') {
+                <div class="mb-2 flex items-start gap-2 rounded-container border border-warning-border bg-warning-bg px-4 py-3 md:mb-4" data-detail="banner">
+                    <ng-icon name="lucideFilePen" size="16px" class="mt-0.5 text-warning-ink" aria-hidden="true" />
+                    <p class="m-0 text-[13px] font-semibold text-warning-ink">{{ 'inventory.stockAdjustment.banner.draft' | translate }}</p>
+                </div>
+            }
+            @case ('Submitted') {
+                <div class="mb-2 flex items-start gap-2 rounded-container border border-line bg-white px-4 py-3 md:mb-4" data-detail="banner">
+                    <ng-icon name="lucideInfo" size="16px" class="mt-0.5 text-ink-muted" aria-hidden="true" />
+                    <p class="m-0 text-[13px] text-ink-body">{{ 'inventory.stockAdjustment.banner.submitted' | translate }}</p>
+                </div>
+            }
+        }
+    }
+
+    <nz-card [nzTitle]="detailsTitle" data-detail="details">
+        <ng-template #detailsTitle
+            ><h2 class="m-0 flex items-center gap-1.5 text-sm font-bold text-ink"><ng-icon name="lucideInfo" size="14px" class="text-ink-muted" aria-hidden="true" />{{ 'inventory.stockAdjustment.section.details' | translate }}</h2></ng-template
+        >
+        @if (adjustment(); as a) {
+            <dl class="m-0 grid grid-cols-2 gap-x-6 gap-y-4 md:grid-cols-4">
+                <div>
+                    <dt class="text-xs text-ink-muted">{{ 'inventory.stockAdjustment.number' | translate }}</dt>
+                    <dd class="mt-1 mb-0 font-mono text-sm font-semibold text-ink" [copyable]="a.adjustment_number ?? ''">{{ a.adjustment_number }}</dd>
+                </div>
+                <div>
+                    <dt class="text-xs text-ink-muted">{{ 'inventory.stockAdjustment.status.label' | translate }}</dt>
+                    <dd class="mt-1 mb-0">
+                        @if (statusTone(); as style) {
+                            <status-tag [label]="style.label" [tone]="style.tone" [icon]="style.icon" size="standard" />
+                        }
+                    </dd>
+                </div>
+                <div>
+                    <dt class="text-xs text-ink-muted">{{ 'inventory.stockAdjustment.reason.label' | translate }}</dt>
+                    <dd class="mt-1 mb-0">
+                        @if (reasonTone(); as style) {
+                            <status-tag [label]="style.label" [tone]="style.tone" [icon]="style.icon" size="standard" />
+                        }
+                    </dd>
+                </div>
+                <div>
+                    <dt class="text-xs text-ink-muted">{{ 'inventory.stockAdjustment.createdOn' | translate }}</dt>
+                    <dd class="mt-1 mb-0 text-sm font-semibold text-ink">
+                        @if (a.created_on) {
+                            {{ a.created_on | recordDate: language() : 'date' }}
+                        }
+                    </dd>
+                    <dd class="mt-0.5 mb-0 text-xs text-ink-muted">{{ a.created_by_name || a.created_by }}</dd>
+                </div>
+                @if (record(); as loaded) {
+                    <div class="col-span-2 border-t border-line-soft pt-4 md:col-span-4" data-detail="notes">
+                        <dt class="text-xs text-ink-muted">{{ 'inventory.stockAdjustment.note' | translate }}</dt>
+                        <dd class="mt-1 mb-0 text-sm whitespace-pre-line text-ink-body">{{ loaded.details.note || ('inventory.stockAdjustment.notGiven' | translate) }}</dd>
+                    </div>
+                }
+            </dl>
+        } @else {
+            <nz-skeleton nzActive [nzTitle]="false" [nzParagraph]="{ rows: 3 }" />
+        }
+    </nz-card>
+
+    @if (record(); as loaded) {
+        <div class="mt-2 grid grid-cols-2 gap-px overflow-hidden rounded-container border border-line bg-line md:mt-4" [class.md:grid-cols-4]="seesMoney()" data-detail="stats">
+            <div class="bg-white px-4 py-3" data-stat="in">
+                <p class="m-0 flex items-center gap-1.5 text-xs font-semibold text-ink-muted"><ng-icon name="lucidePackagePlus" size="13px" aria-hidden="true" />{{ 'inventory.stockAdjustment.unitsIn' | translate }}</p>
+                <p class="mt-1 mb-0 font-mono text-xl font-bold text-ink tabular-nums">{{ loaded.details.units_in | digits }}</p>
+            </div>
+            <div class="bg-white px-4 py-3" data-stat="out">
+                <p class="m-0 flex items-center gap-1.5 text-xs font-semibold text-ink-muted"><ng-icon name="lucidePackageMinus" size="13px" aria-hidden="true" />{{ 'inventory.stockAdjustment.unitsOut' | translate }}</p>
+                <p class="mt-1 mb-0 font-mono text-xl font-bold text-ink tabular-nums">{{ loaded.details.units_out | digits }}</p>
+            </div>
+            @if (seesMoney()) {
+                <div class="bg-white px-4 py-3" data-stat="value-in">
+                    <p class="m-0 flex items-center gap-1.5 text-xs font-semibold text-ink-muted"><ng-icon name="lucideWallet" size="13px" aria-hidden="true" />{{ 'inventory.stockAdjustment.valueIn' | translate }}</p>
+                    <p class="mt-1 mb-0 font-mono text-xl font-bold text-ink tabular-nums">{{ loaded.details.value_in ?? 0 | money }}</p>
+                </div>
+                <div class="bg-white px-4 py-3" data-stat="value-out">
+                    <p class="m-0 flex items-center gap-1.5 text-xs font-semibold text-ink-muted"><ng-icon name="lucideWallet" size="13px" aria-hidden="true" />{{ 'inventory.stockAdjustment.valueOut' | translate }}</p>
+                    <p class="mt-1 mb-0 font-mono text-xl font-bold tabular-nums" [class.text-danger]="(loaded.details.value_out ?? 0) > 0" [class.text-ink]="!loaded.details.value_out">{{ loaded.details.value_out ?? 0 | money }}</p>
+                </div>
+            }
+        </div>
+    }
+
+    <nz-card class="mt-2 block md:mt-4" [nzTitle]="linesTitle" [nzBodyStyle]="{ padding: '0' }" data-detail="lines">
+        <ng-template #linesTitle
+            ><h2 class="m-0 flex items-center gap-1.5 text-sm font-bold text-ink"><ng-icon name="lucideListOrdered" size="14px" class="text-ink-muted" aria-hidden="true" />{{ 'inventory.stockAdjustment.lines' | translate }}</h2></ng-template
+        >
+        @if (record(); as loaded) {
+            @if (loaded.lines.length) {
+                <nz-table nzTemplateMode nzSize="small" [nzScroll]="{ x: '900px' }">
+                    <thead>
+                        <tr>
+                            <th nzWidth="40px" class="text-center">#</th>
+                            <th>{{ 'inventory.stockAdjustment.product' | translate }}</th>
+                            <th nzWidth="110px">{{ 'inventory.stockAdjustment.direction.label' | translate }}</th>
+                            <th>{{ 'inventory.stockAdjustment.batch' | translate }}</th>
+                            <th nzAlign="right" nzWidth="90px">{{ 'inventory.stockAdjustment.quantity' | translate }}</th>
+                            <th>{{ 'inventory.stockAdjustment.where' | translate }}</th>
+                            @if (seesMoney()) {
+                                <th nzAlign="right">{{ 'inventory.stockAdjustment.cost' | translate }}</th>
+                                <th nzAlign="right">{{ 'inventory.stockAdjustment.value' | translate }}</th>
+                            }
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (line of loaded.lines; track line.oid; let i = $index) {
+                            <tr [attr.data-line]="i">
+                                <td class="text-center font-mono text-xs text-ink-muted">{{ i + 1 | digits }}</td>
+                                <td>
+                                    @if (canOpenStock()) {
+                                        <a class="block text-[13px] font-semibold" [routerLink]="productStockRoute(line.product_oid)">{{ line.product_name }}</a>
+                                    } @else {
+                                        <span class="block text-[13px] font-semibold text-ink">{{ line.product_name }}</span>
+                                    }
+                                    <span class="block font-mono text-xs text-ink-muted">{{ line.sku }}</span>
+                                </td>
+                                <td>
+                                    @if (line.direction) {
+                                        <status-tag [label]="'inventory.stockAdjustment.direction.' + line.direction" [tone]="line.direction === 'in' ? 'success' : 'warning'" [icon]="line.direction === 'in' ? 'lucidePackagePlus' : 'lucidePackageMinus'" />
+                                    } @else {
+                                        <span class="text-ink-muted">&ndash;</span>
+                                    }
+                                </td>
+                                <td>
+                                    @if (line.batch_code) {
+                                        <span class="font-mono text-xs text-ink" [copyable]="line.batch_code">{{ line.batch_code }}</span>
+                                        @if (open() && line.free !== null) {
+                                            <span class="block text-xs text-ink-muted">{{ 'inventory.stockAdjustment.batchFree' | translate: { onHand: line.on_hand, free: line.free } | digits }}</span>
+                                        }
+                                    } @else {
+                                        <span class="text-xs text-ink-muted">{{ 'inventory.stockAdjustment.newBatch' | translate }}</span>
+                                    }
+                                </td>
+                                <td class="text-right font-mono text-[13px] text-ink tabular-nums">{{ line.quantity ?? '–' | digits }}</td>
+                                <td class="text-xs text-ink-body">
+                                    {{ line.warehouse_name || ('inventory.stockAdjustment.notGiven' | translate) }}
+                                    @if (line.aisle_name) {
+                                        &middot; {{ line.aisle_name }}
+                                    }
+                                </td>
+                                @if (seesMoney()) {
+                                    <td class="text-right font-mono text-[13px] tabular-nums">{{ line.cost_price === null ? '–' : (line.cost_price | money) }}</td>
+                                    <td class="text-right font-mono text-[13px] tabular-nums">{{ line.value === null ? '–' : (line.value | money) }}</td>
+                                }
+                            </tr>
+                        }
+                    </tbody>
+                </nz-table>
+            } @else {
+                <p class="m-0 px-4 py-3 text-xs text-ink-muted">{{ 'inventory.stockAdjustment.noLinesYet' | translate }}</p>
+            }
+        } @else {
+            <div class="p-4"><nz-skeleton nzActive [nzTitle]="false" [nzParagraph]="{ rows: 3 }" /></div>
+        }
+    </nz-card>
+
+    <!-- Quick actions beside the activity, first in the markup so a phone reads them before a long history. -->
+    <div class="mt-2 grid grid-cols-1 items-start gap-2 md:mt-4 md:gap-4 lg:grid-cols-3">
+        <nz-card class="lg:col-start-3 lg:row-start-1" [nzTitle]="quickTitle" data-detail="quick-actions">
+            <ng-template #quickTitle
+                ><h2 class="m-0 flex items-center gap-1.5 text-sm font-bold text-ink"><ng-icon name="lucideZap" size="14px" class="text-ink-muted" aria-hidden="true" />{{ 'inventory.stockAdjustment.quickActions' | translate }}</h2></ng-template
+            >
+            <div class="flex flex-col gap-2">
+                @if (canExport()) {
+                    <button nz-button nzBlock type="button" class="inline-flex items-center justify-start gap-2" data-quick="report" [nzLoading]="downloading()" (click)="download()">
+                        @if (!downloading()) {
+                            <ng-icon name="lucideFileSpreadsheet" size="14px" aria-hidden="true" />
+                        }
+                        <span>{{ 'inventory.stockAdjustment.downloadReport' | translate }}</span>
+                    </button>
+                } @else {
+                    <p class="m-0 text-xs text-ink-muted">{{ 'inventory.stockAdjustment.noQuickActions' | translate }}</p>
+                }
+            </div>
+        </nz-card>
+
+        <nz-card class="lg:col-span-2 lg:row-start-1" [nzTitle]="activityTitle" data-detail="activity">
+            <ng-template #activityTitle
+                ><h2 class="m-0 flex items-center gap-1.5 text-sm font-bold text-ink"><ng-icon name="lucideHistory" size="14px" class="text-ink-muted" aria-hidden="true" />{{ 'inventory.stockAdjustment.activity' | translate }}</h2></ng-template
+            >
+            @if (record(); as loaded) {
+                @if (loaded.activity.length) {
+                    <nz-timeline>
+                        @for (entry of loaded.activity; track entry.oid; let first = $first) {
+                            <nz-timeline-item [nzColor]="first ? 'blue' : 'gray'">
+                                <p class="m-0 text-[13px] font-semibold text-ink">{{ entry.action }}</p>
+                                @if (entry.description) {
+                                    <p class="mt-0.5 mb-0 text-xs text-ink-body">{{ entry.description }}</p>
+                                }
+                                <p class="mt-0.5 mb-0 text-xs text-ink-muted">{{ entry.user }} &middot; {{ entry.date | recordDate: language() : 'date-time-12' }}</p>
+                            </nz-timeline-item>
+                        }
+                    </nz-timeline>
+                } @else {
+                    <p class="m-0 text-xs text-ink-muted">{{ 'inventory.stockAdjustment.noActivity' | translate }}</p>
+                }
+            } @else {
+                <nz-skeleton nzActive [nzTitle]="false" [nzParagraph]="{ rows: 4 }" />
+            }
+        </nz-card>
+    </div>
+
+    <action-footer>
+        <button nz-button nzType="default" type="button" class="inline-flex items-center gap-1.5" (click)="backToList()">
+            <ng-icon name="lucideArrowLeft" size="14px" aria-hidden="true" />
+            <span>{{ 'inventory.stockAdjustment.backToList' | translate }}</span>
+        </button>
+    </action-footer>
+}
+
+<nz-modal [nzVisible]="!!closing()" [nzTitle]="(closing() === 'reject' ? 'inventory.stockAdjustment.rejectTitle' : 'inventory.stockAdjustment.cancelTitle') | translate" [nzContent]="closeBody" [nzFooter]="closeFooter" nzCentered [nzClosable]="!saving()" [nzMaskClosable]="!saving()" (nzOnCancel)="saving() || closing.set(null)">
+    <ng-template #closeBody>
+        <form nz-form nzLayout="vertical" [formGroup]="closeForm" (ngSubmit)="confirmClosing()">
+            <p class="mt-0 mb-3 text-[13px] text-ink-body">{{ (closing() === 'reject' ? 'inventory.stockAdjustment.rejectBody' : 'inventory.stockAdjustment.cancelBody') | translate }}</p>
+            <nz-form-item>
+                <nz-form-label nzRequired nzFor="close-reason">{{ 'inventory.stockAdjustment.why' | translate }}</nz-form-label>
+                <nz-form-control [nzErrorTip]="'inventory.stockAdjustment.whyRequired' | translate">
+                    <textarea nz-input id="close-reason" formControlName="reason" rows="3" [attr.placeholder]="'inventory.stockAdjustment.whyPlaceholder' | translate"></textarea>
+                </nz-form-control>
+            </nz-form-item>
+        </form>
+    </ng-template>
+    <ng-template #closeFooter>
+        <button nz-button type="button" class="inline-flex items-center gap-1.5" [disabled]="saving()" (click)="closing.set(null)">
+            <ng-icon name="lucideArrowLeft" size="14px" aria-hidden="true" />
+            <span>{{ 'inventory.stockAdjustment.keep' | translate }}</span>
+        </button>
+        <button nz-button nzType="primary" nzDanger type="button" class="inline-flex items-center gap-1.5" [nzLoading]="saving()" (click)="confirmClosing()">
+            @if (!saving()) {
+                <ng-icon [name]="closing() === 'reject' ? 'lucideCircleX' : 'lucideBan'" size="14px" aria-hidden="true" />
+            }
+            <span>{{ (closing() === 'reject' ? 'inventory.stockAdjustment.reject' : 'inventory.stockAdjustment.cancel') | translate }}</span>
+        </button>
+    </ng-template>
+</nz-modal>

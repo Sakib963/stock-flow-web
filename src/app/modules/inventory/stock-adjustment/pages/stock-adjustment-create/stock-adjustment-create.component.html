@@ -1,0 +1,11 @@
+<page-header [back]="back" [title]="'inventory.stockAdjustment.createTitle' | translate" [lead]="'inventory.stockAdjustment.formLead' | translate" />
+
+<form-page [formId]="editor()?.formId ?? ''" [saving]="saving()" [submitting]="submitting()" [remaining]="editor()?.remaining() ?? 0" saveLabel="inventory.stockAdjustment.submit" (cancel)="cancel()">
+    <stock-adjustment-form [presetReason]="presetReason" (submitted)="save()" />
+    <button formAction nz-button type="button" class="inline-flex items-center gap-1.5" [nzLoading]="drafting()" [disabled]="saving()" (click)="saveDraft()">
+        @if (!drafting()) {
+            <ng-icon name="lucideSave" size="14px" aria-hidden="true" />
+        }
+        <span>{{ 'inventory.stockAdjustment.saveDraft' | translate }}</span>
+    </button>
+</form-page>

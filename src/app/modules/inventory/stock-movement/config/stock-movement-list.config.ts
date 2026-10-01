@@ -12,6 +12,8 @@ export const STOCK_MOVEMENT_REASON: ToneMap = {
     returned: { label: 'inventory.stockMovement.reason.returned', tone: 'warning', icon: 'lucideUndo2' },
     disposed: { label: 'inventory.stockMovement.reason.disposed', tone: 'danger', icon: 'lucideTrash2' },
     dispose_reversed: { label: 'inventory.stockMovement.reason.dispose_reversed', tone: 'neutral', icon: 'lucideUndo2' },
+    adjusted: { label: 'inventory.stockMovement.reason.adjusted', tone: 'warning', icon: 'lucideSlidersHorizontal' },
+    opening_stock: { label: 'inventory.stockMovement.reason.opening_stock', tone: 'success', icon: 'lucidePackagePlus' },
 };
 
 const REASONS = Object.keys(STOCK_MOVEMENT_REASON);

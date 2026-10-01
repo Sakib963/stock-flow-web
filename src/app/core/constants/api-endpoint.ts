@@ -91,6 +91,15 @@ export class APIEndpoint {
     // Inventory
     static readonly GET_PURCHASE_ORDER_LIST = '/api/v1/inventory/purchase-order/get-purchase-list';
     static readonly GET_STOCK_MOVEMENT_LIST = '/api/v1/inventory/stock-movement/get-stock-movement-list';
+    static readonly GET_STOCK_ADJUSTMENT_LIST = '/api/v1/inventory/stock-adjustment/get-stock-adjustment-list';
+    static readonly GET_STOCK_ADJUSTMENT_DETAILS = '/api/v1/inventory/stock-adjustment/get-stock-adjustment-details';
+    static readonly GET_PRODUCT_LIST_FOR_ADJUSTMENT = '/api/v1/inventory/stock-adjustment/get-product-list-for-adjustment';
+    static readonly CREATE_STOCK_ADJUSTMENT = '/api/v1/inventory/stock-adjustment/create-stock-adjustment';
+    static readonly UPDATE_STOCK_ADJUSTMENT = '/api/v1/inventory/stock-adjustment/update-stock-adjustment';
+    static readonly VERIFY_STOCK_ADJUSTMENT = '/api/v1/inventory/stock-adjustment/verify-stock-adjustment';
+    static readonly REJECT_STOCK_ADJUSTMENT = '/api/v1/inventory/stock-adjustment/reject-stock-adjustment';
+    static readonly CANCEL_STOCK_ADJUSTMENT = '/api/v1/inventory/stock-adjustment/cancel-stock-adjustment';
+    static readonly GENERATE_STOCK_ADJUSTMENT_REPORT = '/api/v1/inventory/stock-adjustment/generate-stock-adjustment-report';
     static readonly GET_STOCK_OVERVIEW_LIST = '/api/v1/inventory/inventory-overview/get-stock-overview-list';
     static readonly GET_PRODUCT_STOCK = '/api/v1/inventory/inventory-overview/get-product-stock';
     static readonly GENERATE_PRODUCT_STOCK_REPORT = '/api/v1/inventory/inventory-overview/generate-product-stock-report';

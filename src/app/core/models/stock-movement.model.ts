@@ -1,4 +1,4 @@
-export type StockMovementReason = 'carried_over' | 'received' | 'sold' | 'dispatched' | 'returned' | 'disposed' | 'dispose_reversed';
+export type StockMovementReason = 'carried_over' | 'received' | 'sold' | 'dispatched' | 'returned' | 'disposed' | 'dispose_reversed' | 'adjusted' | 'opening_stock';
 
 /** One change to a batch's quantity: positive in, negative out, and what the batch held after it. */
 export interface StockMovementRow {

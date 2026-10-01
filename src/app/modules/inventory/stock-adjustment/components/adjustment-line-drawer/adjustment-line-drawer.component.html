@@ -1,0 +1,226 @@
+<!-- Never wider than the screen: on a phone the drawer is the whole width. -->
+<nz-drawer [nzVisible]="open()" nzWidth="min(480px, 100vw)" nzPlacement="right" [nzTitle]="(line() ? 'inventory.stockAdjustment.drawer.editTitle' : 'inventory.stockAdjustment.drawer.addTitle') | translate" [nzContent]="drawerBody" [nzFooter]="drawerFooter" (nzOnClose)="closed.emit()" />
+
+<ng-template #drawerBody>
+    <form nz-form nzLayout="vertical" [formGroup]="form" (ngSubmit)="save()">
+        <nz-form-item>
+            <nz-form-label nzRequired nzFor="al-product">{{ 'inventory.stockAdjustment.product' | translate }}</nz-form-label>
+            <nz-form-control>
+                <nz-select
+                    nzId="al-product"
+                    class="w-full"
+                    nzShowSearch
+                    nzServerSearch
+                    [nzOptionHeightPx]="optionHeight"
+                    [ngModel]="product()?.oid ?? null"
+                    [ngModelOptions]="{ standalone: true }"
+                    [nzLoading]="searching()"
+                    [nzPlaceHolder]="'inventory.stockAdjustment.productPlaceholder' | translate"
+                    [nzNotFoundContent]="searching() || preloading() ? loading : ('inventory.stockAdjustment.productNotFound' | translate)"
+                    (nzOnSearch)="search($event)"
+                    (nzOpenChange)="opened($event)"
+                    (ngModelChange)="pickProduct($event)"
+                >
+                    @for (option of options(); track option.oid) {
+                        <nz-option nzCustomContent [nzValue]="option.oid" [nzLabel]="option.name">
+                            <span class="block text-[13px] font-semibold text-ink">{{ option.name }}</span>
+                            <span class="block text-xs text-ink-muted">
+                                @if (option.sku) {
+                                    <span class="font-mono">{{ option.sku }}</span> &middot;
+                                }
+                                @if (option.batches.length) {
+                                    {{ 'inventory.stockAdjustment.drawer.batchCount' | translate: { count: option.batches.length } | digits }}
+                                } @else {
+                                    {{ 'inventory.stockAdjustment.drawer.noBatchesShort' | translate }}
+                                }
+                            </span>
+                        </nz-option>
+                    }
+                </nz-select>
+            </nz-form-control>
+        </nz-form-item>
+
+        @if (product(); as current) {
+            @if (reason() === 'entry_error') {
+                <nz-form-item>
+                    <nz-form-label nzRequired>{{ 'inventory.stockAdjustment.direction.label' | translate }}</nz-form-label>
+                    <nz-form-control>
+                        <nz-radio-group formControlName="direction" nzButtonStyle="solid" class="flex w-full" [attr.aria-label]="'inventory.stockAdjustment.direction.label' | translate">
+                            <label nz-radio-button class="flex-1 text-center" nzValue="in">{{ 'inventory.stockAdjustment.direction.inLong' | translate }}</label>
+                            <label nz-radio-button class="flex-1 text-center" nzValue="out">{{ 'inventory.stockAdjustment.direction.outLong' | translate }}</label>
+                        </nz-radio-group>
+                    </nz-form-control>
+                </nz-form-item>
+            }
+
+            @if (reason() !== 'opening_stock' && direction()) {
+                <nz-form-item>
+                    <nz-form-label nzRequired nzFor="al-batch">{{ 'inventory.stockAdjustment.batch' | translate }}</nz-form-label>
+                    @if (batches().length) {
+                        <nz-form-control>
+                            <nz-select nzId="al-batch" class="w-full" formControlName="inventory_oid" [nzOptionHeightPx]="optionHeight" [nzPlaceHolder]="'inventory.stockAdjustment.chooseBatch' | translate">
+                                @if (direction() === 'in') {
+                                    <nz-option nzValue="" [nzLabel]="'inventory.stockAdjustment.newBatch' | translate" />
+                                }
+                                @for (option of batches(); track option.oid) {
+                                    <nz-option nzCustomContent [nzValue]="option.oid" [nzLabel]="option.batch_code">
+                                        <span class="block font-mono text-xs font-semibold text-ink">{{ option.batch_code }}</span>
+                                        <span class="block text-xs text-ink-muted">{{ 'inventory.stockAdjustment.batchFree' | translate: { onHand: option.on_hand, free: option.free } | digits }}{{ option.warehouse_name ? ' · ' + option.warehouse_name : '' }}</span>
+                                    </nz-option>
+                                }
+                            </nz-select>
+                        </nz-form-control>
+                    } @else {
+                        <p class="m-0 mb-6 rounded-control border border-line bg-surface-sunken px-3 py-2 text-xs text-ink-body" data-drawer="no-batches">
+                            {{ (direction() === 'out' ? (current.batches.length ? 'inventory.stockAdjustment.drawer.nothingFree' : 'inventory.stockAdjustment.drawer.noStock') : 'inventory.stockAdjustment.drawer.onlyNewBatch') | translate }}
+                        </p>
+                    }
+                </nz-form-item>
+            }
+
+            <nz-form-item>
+                <nz-form-label nzRequired nzFor="al-quantity">{{ 'inventory.stockAdjustment.quantity' | translate }}</nz-form-label>
+                <nz-form-control [nzExtra]="batch() ? ('inventory.stockAdjustment.batchFree' | translate: { onHand: batch()!.on_hand, free: batch()!.free } | digits) : ''">
+                    <nz-input-number nzId="al-quantity" class="w-full font-mono" formControlName="quantity" [nzMin]="1" [nzMax]="9999" [nzPrecision]="0" />
+                </nz-form-control>
+            </nz-form-item>
+
+            @if (newBatch()) {
+                <div class="grid grid-cols-2 gap-x-3">
+                    <nz-form-item>
+                        <nz-form-label nzRequired nzFor="al-cost">{{ 'inventory.stockAdjustment.cost' | translate }}</nz-form-label>
+                        <nz-form-control>
+                            <nz-input-number nzId="al-cost" class="w-full font-mono" formControlName="cost_price" [nzMin]="0" [nzPrecision]="0" />
+                        </nz-form-control>
+                    </nz-form-item>
+                    <nz-form-item>
+                        <nz-form-label nzRequired>{{ 'inventory.stockAdjustment.use' | translate }}</nz-form-label>
+                        <nz-form-control>
+                            <nz-radio-group formControlName="intended_use" nzButtonStyle="solid" class="flex w-full" [attr.aria-label]="'inventory.stockAdjustment.use' | translate">
+                                <label nz-radio-button class="flex-1 px-1 text-center whitespace-nowrap" nzValue="for_sale">{{ 'inventory.stockAdjustment.forSale' | translate }}</label>
+                                <label nz-radio-button class="flex-1 px-1 text-center whitespace-nowrap" nzValue="internal_use">{{ 'inventory.stockAdjustment.internalUse' | translate }}</label>
+                            </nz-radio-group>
+                        </nz-form-control>
+                    </nz-form-item>
+                </div>
+                @if (value().intended_use === 'for_sale') {
+                    <div class="grid grid-cols-2 gap-x-3">
+                        <nz-form-item>
+                            <nz-form-label nzRequired nzFor="al-price">{{ 'inventory.stockAdjustment.price' | translate }}</nz-form-label>
+                            <nz-form-control>
+                                <nz-input-number nzId="al-price" class="w-full font-mono" formControlName="selling_price" [nzMin]="1" [nzPrecision]="0" />
+                            </nz-form-control>
+                        </nz-form-item>
+                        <nz-form-item>
+                            <nz-form-label nzFor="al-discount">{{ 'inventory.stockAdjustment.maxDiscount' | translate }}</nz-form-label>
+                            <nz-form-control>
+                                <nz-input-number nzId="al-discount" class="w-full font-mono" formControlName="maximum_discount" [nzMin]="0" [nzPrecision]="0" />
+                            </nz-form-control>
+                        </nz-form-item>
+                    </div>
+                }
+                <div class="grid grid-cols-2 gap-x-3">
+                    <nz-form-item>
+                        <nz-form-label nzRequired nzFor="al-warehouse">{{ 'inventory.stockAdjustment.warehouse' | translate }}</nz-form-label>
+                        <nz-form-control>
+                            <nz-select nzId="al-warehouse" class="w-full" formControlName="warehouse_oid" nzShowSearch [nzLoading]="choicesLoading()" [nzNotFoundContent]="choicesLoading() ? loading : undefined" [nzPlaceHolder]="'inventory.stockAdjustment.choose' | translate">
+                                @for (warehouse of warehouses(); track warehouse.value) {
+                                    <nz-option [nzValue]="warehouse.value" [nzLabel]="warehouse.label" />
+                                }
+                            </nz-select>
+                        </nz-form-control>
+                    </nz-form-item>
+                    <nz-form-item>
+                        <nz-form-label nzFor="al-aisle">{{ 'inventory.stockAdjustment.aisle' | translate }}</nz-form-label>
+                        <nz-form-control>
+                            <nz-select nzId="al-aisle" class="w-full" formControlName="aisle_oid" [nzDisabled]="!value().warehouse_oid" [nzPlaceHolder]="'inventory.stockAdjustment.noAisle' | translate">
+                                <nz-option [nzValue]="null" [nzLabel]="'inventory.stockAdjustment.noAisle' | translate" />
+                                @for (aisle of aislesHere(); track aisle.value) {
+                                    <nz-option [nzValue]="aisle.value" [nzLabel]="aisle.label" />
+                                }
+                            </nz-select>
+                        </nz-form-control>
+                    </nz-form-item>
+                </div>
+                @if (current.has_expiry) {
+                    <nz-form-item>
+                        <nz-form-label nzFor="al-expiry">{{ 'inventory.stockAdjustment.expiry' | translate }}</nz-form-label>
+                        <nz-form-control>
+                            <nz-date-picker nzId="al-expiry" class="w-full" formControlName="expiry_date" nzFormat="dd MMM yyyy" [nzPlaceHolder]="'inventory.stockAdjustment.expiryOptional' | translate" />
+                        </nz-form-control>
+                    </nz-form-item>
+                }
+
+                <!-- Entered once, here: after verify the stock overview's Update cost is the only place they change. -->
+                <fieldset class="m-0 border-0 border-t border-line p-0 pt-4" data-drawer="budgets">
+                    <legend class="mb-1 text-[13px] font-semibold text-ink">{{ 'inventory.purchaseOrder.budgets.title' | translate }}</legend>
+                    <p class="mt-0 mb-3 text-xs text-ink-muted">{{ 'inventory.stockAdjustment.drawer.budgetsLead' | translate }}</p>
+                    <div class="grid grid-cols-2 gap-x-3">
+                        @for (key of budgetKeys; track key) {
+                            <nz-form-item>
+                                <nz-form-label [nzFor]="'al-' + key">{{ 'inventory.purchaseOrder.budgets.' + key | translate }}</nz-form-label>
+                                <nz-form-control>
+                                    <nz-input-number class="w-full font-mono" [nzId]="'al-' + key" [formControlName]="key" [nzMin]="0" [nzPrecision]="0" />
+                                </nz-form-control>
+                            </nz-form-item>
+                        }
+                    </div>
+                    <nz-form-item>
+                        <nz-form-label nzFor="al-remarks">{{ 'inventory.purchaseOrder.budgets.remarks' | translate }}</nz-form-label>
+                        <nz-form-control>
+                            <input nz-input id="al-remarks" formControlName="cost_remarks" type="text" maxlength="500" autocomplete="off" [attr.placeholder]="'inventory.purchaseOrder.budgets.remarksPlaceholder' | translate" />
+                        </nz-form-control>
+                    </nz-form-item>
+                </fieldset>
+            } @else if (batch(); as kept) {
+                <!-- Read only: an adjustment moves quantity only; budgets change from the stock overview. -->
+                <dl class="m-0 grid grid-cols-2 gap-3 rounded-control bg-surface-sunken px-3 py-2 text-xs" data-drawer="kept">
+                    @if (kept.cost_price !== undefined) {
+                        <div>
+                            <dt class="text-ink-muted">{{ 'inventory.stockAdjustment.cost' | translate }}</dt>
+                            <dd class="m-0 font-mono text-ink">{{ kept.cost_price | money }}</dd>
+                        </div>
+                        <div>
+                            <dt class="text-ink-muted">{{ 'inventory.stockAdjustment.budgetPerUnit' | translate }}</dt>
+                            <dd class="m-0 font-mono text-ink">{{ kept.budget_per_unit ?? 0 | money }}</dd>
+                        </div>
+                    }
+                    <div>
+                        <dt class="text-ink-muted">{{ 'inventory.stockAdjustment.price' | translate }}</dt>
+                        <dd class="m-0 font-mono text-ink">{{ kept.selling_price | money }}</dd>
+                    </div>
+                    <div>
+                        <dt class="text-ink-muted">{{ 'inventory.stockAdjustment.maxDiscount' | translate }}</dt>
+                        <dd class="m-0 font-mono text-ink">{{ kept.maximum_discount | money }}</dd>
+                    </div>
+                </dl>
+                <p class="mt-2 mb-0 text-xs text-ink-muted">{{ 'inventory.stockAdjustment.keepsBatch' | translate }}</p>
+            }
+        }
+    </form>
+</ng-template>
+
+<ng-template #drawerFooter>
+    <div class="flex flex-col gap-2">
+        @if (problem(); as key) {
+            <p class="m-0 text-xs text-danger-ink" role="alert" data-drawer="problem">{{ key | translate }}</p>
+        }
+        <div class="flex items-center justify-end gap-2">
+            <button nz-button type="button" class="inline-flex items-center gap-1.5" (click)="closed.emit()">
+                <ng-icon name="lucideX" size="14px" aria-hidden="true" />
+                <span>{{ 'form.cancel' | translate }}</span>
+            </button>
+            <button nz-button nzType="primary" type="button" class="inline-flex items-center gap-1.5" data-drawer="save" (click)="save()">
+                <ng-icon name="lucideCheck" size="14px" aria-hidden="true" />
+                <span>{{ (line() ? 'inventory.stockAdjustment.drawer.saveLine' : 'inventory.stockAdjustment.drawer.addLine') | translate }}</span>
+            </button>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #loading>
+    <p class="m-0 flex items-center justify-center gap-2 py-2 text-xs text-ink-muted" role="status">
+        <nz-spin nzSimple nzSize="small" />
+        {{ 'form.loading' | translate }}
+    </p>
+</ng-template>

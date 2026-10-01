@@ -1,6 +1,7 @@
 import { APIEndpoint } from '@app/core/constants/api-endpoint';
 import { ToneMap } from '@app/core/models/config.model';
 import { ListShellPageConfig } from '@app/core/models/list-shell-page.model';
+import { STOCK_ADJUSTMENT_ROUTES } from '@app/modules/inventory/stock-adjustment/constants/stock-adjustment-routes';
 import { STOCK_OVERVIEW_ROUTES } from '@app/modules/inventory/stock-overview/constants/stock-overview-routes';
 
 /** Money is sent only to someone holding this, so its columns and figures are drawn only for them. */
@@ -20,7 +21,11 @@ export const EXPIRY_STATE: ToneMap = {
 /** Every product with stock, its value and what it would earn. The one row action is View. */
 export const STOCK_OVERVIEW_LIST: ListShellPageConfig = {
     permission: 'inventory.overview.view',
-    header: { count: true },
+    header: {
+        count: true,
+        // The first thing a new business does: load the stock it already holds.
+        actions: [{ key: 'opening-stock', label: 'inventory.stockOverview.loadOpeningStock', icon: 'lucidePackagePlus', permission: 'inventory.stock-adjustment.create', run: { kind: 'navigate', route: STOCK_ADJUSTMENT_ROUTES.openingStock } }],
+    },
     // The list shows four figures. Money first, so an owner sees value, revenue, profit and units, and
     // someone without the stock value permission sees units, low, out and expiring instead.
     stats: [

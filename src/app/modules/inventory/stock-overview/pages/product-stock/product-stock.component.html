@@ -218,7 +218,7 @@
                                                     <span class="flex items-center gap-2"><ng-icon name="lucideTag" size="14px" class="text-ink-soft" aria-hidden="true" />{{ 'inventory.stockOverview.price.action' | translate }}</span>
                                                 </li>
                                             }
-                                            @if (canBudget(batch)) {
+                                            @if (canBudget()) {
                                                 <li nz-menu-item data-action="budget" (click)="budgeting.set(batch)">
                                                     <span class="flex items-center gap-2"><ng-icon name="lucideBadgeDollarSign" size="14px" class="text-ink-soft" aria-hidden="true" />{{ 'inventory.stockOverview.budget.action' | translate }}</span>
                                                 </li>

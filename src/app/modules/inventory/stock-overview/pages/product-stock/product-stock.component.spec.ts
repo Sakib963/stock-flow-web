@@ -65,7 +65,7 @@ describe('ProductStockComponent', () => {
         expect(page).not.toContain('inventory.stockOverview.profit');
         const component = fixture.componentInstance;
         expect(component.canPrice(STAFF_VIEW.batches[0])).toBe(false);
-        expect(component.canBudget(STAFF_VIEW.batches[0])).toBe(false);
+        expect(component.canBudget()).toBe(false);
         expect((fixture.nativeElement as HTMLElement).querySelector('[data-batch-actions]')).not.toBeNull();
     });
 

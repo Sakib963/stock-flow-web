@@ -186,9 +186,9 @@ export class ProductStockComponent {
         return this.canEdit() && batch.intended_use === 'for_sale';
     }
 
-    /** Budgets are money, and live on the purchase line the batch came from. */
-    canBudget(batch: StockBatch): boolean {
-        return this.canEdit() && this.seesMoney() && !!batch.purchase_oid;
+    /** Budgets are money, and live on the line that made the batch: a purchase order or a stock adjustment. */
+    canBudget(): boolean {
+        return this.canEdit() && this.seesMoney();
     }
 
     changed(): void {

@@ -3,6 +3,7 @@ import { OVERLAY_PROVIDERS } from '@app/shared/constants/overlay-providers';
 import { permissionGuard } from '@app/core/guards/permission/permission.guard';
 import { unsavedChangesGuard } from '@app/core/guards/unsaved-changes/unsaved-changes.guard';
 import { PURCHASE_ORDER_LIST } from '@app/modules/inventory/purchase-order/config/purchase-order-list.config';
+import { STOCK_ADJUSTMENT_LIST } from '@app/modules/inventory/stock-adjustment/config/stock-adjustment-list.config';
 import { STOCK_MOVEMENT_LIST } from '@app/modules/inventory/stock-movement/config/stock-movement-list.config';
 import { STOCK_OVERVIEW_LIST } from '@app/modules/inventory/stock-overview/config/stock-overview-list.config';
 
@@ -63,6 +64,33 @@ export const INVENTORY_ROUTES: Routes = [
                 canActivate: [permissionGuard],
                 data: { permission: PURCHASE_ORDER_LIST.permission },
                 loadComponent: () => import('./purchase-order/pages/purchase-order-detail/purchase-order-detail.component').then((m) => m.PurchaseOrderDetailComponent),
+            },
+            {
+                path: 'stock-adjustments',
+                canActivate: [permissionGuard],
+                data: { permission: STOCK_ADJUSTMENT_LIST.permission },
+                loadComponent: () => import('./stock-adjustment/pages/stock-adjustment-list/stock-adjustment-list.component').then((m) => m.StockAdjustmentListComponent),
+            },
+            // Before ':oid', or "new" is read as an adjustment's id.
+            {
+                path: 'stock-adjustments/new',
+                canActivate: [permissionGuard],
+                canDeactivate: [unsavedChangesGuard],
+                data: { permission: 'inventory.stock-adjustment.create' },
+                loadComponent: () => import('./stock-adjustment/pages/stock-adjustment-create/stock-adjustment-create.component').then((m) => m.StockAdjustmentCreateComponent),
+            },
+            {
+                path: 'stock-adjustments/:oid/edit',
+                canActivate: [permissionGuard],
+                canDeactivate: [unsavedChangesGuard],
+                data: { permission: 'inventory.stock-adjustment.edit' },
+                loadComponent: () => import('./stock-adjustment/pages/stock-adjustment-edit/stock-adjustment-edit.component').then((m) => m.StockAdjustmentEditComponent),
+            },
+            {
+                path: 'stock-adjustments/:oid',
+                canActivate: [permissionGuard],
+                data: { permission: STOCK_ADJUSTMENT_LIST.permission },
+                loadComponent: () => import('./stock-adjustment/pages/stock-adjustment-detail/stock-adjustment-detail.component').then((m) => m.StockAdjustmentDetailComponent),
             },
         ],
     },

@@ -28,7 +28,7 @@ describe('the stock movements list config', () => {
     it('shows a movement as a signed change, and names its reason for every reason the server writes', () => {
         expect(table.columns.find((c) => c.key === 'quantity')).toEqual(expect.objectContaining({ type: 'number', signed: true }));
         const reasons = table.columns.find((c) => c.type === 'status');
-        expect(Object.keys(reasons?.type === 'status' ? reasons.tones : {})).toEqual(['carried_over', 'received', 'sold', 'dispatched', 'returned', 'disposed', 'dispose_reversed']);
+        expect(Object.keys(reasons?.type === 'status' ? reasons.tones : {})).toEqual(['carried_over', 'received', 'sold', 'dispatched', 'returned', 'disposed', 'dispose_reversed', 'adjusted', 'opening_stock']);
     });
 
     it('links a received movement to its purchase order, a route the module declares', () => {
