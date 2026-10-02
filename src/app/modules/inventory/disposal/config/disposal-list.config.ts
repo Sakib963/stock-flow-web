@@ -16,16 +16,11 @@ export const DISPOSAL_STATUS: ToneMap = {
 
 export const DISPOSAL_METHOD: ToneMap = Object.fromEntries(DISPOSAL_METHODS.map((method) => [method, { label: `inventory.disposal.method.${method}`, tone: 'neutral' }]));
 
-const SUBMITTED = { field: 'status', in: ['Submitted'] } as const;
-const EDITABLE = { field: 'status', in: ['Draft', 'Submitted'] } as const;
-
 export const DISPOSAL_LIST: ListShellPageConfig = {
     permission: 'inventory.product-dispose.view',
     header: {
         count: true,
-        actions: [
-            { key: 'create', label: 'inventory.disposal.add', icon: 'lucidePlus', permission: 'inventory.product-dispose.create', primary: true, run: { kind: 'navigate', route: DISPOSAL_ROUTES.create } },
-        ],
+        actions: [{ key: 'create', label: 'inventory.disposal.add', icon: 'lucidePlus', permission: 'inventory.product-dispose.create', primary: true, run: { kind: 'navigate', route: DISPOSAL_ROUTES.create } }],
     },
     stats: [
         { key: 'draft', label: 'inventory.disposal.stat.draft', icon: 'lucideFilePen', tone: 'warning' },
@@ -35,9 +30,7 @@ export const DISPOSAL_LIST: ListShellPageConfig = {
     filter: {
         render: 'modal',
         search: { placeholder: 'inventory.disposal.searchPlaceholder' },
-        fields: [
-            { key: 'status', label: 'inventory.disposal.status.label', type: 'select', choices: Object.entries(DISPOSAL_STATUS).map(([value, style]) => ({ value, label: style.label })) },
-        ],
+        fields: [{ key: 'status', label: 'inventory.disposal.status.label', type: 'select', choices: Object.entries(DISPOSAL_STATUS).map(([value, style]) => ({ value, label: style.label })) }],
     },
     table: {
         key: 'inventory.disposal',
@@ -58,9 +51,6 @@ export const DISPOSAL_LIST: ListShellPageConfig = {
         layouts: [{ type: 'table' }],
         rowActions: [
             { key: 'view', label: 'inventory.disposal.view', icon: 'lucideEye', permission: 'inventory.product-dispose.view', stateful: false, run: { kind: 'navigate', route: DISPOSAL_ROUTES.detailPattern } },
-            { key: 'edit', label: 'inventory.disposal.edit', icon: 'lucidePencil', permission: 'inventory.product-dispose.edit', stateful: false, when: EDITABLE, run: { kind: 'navigate', route: DISPOSAL_ROUTES.editPattern } },
-            // Approve lives on the record page, where the lines are read first: it is never a click from a list.
-            { key: 'open', label: 'inventory.disposal.openToApprove', icon: 'lucideBadgeCheck', permission: 'inventory.product-dispose.approve', stateful: false, when: SUBMITTED, run: { kind: 'navigate', route: DISPOSAL_ROUTES.detailPattern } },
         ],
         rowActionStyle: 'inline',
         phoneRowActionStyle: 'menu',
