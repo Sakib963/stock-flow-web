@@ -36,6 +36,10 @@ export const routes: Routes = [
                 path: 'inventory',
                 loadChildren: () => import('@app/modules/inventory/inventory.routes').then((m) => m.INVENTORY_ROUTES),
             },
+            {
+                path: 'sales',
+                loadChildren: () => import('@app/modules/sales/sales.routes').then((m) => m.SALES_ROUTES),
+            },
         ],
     },
     { path: '**', redirectTo: '' },

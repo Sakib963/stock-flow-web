@@ -52,6 +52,10 @@ export interface SessionBusiness {
     orderSystem: string;
     /** The IANA zone every time on screen is shown in, such as Asia/Dhaka. */
     timeZone: string;
+    /** Printed under the name on a counter receipt. */
+    address?: string | null;
+    phone?: string | null;
+    receiptFooter?: string | null;
 }
 
 export interface SessionCounters {

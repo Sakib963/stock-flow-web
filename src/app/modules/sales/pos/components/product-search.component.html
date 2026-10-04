@@ -1,0 +1,69 @@
+<div class="flex min-h-0 flex-col gap-2">
+    <nz-input-wrapper nzSize="large" class="w-full">
+        <ng-icon nzInputPrefix name="lucideScanBarcode" size="18px" class="text-ink-faint" aria-hidden="true" />
+        <input
+            #box
+            nz-input
+            type="search"
+            autocomplete="off"
+            enterkeyhint="search"
+            data-pos="search"
+            [attr.aria-label]="'sales.pos.searchLabel' | translate"
+            [attr.placeholder]="'sales.pos.searchPlaceholder' | translate"
+            [ngModel]="text()"
+            (ngModelChange)="typed($event)"
+            (keydown.enter)="enter($event)"
+            (keydown.escape)="clear()"
+        />
+        @if (text()) {
+            <button nzInputSuffix type="button" class="sf-icon-btn" [attr.aria-label]="'sales.pos.clearSearch' | translate" (click)="clear(); focus()">
+                <ng-icon name="lucideX" size="16px" aria-hidden="true" />
+            </button>
+        }
+    </nz-input-wrapper>
+
+    @if (text().trim()) {
+        <div class="max-h-[min(22rem,45vh)] overflow-y-auto rounded-container border border-line bg-white" data-pos="results" role="listbox" [attr.aria-label]="'sales.pos.resultsLabel' | translate" aria-live="polite">
+            @if (failed(); as kind) {
+                <div class="flex items-center justify-between gap-2 px-3 py-3 text-xs text-danger-ink" role="alert">
+                    <span>{{ 'sales.pos.searchFailed.' + kind | translate }}</span>
+                    <button nz-button nzSize="small" type="button" class="inline-flex items-center gap-1.5" (click)="retry()">
+                        <ng-icon name="lucideRotateCw" size="13px" aria-hidden="true" />
+                        <span>{{ 'form.retry' | translate }}</span>
+                    </button>
+                </div>
+            } @else if (loading() && !results().length) {
+                <div class="flex items-center gap-2 px-3 py-3 text-xs text-ink-muted">
+                    <nz-spin nzSimple nzSize="small" />
+                    <span>{{ 'sales.pos.searching' | translate }}</span>
+                </div>
+            } @else if (!results().length) {
+                <p class="m-0 px-3 py-3 text-xs text-ink-muted" data-pos="no-results">{{ 'sales.pos.noResults' | translate: { text: searched() } }}</p>
+            } @else {
+                @for (group of groups(); track group.oid) {
+                    <div class="flex items-baseline gap-2 border-b border-line-soft bg-surface-sunken px-3 py-1.5">
+                        <span class="text-[13px] font-bold text-ink">{{ group.name }}</span>
+                        @if (group.sku) {
+                            <span class="font-mono text-xs text-ink-muted">{{ group.sku }}</span>
+                        }
+                    </div>
+                    @for (batch of group.batches; track batch.inventory_oid) {
+                        <button type="button" role="option" class="flex min-h-10 w-full cursor-pointer items-center gap-3 border-b border-line-soft bg-white px-3 py-1.5 text-left transition-colors last:border-b-0 hover:bg-primary-wash focus-visible:bg-primary-wash pointer-coarse:min-h-12 motion-reduce:transition-none" [attr.data-batch]="batch.batch_code" (click)="pick(batch)">
+                            <span class="min-w-0 flex-1 font-mono text-xs text-ink-body">{{ batch.batch_code }}</span>
+                            @switch (expiry(batch)) {
+                                @case ('expired') {
+                                    <status-tag label="inventory.expiry.expired" tone="danger" icon="lucideCalendarX" />
+                                }
+                                @case ('soon') {
+                                    <status-tag label="inventory.expiry.soon" tone="warning" icon="lucideCalendarClock" />
+                                }
+                            }
+                            <span class="w-20 text-right text-xs text-ink-muted">{{ 'sales.pos.left' | translate: { count: (batch.sellable_quantity | digits) } }}</span>
+                            <span class="w-24 text-right font-mono text-[13px] font-semibold text-ink tabular-nums">{{ batch.selling_price | money }}</span>
+                        </button>
+                    }
+                }
+            }
+        </div>
+    }
+</div>

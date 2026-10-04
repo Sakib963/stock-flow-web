@@ -124,4 +124,12 @@ export class APIEndpoint {
     static readonly CANCEL_PURCHASE_ORDER = '/api/v1/inventory/purchase-order/cancel-purchase';
     static readonly GET_PURCHASE_ORDER_REPORT = '/api/v1/inventory/purchase-order/get-purchase-order-report';
     static readonly GET_PURCHASE_ORDER_PRODUCTS_REPORT = '/api/v1/inventory/purchase-order/get-purchase-order-products-report';
+
+    // Sales: the counter
+    static readonly GET_POS_PRODUCT_LIST = '/api/v1/sales/pos/get-product-list';
+    static readonly CHECKOUT_POS_SALE = '/api/v1/sales/pos/checkout';
+    static readonly PARK_POS_CART = '/api/v1/sales/pos/park-cart';
+    static readonly GET_PARKED_CARTS = '/api/v1/sales/pos/get-parked-carts';
+    static readonly DISCARD_PARKED_CART = '/api/v1/sales/pos/discard-parked-cart';
+    static readonly FIND_CUSTOMER_BY_PHONE = '/api/v1/sales/customer/find-customer-by-phone';
 }

@@ -1,5 +1,6 @@
 import { StickerContent } from '@app/core/models/stock-overview.model';
 import { QUIET_ZONE, code128Modules, code128Widths } from '@app/modules/inventory/stock-overview/utils/code128/code128';
+import { styled } from '@app/shared/utils/styled/styled';
 
 /**
  * A 50 x 25 mm thermal sticker (decided by the user, 2026-09-30). A module of 0.25 mm is 2 dots on a
@@ -9,11 +10,6 @@ import { QUIET_ZONE, code128Modules, code128Widths } from '@app/modules/inventor
 export const STICKER = { width: 50, height: 25, module: 0.25, barHeight: 8 } as const;
 
 const SVG = 'http://www.w3.org/2000/svg';
-
-const styled = <T extends HTMLElement>(element: T, style: Record<string, string>): T => {
-    for (const [property, value] of Object.entries(style)) element.style.setProperty(property, value);
-    return element;
-};
 
 const line = (doc: Document, text: string, style: Record<string, string>): HTMLElement => {
     const element = styled(doc.createElement('div'), { 'text-align': 'center', overflow: 'hidden', ...style });
