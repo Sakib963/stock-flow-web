@@ -2208,13 +2208,9 @@
                 "printerHint": "প্রিন্ট ডায়ালগে রসিদ প্রিন্টার, পেপার হিসেবে তার রোল, স্কেল ১০০% আর মার্জিন নেই বেছে নিন।",
                 "printLast": "শেষ রসিদ প্রিন্ট",
                 "noneYet": "এই স্ক্রিনে এখনো কোনো বিক্রি হয়নি।",
-                "phone": "ফোন {{phone}}",
                 "invoice": "চালান",
                 "date": "তারিখ",
-                "cashier": "ক্যাশিয়ার",
                 "customer": "ক্রেতা",
-                "detail": "{{quantity}} x {{price}}",
-                "detailDiscounted": "{{quantity}} x {{price}}, প্রতিটিতে {{discount}} ছাড়",
                 "subtotal": "উপমোট",
                 "discount": "ছাড়",
                 "total": "মোট",
@@ -2223,7 +2219,11 @@
                 "due": "বাকি",
                 "received": "ক্যাশ পাওয়া",
                 "change": "ফেরত",
-                "thanks": "ধন্যবাদ। আবার আসবেন।"
+                "thanks": "ধন্যবাদ!",
+                "item": "{{name}} x{{quantity}}",
+                "discountEach": "প্রতিটিতে ছাড় {{amount}}",
+                "amount": "{{amount}} টাকা",
+                "poweredBy": "Powered by StockFlow"
             }
         }
     }

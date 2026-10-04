@@ -1,7 +1,9 @@
 import { styled } from '@app/shared/utils/styled/styled';
 
 /**
- * The counter receipt, for a thermal roll printer.
+ * The counter receipt, for a thermal roll printer. Its structure is the old counter receipt's: the
+ * business, invoice, date and customer, one line per item, the total in BDT, then thanks and the
+ * Powered by line.
  *
  * The old receipt printed faint, about three quarters legible. It was set in the browser's monospace
  * font, which on Windows is Courier New: hairline strokes thinner than one dot of a 203 dpi head, so
@@ -20,25 +22,28 @@ const PAPER: Record<ReceiptPaper, { roll: number; print: number; size: number }>
 };
 
 export interface ReceiptLine {
+    /** "Floral print kurti x2". */
     name: string;
-    /** "2 x 1,450.00", and the discount per unit when there is one. */
-    detail: string;
-    total: string;
+    /** Quantity times the selling price, before any discount. */
+    amount: string;
+    /** "Discount 50.00 each", when the line has one. */
+    note: string | null;
 }
 
 export interface ReceiptContent {
     business: string;
     /** Address and phone, each its own line. */
     contact: string[];
-    /** Invoice, date, cashier, customer: label and value. */
+    /** Invoice, date and customer: label and value. */
     meta: [string, string][];
     lines: ReceiptLine[];
-    /** Subtotal, discount, then the total, which is drawn larger. */
+    /** Subtotal and discount, shown only when there is a discount. */
     totals: [string, string][];
     total: [string, string];
-    /** How it was paid: method, paid, still due, cash received, change. */
+    /** How it was paid: method, and paid and due on a part payment, or cash received and change. */
     payment: [string, string][];
-    footer: string;
+    thanks: string;
+    poweredBy: string;
 }
 
 const FONT = "Arial, 'Nirmala UI', 'Vrinda', Helvetica, sans-serif";
@@ -89,19 +94,19 @@ export const drawReceipt = (doc: Document, content: ReceiptContent, paper: Recei
     receipt.append(rule(doc));
 
     for (const line of content.lines) {
-        receipt.append(text(doc, line.name, { 'margin-top': '1mm' }));
-        receipt.append(pair(doc, line.detail, line.total));
+        receipt.append(pair(doc, line.name, line.amount, { 'margin-top': '0.8mm' }));
+        if (line.note) receipt.append(text(doc, line.note, { 'padding-left': '3mm' }));
     }
 
     receipt.append(rule(doc));
     for (const [label, value] of content.totals) receipt.append(pair(doc, label, value));
     receipt.append(pair(doc, content.total[0], content.total[1], { 'font-size': `${size + 4}px`, 'margin-top': '1mm' }));
-    receipt.append(rule(doc));
-    for (const [label, value] of content.payment) receipt.append(pair(doc, label, value));
-    if (content.footer) {
+    if (content.payment.length) {
         receipt.append(rule(doc));
-        for (const line of content.footer.split('\n')) receipt.append(text(doc, line, { 'text-align': 'center' }));
+        for (const [label, value] of content.payment) receipt.append(pair(doc, label, value));
     }
+    receipt.append(text(doc, content.thanks, { 'text-align': 'center', 'margin-top': '5mm' }));
+    receipt.append(text(doc, content.poweredBy, { 'text-align': 'center' }));
     return receipt;
 };
 

@@ -1,4 +1,4 @@
-<page-header [title]="'sales.pos.title' | translate">
+<page-header [title]="'sales.pos.title' | translate" [compact]="true">
     @if (canSell) {
         <button nz-button type="button" class="inline-flex items-center gap-1.5" data-pos="receipt" nz-popover nzPopoverTrigger="click" nzPopoverPlacement="bottomRight" [nzPopoverTitle]="'sales.pos.receipt.settings' | translate" [nzPopoverContent]="receiptSettings">
             <ng-icon name="lucidePrinter" size="14px" aria-hidden="true" />

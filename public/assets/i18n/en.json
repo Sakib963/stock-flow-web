@@ -2208,22 +2208,22 @@
                 "printerHint": "In the print dialog, pick the receipt printer, its roll as paper, scale 100% and no margins.",
                 "printLast": "Print last receipt",
                 "noneYet": "No sale yet on this screen.",
-                "phone": "Phone {{phone}}",
                 "invoice": "Invoice",
                 "date": "Date",
-                "cashier": "Cashier",
                 "customer": "Customer",
-                "detail": "{{quantity}} x {{price}}",
-                "detailDiscounted": "{{quantity}} x {{price}}, less {{discount}} each",
                 "subtotal": "Subtotal",
                 "discount": "Discount",
-                "total": "TOTAL",
+                "total": "Total",
                 "paidBy": "Paid by",
                 "paid": "Paid",
                 "due": "Still to pay",
                 "received": "Cash received",
                 "change": "Change",
-                "thanks": "Thank you. Please come again."
+                "thanks": "Thank you!",
+                "item": "{{name}} x{{quantity}}",
+                "discountEach": "Discount {{amount}} each",
+                "amount": "{{amount}} BDT",
+                "poweredBy": "Powered by StockFlow"
             }
         }
     }

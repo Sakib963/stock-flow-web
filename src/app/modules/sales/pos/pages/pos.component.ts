@@ -400,33 +400,30 @@ export class PosComponent {
         const t = (key: string, params?: Record<string, unknown>) => this._translate.instant('sales.pos.receipt.' + key, params);
         const money = (value: number) => this._money.transform(value);
         const business = this._session.business();
-        const customer = this.customerFound()?.name || this.customerName().trim() || null;
-        const phone = this.normalizedPhone();
+        const customer = this.customerFound()?.name || this.customerName().trim() || this.normalizedPhone();
         const due = this.total() - paid;
         const received = this.change() !== null ? this.received() : null;
+        const rows = (...pairs: ([string, string] | null)[]) => pairs.filter((pair): pair is [string, string] => !!pair);
         return {
             business: business?.name ?? '',
-            contact: [business?.address, business?.phone ? t('phone', { phone: business.phone }) : null].filter((line): line is string => !!line),
-            meta: [
-                [t('invoice'), invoice],
-                [t('date'), new RecordDatePipe().transform(new Date(), this.language(), 'date-time-12')],
-                [t('cashier'), this._session.user()?.name ?? ''],
-                ...(phone ? ([[t('customer'), customer ? `${customer}, ${phone}` : phone]] as [string, string][]) : []),
-            ],
+            contact: [business?.address, business?.phone].filter((line): line is string => !!line),
+            meta: rows([t('invoice'), invoice], [t('date'), new RecordDatePipe().transform(new Date(), this.language(), 'date-time-12')], customer ? [t('customer'), customer] : null),
             lines: this.lines().map((line) => ({
-                name: line.product_name,
-                detail: t(line.discount ? 'detailDiscounted' : 'detail', { quantity: this._digits.transform(line.quantity), price: money(line.selling_price), discount: money(line.discount) }),
-                total: money(this.lineTotal(line)),
+                name: t('item', { name: line.product_name, quantity: this._digits.transform(line.quantity) }),
+                amount: money(line.selling_price * line.quantity),
+                note: line.discount ? t('discountEach', { amount: money(line.discount) }) : null,
             })),
-            totals: [[t('subtotal'), money(this.subtotal())], ...(this.discountTotal() ? ([[t('discount'), '-' + money(this.discountTotal())]] as [string, string][]) : [])],
-            total: [t('total'), money(this.total())],
-            payment: [
+            totals: this.discountTotal() ? rows([t('subtotal'), money(this.subtotal())], [t('discount'), '-' + money(this.discountTotal())]) : [],
+            total: [t('total'), t('amount', { amount: money(this.total()) })],
+            payment: rows(
                 [t('paidBy'), this._translate.instant('sales.pos.method.' + this.method())],
-                [t('paid'), money(paid)],
-                ...(due > 0 ? ([[t('due'), money(due)]] as [string, string][]) : []),
-                ...(received !== null ? ([[t('received'), money(received)], [t('change'), money(this.change()!)]] as [string, string][]) : []),
-            ],
-            footer: business?.receiptFooter || t('thanks'),
+                due > 0 ? [t('paid'), money(paid)] : null,
+                due > 0 ? [t('due'), money(due)] : null,
+                received !== null ? [t('received'), money(received)] : null,
+                received !== null ? [t('change'), money(this.change()!)] : null
+            ),
+            thanks: t('thanks'),
+            poweredBy: t('poweredBy'),
         };
     }
 
