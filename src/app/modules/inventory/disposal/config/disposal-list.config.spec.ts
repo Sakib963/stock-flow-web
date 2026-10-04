@@ -17,9 +17,9 @@ describe('the disposals list config', () => {
         expect(money.every((c) => c.permission === 'inventory.stock-value.view')).toBe(true);
     });
 
-    it('never approves from the list: its Submitted row opens the record, where the lines are read first', () => {
+    it('never approves from the list: its only row action is View, which opens the record where the lines are read first', () => {
         const actions = table.rowActions ?? [];
-        expect(actions.every((a) => a.run.kind === 'navigate')).toBe(true);
-        expect(actions.find((a) => a.key === 'open')?.run).toEqual({ kind: 'navigate', route: '/app/inventory/disposals/:oid' });
+        expect(actions.map((a) => a.key)).toEqual(['view']);
+        expect(actions[0].run).toEqual({ kind: 'navigate', route: '/app/inventory/disposals/:oid' });
     });
 });
