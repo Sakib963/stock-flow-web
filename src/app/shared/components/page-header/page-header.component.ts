@@ -57,6 +57,8 @@ export class PageHeaderComponent {
     readonly count = input<number | null>(null);
     /** A request for the count is in flight. Tells an unknown count apart from a failed one. */
     readonly countPending = input(false);
+    /** One line, title and actions only, for a working screen such as the counter where every row of height goes to the work. */
+    readonly compact = input(false);
 
     readonly action = output<ActionEvent>();
 
