@@ -64,12 +64,6 @@ export const drawInvoice = (doc: Document, content: InvoiceContent, qr: string |
     const meta = styled(doc.createElement('div'), { 'text-align': 'right', 'flex-shrink': '0' });
     meta.append(text(doc, 'div', content.title, { 'font-size': '18px', 'font-weight': '700', 'letter-spacing': '0.08em' }));
     for (const [label, value] of content.meta) meta.append(text(doc, 'div', `${label}: ${value}`));
-    if (qr && content.track) {
-        const code = styled(doc.createElement('img'), { width: '22mm', height: '22mm', display: 'block', 'margin-left': 'auto', 'margin-top': '2mm' }) as HTMLImageElement;
-        code.src = qr;
-        code.alt = '';
-        meta.append(code, text(doc, 'div', content.track.label, { 'font-size': '9px' }));
-    }
     head.append(business, meta);
 
     const parties = styled(doc.createElement('div'), { display: 'flex', gap: '8mm', margin: '6mm 0' });
@@ -99,6 +93,13 @@ export const drawInvoice = (doc: Document, content: InvoiceContent, qr: string |
         const notes = styled(doc.createElement('div'), { 'margin-top': '6mm' });
         for (const [label, value] of content.notes) notes.append(text(doc, 'div', `${label}: ${value}`));
         page.append(notes);
+    }
+    // The tracker QR sits at the foot, under the order, where the customer looks once they have read it (the user, 2026-10-05).
+    if (qr && content.track) {
+        const code = styled(doc.createElement('img'), { width: '22mm', height: '22mm', display: 'block', margin: '8mm auto 1mm' }) as HTMLImageElement;
+        code.src = qr;
+        code.alt = '';
+        page.append(code, text(doc, 'div', content.track.label, { 'font-size': '9px', 'text-align': 'center' }));
     }
     page.append(text(doc, 'div', content.thanks, { 'text-align': 'center', 'margin-top': '10mm', 'font-weight': '700' }), text(doc, 'div', content.poweredBy, { 'text-align': 'center', color: '#555', 'font-size': '10px' }));
     return page;
