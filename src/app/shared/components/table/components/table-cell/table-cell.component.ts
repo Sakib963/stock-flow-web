@@ -13,7 +13,7 @@ import { DigitsPipe } from '@app/shared/pipes/digits/digits.pipe';
 import { MoneyPipe } from '@app/shared/pipes/money/money.pipe';
 import { RecordDatePipe } from '@app/shared/pipes/record-date/record-date.pipe';
 import { UserCardComponent } from '@app/shared/components/user-card/user-card.component';
-import { CopyableDirective } from '@app/shared/directives/copyable/copyable.directive';
+import { NzTypographyModule } from 'ng-zorro-antd/typography';
 import { TextPipe } from '@app/shared/pipes/text/text.pipe';
 import { fillRoute } from '@app/shared/utils/fill-route/fill-route';
 import { readPath } from '@app/shared/utils/read-path/read-path';
@@ -38,7 +38,7 @@ const DOT: Record<Tone, string> = {
  */
 @Component({
     selector: 'table-cell',
-    imports: [NgTemplateOutlet, RouterLink, CopyableDirective, NzPopoverModule, NzTooltipModule, TranslatePipe, TextPipe, MoneyPipe, DigitsPipe, RecordDatePipe, StatusTagComponent, UserCardComponent, RendererOutletComponent],
+    imports: [NgTemplateOutlet, RouterLink, NzTypographyModule, NzPopoverModule, NzTooltipModule, TranslatePipe, TextPipe, MoneyPipe, DigitsPipe, RecordDatePipe, StatusTagComponent, UserCardComponent, RendererOutletComponent],
     templateUrl: './table-cell.component.html',
     styleUrl: './table-cell.component.scss',
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -147,5 +147,10 @@ export class TableCellComponent {
 
     stopRow(event: Event): void {
         event.stopPropagation();
+    }
+
+    /** A click on the copy button copies and does not open the row. */
+    stopCopy(event: Event): void {
+        if ((event.target as HTMLElement).closest('.ant-typography-copy')) event.stopPropagation();
     }
 }

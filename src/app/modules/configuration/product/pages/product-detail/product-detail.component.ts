@@ -30,7 +30,7 @@ import { ProductService } from '@app/modules/configuration/product/services/prod
 import { ActionFooterComponent } from '@app/shared/components/action-footer/action-footer.component';
 import { PageHeaderComponent } from '@app/shared/components/page-header/page-header.component';
 import { StatusTagComponent } from '@app/shared/components/status-tag/status-tag.component';
-import { CopyableDirective } from '@app/shared/directives/copyable/copyable.directive';
+import { NzTypographyModule } from 'ng-zorro-antd/typography';
 import { DigitsPipe } from '@app/shared/pipes/digits/digits.pipe';
 import { MoneyPipe } from '@app/shared/pipes/money/money.pipe';
 import { RecordDatePipe } from '@app/shared/pipes/record-date/record-date.pipe';
@@ -45,7 +45,7 @@ import { resolveTone } from '@app/shared/utils/tone-map/tone-map';
  */
 @Component({
     selector: 'product-detail',
-    imports: [NgIcon, NzButtonModule, NzCardModule, NzImageModule, NzSkeletonModule, NzTableModule, NzTimelineModule, NzTooltipModule, RouterLink, TranslatePipe, PageHeaderComponent, StatusTagComponent, ActionFooterComponent, CopyableDirective, BatchExpiryComponent, DigitsPipe, MoneyPipe, RecordDatePipe],
+    imports: [NgIcon, NzButtonModule, NzCardModule, NzImageModule, NzSkeletonModule, NzTableModule, NzTimelineModule, NzTooltipModule, RouterLink, TranslatePipe, PageHeaderComponent, StatusTagComponent, ActionFooterComponent, NzTypographyModule, BatchExpiryComponent, DigitsPipe, MoneyPipe, RecordDatePipe],
     providers: [provideIcons({ lucideArrowLeft, lucideArrowLeftRight, lucideBoxes, lucideChartColumn, lucideCircleX, lucideHandCoins, lucideHistory, lucideImageOff, lucideInfo, lucideLock, lucidePackageCheck, lucidePencil, lucideRotateCw, lucideShoppingCart, lucideTrash2, lucideTruck, lucideUndo2, lucideZap })],
     templateUrl: './product-detail.component.html',
     styleUrl: './product-detail.component.scss',

@@ -29,11 +29,11 @@ interface ColumnBase {
 }
 
 export type Column =
-    | (ColumnBase & { type: 'text'; /** Click to copy on hover, as on an identifier. */ copy?: boolean })
+    | (ColumnBase & { type: 'text'; /** A copy button after the text, as on an identifier. */ copy?: boolean })
     /** Prose that will not fit: the cell clamps and the full value opens in a popover, not a tooltip. */
     | (ColumnBase & { type: 'long-text'; lines?: 1 | 2 })
     | (ColumnBase & { type: 'name'; sub?: string; thumb?: string })
-    | (ColumnBase & { type: 'identifier'; /** Click to copy on hover, through the `copyable` directive. Give the column about 24px more. */ copy?: boolean })
+    | (ColumnBase & { type: 'identifier'; /** A copy button after the value, NG-Zorro's `nzCopyable`. Give the column about 24px more. */ copy?: boolean })
     | (ColumnBase & { type: 'number'; /** A change rather than an amount: +50 in success ink, -3 in danger ink. */ signed?: boolean })
     | (ColumnBase & { type: 'quantity'; unit?: string })
     | (ColumnBase & { type: 'stock'; restockAt: string })

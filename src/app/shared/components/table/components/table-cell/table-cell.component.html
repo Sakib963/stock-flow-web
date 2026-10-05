@@ -24,7 +24,7 @@
         }
         @case ('identifier') {
             @if (col.copy) {
-                <span class="inline-flex items-center whitespace-nowrap" [copyable]="text()">
+                <span class="inline-flex items-center whitespace-nowrap" nz-typography nzCopyable [nzCopyText]="text()" [nzCopyTooltips]="['copy.hint' | translate, 'copy.copied' | translate]" (click)="stopCopy($event)">
                     <ng-container [ngTemplateOutlet]="identifier" />
                 </span>
             } @else {
@@ -43,7 +43,7 @@
         @case ('text') {
             @if (col.copy) {
                 <!-- The text truncates inside, so a long value never pushes the button out of the cell. -->
-                <span class="flex min-w-0 items-center" [copyable]="text()">
+                <span class="flex min-w-0 items-center" nz-typography nzCopyable [nzCopyText]="text()" [nzCopyTooltips]="['copy.hint' | translate, 'copy.copied' | translate]" (click)="stopCopy($event)">
                     <span class="truncate text-ink-muted" [nz-tooltip]="text()">{{ text() }}</span>
                 </span>
             } @else {

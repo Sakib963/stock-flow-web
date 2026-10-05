@@ -208,7 +208,7 @@
                         @for (batch of batches.data; track batch.oid) {
                             <tr>
                                 <td class="font-mono text-xs">
-                                    <span class="inline-flex items-center whitespace-nowrap" [copyable]="batch.batch_code">{{ batch.batch_code }}</span>
+                                    <span class="inline-flex items-center whitespace-nowrap" nz-typography nzCopyable [nzCopyText]="batch.batch_code" [nzCopyTooltips]="['copy.hint' | translate, 'copy.copied' | translate]">{{ batch.batch_code }}</span>
                                 </td>
                                 <td>{{ batch.warehouse_name || ('configuration.product.notSet' | translate) }}</td>
                                 <td>{{ batch.received_on | recordDate: language() : 'date' }}</td>
@@ -280,7 +280,7 @@
                                     <td nzAlign="right" class="text-ink-soft tabular-nums">{{ i + 1 | digits }}</td>
                                     <td class="whitespace-nowrap tabular-nums text-ink-muted">{{ move.created_on | recordDate: language() : 'date-time-12' }}</td>
                                     <td>
-                                        <span class="inline-flex items-center whitespace-nowrap font-mono text-xs text-ink-body" [copyable]="move.batch_code">{{ move.batch_code }}</span>
+                                        <span class="inline-flex items-center whitespace-nowrap font-mono text-xs text-ink-body" nz-typography nzCopyable [nzCopyText]="move.batch_code" [nzCopyTooltips]="['copy.hint' | translate, 'copy.copied' | translate]">{{ move.batch_code }}</span>
                                     </td>
                                     <td>
                                         @if (reasonOf(move.reason); as style) {

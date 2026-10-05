@@ -26,7 +26,7 @@ import { STOCK_OVERVIEW_ROUTES } from '@app/modules/inventory/stock-overview/con
 import { ActionFooterComponent } from '@app/shared/components/action-footer/action-footer.component';
 import { PageHeaderComponent } from '@app/shared/components/page-header/page-header.component';
 import { StatusTagComponent } from '@app/shared/components/status-tag/status-tag.component';
-import { CopyableDirective } from '@app/shared/directives/copyable/copyable.directive';
+import { NzTypographyModule } from 'ng-zorro-antd/typography';
 import { DigitsPipe } from '@app/shared/pipes/digits/digits.pipe';
 import { MoneyPipe } from '@app/shared/pipes/money/money.pipe';
 import { RecordDatePipe } from '@app/shared/pipes/record-date/record-date.pipe';
@@ -44,7 +44,7 @@ type Closing = 'reject' | 'cancel';
  */
 @Component({
     selector: 'disposal-detail',
-    imports: [NgIcon, ReactiveFormsModule, RouterLink, NzButtonModule, NzCardModule, NzFormModule, NzInputModule, NzModalModule, NzSkeletonModule, NzTableModule, NzTimelineModule, TranslatePipe, PageHeaderComponent, StatusTagComponent, ActionFooterComponent, CopyableDirective, DigitsPipe, MoneyPipe, RecordDatePipe],
+    imports: [NgIcon, ReactiveFormsModule, RouterLink, NzButtonModule, NzCardModule, NzFormModule, NzInputModule, NzModalModule, NzSkeletonModule, NzTableModule, NzTimelineModule, TranslatePipe, PageHeaderComponent, StatusTagComponent, ActionFooterComponent, NzTypographyModule, DigitsPipe, MoneyPipe, RecordDatePipe],
     providers: [MoneyPipe, DigitsPipe, provideIcons({ lucideArrowLeft, lucideBadgeCheck, lucideBan, lucideCircleX, lucideFilePen, lucideFileSpreadsheet, lucideHistory, lucideInfo, lucideListOrdered, lucidePackageMinus, lucidePackagePlus, lucidePencil, lucideRotateCw, lucideWallet, lucideZap })],
     templateUrl: './disposal-detail.component.html',
     styleUrl: './disposal-detail.component.scss',

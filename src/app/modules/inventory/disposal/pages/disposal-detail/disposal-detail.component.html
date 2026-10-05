@@ -95,7 +95,7 @@
             <dl class="m-0 grid grid-cols-2 gap-x-6 gap-y-4 md:grid-cols-4">
                 <div>
                     <dt class="text-xs text-ink-muted">{{ 'inventory.disposal.number' | translate }}</dt>
-                    <dd class="mt-1 mb-0 font-mono text-sm font-semibold text-ink" [copyable]="a.dispose_no ?? ''">{{ a.dispose_no }}</dd>
+                    <dd class="mt-1 mb-0 font-mono text-sm font-semibold text-ink" nz-typography nzCopyable [nzCopyText]="a.dispose_no ?? ''" [nzCopyTooltips]="['copy.hint' | translate, 'copy.copied' | translate]">{{ a.dispose_no }}</dd>
                 </div>
                 <div>
                     <dt class="text-xs text-ink-muted">{{ 'inventory.disposal.status.label' | translate }}</dt>
@@ -194,7 +194,7 @@
                                 </td>
                                 <td>
                                     @if (line.batch_code) {
-                                        <span class="font-mono text-xs text-ink" [copyable]="line.batch_code">{{ line.batch_code }}</span>
+                                        <span class="font-mono text-xs text-ink" nz-typography nzCopyable [nzCopyText]="line.batch_code" [nzCopyTooltips]="['copy.hint' | translate, 'copy.copied' | translate]">{{ line.batch_code }}</span>
                                         @if (open() && line.free !== null) {
                                             <span class="block text-xs text-ink-muted">{{ 'inventory.disposal.batchFree' | translate: { onHand: line.on_hand, free: line.free } | digits }}</span>
                                         }

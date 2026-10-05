@@ -144,7 +144,7 @@
                             <tr [attr.data-batch]="batch.batch_code">
                                 <td nzAlign="right" class="text-ink-soft tabular-nums">{{ i + 1 | digits }}</td>
                                 <td>
-                                    <span class="inline-flex items-center font-mono text-xs whitespace-nowrap text-ink-body" [copyable]="batch.batch_code">{{ batch.batch_code }}</span>
+                                    <span class="inline-flex items-center font-mono text-xs whitespace-nowrap text-ink-body" nz-typography nzCopyable [nzCopyText]="batch.batch_code" [nzCopyTooltips]="['copy.hint' | translate, 'copy.copied' | translate]">{{ batch.batch_code }}</span>
                                     <span class="mt-0.5 block text-xs text-ink-muted">{{ 'inventory.stockOverview.batchStatus.' + batch.status | translate }}</span>
                                     @if (loaded.product.has_expiry) {
                                         <batch-expiry class="block" [batchOid]="batch.oid" [batchCode]="batch.batch_code" [day]="batch.expiry_date" [canEdit]="canEditExpiry()" (changed)="load()" />
@@ -339,7 +339,7 @@
                                 <tr>
                                     <td nzAlign="right" class="text-ink-soft tabular-nums">{{ i + 1 | digits }}</td>
                                     <td class="whitespace-nowrap tabular-nums text-ink-muted">{{ move.created_on | recordDate: language() : 'date-time-12' }}</td>
-                                    <td><span class="inline-flex items-center font-mono text-xs whitespace-nowrap text-ink-body" [copyable]="move.batch_code">{{ move.batch_code }}</span></td>
+                                    <td><span class="inline-flex items-center font-mono text-xs whitespace-nowrap text-ink-body" nz-typography nzCopyable [nzCopyText]="move.batch_code" [nzCopyTooltips]="['copy.hint' | translate, 'copy.copied' | translate]">{{ move.batch_code }}</span></td>
                                     <td>
                                         @if (reasonOf(move.reason); as style) {
                                             <status-tag [label]="style.label" [tone]="style.tone" [icon]="style.icon" />

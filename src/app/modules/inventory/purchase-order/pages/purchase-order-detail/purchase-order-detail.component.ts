@@ -29,7 +29,7 @@ import { budgetPerUnit, marginPerUnit } from '@app/modules/inventory/purchase-or
 import { ActionFooterComponent } from '@app/shared/components/action-footer/action-footer.component';
 import { PageHeaderComponent } from '@app/shared/components/page-header/page-header.component';
 import { StatusTagComponent } from '@app/shared/components/status-tag/status-tag.component';
-import { CopyableDirective } from '@app/shared/directives/copyable/copyable.directive';
+import { NzTypographyModule } from 'ng-zorro-antd/typography';
 import { DigitsPipe } from '@app/shared/pipes/digits/digits.pipe';
 import { MoneyPipe } from '@app/shared/pipes/money/money.pipe';
 import { RecordDatePipe } from '@app/shared/pipes/record-date/record-date.pipe';
@@ -56,7 +56,7 @@ interface OrderStat {
  */
 @Component({
     selector: 'purchase-order-detail',
-    imports: [NgIcon, ReactiveFormsModule, NzButtonModule, NzCardModule, NzFormModule, NzInputModule, NzInputNumberModule, NzModalModule, NzRadioModule, NzSkeletonModule, NzTableModule, NzTimelineModule, TranslatePipe, PageHeaderComponent, StatusTagComponent, ActionFooterComponent, CopyableDirective, MoneyPipe, RecordDatePipe, DigitsPipe, BatchExpiryComponent],
+    imports: [NgIcon, ReactiveFormsModule, NzButtonModule, NzCardModule, NzFormModule, NzInputModule, NzInputNumberModule, NzModalModule, NzRadioModule, NzSkeletonModule, NzTableModule, NzTimelineModule, TranslatePipe, PageHeaderComponent, StatusTagComponent, ActionFooterComponent, NzTypographyModule, MoneyPipe, RecordDatePipe, DigitsPipe, BatchExpiryComponent],
     providers: [
         MoneyPipe,
         provideIcons({

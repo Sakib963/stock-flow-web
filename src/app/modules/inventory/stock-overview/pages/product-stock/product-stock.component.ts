@@ -34,7 +34,7 @@ import { ActionFooterComponent } from '@app/shared/components/action-footer/acti
 import { BatchExpiryComponent } from '@app/shared/components/batch-expiry/batch-expiry.component';
 import { PageHeaderComponent } from '@app/shared/components/page-header/page-header.component';
 import { StatusTagComponent } from '@app/shared/components/status-tag/status-tag.component';
-import { CopyableDirective } from '@app/shared/directives/copyable/copyable.directive';
+import { NzTypographyModule } from 'ng-zorro-antd/typography';
 import { DigitsPipe } from '@app/shared/pipes/digits/digits.pipe';
 import { MoneyPipe } from '@app/shared/pipes/money/money.pipe';
 import { RecordDatePipe } from '@app/shared/pipes/record-date/record-date.pipe';
@@ -59,7 +59,7 @@ interface Figure {
  */
 @Component({
     selector: 'product-stock',
-    imports: [FormsModule, NgIcon, NzButtonModule, NzCardModule, NzDropdownModule, NzMenuModule, NzSkeletonModule, NzSwitchModule, NzTableModule, NzTimelineModule, NzTooltipModule, RouterLink, TranslatePipe, PageHeaderComponent, StatusTagComponent, ActionFooterComponent, BatchExpiryComponent, BatchPriceDialogComponent, BatchBudgetDialogComponent, StickerDialogComponent, CopyableDirective, DigitsPipe, MoneyPipe, RecordDatePipe],
+    imports: [FormsModule, NgIcon, NzButtonModule, NzCardModule, NzDropdownModule, NzMenuModule, NzSkeletonModule, NzSwitchModule, NzTableModule, NzTimelineModule, NzTooltipModule, RouterLink, TranslatePipe, PageHeaderComponent, StatusTagComponent, ActionFooterComponent, BatchExpiryComponent, BatchPriceDialogComponent, BatchBudgetDialogComponent, StickerDialogComponent, NzTypographyModule, DigitsPipe, MoneyPipe, RecordDatePipe],
     providers: [provideIcons({ lucideArrowLeft, lucideArrowLeftRight, lucideBadgeDollarSign, lucideBanknote, lucideBoxes, lucideCalendarClock, lucideEllipsis, lucideFileSpreadsheet, lucideHistory, lucideInfo, lucideLock, lucidePackageCheck, lucidePercent, lucidePrinter, lucideRotateCw, lucideShoppingCart, lucideSlidersHorizontal, lucideTag, lucideTrash2, lucideTrendingDown, lucideTrendingUp, lucideWallet, lucideWrench, lucideZap })],
     templateUrl: './product-stock.component.html',
     styleUrl: './product-stock.component.scss',
