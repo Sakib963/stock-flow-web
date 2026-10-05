@@ -1,10 +1,10 @@
 import { NgTemplateOutlet } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
-import { ChangeDetectionStrategy, Component, computed, inject, signal, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, TemplateRef, computed, inject, signal, viewChild } from '@angular/core';
 import { toObservable, takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { NgIcon, provideIcons } from '@ng-icons/core';
-import { lucidePrinter, lucideCalendarClock, lucideCalendarX, lucideCheck, lucideEraser, lucideMinus, lucidePause, lucidePlay, lucidePlus, lucideRotateCw, lucideShoppingCart, lucideTrash2, lucideUserRound, lucideWallet, lucideX } from '@ng-icons/lucide';
+import { lucideBanknote, lucidePrinter, lucideCalendarClock, lucideCalendarX, lucideCheck, lucideCircleCheck, lucideCreditCard, lucideEllipsis, lucideEraser, lucideInfo, lucideKeyboard, lucideMinus, lucidePackage, lucidePause, lucidePlay, lucidePlus, lucideRotateCw, lucideScanBarcode, lucideShoppingCart, lucideSmartphone, lucideTrash2, lucideUndo2, lucideUserRound, lucideWallet, lucideX } from '@ng-icons/lucide';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzDrawerModule } from 'ng-zorro-antd/drawer';
 import { NzInputModule } from 'ng-zorro-antd/input';
@@ -20,7 +20,7 @@ import { NzTableModule } from 'ng-zorro-antd/table';
 import { NzTooltipModule } from 'ng-zorro-antd/tooltip';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { catchError, distinctUntilChanged, map, of, switchMap } from 'rxjs';
-import { CartLine, CustomerLookup, PAYMENT_METHODS, PAYMENT_STATUSES, ParkedCart, PaymentMethod, PaymentStatus, PosBatch } from '@app/core/models/pos.model';
+import { CartLine, CustomerLookup, PAYMENT_STATUSES, ParkedCart, PaymentMethod, PaymentStatus, PosBatch } from '@app/core/models/pos.model';
 import { RequestFailure } from '@app/core/models/api.model';
 import { LanguageService } from '@app/core/services/language/language.service';
 import { SessionService } from '@app/core/services/session/session.service';
@@ -40,6 +40,36 @@ import { isPhoneWidth, viewportWidth } from '@app/shared/utils/viewport/viewport
 
 type Lookup = { state: 'idle' } | { state: 'loading' } | { state: 'failed'; kind: RequestFailure } | { state: 'done'; result: CustomerLookup };
 
+/** What the cashier needs once a sale is made: above all, the change to hand back. */
+interface SaleDone {
+    invoice_no: string;
+    total: number;
+    paid: number;
+    received: number | null;
+    change: number | null;
+}
+
+/**
+ * Function keys only: they type nothing into a field and no browser acts on them on its own, so they
+ * work from any field without stealing a keystroke someone meant to type. F5 (reload), F11 and F12
+ * are left alone.
+ */
+export const POS_SHORTCUTS = [
+    { key: 'F2', label: 'sales.pos.shortcut.search' },
+    { key: 'F4', label: 'sales.pos.shortcut.received' },
+    { key: 'F8', label: 'sales.pos.shortcut.park' },
+    { key: 'F9', label: 'sales.pos.shortcut.checkout' },
+] as const;
+
+/** A line this close to the last of its batch says so, before Checkout finds out. */
+const LOW_STOCK_LEFT = 2;
+
+/** The buttons the counter shows. bKash and Nagad sit under MFS, but each sale still records its own wallet. */
+const TENDERS = ['cash', 'mfs', 'card', 'other'] as const;
+type Tender = (typeof TENDERS)[number];
+const WALLETS = ['bkash', 'nagad'] as const;
+const TENDER_ICONS: Record<Tender, string> = { cash: 'lucideBanknote', mfs: 'lucideSmartphone', card: 'lucideCreditCard', other: 'lucideEllipsis' };
+
 /**
  * The counter (sales REQ-10 to REQ-24). The page never scrolls on a desktop or tablet: the cart scrolls
  * in its own panel and the total with Checkout is always in view. On a phone the page scrolls and a
@@ -52,10 +82,10 @@ type Lookup = { state: 'idle' } | { state: 'loading' } | { state: 'failed'; kind
 @Component({
     selector: 'pos',
     imports: [FormsModule, NgTemplateOutlet, NgIcon, NzButtonModule, NzDrawerModule, NzInputModule, NzInputNumberModule, NzModalModule, NzPopoverModule, NzRadioModule, NzSwitchModule, NzSkeletonModule, NzSpinModule, NzTableModule, NzTooltipModule, TranslatePipe, PageHeaderComponent, ProductSearchComponent, StatusTagComponent, DigitsPipe, MoneyPipe, RecordDatePipe],
-    providers: [DigitsPipe, MoneyPipe, provideIcons({ lucidePrinter, lucideCalendarClock, lucideCalendarX, lucideCheck, lucideEraser, lucideMinus, lucidePause, lucidePlay, lucidePlus, lucideRotateCw, lucideShoppingCart, lucideTrash2, lucideUserRound, lucideWallet, lucideX })],
+    providers: [DigitsPipe, MoneyPipe, provideIcons({ lucideBanknote, lucidePrinter, lucideCalendarClock, lucideCalendarX, lucideCheck, lucideCircleCheck, lucideCreditCard, lucideEllipsis, lucideEraser, lucideInfo, lucideKeyboard, lucideMinus, lucidePackage, lucidePause, lucidePlay, lucidePlus, lucideRotateCw, lucideScanBarcode, lucideShoppingCart, lucideSmartphone, lucideTrash2, lucideUndo2, lucideUserRound, lucideWallet, lucideX })],
     templateUrl: './pos.component.html',
     styleUrl: './pos.component.scss',
-    host: { class: 'flex min-h-0 flex-col md:h-full' },
+    host: { class: 'flex min-h-0 flex-col md:h-full', '(document:keydown)': 'shortcut($event)' },
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PosComponent {
@@ -82,8 +112,25 @@ export class PosComponent {
     /** A finger rather than a mouse: a tablet at the counter gets 44px targets (REQ-12). */
     readonly coarse = window.matchMedia?.('(pointer: coarse)').matches ?? false;
     readonly search = viewChild(ProductSearchComponent);
-    readonly methods = PAYMENT_METHODS;
+    readonly tenders = TENDERS;
+    readonly wallets = WALLETS;
     readonly statuses = PAYMENT_STATUSES;
+    readonly emptySteps = ['sales.pos.emptyStep1', 'sales.pos.emptyStep2', 'sales.pos.emptyStep3'];
+    readonly tenderIcons = TENDER_ICONS;
+    readonly shortcuts = POS_SHORTCUTS;
+    /** A keyboard at a desk; a tablet or a phone has no function keys. */
+    readonly showShortcuts = computed(() => this.canSell && !this.coarse && !this.isPhone());
+
+    /** The line a scan or a pick just added to, lit for a moment so the cashier sees it land. */
+    readonly flashed = signal<string | null>(null);
+    private _flashTimer: ReturnType<typeof setTimeout> | undefined;
+    private readonly _linesBox = viewChild<ElementRef<HTMLElement>>('linesBox');
+
+    readonly removed = signal<{ line: CartLine; index: number } | null>(null);
+    private readonly _undoTemplate = viewChild.required<TemplateRef<void>>('undoNote');
+    private _undoMessage: string | null = null;
+
+    readonly done = signal<SaleDone | null>(null);
 
     readonly cartOid = signal<string>(crypto.randomUUID());
     /** The parked cart on screen, when one was resumed: Park updates it and Checkout sells it. */
@@ -92,7 +139,12 @@ export class PosComponent {
 
     readonly phone = signal('');
     readonly customerName = signal('');
-    readonly method = signal<PaymentMethod>('cash');
+    /** 'mfs' until a wallet is picked, which Checkout waits for. */
+    readonly method = signal<PaymentMethod | 'mfs'>('cash');
+    readonly tender = computed<Tender>(() => {
+        const method = this.method();
+        return method === 'bkash' || method === 'nagad' ? 'mfs' : method;
+    });
     readonly status = signal<PaymentStatus>('paid');
     readonly partial = signal<number | null>(null);
     readonly received = signal<number | null>(null);
@@ -110,6 +162,7 @@ export class PosComponent {
     readonly unanswered = signal(false);
     private readonly _asking = signal(false);
     readonly checkingOut = signal(false);
+    readonly parking = signal(false);
     readonly busy = computed(() => this._asking() || this._pos.saving());
 
     readonly subtotal = computed(() => this.lines().reduce((sum, line) => sum + line.selling_price * line.quantity, 0));
@@ -131,10 +184,19 @@ export class PosComponent {
         return received - this.total();
     });
 
+    /** The exact total and the notes a customer is likely to hand over for it, nearest first. */
+    readonly cashSuggestions = computed(() => {
+        const total = this.total();
+        if (total <= 0) return [];
+        const upTo = (note: number) => Math.ceil(total / note) * note;
+        return [...new Set([total, upTo(100), upTo(500), upTo(1000), upTo(5000)])].slice(0, 4);
+    });
+
     /** Why Checkout cannot be pressed yet, so the button never sits disabled without saying why. */
     readonly blocker = computed<string | null>(() => {
         if (!this.lines().length) return 'sales.pos.blocker.empty';
         if (this.lines().some((line) => line.quantity > line.sellable)) return 'sales.pos.blocker.stock';
+        if (this.method() === 'mfs') return 'sales.pos.blocker.wallet';
         if (this.phoneInvalid()) return 'sales.pos.blocker.phone';
         if (this.lookup().state === 'loading') return 'sales.pos.blocker.lookingUp';
         if (this.needsName() && !this.customerName().trim()) return 'sales.pos.blocker.name';
@@ -160,6 +222,7 @@ export class PosComponent {
                 return;
             }
             this.patch(at, { quantity: line.quantity + 1, sellable: batch.sellable_quantity, selling_price: batch.selling_price, maximum_discount: batch.maximum_discount });
+            this.flash(batch.inventory_oid);
             return;
         }
         this.lines.update((lines) => [
@@ -168,6 +231,7 @@ export class PosComponent {
                 inventory_oid: batch.inventory_oid,
                 product_oid: batch.product_oid,
                 product_name: batch.product_name,
+                image_url: batch.image_url,
                 batch_code: batch.batch_code,
                 expiry_date: batch.expiry_date,
                 selling_price: batch.selling_price,
@@ -177,6 +241,54 @@ export class PosComponent {
                 discount: 0,
             },
         ]);
+        this.flash(batch.inventory_oid);
+    }
+
+    /** How many more of the batch are left after this line, when that is only a few. */
+    lowStock(line: CartLine): number | null {
+        const left = line.sellable - line.quantity;
+        return left >= 0 && left <= LOW_STOCK_LEFT ? left : null;
+    }
+
+    shortcut(event: KeyboardEvent): void {
+        if (!this.showShortcuts() || event.repeat || event.ctrlKey || event.altKey || event.metaKey || event.shiftKey) return;
+        if (!POS_SHORTCUTS.some((shortcut) => shortcut.key === event.key)) return;
+        // A dialog or a drawer on screen owns the keyboard: Checkout must never fire from behind one.
+        if (this.busy() || this.parkOpen() || this.parkedOpen() || this.done()) return;
+        // Cash received is there only for a cash sale paid in full; otherwise F4 is left to the browser.
+        const received = event.key === 'F4' ? document.getElementById('pos-received') : null;
+        if (event.key === 'F4' && !received) return;
+        event.preventDefault();
+        if (event.key === 'F2') this.search()?.focus();
+        else if (received) received.focus();
+        else if (event.key === 'F8') this.openPark();
+        else if (event.key === 'F9') this.checkout();
+    }
+
+    setTender(tender: Tender): void {
+        if (tender !== this.tender()) this.method.set(tender);
+    }
+
+    setReceived(amount: number): void {
+        this.received.set(amount);
+    }
+
+    closeDone(): void {
+        this.done.set(null);
+        this.search()?.focus();
+    }
+
+    focusNewSale(): void {
+        document.querySelector<HTMLElement>('[data-pos="new-sale"]')?.focus();
+    }
+
+    undoRemove(): void {
+        const removed = this.removed();
+        this.dropUndo();
+        // Added again since it was removed: putting it back would count it twice.
+        if (!removed || this.lines().some((line) => line.inventory_oid === removed.line.inventory_oid)) return;
+        this.lines.update((lines) => [...lines.slice(0, removed.index), removed.line, ...lines.slice(removed.index)]);
+        this.flash(removed.line.inventory_oid);
     }
 
     step(index: number, by: number): void {
@@ -194,7 +306,11 @@ export class PosComponent {
     }
 
     remove(index: number): void {
+        const line = this.lines()[index];
         this.lines.update((lines) => lines.filter((_, i) => i !== index));
+        this.dropUndo();
+        this.removed.set({ line, index });
+        this._undoMessage = this._message.info(this._undoTemplate(), { nzDuration: 6000 }).messageId;
     }
 
     discountCap(line: CartLine): number {
@@ -241,25 +357,21 @@ export class PosComponent {
         this._asking.set(true);
         confirmAction(this._modal, {
             title: this._translate.instant('sales.pos.confirmCheckout.title', { total }),
-            body: [
-                this._translate.instant('sales.pos.confirmCheckout.body', { method: this._translate.instant('sales.pos.method.' + this.method()), status: this._translate.instant('sales.pos.status.' + this.status()) }),
-                change ? this._translate.instant('sales.pos.confirmCheckout.change', { change: this._money.transform(change) }) : '',
-            ]
-                .filter(Boolean)
-                .join(' '),
+            body: [this._translate.instant('sales.pos.confirmCheckout.body', { method: this._translate.instant('sales.pos.method.' + this.method()), status: this._translate.instant('sales.pos.status.' + this.status()) }), change ? this._translate.instant('sales.pos.confirmCheckout.change', { change: this._money.transform(change) }) : ''].filter(Boolean).join(' '),
             ok: this._translate.instant('sales.pos.checkout'),
             cancel: this._translate.instant('form.confirm.cancel'),
         }).subscribe((confirmed) => {
             this._asking.set(false);
             if (!confirmed) return;
             this.checkingOut.set(true);
+            const working = this.working('sales.pos.recordingSale');
             const phone = this.normalizedPhone();
             this._pos
                 .checkout({
                     oid: this.cartOid(),
                     // The name goes whenever there is a phone: after a failed lookup the page cannot tell a new customer from a known one, and the server ignores it for a known phone.
                     customer: phone ? { phone, name: this.customerName().trim() || null } : undefined,
-                    payment_method: this.method(),
+                    payment_method: this.method() as PaymentMethod,
                     payment_reference: this.method() === 'cash' ? null : this.reference().trim() || null,
                     payment_status: this.status(),
                     amount_paid: this.status() === 'partially_paid' ? (this.partial() ?? 0) : undefined,
@@ -269,14 +381,17 @@ export class PosComponent {
                 .subscribe({
                     next: ({ invoice_no, amount_paid }) => {
                         this.checkingOut.set(false);
+                        this._message.remove(working);
                         this.unanswered.set(false);
                         this.lastReceipt.set(this.receiptOf(invoice_no, amount_paid));
                         if (this.printAfterCheckout()) this.printLast();
-                        this._message.success(this._translate.instant('sales.pos.sold', { number: invoice_no }));
+                        const change = this.change();
+                        this.done.set({ invoice_no, total: this.total(), paid: amount_paid, received: change !== null ? this.received() : null, change });
                         this.afterCartLeft();
                     },
                     error: (error: unknown) => {
                         this.checkingOut.set(false);
+                        this._message.remove(working);
                         this.failCheckout(error);
                     },
                 });
@@ -294,6 +409,12 @@ export class PosComponent {
 
     park(): void {
         if (this.busy()) return;
+        this.parking.set(true);
+        const working = this.working('sales.pos.parkingCart');
+        const done = () => {
+            this.parking.set(false);
+            this._message.remove(working);
+        };
         const phone = this.normalizedPhone();
         this._pos
             .park({
@@ -305,11 +426,15 @@ export class PosComponent {
             })
             .subscribe({
                 next: ({ invoice_no }) => {
+                    done();
                     this.parkOpen.set(false);
                     this._message.success(this._translate.instant('sales.pos.parkedMessage', { name: this.parkLabel().trim() || invoice_no }));
                     this.afterCartLeft();
                 },
-                error: (error: unknown) => this.say('error', this.messageOf(error)),
+                error: (error: unknown) => {
+                    done();
+                    this.say('error', this.messageOf(error));
+                },
             });
     }
 
@@ -415,13 +540,7 @@ export class PosComponent {
             })),
             totals: this.discountTotal() ? rows([t('subtotal'), money(this.subtotal())], [t('discount'), '-' + money(this.discountTotal())]) : [],
             total: [t('total'), t('amount', { amount: money(this.total()) })],
-            payment: rows(
-                [t('paidBy'), this._translate.instant('sales.pos.method.' + this.method())],
-                due > 0 ? [t('paid'), money(paid)] : null,
-                due > 0 ? [t('due'), money(due)] : null,
-                received !== null ? [t('received'), money(received)] : null,
-                received !== null ? [t('change'), money(this.change()!)] : null
-            ),
+            payment: rows([t('paidBy'), this._translate.instant('sales.pos.method.' + this.method())], due > 0 ? [t('paid'), money(paid)] : null, due > 0 ? [t('due'), money(due)] : null, received !== null ? [t('received'), money(received)] : null, received !== null ? [t('change'), money(this.change()!)] : null),
             thanks: t('thanks'),
             poweredBy: t('poweredBy'),
         };
@@ -440,6 +559,7 @@ export class PosComponent {
     }
 
     private reset(): void {
+        this.dropUndo();
         this.unanswered.set(false);
         this.resumed.set(null);
         this.lines.set([]);
@@ -454,6 +574,25 @@ export class PosComponent {
 
     private payloadLines(): { inventory_oid: string; quantity: number; discount: number }[] {
         return this.lines().map(({ inventory_oid, quantity, discount }) => ({ inventory_oid, quantity, discount }));
+    }
+
+    private flash(oid: string): void {
+        this.flashed.set(oid);
+        clearTimeout(this._flashTimer);
+        this._flashTimer = setTimeout(() => this.flashed.set(null), 1200);
+        setTimeout(() => {
+            const rows = this._linesBox()?.nativeElement.querySelectorAll<HTMLElement>('[data-oid]') ?? [];
+            Array.from(rows)
+                .find((row) => row.dataset['oid'] === oid)
+                ?.scrollIntoView?.({ block: 'nearest' });
+        });
+    }
+
+    /** An undo belongs to the cart it was offered on, never to the next one. */
+    private dropUndo(): void {
+        this.removed.set(null);
+        if (this._undoMessage) this._message.remove(this._undoMessage);
+        this._undoMessage = null;
     }
 
     private patch(index: number, change: Partial<CartLine>): void {
@@ -525,6 +664,11 @@ export class PosComponent {
         if (error instanceof HttpErrorResponse && error.status === 409) return 'sales.pos.cartMovedOn';
         if (error instanceof HttpErrorResponse && error.status === 400 && error.error?.data?.inventory_oid) return 'sales.pos.lineNotForSale';
         return failureKey(error, 'form.saveFailed');
+    }
+
+    /** Stays until the request answers, so it is removed rather than left to time out. */
+    private working(key: string): string {
+        return this._message.loading(this._translate.instant(key), { nzDuration: 0 }).messageId;
     }
 
     private say(kind: 'success' | 'warning' | 'error', key: string, params: Record<string, unknown> = {}): void {

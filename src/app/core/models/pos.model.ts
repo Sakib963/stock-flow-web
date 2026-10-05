@@ -18,6 +18,8 @@ export interface CartLine {
     inventory_oid: string;
     product_oid: string;
     product_name: string;
+    /** Absent on a line resumed from a parked cart. */
+    image_url?: string | null;
     batch_code: string;
     expiry_date: string | null;
     selling_price: number;
@@ -82,5 +84,5 @@ export interface SaleResult {
 export interface CustomerLookup {
     phone: string;
     customer: { oid: string; name: string; flag: 'None' | 'Watch' | 'Blocked' } | null;
-    history?: { sales: number; last_order_on: string | null };
+    history?: { sales: number; last_order_on: string | null; owed: number };
 }

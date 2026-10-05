@@ -17,7 +17,7 @@ const open = async () => {
     fixture.detectChanges();
     const picked: PosBatch[] = [];
     fixture.componentInstance.picked.subscribe((batch) => picked.push(batch));
-    return { search: fixture.componentInstance, http: TestBed.inject(HttpTestingController), picked };
+    return { fixture, search: fixture.componentInstance, http: TestBed.inject(HttpTestingController), picked };
 };
 
 const scan = (search: ProductSearchComponent, code: string) => {
@@ -40,6 +40,44 @@ describe('ProductSearchComponent', () => {
         http.expectOne((r) => r.url.includes(APIEndpoint.GET_POS_PRODUCT_LIST)).flush({ code: 200, data: [row('B-1'), row('B-2')] });
         expect(picked).toEqual([]);
         expect(search.groups()[0].batches.length).toBe(2);
+    });
+
+    it('says what to type when the dropdown opens on an empty box', async () => {
+        const { fixture, search } = await open();
+        search.select().setOpenState(true);
+        fixture.detectChanges();
+        expect(document.querySelector('[data-pos="search-hint"]')).not.toBeNull();
+    });
+
+    it('puts the batch picked from the dropdown in the cart and empties the box', async () => {
+        const { search, http, picked } = await open();
+        scan(search, 'kurti');
+        http.expectOne((r) => r.url.includes(APIEndpoint.GET_POS_PRODUCT_LIST)).flush({ code: 200, data: [row('B-1'), row('B-2')] });
+        search.chosen('i-B-2');
+        expect(picked.map((b) => b.batch_code)).toEqual(['B-2']);
+        expect(search.text()).toBe('');
+    });
+
+    it('never lets Enter on a scan take the highlighted batch of a SKU with several', async () => {
+        const { fixture, search, http, picked } = await open();
+        await fixture.whenStable();
+        search.select().setOpenState(true);
+        search.typed('KURTI-38');
+        fixture.detectChanges();
+        const input: HTMLInputElement = fixture.nativeElement.querySelector('input');
+        input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', keyCode: 13, bubbles: true }));
+        http.expectOne((r) => r.url.includes(APIEndpoint.GET_POS_PRODUCT_LIST)).flush({ code: 200, data: [row('B-1'), row('B-2')] });
+        fixture.detectChanges();
+        input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', keyCode: 13, bubbles: true }));
+        expect(picked).toEqual([]);
+        expect(search.results().length).toBe(2);
+    });
+
+    it('drops what was typed when the dropdown closes', async () => {
+        const { search } = await open();
+        search.typed('kur');
+        search.opened(false);
+        expect(search.text()).toBe('');
     });
 
     it('takes a SKU with one batch at once', async () => {

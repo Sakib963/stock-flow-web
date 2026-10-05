@@ -123,6 +123,124 @@ describe('PosComponent', () => {
         expect(page.blocker()).toBe('sales.pos.blocker.stock');
     });
 
+    it('covers the page while the sale is recorded and uncovers it when the answer comes, sold or not', async () => {
+        const { fixture, page, http } = await open();
+        const working = () => (fixture.detectChanges(), fixture.nativeElement.querySelector('[data-pos="working"]'));
+        page.add(batch());
+        answerYes(fixture);
+        page.checkout();
+        expect(working()).not.toBeNull();
+
+        http.expectOne((r) => r.url.includes(APIEndpoint.CHECKOUT_POS_SALE)).error(new ProgressEvent('error'), { status: 0 });
+        expect(working()).toBeNull();
+
+        page.checkout();
+        expect(working()).not.toBeNull();
+        http.expectOne((r) => r.url.includes(APIEndpoint.CHECKOUT_POS_SALE)).flush({ code: 200, data: { oid: page.cartOid(), invoice_no: '2610040002', total_amount: 1450, amount_paid: 1450 } });
+        http.expectOne((r) => r.url.includes(APIEndpoint.GET_PARKED_CARTS)).flush({ code: 200, data: [] });
+        expect(working()).toBeNull();
+    });
+
+    it('covers the page while a cart is parked', async () => {
+        const { fixture, page, http } = await open();
+        const working = () => (fixture.detectChanges(), fixture.nativeElement.querySelector('[data-pos="working"]'));
+        page.add(batch());
+        page.park();
+        expect(working()).not.toBeNull();
+        http.expectOne((r) => r.url.includes(APIEndpoint.PARK_POS_CART)).flush({ code: 409, message: 'moved on' }, { status: 409, statusText: 'Conflict' });
+        expect(working()).toBeNull();
+    });
+
+    it('offers the exact total and the notes a customer is likely to hand over, and works out the change', async () => {
+        const { page } = await open();
+        page.add(batch({ selling_price: 1870, maximum_discount: 0 }));
+        expect(page.cashSuggestions()).toEqual([1870, 1900, 2000, 5000]);
+        page.setReceived(2000);
+        expect(page.change()).toBe(130);
+    });
+
+    it('waits for bKash or Nagad under MFS and records the wallet picked', async () => {
+        const { fixture, page, http } = await open();
+        page.add(batch());
+        page.setTender('mfs');
+        expect(page.blocker()).toBe('sales.pos.blocker.wallet');
+        page.method.set('nagad');
+        expect(page.tender()).toBe('mfs');
+        expect(page.blocker()).toBeNull();
+        answerYes(fixture);
+        page.checkout();
+        expect(http.expectOne((r) => r.url.includes(APIEndpoint.CHECKOUT_POS_SALE)).request.body.payment_method).toBe('nagad');
+    });
+
+    it('checks out on F9 and parks on F8, but never from behind an open dialog', async () => {
+        const { fixture, page, http } = await open();
+        page.add(batch());
+        const confirm = answerYes(fixture);
+        page.shortcut(new KeyboardEvent('keydown', { key: 'F8' }));
+        expect(page.parkOpen()).toBe(true);
+
+        page.shortcut(new KeyboardEvent('keydown', { key: 'F9' }));
+        expect(confirm).not.toHaveBeenCalled();
+
+        page.parkOpen.set(false);
+        page.shortcut(new KeyboardEvent('keydown', { key: 'F9' }));
+        expect(confirm).toHaveBeenCalledTimes(1);
+        http.expectOne((r) => r.url.includes(APIEndpoint.CHECKOUT_POS_SALE));
+    });
+
+    it('puts a removed line back where it was on Undo, and never into the next cart', async () => {
+        const { fixture, page } = await open();
+        page.add(batch());
+        page.add(batch({ inventory_oid: 'i-2', batch_code: 'B-2' }));
+        page.remove(0);
+        page.undoRemove();
+        expect(page.lines().map((line) => line.inventory_oid)).toEqual(['i-1', 'i-2']);
+
+        page.remove(0);
+        answerYes(fixture);
+        page.clearCart();
+        page.undoRemove();
+        expect(page.lines()).toEqual([]);
+    });
+
+    it('keeps the sale on screen with the change to give until the cashier starts the next one', async () => {
+        const { fixture, page, http } = await open();
+        page.add(batch());
+        page.setReceived(2000);
+        answerYes(fixture);
+        page.checkout();
+        http.expectOne((r) => r.url.includes(APIEndpoint.CHECKOUT_POS_SALE)).flush({ code: 200, data: { oid: page.cartOid(), invoice_no: '2610050003', total_amount: 1450, amount_paid: 1450 } });
+        http.expectOne((r) => r.url.includes(APIEndpoint.GET_PARKED_CARTS)).flush({ code: 200, data: [] });
+
+        expect(page.done()).toEqual({ invoice_no: '2610050003', total: 1450, paid: 1450, received: 2000, change: 550 });
+        expect(page.lines()).toEqual([]);
+        page.closeDone();
+        expect(page.done()).toBeNull();
+    });
+
+    it('says when a line takes the last few of its batch', async () => {
+        const { page } = await open();
+        page.add(batch({ sellable_quantity: 3 }));
+        expect(page.lowStock(page.lines()[0])).toBe(2);
+        page.setQuantity(0, 3);
+        expect(page.lowStock(page.lines()[0])).toBe(0);
+        page.add(batch({ inventory_oid: 'i-2', sellable_quantity: 20 }));
+        expect(page.lowStock(page.lines()[1])).toBeNull();
+    });
+
+    it('shows an empty cart how a sale is made, offers the parked carts, and gives way to the first line', async () => {
+        const { fixture, page } = await open();
+        const empty = () => (fixture.detectChanges(), fixture.nativeElement.querySelector('[data-pos="empty"]') as HTMLElement | null);
+        expect(empty()!.querySelectorAll('li').length).toBe(3);
+        expect(empty()!.querySelector('[data-pos="empty-parked"]')).toBeNull();
+
+        page.parked.set([{ oid: 'c-1', invoice_no: '2610050001', draft_label: null, customer_name: null, customer_phone: null, created_on: '2026-10-05T10:00:00', lines: [] }] as never);
+        expect(empty()!.querySelector('[data-pos="empty-parked"]')).not.toBeNull();
+
+        page.add(batch());
+        expect(empty()).toBeNull();
+    });
+
     it('resumes a parked cart only onto an empty screen', async () => {
         const { page } = await open();
         const parked = { oid: 'c-1', invoice_no: '2610040002', draft_label: 'Lady in blue', customer_name: null, customer_phone: null, total_amount: 1450, created_on: '2026-10-04T08:00:00', parked_by: 'Owner', lines: [{ inventory_oid: 'i-2', product_oid: 'p-2', product_name: 'Cotton scarf', batch_code: 'B-2M4D-0PL', expiry_date: null, selling_price: 600, maximum_discount: 50, sellable: 12, quantity: 2, discount: 0 }] };

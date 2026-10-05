@@ -2074,6 +2074,9 @@
             "clearSearch": "Clear the search",
             "resultsLabel": "Batches you can sell",
             "searching": "Searching…",
+            "searchHint": "Type a product name, SKU or batch code, or scan a barcode.",
+            "recordingSale": "Recording the sale…",
+            "parkingCart": "Parking the cart…",
             "searchFailed": {
                 "network": "Could not reach the server to search. Check the connection and try again.",
                 "forbidden": "You do not have permission to search the counter's products. Ask your admin if you should.",
@@ -2086,7 +2089,12 @@
             "clear": "Clear cart",
             "clearScreen": "Close this cart",
             "emptyTitle": "The cart is empty",
-            "emptyBody": "Scan a sticker, or search a product above, and it is added here.",
+            "emptyBody": "Scan the sticker on a product, or search for it above. Each one you add shows here.",
+            "emptyStep1": "Scan a sticker or search a product",
+            "emptyStep2": "Set the quantity and any discount",
+            "emptyStep3": "Take the payment and press Checkout",
+            "emptySearch": "Search a product",
+            "emptyResume": "Resume a parked cart ({{count}})",
             "product": "Product",
             "quantity": "Qty",
             "quantityOf": "Quantity of {{name}}",
@@ -2094,7 +2102,7 @@
             "more": "One more",
             "price": "Price",
             "discountPerUnit": "Discount a unit",
-            "discountUpTo": "Up to {{max}} a unit",
+            "discountUpTo": "Maximum discount: {{max}} a unit",
             "noDiscount": "This batch takes no discount",
             "lineTotal": "Total",
             "removeLine": "Remove from cart",
@@ -2129,7 +2137,8 @@
                 "bkash": "bKash",
                 "nagad": "Nagad",
                 "card": "Card",
-                "other": "Other"
+                "other": "Other",
+                "mfs": "MFS"
             },
             "reference": "Transaction ID (optional)",
             "statusLabel": "Payment",
@@ -2153,7 +2162,8 @@
                 "name": "Give the new customer's name, or clear the phone.",
                 "partial": "A part payment is more than nothing and less than the total.",
                 "received": "The cash received is less than the total.",
-                "creditNeedsPhone": "A sale not paid in full needs the customer's phone, so what they owe is recorded against them."
+                "creditNeedsPhone": "A sale not paid in full needs the customer's phone, so what they owe is recorded against them.",
+                "wallet": "Choose bKash or Nagad."
             },
             "confirmCheckout": {
                 "title": "Sell for {{total}}?",
@@ -2224,7 +2234,33 @@
                 "discountEach": "Discount {{amount}} each",
                 "amount": "{{amount}} BDT",
                 "poweredBy": "Powered by StockFlow"
-            }
+            },
+            "shortcut": {
+                "title": "Keyboard shortcuts on this page",
+                "search": "Find a product",
+                "received": "Type the cash received (cash, paid in full)",
+                "park": "Park this cart",
+                "checkout": "Checkout",
+                "note": "They work from any field on this page, but not while a dialog is open.",
+                "tip": "Tip:"
+            },
+            "quickCash": "Quick cash amounts",
+            "exact": "Exact",
+            "lowStock": "Only {{count}} more in stock",
+            "lowStockLast": "This takes the last in stock",
+            "removed": "{{name}} removed.",
+            "undo": "Undo",
+            "owes": "Owes {{amount}}",
+            "done": {
+                "title": "Sale complete",
+                "invoice": "Invoice {{number}}",
+                "giveChange": "Give back as change",
+                "paid": "Paid now",
+                "due": "Still owed",
+                "print": "Print receipt",
+                "next": "New sale"
+            },
+            "wallet": "Which wallet"
         }
     }
 }
