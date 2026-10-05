@@ -1,0 +1,80 @@
+<div nz-form nzLayout="vertical" class="grid grid-cols-1 items-start gap-x-4 md:grid-cols-3" [formGroup]="form">
+    <nz-form-item>
+        <nz-form-label nzRequired [nzFor]="id('recipient')" [nzTooltipTitle]="'sales.customer.address.recipientHelper' | translate">{{ 'sales.customer.address.recipient' | translate }}</nz-form-label>
+        <nz-form-control [nzErrorTip]="'form.required' | translate">
+            <input nz-input [id]="id('recipient')" formControlName="recipient_name" type="text" maxlength="255" autocomplete="off" [attr.aria-invalid]="invalid('recipient_name')" />
+        </nz-form-control>
+    </nz-form-item>
+
+    <nz-form-item>
+        <nz-form-label [nzFor]="id('recipient-phone')" [nzTooltipTitle]="'sales.customer.address.recipientPhoneHelper' | translate">{{ 'sales.customer.address.recipientPhone' | translate }}</nz-form-label>
+        <nz-form-control [nzErrorTip]="'sales.customer.phoneInvalid' | translate">
+            <input nz-input [id]="id('recipient-phone')" formControlName="recipient_phone" type="tel" inputmode="tel" autocomplete="off" class="font-mono" placeholder="01XXXXXXXXX" [attr.aria-invalid]="invalid('recipient_phone')" />
+        </nz-form-control>
+    </nz-form-item>
+
+    <nz-form-item>
+        <nz-form-label [nzFor]="id('label')" [nzTooltipTitle]="'sales.customer.address.labelHelper' | translate">{{ 'sales.customer.address.label' | translate }}</nz-form-label>
+        <nz-form-control>
+            <input nz-input [id]="id('label')" formControlName="label" type="text" maxlength="64" autocomplete="off" [attr.placeholder]="'sales.customer.address.labelPlaceholder' | translate" />
+        </nz-form-control>
+    </nz-form-item>
+
+    <nz-form-item>
+        <nz-form-label nzRequired [nzFor]="id('district')">{{ 'sales.customer.district' | translate }}</nz-form-label>
+        <nz-form-control [nzErrorTip]="'form.required' | translate">
+            <nz-select [nzId]="id('district')" formControlName="district_oid" nzShowSearch nzServerSearch [nzLoading]="searchingDistricts()" [nzNotFoundContent]="placeState" [nzPlaceHolder]="'sales.customer.address.pickDistrict' | translate" (nzOnSearch)="searchDistricts($event)" (nzOpenChange)="$event && !districts().length && searchDistricts('')" (ngModelChange)="districtPicked()">
+                @for (place of districts(); track place.oid) {
+                    <nz-option [nzValue]="place.oid" [nzLabel]="placeName()(place)" />
+                }
+            </nz-select>
+        </nz-form-control>
+    </nz-form-item>
+
+    <nz-form-item>
+        <nz-form-label nzRequired [nzFor]="id('thana')" [nzTooltipTitle]="'sales.customer.address.thanaHelper' | translate">{{ 'sales.customer.address.thana' | translate }}</nz-form-label>
+        <nz-form-control [nzErrorTip]="'form.required' | translate">
+            <nz-select [nzId]="id('thana')" formControlName="thana_oid" nzShowSearch nzServerSearch [nzDisabled]="!form.controls.district_oid.value" [nzLoading]="searchingThanas()" [nzNotFoundContent]="placeState" [nzPlaceHolder]="'sales.customer.address.pickThana' | translate" (nzOnSearch)="searchThanas($event)" (ngModelChange)="thanaPicked($event)">
+                @for (place of thanas(); track place.oid) {
+                    <nz-option [nzValue]="place.oid" [nzLabel]="placeName()(place)" />
+                }
+            </nz-select>
+        </nz-form-control>
+    </nz-form-item>
+
+    <nz-form-item>
+        <nz-form-label [nzFor]="id('area')">{{ 'sales.customer.address.area' | translate }}</nz-form-label>
+        <nz-form-control>
+            <input nz-input [id]="id('area')" formControlName="area_text" type="text" maxlength="128" autocomplete="off" [attr.placeholder]="'sales.customer.address.areaPlaceholder' | translate" />
+        </nz-form-control>
+    </nz-form-item>
+
+    <nz-form-item class="md:col-span-2">
+        <nz-form-label nzRequired [nzFor]="id('line')" [nzTooltipTitle]="'sales.customer.address.lineHelper' | translate">{{ 'sales.customer.address.line' | translate }}</nz-form-label>
+        <nz-form-control [nzErrorTip]="'form.required' | translate">
+            <textarea nz-input [id]="id('line')" formControlName="address_line" rows="2" maxlength="1000" [attr.placeholder]="'sales.customer.address.linePlaceholder' | translate" [attr.aria-invalid]="invalid('address_line')"></textarea>
+        </nz-form-control>
+    </nz-form-item>
+
+    <nz-form-item>
+        <nz-form-label [nzFor]="id('postal')">{{ 'sales.customer.address.postalCode' | translate }}</nz-form-label>
+        <nz-form-control [nzErrorTip]="'sales.customer.address.postalInvalid' | translate">
+            <input nz-input [id]="id('postal')" formControlName="postal_code" type="text" inputmode="numeric" maxlength="4" autocomplete="off" class="font-mono" [attr.aria-invalid]="invalid('postal_code')" />
+        </nz-form-control>
+    </nz-form-item>
+
+    @if (showDefault()) {
+        <label nz-checkbox formControlName="is_default" class="md:col-span-3">{{ 'sales.customer.address.makeDefault' | translate }}</label>
+    }
+</div>
+
+<!-- What a place picker says when it has nothing to list: still searching, the search failed, or no match. -->
+<ng-template #placeState>
+    @if (searchingDistricts() || searchingThanas()) {
+        <span class="flex items-center gap-2 text-xs text-ink-muted"><nz-spin nzSimple nzSize="small" />{{ 'sales.customer.address.searchingPlaces' | translate }}</span>
+    } @else if (placesFailed(); as kind) {
+        <span class="text-xs text-danger-ink" role="alert">{{ 'sales.customer.address.placesFailed.' + kind | translate }}</span>
+    } @else {
+        <span class="text-xs text-ink-muted">{{ 'sales.customer.address.noPlace' | translate }}</span>
+    }
+</ng-template>

@@ -1,0 +1,94 @@
+<!-- Three columns from a tablet up: who the customer is, then what is known about them. -->
+<form nz-form nzLayout="vertical" class="grid grid-cols-1 items-start gap-x-4 md:grid-cols-3" [id]="formId" [formGroup]="form" (ngSubmit)="submitted.emit()">
+    <nz-form-item>
+        <nz-form-label nzRequired nzFor="customer-name" [nzTooltipTitle]="'sales.customer.nameHelper' | translate">{{ 'sales.customer.name' | translate }}</nz-form-label>
+        <nz-form-control [nzErrorTip]="nameError">
+            <input nz-input id="customer-name" formControlName="name" type="text" autocomplete="off" [attr.placeholder]="'sales.customer.namePlaceholder' | translate" [attr.aria-invalid]="invalid('name')" />
+        </nz-form-control>
+        <ng-template #nameError let-control>
+            @if (control.hasError('required')) {
+                {{ 'form.required' | translate }}
+            } @else if (control.hasError('maxlength')) {
+                {{ 'form.tooLong' | translate: { max: 255 } }}
+            }
+        </ng-template>
+    </nz-form-item>
+
+    <nz-form-item>
+        <nz-form-label nzRequired nzFor="customer-phone" [nzTooltipTitle]="'sales.customer.phoneHelper' | translate">{{ 'sales.customer.phone' | translate }}</nz-form-label>
+        <nz-form-control [nzErrorTip]="phoneError">
+            <input nz-input id="customer-phone" formControlName="phone" type="tel" inputmode="tel" autocomplete="off" class="font-mono" placeholder="01XXXXXXXXX" [attr.aria-invalid]="invalid('phone')" />
+        </nz-form-control>
+        <ng-template #phoneError let-control>
+            @if (control.hasError('taken')) {
+                {{ phoneOwner() ? ('sales.customer.phoneTakenBy' | translate: { name: phoneOwner() }) : ('sales.customer.phoneTaken' | translate) }}
+            } @else if (control.hasError('required')) {
+                {{ 'form.required' | translate }}
+            } @else if (control.hasError('phone')) {
+                {{ 'sales.customer.phoneInvalid' | translate }}
+            }
+        </ng-template>
+    </nz-form-item>
+
+    <nz-form-item>
+        <nz-form-label nzFor="customer-social" [nzTooltipTitle]="'sales.customer.socialHelper' | translate">{{ 'sales.customer.social' | translate }}</nz-form-label>
+        <nz-form-control>
+            <input nz-input id="customer-social" formControlName="social_handle" type="text" autocomplete="off" [attr.placeholder]="'sales.customer.socialPlaceholder' | translate" />
+        </nz-form-control>
+    </nz-form-item>
+
+    <nz-form-item>
+        <nz-form-label nzFor="customer-gender" [nzTooltipTitle]="'sales.customer.gender.helper' | translate">{{ 'sales.customer.gender.label' | translate }}</nz-form-label>
+        <nz-form-control>
+            <nz-select nzId="customer-gender" formControlName="gender">
+                <nz-option nzValue="" [nzLabel]="'sales.customer.gender.unknown' | translate" />
+                @for (gender of genders; track gender) {
+                    <nz-option [nzValue]="gender" [nzLabel]="'sales.customer.gender.' + gender | translate" />
+                }
+            </nz-select>
+        </nz-form-control>
+    </nz-form-item>
+
+    <nz-form-item>
+        <nz-form-label nzFor="customer-age" [nzTooltipTitle]="'sales.customer.ageBand.helper' | translate">{{ 'sales.customer.ageBand.label' | translate }}</nz-form-label>
+        <nz-form-control>
+            <nz-select nzId="customer-age" formControlName="age_band">
+                <nz-option nzValue="" [nzLabel]="'sales.customer.ageBand.unknown' | translate" />
+                @for (band of ageBands; track band) {
+                    <nz-option [nzValue]="band" [nzLabel]="'sales.customer.ageBand.' + band | translate" />
+                }
+            </nz-select>
+        </nz-form-control>
+    </nz-form-item>
+
+    @if (editing()) {
+        <nz-form-item>
+            <nz-form-label nzFor="customer-status" [nzTooltipTitle]="'sales.customer.statusHelper' | translate">{{ 'sales.customer.status.label' | translate }}</nz-form-label>
+            <nz-form-control>
+                <nz-select nzId="customer-status" formControlName="status">
+                    <nz-option nzValue="Active" [nzLabel]="'sales.customer.status.active' | translate" />
+                    <nz-option nzValue="Inactive" [nzLabel]="'sales.customer.status.inactive' | translate" />
+                </nz-select>
+            </nz-form-control>
+        </nz-form-item>
+    }
+
+    <nz-form-item class="md:col-span-3">
+        <nz-form-label nzFor="customer-note" [nzTooltipTitle]="'sales.customer.noteHelper' | translate">{{ 'sales.customer.note' | translate }}</nz-form-label>
+        <nz-form-control [nzErrorTip]="'form.tooLong' | translate: { max: 1000 }">
+            <textarea nz-input id="customer-note" formControlName="note" rows="2" [attr.placeholder]="'sales.customer.notePlaceholder' | translate"></textarea>
+        </nz-form-control>
+    </nz-form-item>
+
+    @if (withAddress() && !editing()) {
+        <div class="border-t border-line-soft pt-4 md:col-span-3">
+            <label class="mb-3 flex items-center gap-2 text-[13px] font-semibold text-ink">
+                <nz-switch nzSize="small" data-customer="add-address" [ngModel]="addAddress()" [ngModelOptions]="{ standalone: true }" (ngModelChange)="addAddress.set($event)" />
+                {{ 'sales.customer.address.addFirst' | translate }}
+            </label>
+            @if (addAddress()) {
+                <address-form idPrefix="first-address" [showDefault]="false" />
+            }
+        </div>
+    }
+</form>

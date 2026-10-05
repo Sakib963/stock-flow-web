@@ -321,6 +321,9 @@
                                         @if (result.history?.owed; as owed) {
                                             <span class="mt-1 block font-semibold text-warning-ink" data-pos="owed">{{ 'sales.pos.owes' | translate: { amount: (owed | money) } }}</span>
                                         }
+                                        @if (canViewCustomers) {
+                                            <a class="mt-1 inline-block text-xs font-semibold" target="_blank" rel="noopener" data-pos="open-customer" [routerLink]="customerRoute(customer.oid)">{{ 'sales.pos.openCustomer' | translate }}</a>
+                                        }
                                     </div>
                                 </div>
                             } @else {

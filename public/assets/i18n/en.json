@@ -2260,7 +2260,204 @@
                 "print": "Print receipt",
                 "next": "New sale"
             },
-            "wallet": "Which wallet"
+            "wallet": "Which wallet",
+            "openCustomer": "Open their record"
+        },
+        "customer": {
+            "add": "Add customer",
+            "view": "View",
+            "edit": "Edit",
+            "searchPlaceholder": "Search name or phone",
+            "emptyTitle": "No customers yet",
+            "emptyBody": "A customer is added the first time someone buys with their phone number, or here by hand, so every sale and what they owe can be found again.",
+            "name": "Name",
+            "nameHelper": "What the customer is called, as you would write it on a parcel.",
+            "namePlaceholder": "e.g. Nusrat Jahan",
+            "phone": "Phone",
+            "phoneHelper": "One customer per mobile number. Bengali digits and +88 are fine.",
+            "phoneInvalid": "Type an 11 digit mobile number starting with 01.",
+            "phoneTaken": "This phone already belongs to another customer.",
+            "phoneTakenBy": "This phone already belongs to {{name}}. Open their record instead.",
+            "social": "Social handle",
+            "socialHelper": "Their Facebook, Instagram or WhatsApp name, to find the chat again.",
+            "socialPlaceholder": "e.g. facebook.com/nusrat",
+            "note": "Note",
+            "noteHelper": "Anything worth remembering about this customer.",
+            "notePlaceholder": "e.g. Prefers delivery after 5 pm",
+            "district": "District",
+            "created": "Added",
+            "lastTouched": "Last changed by",
+            "lastTouchedOn": "Last changed",
+            "lastOrder": "Last order",
+            "neverBought": "No orders yet",
+            "notSet": "Not set",
+            "notEnough": "Not enough data yet",
+            "status": {
+                "label": "Status",
+                "active": "Active",
+                "inactive": "Inactive"
+            },
+            "statusHelper": "An inactive customer stays in the records but is set aside.",
+            "flag": {
+                "label": "Flag",
+                "None": "No flag",
+                "Watch": "Watch",
+                "Blocked": "Blocked"
+            },
+            "flagHelp": {
+                "None": "Nothing to warn about.",
+                "Watch": "Shown as a warning when this customer orders, so whoever takes the order looks twice.",
+                "Blocked": "Shown in red when this customer orders, so nobody sends them a parcel without checking."
+            },
+            "flagReason": "Reason",
+            "flagReasonNeeded": "Say why, so whoever sees the flag later knows.",
+            "flagTitle": "Flag this customer",
+            "flagAction": "Flag",
+            "changeFlag": "Change flag",
+            "saveFlag": "Save flag",
+            "flagSaved": "Flag saved.",
+            "gender": {
+                "label": "Gender",
+                "helper": "Your best guess. Used only to see who buys what.",
+                "Female": "Female",
+                "Male": "Male",
+                "unknown": "Not known"
+            },
+            "ageBand": {
+                "label": "Age",
+                "helper": "Your best guess. Used only to see who buys what.",
+                "under_18": "Under 18",
+                "18_24": "18 to 24",
+                "25_34": "25 to 34",
+                "35_44": "35 to 44",
+                "45_plus": "45 and over",
+                "unknown": "Not known"
+            },
+            "stat": {
+                "active": "Active",
+                "inactive": "Inactive",
+                "watch": "On watch",
+                "blocked": "Blocked",
+                "sales": "Purchases",
+                "lifetimeValue": "Lifetime value",
+                "averageOrder": "Average purchase",
+                "owed": "Owes",
+                "deliveredRate": "Delivered",
+                "refused": "Refused parcels",
+                "orders": "Orders"
+            },
+            "createTitle": "Add customer",
+            "editTitle": "Edit customer",
+            "formLead": "Name and phone are all that is needed. The rest helps you serve them and read your sales.",
+            "detailTitle": "Customer",
+            "detailLead": "Who they are, what they bought and what they owe.",
+            "confirmCreate": {
+                "title": "Add this customer?",
+                "body": "{{name}} will be added to your customers."
+            },
+            "confirmEdit": {
+                "title": "Save changes?",
+                "body": "The changes to {{name}} will be saved."
+            },
+            "createdMessage": "Customer added.",
+            "updated": "Customer saved.",
+            "movedOn": "Someone else changed this customer at the same time. The page has been reloaded; check and try again.",
+            "backToList": "Back to customers",
+            "loadFailed": {
+                "network": "No connection. Check the internet and try again.",
+                "forbidden": "You do not have permission to see this customer.",
+                "server": "This customer could not be loaded. Try again in a moment."
+            },
+            "section": {
+                "details": "Details",
+                "numbers": "Numbers",
+                "addresses": "Addresses",
+                "orders": "Recent orders"
+            },
+            "quickActions": "Quick actions",
+            "noActions": "There is nothing you can change here.",
+            "activity": "Recent activity",
+            "noActivity": "Nothing has happened to this customer yet.",
+            "noOrders": "No orders yet.",
+            "order": {
+                "invoice": "Invoice",
+                "channel": "Where",
+                "status": "Status",
+                "total": "Total",
+                "date": "Date"
+            },
+            "address": {
+                "add": "Add address",
+                "addFirst": "Add their first address",
+                "edit": "Edit address",
+                "save": "Save address",
+                "saved": "Address saved.",
+                "remove": "Remove",
+                "removed": "Address removed.",
+                "defaultSet": "This is now the default address.",
+                "default": "Default",
+                "makeDefault": "Make this the default address",
+                "unnamed": "Address",
+                "none": "No addresses yet. Add one when they order for delivery.",
+                "label": "Label",
+                "labelHelper": "A short name so the right address is picked: Home, Office, Mother's house.",
+                "labelPlaceholder": "e.g. Home",
+                "recipient": "Receiver",
+                "recipientHelper": "Who takes the parcel at the door. It may be someone other than the customer.",
+                "recipientPhone": "Receiver's phone",
+                "recipientPhoneHelper": "For the courier to call. Leave empty when it is the customer's own phone.",
+                "pickDistrict": "Search a district",
+                "thana": "Thana or upazila",
+                "thanaHelper": "Pick the district first, then its thana or upazila.",
+                "pickThana": "Search a thana or upazila",
+                "area": "Area",
+                "areaPlaceholder": "e.g. Mirpur 10",
+                "line": "Address",
+                "lineHelper": "House, road and anything that helps the courier find the door.",
+                "linePlaceholder": "House 12, Road 4, near the mosque",
+                "postalCode": "Post code",
+                "postalInvalid": "A post code is 4 digits.",
+                "confirmRemove": {
+                    "title": "Remove this address?",
+                    "body": "The address in {{place}} will be removed. Orders already sent there keep their copy."
+                },
+                "searchingPlaces": "Searching…",
+                "noPlace": "No place by that name. Try another spelling.",
+                "placesFailed": {
+                    "network": "No connection. Check the internet and search again.",
+                    "forbidden": "You do not have permission to search places.",
+                    "server": "Places could not be searched. Try again in a moment."
+                },
+                "confirmSave": {
+                    "title": "Save this address?",
+                    "body": "The address for {{name}} will be saved."
+                },
+                "confirmDefault": {
+                    "title": "Make this the default address?",
+                    "body": "New orders will go to {{place}} unless another address is picked."
+                }
+            },
+            "confirmFlag": {
+                "title": "Save this flag?",
+                "body": "{{name}} will be marked: {{flag}}."
+            }
+        },
+        "order": {
+            "channel": {
+                "POS": "Counter",
+                "ONLINE": "Online"
+            },
+            "status": {
+                "Draft": "Draft",
+                "Pending": "Pending",
+                "Confirmed": "Confirmed",
+                "Purchased": "Sold",
+                "Delivered": "Delivered",
+                "PartiallyReturned": "Partly returned",
+                "Returned": "Returned",
+                "Cancelled": "Cancelled",
+                "Refunded": "Refunded"
+            }
         }
     }
 }

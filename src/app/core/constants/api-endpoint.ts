@@ -132,4 +132,13 @@ export class APIEndpoint {
     static readonly GET_PARKED_CARTS = '/api/v1/sales/pos/get-parked-carts';
     static readonly DISCARD_PARKED_CART = '/api/v1/sales/pos/discard-parked-cart';
     static readonly FIND_CUSTOMER_BY_PHONE = '/api/v1/sales/customer/find-customer-by-phone';
+    static readonly GET_CUSTOMER_LIST = '/api/v1/sales/customer/get-customer-list';
+    static readonly GET_CUSTOMER_DETAILS = '/api/v1/sales/customer/get-customer-details';
+    static readonly CREATE_CUSTOMER = '/api/v1/sales/customer/create-customer';
+    static readonly UPDATE_CUSTOMER_DETAILS = '/api/v1/sales/customer/update-customer-details';
+    static readonly FLAG_CUSTOMER = '/api/v1/sales/customer/flag-customer';
+    static readonly CREATE_CUSTOMER_ADDRESS = '/api/v1/sales/customer/create-customer-address';
+    static readonly UPDATE_CUSTOMER_ADDRESS = '/api/v1/sales/customer/update-customer-address';
+    static readonly RETIRE_CUSTOMER_ADDRESS = '/api/v1/sales/customer/retire-customer-address';
+    static readonly SEARCH_LOCATION = '/api/v1/sales/location/search-location';
 }

@@ -3,6 +3,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { ChangeDetectionStrategy, Component, ElementRef, TemplateRef, computed, inject, signal, viewChild } from '@angular/core';
 import { toObservable, takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideBanknote, lucidePrinter, lucideCalendarClock, lucideCalendarX, lucideCheck, lucideCircleCheck, lucideCreditCard, lucideEllipsis, lucideEraser, lucideInfo, lucideKeyboard, lucideMinus, lucidePackage, lucidePause, lucidePlay, lucidePlus, lucideRotateCw, lucideScanBarcode, lucideShoppingCart, lucideSmartphone, lucideTrash2, lucideUndo2, lucideUserRound, lucideWallet, lucideX } from '@ng-icons/lucide';
 import { NzButtonModule } from 'ng-zorro-antd/button';
@@ -26,7 +27,8 @@ import { LanguageService } from '@app/core/services/language/language.service';
 import { SessionService } from '@app/core/services/session/session.service';
 import { ProductSearchComponent } from '@app/modules/sales/pos/components/product-search.component';
 import { PosService } from '@app/modules/sales/pos/services/pos.service';
-import { normalizePhone } from '@app/modules/sales/pos/utils/phone/phone';
+import { CUSTOMER_ROUTES } from '@app/modules/sales/customer/constants/customer-routes';
+import { normalizePhone } from '@app/shared/utils/phone/phone';
 import { RECEIPT_PAPERS, ReceiptContent, ReceiptPaper, printReceipt } from '@app/modules/sales/pos/utils/receipt/receipt';
 import { PageHeaderComponent } from '@app/shared/components/page-header/page-header.component';
 import { StatusTagComponent } from '@app/shared/components/status-tag/status-tag.component';
@@ -81,7 +83,7 @@ const TENDER_ICONS: Record<Tender, string> = { cash: 'lucideBanknote', mfs: 'luc
  */
 @Component({
     selector: 'pos',
-    imports: [FormsModule, NgTemplateOutlet, NgIcon, NzButtonModule, NzDrawerModule, NzInputModule, NzInputNumberModule, NzModalModule, NzPopoverModule, NzRadioModule, NzSwitchModule, NzSkeletonModule, NzSpinModule, NzTableModule, NzTooltipModule, TranslatePipe, PageHeaderComponent, ProductSearchComponent, StatusTagComponent, DigitsPipe, MoneyPipe, RecordDatePipe],
+    imports: [FormsModule, RouterLink, NgTemplateOutlet, NgIcon, NzButtonModule, NzDrawerModule, NzInputModule, NzInputNumberModule, NzModalModule, NzPopoverModule, NzRadioModule, NzSwitchModule, NzSkeletonModule, NzSpinModule, NzTableModule, NzTooltipModule, TranslatePipe, PageHeaderComponent, ProductSearchComponent, StatusTagComponent, DigitsPipe, MoneyPipe, RecordDatePipe],
     providers: [DigitsPipe, MoneyPipe, provideIcons({ lucideBanknote, lucidePrinter, lucideCalendarClock, lucideCalendarX, lucideCheck, lucideCircleCheck, lucideCreditCard, lucideEllipsis, lucideEraser, lucideInfo, lucideKeyboard, lucideMinus, lucidePackage, lucidePause, lucidePlay, lucidePlus, lucideRotateCw, lucideScanBarcode, lucideShoppingCart, lucideSmartphone, lucideTrash2, lucideUndo2, lucideUserRound, lucideWallet, lucideX })],
     templateUrl: './pos.component.html',
     styleUrl: './pos.component.scss',
@@ -100,6 +102,7 @@ export class PosComponent {
     /** Selling, parking and the parked carts need `sales.pos.create`; someone who may only open the counter can look products up. */
     private readonly _session = inject(SessionService);
     readonly canSell = this._session.can('sales.pos.create');
+    readonly canViewCustomers = this._session.can('sales.customer.view');
     readonly papers = RECEIPT_PAPERS;
     /** Each counter has its own printer, so its paper and whether it prints are remembered on that machine. */
     readonly paper = signal<ReceiptPaper>(remembered('sf.pos.receiptPaper', '58') === '80' ? '80' : '58');
@@ -267,6 +270,11 @@ export class PosComponent {
 
     setTender(tender: Tender): void {
         if (tender !== this.tender()) this.method.set(tender);
+    }
+
+    /** In a new tab, so the cart on the counter is never left behind. */
+    customerRoute(oid: string): string {
+        return CUSTOMER_ROUTES.detail(oid);
     }
 
     setReceived(amount: number): void {
