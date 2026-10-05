@@ -42,7 +42,7 @@ import { MoneyPipe } from '@app/shared/pipes/money/money.pipe';
 import { RecordDatePipe } from '@app/shared/pipes/record-date/record-date.pipe';
 import { ProductSearchService } from '@app/core/services/product-search/product-search.service';
 import { environment } from '@env/environment';
-import { InvoiceContent, printInvoice } from '@app/modules/sales/online-order/utils/invoice';
+import { InvoiceContent, printInvoice } from '@app/shared/utils/invoice/invoice';
 import { confirmAction } from '@app/shared/utils/confirm-action/confirm-action';
 import { normalizePhone } from '@app/shared/utils/phone/phone';
 import { failureOf } from '@app/shared/utils/request-failure/request-failure';

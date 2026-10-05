@@ -184,7 +184,13 @@
                                 <span>{{ 'sales.order.action.cancel.button' | translate }}</span>
                             </button>
                         }
-                        @if (canViewCustomers && record()?.customer_oid) {
+                        @if (record()?.online) {
+                        <button nz-button nzBlock type="button" class="inline-flex items-center justify-start gap-2" data-quick="print" (click)="print()">
+                            <ng-icon name="lucidePrinter" size="14px" aria-hidden="true" />
+                            <span>{{ 'sales.online.invoice.print' | translate }}</span>
+                        </button>
+                    }
+                    @if (canViewCustomers && record()?.customer_oid) {
                             <a nz-button nzBlock class="inline-flex items-center justify-start gap-2" [routerLink]="customerRoute.detail(record()!.customer_oid!)">
                                 <ng-icon name="lucideUserRound" size="14px" aria-hidden="true" />
                                 <span>{{ 'sales.order.openCustomer' | translate }}</span>

@@ -84,6 +84,7 @@ export interface OrderDetails {
     cancel_reason_code: CancelReason | null;
     cancel_reason: string | null;
     sold_on: string | null;
+    tracking_token: string | null;
     notes: string | null;
     created_by: string;
     created_by_name: string | null;

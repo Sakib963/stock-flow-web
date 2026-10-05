@@ -39,6 +39,7 @@ const order = (over: Partial<OrderDetails> = {}): OrderDetails => ({
     cancel_reason_code: null,
     cancel_reason: null,
     sold_on: null,
+    tracking_token: null,
     notes: null,
     created_by: 'm@x.test',
     created_by_name: 'Moderator',
@@ -68,17 +69,17 @@ const quick = (element: HTMLElement) => [...element.querySelectorAll('[data-quic
 describe('OrderDetailComponent', () => {
     it('offers Confirm and Cancel on a Pending online order, and nothing that comes later', async () => {
         const { element } = await open(order());
-        expect(quick(element)).toEqual(['confirm', 'cancel']);
+        expect(quick(element)).toEqual(['confirm', 'cancel', 'print']);
     });
 
     it('offers Deliver and Not delivered once the parcel is with the courier, and no Cancel', async () => {
         const { element } = await open(order({ status: 'Confirmed', dispatched_on: '2026-10-05T12:00:00.000', online: { ...order().online!, delivery_status: 'WithCourier' } }));
-        expect(quick(element)).toEqual(['deliver', 'not-delivered']);
+        expect(quick(element)).toEqual(['deliver', 'not-delivered', 'print']);
     });
 
     it('hides an action from someone without its permission', async () => {
         const { element } = await open(order({ status: 'Confirmed', online: { ...order().online!, delivery_status: 'Preparing' } }), ['sales.order.view']);
-        expect(quick(element)).toEqual(['none']);
+        expect(quick(element)).toEqual(['print', 'none']);
     });
 
     it('offers nothing on a counter sale, which only a return can undo', async () => {

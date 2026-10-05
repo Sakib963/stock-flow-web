@@ -3,7 +3,7 @@ import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@a
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { NgIcon, provideIcons } from '@ng-icons/core';
-import { lucideArrowLeft, lucideBan, lucideCheck, lucideCircleCheck, lucideHistory, lucideInfo, lucideMapPin, lucidePackage, lucidePackageCheck, lucidePackageX, lucideReceipt, lucideRotateCw, lucideTruck, lucideUserRound, lucideWallet, lucideX, lucideZap } from '@ng-icons/lucide';
+import { lucideArrowLeft, lucideBan, lucideCheck, lucideCircleCheck, lucideHistory, lucideInfo, lucideMapPin, lucidePackage, lucidePackageCheck, lucidePackageX, lucidePrinter, lucideReceipt, lucideRotateCw, lucideTruck, lucideUserRound, lucideWallet, lucideX, lucideZap } from '@ng-icons/lucide';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzCardModule } from 'ng-zorro-antd/card';
 import { NzFormModule } from 'ng-zorro-antd/form';
@@ -33,6 +33,8 @@ import { StatusTagComponent } from '@app/shared/components/status-tag/status-tag
 import { DigitsPipe } from '@app/shared/pipes/digits/digits.pipe';
 import { MoneyPipe } from '@app/shared/pipes/money/money.pipe';
 import { RecordDatePipe } from '@app/shared/pipes/record-date/record-date.pipe';
+import { environment } from '@env/environment';
+import { printInvoice } from '@app/shared/utils/invoice/invoice';
 import { confirmAction } from '@app/shared/utils/confirm-action/confirm-action';
 import { failureKey, failureOf } from '@app/shared/utils/request-failure/request-failure';
 import { resolveTone } from '@app/shared/utils/tone-map/tone-map';
@@ -48,7 +50,7 @@ type Dialog = 'confirm' | 'cancel' | 'dispatch' | 'notDelivered';
 @Component({
     selector: 'order-detail',
     imports: [FormsModule, RouterLink, NgIcon, NzButtonModule, NzCardModule, NzFormModule, NzInputModule, NzModalModule, NzRadioModule, NzSelectModule, NzSkeletonModule, NzTableModule, NzTimelineModule, NzTypographyModule, TranslatePipe, PageHeaderComponent, ActionFooterComponent, StatusTagComponent, DigitsPipe, MoneyPipe, RecordDatePipe],
-    providers: [provideIcons({ lucideArrowLeft, lucideBan, lucideCheck, lucideCircleCheck, lucideHistory, lucideInfo, lucideMapPin, lucidePackage, lucidePackageCheck, lucidePackageX, lucideReceipt, lucideRotateCw, lucideTruck, lucideUserRound, lucideWallet, lucideX, lucideZap })],
+    providers: [MoneyPipe, DigitsPipe, provideIcons({ lucideArrowLeft, lucideBan, lucideCheck, lucideCircleCheck, lucideHistory, lucideInfo, lucideMapPin, lucidePackage, lucidePackageCheck, lucidePackageX, lucidePrinter, lucideReceipt, lucideRotateCw, lucideTruck, lucideUserRound, lucideWallet, lucideX, lucideZap })],
     templateUrl: './order-detail.component.html',
     styleUrl: './order-detail.component.scss',
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -61,6 +63,8 @@ export class OrderDetailComponent {
     private readonly _translate = inject(TranslateService);
     private readonly _message = inject(NzMessageService);
     private readonly _modal = inject(NzModalService);
+    private readonly _money = inject(MoneyPipe);
+    private readonly _digits = inject(DigitsPipe);
 
     readonly language = inject(LanguageService).current;
     readonly oid = this._route.snapshot.paramMap.get('oid') ?? '';
@@ -159,6 +163,36 @@ export class OrderDetailComponent {
         if (!online) return '';
         const bn = this.language() === 'bn';
         return [online.address_line, bn ? online.thana_name_bn : online.thana_name_en, bn ? online.district_name_bn : online.district_name_en, online.postal_code].filter(Boolean).join(', ');
+    }
+
+    /** The same A4 invoice the online order prints at Create, drawn from the order as it stands now (sales REQ-57). */
+    print(): void {
+        const o = this.record();
+        if (!o?.online) return;
+        const t = (key: string, params?: Record<string, unknown>) => this._translate.instant('sales.online.invoice.' + key, params);
+        const money = (value: number) => this._money.transform(value);
+        const business = this._session.business();
+        const paid = o.payment_status === 'paid' ? o.total_amount : o.payment_status === 'partially_paid' ? o.amount_paid : 0;
+        const rows = (...pairs: ([string, string] | null)[]) => pairs.filter((pair): pair is [string, string] => !!pair);
+        printInvoice({
+            business: business?.name ?? '',
+            logoUrl: business?.logoUrl ?? null,
+            track: o.tracking_token ? { url: `${environment.trackerUrl}/${o.tracking_token}`, label: t('track') } : null,
+            contact: [business?.address, business?.phone].filter((line): line is string => !!line),
+            title: t('title'),
+            meta: [
+                [t('number'), o.invoice_no],
+                [t('date'), new RecordDatePipe().transform(o.created_on, this.language(), 'date-time-12')],
+            ],
+            billedTo: { label: t('billedTo'), lines: [o.customer_name ?? '', o.customer_phone ?? ''] },
+            shipTo: { label: t('shipTo'), lines: [o.online.recipient_name ?? '', o.online.recipient_phone ?? o.customer_phone ?? '', this.placeOf(o)] },
+            columns: { item: t('item'), quantity: t('quantity'), price: t('price'), amount: t('amount') },
+            lines: o.items.map((line) => ({ name: line.product_name, quantity: this._digits.transform(line.quantity), price: money(line.unit_price), amount: money(line.unit_price * line.quantity) })),
+            totals: rows([t('subtotal'), money(o.subtotal)], o.discount_total ? [t('discount'), '-' + money(o.discount_total)] : null, [t('delivery'), money(o.delivery_charge)], [t('total'), money(o.total_amount)], paid ? [t('paid'), '-' + money(paid)] : null, [t('collect'), t('withCurrency', { amount: money(this.due()) })]),
+            notes: rows(o.payment_type ? [t('payment'), this._translate.instant('sales.online.terms.' + o.payment_type)] : null, o.notes ? [t('note'), o.notes] : null),
+            thanks: t('thanks'),
+            poweredBy: t('poweredBy'),
+        });
     }
 
     open(dialog: Dialog): void {
