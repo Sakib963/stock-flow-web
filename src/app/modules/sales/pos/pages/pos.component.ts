@@ -544,7 +544,6 @@ export class PosComponent {
             lines: this.lines().map((line) => ({
                 name: t('item', { name: line.product_name, quantity: this._digits.transform(line.quantity) }),
                 amount: money(line.selling_price * line.quantity),
-                note: line.discount ? t('discountEach', { amount: money(line.discount) }) : null,
             })),
             totals: this.discountTotal() ? rows([t('subtotal'), money(this.subtotal())], [t('discount'), '-' + money(this.discountTotal())]) : [],
             total: [t('total'), t('amount', { amount: money(this.total()) })],

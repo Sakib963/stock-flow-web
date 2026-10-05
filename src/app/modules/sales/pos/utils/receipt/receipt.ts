@@ -26,8 +26,6 @@ export interface ReceiptLine {
     name: string;
     /** Quantity times the selling price, before any discount. */
     amount: string;
-    /** "Discount 50.00 each", when the line has one. */
-    note: string | null;
 }
 
 export interface ReceiptContent {
@@ -95,7 +93,6 @@ export const drawReceipt = (doc: Document, content: ReceiptContent, paper: Recei
 
     for (const line of content.lines) {
         receipt.append(pair(doc, line.name, line.amount, { 'margin-top': '0.8mm' }));
-        if (line.note) receipt.append(text(doc, line.note, { 'padding-left': '3mm' }));
     }
 
     receipt.append(rule(doc));

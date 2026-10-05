@@ -2231,7 +2231,6 @@
                 "change": "ফেরত",
                 "thanks": "ধন্যবাদ!",
                 "item": "{{name}} x{{quantity}}",
-                "discountEach": "প্রতিটিতে ছাড় {{amount}}",
                 "amount": "{{amount}} টাকা",
                 "poweredBy": "Powered by StockFlow"
             },

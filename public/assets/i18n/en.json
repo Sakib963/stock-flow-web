@@ -2231,7 +2231,6 @@
                 "change": "Change",
                 "thanks": "Thank you!",
                 "item": "{{name}} x{{quantity}}",
-                "discountEach": "Discount {{amount}} each",
                 "amount": "{{amount}} BDT",
                 "poweredBy": "Powered by StockFlow"
             },

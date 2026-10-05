@@ -265,7 +265,7 @@
 
 <ng-template #discountField let-line let-i="i">
     @if (discountCap(line) > 0) {
-        <nz-input-number class="w-24" [nzSize]="coarse ? 'large' : 'default'" [nzMin]="0" [nzMax]="discountCap(line)" [nzStep]="1" [nzPrecision]="0" nz-tooltip [nzTooltipTitle]="'sales.pos.discountUpTo' | translate: { max: (discountCap(line) | money) }" [attr.aria-label]="'sales.pos.discountPerUnit' | translate" [ngModel]="line.discount" (ngModelChange)="setDiscount(i, $event)" />
+        <nz-input-number class="w-24" [nzSize]="coarse ? 'large' : 'default'" [nzMin]="0" [nzMax]="discountCap(line)" [nzStep]="1" [nzPrecision]="0" [attr.aria-label]="'sales.pos.discountPerUnit' | translate" [ngModel]="line.discount" (ngModelChange)="setDiscount(i, $event)" />
     } @else {
         <span class="text-xs text-ink-muted" nz-tooltip [nzTooltipTitle]="'sales.pos.noDiscount' | translate">&ndash;</span>
     }
@@ -339,20 +339,7 @@
             <input nz-input id="pos-name" nzSize="large" type="text" autocomplete="off" data-pos="name" [attr.placeholder]="'sales.pos.namePlaceholder' | translate" [ngModel]="customerName()" (ngModelChange)="customerName.set($event)" />
         }
 
-        <dl class="mt-4 mb-0 space-y-1 border-t border-line pt-3 text-[13px]">
-            <div class="flex justify-between">
-                <dt class="text-ink-muted">{{ 'sales.pos.subtotal' | translate }}</dt>
-                <dd class="m-0 font-mono text-ink tabular-nums">{{ subtotal() | money }}</dd>
-            </div>
-            @if (discountTotal()) {
-                <div class="flex justify-between">
-                    <dt class="text-ink-muted">{{ 'sales.pos.discount' | translate }}</dt>
-                    <dd class="m-0 font-mono text-ink tabular-nums">&minus;{{ discountTotal() | money }}</dd>
-                </div>
-            }
-        </dl>
-
-        <p class="mt-4 mb-1 text-xs font-semibold text-ink-body" id="pos-method">{{ 'sales.pos.methodLabel' | translate }}</p>
+        <p class="mt-4 mb-1 border-t border-line pt-3 text-xs font-semibold text-ink-body" id="pos-method">{{ 'sales.pos.methodLabel' | translate }}</p>
         <nz-radio-group nzButtonStyle="solid" nzSize="large" class="flex w-full" aria-labelledby="pos-method" data-pos="method" [ngModel]="tender()" (ngModelChange)="setTender($event)">
             @for (item of tenders; track item) {
                 <label nz-radio-button class="flex-1 px-1 text-center text-[13px] whitespace-nowrap" [nzValue]="item"
@@ -417,6 +404,19 @@
     </div>
 
     <div class="flex-none border-t border-line px-4 pt-3 pb-4">
+        <!-- What the customer is charged, read together just above the total: one discount, never a line's. -->
+        <dl class="mt-0 mb-1 space-y-1 text-[13px]">
+            <div class="flex justify-between">
+                <dt class="text-ink-muted">{{ 'sales.pos.subtotal' | translate }}</dt>
+                <dd class="m-0 font-mono text-ink tabular-nums">{{ subtotal() | money }}</dd>
+            </div>
+            @if (discountTotal()) {
+                <div class="flex justify-between">
+                    <dt class="text-ink-muted">{{ 'sales.pos.discount' | translate }}</dt>
+                    <dd class="m-0 font-mono text-ink tabular-nums">&minus;{{ discountTotal() | money }}</dd>
+                </div>
+            }
+        </dl>
         <div class="mb-2 flex items-baseline justify-between">
             <span class="text-sm font-bold text-ink">{{ 'sales.pos.total' | translate }}</span>
             <span class="font-mono text-2xl font-extrabold text-ink tabular-nums" data-pos="total">{{ total() | money }}</span>
