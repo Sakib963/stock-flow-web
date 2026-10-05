@@ -132,6 +132,15 @@ export class APIEndpoint {
     static readonly GET_PARKED_CARTS = '/api/v1/sales/pos/get-parked-carts';
     static readonly DISCARD_PARKED_CART = '/api/v1/sales/pos/discard-parked-cart';
     static readonly FIND_CUSTOMER_BY_PHONE = '/api/v1/sales/customer/find-customer-by-phone';
+    // Sales: orders list and record
+    static readonly GET_ORDER_LIST = '/api/v1/sales/order/get-order-list';
+    static readonly GET_ORDER_DETAILS = '/api/v1/sales/order/get-order-details';
+    static readonly CONFIRM_ORDER = '/api/v1/sales/order/confirm-order';
+    static readonly CANCEL_ORDER = '/api/v1/sales/order/cancel-order';
+    static readonly MARK_ORDER_PACKED = '/api/v1/sales/order/mark-order-packed';
+    static readonly DISPATCH_ORDER = '/api/v1/sales/order/dispatch-order';
+    static readonly DELIVER_ORDER = '/api/v1/sales/order/deliver-order';
+    static readonly MARK_ORDER_NOT_DELIVERED = '/api/v1/sales/order/mark-order-not-delivered';
     static readonly GET_CUSTOMER_LIST = '/api/v1/sales/customer/get-customer-list';
     static readonly GET_CUSTOMER_DETAILS = '/api/v1/sales/customer/get-customer-details';
     static readonly CREATE_CUSTOMER = '/api/v1/sales/customer/create-customer';

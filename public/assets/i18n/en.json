@@ -2457,6 +2457,200 @@
                 "Returned": "Returned",
                 "Cancelled": "Cancelled",
                 "Refunded": "Refunded"
+            },
+            "detailTitle": "Order",
+            "detailLead": "Everything about one order: what was bought, where it goes, the money, and what happened when.",
+            "backToList": "Back to orders",
+            "loadFailed": {
+                "network": "Could not reach the server to load this order.",
+                "forbidden": "You do not have permission to see this order.",
+                "server": "Could not load this order. Try again in a moment."
+            },
+            "section": {
+                "details": "Order",
+                "lines": "Products",
+                "delivery": "Delivery",
+                "timeline": "Timeline"
+            },
+            "invoice": "Invoice",
+            "customer": "Customer",
+            "walkIn": "Walk-in customer",
+            "statusLabel": "Status",
+            "deliveryLabel": "Delivery",
+            "paymentLabel": "Payment",
+            "refundLabel": "Refund",
+            "channelLabel": "Channel",
+            "placedOn": "Placed",
+            "soldOn": "Sold",
+            "source": "Came from",
+            "note": "Note",
+            "noteNeeded": "Write a note to say what happened.",
+            "total": "Total",
+            "paid": "Paid",
+            "toCollect": "To collect",
+            "owed": "Still owed",
+            "units": "Units",
+            "takenBy": "Taken by",
+            "onlyMine": "Only my orders",
+            "district": "District",
+            "view": "Open",
+            "searchPlaceholder": "Search invoice, customer or phone",
+            "emptyTitle": "No orders yet",
+            "emptyBody": "Sales from the counter and online orders appear here as soon as they are placed.",
+            "stat": {
+                "pending": "Waiting to confirm",
+                "toDispatch": "To dispatch",
+                "withCourier": "With the courier",
+                "toRefund": "To refund"
+            },
+            "product": "Product",
+            "quantity": "Qty",
+            "price": "Price",
+            "discountPerUnit": "Discount a unit",
+            "lineTotal": "Amount",
+            "subtotal": "Subtotal",
+            "discount": "Discount",
+            "deliveryCharge": "Delivery charge",
+            "recipient": "Receives it",
+            "address": "Address",
+            "courier": "Courier",
+            "consignment": "Consignment number",
+            "confirmedHow": "How it was confirmed",
+            "cancelledBecause": "Why it was cancelled",
+            "refundDue": "{{amount}} to refund",
+            "quickActions": "Quick actions",
+            "openCustomer": "Open the customer",
+            "nothingToDo": "Nothing to do on this order now.",
+            "movedOn": "Someone else changed this order a moment ago. It has been reloaded.",
+            "pickReason": "Pick a reason",
+            "pickCourier": "Pick the courier",
+            "notDeliveredWhy": "Why it was not delivered",
+            "notDeliveredNote": "The parcel stays out of stock until it is back in the shop and its return is confirmed.",
+            "cancelRefundNote": "Money was paid on this order. It becomes owed back to the customer as soon as the order is cancelled.",
+            "delivery": {
+                "Preparing": "Preparing",
+                "Packed": "Packed",
+                "WithCourier": "With courier",
+                "Delivered": "Delivered",
+                "Failed": "Not delivered",
+                "BackInShop": "Back in shop"
+            },
+            "payment": {
+                "unpaid": "Unpaid",
+                "partially_paid": "Part paid",
+                "paid": "Paid",
+                "partially_refunded": "Part refunded",
+                "refunded": "Refunded"
+            },
+            "refund": {
+                "None": "Nothing to refund",
+                "ToRefund": "To refund",
+                "Refunded": "Refunded"
+            },
+            "confirmedVia": {
+                "PhoneCall": "Phone call",
+                "Message": "Message",
+                "AdvanceReceived": "Advance received",
+                "NotNeeded": "Not needed"
+            },
+            "reasonSide": {
+                "customer": "From the customer",
+                "business": "From the business",
+                "other": "Other"
+            },
+            "cancelReason": {
+                "changed_mind": "Changed their mind",
+                "unreachable": "Could not reach them",
+                "fake_order": "Fake order",
+                "price": "Price or delivery charge",
+                "ordered_elsewhere": "Ordered elsewhere",
+                "out_of_stock": "Out of stock",
+                "duplicate": "Duplicate order",
+                "cannot_deliver": "Cannot deliver there",
+                "other": "Other"
+            },
+            "notDeliveredReason": {
+                "refused": "Refused the parcel",
+                "unreachable": "Could not be reached",
+                "wrong_address": "Wrong address",
+                "other": "Other"
+            },
+            "couriers": {
+                "Pathao": "Pathao",
+                "Steadfast": "Steadfast",
+                "RedX": "RedX",
+                "Paperfly": "Paperfly",
+                "Sundarban": "Sundarban",
+                "OwnRider": "Own rider",
+                "Other": "Other"
+            },
+            "history": {
+                "Order": "Order {{to}}",
+                "Delivery": "Delivery: {{to}}",
+                "Payment": "Payment: {{to}}",
+                "Refund": "Refund: {{to}}"
+            },
+            "historyValue": {
+                "Draft": "saved as a draft",
+                "Pending": "placed",
+                "Confirmed": "confirmed",
+                "Purchased": "sold",
+                "Delivered": "delivered",
+                "PartiallyReturned": "partly returned",
+                "Returned": "returned",
+                "Cancelled": "cancelled",
+                "Refunded": "refunded",
+                "Preparing": "preparing",
+                "Packed": "packed",
+                "WithCourier": "with the courier",
+                "Failed": "not delivered",
+                "BackInShop": "back in shop",
+                "paid": "paid",
+                "partially_paid": "part paid",
+                "unpaid": "unpaid",
+                "ToRefund": "to refund"
+            },
+            "action": {
+                "confirm": {
+                    "title": "Confirm the order",
+                    "button": "Confirm order",
+                    "confirmTitle": "Confirm order {{number}}?",
+                    "confirmBody": "The stock stays held for it, and the order moves on to packing.",
+                    "done": "Order confirmed."
+                },
+                "packed": {
+                    "button": "Mark packed",
+                    "confirmTitle": "Mark {{number}} packed?",
+                    "confirmBody": "The parcel is boxed and waits for the courier. Nothing leaves the shelf yet.",
+                    "done": "Marked packed."
+                },
+                "dispatch": {
+                    "title": "Dispatch the order",
+                    "button": "Dispatch",
+                    "confirmTitle": "Dispatch {{number}}?",
+                    "confirmBody": "The held stock leaves the shelf now. After this the order cannot be cancelled, only returned.",
+                    "done": "Dispatched. The stock has left the shelf."
+                },
+                "deliver": {
+                    "button": "Mark delivered",
+                    "confirmTitle": "Mark {{number}} delivered?",
+                    "confirmBody": "It becomes a sale now, and what the courier collected is recorded as paid.",
+                    "done": "Delivered and counted as a sale."
+                },
+                "notDelivered": {
+                    "title": "Record not delivered",
+                    "button": "Record not delivered",
+                    "confirmTitle": "Record {{number}} as not delivered?",
+                    "confirmBody": "It will never count as a sale. The parcel comes back into stock when its return is confirmed.",
+                    "done": "Recorded as not delivered."
+                },
+                "cancel": {
+                    "title": "Cancel the order",
+                    "button": "Cancel order",
+                    "confirmTitle": "Cancel order {{number}}?",
+                    "confirmBody": "The held stock becomes sellable again. A cancelled order cannot be placed again.",
+                    "done": "Order cancelled. Its stock is free to sell."
+                }
             }
         },
         "online": {
