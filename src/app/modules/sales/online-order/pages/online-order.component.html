@@ -607,7 +607,7 @@
     </ng-container>
 </nz-modal>
 
-<!-- Saved drafts, for every moderator: a chat that paused, resumed on an empty screen. -->
+<!-- The person's own saved drafts: a chat that paused, resumed on an empty screen. -->
 <nz-drawer [nzVisible]="draftsOpen()" nzPlacement="right" nzWidth="min(440px, 100vw)" [nzTitle]="'sales.online.drafts.title' | translate" (nzOnClose)="draftsOpen.set(false)">
     <ng-container *nzDrawerContent>
         @if (draftsLoading()) {
