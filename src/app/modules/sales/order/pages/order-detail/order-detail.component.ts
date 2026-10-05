@@ -19,7 +19,7 @@ import { NzTypographyModule } from 'ng-zorro-antd/typography';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { Observable } from 'rxjs';
 import { RequestFailure } from '@app/core/models/api.model';
-import { CANCEL_REASONS, CONFIRMED_VIA, COURIERS, CancelReason, ConfirmedVia, Courier, NOT_DELIVERED_REASONS, NotDeliveredReason, OrderDetails } from '@app/core/models/order.model';
+import { CANCEL_REASONS, CONFIRMED_VIA, COURIERS, CancelReason, ConfirmedVia, Courier, NOT_DELIVERED_REASONS, NotDeliveredReason, OrderDetails, OrderScope } from '@app/core/models/order.model';
 import { PageBack } from '@app/core/models/page-header.model';
 import { LanguageService } from '@app/core/services/language/language.service';
 import { SessionService } from '@app/core/services/session/session.service';
@@ -68,7 +68,10 @@ export class OrderDetailComponent {
 
     readonly language = inject(LanguageService).current;
     readonly oid = this._route.snapshot.paramMap.get('oid') ?? '';
-    readonly back: PageBack = { route: ORDER_ROUTES.list };
+    /** Order history reaches only the person's own orders and offers Confirm and Cancel; Orders offers every action. */
+    readonly scope: OrderScope = (this._route.snapshot.data['scope'] as OrderScope | undefined) ?? 'all';
+    private readonly _listRoute = this.scope === 'history' ? ORDER_ROUTES.historyList : ORDER_ROUTES.list;
+    readonly back: PageBack = { route: this._listRoute };
     readonly customerRoute = CUSTOMER_ROUTES;
     readonly canViewCustomers = this._session.can('sales.customer.view');
 
@@ -97,14 +100,15 @@ export class OrderDetailComponent {
         const online = o?.channel === 'ONLINE';
         const delivery = o?.online?.delivery_status ?? null;
         const open = !!o && !o.dispatched_on && (o.status === 'Pending' || o.status === 'Confirmed');
-        const can = (code: string) => this._session.can(code);
+        const all = this.scope === 'all';
+        const can = (action: string) => this._session.can((all ? 'sales.order.' : 'sales.order-history.') + action);
         return {
-            confirm: online && o.status === 'Pending' && can('sales.order.confirm'),
-            packed: online && o.status === 'Confirmed' && delivery === 'Preparing' && can('sales.order.dispatch'),
-            dispatch: online && o.status === 'Confirmed' && !o.dispatched_on && (delivery === 'Preparing' || delivery === 'Packed') && can('sales.order.dispatch'),
-            deliver: online && o.status === 'Confirmed' && delivery === 'WithCourier' && can('sales.order.deliver'),
-            notDelivered: online && o.status === 'Confirmed' && delivery === 'WithCourier' && can('sales.order.deliver'),
-            cancel: online && open && can('sales.order.cancel'),
+            confirm: online && o.status === 'Pending' && can('confirm'),
+            packed: all && online && o.status === 'Confirmed' && delivery === 'Preparing' && can('dispatch'),
+            dispatch: all && online && o.status === 'Confirmed' && !o.dispatched_on && (delivery === 'Preparing' || delivery === 'Packed') && can('dispatch'),
+            deliver: all && online && o.status === 'Confirmed' && delivery === 'WithCourier' && can('deliver'),
+            notDelivered: all && online && o.status === 'Confirmed' && delivery === 'WithCourier' && can('deliver'),
+            cancel: online && open && can('cancel'),
         };
     });
     readonly anyAction = computed(() => Object.values(this.actions()).some(Boolean));
@@ -142,7 +146,7 @@ export class OrderDetailComponent {
     load(): void {
         this.loading.set(true);
         this.failed.set(null);
-        this._orders.details(this.oid).subscribe({
+        this._orders.details(this.oid, this.scope).subscribe({
             next: (details) => {
                 this.record.set(details);
                 this.loading.set(false);
@@ -155,7 +159,7 @@ export class OrderDetailComponent {
     }
 
     backToList(): void {
-        void this._router.navigateByUrl(ORDER_ROUTES.list);
+        void this._router.navigateByUrl(this._listRoute);
     }
 
     placeOf(o: OrderDetails): string {
@@ -218,8 +222,8 @@ export class OrderDetailComponent {
         if (!dialog || this.dialogIncomplete() || this.saving()) return;
         const note = this.note().trim() || null;
         const send: Record<Dialog, () => Observable<unknown>> = {
-            confirm: () => this._orders.confirm(this.oid, this.confirmedVia(), note),
-            cancel: () => this._orders.cancel(this.oid, this.cancelReason()!, note),
+            confirm: () => this._orders.confirm(this.oid, this.confirmedVia(), note, this.scope),
+            cancel: () => this._orders.cancel(this.oid, this.cancelReason()!, note, this.scope),
             dispatch: () => this._orders.dispatch(this.oid, this.courier()!, this.consignment().trim() || null),
             notDelivered: () => this._orders.notDelivered(this.oid, this.notDeliveredReason()!, note),
         };

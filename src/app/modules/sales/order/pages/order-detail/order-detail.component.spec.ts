@@ -50,15 +50,15 @@ const order = (over: Partial<OrderDetails> = {}): OrderDetails => ({
     ...over,
 });
 
-const open = async (details: OrderDetails, granted: string[] = ['sales.order.view', 'sales.order.confirm', 'sales.order.cancel', 'sales.order.dispatch', 'sales.order.deliver']) => {
+const open = async (details: OrderDetails, granted: string[] = ['sales.order.view', 'sales.order.confirm', 'sales.order.cancel', 'sales.order.dispatch', 'sales.order.deliver'], scope = 'all') => {
     await TestBed.configureTestingModule({
         imports: [OrderDetailComponent],
-        providers: [provideRouter([]), provideHttpClient(), provideHttpClientTesting(), provideNzI18n(en_US), provideTranslateService({ fallbackLang: 'en' }), ...OVERLAY_PROVIDERS, { provide: ActivatedRoute, useValue: { snapshot: { paramMap: convertToParamMap({ oid: OID }) } } }, { provide: SessionService, useValue: { can: (code: string) => granted.includes(code), menu: () => [], business: () => null, user: () => ({ name: 'Manager' }) } }],
+        providers: [provideRouter([]), provideHttpClient(), provideHttpClientTesting(), provideNzI18n(en_US), provideTranslateService({ fallbackLang: 'en' }), ...OVERLAY_PROVIDERS, { provide: ActivatedRoute, useValue: { snapshot: { paramMap: convertToParamMap({ oid: OID }), data: { scope } } } }, { provide: SessionService, useValue: { can: (code: string) => granted.includes(code), menu: () => [], business: () => null, user: () => ({ name: 'Manager' }) } }],
     }).compileComponents();
     const fixture = TestBed.createComponent(OrderDetailComponent);
     const http = TestBed.inject(HttpTestingController);
     fixture.detectChanges();
-    http.expectOne((r) => r.url.includes(APIEndpoint.GET_ORDER_DETAILS)).flush({ code: 200, data: details });
+    http.expectOne((r) => r.url.includes(scope === 'history' ? APIEndpoint.GET_ORDER_HISTORY_DETAILS : APIEndpoint.GET_ORDER_DETAILS)).flush({ code: 200, data: details });
     fixture.detectChanges();
     return { fixture, page: fixture.componentInstance, http, element: fixture.nativeElement as HTMLElement };
 };
@@ -80,6 +80,13 @@ describe('OrderDetailComponent', () => {
     it('hides an action from someone without its permission', async () => {
         const { element } = await open(order({ status: 'Confirmed', online: { ...order().online!, delivery_status: 'Preparing' } }), ['sales.order.view']);
         expect(quick(element)).toEqual(['print', 'none']);
+    });
+
+    it('offers only Confirm and Cancel in Order history, on its own permissions, even with the parcel ready to send', async () => {
+        const history = ['sales.order-history.view', 'sales.order-history.confirm', 'sales.order-history.cancel', 'sales.order.dispatch'];
+        const { element, http } = await open(order({ status: 'Confirmed', online: { ...order().online!, delivery_status: 'Preparing' } }), history, 'history');
+        expect(quick(element)).toEqual(['cancel', 'print']);
+        http.verify();
     });
 
     it('offers nothing on a counter sale, which only a return can undo', async () => {

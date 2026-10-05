@@ -2492,7 +2492,6 @@
             "owed": "Still owed",
             "units": "Units",
             "takenBy": "Taken by",
-            "onlyMine": "Only my orders",
             "district": "District",
             "view": "Open",
             "searchPlaceholder": "Search invoice, customer or phone",
@@ -2652,7 +2651,8 @@
                     "confirmBody": "The held stock becomes sellable again. A cancelled order cannot be placed again.",
                     "done": "Order cancelled. Its stock is free to sell."
                 }
-            }
+            },
+            "historyEmptyBody": "Orders you place at the counter or online appear here."
         },
         "online": {
             "title": "New online order",

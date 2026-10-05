@@ -1,3 +1,6 @@
+/** Orders is every order with every action; Order history is the person's own with view, confirm and cancel. */
+export type OrderScope = 'all' | 'history';
+
 export type OrderChannel = 'POS' | 'ONLINE';
 export type DeliveryStatus = 'Preparing' | 'Packed' | 'WithCourier' | 'Delivered' | 'Failed' | 'BackInShop';
 

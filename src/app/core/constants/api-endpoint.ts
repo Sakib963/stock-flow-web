@@ -135,6 +135,10 @@ export class APIEndpoint {
     // Sales: orders list and record
     static readonly GET_ORDER_LIST = '/api/v1/sales/order/get-order-list';
     static readonly GET_ORDER_DETAILS = '/api/v1/sales/order/get-order-details';
+    static readonly GET_ORDER_HISTORY_LIST = '/api/v1/sales/order-history/get-order-list';
+    static readonly GET_ORDER_HISTORY_DETAILS = '/api/v1/sales/order-history/get-order-details';
+    static readonly CONFIRM_ORDER_HISTORY = '/api/v1/sales/order-history/confirm-order';
+    static readonly CANCEL_ORDER_HISTORY = '/api/v1/sales/order-history/cancel-order';
     static readonly CONFIRM_ORDER = '/api/v1/sales/order/confirm-order';
     static readonly CANCEL_ORDER = '/api/v1/sales/order/cancel-order';
     static readonly MARK_ORDER_PACKED = '/api/v1/sales/order/mark-order-packed';

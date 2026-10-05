@@ -35,6 +35,18 @@ export const SALES_ROUTES: Routes = [
                 loadComponent: () => import('./order/pages/order-detail/order-detail.component').then((m) => m.OrderDetailComponent),
             },
             {
+                path: 'order-history',
+                canActivate: [permissionGuard],
+                data: { permission: 'sales.order-history.view', scope: 'history' },
+                loadComponent: () => import('./order/pages/order-list/order-list.component').then((m) => m.OrderListComponent),
+            },
+            {
+                path: 'order-history/:oid',
+                canActivate: [permissionGuard],
+                data: { permission: 'sales.order-history.view', scope: 'history' },
+                loadComponent: () => import('./order/pages/order-detail/order-detail.component').then((m) => m.OrderDetailComponent),
+            },
+            {
                 path: 'customers',
                 canActivate: [permissionGuard],
                 data: { permission: CUSTOMER_LIST.permission },

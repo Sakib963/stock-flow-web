@@ -1,5 +1,6 @@
 import { APIEndpoint } from '@app/core/constants/api-endpoint';
 import { ToneMap } from '@app/core/models/config.model';
+import { OrderScope } from '@app/core/models/order.model';
 import { ListShellPageConfig } from '@app/core/models/list-shell-page.model';
 import { ORDER_ROUTES } from '@app/modules/sales/order/constants/order-routes';
 
@@ -37,51 +38,55 @@ export const ORDER_CHANNEL: ToneMap = {
 };
 
 /**
- * The orders list. The channel filter and column appear only to someone with both channels
- * (sales REQ-03), and someone who cannot confirm orders opens it on their own orders, so a
- * salesperson sees their invoices first and the owner sees everyone's.
+ * Orders (every order, the cards that say what needs a hand) and Order history (the person's own,
+ * nothing to analyse) from one definition. The channel filter and column appear only to someone with
+ * both channels (sales REQ-03).
  */
-export const orderList = ({ bothChannels, ownFirst }: { bothChannels: boolean; ownFirst: boolean }): ListShellPageConfig => ({
-    permission: 'sales.order.view',
-    header: { count: true },
-    stats: [
-        { key: 'pending', label: 'sales.order.stat.pending', icon: 'lucideClock', tone: 'warning' },
-        { key: 'to_dispatch', label: 'sales.order.stat.toDispatch', icon: 'lucidePackage' },
-        { key: 'with_courier', label: 'sales.order.stat.withCourier', icon: 'lucideTruck' },
-        { key: 'to_refund', label: 'sales.order.stat.toRefund', icon: 'lucideHandCoins', tone: 'danger' },
-    ],
-    filter: {
-        render: 'modal',
-        search: { placeholder: 'sales.order.searchPlaceholder' },
-        fields: [
-            { key: 'mine', label: 'sales.order.takenBy', type: 'select', choices: [{ value: 'true', label: 'sales.order.onlyMine' }], ...(ownFirst ? { default: 'true' } : {}) },
-            ...(bothChannels ? [{ key: 'channel', label: 'sales.order.channelLabel', type: 'select' as const, choices: ['POS', 'ONLINE'].map((value) => ({ value, label: `sales.order.channel.${value}` })) }] : []),
-            { key: 'status', label: 'sales.order.statusLabel', type: 'multi-select', choices: Object.keys(ORDER_STATUS).map((value) => ({ value, label: `sales.order.status.${value}` })) },
-            { key: 'delivery_status', label: 'sales.order.deliveryLabel', type: 'multi-select', choices: Object.keys(DELIVERY_STATUS).map((value) => ({ value, label: `sales.order.delivery.${value}` })) },
-            { key: 'payment_status', label: 'sales.order.paymentLabel', type: 'multi-select', choices: Object.keys(PAYMENT_STATUS).map((value) => ({ value, label: `sales.order.payment.${value}` })) },
-            { key: 'refund_status', label: 'sales.order.refundLabel', type: 'select', choices: ['ToRefund', 'Refunded'].map((value) => ({ value, label: `sales.order.refund.${value}` })) },
-        ],
-    },
-    table: {
-        key: 'sales.order',
-        rowKey: 'oid',
-        source: { endpoint: APIEndpoint.GET_ORDER_LIST },
-        sort: { key: 'created_on', order: 'desc' },
-        columns: [
-            { key: 'invoice_no', label: 'sales.order.invoice', type: 'identifier', width: 15, sortable: true, locked: true, pin: 'start', copy: true },
-            { key: 'customer_name', label: 'sales.order.customer', type: 'name', sub: 'customer_phone', width: 18 },
-            ...(bothChannels ? [{ key: 'channel', label: 'sales.order.channelLabel', type: 'status' as const, width: 11, tones: ORDER_CHANNEL }] : []),
-            { key: 'status', label: 'sales.order.statusLabel', type: 'status', width: 13, tones: ORDER_STATUS },
-            { key: 'delivery_status', label: 'sales.order.deliveryLabel', type: 'status', width: 15, tones: DELIVERY_STATUS },
-            { key: 'payment_status', label: 'sales.order.paymentLabel', type: 'status', width: 13, tones: PAYMENT_STATUS },
-            { key: 'total_amount', label: 'sales.order.total', type: 'money', width: 12, sortable: true },
-            { key: 'units', label: 'sales.order.units', type: 'quantity', width: 8 },
-            { key: 'created_by', label: 'sales.order.takenBy', type: 'user', name: 'created_by_name', width: 15 },
-            { key: 'created_on', label: 'sales.order.placedOn', type: 'date', format: 'date-time-12', width: 15, sortable: true },
-        ],
-        layouts: [{ type: 'table' }],
-        rowActions: [{ key: 'view', label: 'sales.order.view', icon: 'lucideEye', permission: 'sales.order.view', stateful: false, run: { kind: 'navigate', route: ORDER_ROUTES.detailPattern } }],
-        phoneRowActionStyle: 'menu',
-        empty: { icon: 'lucideReceipt', title: 'sales.order.emptyTitle', body: 'sales.order.emptyBody' },
-    },
-});
+export const orderList = ({ scope, bothChannels }: { scope: OrderScope; bothChannels: boolean }): ListShellPageConfig => {
+    const all = scope === 'all';
+    return {
+        permission: all ? 'sales.order.view' : 'sales.order-history.view',
+        header: { count: true },
+        stats: !all
+            ? undefined
+            : [
+                  { key: 'pending', label: 'sales.order.stat.pending', icon: 'lucideClock', tone: 'warning' },
+                  { key: 'to_dispatch', label: 'sales.order.stat.toDispatch', icon: 'lucidePackage' },
+                  { key: 'with_courier', label: 'sales.order.stat.withCourier', icon: 'lucideTruck' },
+                  { key: 'to_refund', label: 'sales.order.stat.toRefund', icon: 'lucideHandCoins', tone: 'danger' },
+              ],
+        filter: {
+            render: 'modal',
+            search: { placeholder: 'sales.order.searchPlaceholder' },
+            fields: [
+                ...(bothChannels ? [{ key: 'channel', label: 'sales.order.channelLabel', type: 'select' as const, choices: ['POS', 'ONLINE'].map((value) => ({ value, label: `sales.order.channel.${value}` })) }] : []),
+                { key: 'status', label: 'sales.order.statusLabel', type: 'multi-select', choices: Object.keys(ORDER_STATUS).map((value) => ({ value, label: `sales.order.status.${value}` })) },
+                { key: 'delivery_status', label: 'sales.order.deliveryLabel', type: 'multi-select', choices: Object.keys(DELIVERY_STATUS).map((value) => ({ value, label: `sales.order.delivery.${value}` })) },
+                { key: 'payment_status', label: 'sales.order.paymentLabel', type: 'multi-select', choices: Object.keys(PAYMENT_STATUS).map((value) => ({ value, label: `sales.order.payment.${value}` })) },
+                { key: 'refund_status', label: 'sales.order.refundLabel', type: 'select', choices: ['ToRefund', 'Refunded'].map((value) => ({ value, label: `sales.order.refund.${value}` })) },
+            ],
+        },
+        table: {
+            key: 'sales.order',
+            rowKey: 'oid',
+            source: { endpoint: all ? APIEndpoint.GET_ORDER_LIST : APIEndpoint.GET_ORDER_HISTORY_LIST },
+            sort: { key: 'created_on', order: 'desc' },
+            columns: [
+                { key: 'invoice_no', label: 'sales.order.invoice', type: 'identifier', width: 15, sortable: true, locked: true, pin: 'start', copy: true },
+                { key: 'customer_name', label: 'sales.order.customer', type: 'name', sub: 'customer_phone', width: 18 },
+                ...(bothChannels ? [{ key: 'channel', label: 'sales.order.channelLabel', type: 'status' as const, width: 11, tones: ORDER_CHANNEL }] : []),
+                { key: 'status', label: 'sales.order.statusLabel', type: 'status', width: 13, tones: ORDER_STATUS },
+                { key: 'delivery_status', label: 'sales.order.deliveryLabel', type: 'status', width: 15, tones: DELIVERY_STATUS },
+                { key: 'payment_status', label: 'sales.order.paymentLabel', type: 'status', width: 13, tones: PAYMENT_STATUS },
+                { key: 'total_amount', label: 'sales.order.total', type: 'money', width: 12, sortable: true },
+                { key: 'units', label: 'sales.order.units', type: 'quantity', width: 8 },
+                ...(all ? [{ key: 'created_by', label: 'sales.order.takenBy', type: 'user' as const, name: 'created_by_name', width: 15 }] : []),
+                { key: 'created_on', label: 'sales.order.placedOn', type: 'date', format: 'date-time-12', width: 15, sortable: true },
+            ],
+            layouts: [{ type: 'table' }],
+            rowActions: [{ key: 'view', label: 'sales.order.view', icon: 'lucideEye', permission: all ? 'sales.order.view' : 'sales.order-history.view', stateful: false, run: { kind: 'navigate', route: all ? ORDER_ROUTES.detailPattern : ORDER_ROUTES.historyDetailPattern } }],
+            phoneRowActionStyle: 'menu',
+            empty: { icon: 'lucideReceipt', title: 'sales.order.emptyTitle', body: all ? 'sales.order.emptyBody' : 'sales.order.historyEmptyBody' },
+        },
+    };
+};
