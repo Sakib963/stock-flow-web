@@ -2260,7 +2260,8 @@
                 "next": "New sale"
             },
             "wallet": "Which wallet",
-            "openCustomer": "Open their record"
+            "openCustomer": "Open their record",
+            "nothingToSell": "Nothing is in stock to sell yet."
         },
         "customer": {
             "add": "Add customer",
@@ -2456,6 +2457,205 @@
                 "Returned": "Returned",
                 "Cancelled": "Cancelled",
                 "Refunded": "Refunded"
+            }
+        },
+        "online": {
+            "title": "New online order",
+            "retry": "Try again",
+            "setupFailed": {
+                "network": "Could not reach the server. Check the connection and try again.",
+                "forbidden": "You do not have permission to take online orders.",
+                "server": "Could not open the online order page. Try again in a moment."
+            },
+            "customer": "Customer",
+            "phone": "Customer phone",
+            "phoneFirst": "Start with the phone. A customer who ordered before brings their addresses.",
+            "phoneInvalid": "Not a mobile number yet. It needs 11 digits starting 01.",
+            "lookingUp": "Looking up this phone…",
+            "lookupFailed": "Could not look up this phone. You can still take the order; give the name.",
+            "newCustomer": "New customer. Give their name; they are saved with the order.",
+            "name": "Customer name",
+            "paste": {
+                "open": "Paste chat message",
+                "helper": "Paste the customer's message as it is. Phone, name and address are read from it; check them before creating.",
+                "placeholder": "person a, 01XXXXXXXXX, house 5, road 2, mohammadpur",
+                "read": "Read message",
+                "noPhone": "No mobile number in that message. Ask the customer for an 11 digit number starting 01.",
+                "failed": {
+                    "network": "Could not reach the server to read the message. Type the phone and address instead.",
+                    "forbidden": "You do not have permission to read messages here.",
+                    "server": "Could not read that message. Type the phone and address instead."
+                }
+            },
+            "risk": {
+                "orders": "Orders {{orders}} · delivered {{delivered}} · came back {{refused}}",
+                "rate": "{{rate}}% delivered",
+                "fake": "{{count}} cancelled as fake or unreachable"
+            },
+            "recentOpen": "This phone already has an open order, {{number}}, placed {{date}}. Check it is not the same order twice.",
+            "address": "Delivery address",
+            "candidates": "Which place is it? Pick one.",
+            "noCandidates": "The place could not be read from the message. Add the address and pick the district and thana.",
+            "newAddress": "New address",
+            "editAddress": "Edit the new address",
+            "addAddress": "Add an address",
+            "addressTitle": "Delivery address",
+            "useAddress": "Use this address",
+            "products": "Products",
+            "sellable": "{{count}} can be sold",
+            "removeLine": "Remove from the order",
+            "less": "One less",
+            "more": "One more",
+            "quantityOf": "Quantity of {{name}}",
+            "discountPerUnit": "Discount a unit",
+            "noDiscount": "No discount on this batch",
+            "emptyLines": "Search or scan the products the customer asked for.",
+            "onlyLeft": "Only {{count}} left of {{name}}.",
+            "summary": "Summary",
+            "source": "Order came from",
+            "pickSource": "Pick the page or inbox",
+            "termsLabel": "Payment",
+            "terms": {
+                "COD": "COD",
+                "ADVANCE": "Advance",
+                "PREPAID": "Prepaid"
+            },
+            "termsHelp": {
+                "COD": "All of it is collected at the door.",
+                "ADVANCE": "Part is paid now, the rest at the door.",
+                "PREPAID": "All of it is paid before the parcel goes out."
+            },
+            "paidBy": "Paid by",
+            "advance": "Advance paid",
+            "reference": "Transaction ID (optional)",
+            "referencePlaceholder": "From the payment message",
+            "notes": "Note",
+            "notesPlaceholder": "Optional, for the packer or the courier",
+            "blockedAcknowledge": "I know this customer is blocked and want to place the order anyway.",
+            "subtotal": "Subtotal",
+            "discount": "Discount",
+            "deliveryCharge": "Delivery charge",
+            "paidAlready": "Paid",
+            "total": "Total",
+            "collect": "To collect",
+            "create": "Create order",
+            "unanswered": "No answer came back, so the order may already be placed. Press Create again: it will not be placed twice.",
+            "blocker": {
+                "phone": "Type the customer's phone, or paste their message.",
+                "phoneInvalid": "The phone needs 11 digits starting 01.",
+                "lookingUp": "Wait a moment, looking up the phone.",
+                "name": "Give the new customer's name.",
+                "address": "Pick or add the delivery address.",
+                "empty": "Add at least one product.",
+                "stock": "A line asks for more than can be sold. Reduce it or remove it.",
+                "source": "Pick where the order came from.",
+                "advance": "Type the advance paid: more than 0 and less than the total.",
+                "blocked": "This customer is blocked. Tick that you know before creating."
+            },
+            "confirmCreate": {
+                "title": "Create this order of {{total}}?",
+                "body": "{{terms}}: {{collect}} to collect at the door. The stock is held for it until the parcel goes out."
+            },
+            "alreadyPlaced": "This order was already placed as {{number}}. Nothing was placed twice.",
+            "priceChanged": "A price changed since the products were added. Check the order and create again.",
+            "failed": {
+                "network": "Could not reach the server. Check the connection and press Create again: it will not be placed twice.",
+                "forbidden": "You do not have permission to create online orders.",
+                "server": "The order was not placed and no stock was held. Try again in a moment."
+            },
+            "done": {
+                "title": "Order placed",
+                "body": "The stock is held for it. Confirm it once you have checked the order is real.",
+                "customer": "Open the customer",
+                "next": "New order",
+                "copy": "Copy invoice number",
+                "copied": "Copied"
+            },
+            "quantity": "Quantity",
+            "charges": {
+                "title": "Delivery charges",
+                "help": "The charge suggested on each order: one inside the district the business sends from, another outside it. The charge can still be changed on any order.",
+                "district": "Business sends from",
+                "inside": "Inside the district",
+                "outside": "Outside the district",
+                "save": "Save charges",
+                "saved": "Delivery charges saved.",
+                "incomplete": "Pick the district and give both charges.",
+                "unset": "The delivery charges are not set yet. Ask whoever runs sales settings.",
+                "unsetEdit": "The delivery charges are not set yet. Set them with the button beside Delivery charge.",
+                "placesFailed": {
+                    "network": "Could not reach the server to search districts.",
+                    "forbidden": "You do not have permission to search districts.",
+                    "server": "Could not search districts. Try again in a moment."
+                },
+                "failed": {
+                    "network": "Could not reach the server. The charges were not saved.",
+                    "forbidden": "You do not have permission to change the delivery charges.",
+                    "server": "The charges were not saved. Try again in a moment."
+                }
+            },
+            "invoice": {
+                "title": "INVOICE",
+                "number": "Invoice",
+                "date": "Date",
+                "billedTo": "Billed to",
+                "shipTo": "Ship to",
+                "item": "Item",
+                "quantity": "Qty",
+                "price": "Price",
+                "amount": "Amount",
+                "subtotal": "Subtotal",
+                "discount": "Discount",
+                "delivery": "Delivery charge",
+                "total": "Total",
+                "paid": "Paid",
+                "collect": "To collect",
+                "payment": "Payment",
+                "note": "Note",
+                "thanks": "Thank you for your order!",
+                "poweredBy": "Powered by StockFlow",
+                "print": "Print invoice",
+                "printLast": "Print last invoice",
+                "noneYet": "No order placed on this screen yet.",
+                "withCurrency": "{{amount}} BDT",
+                "track": "Scan to track your order"
+            },
+            "product": "Product",
+            "lineTotal": "Total",
+            "emptyTitle": "No products yet",
+            "emptySearch": "Add a product",
+            "recentOrders": "Recent orders",
+            "startTitle": "Start with the customer",
+            "startBody": "Paste their chat message, or type their phone. A returning customer brings their saved addresses.",
+            "clear": "Clear",
+            "confirmClear": {
+                "title": "Clear this order?",
+                "body": "Everything typed on this order is removed. Nothing was saved, so nothing else changes."
+            },
+            "placing": "Placing the order and holding its stock…",
+            "drafts": {
+                "button": "Drafts",
+                "title": "Saved drafts",
+                "save": "Save draft",
+                "saved": "Saved as draft {{number}}. Open Drafts to finish it later.",
+                "failed": {
+                    "network": "Could not reach the server. Nothing was saved.",
+                    "forbidden": "You do not have permission to save online orders.",
+                    "server": "The draft was not saved. Try again in a moment."
+                },
+                "loadFailed": {
+                    "network": "Could not reach the server to load the drafts.",
+                    "forbidden": "You do not have permission to see drafts.",
+                    "server": "Could not load the drafts. Try again in a moment."
+                },
+                "screenNotEmpty": "Clear or finish the order on screen first, so nothing on it is lost.",
+                "short": "Some stock on this draft was sold while it waited. Check the lines marked in red.",
+                "discardTitle": "Discard the draft {{name}}?",
+                "discardBody": "It held no stock, so nothing goes back. Its invoice number stays as cancelled.",
+                "discard": "Discard",
+                "resume": "Resume",
+                "empty": "No saved drafts. Save draft keeps an order you cannot finish yet.",
+                "lines": "{{count}} line(s)"
             }
         }
     }

@@ -86,4 +86,17 @@ describe('ProductSearchComponent', () => {
         http.expectOne((r) => r.url.includes(APIEndpoint.GET_POS_PRODUCT_LIST)).flush({ code: 200, data: [row('B-9', 'SCARF-01')] });
         expect(picked.map((b) => b.batch_code)).toEqual(['B-9']);
     });
+
+    it('lists products as soon as the online order opens the box, and waits for a scan or a name at the counter', async () => {
+        const { fixture, search, http } = await open();
+        search.opened(true);
+        http.expectNone((r) => r.url.includes(APIEndpoint.GET_POS_PRODUCT_LIST));
+        search.opened(false);
+        fixture.componentRef.setInput('browse', true);
+        search.opened(true);
+        const request = http.expectOne((r) => r.url.includes(APIEndpoint.GET_POS_PRODUCT_LIST));
+        expect(request.request.params.get('search_text')).toBe('');
+        request.flush({ code: 200, data: [row('B-1'), row('B-2', 'SCARF')] });
+        expect(search.results().length).toBe(2);
+    });
 });

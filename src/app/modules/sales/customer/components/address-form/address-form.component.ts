@@ -90,8 +90,9 @@ export class AddressFormComponent {
         effect(() => {
             const address = this.editing();
             if (!address) return;
-            this.districts.set([{ oid: address.district_oid, name_en: address.district_name_en, name_bn: address.district_name_bn }]);
-            this.thanas.set([{ oid: address.thana_oid, name_en: address.thana_name_en, name_bn: address.thana_name_bn }]);
+            // An address read from a chat message may come without a place yet.
+            this.districts.set(address.district_oid ? [{ oid: address.district_oid, name_en: address.district_name_en, name_bn: address.district_name_bn }] : []);
+            this.thanas.set(address.thana_oid ? [{ oid: address.thana_oid, name_en: address.thana_name_en, name_bn: address.thana_name_bn }] : []);
             this.form.setValue({
                 label: address.label ?? '',
                 recipient_name: address.recipient_name,

@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, ElementRef, afterNextRender, computed, inject, output, signal, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, ElementRef, afterNextRender, computed, inject, input, output, signal, viewChild } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { NgIcon, provideIcons } from '@ng-icons/core';
@@ -11,7 +11,7 @@ import { Subject, catchError, debounceTime, map, merge, of, switchMap } from 'rx
 import { RequestFailure } from '@app/core/models/api.model';
 import { PosBatch } from '@app/core/models/pos.model';
 import { LanguageService } from '@app/core/services/language/language.service';
-import { PosService } from '@app/modules/sales/pos/services/pos.service';
+import { ProductSearchService } from '@app/core/services/product-search/product-search.service';
 import { StatusTagComponent } from '@app/shared/components/status-tag/status-tag.component';
 import { DigitsPipe } from '@app/shared/pipes/digits/digits.pipe';
 import { MoneyPipe } from '@app/shared/pipes/money/money.pipe';
@@ -34,7 +34,7 @@ import { failureOf } from '@app/shared/utils/request-failure/request-failure';
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProductSearchComponent {
-    private readonly _pos = inject(PosService);
+    private readonly _products = inject(ProductSearchService);
     private readonly _typed = new Subject<string>();
     private readonly _now = new Subject<string>();
     private _enterPending = false;
@@ -42,6 +42,8 @@ export class ProductSearchComponent {
     private _arrowed = false;
 
     readonly language = inject(LanguageService).current;
+    /** The online order opens on a list to pick from; the counter waits for a scan or a typed name. */
+    readonly browse = input(false);
     readonly picked = output<PosBatch>();
     readonly select = viewChild.required(NzSelectComponent);
     private readonly _host = viewChild.required(NzSelectComponent, { read: ElementRef });
@@ -70,7 +72,7 @@ export class ProductSearchComponent {
         merge(this._typed.pipe(debounceTime(250)), this._now)
             .pipe(
                 switchMap((text) =>
-                    this._pos.search(text).pipe(
+                    this._products.search(text).pipe(
                         map((rows) => ({ text, rows, failed: null as RequestFailure | null })),
                         catchError((error: unknown) => of({ text, rows: [] as PosBatch[], failed: failureOf(error) as RequestFailure | null }))
                     )
@@ -115,6 +117,7 @@ export class ProductSearchComponent {
         const text = value.trim();
         if (!text) {
             this.clear();
+            if (this.browse() && this.open()) this.browseAll();
             return;
         }
         // Set on the keystroke, not after the debounce, so the list never claims nothing matches while it is still asking.
@@ -126,6 +129,7 @@ export class ProductSearchComponent {
         this.open.set(open);
         // nz-select empties its box when it opens or closes, so the search it showed goes with it.
         if (!open) this.clear();
+        else if (this.browse() && !this.text().trim()) this.browseAll();
     }
 
     chosen(oid: string | null): void {
@@ -148,7 +152,7 @@ export class ProductSearchComponent {
 
     retry(): void {
         const text = this.text().trim();
-        if (!text) return;
+        if (!text) return this.browseAll();
         this.loading.set(true);
         this._now.next(text);
     }
@@ -173,6 +177,11 @@ export class ProductSearchComponent {
 
     expiry(batch: PosBatch): string {
         return expiryState(batch.expiry_date);
+    }
+
+    private browseAll(): void {
+        this.loading.set(true);
+        this._now.next('');
     }
 
     private takeExactMatch(): void {

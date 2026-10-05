@@ -1,0 +1,612 @@
+<page-header [title]="'sales.online.title' | translate" [compact]="true">
+    @if (canCreate) {
+        <button nz-button type="button" class="inline-flex items-center gap-1.5" data-online="drafts" (click)="openDrafts()">
+            <ng-icon name="lucideFileClock" size="14px" aria-hidden="true" />
+            <span>{{ 'sales.online.drafts.button' | translate }}</span>
+        </button>
+        <button nz-button type="button" class="inline-flex items-center gap-1.5" data-online="clear" [disabled]="busy() || !dirty()" (click)="clearOrder()">
+            <ng-icon name="lucideEraser" size="14px" aria-hidden="true" />
+            <span>{{ 'sales.online.clear' | translate }}</span>
+        </button>
+        <span class="inline-flex" nz-tooltip [nzTooltipTitle]="lastInvoice() ? null : ('sales.online.invoice.noneYet' | translate)">
+            <button nz-button type="button" class="inline-flex items-center gap-1.5" data-online="print-last" [disabled]="!lastInvoice()" (click)="printLast()">
+                <ng-icon name="lucidePrinter" size="14px" aria-hidden="true" />
+                <span>{{ 'sales.online.invoice.printLast' | translate }}</span>
+            </button>
+        </span>
+    }
+</page-header>
+
+@if (setupFailed(); as kind) {
+    <section class="rounded-container border border-line bg-white p-6 text-center" role="alert" data-online="setup-failed">
+        <p class="m-0 mb-3 text-sm text-ink-body">{{ 'sales.online.setupFailed.' + kind | translate }}</p>
+        <button nz-button type="button" class="inline-flex items-center gap-1.5" (click)="loadSetup()">
+            <ng-icon name="lucideRotateCw" size="14px" aria-hidden="true" />
+            <span>{{ 'sales.online.retry' | translate }}</span>
+        </button>
+    </section>
+} @else if (!setup()) {
+    <section class="rounded-container border border-line bg-white p-4"><nz-skeleton [nzActive]="true" [nzParagraph]="{ rows: 6 }" /></section>
+} @else {
+    <div class="grid min-h-0 flex-1 grid-cols-1 gap-2 md:gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.25fr)_minmax(0,0.9fr)]">
+        <!-- Customer: phone first, then who they are and where the parcel goes. -->
+        <section class="flex min-h-0 flex-col rounded-container border border-line bg-white" data-online="customer" [class.ring-2]="attention() === 'customer'" [class.ring-warning]="attention() === 'customer'" [attr.aria-label]="'sales.online.customer' | translate">
+            <div class="min-h-0 flex-1 overflow-y-auto p-3 md:p-4">
+                <div class="mb-1 flex items-center justify-between gap-2">
+                    <label class="text-xs font-semibold text-ink-body" for="online-phone">{{ 'sales.online.phone' | translate }}</label>
+                    <button nz-button nzType="link" nzSize="small" type="button" class="inline-flex items-center gap-1 px-0" data-online="paste-toggle" [attr.aria-expanded]="pasteOpen()" (click)="pasteOpen.set(!pasteOpen())">
+                        <ng-icon name="lucideClipboardPaste" size="14px" aria-hidden="true" />
+                        <span>{{ 'sales.online.paste.open' | translate }}</span>
+                    </button>
+                </div>
+                <nz-input-wrapper nzSize="large">
+                    <ng-icon nzInputPrefix name="lucideUserRound" size="16px" class="text-ink-faint" aria-hidden="true" />
+                    <input nz-input id="online-phone" type="tel" inputmode="tel" autocomplete="off" data-online="phone" placeholder="01XXXXXXXXX" [attr.aria-invalid]="phoneInvalid()" aria-describedby="online-phone-state" [ngModel]="phone()" (ngModelChange)="phone.set($event)" />
+                </nz-input-wrapper>
+
+                <div id="online-phone-state" class="mt-1.5 min-h-5 text-xs" aria-live="polite" data-online="lookup">
+                    @if (phoneInvalid()) {
+                        <span class="text-danger-ink">{{ 'sales.online.phoneInvalid' | translate }}</span>
+                    } @else {
+                        @switch (lookup().state) {
+                            @case ('idle') {
+                                <span class="text-ink-muted">{{ 'sales.online.phoneFirst' | translate }}</span>
+                            }
+                            @case ('loading') {
+                                <span class="inline-flex items-center gap-1.5 text-ink-muted"><nz-spin nzSimple nzSize="small" />{{ 'sales.online.lookingUp' | translate }}</span>
+                            }
+                            @case ('failed') {
+                                <span class="text-warning-ink">{{ 'sales.online.lookupFailed' | translate }}</span>
+                            }
+                            @case ('done') {
+                                @if (!customer()) {
+                                    <span class="text-ink-muted">{{ 'sales.online.newCustomer' | translate }}</span>
+                                }
+                            }
+                        }
+                    }
+                </div>
+
+                @if (customer(); as known) {
+                    <div class="mt-2 rounded-control border border-line p-3" data-online="known">
+                        <div class="flex items-start justify-between gap-2">
+                            <div class="min-w-0">
+                                @if (canViewCustomers) {
+                                    <a class="font-semibold text-ink" [routerLink]="customerRoute.detail(known.oid)" target="_blank">{{ known.name }}</a>
+                                } @else {
+                                    <span class="font-semibold text-ink">{{ known.name }}</span>
+                                }
+                            </div>
+                            @if (known.flag === 'Watch') {
+                                <status-tag label="sales.customer.flag.Watch" tone="warning" />
+                            } @else if (known.flag === 'Blocked') {
+                                <status-tag label="sales.customer.flag.Blocked" tone="danger" />
+                            }
+                        </div>
+                        @if (found()?.history; as history) {
+                            <!-- Own history (REQ-70): how this phone's parcels have ended. -->
+                            <p class="m-0 mt-1 text-xs text-ink-muted" data-online="risk">
+                                {{ 'sales.online.risk.orders' | translate: { orders: (history.orders | digits), delivered: (history.delivered | digits), refused: (history.refused_parcels | digits) } }}
+                                @if (history.delivered_rate !== null) {
+                                    · {{ 'sales.online.risk.rate' | translate: { rate: (history.delivered_rate | digits) } }}
+                                }
+                                @if (history.cancelled_fake_or_unreachable) {
+                                    · <span class="text-warning-ink">{{ 'sales.online.risk.fake' | translate: { count: (history.cancelled_fake_or_unreachable | digits) } }}</span>
+                                }
+                            </p>
+                        }
+                        @if (known.flag !== 'None' && known.flag_reason) {
+                            <p class="m-0 mt-1 text-xs" [class.text-danger-ink]="known.flag === 'Blocked'" [class.text-warning-ink]="known.flag === 'Watch'">{{ known.flag_reason }}</p>
+                        }
+                    </div>
+                }
+                @if (lookup().state === 'idle' && !phoneInvalid()) {
+                    <!-- Before a phone, the column says how an order starts instead of standing empty. -->
+                    <div class="mt-3 flex items-start gap-3 rounded-control border border-line-soft bg-surface-sunken p-3" data-online="start">
+                        <span class="flex size-9 flex-none items-center justify-center rounded-full bg-primary-wash text-primary">
+                            <ng-icon name="lucideClipboardPaste" size="16px" aria-hidden="true" />
+                        </span>
+                        <div>
+                            <p class="m-0 text-[13px] font-semibold text-ink">{{ 'sales.online.startTitle' | translate }}</p>
+                            <p class="m-0 mt-0.5 text-xs text-ink-muted">{{ 'sales.online.startBody' | translate }}</p>
+                        </div>
+                    </div>
+                }
+                @if (found()?.last_orders?.length) {
+                    <div class="mt-2" data-online="recent">
+                        <p class="m-0 mb-1 text-xs font-semibold text-ink-body">{{ 'sales.online.recentOrders' | translate }}</p>
+                        <ul class="m-0 list-none divide-y divide-line-soft rounded-control border border-line-soft p-0">
+                            @for (order of found()!.last_orders!; track order.oid) {
+                                <li class="flex items-center justify-between gap-2 px-2.5 py-1.5 text-xs">
+                                    <span class="min-w-0">
+                                        <span class="block font-mono text-ink">{{ order.invoice_no }}</span>
+                                        <span class="block text-ink-muted">{{ order.created_on | recordDate: language() : 'date' }}</span>
+                                    </span>
+                                    <span class="text-right">
+                                        <span class="block font-mono font-semibold text-ink tabular-nums">{{ order.total_amount | money }}</span>
+                                        <span class="block text-ink-muted">{{ 'sales.order.status.' + order.status | translate }}</span>
+                                    </span>
+                                </li>
+                            }
+                        </ul>
+                    </div>
+                }
+                @if (recentOpen(); as open) {
+                    <p class="m-0 mt-2 flex items-start gap-1.5 rounded-control bg-warning-bg p-2 text-xs text-warning-ink" role="status" data-online="duplicate">
+                        <ng-icon name="lucideTriangleAlert" size="14px" class="mt-px flex-none" aria-hidden="true" />
+                        <span>{{ 'sales.online.recentOpen' | translate: { number: open.invoice_no, date: (open.created_on | recordDate: language() : 'date-time-12') } }}</span>
+                    </p>
+                }
+
+                @if (isNewCustomer() || lookup().state === 'failed') {
+                    <label class="mt-3 mb-1 block text-xs font-semibold text-ink-body" for="online-name">{{ 'sales.online.name' | translate }}</label>
+                    <input nz-input id="online-name" nzSize="large" type="text" maxlength="255" autocomplete="off" data-online="name" [ngModel]="customerName()" (ngModelChange)="customerName.set($event)" />
+                    <div class="mt-3 grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="mb-1 block text-xs font-semibold text-ink-body" for="online-gender">{{ 'sales.customer.gender.label' | translate }}</label>
+                            <nz-select nzId="online-gender" class="w-full" nzAllowClear [nzPlaceHolder]="'sales.customer.gender.unknown' | translate" [ngModel]="gender()" (ngModelChange)="gender.set($event)">
+                                @for (value of genders; track value) {
+                                    <nz-option [nzValue]="value" [nzLabel]="'sales.customer.gender.' + value | translate" />
+                                }
+                            </nz-select>
+                        </div>
+                        <div>
+                            <label class="mb-1 block text-xs font-semibold text-ink-body" for="online-age">{{ 'sales.customer.ageBand.label' | translate }}</label>
+                            <nz-select nzId="online-age" class="w-full" nzAllowClear [nzPlaceHolder]="'sales.customer.ageBand.unknown' | translate" [ngModel]="ageBand()" (ngModelChange)="ageBand.set($event)">
+                                @for (value of ageBands; track value) {
+                                    <nz-option [nzValue]="value" [nzLabel]="'sales.customer.ageBand.' + value | translate" />
+                                }
+                            </nz-select>
+                        </div>
+                    </div>
+                }
+
+                <!-- Where the parcel goes: a saved address, or a new one the order saves to the customer. -->
+                <h3 class="mt-4 mb-2 flex items-center gap-1.5 text-xs font-semibold text-ink-body"><ng-icon name="lucideMapPin" size="14px" class="text-ink-muted" aria-hidden="true" />{{ 'sales.online.address' | translate }}</h3>
+                @if (pasted(); as from) {
+                    @if (from.candidates.length) {
+                        <div class="mb-2" data-online="candidates">
+                            <p class="m-0 mb-1 text-xs text-ink-muted">{{ 'sales.online.candidates' | translate }}</p>
+                            <div class="flex flex-wrap gap-1.5">
+                                @for (candidate of from.candidates; track candidate.district.oid + (candidate.thana?.oid ?? '')) {
+                                    <button nz-button nzSize="small" type="button" [nzType]="isPicked(candidate) ? 'primary' : 'default'" [attr.aria-pressed]="isPicked(candidate)" class="inline-flex items-center gap-1" (click)="useCandidate(candidate)">
+                                        <ng-icon name="lucideMapPin" size="13px" aria-hidden="true" />
+                                        <span>{{ candidate.thana ? placeName(candidate.thana) + ', ' : '' }}{{ placeName(candidate.district) }}</span>
+                                    </button>
+                                }
+                            </div>
+                        </div>
+                    } @else {
+                        <p class="m-0 mb-2 text-xs text-warning-ink" data-online="no-place">{{ 'sales.online.noCandidates' | translate }}</p>
+                    }
+                }
+                <nz-radio-group class="flex w-full flex-col gap-2" data-online="addresses" [ngModel]="addressChoice()" (ngModelChange)="addressChoice.set($event)">
+                    @for (address of savedAddresses(); track address.oid) {
+                        <label nz-radio class="m-0 rounded-control border border-line p-2" [nzValue]="address.oid">
+                            <span class="block text-[13px] font-semibold text-ink">{{ address.label || address.recipient_name }}</span>
+                            <span class="block text-xs text-ink-muted">{{ address.address_line }}, {{ language() === 'bn' ? address.thana_name_bn : address.thana_name_en }}, {{ language() === 'bn' ? address.district_name_bn : address.district_name_en }}</span>
+                        </label>
+                    }
+                    @if (newAddress(); as fresh) {
+                        <label nz-radio class="m-0 rounded-control border border-line p-2" nzValue="new" data-online="new-address">
+                            <span class="flex items-center gap-1 text-[13px] font-semibold text-ink">
+                                {{ 'sales.online.newAddress' | translate }}
+                                <button nz-button nzType="link" nzSize="small" type="button" class="h-auto px-1" [attr.aria-label]="'sales.online.editAddress' | translate" (click)="$event.preventDefault(); openAddress()">
+                                    <ng-icon name="lucidePencil" size="13px" aria-hidden="true" />
+                                </button>
+                            </span>
+                            <span class="block text-xs text-ink-muted">{{ fresh.recipient_name }} · {{ fresh.address_line }}, {{ language() === 'bn' ? fresh.thana_name_bn : fresh.thana_name_en }}, {{ language() === 'bn' ? fresh.district_name_bn : fresh.district_name_en }}</span>
+                        </label>
+                    }
+                </nz-radio-group>
+                @if (!newAddress()) {
+                    <button nz-button nzBlock type="button" class="mt-2 inline-flex items-center justify-center gap-1.5" data-online="add-address" [disabled]="!normalizedPhone()" (click)="openAddress()">
+                        <ng-icon name="lucidePlus" size="14px" aria-hidden="true" />
+                        <span>{{ 'sales.online.addAddress' | translate }}</span>
+                    </button>
+                }
+
+                <!-- Where the order came from and a note for the packer, under the customer they belong to. -->
+                <div class="mt-4 border-t border-line pt-3" data-online="order-details">
+                    <label class="mb-1 block text-xs font-semibold text-ink-body" for="online-source">{{ 'sales.online.source' | translate }}</label>
+                    <nz-select nzId="online-source" class="w-full" data-online="source" [nzPlaceHolder]="'sales.online.pickSource' | translate" [ngModel]="sourceOid()" (ngModelChange)="sourceOid.set($event)">
+                        @for (source of setup()!.sources; track source.oid) {
+                            <nz-option [nzValue]="source.oid" [nzLabel]="source.name" />
+                        }
+                    </nz-select>
+
+                    <label class="mt-3 mb-1 block text-xs font-semibold text-ink-body" for="online-notes">{{ 'sales.online.notes' | translate }}</label>
+                    <textarea nz-input id="online-notes" rows="2" maxlength="256" [attr.placeholder]="'sales.online.notesPlaceholder' | translate" [ngModel]="notes()" (ngModelChange)="notes.set($event)"></textarea>
+                </div>
+            </div>
+        </section>
+
+        <!-- Products, added as at the counter (REQ-37). Its lines scroll inside it. -->
+        <section class="flex min-h-0 flex-col gap-3 rounded-container border border-line bg-white p-3 md:p-4" data-online="products" [class.ring-2]="attention() === 'products'" [class.ring-warning]="attention() === 'products'" [attr.aria-label]="'sales.online.products' | translate">
+            <product-search [browse]="true" (picked)="add($event)" />
+            <h2 class="m-0 flex items-center gap-1.5 text-sm font-bold text-ink">
+                <ng-icon name="lucidePackage" size="14px" class="text-ink-muted" aria-hidden="true" />
+                {{ 'sales.online.products' | translate }}
+                <span class="rounded-full bg-surface-sunken px-2 text-xs font-semibold text-ink-muted">{{ units() | digits }}</span>
+            </h2>
+            <div class="-mx-3 flex min-h-0 flex-1 flex-col overflow-y-auto border-t border-line md:-mx-4" data-online="lines">
+                @if (wide() && lines().length) {
+                    <nz-table nzTemplateMode nzSize="small">
+                        <thead>
+                            <tr>
+                                <th>{{ 'sales.online.product' | translate }}</th>
+                                <th nzWidth="124px" class="text-center">{{ 'sales.online.quantity' | translate }}</th>
+                                <th nzWidth="104px" class="text-right whitespace-nowrap">{{ 'sales.online.discountPerUnit' | translate }}</th>
+                                <th nzWidth="96px" class="text-right">{{ 'sales.online.lineTotal' | translate }}</th>
+                                <th nzWidth="40px">
+                                    <span class="sr-only">{{ 'sales.online.removeLine' | translate }}</span>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for (line of lines(); track line.inventory_oid; let i = $index) {
+                                @let short = line.quantity > line.sellable;
+                                <tr [class.bg-danger-bg]="short" [attr.data-line]="i">
+                                    <td><ng-container [ngTemplateOutlet]="lineName" [ngTemplateOutletContext]="{ $implicit: line, short }" /></td>
+                                    <td class="text-center"><ng-container [ngTemplateOutlet]="stepper" [ngTemplateOutletContext]="{ $implicit: line, i }" /></td>
+                                    <td class="text-right"><ng-container [ngTemplateOutlet]="discountField" [ngTemplateOutletContext]="{ $implicit: line, i }" /></td>
+                                    <td class="text-right font-mono text-[13px] font-semibold text-ink tabular-nums">{{ lineTotal(line) | money }}</td>
+                                    <td class="text-right">
+                                        <button nz-button nzType="text" nzSize="small" type="button" nz-tooltip [nzTooltipTitle]="'sales.online.removeLine' | translate" [attr.aria-label]="'sales.online.removeLine' | translate" (click)="remove(i)">
+                                            <ng-icon name="lucideTrash2" size="14px" class="text-ink-muted" aria-hidden="true" />
+                                        </button>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </nz-table>
+                } @else {
+                    @for (line of lines(); track line.inventory_oid; let i = $index) {
+                        @let short = line.quantity > line.sellable;
+                        <div class="border-b border-line-soft px-3 py-2.5 md:px-4" [class.bg-danger-bg]="short" [attr.data-line]="i">
+                            <div class="flex items-start justify-between gap-2">
+                                <ng-container [ngTemplateOutlet]="lineName" [ngTemplateOutletContext]="{ $implicit: line, short }" />
+                                <button nz-button nzType="text" type="button" class="flex-none" [attr.aria-label]="'sales.online.removeLine' | translate" (click)="remove(i)">
+                                    <ng-icon name="lucideTrash2" size="16px" class="text-ink-muted" aria-hidden="true" />
+                                </button>
+                            </div>
+                            <div class="mt-2 flex flex-wrap items-end justify-between gap-2">
+                                <ng-container [ngTemplateOutlet]="stepper" [ngTemplateOutletContext]="{ $implicit: line, i }" />
+                                <span class="flex flex-col text-[11px] text-ink-muted">
+                                    <span>{{ 'sales.online.discountPerUnit' | translate }}</span>
+                                    <ng-container [ngTemplateOutlet]="discountField" [ngTemplateOutletContext]="{ $implicit: line, i }" />
+                                </span>
+                                <span class="pb-1 text-right font-mono text-sm font-bold text-ink tabular-nums">{{ lineTotal(line) | money }}</span>
+                            </div>
+                        </div>
+                    }
+                }
+                @if (!lines().length) {
+                    <!-- An empty order says how one is taken, not only that nothing is in it. -->
+                    <div class="flex flex-1 flex-col items-center justify-center gap-3 px-4 py-8 text-center" data-online="empty">
+                        <span class="flex size-14 items-center justify-center rounded-full bg-primary-wash text-primary">
+                            <ng-icon name="lucidePackage" size="26px" aria-hidden="true" />
+                        </span>
+                        <p class="m-0 text-sm font-bold text-ink">{{ 'sales.online.emptyTitle' | translate }}</p>
+                        <p class="m-0 max-w-[44ch] text-xs text-ink-muted">{{ 'sales.online.emptyLines' | translate }}</p>
+                        <button nz-button nzType="primary" type="button" class="inline-flex items-center gap-1.5" data-online="empty-search" (click)="search()?.focus()">
+                            <ng-icon name="lucidePlus" size="14px" aria-hidden="true" />
+                            <span>{{ 'sales.online.emptySearch' | translate }}</span>
+                        </button>
+                    </div>
+                }
+            </div>
+        </section>
+
+        <!-- Summary: where it came from and the money. The total and Create are pinned below it. -->
+        <section class="flex min-h-0 flex-col rounded-container border border-line bg-white" data-online="summary" [class.ring-2]="attention() === 'summary'" [class.ring-warning]="attention() === 'summary'" [attr.aria-label]="'sales.online.summary' | translate">
+            <div class="min-h-0 flex-1 overflow-y-auto px-4 pt-4 pb-2">
+                <p class="mt-0 mb-1 text-xs font-semibold text-ink-body" id="online-terms">{{ 'sales.online.termsLabel' | translate }}</p>
+                <nz-radio-group nzButtonStyle="solid" class="flex w-full" aria-labelledby="online-terms" data-online="terms" [ngModel]="paymentType()" (ngModelChange)="setPaymentType($event)">
+                    @for (value of terms; track value) {
+                        <label nz-radio-button class="flex-1 px-1 text-center text-[13px] whitespace-nowrap" [nzValue]="value">{{ 'sales.online.terms.' + value | translate }}</label>
+                    }
+                </nz-radio-group>
+                <p class="m-0 mt-1 text-xs text-ink-muted">{{ 'sales.online.termsHelp.' + paymentType() | translate }}</p>
+
+                @if (paymentType() !== 'COD') {
+                    <div class="mt-3 grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="mb-1 block text-xs font-semibold text-ink-body" for="online-method">{{ 'sales.online.paidBy' | translate }}</label>
+                            <nz-select nzId="online-method" class="w-full" [ngModel]="method()" (ngModelChange)="method.set($event)">
+                                @for (value of methods; track value) {
+                                    <nz-option [nzValue]="value" [nzLabel]="'sales.pos.method.' + value | translate" />
+                                }
+                            </nz-select>
+                        </div>
+                        @if (paymentType() === 'ADVANCE') {
+                            <div>
+                                <label class="mb-1 block text-xs font-semibold text-ink-body" for="online-advance">{{ 'sales.online.advance' | translate }}</label>
+                                <nz-input-number nzId="online-advance" class="w-full" data-online="advance" [nzMin]="1" [nzMax]="total() > 1 ? total() - 1 : 1" [nzStep]="1" [nzPrecision]="0" [ngModel]="advance()" (ngModelChange)="advance.set($event)" />
+                            </div>
+                        }
+                    </div>
+                    <label class="mt-2 mb-1 block text-xs font-semibold text-ink-body" for="online-reference">{{ 'sales.online.reference' | translate }}</label>
+                    <input nz-input id="online-reference" type="text" maxlength="64" autocomplete="off" [attr.placeholder]="'sales.online.referencePlaceholder' | translate" [ngModel]="reference()" (ngModelChange)="reference.set($event)" />
+                }
+
+                @if (customer()?.flag === 'Blocked') {
+                    <label nz-checkbox class="mt-3 text-xs text-danger-ink" data-online="blocked" [ngModel]="blockedAcknowledged()" (ngModelChange)="blockedAcknowledged.set($event)">{{ 'sales.online.blockedAcknowledge' | translate }}</label>
+                }
+            </div>
+
+            @if (!stacked()) {
+                <div class="flex-none border-t border-line bg-white px-4 pt-3 pb-4" data-online="footer"><ng-container [ngTemplateOutlet]="footer" /></div>
+            }
+        </section>
+    </div>
+    <!-- Stacked below a laptop: the page scrolls, so the money and Create stay at the bottom of the screen. -->
+    @if (stacked()) {
+        <div class="sticky bottom-0 z-10 mt-2 rounded-container border border-line bg-white px-4 pt-3 pb-4 shadow-lg" data-online="footer"><ng-container [ngTemplateOutlet]="footer" /></div>
+    }
+}
+
+<nz-drawer [nzVisible]="addressOpen()" nzPlacement="right" nzWidth="min(720px, 100vw)" [nzTitle]="'sales.online.addressTitle' | translate" [nzFooter]="addressFooter" [nzMaskClosable]="false" (nzOnClose)="addressOpen.set(false)">
+    <ng-container *nzDrawerContent>
+        @if (addressOpen()) {
+            <address-form idPrefix="online-address" [editing]="addressSeed()" [showDefault]="false" />
+        }
+    </ng-container>
+</nz-drawer>
+<ng-template #addressFooter>
+    <div class="flex justify-end gap-2">
+        <button nz-button type="button" class="inline-flex items-center gap-1.5" (click)="addressOpen.set(false)">
+            <ng-icon name="lucideX" size="14px" aria-hidden="true" />
+            <span>{{ 'form.confirm.cancel' | translate }}</span>
+        </button>
+        <button nz-button nzType="primary" type="button" class="inline-flex items-center gap-1.5" data-online="use-address" (click)="saveAddress()">
+            <ng-icon name="lucideCheck" size="14px" aria-hidden="true" />
+            <span>{{ 'sales.online.useAddress' | translate }}</span>
+        </button>
+    </div>
+</ng-template>
+
+<!-- The money and Create, drawn in the summary column on a laptop and as a pinned bar when the columns stack. -->
+<ng-template #footer>
+    <dl class="mt-0 mb-1 space-y-1 text-[13px]">
+        <div class="flex justify-between">
+            <dt class="text-ink-muted">{{ 'sales.online.subtotal' | translate }}</dt>
+            <dd class="m-0 font-mono text-ink tabular-nums">{{ subtotal() | money }}</dd>
+        </div>
+        @if (discountTotal()) {
+            <div class="flex justify-between">
+                <dt class="text-ink-muted">{{ 'sales.online.discount' | translate }}</dt>
+                <dd class="m-0 font-mono text-ink tabular-nums">&minus;{{ discountTotal() | money }}</dd>
+            </div>
+        }
+        <div class="flex items-center justify-between gap-2">
+            <dt class="flex items-center gap-1 text-ink-muted">
+                <label for="online-charge">{{ 'sales.online.deliveryCharge' | translate }}</label>
+                @if (canEditCharges) {
+                    <button nz-button nzType="text" nzSize="small" type="button" class="inline-flex size-6 items-center justify-center p-0" data-online="charges" nz-tooltip [nzTooltipTitle]="'sales.online.charges.title' | translate" [attr.aria-label]="'sales.online.charges.title' | translate" (click)="openCharges()">
+                        <ng-icon name="lucideSettings2" size="14px" aria-hidden="true" />
+                    </button>
+                }
+            </dt>
+            <dd class="m-0"><nz-input-number nzId="online-charge" nzSize="small" class="w-24" data-online="charge" [nzMin]="0" [nzStep]="10" [nzPrecision]="0" [ngModel]="deliveryCharge()" (ngModelChange)="setCharge($event)" /></dd>
+        </div>
+        @if (canEditCharges && !setup()?.home_district) {
+            <p class="m-0 text-xs text-warning-ink" data-online="charges-unset">{{ 'sales.online.charges.unsetEdit' | translate }}</p>
+        }
+        @if (paid()) {
+            <div class="flex justify-between">
+                <dt class="text-ink-muted">{{ 'sales.online.paidAlready' | translate }}</dt>
+                <dd class="m-0 font-mono text-ink tabular-nums">&minus;{{ paid() | money }}</dd>
+            </div>
+        }
+    </dl>
+    <div class="mb-1 flex items-baseline justify-between">
+        <span class="text-sm font-bold text-ink">{{ 'sales.online.total' | translate }}</span>
+        <span class="font-mono text-xl font-extrabold text-ink tabular-nums" data-online="total">{{ total() | money }}</span>
+    </div>
+    <div class="mb-2 flex items-baseline justify-between text-[13px]">
+        <span class="text-ink-muted">{{ 'sales.online.collect' | translate }}</span>
+        <span class="font-mono font-semibold text-ink tabular-nums" data-online="collect">{{ collect() | money }}</span>
+    </div>
+    @if (unanswered()) {
+        <p class="m-0 mb-2 text-xs text-warning-ink" role="status">{{ 'sales.online.unanswered' | translate }}</p>
+    } @else if (blocker(); as reason) {
+        <p class="m-0 mb-2 flex items-start gap-1.5 rounded-control bg-warning-bg p-2 text-xs text-warning-ink" role="status" data-online="blocker">
+            <ng-icon name="lucideCircleAlert" size="14px" class="mt-px flex-none" aria-hidden="true" />
+            <span>{{ reason | translate }}</span>
+        </p>
+    }
+    @if (canCreate) {
+        <div class="flex gap-2">
+            <button nz-button nzSize="large" type="button" class="inline-flex h-12 flex-none items-center justify-center gap-1.5 px-3" data-online="save-draft" [nzLoading]="savingDraft()" [disabled]="busy() || creating()" (click)="saveDraft()">
+                @if (!savingDraft()) {
+                    <ng-icon name="lucideFileClock" size="16px" aria-hidden="true" />
+                }
+                <span>{{ 'sales.online.drafts.save' | translate }}</span>
+            </button>
+            <button nz-button nzType="primary" nzSize="large" type="button" class="inline-flex h-12 min-w-0 flex-1 items-center justify-center gap-1.5 px-3 text-sm font-bold" data-online="create" [nzLoading]="creating()" [disabled]="busy() || savingDraft()" (click)="create()">
+                @if (!creating()) {
+                    <ng-icon name="lucideSend" size="18px" aria-hidden="true" />
+                }
+                <span>{{ 'sales.online.create' | translate }}</span>
+            </button>
+        </div>
+    }
+</ng-template>
+
+<nz-modal [nzVisible]="chargesOpen()" [nzTitle]="'sales.online.charges.title' | translate" [nzFooter]="chargesFooter" [nzMaskClosable]="false" (nzOnCancel)="chargesOpen.set(false)">
+    <ng-container *nzModalContent>
+        <p class="mt-0 mb-3 text-xs text-ink-muted">{{ 'sales.online.charges.help' | translate }}</p>
+        <label class="mb-1 block text-xs font-semibold text-ink-body" for="charges-district">{{ 'sales.online.charges.district' | translate }}</label>
+        <nz-select nzId="charges-district" class="w-full" nzShowSearch data-online="charges-district" [nzLoading]="districtsLoading()" [nzPlaceHolder]="'sales.customer.address.pickDistrict' | translate" [ngModel]="chargesDistrict()" (ngModelChange)="chargesDistrict.set($event)">
+            @for (place of districtChoices(); track place.oid) {
+                <nz-option [nzValue]="place.oid" [nzLabel]="placeName(place)" />
+            }
+        </nz-select>
+        <div class="mt-3 grid grid-cols-2 gap-3">
+            <div>
+                <label class="mb-1 block text-xs font-semibold text-ink-body" for="charges-inside">{{ 'sales.online.charges.inside' | translate }}</label>
+                <nz-input-number nzId="charges-inside" class="w-full" data-online="charges-inside" [nzMin]="0" [nzStep]="10" [nzPrecision]="0" [ngModel]="chargesInside()" (ngModelChange)="chargesInside.set($event)" />
+            </div>
+            <div>
+                <label class="mb-1 block text-xs font-semibold text-ink-body" for="charges-outside">{{ 'sales.online.charges.outside' | translate }}</label>
+                <nz-input-number nzId="charges-outside" class="w-full" data-online="charges-outside" [nzMin]="0" [nzStep]="10" [nzPrecision]="0" [ngModel]="chargesOutside()" (ngModelChange)="chargesOutside.set($event)" />
+            </div>
+        </div>
+    </ng-container>
+</nz-modal>
+<ng-template #chargesFooter>
+    <div class="flex justify-end gap-2">
+        <button nz-button type="button" class="inline-flex items-center gap-1.5" (click)="chargesOpen.set(false)">
+            <ng-icon name="lucideX" size="14px" aria-hidden="true" />
+            <span>{{ 'form.confirm.cancel' | translate }}</span>
+        </button>
+        <button nz-button nzType="primary" type="button" class="inline-flex items-center gap-1.5" data-online="charges-save" [nzLoading]="chargesSaving()" (click)="saveCharges()">
+            @if (!chargesSaving()) {
+                <ng-icon name="lucideCheck" size="14px" aria-hidden="true" />
+            }
+            <span>{{ 'sales.online.charges.save' | translate }}</span>
+        </button>
+    </div>
+</ng-template>
+
+<ng-template #lineName let-line let-short="short">
+    <div class="flex min-w-0 items-start gap-2">
+        <span class="flex size-9 flex-none items-center justify-center overflow-hidden rounded-control border border-line-soft bg-surface-sunken">
+            @if (line.image_url) {
+                <img [src]="line.image_url" alt="" loading="lazy" class="size-full object-cover" />
+            } @else {
+                <ng-icon name="lucidePackage" size="16px" class="text-ink-faint" aria-hidden="true" />
+            }
+        </span>
+        <div class="min-w-0">
+            <span class="block text-[13px] font-semibold text-ink">{{ line.product_name }}</span>
+            <span class="block font-mono text-xs text-ink-muted">{{ line.batch_code }} · {{ line.selling_price | money }}</span>
+            <span class="block text-xs" [class.text-danger-ink]="short" [class.text-ink-muted]="!short">{{ 'sales.online.sellable' | translate: { count: (line.sellable | digits) } }}</span>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #stepper let-line let-i="i">
+    <span class="inline-flex items-center gap-1" role="group" [attr.aria-label]="'sales.online.quantityOf' | translate: { name: line.product_name }">
+        <button nz-button type="button" class="inline-flex size-8 items-center justify-center p-0 pointer-coarse:size-11" [attr.aria-label]="'sales.online.less' | translate" [disabled]="line.quantity <= 1" (click)="step(i, -1)">
+            <ng-icon name="lucideMinus" size="14px" aria-hidden="true" />
+        </button>
+        <input nz-input type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="off" class="h-8 w-12 px-1 text-center font-mono tabular-nums pointer-coarse:h-11" [attr.aria-label]="'sales.online.quantity' | translate" [ngModel]="line.quantity" (ngModelChange)="setQuantity(i, $event)" />
+        <button nz-button type="button" class="inline-flex size-8 items-center justify-center p-0 pointer-coarse:size-11" [attr.aria-label]="'sales.online.more' | translate" (click)="step(i, 1)">
+            <ng-icon name="lucidePlus" size="14px" aria-hidden="true" />
+        </button>
+    </span>
+</ng-template>
+
+<ng-template #discountField let-line let-i="i">
+    @if (discountCap(line) > 0) {
+        <nz-input-number class="w-24" [nzMin]="0" [nzMax]="discountCap(line)" [nzStep]="1" [nzPrecision]="0" [attr.aria-label]="'sales.online.discountPerUnit' | translate" [ngModel]="line.discount" (ngModelChange)="setDiscount(i, $event)" />
+    } @else {
+        <span class="text-xs text-ink-muted" nz-tooltip [nzTooltipTitle]="'sales.online.noDiscount' | translate">&ndash;</span>
+    }
+</ng-template>
+
+<!-- The order helper: the customer's message pasted as it is. -->
+<nz-modal [nzVisible]="pasteOpen()" [nzTitle]="'sales.online.paste.open' | translate" [nzFooter]="pasteFooter" (nzOnCancel)="pasteOpen.set(false)">
+    <ng-container *nzModalContent>
+        <label class="mb-1 block text-xs text-ink-muted" for="online-paste">{{ 'sales.online.paste.helper' | translate }}</label>
+        <textarea nz-input id="online-paste" rows="8" maxlength="2000" data-online="paste" [attr.placeholder]="'sales.online.paste.placeholder' | translate" [ngModel]="pasteText()" (ngModelChange)="pasteText.set($event)"></textarea>
+    </ng-container>
+</nz-modal>
+<ng-template #pasteFooter>
+    <div class="flex justify-end gap-2">
+        <button nz-button type="button" class="inline-flex items-center gap-1.5" (click)="pasteOpen.set(false)">
+            <ng-icon name="lucideX" size="14px" aria-hidden="true" />
+            <span>{{ 'form.confirm.cancel' | translate }}</span>
+        </button>
+        <button nz-button nzType="primary" type="button" class="inline-flex items-center gap-1.5" data-online="paste-read" [nzLoading]="reading()" [disabled]="!pasteText().trim()" (click)="readMessage()">
+            @if (!reading()) {
+                <ng-icon name="lucideScanText" size="14px" aria-hidden="true" />
+            }
+            <span>{{ 'sales.online.paste.read' | translate }}</span>
+        </button>
+    </div>
+</ng-template>
+
+<!-- The order just placed, over a page already cleared for the next one. -->
+<nz-modal [nzVisible]="!!done()" [nzFooter]="null" [nzClosable]="true" [nzMaskClosable]="false" nzWidth="420px" (nzOnCancel)="done.set(null)">
+    <ng-container *nzModalContent>
+        @if (done(); as placed) {
+            <div class="text-center" role="status" data-online="done">
+                <ng-icon name="lucideCircleCheck" size="40px" class="text-success" aria-hidden="true" />
+                <h2 class="mt-2 mb-1 text-lg font-bold text-ink">{{ 'sales.online.done.title' | translate }}</h2>
+                <span nz-typography nzCopyable class="font-mono text-sm text-ink-body" data-online="done-invoice" [nzCopyText]="placed.invoice_no" [nzCopyTooltips]="['sales.online.done.copy' | translate, 'sales.online.done.copied' | translate]">{{ placed.invoice_no }}</span>
+                <dl class="mx-auto mt-4 mb-0 max-w-64 space-y-1 text-left text-sm">
+                    <div class="flex justify-between">
+                        <dt class="text-ink-muted">{{ 'sales.online.total' | translate }}</dt>
+                        <dd class="m-0 font-mono font-semibold text-ink tabular-nums">{{ placed.total | money }}</dd>
+                    </div>
+                    <div class="flex justify-between">
+                        <dt class="text-ink-muted">{{ 'sales.online.collect' | translate }}</dt>
+                        <dd class="m-0 font-mono font-semibold text-ink tabular-nums" data-online="done-collect">{{ placed.collect | money }}</dd>
+                    </div>
+                </dl>
+                <p class="mt-4 mb-4 text-xs text-ink-muted">{{ 'sales.online.done.body' | translate }}</p>
+                <div class="flex flex-wrap justify-center gap-2">
+                    <button nz-button type="button" class="inline-flex items-center gap-1.5" data-online="print-invoice" (click)="printLast()">
+                        <ng-icon name="lucidePrinter" size="14px" aria-hidden="true" />
+                        <span>{{ 'sales.online.invoice.print' | translate }}</span>
+                    </button>
+                    @if (canViewCustomers && placed.customer_oid) {
+                        <a nz-button class="inline-flex items-center gap-1.5" [routerLink]="customerRoute.detail(placed.customer_oid)" target="_blank">
+                            <ng-icon name="lucideUserRound" size="14px" aria-hidden="true" />
+                            <span>{{ 'sales.online.done.customer' | translate }}</span>
+                        </a>
+                    }
+                    <button nz-button nzType="primary" type="button" class="inline-flex items-center gap-1.5" data-online="new-order" (click)="done.set(null)">
+                        <ng-icon name="lucidePlus" size="14px" aria-hidden="true" />
+                        <span>{{ 'sales.online.done.next' | translate }}</span>
+                    </button>
+                </div>
+            </div>
+        }
+    </ng-container>
+</nz-modal>
+
+<!-- Saved drafts, for every moderator: a chat that paused, resumed on an empty screen. -->
+<nz-drawer [nzVisible]="draftsOpen()" nzPlacement="right" nzWidth="min(440px, 100vw)" [nzTitle]="'sales.online.drafts.title' | translate" (nzOnClose)="draftsOpen.set(false)">
+    <ng-container *nzDrawerContent>
+        @if (draftsLoading()) {
+            <nz-skeleton [nzActive]="true" [nzParagraph]="{ rows: 4 }" />
+        } @else {
+            @for (draft of drafts(); track draft.oid) {
+                <div class="mb-2 rounded-control border border-line p-3" data-online="draft">
+                    <div class="flex items-start justify-between gap-2">
+                        <div class="min-w-0">
+                            <span class="block text-[13px] font-semibold text-ink">{{ draft.draft_label || draft.customer_phone || draft.invoice_no }}</span>
+                            <span class="block font-mono text-xs text-ink-muted">{{ draft.invoice_no }} · {{ draft.created_on | recordDate: language() : 'date-time-12' }}</span>
+                            <span class="block text-xs text-ink-muted">{{ 'sales.online.drafts.lines' | translate: { count: (draft.lines.length | digits) } }}{{ draft.saved_by ? ' · ' + draft.saved_by : '' }}</span>
+                        </div>
+                        <span class="font-mono text-sm font-bold text-ink tabular-nums">{{ draft.total_amount | money }}</span>
+                    </div>
+                    <div class="mt-2 flex justify-end gap-2">
+                        <button nz-button nzSize="small" nzDanger type="button" class="inline-flex items-center gap-1" (click)="discardDraft(draft)">
+                            <ng-icon name="lucideTrash2" size="13px" aria-hidden="true" />
+                            <span>{{ 'sales.online.drafts.discard' | translate }}</span>
+                        </button>
+                        <button nz-button nzType="primary" nzSize="small" type="button" class="inline-flex items-center gap-1" data-online="resume" (click)="resume(draft)">
+                            <ng-icon name="lucidePlay" size="13px" aria-hidden="true" />
+                            <span>{{ 'sales.online.drafts.resume' | translate }}</span>
+                        </button>
+                    </div>
+                </div>
+            } @empty {
+                <p class="m-0 p-6 text-center text-sm text-ink-muted">{{ 'sales.online.drafts.empty' | translate }}</p>
+            }
+        }
+    </ng-container>
+</nz-drawer>
+
+@if (creating()) {
+    <!-- While the order is being placed the page is covered, so a slow answer never looks like a missed click. -->
+    <div class="fixed inset-0 z-50 flex flex-col items-center justify-center gap-3 bg-white/70" role="status" data-online="creating">
+        <nz-spin nzSimple nzSize="large" />
+        <p class="m-0 text-sm font-semibold text-ink">{{ 'sales.online.placing' | translate }}</p>
+    </div>
+}

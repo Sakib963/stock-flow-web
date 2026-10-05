@@ -25,7 +25,7 @@ import { CartLine, CustomerLookup, PAYMENT_STATUSES, ParkedCart, PaymentMethod, 
 import { RequestFailure } from '@app/core/models/api.model';
 import { LanguageService } from '@app/core/services/language/language.service';
 import { SessionService } from '@app/core/services/session/session.service';
-import { ProductSearchComponent } from '@app/modules/sales/pos/components/product-search.component';
+import { ProductSearchComponent } from '@app/shared/components/product-search/product-search.component';
 import { PosService } from '@app/modules/sales/pos/services/pos.service';
 import { CUSTOMER_ROUTES } from '@app/modules/sales/customer/constants/customer-routes';
 import { normalizePhone } from '@app/shared/utils/phone/phone';

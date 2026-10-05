@@ -55,7 +55,7 @@
 <!-- What the dropdown says when it has no batches to list. -->
 <ng-template #status>
     <div class="flex min-h-36 flex-col items-center justify-center gap-2 px-4 py-3 text-center text-xs">
-        @if (!text().trim()) {
+        @if (!text().trim() && !browse()) {
             <ng-icon name="lucideScanBarcode" size="28px" class="text-ink-faint" aria-hidden="true" />
             <p class="m-0 max-w-[40ch] text-ink-muted" data-pos="search-hint">{{ 'sales.pos.searchHint' | translate }}</p>
         } @else if (failed(); as kind) {
@@ -68,6 +68,9 @@
         } @else if (loading()) {
             <nz-spin nzSimple />
             <p class="m-0 text-ink-muted">{{ 'sales.pos.searching' | translate }}</p>
+        } @else if (!searched()) {
+            <ng-icon name="lucidePackage" size="28px" class="text-ink-faint" aria-hidden="true" />
+            <p class="m-0 max-w-[40ch] text-ink-muted" data-pos="nothing-to-sell">{{ 'sales.pos.nothingToSell' | translate }}</p>
         } @else {
             <ng-icon name="lucideSearchX" size="28px" class="text-ink-faint" aria-hidden="true" />
             <p class="m-0 max-w-[40ch] text-ink-muted" data-pos="no-results">{{ 'sales.pos.noResults' | translate: { text: searched() } }}</p>

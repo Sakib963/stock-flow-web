@@ -141,4 +141,13 @@ export class APIEndpoint {
     static readonly UPDATE_CUSTOMER_ADDRESS = '/api/v1/sales/customer/update-customer-address';
     static readonly RETIRE_CUSTOMER_ADDRESS = '/api/v1/sales/customer/retire-customer-address';
     static readonly SEARCH_LOCATION = '/api/v1/sales/location/search-location';
+
+    // Sales: the online order
+    static readonly GET_ONLINE_ORDER_SETUP = '/api/v1/sales/online/get-online-order-setup';
+    static readonly READ_CHAT_MESSAGE = '/api/v1/sales/online/read-chat-message';
+    static readonly CREATE_ONLINE_ORDER = '/api/v1/sales/online/create-online-order';
+    static readonly SAVE_ONLINE_DRAFT = '/api/v1/sales/online/save-online-draft';
+    static readonly GET_ONLINE_DRAFTS = '/api/v1/sales/online/get-online-drafts';
+    static readonly DISCARD_ONLINE_DRAFT = '/api/v1/sales/online/discard-online-draft';
+    static readonly UPDATE_DELIVERY_CHARGES = '/api/v1/sales/settings/update-delivery-charges';
 }

@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject, signal } from '@angular/core';
 import { APIEndpoint } from '@app/core/constants/api-endpoint';
-import { CheckoutPayload, CustomerLookup, ParkPayload, ParkedCart, PosBatch, SaleResult } from '@app/core/models/pos.model';
+import { CheckoutPayload, CustomerLookup, ParkPayload, ParkedCart, SaleResult } from '@app/core/models/pos.model';
 import { environment } from '@env/environment';
 import { Observable, finalize, map } from 'rxjs';
 
@@ -12,10 +12,6 @@ export class PosService {
     private readonly _base = environment.baseUrl;
 
     readonly saving = signal(false);
-
-    search(text: string): Observable<PosBatch[]> {
-        return this._http.get<{ data: PosBatch[] }>(`${this._base}${APIEndpoint.GET_POS_PRODUCT_LIST}`, { params: { search_text: text } }).pipe(map((response) => response.data));
-    }
 
     parkedCarts(): Observable<ParkedCart[]> {
         return this._http.get<{ data: ParkedCart[] }>(`${this._base}${APIEndpoint.GET_PARKED_CARTS}`).pipe(map((response) => response.data));
