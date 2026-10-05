@@ -2470,7 +2470,8 @@
                 "details": "অর্ডার",
                 "lines": "পণ্য",
                 "delivery": "ডেলিভারি",
-                "timeline": "সময়রেখা"
+                "timeline": "সময়রেখা",
+                "numbers": "টাকার হিসাব"
             },
             "invoice": "ইনভয়েস",
             "customer": "গ্রাহক",

@@ -3,7 +3,7 @@ import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@a
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { NgIcon, provideIcons } from '@ng-icons/core';
-import { lucideArrowLeft, lucideBan, lucideCheck, lucideCircleCheck, lucideHistory, lucideInfo, lucideMapPin, lucidePackage, lucidePackageCheck, lucidePackageX, lucideReceipt, lucideRotateCw, lucideTruck, lucideUserRound, lucideX, lucideZap } from '@ng-icons/lucide';
+import { lucideArrowLeft, lucideBan, lucideCheck, lucideCircleCheck, lucideHistory, lucideInfo, lucideMapPin, lucidePackage, lucidePackageCheck, lucidePackageX, lucideReceipt, lucideRotateCw, lucideTruck, lucideUserRound, lucideWallet, lucideX, lucideZap } from '@ng-icons/lucide';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzCardModule } from 'ng-zorro-antd/card';
 import { NzFormModule } from 'ng-zorro-antd/form';
@@ -27,6 +27,7 @@ import { CUSTOMER_ROUTES } from '@app/modules/sales/customer/constants/customer-
 import { DELIVERY_STATUS, ORDER_STATUS, PAYMENT_STATUS } from '@app/modules/sales/order/config/order-list.config';
 import { ORDER_ROUTES } from '@app/modules/sales/order/constants/order-routes';
 import { OrderService } from '@app/modules/sales/order/services/order.service';
+import { ActionFooterComponent } from '@app/shared/components/action-footer/action-footer.component';
 import { PageHeaderComponent } from '@app/shared/components/page-header/page-header.component';
 import { StatusTagComponent } from '@app/shared/components/status-tag/status-tag.component';
 import { DigitsPipe } from '@app/shared/pipes/digits/digits.pipe';
@@ -46,8 +47,8 @@ type Dialog = 'confirm' | 'cancel' | 'dispatch' | 'notDelivered';
  */
 @Component({
     selector: 'order-detail',
-    imports: [FormsModule, RouterLink, NgIcon, NzButtonModule, NzCardModule, NzFormModule, NzInputModule, NzModalModule, NzRadioModule, NzSelectModule, NzSkeletonModule, NzTableModule, NzTimelineModule, NzTypographyModule, TranslatePipe, PageHeaderComponent, StatusTagComponent, DigitsPipe, MoneyPipe, RecordDatePipe],
-    providers: [provideIcons({ lucideArrowLeft, lucideBan, lucideCheck, lucideCircleCheck, lucideHistory, lucideInfo, lucideMapPin, lucidePackage, lucidePackageCheck, lucidePackageX, lucideReceipt, lucideRotateCw, lucideTruck, lucideUserRound, lucideX, lucideZap })],
+    imports: [FormsModule, RouterLink, NgIcon, NzButtonModule, NzCardModule, NzFormModule, NzInputModule, NzModalModule, NzRadioModule, NzSelectModule, NzSkeletonModule, NzTableModule, NzTimelineModule, NzTypographyModule, TranslatePipe, PageHeaderComponent, ActionFooterComponent, StatusTagComponent, DigitsPipe, MoneyPipe, RecordDatePipe],
+    providers: [provideIcons({ lucideArrowLeft, lucideBan, lucideCheck, lucideCircleCheck, lucideHistory, lucideInfo, lucideMapPin, lucidePackage, lucidePackageCheck, lucidePackageX, lucideReceipt, lucideRotateCw, lucideTruck, lucideUserRound, lucideWallet, lucideX, lucideZap })],
     templateUrl: './order-detail.component.html',
     styleUrl: './order-detail.component.scss',
     changeDetection: ChangeDetectionStrategy.OnPush,

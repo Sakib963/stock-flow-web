@@ -2470,7 +2470,8 @@
                 "details": "Order",
                 "lines": "Products",
                 "delivery": "Delivery",
-                "timeline": "Timeline"
+                "timeline": "Timeline",
+                "numbers": "Money"
             },
             "invoice": "Invoice",
             "customer": "Customer",
