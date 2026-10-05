@@ -2625,6 +2625,8 @@
             "emptyTitle": "No products yet",
             "emptySearch": "Add a product",
             "recentOrders": "Recent orders",
+            "seeHistory": "See order history",
+            "allOrders": "All orders on the customer record",
             "startTitle": "Start with the customer",
             "startBody": "Paste their chat message, or type their phone. A returning customer brings their saved addresses.",
             "clear": "Clear",
@@ -2637,6 +2639,8 @@
                 "button": "Drafts",
                 "title": "Saved drafts",
                 "save": "Save draft",
+                "saveTitle": "Save this order as a draft?",
+                "saveBody": "No stock is held and no customer is saved until the draft is resumed and created.",
                 "saved": "Saved as draft {{number}}. Open Drafts to finish it later.",
                 "failed": {
                     "network": "Could not reach the server. Nothing was saved.",

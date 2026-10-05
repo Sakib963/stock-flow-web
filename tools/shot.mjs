@@ -80,7 +80,7 @@ const SESSION = {
     version: '1',
     user: { name: 'Nazmus Sakib', email: 'owner@arithmalabs.test', mobile_number: null, photo: null, designation: 'Owner', role: 'Owner' },
     business: { name: 'Arithma Labs', logoUrl: null, orderSystem: 'BOTH' },
-    permissions: ['dashboard.overview.view', 'configuration.category.view', 'configuration.category.create', 'configuration.category.edit', 'configuration.category.export', 'configuration.brands.view', 'configuration.brands.create', 'configuration.brands.edit', 'configuration.brands.export', 'configuration.supplier.view', 'configuration.supplier.create', 'configuration.supplier.edit', 'configuration.supplier.export', 'configuration.warehouse.view', 'configuration.warehouse.create', 'configuration.warehouse.edit', 'configuration.warehouse.export', 'configuration.aisle.view', 'configuration.aisle.create', 'configuration.aisle.edit', 'configuration.aisle.export', 'configuration.product.view', 'configuration.product.create', 'configuration.product.edit', 'configuration.product.delete', 'configuration.analytics.view', 'inventory.purchase-order.view', 'inventory.purchase-order.create', 'inventory.purchase-order.edit', 'inventory.purchase-order.approve', 'inventory.purchase-order.cancel', 'inventory.purchase-order.export', 'inventory.stock-movement.view', 'inventory.overview.view', 'inventory.overview.edit', 'inventory.stock-value.view'],
+    permissions: ['dashboard.overview.view', 'configuration.category.view', 'configuration.category.create', 'configuration.category.edit', 'configuration.category.export', 'configuration.brands.view', 'configuration.brands.create', 'configuration.brands.edit', 'configuration.brands.export', 'configuration.supplier.view', 'configuration.supplier.create', 'configuration.supplier.edit', 'configuration.supplier.export', 'configuration.warehouse.view', 'configuration.warehouse.create', 'configuration.warehouse.edit', 'configuration.warehouse.export', 'configuration.aisle.view', 'configuration.aisle.create', 'configuration.aisle.edit', 'configuration.aisle.export', 'configuration.product.view', 'configuration.product.create', 'configuration.product.edit', 'configuration.product.delete', 'configuration.analytics.view', 'inventory.purchase-order.view', 'inventory.purchase-order.create', 'inventory.purchase-order.edit', 'inventory.purchase-order.approve', 'inventory.purchase-order.cancel', 'inventory.purchase-order.export', 'inventory.stock-movement.view', 'inventory.overview.view', 'inventory.overview.edit', 'inventory.stock-value.view', 'sales.online.view', 'sales.online.create', 'sales.customer.view', 'sales.settings.edit'],
     menu: MENU,
     counters: { notifications: 0 },
 };
@@ -365,13 +365,23 @@ function handle(request) {
     if (url.includes('/get-brand-list-for-dropdown')) return answer(request, [{ value: 'b-1', label: 'Aarong' }, { value: 'b-2', label: 'Cosrx' }]);
     if (url.includes('/check-product-availability')) return answer(request, { field: 'sku', available: true });
     if (url.includes('/get-configuration-analytics')) return answer(request, ANALYTICS);
+    if (url.includes('/get-online-order-setup')) return answer(request, { sources: [{ oid: 's-1', platform: 'Facebook', name: 'Facebook page' }, { oid: 's-2', platform: 'Instagram', name: 'Instagram' }], delivery_charge_inside: 60, delivery_charge_outside: 120, home_district: { oid: 'BD-Dhaka', name_en: 'Dhaka', name_bn: 'ঢাকা' }, logo_url: null });
+    if (url.includes('/find-customer-by-phone'))
+        return answer(request, {
+            phone: '01987654321',
+            customer: { oid: 'cu-1', name: 'Person A', phone: '01987654321', gender: null, age_band: null, flag: 'None', flag_reason: null, status: 'Active' },
+            addresses: [{ oid: 'a-1', label: 'Home', recipient_name: 'Person A', recipient_phone: null, address_line: '5/5 Gaznabi Road', district_oid: 'BD-Dhaka', district_name_en: 'Dhaka', district_name_bn: 'ঢাকা', thana_oid: 'T-1', thana_name_en: 'Mohammadpur', thana_name_bn: 'মোহাম্মদপুর', area_text: null, postal_code: null, is_default: true }],
+            history: { orders: 5, sales: 4, lifetime_value: 9200, average_order: 1840, delivered: 4, refused_parcels: 1, delivered_rate: 80, last_order_on: '2026-09-28T10:00:00.000', owed: 0, cancelled_fake_or_unreachable: 0 },
+            last_orders: [1, 2, 3, 4, 5].map((n) => ({ oid: 'o-' + n, invoice_no: '26092800' + n, channel: 'ONLINE', status: n === 2 ? 'Returned' : 'Delivered', payment_status: 'paid', total_amount: 1200 + n * 150, created_on: '2026-09-2' + n + 'T10:00:00.000', delivery_status: null })),
+        });
     if (url.includes('/get-user-card')) return answer(request, { name: 'Ahmad Saif', email: 'ahmad@arithmalabs.test', designation: 'Manager', role: 'Manager', photo: null, active: true });
     console.log('  unmocked API call:', url);
     return answer(request, {});
 }
 
 const LANG = process.env.SHOT_LANG === 'bn' ? "localStorage.setItem('app_lang', 'bn'); " : '';
-const seed = "try { " + LANG + "localStorage.setItem('__x9f4c2e8a1b7d6f3c0a5e9b2d4f8a11__', JSON.stringify({ transport: 'body', refresh_token: 'refresh-1', session_id: 'session-1', remember: true })); localStorage.setItem('__x7d2a9f4e1c8b3d6a0f5e2c9b7a41__', 'session-1'); } catch (e) {}";
+/** SHOT_SEED is more script run before the app starts, such as storage a page restores from. */
+const seed = "try { " + LANG + (process.env.SHOT_SEED ?? '') + "localStorage.setItem('__x9f4c2e8a1b7d6f3c0a5e9b2d4f8a11__', JSON.stringify({ transport: 'body', refresh_token: 'refresh-1', session_id: 'session-1', remember: true })); localStorage.setItem('__x7d2a9f4e1c8b3d6a0f5e2c9b7a41__', 'session-1'); } catch (e) {}";
 
 const PROBE = `(() => {
     const row = document.querySelector('[data-table="row"]');

@@ -5,14 +5,16 @@ import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { NgIcon, provideIcons } from '@ng-icons/core';
-import { lucideEraser, lucideFileClock, lucideCopy, lucidePlay, lucideCheck, lucideCircleAlert, lucideCircleCheck, lucideClipboardPaste, lucideMapPin, lucideMinus, lucidePackage, lucidePencil, lucidePlus, lucidePrinter, lucideRotateCw, lucideScanText, lucideSend, lucideSettings2, lucideTrash2, lucideTriangleAlert, lucideUserRound, lucideX } from '@ng-icons/lucide';
+import { lucideEraser, lucideExternalLink, lucideFileClock, lucideHistory, lucidePlay, lucideCheck, lucideCircleAlert, lucideCircleCheck, lucideClipboardPaste, lucideMapPin, lucideMinus, lucidePackage, lucidePencil, lucidePlus, lucidePrinter, lucideRotateCw, lucideScanText, lucideSend, lucideSettings2, lucideTrash2, lucideTriangleAlert, lucideUserRound, lucideX } from '@ng-icons/lucide';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzCheckboxModule } from 'ng-zorro-antd/checkbox';
 import { NzDrawerModule } from 'ng-zorro-antd/drawer';
+import { NzFormModule } from 'ng-zorro-antd/form';
 import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzInputNumberModule } from 'ng-zorro-antd/input-number';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzModalModule, NzModalService } from 'ng-zorro-antd/modal';
+import { NzPopoverModule } from 'ng-zorro-antd/popover';
 import { NzRadioModule } from 'ng-zorro-antd/radio';
 import { NzSelectModule } from 'ng-zorro-antd/select';
 import { NzSkeletonModule } from 'ng-zorro-antd/skeleton';
@@ -64,8 +66,11 @@ interface Pasted {
 }
 
 /** The part of the page each reason points at, lit for a moment when Create is pressed too early. */
-const BLOCKER_PART: Record<string, Part> = { phone: 'customer', phoneInvalid: 'customer', lookingUp: 'customer', name: 'customer', address: 'customer', empty: 'products', stock: 'products', source: 'customer', advance: 'summary', blocked: 'summary' };
+const BLOCKER_PART: Record<string, Part> = { phone: 'customer', phoneInvalid: 'customer', lookingUp: 'customer', name: 'customer', address: 'customer', empty: 'products', stock: 'products', source: 'summary', advance: 'summary', blocked: 'summary' };
 type Part = 'customer' | 'products' | 'summary';
+type RequiredField = 'phone' | 'name' | 'source' | 'advance';
+/** Blockers a form field shows under itself, so they need no message as well. */
+const FIELD_BLOCKERS = ['phone', 'phoneInvalid', 'name', 'source', 'advance'];
 
 const OPEN_STATUSES = ['Pending', 'Confirmed'];
 const DAY_MS = 24 * 60 * 60 * 1000;
@@ -81,8 +86,8 @@ const DAY_MS = 24 * 60 * 60 * 1000;
  */
 @Component({
     selector: 'online-order',
-    imports: [FormsModule, RouterLink, NgTemplateOutlet, NgIcon, NzButtonModule, NzCheckboxModule, NzDrawerModule, NzInputModule, NzInputNumberModule, NzModalModule, NzRadioModule, NzSelectModule, NzSkeletonModule, NzSpinModule, NzTableModule, NzTooltipModule, NzTypographyModule, TranslatePipe, PageHeaderComponent, ProductSearchComponent, StatusTagComponent, AddressFormComponent, DigitsPipe, MoneyPipe, RecordDatePipe],
-    providers: [DigitsPipe, MoneyPipe, provideIcons({ lucideEraser, lucideFileClock, lucideCopy, lucidePlay, lucideCheck, lucideCircleAlert, lucideCircleCheck, lucideClipboardPaste, lucideMapPin, lucideMinus, lucidePackage, lucidePencil, lucidePlus, lucidePrinter, lucideRotateCw, lucideScanText, lucideSend, lucideSettings2, lucideTrash2, lucideTriangleAlert, lucideUserRound, lucideX })],
+    imports: [FormsModule, RouterLink, NgTemplateOutlet, NgIcon, NzButtonModule, NzCheckboxModule, NzDrawerModule, NzFormModule, NzInputModule, NzInputNumberModule, NzModalModule, NzPopoverModule, NzRadioModule, NzSelectModule, NzSkeletonModule, NzSpinModule, NzTableModule, NzTooltipModule, NzTypographyModule, TranslatePipe, PageHeaderComponent, ProductSearchComponent, StatusTagComponent, AddressFormComponent, DigitsPipe, MoneyPipe, RecordDatePipe],
+    providers: [DigitsPipe, MoneyPipe, provideIcons({ lucideEraser, lucideExternalLink, lucideFileClock, lucideHistory, lucidePlay, lucideCheck, lucideCircleAlert, lucideCircleCheck, lucideClipboardPaste, lucideMapPin, lucideMinus, lucidePackage, lucidePencil, lucidePlus, lucidePrinter, lucideRotateCw, lucideScanText, lucideSend, lucideSettings2, lucideTrash2, lucideTriangleAlert, lucideUserRound, lucideX })],
     templateUrl: './online-order.component.html',
     styleUrl: './online-order.component.scss',
     host: { class: 'flex min-h-0 flex-col lg:h-full' },
@@ -168,6 +173,8 @@ export class OnlineOrderComponent {
     readonly done = signal<{ invoice_no: string; total: number; collect: number; customer_oid: string } | null>(null);
     /** Something typed that a reload or Clear would lose. */
     readonly dirty = computed(() => !!(this.phone().trim() || this.lines().length || this.notes().trim()));
+    /** Create was pressed with a field still empty: from then the empty required fields show their errors. */
+    readonly tried = signal(false);
     readonly attention = signal<Part | null>(null);
     private _attentionTimer?: ReturnType<typeof setTimeout>;
     readonly lastInvoice = signal<InvoiceContent | null>(null);
@@ -225,6 +232,20 @@ export class OnlineOrderComponent {
         if (this.customer()?.flag === 'Blocked' && !this.blockedAcknowledged()) return 'sales.online.blocker.blocked';
         return null;
     });
+
+    missing(field: RequiredField): boolean {
+        if (!this.tried()) return false;
+        switch (field) {
+            case 'phone':
+                return !this.normalizedPhone() && !this.phoneInvalid();
+            case 'name':
+                return this.isNewCustomer() && !this.customerName().trim();
+            case 'source':
+                return !this.sourceOid();
+            case 'advance':
+                return this.blocker() === 'sales.online.blocker.advance';
+        }
+    }
 
     constructor() {
         this.loadSetup();
@@ -490,8 +511,10 @@ export class OnlineOrderComponent {
 
     /** Says what is missing and lights the part of the page that needs it, scrolled into view. */
     private pointAt(blocker: string): void {
-        this._message.warning(this._translate.instant(blocker));
-        const part = BLOCKER_PART[blocker.split('.').pop()!] ?? null;
+        const reason = blocker.split('.').pop()!;
+        this.tried.set(true);
+        if (!FIELD_BLOCKERS.includes(reason)) this._message.warning(this._translate.instant(blocker));
+        const part = BLOCKER_PART[reason] ?? null;
         this.attention.set(part);
         if (part) document.querySelector(`[data-online="${part}"]`)?.scrollIntoView?.({ block: 'nearest', behavior: 'smooth' });
         clearTimeout(this._attentionTimer);
@@ -500,6 +523,7 @@ export class OnlineOrderComponent {
 
     newOrder(): void {
         this.done.set(null);
+        this.tried.set(false);
         this._resumeAddress = null;
         this.unanswered.set(false);
         this.orderOid.set(crypto.randomUUID());
@@ -542,7 +566,20 @@ export class OnlineOrderComponent {
     /** A half-made order goes to the server as a draft: no stock held, no customer saved (REQ-42). */
     saveDraft(): void {
         if (!this.lines().length) return this.pointAt('sales.online.blocker.empty');
-        if (this.savingDraft()) return;
+        if (this.savingDraft() || this.busy()) return;
+        this._asking.set(true);
+        confirmAction(this._modal, {
+            title: this._translate.instant('sales.online.drafts.saveTitle'),
+            body: this._translate.instant('sales.online.drafts.saveBody'),
+            ok: this._translate.instant('sales.online.drafts.save'),
+            cancel: this._translate.instant('form.confirm.cancel'),
+        }).subscribe((confirmed) => {
+            this._asking.set(false);
+            if (confirmed) this.sendDraft();
+        });
+    }
+
+    private sendDraft(): void {
         this.savingDraft.set(true);
         const choice = this.addressChoice();
         this._orders

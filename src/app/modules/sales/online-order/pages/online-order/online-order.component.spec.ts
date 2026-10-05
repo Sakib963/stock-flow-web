@@ -3,6 +3,7 @@ import { HttpTestingController, provideHttpClientTesting } from '@angular/common
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { provideNzI18n, en_US } from 'ng-zorro-antd/i18n';
+import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzModalRef, NzModalService } from 'ng-zorro-antd/modal';
 import { of } from 'rxjs';
 import { provideTranslateService } from '@ngx-translate/core';
@@ -36,7 +37,7 @@ const open = async (canCreate = true, keep = false) => {
     return { fixture, page: fixture.componentInstance, http, element: fixture.nativeElement as HTMLElement };
 };
 
-const answerYes = (fixture: ComponentFixture<OnlineOrderComponent>) => vi.spyOn(fixture.debugElement.injector.get(NzModalService), 'confirm').mockImplementation(() => ({ afterClose: of(true) }) as unknown as NzModalRef);
+const answerYes = (fixture: ComponentFixture<OnlineOrderComponent>, answer = true) => vi.spyOn(fixture.debugElement.injector.get(NzModalService), 'confirm').mockImplementation(() => ({ afterClose: of(answer) }) as unknown as NzModalRef);
 
 /** A returning customer with one saved address, so the order is ready but for its products. */
 const knownCustomer = (page: OnlineOrderComponent, http: HttpTestingController, address = saved()) => {
@@ -211,11 +212,37 @@ describe('OnlineOrderComponent', () => {
         expect(localStorage.getItem('sf.online.unsent')).toBeNull();
     });
 
+    it('asks before saving a draft, and saves nothing when the answer is no', async () => {
+        const { fixture, page, http } = await open();
+        knownCustomer(page, http);
+        page.add(batch());
+        answerYes(fixture, false);
+        page.saveDraft();
+        http.expectNone((r) => r.url.includes(APIEndpoint.SAVE_ONLINE_DRAFT));
+        expect(page.lines().length).toBe(1);
+    });
+
+    it('shows an empty source as an error under its field, not as a message', async () => {
+        const { fixture, page, http, element } = await open();
+        const warning = vi.spyOn(fixture.debugElement.injector.get(NzMessageService), 'warning');
+        knownCustomer(page, http);
+        page.add(batch());
+        page.sourceOid.set(null);
+        expect(page.missing('source')).toBe(false);
+        page.create();
+        fixture.detectChanges();
+        expect(page.missing('source')).toBe(true);
+        expect(warning).not.toHaveBeenCalled();
+        expect(element.querySelector('[data-online="summary"] .ant-form-item-has-error')).not.toBeNull();
+        http.expectNone((r) => r.url.includes(APIEndpoint.CREATE_ONLINE_ORDER));
+    });
+
     it('saves a half-made order as a draft and resumes it under the same oid', async () => {
-        const { page, http } = await open();
+        const { fixture, page, http } = await open();
         knownCustomer(page, http);
         page.add(batch());
         const oid = page.orderOid();
+        answerYes(fixture);
         page.saveDraft();
         const saved = http.expectOne((r) => r.url.includes(APIEndpoint.SAVE_ONLINE_DRAFT));
         expect(saved.request.body).toMatchObject({ oid, customer: { phone: '01987654321' }, address: { oid: 'a-1' }, lines: [{ inventory_oid: 'i-1', quantity: 1, discount: 0 }] });
