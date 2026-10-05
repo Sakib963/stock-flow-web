@@ -472,3 +472,24 @@ body.lang-bn {
 .ant-modal-confirm-btns:empty {
     display: none;
 }
+
+/* Footer buttons are inline-flex, so on the default baseline a loading spinner replacing an icon
+   drops that button below its neighbour. Only bare buttons: a footer with its own wrapper lays itself out. */
+.ant-modal-footer:has(> .ant-btn) {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+/* nz-select scrolls its list by a fixed row height and sizes the list from it, so a row drawn at any
+   other height leaves a gap under the last one. A touch list sets the height its rows are given. */
+.sf-select-touch .ant-select-item {
+    min-height: 44px;
+    align-items: center;
+}
+
+/* The prefix box does not centre what it holds, so an icon sits above the typed text. */
+.ant-select-prefix {
+    display: flex;
+    align-items: center;
+}
