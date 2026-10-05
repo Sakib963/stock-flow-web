@@ -189,10 +189,19 @@ export class FilterComponent {
         return this.source(draft)[field.key] ?? null;
     }
 
+    /**
+     * The same array for the same value: a new one on every redraw reads to ngModel as a change, the
+     * multi-select redraws for it, and with several on one panel the page never stops redrawing.
+     */
     listOf(field: FilterField, draft?: boolean): string[] {
-        const value = this.valueOf(field, draft);
-        return value ? value.split(SEPARATOR).filter(Boolean) : [];
+        const value = this.valueOf(field, draft) ?? '';
+        const kept = this._lists.get(field.key);
+        if (kept?.value === value) return kept.list;
+        const list = value ? value.split(SEPARATOR).filter(Boolean) : [];
+        this._lists.set(field.key, { value, list });
+        return list;
     }
+    private readonly _lists = new Map<string, { value: string; list: string[] }>();
 
     toggleOf(field: FilterField, draft?: boolean): boolean {
         return this.valueOf(field, draft) === 'true';
