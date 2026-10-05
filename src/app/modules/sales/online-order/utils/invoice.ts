@@ -36,6 +36,7 @@ const text = (doc: Document, tag: string, value: string, style: Record<string, s
     return element;
 };
 
+// The print frame is its own document with no stylesheet, so its few greys are literal values, not tokens.
 const block = (doc: Document, heading: { label: string; lines: string[] }): HTMLElement => {
     const box = styled(doc.createElement('div'), { flex: '1', 'min-width': '0' });
     box.append(text(doc, 'div', heading.label, { 'font-size': '10px', 'font-weight': '700', 'text-transform': 'uppercase', 'letter-spacing': '0.06em', color: '#555', 'margin-bottom': '1.5mm' }));

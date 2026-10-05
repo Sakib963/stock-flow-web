@@ -20,7 +20,7 @@ export const SALES_ROUTES: Routes = [
                 path: 'online-order',
                 canActivate: [permissionGuard],
                 data: { permission: 'sales.online.view' },
-                loadComponent: () => import('./online-order/pages/online-order/online-order.component').then((m) => m.OnlineOrderComponent),
+                loadComponent: () => import('./online-order/pages/online-order.component').then((m) => m.OnlineOrderComponent),
             },
             {
                 path: 'customers',

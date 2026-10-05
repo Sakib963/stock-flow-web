@@ -24,6 +24,7 @@ import { NzTypographyModule } from 'ng-zorro-antd/typography';
 import { NzTooltipModule } from 'ng-zorro-antd/tooltip';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { catchError, distinctUntilChanged, map, of, switchMap } from 'rxjs';
+import { Constants } from '@app/core/constants/constants';
 import { RequestFailure } from '@app/core/models/api.model';
 import { AddressPayload, Place, CUSTOMER_AGE_BANDS, CUSTOMER_GENDERS, CustomerAddress, CustomerAgeBand, CustomerGender } from '@app/core/models/customer.model';
 import { ChatReading, OnlineDraft, OnlineOrderSetup, PAYMENT_TERMS, PaymentTerms, PhoneLookup, PlaceCandidate } from '@app/core/models/online-order.model';
@@ -41,7 +42,7 @@ import { MoneyPipe } from '@app/shared/pipes/money/money.pipe';
 import { RecordDatePipe } from '@app/shared/pipes/record-date/record-date.pipe';
 import { ProductSearchService } from '@app/core/services/product-search/product-search.service';
 import { environment } from '@env/environment';
-import { InvoiceContent, printInvoice } from '@app/modules/sales/online-order/utils/invoice/invoice';
+import { InvoiceContent, printInvoice } from '@app/modules/sales/online-order/utils/invoice';
 import { confirmAction } from '@app/shared/utils/confirm-action/confirm-action';
 import { normalizePhone } from '@app/shared/utils/phone/phone';
 import { failureOf } from '@app/shared/utils/request-failure/request-failure';
@@ -782,7 +783,7 @@ export class OnlineOrderComponent {
 
 const sameLine = (a: string, b: string) => a.toLowerCase().replace(/[^\p{L}\p{N}]+/gu, '') === b.toLowerCase().replace(/[^\p{L}\p{N}]+/gu, '');
 
-const UNSENT_KEY = 'sf.online.unsent';
+const UNSENT_KEY = Constants.ONLINE_UNSENT_KEY;
 
 /** The order on screen, kept in this browser until it is placed, saved as a draft or cleared. */
 interface Unsent {

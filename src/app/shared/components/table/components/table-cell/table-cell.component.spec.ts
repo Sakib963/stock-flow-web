@@ -80,4 +80,16 @@ describe('TableCellComponent', () => {
         expect(outward.el.textContent?.trim()).toBe('-3');
         expect(outward.el.querySelector('.text-danger-ink')).not.toBeNull();
     });
+
+    it('copies a code without opening the row when the copy button is clicked', async () => {
+        const { el } = await render({ key: 'code', label: 'Code', type: 'identifier', copy: true, width: 20 } as Column, { code: 'CODE-001' });
+        const row = vi.fn();
+        el.addEventListener('click', row);
+        const button = el.querySelector<HTMLElement>('.ant-typography-copy');
+        expect(button).not.toBeNull();
+        button!.click();
+        expect(row).not.toHaveBeenCalled();
+        el.querySelector<HTMLElement>('.font-mono')!.click();
+        expect(row).toHaveBeenCalledTimes(1);
+    });
 });

@@ -8,7 +8,7 @@ import { Observable, map, of, tap } from 'rxjs';
 /** How long the list the online order opens on is reused before it is asked for again. */
 const BROWSE_TTL_MS = 2 * 60 * 1000;
 
-/** The sellable batches both counters pick from, the counter and the online order (sales REQ-13, REQ-37). Never cached: another sale may have taken the stock a moment ago. */
+/** The sellable batches both counters pick from, the counter and the online order (sales REQ-13, REQ-37). A typed search always asks the server. */
 @Injectable({ providedIn: 'root' })
 export class ProductSearchService {
     private readonly _http = inject(HttpClient);

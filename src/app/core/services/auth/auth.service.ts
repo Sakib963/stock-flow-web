@@ -388,6 +388,7 @@ export class AuthService {
 
     private clearStored(): void {
         this.remove(Constants.AUTH_STORE_KEY);
+        this.remove(Constants.ONLINE_UNSENT_KEY);
     }
 
     private readEndedNote(): SessionEndReason | null {

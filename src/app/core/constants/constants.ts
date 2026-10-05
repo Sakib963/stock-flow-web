@@ -7,6 +7,8 @@ export class Constants {
 
     // Opaque on purpose: a key named "auth" or "token" is the first thing anyone pokes at in
     // devtools on a shared counter machine.
+    /** The online order still on screen, kept for a reload and cleared when the session ends: it holds a customer's phone and address. */
+    static readonly ONLINE_UNSENT_KEY = 'sf.online.unsent';
     static readonly AUTH_STORE_KEY = '__x9f4c2e8a1b7d6f3c0a5e9b2d4f8a11__';
     static readonly SIGN_OUT_PENDING_KEY = '__x3b8e1d6c9f2a7e4b0d5c8a1f6e3b27__';
     // The last session this browser held, so signing in again replaces it instead of adding one.
