@@ -3,8 +3,7 @@ import { HttpTestingController, provideHttpClientTesting } from '@angular/common
 import { TestBed } from '@angular/core/testing';
 import { ActivatedRoute, provideRouter } from '@angular/router';
 import { provideNzI18n, en_US } from 'ng-zorro-antd/i18n';
-import { NzModalRef, NzModalService } from 'ng-zorro-antd/modal';
-import { of } from 'rxjs';
+import { NzModalService } from 'ng-zorro-antd/modal';
 import { provideTranslateService } from '@ngx-translate/core';
 import { APIEndpoint } from '@app/core/constants/api-endpoint';
 import { SessionService } from '@app/core/services/session/session.service';
@@ -59,11 +58,11 @@ describe('CustomerDetailComponent', () => {
         expect(page.querySelector('[data-stat="delivered"]')).toBeNull();
     });
 
-    it('will not save a Watch or a Block without a reason', async () => {
+    it('will not save a Watch or a Block without a reason, and asks inside the same dialog', async () => {
         const { fixture, http } = await open();
         http.expectOne((r) => r.url.includes(APIEndpoint.GET_CUSTOMER_DETAILS)).flush(details());
         const page = fixture.componentInstance;
-        vi.spyOn(fixture.debugElement.injector.get(NzModalService), 'confirm').mockImplementation(() => ({ afterClose: of(true) }) as unknown as NzModalRef);
+        const second = vi.spyOn(fixture.debugElement.injector.get(NzModalService), 'confirm');
         page.openFlag();
         page.flagChoice.set('Blocked');
         page.saveFlag();
@@ -71,6 +70,11 @@ describe('CustomerDetailComponent', () => {
 
         page.flagReason.set('Refused two parcels');
         page.saveFlag();
+        expect(page.flagConfirming()).toBe(true);
+        http.expectNone((r) => r.url.includes(APIEndpoint.FLAG_CUSTOMER));
+
+        page.saveFlag();
+        expect(second).not.toHaveBeenCalled();
         expect(http.expectOne((r) => r.url.includes(APIEndpoint.FLAG_CUSTOMER)).request.body).toEqual({ oid: 'c-1', flag: 'Blocked', reason: 'Refused two parcels' });
     });
 

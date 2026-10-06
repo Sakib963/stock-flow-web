@@ -27,7 +27,6 @@ import { CustomerService } from '@app/modules/sales/customer/services/customer.s
 import { ActionFooterComponent } from '@app/shared/components/action-footer/action-footer.component';
 import { PageHeaderComponent } from '@app/shared/components/page-header/page-header.component';
 import { StatusTagComponent } from '@app/shared/components/status-tag/status-tag.component';
-import { DigitsPipe } from '@app/shared/pipes/digits/digits.pipe';
 import { MoneyPipe } from '@app/shared/pipes/money/money.pipe';
 import { RecordDatePipe } from '@app/shared/pipes/record-date/record-date.pipe';
 import { confirmAction } from '@app/shared/utils/confirm-action/confirm-action';
@@ -51,7 +50,7 @@ interface CustomerStat {
  */
 @Component({
     selector: 'customer-detail',
-    imports: [FormsModule, NgIcon, NzButtonModule, NzCardModule, NzDrawerModule, NzInputModule, NzModalModule, NzRadioModule, NzSkeletonModule, NzTableModule, NzTimelineModule, NzTooltipModule, TranslatePipe, PageHeaderComponent, StatusTagComponent, ActionFooterComponent, AddressFormComponent, MoneyPipe, RecordDatePipe, DigitsPipe],
+    imports: [FormsModule, NgIcon, NzButtonModule, NzCardModule, NzDrawerModule, NzInputModule, NzModalModule, NzRadioModule, NzSkeletonModule, NzTableModule, NzTimelineModule, NzTooltipModule, TranslatePipe, PageHeaderComponent, StatusTagComponent, ActionFooterComponent, AddressFormComponent, MoneyPipe, RecordDatePipe],
     providers: [provideIcons({ lucideArrowLeft, lucideBan, lucideBanknote, lucideCalendarClock, lucideCheck, lucideCircleCheck, lucideEye, lucideFlag, lucideHandCoins, lucideHistory, lucideInfo, lucideMapPin, lucidePackageCheck, lucidePackageX, lucidePencil, lucidePlus, lucideReceipt, lucideRotateCw, lucideShoppingBag, lucideStar, lucideTrash2, lucideTrendingUp, lucideX, lucideZap })],
     templateUrl: './customer-detail.component.html',
     styleUrl: './customer-detail.component.scss',
@@ -115,6 +114,7 @@ export class CustomerDetailComponent {
 
     // The flag dialog.
     readonly flagOpen = signal(false);
+    readonly flagConfirming = signal(false);
     readonly flags = CUSTOMER_FLAGS;
     readonly flagChoice = signal<CustomerFlag>('None');
     readonly flagReason = signal('');
@@ -219,22 +219,23 @@ export class CustomerDetailComponent {
         if (!customer) return;
         this.flagChoice.set(customer.flag);
         this.flagReason.set(customer.flag_reason ?? '');
+        this.flagConfirming.set(false);
         this.flagOpen.set(true);
     }
 
     saveFlag(): void {
         if (this.flagReasonMissing() || this.saving()) return;
-        const flag = this._translate.instant('sales.customer.flag.' + this.flagChoice());
-        this.ask('sales.customer.confirmFlag', { name: this.record()?.details.name ?? '', flag }, 'sales.customer.saveFlag').subscribe((confirmed) => {
-            if (!confirmed) return;
-            this._customers.flag(this.oid, this.flagChoice(), this.flagReason().trim() || null).subscribe({
-                next: (changed) => {
-                    this.flagOpen.set(false);
-                    this._message[changed ? 'success' : 'info'](this._translate.instant(changed ? 'sales.customer.flagSaved' : 'form.nothingChanged'));
-                    this.load();
-                },
-                error: (error: unknown) => this.writeFailed(error),
-            });
+        if (!this.flagConfirming()) {
+            this.flagConfirming.set(true);
+            return;
+        }
+        this._customers.flag(this.oid, this.flagChoice(), this.flagReason().trim() || null).subscribe({
+            next: (changed) => {
+                this.flagOpen.set(false);
+                this._message[changed ? 'success' : 'info'](this._translate.instant(changed ? 'sales.customer.flagSaved' : 'form.nothingChanged'));
+                this.load();
+            },
+            error: (error: unknown) => this.writeFailed(error),
         });
     }
 

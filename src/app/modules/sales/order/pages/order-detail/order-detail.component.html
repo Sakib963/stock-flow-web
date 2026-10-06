@@ -149,48 +149,48 @@
                 @if (record()) {
                     <div class="flex flex-col gap-2">
                         @if (actions().confirm) {
-                            <button nz-button nzType="primary" nzBlock type="button" class="inline-flex items-center justify-start gap-2" data-quick="confirm" (click)="open('confirm')">
+                            <button nz-button nzType="primary" nzBlock type="button" class="inline-flex items-center justify-start gap-2" data-quick="confirm" [disabled]="saving()" (click)="open('confirm')">
                                 <ng-icon name="lucideCircleCheck" size="14px" aria-hidden="true" />
                                 <span>{{ 'sales.order.action.confirm.button' | translate }}</span>
                             </button>
                         }
                         @if (actions().packed) {
-                            <button nz-button nzBlock type="button" class="inline-flex items-center justify-start gap-2" data-quick="packed" [nzLoading]="saving()" (click)="markPacked()">
+                            <button nz-button nzBlock type="button" class="inline-flex items-center justify-start gap-2" data-quick="packed" [nzLoading]="acting() === 'packed'" [disabled]="saving() && acting() !== 'packed'" (click)="markPacked()">
                                 <ng-icon name="lucidePackage" size="14px" aria-hidden="true" />
                                 <span>{{ 'sales.order.action.packed.button' | translate }}</span>
                             </button>
                         }
                         @if (actions().dispatch) {
-                            <button nz-button nzType="primary" nzBlock type="button" class="inline-flex items-center justify-start gap-2" data-quick="dispatch" (click)="open('dispatch')">
+                            <button nz-button nzType="primary" nzBlock type="button" class="inline-flex items-center justify-start gap-2" data-quick="dispatch" [disabled]="saving()" (click)="open('dispatch')">
                                 <ng-icon name="lucideTruck" size="14px" aria-hidden="true" />
                                 <span>{{ 'sales.order.action.dispatch.button' | translate }}</span>
                             </button>
                         }
                         @if (actions().deliver) {
-                            <button nz-button nzType="primary" nzBlock type="button" class="inline-flex items-center justify-start gap-2" data-quick="deliver" [nzLoading]="saving()" (click)="deliver()">
+                            <button nz-button nzType="primary" nzBlock type="button" class="inline-flex items-center justify-start gap-2" data-quick="deliver" [nzLoading]="acting() === 'deliver'" [disabled]="saving() && acting() !== 'deliver'" (click)="deliver()">
                                 <ng-icon name="lucidePackageCheck" size="14px" aria-hidden="true" />
                                 <span>{{ 'sales.order.action.deliver.button' | translate }}</span>
                             </button>
                         }
                         @if (actions().notDelivered) {
-                            <button nz-button nzBlock type="button" class="inline-flex items-center justify-start gap-2" data-quick="not-delivered" (click)="open('notDelivered')">
+                            <button nz-button nzBlock type="button" class="inline-flex items-center justify-start gap-2" data-quick="not-delivered" [disabled]="saving()" (click)="open('notDelivered')">
                                 <ng-icon name="lucidePackageX" size="14px" aria-hidden="true" />
                                 <span>{{ 'sales.order.action.notDelivered.button' | translate }}</span>
                             </button>
                         }
                         @if (actions().cancel) {
-                            <button nz-button nzDanger nzBlock type="button" class="inline-flex items-center justify-start gap-2" data-quick="cancel" (click)="open('cancel')">
+                            <button nz-button nzDanger nzBlock type="button" class="inline-flex items-center justify-start gap-2" data-quick="cancel" [disabled]="saving()" (click)="open('cancel')">
                                 <ng-icon name="lucideBan" size="14px" aria-hidden="true" />
                                 <span>{{ 'sales.order.action.cancel.button' | translate }}</span>
                             </button>
                         }
                         @if (record()?.online) {
-                        <button nz-button nzBlock type="button" class="inline-flex items-center justify-start gap-2" data-quick="print" (click)="print()">
-                            <ng-icon name="lucidePrinter" size="14px" aria-hidden="true" />
-                            <span>{{ 'sales.online.invoice.print' | translate }}</span>
-                        </button>
-                    }
-                    @if (canViewCustomers && record()?.customer_oid) {
+                            <button nz-button nzBlock type="button" class="inline-flex items-center justify-start gap-2" data-quick="print" (click)="print()">
+                                <ng-icon name="lucidePrinter" size="14px" aria-hidden="true" />
+                                <span>{{ 'sales.online.invoice.print' | translate }}</span>
+                            </button>
+                        }
+                        @if (canViewCustomers && record()?.customer_oid) {
                             <a nz-button nzBlock class="inline-flex items-center justify-start gap-2" [routerLink]="customerRoute.detail(record()!.customer_oid!)">
                                 <ng-icon name="lucideUserRound" size="14px" aria-hidden="true" />
                                 <span>{{ 'sales.order.openCustomer' | translate }}</span>
@@ -209,7 +209,7 @@
                     ><h2 class="m-0 flex items-center gap-1.5 text-sm font-bold text-ink"><ng-icon name="lucideHistory" size="14px" class="text-ink-muted" aria-hidden="true" />{{ 'sales.order.section.timeline' | translate }}</h2></ng-template
                 >
                 @if (record(); as o) {
-                    <nz-timeline>
+                    <nz-timeline nzReverse>
                         @for (entry of o.status_history; track $index; let last = $last) {
                             <nz-timeline-item [nzColor]="last ? 'blue' : 'gray'">
                                 <p class="m-0 text-[13px] font-semibold text-ink">{{ 'sales.order.history.' + entry.kind | translate: { to: ('sales.order.historyValue.' + entry.to_status | translate) } }}</p>
@@ -333,88 +333,100 @@
 
 <nz-modal [nzVisible]="!!dialog()" [nzTitle]="dialog() ? ('sales.order.action.' + dialog() + '.title' | translate) : ''" [nzFooter]="dialogFooter" nzCentered (nzOnCancel)="dialog.set(null)">
     <ng-container *nzModalContent>
-        <div nz-form nzLayout="vertical">
-            @switch (dialog()) {
-                @case ('confirm') {
-                    <nz-form-item>
-                        <nz-form-label nzRequired>{{ 'sales.order.confirmedHow' | translate }}</nz-form-label>
-                        <nz-form-control>
-                            <nz-radio-group class="flex flex-col gap-2" data-dialog="confirmed-via" [ngModel]="confirmedVia()" (ngModelChange)="confirmedVia.set($event)">
-                                @for (via of confirmedVias; track via) {
-                                    <label nz-radio [nzValue]="via">{{ 'sales.order.confirmedVia.' + via | translate }}</label>
-                                }
-                            </nz-radio-group>
-                        </nz-form-control>
-                    </nz-form-item>
-                }
-                @case ('cancel') {
-                    <nz-form-item>
-                        <nz-form-label nzRequired nzFor="order-cancel-reason">{{ 'sales.order.cancelledBecause' | translate }}</nz-form-label>
-                        <nz-form-control>
-                            <nz-select nzId="order-cancel-reason" class="w-full" data-dialog="cancel-reason" [nzPlaceHolder]="'sales.order.pickReason' | translate" [ngModel]="cancelReason()" (ngModelChange)="cancelReason.set($event)">
-                                @for (group of reasonGroups; track group[0]) {
-                                    <nz-option-group [nzLabel]="'sales.order.reasonSide.' + group[0] | translate">
-                                        @for (reason of group[1]; track reason) {
-                                            <nz-option [nzValue]="reason" [nzLabel]="'sales.order.cancelReason.' + reason | translate" />
-                                        }
-                                    </nz-option-group>
-                                }
-                            </nz-select>
-                        </nz-form-control>
-                    </nz-form-item>
-                    @if ((record()?.amount_paid ?? 0) > 0 || record()?.payment_status === 'paid') {
-                        <p class="mt-0 mb-3 rounded-control bg-warning-bg p-2 text-xs text-warning-ink">{{ 'sales.order.cancelRefundNote' | translate }}</p>
+        @if (confirming()) {
+            <p class="m-0 text-sm font-semibold text-ink" data-dialog="confirm">{{ 'sales.order.action.' + dialog() + '.confirmTitle' | translate: { number: record()?.invoice_no ?? '' } }}</p>
+            <p class="mt-1 mb-0 text-sm text-ink-muted">{{ 'sales.order.action.' + dialog() + '.confirmBody' | translate }}</p>
+        } @else {
+            <div nz-form nzLayout="vertical">
+                @switch (dialog()) {
+                    @case ('confirm') {
+                        <nz-form-item>
+                            <nz-form-label nzRequired>{{ 'sales.order.confirmedHow' | translate }}</nz-form-label>
+                            <nz-form-control>
+                                <nz-radio-group class="flex flex-col gap-2" data-dialog="confirmed-via" [ngModel]="confirmedVia()" (ngModelChange)="confirmedVia.set($event)">
+                                    @for (via of confirmedVias; track via) {
+                                        <label nz-radio [nzValue]="via">{{ 'sales.order.confirmedVia.' + via | translate }}</label>
+                                    }
+                                </nz-radio-group>
+                            </nz-form-control>
+                        </nz-form-item>
+                    }
+                    @case ('cancel') {
+                        <nz-form-item>
+                            <nz-form-label nzRequired nzFor="order-cancel-reason">{{ 'sales.order.cancelledBecause' | translate }}</nz-form-label>
+                            <nz-form-control>
+                                <nz-select nzId="order-cancel-reason" class="w-full" data-dialog="cancel-reason" [nzPlaceHolder]="'sales.order.pickReason' | translate" [ngModel]="cancelReason()" (ngModelChange)="cancelReason.set($event)">
+                                    @for (group of reasonGroups; track group[0]) {
+                                        <nz-option-group [nzLabel]="'sales.order.reasonSide.' + group[0] | translate">
+                                            @for (reason of group[1]; track reason) {
+                                                <nz-option [nzValue]="reason" [nzLabel]="'sales.order.cancelReason.' + reason | translate" />
+                                            }
+                                        </nz-option-group>
+                                    }
+                                </nz-select>
+                            </nz-form-control>
+                        </nz-form-item>
+                        @if ((record()?.amount_paid ?? 0) > 0 || record()?.payment_status === 'paid') {
+                            <p class="mt-0 mb-3 rounded-control bg-warning-bg p-2 text-xs text-warning-ink">{{ 'sales.order.cancelRefundNote' | translate }}</p>
+                        }
+                    }
+                    @case ('dispatch') {
+                        <nz-form-item>
+                            <nz-form-label nzRequired nzFor="order-courier">{{ 'sales.order.courier' | translate }}</nz-form-label>
+                            <nz-form-control>
+                                <nz-select nzId="order-courier" class="w-full" data-dialog="courier" [nzPlaceHolder]="'sales.order.pickCourier' | translate" [ngModel]="courier()" (ngModelChange)="courier.set($event)">
+                                    @for (name of couriers; track name) {
+                                        <nz-option [nzValue]="name" [nzLabel]="'sales.order.couriers.' + name | translate" />
+                                    }
+                                </nz-select>
+                            </nz-form-control>
+                        </nz-form-item>
+                        <nz-form-item>
+                            <nz-form-label nzFor="order-consignment">{{ 'sales.order.consignment' | translate }}</nz-form-label>
+                            <nz-form-control>
+                                <input nz-input id="order-consignment" maxlength="128" autocomplete="off" class="font-mono" [ngModel]="consignment()" (ngModelChange)="consignment.set($event)" />
+                            </nz-form-control>
+                        </nz-form-item>
+                    }
+                    @case ('notDelivered') {
+                        <nz-form-item>
+                            <nz-form-label nzRequired nzFor="order-not-delivered">{{ 'sales.order.notDeliveredWhy' | translate }}</nz-form-label>
+                            <nz-form-control>
+                                <nz-select nzId="order-not-delivered" class="w-full" data-dialog="not-delivered-reason" [nzPlaceHolder]="'sales.order.pickReason' | translate" [ngModel]="notDeliveredReason()" (ngModelChange)="notDeliveredReason.set($event)">
+                                    @for (reason of notDeliveredReasons; track reason) {
+                                        <nz-option [nzValue]="reason" [nzLabel]="'sales.order.notDeliveredReason.' + reason | translate" />
+                                    }
+                                </nz-select>
+                            </nz-form-control>
+                        </nz-form-item>
+                        <p class="mt-0 mb-3 text-xs text-ink-muted">{{ 'sales.order.notDeliveredNote' | translate }}</p>
                     }
                 }
-                @case ('dispatch') {
-                    <nz-form-item>
-                        <nz-form-label nzRequired nzFor="order-courier">{{ 'sales.order.courier' | translate }}</nz-form-label>
-                        <nz-form-control>
-                            <nz-select nzId="order-courier" class="w-full" data-dialog="courier" [nzPlaceHolder]="'sales.order.pickCourier' | translate" [ngModel]="courier()" (ngModelChange)="courier.set($event)">
-                                @for (name of couriers; track name) {
-                                    <nz-option [nzValue]="name" [nzLabel]="'sales.order.couriers.' + name | translate" />
-                                }
-                            </nz-select>
-                        </nz-form-control>
-                    </nz-form-item>
-                    <nz-form-item>
-                        <nz-form-label nzFor="order-consignment">{{ 'sales.order.consignment' | translate }}</nz-form-label>
-                        <nz-form-control>
-                            <input nz-input id="order-consignment" maxlength="128" autocomplete="off" class="font-mono" [ngModel]="consignment()" (ngModelChange)="consignment.set($event)" />
+                @if (dialog() && dialog() !== 'dispatch') {
+                    @let needsNote = (dialog() === 'cancel' && cancelReason() === 'other') || (dialog() === 'notDelivered' && notDeliveredReason() === 'other');
+                    <nz-form-item class="mb-0">
+                        <nz-form-label [nzRequired]="needsNote" nzFor="order-note">{{ 'sales.order.note' | translate }}</nz-form-label>
+                        <nz-form-control [nzValidateStatus]="needsNote && !note().trim() ? 'error' : ''" [nzErrorTip]="'sales.order.noteNeeded' | translate">
+                            <textarea nz-input id="order-note" rows="2" maxlength="256" data-dialog="note" [ngModel]="note()" (ngModelChange)="note.set($event)"></textarea>
                         </nz-form-control>
                     </nz-form-item>
                 }
-                @case ('notDelivered') {
-                    <nz-form-item>
-                        <nz-form-label nzRequired nzFor="order-not-delivered">{{ 'sales.order.notDeliveredWhy' | translate }}</nz-form-label>
-                        <nz-form-control>
-                            <nz-select nzId="order-not-delivered" class="w-full" data-dialog="not-delivered-reason" [nzPlaceHolder]="'sales.order.pickReason' | translate" [ngModel]="notDeliveredReason()" (ngModelChange)="notDeliveredReason.set($event)">
-                                @for (reason of notDeliveredReasons; track reason) {
-                                    <nz-option [nzValue]="reason" [nzLabel]="'sales.order.notDeliveredReason.' + reason | translate" />
-                                }
-                            </nz-select>
-                        </nz-form-control>
-                    </nz-form-item>
-                    <p class="mt-0 mb-3 text-xs text-ink-muted">{{ 'sales.order.notDeliveredNote' | translate }}</p>
-                }
-            }
-            @if (dialog() && dialog() !== 'dispatch') {
-                @let needsNote = (dialog() === 'cancel' && cancelReason() === 'other') || (dialog() === 'notDelivered' && notDeliveredReason() === 'other');
-                <nz-form-item class="mb-0">
-                    <nz-form-label [nzRequired]="needsNote" nzFor="order-note">{{ 'sales.order.note' | translate }}</nz-form-label>
-                    <nz-form-control [nzValidateStatus]="needsNote && !note().trim() ? 'error' : ''" [nzErrorTip]="'sales.order.noteNeeded' | translate">
-                        <textarea nz-input id="order-note" rows="2" maxlength="256" data-dialog="note" [ngModel]="note()" (ngModelChange)="note.set($event)"></textarea>
-                    </nz-form-control>
-                </nz-form-item>
-            }
-        </div>
+            </div>
+        }
     </ng-container>
 </nz-modal>
 <ng-template #dialogFooter>
-    <button nz-button type="button" class="inline-flex items-center gap-1.5" (click)="dialog.set(null)">
-        <ng-icon name="lucideX" size="14px" aria-hidden="true" />
-        <span>{{ 'form.confirm.cancel' | translate }}</span>
-    </button>
+    @if (confirming()) {
+        <button nz-button type="button" class="inline-flex items-center gap-1.5" data-dialog="back" [disabled]="saving()" (click)="confirming.set(false)">
+            <ng-icon name="lucideArrowLeft" size="14px" aria-hidden="true" />
+            <span>{{ 'list.back' | translate }}</span>
+        </button>
+    } @else {
+        <button nz-button type="button" class="inline-flex items-center gap-1.5" [disabled]="saving()" (click)="dialog.set(null)">
+            <ng-icon name="lucideX" size="14px" aria-hidden="true" />
+            <span>{{ 'form.confirm.cancel' | translate }}</span>
+        </button>
+    }
     <button nz-button nzType="primary" type="button" class="inline-flex items-center gap-1.5" data-dialog="submit" [nzDanger]="dialog() === 'cancel'" [nzLoading]="saving()" [disabled]="dialogIncomplete()" (click)="submitDialog()">
         @if (!saving()) {
             <ng-icon name="lucideCheck" size="14px" aria-hidden="true" />

@@ -94,15 +94,27 @@ describe('OrderDetailComponent', () => {
         expect(quick(element)).toEqual(['none']);
     });
 
-    it('confirms only after it is asked, with how it was checked, and reloads the order', async () => {
+    it('asks inside the same dialog, with no second modal on top, and Back returns to the details', async () => {
         const { fixture, page, http } = await open(order());
-        answer(fixture, false);
+        const second = answer(fixture);
+        page.open('confirm');
+        page.submitDialog();
+        expect(page.confirming()).toBe(true);
+        expect(second).not.toHaveBeenCalled();
+        http.expectNone((r) => r.url.includes(APIEndpoint.CONFIRM_ORDER));
+
+        page.confirming.set(false);
+        page.open('cancel');
+        expect(page.confirming()).toBe(false);
+    });
+
+    it('confirms only after it is asked, with how it was checked, and reloads the order', async () => {
+        const { page, http } = await open(order());
         page.open('confirm');
         page.confirmedVia.set('Message');
         page.submitDialog();
         http.expectNone((r) => r.url.includes(APIEndpoint.CONFIRM_ORDER));
 
-        answer(fixture);
         page.submitDialog();
         const sent = http.expectOne((r) => r.url.includes(APIEndpoint.CONFIRM_ORDER));
         expect(sent.request.body).toEqual({ oid: OID, confirmed_via: 'Message', note: null });
@@ -122,12 +134,33 @@ describe('OrderDetailComponent', () => {
     });
 
     it('reloads and says what changed when someone else moved the order first', async () => {
-        const { fixture, page, http } = await open(order());
-        answer(fixture);
+        const { page, http } = await open(order());
         page.open('confirm');
+        page.submitDialog();
         page.submitDialog();
         http.expectOne((r) => r.url.includes(APIEndpoint.CONFIRM_ORDER)).flush({ code: 409, message: 'Already confirmed' }, { status: 409, statusText: 'Conflict' });
         http.expectOne((r) => r.url.includes(APIEndpoint.GET_ORDER_DETAILS)).flush({ code: 200, data: order({ status: 'Confirmed' }) });
         expect(page.record()?.status).toBe('Confirmed');
+    });
+
+    it('spins only the pressed action and holds the others until it is done', async () => {
+        const { fixture, page, element, http } = await open(order({ status: 'Confirmed', online: { ...order().online!, delivery_status: 'Preparing' } }));
+        vi.spyOn(fixture.debugElement.injector.get(NzModalService), 'confirm').mockImplementation(() => ({ afterClose: of(true) }) as unknown as NzModalRef);
+        page.markPacked();
+        fixture.detectChanges();
+        const button = (name: string) => element.querySelector<HTMLButtonElement>(`[data-quick="${name}"]`)!;
+        expect(button('packed').classList).toContain('ant-btn-loading');
+        expect(button('dispatch').disabled).toBe(true);
+        expect(button('cancel').disabled).toBe(true);
+        http.expectOne((r) => r.url.includes(APIEndpoint.MARK_ORDER_PACKED)).flush({ code: 200, data: { oid: OID } });
+        expect(page.acting()).toBeNull();
+    });
+
+    it('shows the latest step at the top of the timeline', async () => {
+        const later = { kind: 'Order', from_status: 'Pending', to_status: 'Confirmed', reason: null, performed_by: 'm@x.test', performed_by_name: 'Owner', performed_on: '2026-10-05T11:00:00.000' } as OrderDetails['status_history'][number];
+        const { element } = await open(order({ status_history: [...order().status_history, later] }));
+        const items = [...element.querySelectorAll('.ant-timeline-item')].map((node) => node.textContent ?? '');
+        expect(items[0]).toContain('Owner');
+        expect(items[1]).toContain('Moderator');
     });
 });

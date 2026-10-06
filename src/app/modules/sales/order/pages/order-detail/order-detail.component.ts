@@ -17,7 +17,7 @@ import { NzTableModule } from 'ng-zorro-antd/table';
 import { NzTimelineModule } from 'ng-zorro-antd/timeline';
 import { NzTypographyModule } from 'ng-zorro-antd/typography';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
-import { Observable } from 'rxjs';
+import { Observable, finalize } from 'rxjs';
 import { RequestFailure } from '@app/core/models/api.model';
 import { CANCEL_REASONS, CONFIRMED_VIA, COURIERS, CancelReason, ConfirmedVia, Courier, NOT_DELIVERED_REASONS, NotDeliveredReason, OrderDetails, OrderScope } from '@app/core/models/order.model';
 import { PageBack } from '@app/core/models/page-header.model';
@@ -115,6 +115,8 @@ export class OrderDetailComponent {
 
     // The action dialog and what it holds.
     readonly dialog = signal<Dialog | null>(null);
+    readonly confirming = signal(false);
+    readonly acting = signal<Dialog | 'packed' | 'deliver' | null>(null);
     readonly confirmedVias = CONFIRMED_VIA;
     readonly reasonGroups = Object.entries(CANCEL_REASONS);
     readonly couriers = COURIERS;
@@ -206,20 +208,26 @@ export class OrderDetailComponent {
         this.courier.set(this.record()?.online?.courier ?? null);
         this.consignment.set('');
         this.confirmedVia.set('PhoneCall');
+        this.confirming.set(false);
         this.dialog.set(dialog);
     }
 
     markPacked(): void {
-        this.run('packed', () => this._orders.markPacked(this.oid));
+        this.ask('packed', () => this._orders.markPacked(this.oid));
     }
 
     deliver(): void {
-        this.run('deliver', () => this._orders.deliver(this.oid));
+        this.ask('deliver', () => this._orders.deliver(this.oid));
     }
 
+    /** A dialog asks inside itself: the first press turns the body into the confirmation, never a second modal on top. */
     submitDialog(): void {
         const dialog = this.dialog();
         if (!dialog || this.dialogIncomplete() || this.saving()) return;
+        if (!this.confirming()) {
+            this.confirming.set(true);
+            return;
+        }
         const note = this.note().trim() || null;
         const send: Record<Dialog, () => Observable<unknown>> = {
             confirm: () => this._orders.confirm(this.oid, this.confirmedVia(), note, this.scope),
@@ -230,26 +238,31 @@ export class OrderDetailComponent {
         this.run(dialog, send[dialog]);
     }
 
-    /** Every action asks first, then reloads the order so the page shows what the server now holds. */
-    private run(action: Dialog | 'packed' | 'deliver', send: () => Observable<unknown>): void {
+    private ask(action: 'packed' | 'deliver', send: () => Observable<unknown>): void {
         const key = 'sales.order.action.' + action;
         confirmAction(this._modal, {
             title: this._translate.instant(key + '.confirmTitle', { number: this.record()?.invoice_no ?? '' }),
             body: this._translate.instant(key + '.confirmBody'),
             ok: this._translate.instant(key + '.button'),
             cancel: this._translate.instant('form.confirm.cancel'),
-            danger: action === 'cancel',
         }).subscribe((confirmed) => {
-            if (!confirmed) return;
-            send().subscribe({
+            if (confirmed) this.run(action, send);
+        });
+    }
+
+    /** Reloads the order after every action, so the page shows what the server now holds. */
+    private run(action: Dialog | 'packed' | 'deliver', send: () => Observable<unknown>): void {
+        this.acting.set(action);
+        send()
+            .pipe(finalize(() => this.acting.set(null)))
+            .subscribe({
                 next: () => {
                     this.dialog.set(null);
-                    this._message.success(this._translate.instant(key + '.done'));
+                    this._message.success(this._translate.instant('sales.order.action.' + action + '.done'));
                     this.load();
                 },
                 error: (error: unknown) => this.writeFailed(error),
             });
-        });
     }
 
     /** A 409 says what state the order is in now: show it and reload, so the page catches up. */
