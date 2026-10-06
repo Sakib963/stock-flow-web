@@ -27,7 +27,29 @@
             </button>
         }
 
-        <!-- Disabled rather than hidden: the person should see where this lives before it arrives. -->
+        @if (newOrderTargets().length > 1) {
+            <button nz-button nzType="default" class="flex items-center gap-1.5 max-md:px-2" nz-dropdown nzTrigger="click" nzPlacement="bottomRight" [nzDropdownMenu]="newOrderMenu" [attr.aria-label]="'shell.newOrder' | translate" data-shell="new-order">
+                <ng-icon name="lucidePlus" size="16px" aria-hidden="true" />
+                <span class="max-md:hidden">{{ 'shell.newOrder' | translate }}</span>
+                <ng-icon name="lucideChevronDown" size="14px" class="max-md:hidden" aria-hidden="true" />
+            </button>
+            <nz-dropdown-menu #newOrderMenu="nzDropdownMenu">
+                <ul nz-menu class="min-w-44">
+                    @for (target of newOrderTargets(); track target.route) {
+                        <li nz-menu-item [routerLink]="target.route">
+                            <span class="flex items-center gap-2"><ng-icon [name]="target.icon" size="14px" class="text-ink-soft" aria-hidden="true" />{{ target.label | translate }}</span>
+                        </li>
+                    }
+                </ul>
+            </nz-dropdown-menu>
+        } @else if (newOrderTargets().length === 1) {
+            <a nz-button nzType="primary" class="flex items-center gap-1.5 max-md:px-2" [routerLink]="newOrderTargets()[0].route" [attr.aria-label]="newOrderTargets()[0].label | translate" data-shell="new-order">
+                <ng-icon name="lucidePlus" size="16px" aria-hidden="true" />
+                <span class="max-md:hidden">{{ newOrderTargets()[0].label | translate }}</span>
+            </a>
+        }
+
+        <!-- Disabled rather than hidden:the person should see where this lives before it arrives. -->
         <button type="button" class="sf-icon-btn max-md:hidden" disabled nz-tooltip nzTooltipPlacement="bottom" [nzTooltipTitle]="'shell.notesSoon' | translate">
             <ng-icon name="lucideStickyNote" size="18px" />
         </button>

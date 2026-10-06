@@ -696,4 +696,38 @@ describe('LayoutComponent', () => {
         notifications.markRead(unread.id);
         expect(notifications.unread()).toBe(before - 1);
     });
+
+    describe('the New order button', () => {
+        async function signInWith(permissions: string[]) {
+            const load = TestBed.inject(SessionService).load('session-b');
+            TestBed.inject(HttpTestingController)
+                .expectOne((r) => r.url.includes(APIEndpoint.GET_USER_INFO))
+                .flush({ code: 200, data: { ...payload, permissions } });
+            await load;
+            return render();
+        }
+
+        const button = (el: HTMLElement) => el.querySelector<HTMLElement>('[data-shell="new-order"]');
+
+        it('goes straight to the counter when that is the only place the person can sell', async () => {
+            const { el } = await signInWith(['sales.pos.view', 'sales.pos.create']);
+            expect(button(el)?.getAttribute('href')).toBe('/app/sales/pos');
+        });
+
+        it('goes straight to the online order when that is the only place the person can sell', async () => {
+            const { el } = await signInWith(['sales.online.view', 'sales.online.create']);
+            expect(button(el)?.getAttribute('href')).toBe('/app/sales/online-order');
+        });
+
+        it('offers a choice when the person can sell at both', async () => {
+            const { el } = await signInWith(['sales.pos.view', 'sales.pos.create', 'sales.online.view', 'sales.online.create']);
+            expect(button(el)?.tagName).toBe('BUTTON');
+            expect(button(el)?.hasAttribute('href')).toBe(false);
+        });
+
+        it('is absent for someone who can only open the counter to look products up', async () => {
+            const { el } = await signInWith(['sales.pos.view']);
+            expect(button(el)).toBeNull();
+        });
+    });
 });
