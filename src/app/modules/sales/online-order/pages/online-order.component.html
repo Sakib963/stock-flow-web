@@ -1,5 +1,5 @@
-<page-header [title]="'sales.online.title' | translate" [compact]="true">
-    @if (canCreate) {
+<page-header [title]="editingOid ? ('sales.online.edit.title' | translate: { number: editingInvoice() ?? '' }) : ('sales.online.title' | translate)" [compact]="true">
+    @if (canCreate && !editingOid) {
         <button nz-button type="button" class="inline-flex items-center gap-1.5" data-online="drafts" (click)="openDrafts()">
             <ng-icon name="lucideFileClock" size="14px" aria-hidden="true" />
             <span>{{ 'sales.online.drafts.button' | translate }}</span>
@@ -430,19 +430,21 @@
             <span>{{ reason | translate }}</span>
         </p>
     }
-    @if (canCreate) {
+    @if (canSave) {
         <div class="flex gap-2">
-            <button nz-button nzSize="large" type="button" class="inline-flex h-12 flex-none items-center justify-center gap-1.5 px-3" data-online="save-draft" [nzLoading]="savingDraft()" [disabled]="busy() || creating()" (click)="saveDraft()">
-                @if (!savingDraft()) {
-                    <ng-icon name="lucideFileClock" size="16px" aria-hidden="true" />
-                }
-                <span>{{ 'sales.online.drafts.save' | translate }}</span>
-            </button>
+            @if (!editingOid) {
+                <button nz-button nzSize="large" type="button" class="inline-flex h-12 flex-none items-center justify-center gap-1.5 px-3" data-online="save-draft" [nzLoading]="savingDraft()" [disabled]="busy() || creating()" (click)="saveDraft()">
+                    @if (!savingDraft()) {
+                        <ng-icon name="lucideFileClock" size="16px" aria-hidden="true" />
+                    }
+                    <span>{{ 'sales.online.drafts.save' | translate }}</span>
+                </button>
+            }
             <button nz-button nzType="primary" nzSize="large" type="button" class="inline-flex h-12 min-w-0 flex-1 items-center justify-center gap-1.5 px-3 text-sm font-bold" data-online="create" [nzLoading]="creating()" [disabled]="busy() || savingDraft()" (click)="create()">
                 @if (!creating()) {
                     <ng-icon name="lucideSend" size="18px" aria-hidden="true" />
                 }
-                <span>{{ 'sales.online.create' | translate }}</span>
+                <span>{{ (editingOid ? 'sales.online.edit.save' : 'sales.online.create') | translate }}</span>
             </button>
         </div>
     }

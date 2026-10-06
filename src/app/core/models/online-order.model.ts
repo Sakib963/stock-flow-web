@@ -90,6 +90,9 @@ export interface OnlineDraft {
     customer_phone: string | null;
     notes: string | null;
     payment_type: PaymentTerms | null;
+    payment_method?: string | null;
+    payment_reference?: string | null;
+    amount_paid?: number;
     delivery_charge: number;
     total_amount: number;
     created_on: string;

@@ -3,12 +3,13 @@ import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@a
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { NgIcon, provideIcons } from '@ng-icons/core';
-import { lucideArrowLeft, lucideBan, lucideCheck, lucideCircleCheck, lucideHistory, lucideInfo, lucideMapPin, lucidePackage, lucidePackageCheck, lucidePackageX, lucidePrinter, lucideReceipt, lucideRotateCw, lucideTruck, lucideUserRound, lucideWallet, lucideX, lucideZap } from '@ng-icons/lucide';
+import { lucideMessageSquareText, lucidePencil, lucideArrowLeft, lucideBan, lucideHandCoins, lucideCheck, lucideCircleCheck, lucideHistory, lucideInfo, lucideMapPin, lucidePackage, lucidePackageCheck, lucidePackageX, lucidePrinter, lucideReceipt, lucideRotateCw, lucideTruck, lucideUserRound, lucideWallet, lucideX, lucideZap } from '@ng-icons/lucide';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzCardModule } from 'ng-zorro-antd/card';
 import { NzFormModule } from 'ng-zorro-antd/form';
 import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzMessageService } from 'ng-zorro-antd/message';
+import { NzInputNumberModule } from 'ng-zorro-antd/input-number';
 import { NzModalModule, NzModalService } from 'ng-zorro-antd/modal';
 import { NzRadioModule } from 'ng-zorro-antd/radio';
 import { NzSelectModule } from 'ng-zorro-antd/select';
@@ -19,13 +20,16 @@ import { NzTypographyModule } from 'ng-zorro-antd/typography';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { Observable, finalize } from 'rxjs';
 import { RequestFailure } from '@app/core/models/api.model';
-import { CANCEL_REASONS, CONFIRMED_VIA, COURIERS, CancelReason, ConfirmedVia, Courier, NOT_DELIVERED_REASONS, NotDeliveredReason, OrderDetails, OrderScope } from '@app/core/models/order.model';
+import { CANCEL_REASONS, CONFIRMED_VIA, COURIERS, CancelReason, ConfirmedVia, Courier, NOT_DELIVERED_REASONS, NotDeliveredReason, OrderDetails, OrderScope, REFUND_METHODS, RefundMethod } from '@app/core/models/order.model';
 import { PageBack } from '@app/core/models/page-header.model';
 import { LanguageService } from '@app/core/services/language/language.service';
 import { SessionService } from '@app/core/services/session/session.service';
 import { CUSTOMER_ROUTES } from '@app/modules/sales/customer/constants/customer-routes';
 import { DELIVERY_STATUS, ORDER_STATUS, PAYMENT_STATUS } from '@app/modules/sales/order/config/order-list.config';
 import { ORDER_ROUTES } from '@app/modules/sales/order/constants/order-routes';
+import { SalesSettingsService } from '@app/modules/sales/settings/services/sales-settings.service';
+import { fillMessage, templatesFor } from '@app/modules/sales/settings/utils/fill-message';
+import { MessageTemplate } from '@app/core/models/message-template.model';
 import { OrderService } from '@app/modules/sales/order/services/order.service';
 import { ActionFooterComponent } from '@app/shared/components/action-footer/action-footer.component';
 import { PageHeaderComponent } from '@app/shared/components/page-header/page-header.component';
@@ -39,8 +43,19 @@ import { confirmAction } from '@app/shared/utils/confirm-action/confirm-action';
 import { failureKey, failureOf } from '@app/shared/utils/request-failure/request-failure';
 import { resolveTone } from '@app/shared/utils/tone-map/tone-map';
 
+/** The server writes these few reasons as fixed English sentences; each has a label in both languages. */
+const FIXED_REASONS: Record<string, string> = {
+    'Online order placed': 'placed',
+    'Online draft placed': 'draftPlaced',
+    'Online draft saved': 'draftSaved',
+    'POS checkout': 'checkout',
+    'Parked cart checked out': 'parkedCheckout',
+    'Collected by the courier': 'collected',
+    'Online order edited': 'edited',
+};
+
 /** The actions that open a dialog for their details; Packed and Deliver only ask. */
-type Dialog = 'confirm' | 'cancel' | 'dispatch' | 'notDelivered';
+type Dialog = 'confirm' | 'cancel' | 'dispatch' | 'notDelivered' | 'refund';
 
 /**
  * One order (sales: order record page). The order leads, then its numbers, lines, where it goes and
@@ -49,8 +64,8 @@ type Dialog = 'confirm' | 'cancel' | 'dispatch' | 'notDelivered';
  */
 @Component({
     selector: 'order-detail',
-    imports: [FormsModule, RouterLink, NgIcon, NzButtonModule, NzCardModule, NzFormModule, NzInputModule, NzModalModule, NzRadioModule, NzSelectModule, NzSkeletonModule, NzTableModule, NzTimelineModule, NzTypographyModule, TranslatePipe, PageHeaderComponent, ActionFooterComponent, StatusTagComponent, DigitsPipe, MoneyPipe, RecordDatePipe],
-    providers: [MoneyPipe, DigitsPipe, provideIcons({ lucideArrowLeft, lucideBan, lucideCheck, lucideCircleCheck, lucideHistory, lucideInfo, lucideMapPin, lucidePackage, lucidePackageCheck, lucidePackageX, lucidePrinter, lucideReceipt, lucideRotateCw, lucideTruck, lucideUserRound, lucideWallet, lucideX, lucideZap })],
+    imports: [FormsModule, RouterLink, NgIcon, NzButtonModule, NzCardModule, NzFormModule, NzInputModule, NzInputNumberModule, NzModalModule, NzRadioModule, NzSelectModule, NzSkeletonModule, NzTableModule, NzTimelineModule, NzTypographyModule, TranslatePipe, PageHeaderComponent, ActionFooterComponent, StatusTagComponent, DigitsPipe, MoneyPipe, RecordDatePipe],
+    providers: [MoneyPipe, DigitsPipe, provideIcons({ lucideMessageSquareText, lucidePencil, lucideArrowLeft, lucideBan, lucideHandCoins, lucideCheck, lucideCircleCheck, lucideHistory, lucideInfo, lucideMapPin, lucidePackage, lucidePackageCheck, lucidePackageX, lucidePrinter, lucideReceipt, lucideRotateCw, lucideTruck, lucideUserRound, lucideWallet, lucideX, lucideZap })],
     templateUrl: './order-detail.component.html',
     styleUrl: './order-detail.component.scss',
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -104,11 +119,14 @@ export class OrderDetailComponent {
         const can = (action: string) => this._session.can((all ? 'sales.order.' : 'sales.order-history.') + action);
         return {
             confirm: online && o.status === 'Pending' && can('confirm'),
+            // The edit opens the online order page, which needs the online channel as well.
+            edit: all && online && o.status === 'Pending' && can('edit') && this._session.can('sales.online.view'),
             packed: all && online && o.status === 'Confirmed' && delivery === 'Preparing' && can('dispatch'),
             dispatch: all && online && o.status === 'Confirmed' && !o.dispatched_on && (delivery === 'Preparing' || delivery === 'Packed') && can('dispatch'),
             deliver: all && online && o.status === 'Confirmed' && delivery === 'WithCourier' && can('deliver'),
             notDelivered: all && online && o.status === 'Confirmed' && delivery === 'WithCourier' && can('deliver'),
             cancel: online && open && can('cancel'),
+            refund: all && online && o.refund_status === 'ToRefund' && can('refund'),
         };
     });
     readonly anyAction = computed(() => Object.values(this.actions()).some(Boolean));
@@ -126,6 +144,9 @@ export class OrderDetailComponent {
     readonly courier = signal<Courier | null>(null);
     readonly consignment = signal('');
     readonly notDeliveredReason = signal<NotDeliveredReason | null>(null);
+    readonly refundMethods = REFUND_METHODS;
+    readonly refundAmount = signal<number | null>(null);
+    readonly refundMethod = signal<RefundMethod | null>(null);
     readonly note = signal('');
     /** Other needs a note, and every dialog but Confirm needs its choice. */
     readonly dialogIncomplete = computed(() => {
@@ -134,6 +155,10 @@ export class OrderDetailComponent {
                 return !this.cancelReason() || (this.cancelReason() === 'other' && !this.note().trim());
             case 'dispatch':
                 return !this.courier();
+            case 'refund': {
+                const amount = this.refundAmount() ?? 0;
+                return amount < 1 || amount > (this.record()?.refund_due ?? 0) || !this.refundMethod() || (this.refundMethod() === 'other' && !this.note().trim());
+            }
             case 'notDelivered':
                 return !this.notDeliveredReason() || (this.notDeliveredReason() === 'other' && !this.note().trim());
             default:
@@ -143,6 +168,7 @@ export class OrderDetailComponent {
 
     constructor() {
         this.load();
+        this.loadTemplates();
     }
 
     load(): void {
@@ -201,6 +227,68 @@ export class OrderDetailComponent {
         });
     }
 
+    /** The timeline stores codes and the server's own wording; this says them in the reader's language. */
+    reasonOf(entry: OrderDetails['status_history'][number]): string {
+        const raw = entry.reason ?? '';
+        const t = (key: string, params?: object) => this._translate.instant(key, params);
+        const known = FIXED_REASONS[raw];
+        if (known) return t('sales.order.reason.' + known);
+        const cut = raw.indexOf(': ');
+        const [code, note] = cut < 0 ? [raw, ''] : [raw.slice(0, cut), raw.slice(cut + 2)];
+        const withNote = (label: string) => (note ? label + ': ' + note : label);
+        if (entry.kind === 'Order' && entry.to_status === 'Cancelled') return withNote(t('sales.order.cancelReason.' + code));
+        if (entry.kind === 'Order' && entry.to_status === 'Confirmed') return withNote(t('sales.order.confirmedVia.' + code));
+        if (entry.kind === 'Delivery' && entry.to_status === 'Failed') return withNote(t('sales.order.notDeliveredReason.' + code));
+        if (entry.kind === 'Delivery' && entry.to_status === 'WithCourier') {
+            const [courier, ...consignment] = raw.split(' ');
+            return [t('sales.order.couriers.' + courier), ...consignment].join(' ');
+        }
+        if (entry.kind === 'Refund' && entry.from_status === 'None') return t('sales.order.reason.owed', { amount: this._money.transform(Number(raw)) });
+        const refund = entry.kind === 'Refund' ? /^(\d+) by (\w+)$/.exec(code) : null;
+        if (refund) return withNote(t('sales.order.reason.refunded', { amount: this._money.transform(Number(refund[1])), method: t('sales.pos.method.' + refund[2]) }));
+        return raw;
+    }
+
+    readonly editRoute = ORDER_ROUTES.edit;
+
+    private readonly _settings = inject(SalesSettingsService);
+    private readonly _templates = signal<MessageTemplate[]>([]);
+    readonly templatesFailed = signal(false);
+    /** The business's templates that fit the order's stage now, filled in with this order (sales REQ-51, REQ-91). */
+    readonly messages = computed(() => {
+        const o = this.record();
+        if (!o?.online) return [];
+        const bn = this.language() === 'bn';
+        const money = (value: number) => this._money.transform(value);
+        const business = this._session.business();
+        const place = [o.online.address_line, bn ? o.online.thana_name_bn : o.online.thana_name_en, bn ? o.online.district_name_bn : o.online.district_name_en].filter(Boolean).join(', ');
+        const values = {
+            customer_name: o.online.recipient_name ?? o.customer_name ?? '',
+            invoice_no: o.invoice_no,
+            items: o.items.map((line) => `${line.product_name} x${line.quantity}`).join(', '),
+            total: money(o.total_amount),
+            due: money(this.due()),
+            delivery_charge: money(o.delivery_charge),
+            address: place,
+            tracking_link: o.tracking_token ? `${environment.trackerUrl}/${o.tracking_token}` : '',
+            business_name: business?.name ?? '',
+            business_phone: business?.phone ?? '',
+        };
+        return templatesFor(this._templates(), [o.status, o.online.delivery_status, o.refund_status]).map((template) => ({ template, text: fillMessage(template.body, values) }));
+    });
+
+    private loadTemplates(): void {
+        this._settings.templates().subscribe({
+            next: (templates) => this._templates.set(templates),
+            error: () => this.templatesFailed.set(true),
+        });
+    }
+
+    /** Logged on the order, so the record shows the customer was told. */
+    copied(template: MessageTemplate): void {
+        this._settings.recordCopied(this.oid, template.oid).subscribe({ error: () => this._message.warning(this._translate.instant('sales.order.messages.notLogged')) });
+    }
+
     open(dialog: Dialog): void {
         this.note.set('');
         this.cancelReason.set(null);
@@ -208,6 +296,8 @@ export class OrderDetailComponent {
         this.courier.set(this.record()?.online?.courier ?? null);
         this.consignment.set('');
         this.confirmedVia.set('PhoneCall');
+        this.refundAmount.set(this.record()?.refund_due ?? null);
+        this.refundMethod.set(null);
         this.confirming.set(false);
         this.dialog.set(dialog);
     }
@@ -234,6 +324,7 @@ export class OrderDetailComponent {
             cancel: () => this._orders.cancel(this.oid, this.cancelReason()!, note, this.scope),
             dispatch: () => this._orders.dispatch(this.oid, this.courier()!, this.consignment().trim() || null),
             notDelivered: () => this._orders.notDelivered(this.oid, this.notDeliveredReason()!, note),
+            refund: () => this._orders.recordRefund(this.oid, this.refundAmount()!, this.refundMethod()!, note),
         };
         this.run(dialog, send[dialog]);
     }

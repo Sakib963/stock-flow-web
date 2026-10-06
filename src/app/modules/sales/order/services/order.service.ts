@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject, signal } from '@angular/core';
 import { APIEndpoint } from '@app/core/constants/api-endpoint';
-import { CancelReason, ConfirmedVia, Courier, NotDeliveredReason, OrderDetails, OrderScope } from '@app/core/models/order.model';
+import { CancelReason, ConfirmedVia, Courier, NotDeliveredReason, OrderDetails, OrderScope, RefundMethod } from '@app/core/models/order.model';
 import { environment } from '@env/environment';
 import { Observable, finalize, map } from 'rxjs';
 
@@ -39,6 +39,10 @@ export class OrderService {
 
     notDelivered(oid: string, reason: NotDeliveredReason, note: string | null): Observable<unknown> {
         return this.write(APIEndpoint.MARK_ORDER_NOT_DELIVERED, { oid, reason, note });
+    }
+
+    recordRefund(oid: string, amount: number, method: RefundMethod, note: string | null): Observable<unknown> {
+        return this.write(APIEndpoint.RECORD_ORDER_REFUND, { oid, amount, method, note });
     }
 
     private write<T = unknown>(endpoint: string, body: object): Observable<T> {

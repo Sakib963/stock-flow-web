@@ -154,6 +154,12 @@
                                 <span>{{ 'sales.order.action.confirm.button' | translate }}</span>
                             </button>
                         }
+                        @if (actions().edit) {
+                            <a nz-button nzBlock class="inline-flex items-center justify-start gap-2" data-quick="edit" [class.pointer-events-none]="saving()" [routerLink]="editRoute(oid)">
+                                <ng-icon name="lucidePencil" size="14px" aria-hidden="true" />
+                                <span>{{ 'sales.order.action.edit.button' | translate }}</span>
+                            </a>
+                        }
                         @if (actions().packed) {
                             <button nz-button nzBlock type="button" class="inline-flex items-center justify-start gap-2" data-quick="packed" [nzLoading]="acting() === 'packed'" [disabled]="saving() && acting() !== 'packed'" (click)="markPacked()">
                                 <ng-icon name="lucidePackage" size="14px" aria-hidden="true" />
@@ -184,6 +190,12 @@
                                 <span>{{ 'sales.order.action.cancel.button' | translate }}</span>
                             </button>
                         }
+                        @if (actions().refund) {
+                            <button nz-button nzType="primary" nzBlock type="button" class="inline-flex items-center justify-start gap-2" data-quick="refund" [disabled]="saving()" (click)="open('refund')">
+                                <ng-icon name="lucideHandCoins" size="14px" aria-hidden="true" />
+                                <span>{{ 'sales.order.action.refund.button' | translate }}</span>
+                            </button>
+                        }
                         @if (record()?.online) {
                             <button nz-button nzBlock type="button" class="inline-flex items-center justify-start gap-2" data-quick="print" (click)="print()">
                                 <ng-icon name="lucidePrinter" size="14px" aria-hidden="true" />
@@ -204,6 +216,30 @@
                     <nz-skeleton nzActive [nzTitle]="false" [nzParagraph]="{ rows: 3 }" />
                 }
             </nz-card>
+            @if (record()?.online) {
+                <nz-card [nzTitle]="messagesTitle" data-detail="messages">
+                    <ng-template #messagesTitle
+                        ><h2 class="m-0 flex items-center gap-1.5 text-sm font-bold text-ink"><ng-icon name="lucideMessageSquareText" size="14px" class="text-ink-muted" aria-hidden="true" />{{ 'sales.order.messages.title' | translate }}</h2></ng-template
+                    >
+                    @if (templatesFailed()) {
+                        <p class="m-0 text-xs text-ink-muted">{{ 'sales.order.messages.loadFailed' | translate }}</p>
+                    } @else if (!messages().length) {
+                        <p class="m-0 text-xs text-ink-muted" data-messages="empty">{{ 'sales.order.messages.empty' | translate }}</p>
+                    } @else {
+                        <ul class="m-0 flex list-none flex-col gap-3 p-0">
+                            @for (message of messages(); track message.template.oid) {
+                                <li class="rounded-control border border-line p-2.5" [attr.data-message]="message.template.oid">
+                                    <div class="mb-1 flex items-center justify-between gap-2">
+                                        <span class="text-xs font-semibold text-ink">{{ message.template.name }}</span>
+                                        <span nz-typography nzCopyable [nzCopyText]="message.text" [nzCopyTooltips]="['sales.order.messages.copy' | translate, 'sales.order.messages.copied' | translate]" (nzCopy)="copied(message.template)"></span>
+                                    </div>
+                                    <p class="m-0 text-xs whitespace-pre-wrap text-ink-body">{{ message.text }}</p>
+                                </li>
+                            }
+                        </ul>
+                    }
+                </nz-card>
+            }
             <nz-card [nzTitle]="historyTitle" data-detail="timeline">
                 <ng-template #historyTitle
                     ><h2 class="m-0 flex items-center gap-1.5 text-sm font-bold text-ink"><ng-icon name="lucideHistory" size="14px" class="text-ink-muted" aria-hidden="true" />{{ 'sales.order.section.timeline' | translate }}</h2></ng-template
@@ -214,7 +250,7 @@
                             <nz-timeline-item [nzColor]="last ? 'blue' : 'gray'">
                                 <p class="m-0 text-[13px] font-semibold text-ink">{{ 'sales.order.history.' + entry.kind | translate: { to: ('sales.order.historyValue.' + entry.to_status | translate) } }}</p>
                                 @if (entry.reason) {
-                                    <p class="mt-0.5 mb-0 text-xs text-ink-body">{{ entry.reason }}</p>
+                                    <p class="mt-0.5 mb-0 text-xs text-ink-body">{{ reasonOf(entry) }}</p>
                                 }
                                 <p class="mt-0.5 mb-0 text-xs text-ink-muted">{{ entry.performed_by_name || entry.performed_by }} &middot; {{ entry.performed_on | recordDate: language() : 'date-time-12' }}</p>
                             </nz-timeline-item>
@@ -334,7 +370,7 @@
 <nz-modal [nzVisible]="!!dialog()" [nzTitle]="dialog() ? ('sales.order.action.' + dialog() + '.title' | translate) : ''" [nzFooter]="dialogFooter" nzCentered (nzOnCancel)="dialog.set(null)">
     <ng-container *nzModalContent>
         @if (confirming()) {
-            <p class="m-0 text-sm font-semibold text-ink" data-dialog="confirm">{{ 'sales.order.action.' + dialog() + '.confirmTitle' | translate: { number: record()?.invoice_no ?? '' } }}</p>
+            <p class="m-0 text-sm font-semibold text-ink" data-dialog="confirm">{{ 'sales.order.action.' + dialog() + '.confirmTitle' | translate: { number: record()?.invoice_no ?? '', amount: (refundAmount() ?? 0 | money) } }}</p>
             <p class="mt-1 mb-0 text-sm text-ink-muted">{{ 'sales.order.action.' + dialog() + '.confirmBody' | translate }}</p>
         } @else {
             <div nz-form nzLayout="vertical">
@@ -401,9 +437,30 @@
                         </nz-form-item>
                         <p class="mt-0 mb-3 text-xs text-ink-muted">{{ 'sales.order.notDeliveredNote' | translate }}</p>
                     }
+                    @case ('refund') {
+                        <p class="mt-0 mb-3 text-sm text-ink-body">{{ 'sales.order.refundOwed' | translate: { amount: (record()?.refund_due ?? 0 | money) } }}</p>
+                        <div class="grid grid-cols-2 gap-x-3">
+                            <nz-form-item>
+                                <nz-form-label nzRequired nzFor="order-refund-amount">{{ 'sales.order.refundAmount' | translate }}</nz-form-label>
+                                <nz-form-control [nzValidateStatus]="(refundAmount() ?? 0) > (record()?.refund_due ?? 0) ? 'error' : ''" [nzErrorTip]="'sales.order.refundTooMuch' | translate">
+                                    <nz-input-number nzId="order-refund-amount" class="w-full font-mono" data-dialog="refund-amount" [nzMin]="1" [nzPrecision]="0" [ngModel]="refundAmount()" (ngModelChange)="refundAmount.set($event)" />
+                                </nz-form-control>
+                            </nz-form-item>
+                            <nz-form-item>
+                                <nz-form-label nzRequired nzFor="order-refund-method">{{ 'sales.order.refundMethod' | translate }}</nz-form-label>
+                                <nz-form-control>
+                                    <nz-select nzId="order-refund-method" class="w-full" data-dialog="refund-method" [nzPlaceHolder]="'sales.order.refundMethodPick' | translate" [ngModel]="refundMethod()" (ngModelChange)="refundMethod.set($event)">
+                                        @for (method of refundMethods; track method) {
+                                            <nz-option [nzValue]="method" [nzLabel]="'sales.pos.method.' + method | translate" />
+                                        }
+                                    </nz-select>
+                                </nz-form-control>
+                            </nz-form-item>
+                        </div>
+                    }
                 }
                 @if (dialog() && dialog() !== 'dispatch') {
-                    @let needsNote = (dialog() === 'cancel' && cancelReason() === 'other') || (dialog() === 'notDelivered' && notDeliveredReason() === 'other');
+                    @let needsNote = (dialog() === 'cancel' && cancelReason() === 'other') || (dialog() === 'notDelivered' && notDeliveredReason() === 'other') || (dialog() === 'refund' && refundMethod() === 'other');
                     <nz-form-item class="mb-0">
                         <nz-form-label [nzRequired]="needsNote" nzFor="order-note">{{ 'sales.order.note' | translate }}</nz-form-label>
                         <nz-form-control [nzValidateStatus]="needsNote && !note().trim() ? 'error' : ''" [nzErrorTip]="'sales.order.noteNeeded' | translate">

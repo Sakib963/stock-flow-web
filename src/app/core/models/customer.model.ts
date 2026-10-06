@@ -50,6 +50,8 @@ export interface CustomerStats {
     orders: number;
     sales: number;
     lifetime_value: number;
+    lifetime_goods: number;
+    lifetime_delivery: number;
     average_order: number | null;
     delivered: number;
     refused_parcels: number;

@@ -41,6 +41,7 @@ interface CustomerStat {
     format: 'money' | 'number';
     unit?: string;
     alert?: boolean;
+    detail?: string;
 }
 
 /**
@@ -51,7 +52,7 @@ interface CustomerStat {
 @Component({
     selector: 'customer-detail',
     imports: [FormsModule, NgIcon, NzButtonModule, NzCardModule, NzDrawerModule, NzInputModule, NzModalModule, NzRadioModule, NzSkeletonModule, NzTableModule, NzTimelineModule, NzTooltipModule, TranslatePipe, PageHeaderComponent, StatusTagComponent, ActionFooterComponent, AddressFormComponent, MoneyPipe, RecordDatePipe],
-    providers: [provideIcons({ lucideArrowLeft, lucideBan, lucideBanknote, lucideCalendarClock, lucideCheck, lucideCircleCheck, lucideEye, lucideFlag, lucideHandCoins, lucideHistory, lucideInfo, lucideMapPin, lucidePackageCheck, lucidePackageX, lucidePencil, lucidePlus, lucideReceipt, lucideRotateCw, lucideShoppingBag, lucideStar, lucideTrash2, lucideTrendingUp, lucideX, lucideZap })],
+    providers: [MoneyPipe, provideIcons({ lucideArrowLeft, lucideBan, lucideBanknote, lucideCalendarClock, lucideCheck, lucideCircleCheck, lucideEye, lucideFlag, lucideHandCoins, lucideHistory, lucideInfo, lucideMapPin, lucidePackageCheck, lucidePackageX, lucidePencil, lucidePlus, lucideReceipt, lucideRotateCw, lucideShoppingBag, lucideStar, lucideTrash2, lucideTrendingUp, lucideX, lucideZap })],
     templateUrl: './customer-detail.component.html',
     styleUrl: './customer-detail.component.scss',
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -62,6 +63,7 @@ export class CustomerDetailComponent {
     private readonly _customers = inject(CustomerService);
     private readonly _session = inject(SessionService);
     private readonly _translate = inject(TranslateService);
+    private readonly _money = inject(MoneyPipe);
     private readonly _message = inject(NzMessageService);
     private readonly _modal = inject(NzModalService);
 
@@ -96,7 +98,7 @@ export class CustomerDetailComponent {
         const online = loaded.channels.includes('ONLINE');
         return [
             { key: 'sales', label: 'sales.customer.stat.sales', value: s.sales, icon: 'lucideShoppingBag', format: 'number' as const },
-            { key: 'value', label: 'sales.customer.stat.lifetimeValue', value: s.lifetime_value, icon: 'lucideTrendingUp', format: 'money' as const },
+            { key: 'value', label: 'sales.customer.stat.lifetimeValue', value: s.lifetime_value, icon: 'lucideTrendingUp', format: 'money' as const, detail: this._translate.instant('sales.customer.stat.lifetimeSplit', { goods: this._money.transform(s.lifetime_goods), delivery: this._money.transform(s.lifetime_delivery) }) },
             { key: 'average', label: 'sales.customer.stat.averageOrder', value: s.average_order, icon: 'lucideReceipt', format: 'money' as const },
             { key: 'owed', label: 'sales.customer.stat.owed', value: s.owed, icon: 'lucideHandCoins', format: 'money' as const, alert: s.owed > 0 },
             ...(online

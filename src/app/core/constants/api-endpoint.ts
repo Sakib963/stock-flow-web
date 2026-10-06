@@ -145,6 +145,7 @@ export class APIEndpoint {
     static readonly DISPATCH_ORDER = '/api/v1/sales/order/dispatch-order';
     static readonly DELIVER_ORDER = '/api/v1/sales/order/deliver-order';
     static readonly MARK_ORDER_NOT_DELIVERED = '/api/v1/sales/order/mark-order-not-delivered';
+    static readonly RECORD_ORDER_REFUND = '/api/v1/sales/order/record-order-refund';
     static readonly GET_CUSTOMER_LIST = '/api/v1/sales/customer/get-customer-list';
     static readonly GET_CUSTOMER_DETAILS = '/api/v1/sales/customer/get-customer-details';
     static readonly CREATE_CUSTOMER = '/api/v1/sales/customer/create-customer';
@@ -159,8 +160,13 @@ export class APIEndpoint {
     static readonly GET_ONLINE_ORDER_SETUP = '/api/v1/sales/online/get-online-order-setup';
     static readonly READ_CHAT_MESSAGE = '/api/v1/sales/online/read-chat-message';
     static readonly CREATE_ONLINE_ORDER = '/api/v1/sales/online/create-online-order';
+    static readonly EDIT_ONLINE_ORDER = '/api/v1/sales/online/edit-online-order';
+    static readonly GET_ONLINE_ORDER_FOR_EDIT = '/api/v1/sales/online/get-online-order-for-edit';
     static readonly SAVE_ONLINE_DRAFT = '/api/v1/sales/online/save-online-draft';
     static readonly GET_ONLINE_DRAFTS = '/api/v1/sales/online/get-online-drafts';
     static readonly DISCARD_ONLINE_DRAFT = '/api/v1/sales/online/discard-online-draft';
     static readonly UPDATE_DELIVERY_CHARGES = '/api/v1/sales/settings/update-delivery-charges';
+    static readonly GET_MESSAGE_TEMPLATES = '/api/v1/sales/settings/get-message-templates';
+    static readonly SAVE_MESSAGE_TEMPLATE = '/api/v1/sales/settings/save-message-template';
+    static readonly RECORD_MESSAGE_COPIED = '/api/v1/sales/settings/record-message-copied';
 }

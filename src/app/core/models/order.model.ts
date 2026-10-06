@@ -16,6 +16,8 @@ export type Courier = (typeof COURIERS)[number];
 
 export const NOT_DELIVERED_REASONS = ['refused', 'unreachable', 'wrong_address', 'other'] as const;
 export type NotDeliveredReason = (typeof NOT_DELIVERED_REASONS)[number];
+export const REFUND_METHODS = ['cash', 'bkash', 'nagad', 'card', 'other'] as const;
+export type RefundMethod = (typeof REFUND_METHODS)[number];
 
 export interface OrderLine {
     oid: string;

@@ -48,9 +48,14 @@ export class OnlineOrderService {
         return this._http.post<{ data: Pick<OnlineOrderSetup, 'home_district' | 'delivery_charge_inside' | 'delivery_charge_outside'> }>(`${this._base}${APIEndpoint.UPDATE_DELIVERY_CHARGES}`, charges).pipe(map((response) => response.data));
     }
 
-    create(payload: OnlineOrderPayload): Observable<OnlineOrderResult> {
+    forEdit(oid: string): Observable<OnlineDraft> {
+        return this._http.get<{ data: OnlineDraft }>(`${this._base}${APIEndpoint.GET_ONLINE_ORDER_FOR_EDIT}`, { params: { oid } }).pipe(map((response) => response.data));
+    }
+
+    /** One write for both: an edit replaces a Pending order's lines and holds under the same oid. */
+    create(payload: OnlineOrderPayload, editing = false): Observable<OnlineOrderResult> {
         this.saving.set(true);
-        return this._http.post<{ data: OnlineOrderResult }>(`${this._base}${APIEndpoint.CREATE_ONLINE_ORDER}`, payload).pipe(
+        return this._http.post<{ data: OnlineOrderResult }>(`${this._base}${editing ? APIEndpoint.EDIT_ONLINE_ORDER : APIEndpoint.CREATE_ONLINE_ORDER}`, payload).pipe(
             map((response) => response.data),
             finalize(() => this.saving.set(false))
         );

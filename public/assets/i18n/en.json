@@ -2347,7 +2347,8 @@
                 "owed": "Owes",
                 "deliveredRate": "Delivered",
                 "refused": "Refused parcels",
-                "orders": "Orders"
+                "orders": "Orders",
+                "lifetimeSplit": "{{goods}} goods + {{delivery}} delivery"
             },
             "createTitle": "Add customer",
             "editTitle": "Edit customer",
@@ -2528,6 +2529,22 @@
             "pickReason": "Pick a reason",
             "pickCourier": "Pick the courier",
             "notDeliveredWhy": "Why it was not delivered",
+            "reason": {
+                "placed": "Online order placed",
+                "draftPlaced": "Placed from a draft",
+                "draftSaved": "Saved as a draft",
+                "checkout": "Sold at the counter",
+                "parkedCheckout": "Parked cart sold",
+                "collected": "Collected by the courier",
+                "owed": "{{amount}} owed back to the customer",
+                "refunded": "{{amount}} sent back by {{method}}",
+                "edited": "Order changed"
+            },
+            "refundOwed": "{{amount}} is owed back to the customer for this cancelled order.",
+            "refundAmount": "Amount sent back",
+            "refundTooMuch": "That is more than is owed back.",
+            "refundMethod": "Sent by",
+            "refundMethodPick": "How the money went back",
             "notDeliveredNote": "The parcel stays out of stock until it is back in the shop and its return is confirmed.",
             "cancelRefundNote": "Money was paid on this order. It becomes owed back to the customer as soon as the order is cancelled.",
             "delivery": {
@@ -2640,6 +2657,13 @@
                     "confirmBody": "It becomes a sale now, and what the courier collected is recorded as paid.",
                     "done": "Delivered and counted as a sale."
                 },
+                "refund": {
+                    "title": "Record a refund",
+                    "button": "Record refund",
+                    "confirmTitle": "Record {{amount}} refunded on {{number}}?",
+                    "confirmBody": "Record it only once the money has gone back to the customer. A refund cannot be undone from here.",
+                    "done": "Refund recorded."
+                },
                 "notDelivered": {
                     "title": "Record not delivered",
                     "button": "Record not delivered",
@@ -2653,9 +2677,20 @@
                     "confirmTitle": "Cancel order {{number}}?",
                     "confirmBody": "The held stock becomes sellable again. A cancelled order cannot be placed again.",
                     "done": "Order cancelled. Its stock is free to sell."
+                },
+                "edit": {
+                    "button": "Edit order"
                 }
             },
-            "historyEmptyBody": "Orders you place at the counter or online appear here."
+            "historyEmptyBody": "Orders you place at the counter or online appear here.",
+            "messages": {
+                "title": "Messages",
+                "empty": "No message fits this order now. Templates are written in Sales settings.",
+                "copy": "Copy",
+                "copied": "Copied",
+                "notLogged": "Copying it was not recorded on the order. The message itself was copied.",
+                "loadFailed": "Could not load the message templates. Reload the page to try again."
+            }
         },
         "online": {
             "title": "New online order",
@@ -2858,6 +2893,72 @@
                 "resume": "Resume",
                 "empty": "No saved drafts. Save draft keeps an order you cannot finish yet.",
                 "lines": "{{count}} line(s)"
+            },
+            "edit": {
+                "title": "Change order {{number}}",
+                "save": "Save changes",
+                "confirmTitle": "Save the changes to {{number}}?",
+                "confirmBody": "The new total is {{total}}, {{collect}} to collect ({{terms}}). The stock it holds follows the new lines.",
+                "saved": "Order {{number}} changed.",
+                "loadFailed": "Could not open the order to change it. Try again in a moment."
+            }
+        },
+        "settings": {
+            "title": "Sales settings",
+            "lead": "How the business talks to its customers about their orders.",
+            "templates": {
+                "title": "Message templates",
+                "lead": "Messages your team copies from an order page and sends from the chat app. Each one is filled in with the order’s own details.",
+                "add": "Add template",
+                "edit": "Edit",
+                "editOne": "Edit {{name}}",
+                "addTitle": "Add a message template",
+                "editTitle": "Edit message template",
+                "name": "Name",
+                "languageLabel": "Language",
+                "language": {
+                    "en": "English",
+                    "bn": "Bengali"
+                },
+                "status": {
+                    "Active": "In use",
+                    "Inactive": "Switched off"
+                },
+                "when": "Shown when the order is",
+                "whenHelp": "Pick the stages this message fits. Leave it empty to offer it at every stage.",
+                "always": "Any stage",
+                "stage": {
+                    "Pending": "Waiting to confirm",
+                    "Confirmed": "Confirmed",
+                    "Packed": "Packed",
+                    "WithCourier": "With the courier",
+                    "Delivered": "Delivered",
+                    "Failed": "Not delivered",
+                    "Cancelled": "Cancelled",
+                    "ToRefund": "Refund owed",
+                    "Refunded": "Refunded"
+                },
+                "body": "Message",
+                "insertLead": "Press a detail to add it to the message. It is filled in from each order.",
+                "placeholder": {
+                    "customer_name": "Customer name",
+                    "invoice_no": "Invoice number",
+                    "items": "Items",
+                    "total": "Total",
+                    "due": "To collect",
+                    "delivery_charge": "Delivery charge",
+                    "address": "Address",
+                    "tracking_link": "Tracking link",
+                    "business_name": "Business name",
+                    "business_phone": "Business phone"
+                },
+                "activeLabel": "In use: offered on order pages",
+                "save": "Save template",
+                "confirmTitle": "Save the template {{name}}?",
+                "confirmBody": "Your team sees the new wording on order pages straight away.",
+                "saved": "Template saved.",
+                "empty": "No templates yet. Add the messages your team sends most, such as order received or order sent.",
+                "loadFailed": "Could not load the templates. Check the connection and try again."
             }
         }
     }

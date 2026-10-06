@@ -4,6 +4,7 @@ export const ORDER_ROUTES = {
     /** The list config fills `:oid` from the row. */
     detailPattern: '/app/sales/orders/:oid',
     detail: (oid: string) => `/app/sales/orders/${oid}`,
+    edit: (oid: string) => `/app/sales/online-order/${oid}/edit`,
     historyList: '/app/sales/order-history',
     historyDetailPattern: '/app/sales/order-history/:oid',
 } as const;

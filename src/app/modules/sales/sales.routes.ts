@@ -23,6 +23,18 @@ export const SALES_ROUTES: Routes = [
                 loadComponent: () => import('./online-order/pages/online-order.component').then((m) => m.OnlineOrderComponent),
             },
             {
+                path: 'settings',
+                canActivate: [permissionGuard],
+                data: { permission: 'sales.settings.view' },
+                loadComponent: () => import('./settings/pages/sales-settings/sales-settings.component').then((m) => m.SalesSettingsComponent),
+            },
+            {
+                path: 'online-order/:oid/edit',
+                canActivate: [permissionGuard],
+                data: { permission: 'sales.order.edit' },
+                loadComponent: () => import('./online-order/pages/online-order.component').then((m) => m.OnlineOrderComponent),
+            },
+            {
                 path: 'orders',
                 canActivate: [permissionGuard],
                 data: { permission: 'sales.order.view' },

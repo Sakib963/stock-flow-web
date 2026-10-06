@@ -3,7 +3,8 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { ChangeDetectionStrategy, Component, computed, effect, inject, signal, viewChild } from '@angular/core';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { ORDER_ROUTES } from '@app/modules/sales/order/constants/order-routes';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideEraser, lucideExternalLink, lucideFileClock, lucideHistory, lucidePlay, lucideCheck, lucideCircleAlert, lucideCircleCheck, lucideClipboardPaste, lucideMapPin, lucideMinus, lucidePackage, lucidePencil, lucidePlus, lucidePrinter, lucideRotateCw, lucideScanText, lucideSend, lucideSettings2, lucideTrash2, lucideTriangleAlert, lucideUserRound, lucideX } from '@ng-icons/lucide';
 import { NzButtonModule } from 'ng-zorro-antd/button';
@@ -106,6 +107,11 @@ export class OnlineOrderComponent {
 
     readonly language = inject(LanguageService).current;
     readonly canCreate = this._session.can('sales.online.create');
+    private readonly _router = inject(Router);
+    /** Set on the edit route: the page fills from a Pending order and saves over it (REQ-52). */
+    readonly editingOid = inject(ActivatedRoute).snapshot.paramMap.get('oid');
+    readonly editingInvoice = signal<string | null>(null);
+    readonly canSave = this.editingOid ? this._session.can('sales.order.edit') : this.canCreate;
     readonly canViewCustomers = this._session.can('sales.customer.view');
     readonly canEditCharges = this._session.can('sales.settings.edit');
     readonly customerRoute = CUSTOMER_ROUTES;
@@ -250,9 +256,12 @@ export class OnlineOrderComponent {
 
     constructor() {
         this.loadSetup();
-        this.restore();
-        // What is typed is kept in this browser, so a reload by mistake loses nothing (the user, 2026-10-05).
-        effect(() => remember(UNSENT_KEY, this.dirty() ? this.snapshot() : null));
+        if (this.editingOid) this.loadForEdit(this.editingOid);
+        else {
+            this.restore();
+            // What is typed is kept in this browser, so a reload by mistake loses nothing (the user, 2026-10-05).
+            effect(() => remember(UNSENT_KEY, this.dirty() ? this.snapshot() : null));
+        }
         // A known phone starts on its default address; a new one waits for the moderator to add one.
         toObservable(this.lookup)
             .pipe(takeUntilDestroyed())
@@ -459,14 +468,14 @@ export class OnlineOrderComponent {
     }
 
     create(): void {
-        if (this.busy() || !this.canCreate) return;
+        if (this.busy() || !this.canSave) return;
         const blocker = this.blocker();
         if (blocker) return this.pointAt(blocker);
         this._asking.set(true);
         confirmAction(this._modal, {
-            title: this._translate.instant('sales.online.confirmCreate.title', { total: this._money.transform(this.total()) }),
-            body: this._translate.instant('sales.online.confirmCreate.body', { collect: this._money.transform(this.collect()), terms: this._translate.instant('sales.online.terms.' + this.paymentType()) }),
-            ok: this._translate.instant('sales.online.create'),
+            title: this.editingOid ? this._translate.instant('sales.online.edit.confirmTitle', { number: this.editingInvoice() ?? '' }) : this._translate.instant('sales.online.confirmCreate.title', { total: this._money.transform(this.total()) }),
+            body: this._translate.instant(this.editingOid ? 'sales.online.edit.confirmBody' : 'sales.online.confirmCreate.body', { total: this._money.transform(this.total()), collect: this._money.transform(this.collect()), terms: this._translate.instant('sales.online.terms.' + this.paymentType()) }),
+            ok: this._translate.instant(this.editingOid ? 'sales.online.edit.save' : 'sales.online.create'),
             cancel: this._translate.instant('form.confirm.cancel'),
         }).subscribe((confirmed) => {
             this._asking.set(false);
@@ -476,24 +485,34 @@ export class OnlineOrderComponent {
             const address = choice === 'new' ? this.newPayload() : { oid: choice };
             const terms = this.paymentType();
             this._orders
-                .create({
-                    oid: this.orderOid(),
-                    // The name goes whenever there is one: after a failed lookup the page cannot tell a new customer from a known one, and the server keeps a known customer's own.
-                    customer: { phone: this.normalizedPhone()!, name: this.customerName().trim() || null, gender: this.gender(), age_band: this.ageBand() },
-                    address,
-                    source_oid: this.sourceOid()!,
-                    payment_type: terms,
-                    payment_method: terms === 'COD' ? undefined : this.method(),
-                    payment_reference: terms === 'COD' ? null : this.reference().trim() || null,
-                    amount_paid: terms === 'ADVANCE' ? (this.advance() ?? 0) : undefined,
-                    delivery_charge: this.deliveryCharge(),
-                    total_amount: this.total(),
-                    blocked_acknowledged: this.blockedAcknowledged(),
-                    notes: this.notes().trim() || null,
-                    lines: this.lines().map(({ inventory_oid, quantity, discount }) => ({ inventory_oid, quantity, discount })),
-                })
+                .create(
+                    {
+                        oid: this.orderOid(),
+                        // The name goes whenever there is one: after a failed lookup the page cannot tell a new customer from a known one, and the server keeps a known customer's own.
+                        customer: { phone: this.normalizedPhone()!, name: this.customerName().trim() || null, gender: this.gender(), age_band: this.ageBand() },
+                        address,
+                        source_oid: this.sourceOid()!,
+                        payment_type: terms,
+                        payment_method: terms === 'COD' ? undefined : this.method(),
+                        payment_reference: terms === 'COD' ? null : this.reference().trim() || null,
+                        amount_paid: terms === 'ADVANCE' ? (this.advance() ?? 0) : undefined,
+                        delivery_charge: this.deliveryCharge(),
+                        total_amount: this.total(),
+                        blocked_acknowledged: this.blockedAcknowledged(),
+                        notes: this.notes().trim() || null,
+                        lines: this.lines().map(({ inventory_oid, quantity, discount }) => ({ inventory_oid, quantity, discount })),
+                    },
+                    !!this.editingOid
+                )
                 .subscribe({
                     next: ({ invoice_no, customer_oid, amount_paid, tracking_token }) => {
+                        if (this.editingOid) {
+                            this.creating.set(false);
+                            this._products.forget();
+                            this._message.success(this._translate.instant('sales.online.edit.saved', { number: invoice_no }));
+                            void this._router.navigateByUrl(ORDER_ROUTES.detail(this.editingOid));
+                            return;
+                        }
                         this.lastInvoice.set(this.invoiceOf(invoice_no, amount_paid, tracking_token));
                         this.creating.set(false);
                         this.unanswered.set(false);
@@ -629,6 +648,30 @@ export class OnlineOrderComponent {
             this._message.warning(this._translate.instant('sales.online.drafts.screenNotEmpty'));
             return;
         }
+        this.fill(draft);
+        this.draftsOpen.set(false);
+        if (draft.lines.some((line) => line.quantity > line.sellable)) this._message.warning(this._translate.instant('sales.online.drafts.short'));
+    }
+
+    private loadForEdit(oid: string): void {
+        this._orders.forEdit(oid).subscribe({
+            next: (order) => {
+                this.fill(order);
+                this.editingInvoice.set(order.invoice_no);
+                if (order.payment_type && order.payment_type !== 'COD') {
+                    if (order.payment_method) this.method.set(order.payment_method as PaymentMethod);
+                    this.reference.set(order.payment_reference ?? '');
+                    if (order.payment_type === 'ADVANCE') this.advance.set(order.amount_paid ?? null);
+                }
+            },
+            error: (error: unknown) => {
+                this._message.error(error instanceof HttpErrorResponse && error.status === 409 ? error.error?.message : this._translate.instant('sales.online.edit.loadFailed'));
+                void this._router.navigateByUrl(ORDER_ROUTES.detail(oid));
+            },
+        });
+    }
+
+    private fill(draft: OnlineDraft): void {
         this.newOrder();
         this.orderOid.set(draft.oid);
         this.phone.set(draft.customer_phone ?? '');
@@ -643,8 +686,6 @@ export class OnlineOrderComponent {
             this.newAddress.set({ label: null, recipient_name: draft.recipient_name, recipient_phone: draft.recipient_phone, address_line: draft.address_line, district_oid: draft.district_oid, thana_oid: draft.thana_oid, area_text: draft.area_text, postal_code: draft.postal_code, is_default: false, district_name_en: draft.district_name_en ?? '', district_name_bn: draft.district_name_bn ?? '', thana_name_en: draft.thana_name_en ?? '', thana_name_bn: draft.thana_name_bn ?? '' });
             this.addressChoice.set('new');
         }
-        this.draftsOpen.set(false);
-        if (draft.lines.some((line) => line.quantity > line.sellable)) this._message.warning(this._translate.instant('sales.online.drafts.short'));
     }
 
     discardDraft(draft: OnlineDraft): void {

@@ -7,6 +7,7 @@ import { NzModalRef, NzModalService } from 'ng-zorro-antd/modal';
 import { of } from 'rxjs';
 import { provideTranslateService } from '@ngx-translate/core';
 import { APIEndpoint } from '@app/core/constants/api-endpoint';
+import { MessageTemplate } from '@app/core/models/message-template.model';
 import { OrderDetails } from '@app/core/models/order.model';
 import { SessionService } from '@app/core/services/session/session.service';
 import { OVERLAY_PROVIDERS } from '@app/shared/constants/overlay-providers';
@@ -50,7 +51,7 @@ const order = (over: Partial<OrderDetails> = {}): OrderDetails => ({
     ...over,
 });
 
-const open = async (details: OrderDetails, granted: string[] = ['sales.order.view', 'sales.order.confirm', 'sales.order.cancel', 'sales.order.dispatch', 'sales.order.deliver'], scope = 'all') => {
+const open = async (details: OrderDetails, granted: string[] = ['sales.order.view', 'sales.order.confirm', 'sales.order.cancel', 'sales.order.dispatch', 'sales.order.deliver', 'sales.order.refund', 'sales.order.edit', 'sales.online.view'], scope = 'all', templates: MessageTemplate[] = []) => {
     await TestBed.configureTestingModule({
         imports: [OrderDetailComponent],
         providers: [provideRouter([]), provideHttpClient(), provideHttpClientTesting(), provideNzI18n(en_US), provideTranslateService({ fallbackLang: 'en' }), ...OVERLAY_PROVIDERS, { provide: ActivatedRoute, useValue: { snapshot: { paramMap: convertToParamMap({ oid: OID }), data: { scope } } } }, { provide: SessionService, useValue: { can: (code: string) => granted.includes(code), menu: () => [], business: () => null, user: () => ({ name: 'Manager' }) } }],
@@ -59,6 +60,7 @@ const open = async (details: OrderDetails, granted: string[] = ['sales.order.vie
     const http = TestBed.inject(HttpTestingController);
     fixture.detectChanges();
     http.expectOne((r) => r.url.includes(scope === 'history' ? APIEndpoint.GET_ORDER_HISTORY_DETAILS : APIEndpoint.GET_ORDER_DETAILS)).flush({ code: 200, data: details });
+    http.expectOne((r) => r.url.includes(APIEndpoint.GET_MESSAGE_TEMPLATES)).flush({ code: 200, data: templates });
     fixture.detectChanges();
     return { fixture, page: fixture.componentInstance, http, element: fixture.nativeElement as HTMLElement };
 };
@@ -69,7 +71,7 @@ const quick = (element: HTMLElement) => [...element.querySelectorAll('[data-quic
 describe('OrderDetailComponent', () => {
     it('offers Confirm and Cancel on a Pending online order, and nothing that comes later', async () => {
         const { element } = await open(order());
-        expect(quick(element)).toEqual(['confirm', 'cancel', 'print']);
+        expect(quick(element)).toEqual(['confirm', 'edit', 'cancel', 'print']);
     });
 
     it('offers Deliver and Not delivered once the parcel is with the courier, and no Cancel', async () => {
@@ -162,5 +164,49 @@ describe('OrderDetailComponent', () => {
         const items = [...element.querySelectorAll('.ant-timeline-item')].map((node) => node.textContent ?? '');
         expect(items[0]).toContain('Owner');
         expect(items[1]).toContain('Moderator');
+    });
+
+    it('records a refund owed on a cancelled order, no more than is owed, after asking in the same dialog', async () => {
+        const owed = order({ status: 'Cancelled', payment_status: 'partially_paid', amount_paid: 200, refund_status: 'ToRefund', refund_due: 200 });
+        const { page, element, http } = await open(owed);
+        expect(quick(element)).toContain('refund');
+        page.open('refund');
+        expect(page.refundAmount()).toBe(200);
+        page.refundMethod.set('bkash');
+        page.refundAmount.set(250);
+        expect(page.dialogIncomplete()).toBe(true);
+        page.refundAmount.set(150);
+        page.submitDialog();
+        http.expectNone((r) => r.url.includes(APIEndpoint.RECORD_ORDER_REFUND));
+        page.submitDialog();
+        expect(http.expectOne((r) => r.url.includes(APIEndpoint.RECORD_ORDER_REFUND)).request.body).toEqual({ oid: OID, amount: 150, method: 'bkash', note: null });
+    });
+
+    it('offers no refund to someone without the refund permission', async () => {
+        const owed = order({ status: 'Cancelled', refund_status: 'ToRefund', refund_due: 200 });
+        expect(quick((await open(owed, ['sales.order.view'])).element)).not.toContain('refund');
+    });
+
+    it('says a timeline reason as its label, never the stored code', async () => {
+        const { page } = await open(order());
+        const entry = (kind: string, to_status: string, reason: string, from_status: string | null = null) => ({ kind, from_status, to_status, reason, performed_by: 'm', performed_by_name: 'M', performed_on: '2026-10-05T10:00:00.000' }) as OrderDetails['status_history'][number];
+        expect(page.reasonOf(entry('Order', 'Cancelled', 'out_of_stock'))).toBe('sales.order.cancelReason.out_of_stock');
+        expect(page.reasonOf(entry('Order', 'Cancelled', 'other: Called twice'))).toBe('sales.order.cancelReason.other: Called twice');
+        expect(page.reasonOf(entry('Delivery', 'WithCourier', 'OwnRider CN-55'))).toBe('sales.order.couriers.OwnRider CN-55');
+        expect(page.reasonOf(entry('Order', 'Pending', 'Online order placed'))).toBe('sales.order.reason.placed');
+        expect(page.reasonOf(entry('Refund', 'Refunded', '50 by bkash: TrxID 8K2', 'ToRefund'))).toBe('sales.order.reason.refunded: TrxID 8K2');
+    });
+
+    it('offers the templates that fit the order now, filled in, and logs a copy on the order', async () => {
+        const templates: MessageTemplate[] = [
+            { oid: 't-1', name: 'Order received', language: 'en', body: 'Hi {customer_name}, we got {invoice_no}: {items}.', order_statuses: ['Pending'], status: 'Active' },
+            { oid: 't-2', name: 'Sent', language: 'en', body: 'On its way', order_statuses: ['WithCourier'], status: 'Active' },
+        ];
+        const { page, http } = await open(order(), undefined, 'all', templates);
+        expect(page.messages().map((m) => m.template.oid)).toEqual(['t-1']);
+        expect(page.messages()[0].text).toContain(page.record()!.invoice_no);
+        expect(page.messages()[0].text).not.toContain('{');
+        page.copied(templates[0]);
+        expect(http.expectOne((r) => r.url.includes(APIEndpoint.RECORD_MESSAGE_COPIED)).request.body).toEqual({ order_oid: OID, template_oid: 't-1' });
     });
 });

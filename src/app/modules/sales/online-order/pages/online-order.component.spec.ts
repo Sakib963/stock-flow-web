@@ -1,7 +1,7 @@
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { provideRouter } from '@angular/router';
+import { ActivatedRoute, convertToParamMap, provideRouter } from '@angular/router';
 import { provideNzI18n, en_US } from 'ng-zorro-antd/i18n';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzModalRef, NzModalService } from 'ng-zorro-antd/modal';
@@ -23,11 +23,11 @@ const place = (district: string, thana: string, rank: number): PlaceCandidate =>
 
 const saved = (over: Partial<CustomerAddress> = {}): CustomerAddress => ({ oid: 'a-1', label: 'Home', recipient_name: 'Person A', recipient_phone: null, address_line: '5/5 Gaznabi Road', district_oid: 'BD-Magura', district_name_en: 'Magura', district_name_bn: 'মাগুরা', thana_oid: 'T-Magura', thana_name_en: 'Mohammadpur', thana_name_bn: 'মোহাম্মদপুর', area_text: null, postal_code: null, is_default: true, ...over });
 
-const open = async (canCreate = true, keep = false) => {
+const open = async (canCreate = true, keep = false, editing: string | null = null) => {
     if (!keep) localStorage.removeItem('sf.online.unsent');
     await TestBed.configureTestingModule({
         imports: [OnlineOrderComponent],
-        providers: [provideRouter([]), provideHttpClient(), provideHttpClientTesting(), provideNzI18n(en_US), provideTranslateService({ fallbackLang: 'en' }), ...OVERLAY_PROVIDERS, { provide: SessionService, useValue: { can: (code: string) => code !== 'sales.online.create' || canCreate, menu: () => [], business: () => null, user: () => ({ name: 'Moderator' }) } }],
+        providers: [provideRouter([]), provideHttpClient(), provideHttpClientTesting(), provideNzI18n(en_US), provideTranslateService({ fallbackLang: 'en' }), ...OVERLAY_PROVIDERS, { provide: SessionService, useValue: { can: (code: string) => code !== 'sales.online.create' || canCreate, menu: () => [], business: () => null, user: () => ({ name: 'Moderator' }) } }, ...(editing ? [{ provide: ActivatedRoute, useValue: { snapshot: { paramMap: convertToParamMap({ oid: editing }) } } }] : [])],
     }).compileComponents();
     const fixture = TestBed.createComponent(OnlineOrderComponent);
     fixture.detectChanges();
@@ -250,7 +250,33 @@ describe('OnlineOrderComponent', () => {
         expect(page.lines().length).toBe(0);
 
         page.openDrafts();
-        const draft = { oid, invoice_no: '2610050009', draft_label: 'Person A', customer_name: 'Person A', customer_phone: '01987654321', notes: null, payment_type: 'COD', delivery_charge: 120, total_amount: 1570, created_on: new Date().toISOString(), saved_by: null, source_oid: 's-1', customer_address_oid: 'a-1', recipient_name: null, recipient_phone: null, address_line: null, area_text: null, postal_code: null, district_oid: null, district_name_en: null, district_name_bn: null, thana_oid: null, thana_name_en: null, thana_name_bn: null, lines: [{ ...batch(), sellable: 4, quantity: 1, discount: 0 }] };
+        const draft = {
+            oid,
+            invoice_no: '2610050009',
+            draft_label: 'Person A',
+            customer_name: 'Person A',
+            customer_phone: '01987654321',
+            notes: null,
+            payment_type: 'COD',
+            delivery_charge: 120,
+            total_amount: 1570,
+            created_on: new Date().toISOString(),
+            saved_by: null,
+            source_oid: 's-1',
+            customer_address_oid: 'a-1',
+            recipient_name: null,
+            recipient_phone: null,
+            address_line: null,
+            area_text: null,
+            postal_code: null,
+            district_oid: null,
+            district_name_en: null,
+            district_name_bn: null,
+            thana_oid: null,
+            thana_name_en: null,
+            thana_name_bn: null,
+            lines: [{ ...batch(), sellable: 4, quantity: 1, discount: 0 }],
+        };
         http.expectOne((r) => r.url.includes(APIEndpoint.GET_ONLINE_DRAFTS)).flush({ code: 200, data: [draft] });
         page.resume(draft as never);
         expect([page.orderOid(), page.lines().length, page.deliveryCharge()]).toEqual([oid, 1, 120]);
@@ -259,5 +285,21 @@ describe('OnlineOrderComponent', () => {
     it('shows no Create to someone who may only open the page', async () => {
         const { element } = await open(false);
         expect(element.querySelector('[data-online="create"]')).toBeNull();
+    });
+
+    it('opens a Pending order to change it, with its advance, and saves over it rather than placing a new one', async () => {
+        const { fixture, page, http, element } = await open(true, false, 'o-9');
+        const pending = { oid: 'o-9', invoice_no: '2610060004', draft_label: null, customer_name: 'Person A', customer_phone: '01987654321', notes: null, payment_type: 'ADVANCE', payment_method: 'bkash', payment_reference: 'TX1', amount_paid: 200, delivery_charge: 120, total_amount: 1570, created_on: new Date().toISOString(), saved_by: null, source_oid: 's-1', customer_address_oid: 'a-1', recipient_name: null, recipient_phone: null, address_line: null, area_text: null, postal_code: null, district_oid: null, district_name_en: null, district_name_bn: null, thana_oid: null, thana_name_en: null, thana_name_bn: null, lines: [{ ...batch(), sellable: 4, quantity: 1, discount: 0 }] };
+        http.expectOne((r) => r.url.includes(APIEndpoint.GET_ONLINE_ORDER_FOR_EDIT)).flush({ code: 200, data: pending });
+        knownCustomer(page, http);
+        fixture.detectChanges();
+        expect([page.orderOid(), page.advance(), page.reference()]).toEqual(['o-9', 200, 'TX1']);
+        expect(element.querySelector('[data-online="drafts"]')).toBeNull();
+        expect(element.querySelector('[data-online="save-draft"]')).toBeNull();
+
+        answerYes(fixture);
+        page.create();
+        http.expectNone((r) => r.url.includes(APIEndpoint.CREATE_ONLINE_ORDER));
+        expect(http.expectOne((r) => r.url.includes(APIEndpoint.EDIT_ONLINE_ORDER)).request.body).toMatchObject({ oid: 'o-9', payment_type: 'ADVANCE', amount_paid: 200, lines: [{ inventory_oid: 'i-1', quantity: 1, discount: 0 }] });
     });
 });
