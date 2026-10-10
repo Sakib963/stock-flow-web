@@ -44,21 +44,16 @@
         <product-search [browse]="true" (picked)="add($event)" />
         <ul class="m-0 mt-3 flex list-none flex-col gap-2 p-0">
             @for (line of lines(); track line.inventory_oid; let i = $index) {
-                <li class="rounded-control border border-line p-3" [attr.data-line]="line.inventory_oid">
-                    <div class="flex items-start justify-between gap-2">
-                        <div class="min-w-0">
-                            <span class="block text-[13px] font-semibold text-ink">{{ line.product_name }}</span>
-                            <span class="block font-mono text-xs text-ink-muted">{{ line.batch_code }}</span>
-                        </div>
-                        <button nz-button nzType="text" nzDanger type="button" class="sf-icon-btn" [attr.aria-label]="'sales.giveaway.remove' | translate" (click)="remove(i)">
-                            <ng-icon name="lucideTrash2" size="14px" aria-hidden="true" />
-                        </button>
+                <li class="flex items-center gap-3 rounded-control border border-line p-3" [attr.data-line]="line.inventory_oid">
+                    <div class="min-w-0 flex-1">
+                        <span class="block text-[13px] font-semibold text-ink">{{ line.product_name }}</span>
+                        <span class="block font-mono text-xs text-ink-muted">{{ line.batch_code }}</span>
+                        <span class="block text-xs" [class.text-ink-muted]="line.quantity <= line.sellable" [class.text-danger-ink]="line.quantity > line.sellable">{{ 'sales.giveaway.free' | translate: { count: (line.sellable | digits) } }}</span>
                     </div>
-                    <div class="mt-2 flex items-center gap-3">
-                        <label class="text-xs text-ink-body" [for]="'giveaway-qty-' + i">{{ 'sales.order.units' | translate }}</label>
-                        <nz-input-number class="w-28 font-mono" [nzId]="'giveaway-qty-' + i" [nzMin]="1" [nzMax]="line.sellable" [nzPrecision]="0" [ngModel]="line.quantity" (ngModelChange)="setQuantity(i, $event)" />
-                        <span class="text-xs" [class.text-ink-muted]="line.quantity <= line.sellable" [class.text-danger-ink]="line.quantity > line.sellable">{{ 'sales.giveaway.free' | translate: { count: (line.sellable | digits) } }}</span>
-                    </div>
+                    <nz-input-number class="w-24 shrink-0 font-mono" [nzId]="'giveaway-qty-' + i" [attr.aria-label]="'sales.order.units' | translate" [nzMin]="1" [nzMax]="line.sellable" [nzPrecision]="0" [ngModel]="line.quantity" (ngModelChange)="setQuantity(i, $event)" />
+                    <button nz-button nzType="text" nzDanger type="button" class="sf-icon-btn shrink-0" [attr.aria-label]="'sales.giveaway.remove' | translate" (click)="remove(i)">
+                        <ng-icon name="lucideTrash2" size="14px" aria-hidden="true" />
+                    </button>
                 </li>
             } @empty {
                 <li class="rounded-control border border-dashed p-4 text-center text-sm" [class.border-line]="!tried()" [class.text-ink-muted]="!tried()" [class.border-danger]="tried()" [class.text-danger-ink]="tried()" data-giveaway="no-lines">{{ 'sales.giveaway.noLines' | translate }}</li>

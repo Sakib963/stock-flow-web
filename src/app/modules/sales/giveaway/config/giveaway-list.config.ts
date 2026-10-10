@@ -33,7 +33,7 @@ export const giveawayList = ({ seesMoney }: { seesMoney: boolean }): ListShellPa
             { key: 'status', label: 'sales.giveaway.statusLabel', type: 'status', width: 12, tones: GIVEAWAY_STATUS },
             { key: 'units', label: 'sales.order.units', type: 'quantity', width: 8 },
             ...(seesMoney ? [{ key: 'cost', label: 'sales.giveaway.cost', type: 'money' as const, width: 12 }] : []),
-            { key: 'note', label: 'sales.giveaway.note', type: 'text', width: 20 },
+            { key: 'note', label: 'sales.giveaway.note', type: 'long-text', width: 22 },
             { key: 'created_on', label: 'sales.giveaway.savedOn', type: 'date', format: 'date-time-12', width: 15, sortable: true },
         ],
         layouts: [{ type: 'table' }],
