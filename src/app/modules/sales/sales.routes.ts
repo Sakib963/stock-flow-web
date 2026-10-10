@@ -71,6 +71,24 @@ export const SALES_ROUTES: Routes = [
                 loadComponent: () => import('./return/pages/return-detail/return-detail.component').then((m) => m.ReturnDetailComponent),
             },
             {
+                path: 'giveaways',
+                canActivate: [permissionGuard],
+                data: { permission: 'sales.giveaway.view' },
+                loadComponent: () => import('./giveaway/pages/giveaway-list/giveaway-list.component').then((m) => m.GiveawayListComponent),
+            },
+            {
+                path: 'giveaways/new',
+                canActivate: [permissionGuard],
+                data: { permission: 'sales.giveaway.create' },
+                loadComponent: () => import('./giveaway/pages/giveaway-create/giveaway-create.component').then((m) => m.GiveawayCreateComponent),
+            },
+            {
+                path: 'giveaways/:oid',
+                canActivate: [permissionGuard],
+                data: { permission: 'sales.giveaway.view' },
+                loadComponent: () => import('./giveaway/pages/giveaway-detail/giveaway-detail.component').then((m) => m.GiveawayDetailComponent),
+            },
+            {
                 path: 'customers',
                 canActivate: [permissionGuard],
                 data: { permission: CUSTOMER_LIST.permission },

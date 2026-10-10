@@ -3073,6 +3073,80 @@
             },
             "emptyTitle": "No returns yet",
             "emptyBody": "A return is raised from the order the goods came from."
+        },
+        "giveaway": {
+            "add": "New giveaway",
+            "number": "Giveaway",
+            "recipient": "Given to",
+            "recipientName": "Name",
+            "namePlaceholder": "Who is it for",
+            "phone": "Phone",
+            "phoneHelp": "Optional. If a customer has this number, the gift is linked to them.",
+            "phoneInvalid": "Type an 11 digit mobile number starting with 01.",
+            "address": "Address",
+            "addressPlaceholder": "Optional, where it is going",
+            "note": "Why",
+            "notePlaceholder": "e.g. Eid gift for a regular customer",
+            "cost": "Cost",
+            "savedOn": "Saved",
+            "givenOn": "Given",
+            "cancelReason": "Why it was cancelled",
+            "cancelWhy": "Why is it cancelled?",
+            "cancelPlaceholder": "e.g. Saved by mistake",
+            "statusLabel": "Status",
+            "status": {
+                "Draft": "Draft",
+                "Given": "Given",
+                "Cancelled": "Cancelled"
+            },
+            "stat": {
+                "drafts": "Drafts to give",
+                "given": "Given this month",
+                "units": "Units given this month",
+                "cost": "Cost given this month"
+            },
+            "searchPlaceholder": "Giveaway number, name or phone",
+            "emptyTitle": "No giveaways yet",
+            "emptyBody": "A gift that leaves the shelf is recorded here, so the count stays right and it is never counted as a sale.",
+            "createTitle": "New giveaway",
+            "createLead": "Saved as a draft first. Nothing leaves the shelf until it is given.",
+            "detailTitle": "Giveaway",
+            "detailLead": "What was given, to whom, and why.",
+            "section": {
+                "recipient": "Who it is for",
+                "lines": "Products",
+                "details": "Giveaway"
+            },
+            "free": "{{count}} free to give",
+            "noLines": "Search above and pick the products to give.",
+            "remove": "Remove this product",
+            "waiting": "Waiting for someone who can give or cancel giveaways.",
+            "backToList": "Back to giveaways",
+            "loadFailed": {
+                "network": "Could not reach the server to load this giveaway.",
+                "forbidden": "You do not have permission to see giveaways.",
+                "server": "Could not load this giveaway. Try again in a moment.",
+                "notFound": "No giveaway with that number."
+            },
+            "action": {
+                "create": {
+                    "button": "Save draft",
+                    "confirmTitle": "Save a giveaway for {{name}}?",
+                    "confirmBody": "It is saved as a draft. No stock leaves until it is given.",
+                    "done": "Giveaway {{number}} saved. Give it when it goes out."
+                },
+                "give": {
+                    "button": "Give",
+                    "confirmTitle": "Give {{number}}?",
+                    "confirmBody": "The products leave stock now and are recorded as given away, never as a sale. This cannot be undone.",
+                    "done": "Given. The stock has left."
+                },
+                "cancel": {
+                    "button": "Cancel giveaway",
+                    "title": "Cancel the giveaway",
+                    "done": "Giveaway cancelled"
+                }
+            }
         }
     }
 }

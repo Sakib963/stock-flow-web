@@ -1,0 +1,214 @@
+<page-header [back]="back" [title]="'sales.giveaway.detailTitle' | translate" [lead]="'sales.giveaway.detailLead' | translate" />
+
+@if (failed(); as failure) {
+    <div class="sf-empty" role="alert">
+        <p class="m-0 text-sm text-ink-body">{{ 'sales.giveaway.loadFailed.' + failure | translate }}</p>
+        <div class="mt-3 flex items-center justify-center gap-2">
+            <button nz-button type="button" class="inline-flex items-center gap-1.5" (click)="backToList()">
+                <ng-icon name="lucideArrowLeft" size="14px" aria-hidden="true" />
+                <span>{{ 'sales.giveaway.backToList' | translate }}</span>
+            </button>
+            <button nz-button nzType="primary" type="button" class="inline-flex items-center gap-1.5" (click)="load()">
+                <ng-icon name="lucideRotateCw" size="14px" aria-hidden="true" />
+                <span>{{ 'form.retry' | translate }}</span>
+            </button>
+        </div>
+    </div>
+} @else {
+    @if (!record()) {
+        <span class="sr-only" role="status">{{ 'form.loading' | translate }}</span>
+    }
+
+    <nz-card [nzTitle]="detailsTitle" data-detail="details">
+        <ng-template #detailsTitle
+            ><h2 class="m-0 flex items-center gap-1.5 text-sm font-bold text-ink"><ng-icon name="lucideInfo" size="14px" class="text-ink-muted" aria-hidden="true" />{{ 'sales.giveaway.section.details' | translate }}</h2></ng-template
+        >
+        @if (gift(); as g) {
+            <dl class="m-0 grid grid-cols-2 gap-x-6 gap-y-4 md:grid-cols-4">
+                <div>
+                    <dt class="text-xs text-ink-muted">{{ 'sales.giveaway.number' | translate }}</dt>
+                    <dd class="mt-1 mb-0 font-mono text-sm font-semibold text-ink">
+                        <span nz-typography nzCopyable [nzCopyText]="g.giveaway_no ?? ''" [nzCopyTooltips]="['copy.hint' | translate, 'copy.copied' | translate]">{{ g.giveaway_no }}</span>
+                    </dd>
+                </div>
+                <div>
+                    <dt class="text-xs text-ink-muted">{{ 'sales.giveaway.statusLabel' | translate }}</dt>
+                    <dd class="mt-1 mb-0" data-detail="status">
+                        @if (statusTone(); as style) {
+                            <status-tag [label]="style.label" [tone]="style.tone" [icon]="style.icon" size="standard" />
+                        }
+                    </dd>
+                </div>
+                <div>
+                    <dt class="text-xs text-ink-muted">{{ 'sales.giveaway.recipient' | translate }}</dt>
+                    <dd class="mt-1 mb-0 text-sm font-semibold text-ink">{{ g.recipient_name }}</dd>
+                    @if (g.recipient_phone) {
+                        <dd class="mt-0.5 mb-0 font-mono text-xs text-ink-muted">{{ g.recipient_phone }}</dd>
+                    }
+                </div>
+                <div>
+                    <dt class="text-xs text-ink-muted">{{ 'sales.giveaway.savedOn' | translate }}</dt>
+                    <dd class="mt-1 mb-0 text-sm font-semibold text-ink">{{ g.created_on ? (g.created_on | recordDate: language() : 'date-time-12') : '' }}</dd>
+                    <dd class="mt-0.5 mb-0 text-xs text-ink-muted">{{ g.created_by }}</dd>
+                </div>
+                @if (g.address_line) {
+                    <div class="col-span-2">
+                        <dt class="text-xs text-ink-muted">{{ 'sales.giveaway.address' | translate }}</dt>
+                        <dd class="mt-1 mb-0 text-sm text-ink">{{ g.address_line }}</dd>
+                    </div>
+                }
+                <div class="col-span-2">
+                    <dt class="text-xs text-ink-muted">{{ 'sales.giveaway.note' | translate }}</dt>
+                    <dd class="mt-1 mb-0 text-sm text-ink">{{ g.note }}</dd>
+                </div>
+                @if (g.status === 'Given' && g.given_on) {
+                    <div>
+                        <dt class="text-xs text-ink-muted">{{ 'sales.giveaway.givenOn' | translate }}</dt>
+                        <dd class="mt-1 mb-0 text-sm font-semibold text-ink">{{ g.given_on | recordDate: language() : 'date-time-12' }}</dd>
+                        <dd class="mt-0.5 mb-0 text-xs text-ink-muted">{{ g.given_by }}</dd>
+                    </div>
+                }
+                @if (g.status === 'Cancelled' && g.cancel_reason) {
+                    <div class="col-span-2">
+                        <dt class="text-xs text-ink-muted">{{ 'sales.giveaway.cancelReason' | translate }}</dt>
+                        <dd class="mt-1 mb-0 text-sm text-ink">{{ g.cancel_reason }}</dd>
+                    </div>
+                }
+            </dl>
+        } @else {
+            <nz-skeleton nzActive [nzTitle]="false" [nzParagraph]="{ rows: 3 }" />
+        }
+    </nz-card>
+
+    <div class="mt-2 grid grid-cols-1 items-start gap-2 md:mt-4 md:gap-4 lg:grid-cols-3">
+        <div class="flex min-w-0 flex-col gap-2 md:gap-4 lg:col-start-3 lg:row-start-1">
+            <nz-card [nzTitle]="quickTitle" data-detail="quick-actions">
+                <ng-template #quickTitle
+                    ><h2 class="m-0 flex items-center gap-1.5 text-sm font-bold text-ink"><ng-icon name="lucideZap" size="14px" class="text-ink-muted" aria-hidden="true" />{{ 'sales.order.quickActions' | translate }}</h2></ng-template
+                >
+                @if (record(); as g) {
+                    <div class="flex flex-col gap-2">
+                        @if (actions().give) {
+                            <button nz-button nzType="primary" nzBlock type="button" class="inline-flex items-center justify-start gap-2" data-quick="give" [nzLoading]="saving()" (click)="give()">
+                                @if (!saving()) {
+                                    <ng-icon name="lucideGift" size="14px" aria-hidden="true" />
+                                }
+                                <span>{{ 'sales.giveaway.action.give.button' | translate }}</span>
+                            </button>
+                        }
+                        @if (actions().cancel) {
+                            <button nz-button nzDanger nzBlock type="button" class="inline-flex items-center justify-start gap-2" data-quick="cancel" [disabled]="saving()" (click)="openCancel()">
+                                <ng-icon name="lucideBan" size="14px" aria-hidden="true" />
+                                <span>{{ 'sales.giveaway.action.cancel.button' | translate }}</span>
+                            </button>
+                        }
+                        @if (!actions().give && !actions().cancel) {
+                            <p class="m-0 text-xs text-ink-muted" data-quick="none">{{ (g.status === 'Draft' ? 'sales.giveaway.waiting' : 'sales.order.nothingToDo') | translate }}</p>
+                        }
+                    </div>
+                } @else {
+                    <nz-skeleton nzActive [nzTitle]="false" [nzParagraph]="{ rows: 2 }" />
+                }
+            </nz-card>
+            <nz-card [nzTitle]="historyTitle" data-detail="timeline">
+                <ng-template #historyTitle
+                    ><h2 class="m-0 flex items-center gap-1.5 text-sm font-bold text-ink"><ng-icon name="lucideHistory" size="14px" class="text-ink-muted" aria-hidden="true" />{{ 'sales.order.section.timeline' | translate }}</h2></ng-template
+                >
+                @if (record(); as g) {
+                    <nz-timeline>
+                        @for (entry of g.activity; track $index; let first = $first) {
+                            <nz-timeline-item [nzColor]="first ? 'blue' : 'gray'">
+                                <p class="m-0 text-[13px] font-semibold text-ink">{{ entry.title }}</p>
+                                @if (entry.description) {
+                                    <p class="mt-0.5 mb-0 text-xs text-ink-body">{{ entry.description }}</p>
+                                }
+                                <p class="mt-0.5 mb-0 text-xs text-ink-muted">{{ entry.performed_by }} &middot; {{ entry.performed_on | recordDate: language() : 'date-time-12' }}</p>
+                            </nz-timeline-item>
+                        }
+                    </nz-timeline>
+                } @else {
+                    <nz-skeleton nzActive [nzTitle]="false" [nzParagraph]="{ rows: 3 }" />
+                }
+            </nz-card>
+        </div>
+
+        <div class="flex min-w-0 flex-col gap-2 md:gap-4 lg:col-span-2 lg:row-start-1">
+            <nz-card [nzTitle]="linesTitle" [nzBodyStyle]="{ padding: '0' }" data-detail="lines">
+                <ng-template #linesTitle
+                    ><h2 class="m-0 flex items-center gap-1.5 text-sm font-bold text-ink"><ng-icon name="lucidePackage" size="14px" class="text-ink-muted" aria-hidden="true" />{{ 'sales.giveaway.section.lines' | translate }}</h2></ng-template
+                >
+                @if (record(); as g) {
+                    <nz-table nzTemplateMode nzSize="small" [nzScroll]="{ x: '420px' }">
+                        <thead>
+                            <tr>
+                                <th>{{ 'sales.order.product' | translate }}</th>
+                                <th nzWidth="90px" class="text-right">{{ 'sales.order.units' | translate }}</th>
+                                @if (seesMoney) {
+                                    <th nzWidth="120px" class="text-right">{{ 'sales.giveaway.cost' | translate }}</th>
+                                }
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for (line of g.lines; track line.oid) {
+                                <tr>
+                                    <td>
+                                        <span class="block text-[13px] font-semibold text-ink">{{ line.product_name }}</span>
+                                        <span class="block font-mono text-xs text-ink-muted">{{ line.batch_code }}</span>
+                                    </td>
+                                    <td class="text-right font-mono tabular-nums">{{ line.quantity | digits }}</td>
+                                    @if (seesMoney) {
+                                        <td class="text-right font-mono tabular-nums">{{ line.quantity * (line.cost_price ?? 0) | money }}</td>
+                                    }
+                                </tr>
+                            }
+                        </tbody>
+                    </nz-table>
+                    <div class="flex justify-end gap-6 border-t border-line px-4 py-3 text-sm">
+                        <span class="text-ink-body"
+                            >{{ 'sales.order.units' | translate }}: <span class="font-mono font-semibold text-ink tabular-nums">{{ units() | digits }}</span></span
+                        >
+                        @if (seesMoney) {
+                            <span class="text-ink-body" data-detail="cost"
+                                >{{ 'sales.giveaway.cost' | translate }}: <span class="font-mono font-semibold text-ink tabular-nums">{{ cost() | money }}</span></span
+                            >
+                        }
+                    </div>
+                } @else {
+                    <div class="px-4 py-3"><nz-skeleton nzActive [nzTitle]="false" [nzParagraph]="{ rows: 2 }" /></div>
+                }
+            </nz-card>
+        </div>
+    </div>
+
+    <action-footer>
+        <button nz-button nzType="default" type="button" class="inline-flex items-center gap-1.5" (click)="backToList()">
+            <ng-icon name="lucideArrowLeft" size="14px" aria-hidden="true" />
+            <span>{{ 'sales.giveaway.backToList' | translate }}</span>
+        </button>
+    </action-footer>
+}
+
+<nz-modal [nzVisible]="cancelling()" [nzTitle]="'sales.giveaway.action.cancel.title' | translate" [nzFooter]="cancelFooter" nzCentered (nzOnCancel)="cancelling.set(false)">
+    <ng-container *nzModalContent>
+        <div nz-form nzLayout="vertical">
+            <nz-form-item class="mb-0">
+                <nz-form-label nzRequired nzFor="giveaway-cancel-reason">{{ 'sales.giveaway.cancelWhy' | translate }}</nz-form-label>
+                <nz-form-control>
+                    <textarea nz-input id="giveaway-cancel-reason" rows="2" maxlength="256" data-dialog="cancel-reason" [placeholder]="'sales.giveaway.cancelPlaceholder' | translate" [ngModel]="cancelReason()" (ngModelChange)="cancelReason.set($event)"></textarea>
+                </nz-form-control>
+            </nz-form-item>
+        </div>
+    </ng-container>
+</nz-modal>
+<ng-template #cancelFooter>
+    <button nz-button type="button" class="inline-flex items-center gap-1.5" [disabled]="saving()" (click)="cancelling.set(false)">
+        <ng-icon name="lucideX" size="14px" aria-hidden="true" />
+        <span>{{ 'form.confirm.cancel' | translate }}</span>
+    </button>
+    <button nz-button nzType="primary" nzDanger type="button" class="inline-flex items-center gap-1.5" data-dialog="submit" [nzLoading]="saving()" [disabled]="!cancelReason().trim()" (click)="submitCancel()">
+        @if (!saving()) {
+            <ng-icon name="lucideCheck" size="14px" aria-hidden="true" />
+        }
+        <span>{{ 'sales.giveaway.action.cancel.button' | translate }}</span>
+    </button>
+</ng-template>

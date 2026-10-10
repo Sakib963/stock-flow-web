@@ -1,0 +1,81 @@
+<page-header [back]="back" [title]="'sales.giveaway.createTitle' | translate" [lead]="'sales.giveaway.createLead' | translate" />
+
+<div class="grid grid-cols-1 items-start gap-2 md:gap-4 lg:grid-cols-2">
+    <nz-card [nzTitle]="recipientTitle" data-giveaway="recipient">
+        <ng-template #recipientTitle
+            ><h2 class="m-0 flex items-center gap-1.5 text-sm font-bold text-ink"><ng-icon name="lucideUserRound" size="14px" class="text-ink-muted" aria-hidden="true" />{{ 'sales.giveaway.section.recipient' | translate }}</h2></ng-template
+        >
+        <div nz-form nzLayout="vertical">
+            <div class="grid grid-cols-1 gap-x-3 sm:grid-cols-2">
+                <nz-form-item>
+                    <nz-form-label nzRequired nzFor="giveaway-name">{{ 'sales.giveaway.recipientName' | translate }}</nz-form-label>
+                    <nz-form-control [nzValidateStatus]="tried() && !name().trim() ? 'error' : ''" [nzErrorTip]="'form.required' | translate">
+                        <input nz-input id="giveaway-name" maxlength="255" autocomplete="off" data-giveaway="name" [placeholder]="'sales.giveaway.namePlaceholder' | translate" [ngModel]="name()" (ngModelChange)="name.set($event)" />
+                    </nz-form-control>
+                </nz-form-item>
+                <nz-form-item>
+                    <nz-form-label nzFor="giveaway-phone" [nzTooltipTitle]="'sales.giveaway.phoneHelp' | translate">{{ 'sales.giveaway.phone' | translate }}</nz-form-label>
+                    <nz-form-control [nzValidateStatus]="phoneInvalid() ? 'error' : ''" [nzErrorTip]="'sales.giveaway.phoneInvalid' | translate">
+                        <input nz-input id="giveaway-phone" maxlength="20" inputmode="tel" autocomplete="off" class="font-mono" data-giveaway="phone" placeholder="01XXXXXXXXX" [ngModel]="phone()" (ngModelChange)="phone.set($event)" />
+                    </nz-form-control>
+                </nz-form-item>
+            </div>
+            <nz-form-item>
+                <nz-form-label nzFor="giveaway-address">{{ 'sales.giveaway.address' | translate }}</nz-form-label>
+                <nz-form-control>
+                    <input nz-input id="giveaway-address" maxlength="512" autocomplete="off" data-giveaway="address" [placeholder]="'sales.giveaway.addressPlaceholder' | translate" [ngModel]="address()" (ngModelChange)="address.set($event)" />
+                </nz-form-control>
+            </nz-form-item>
+            <nz-form-item class="mb-0">
+                <nz-form-label nzRequired nzFor="giveaway-note">{{ 'sales.giveaway.note' | translate }}</nz-form-label>
+                <nz-form-control [nzValidateStatus]="tried() && !note().trim() ? 'error' : ''" [nzErrorTip]="'form.required' | translate">
+                    <nz-textarea-count [nzMaxCharacterCount]="256">
+                        <textarea nz-input id="giveaway-note" rows="3" maxlength="256" data-giveaway="note" [placeholder]="'sales.giveaway.notePlaceholder' | translate" [ngModel]="note()" (ngModelChange)="note.set($event)"></textarea>
+                    </nz-textarea-count>
+                </nz-form-control>
+            </nz-form-item>
+        </div>
+    </nz-card>
+
+    <nz-card [nzTitle]="productsTitle" data-giveaway="products">
+        <ng-template #productsTitle
+            ><h2 class="m-0 flex items-center gap-1.5 text-sm font-bold text-ink"><ng-icon name="lucidePackage" size="14px" class="text-ink-muted" aria-hidden="true" />{{ 'sales.giveaway.section.lines' | translate }}</h2></ng-template
+        >
+        <product-search [browse]="true" (picked)="add($event)" />
+        <ul class="m-0 mt-3 flex list-none flex-col gap-2 p-0">
+            @for (line of lines(); track line.inventory_oid; let i = $index) {
+                <li class="rounded-control border border-line p-3" [attr.data-line]="line.inventory_oid">
+                    <div class="flex items-start justify-between gap-2">
+                        <div class="min-w-0">
+                            <span class="block text-[13px] font-semibold text-ink">{{ line.product_name }}</span>
+                            <span class="block font-mono text-xs text-ink-muted">{{ line.batch_code }}</span>
+                        </div>
+                        <button nz-button nzType="text" nzDanger type="button" class="sf-icon-btn" [attr.aria-label]="'sales.giveaway.remove' | translate" (click)="remove(i)">
+                            <ng-icon name="lucideTrash2" size="14px" aria-hidden="true" />
+                        </button>
+                    </div>
+                    <div class="mt-2 flex items-center gap-3">
+                        <label class="text-xs text-ink-body" [for]="'giveaway-qty-' + i">{{ 'sales.order.units' | translate }}</label>
+                        <nz-input-number class="w-28 font-mono" [nzId]="'giveaway-qty-' + i" [nzMin]="1" [nzMax]="line.sellable" [nzPrecision]="0" [ngModel]="line.quantity" (ngModelChange)="setQuantity(i, $event)" />
+                        <span class="text-xs" [class.text-ink-muted]="line.quantity <= line.sellable" [class.text-danger-ink]="line.quantity > line.sellable">{{ 'sales.giveaway.free' | translate: { count: (line.sellable | digits) } }}</span>
+                    </div>
+                </li>
+            } @empty {
+                <li class="rounded-control border border-dashed p-4 text-center text-sm" [class.border-line]="!tried()" [class.text-ink-muted]="!tried()" [class.border-danger]="tried()" [class.text-danger-ink]="tried()" data-giveaway="no-lines">{{ 'sales.giveaway.noLines' | translate }}</li>
+            }
+        </ul>
+    </nz-card>
+</div>
+
+<action-footer>
+    <button nz-button type="button" class="inline-flex items-center gap-1.5" [disabled]="saving()" (click)="cancel()">
+        <ng-icon name="lucideX" size="14px" aria-hidden="true" />
+        <span>{{ 'form.confirm.cancel' | translate }}</span>
+    </button>
+    <button nz-button nzType="primary" type="button" class="inline-flex items-center gap-1.5" data-giveaway="save" [nzLoading]="saving()" (click)="save()">
+        @if (!saving()) {
+            <ng-icon name="lucideCheck" size="14px" aria-hidden="true" />
+        }
+        <span>{{ 'sales.giveaway.action.create.button' | translate }}</span>
+    </button>
+</action-footer>
