@@ -166,6 +166,55 @@ describe('OrderDetailComponent', () => {
         expect(items[1]).toContain('Moderator');
     });
 
+    it('says a refund owed by a return as an amount owed back, and a confirmed return by its number', async () => {
+        const { page } = await open(order());
+        const entry = (kind: string, from_status: string | null, to_status: string, reason: string) => ({ kind, from_status, to_status, reason, performed_by: 'm', performed_by_name: 'M', performed_on: '2026-10-05T10:00:00.000' }) as OrderDetails['status_history'][number];
+        expect(page.reasonOf(entry('Refund', 'Refunded', 'ToRefund', '1450'))).toBe('sales.order.reason.owed');
+        expect(page.reasonOf(entry('Order', 'Delivered', 'PartiallyReturned', 'INV-R1'))).toBe('sales.order.reason.returnConfirmed');
+        expect(page.reasonOf(entry('Delivery', 'Failed', 'WithCourier', 'INV-R1'))).toBe('sales.order.reason.parcelUndone');
+    });
+
+    it('offers a return on a sale with units still out, and lists the returns already raised', async () => {
+        const sold = order({ status: 'Delivered', sold_on: '2026-10-06T09:00:00.000', online: { ...order().online!, delivery_status: 'Delivered' } });
+        const { fixture, element, http } = await open(sold, ['sales.order.view', 'sales.online.view', 'sales.return.view', 'sales.return.create']);
+        const returns = http.expectOne((r) => r.url.includes(APIEndpoint.GET_RETURNS_FOR_ORDER));
+        returns.flush({ code: 200, data: { returns: [{ oid: 'r-1', return_no: 'INV-R1', refund_amount: 0, return_reason: 'changed_mind', not_delivered_reason: null, status: 'Pending', created_on: '2026-10-07T09:00:00.000', created_by_name: 'M', units: 1 }], returnable: [{ order_item_oid: sold.items[0].oid, returnable: 1 }] } });
+        fixture.detectChanges();
+        expect(quick(element)).toContain('return');
+        expect(element.querySelector('[data-return="r-1"]')?.textContent).toContain('INV-R1');
+    });
+
+    it('offers no return once every unit is already on one', async () => {
+        const sold = order({ status: 'Delivered', sold_on: '2026-10-06T09:00:00.000' });
+        const { fixture, element, http } = await open(sold, ['sales.order.view', 'sales.online.view', 'sales.return.view', 'sales.return.create']);
+        http.expectOne((r) => r.url.includes(APIEndpoint.GET_RETURNS_FOR_ORDER)).flush({ code: 200, data: { returns: [], returnable: [{ order_item_oid: sold.items[0].oid, returnable: 0 }] } });
+        fixture.detectChanges();
+        expect(quick(element)).not.toContain('return');
+    });
+
+    it('shows the latest five steps, and five more under them after See more', async () => {
+        vi.useFakeTimers();
+        const steps = Array.from({ length: 12 }, (_, i) => ({ kind: 'Order', from_status: null, to_status: 'Pending', reason: null, performed_by: 'm', performed_by_name: `Step ${i + 1}`, performed_on: '2026-10-05T10:00:00.000' })) as OrderDetails['status_history'];
+        const { fixture, element } = await open(order({ status_history: steps }));
+        const names = () => [...element.querySelectorAll('.ant-timeline-item')].map((node) => node.textContent?.match(/Step \d+/)?.[0]);
+        const more = () => element.querySelector<HTMLButtonElement>('[data-detail="timeline-more"]');
+        expect(names()).toEqual(['Step 12', 'Step 11', 'Step 10', 'Step 9', 'Step 8']);
+
+        more()!.click();
+        fixture.detectChanges();
+        expect(more()!.classList).toContain('ant-btn-loading');
+        vi.advanceTimersByTime(400);
+        fixture.detectChanges();
+        expect(names().length).toBe(10);
+
+        more()!.click();
+        vi.advanceTimersByTime(400);
+        fixture.detectChanges();
+        expect(names().at(-1)).toBe('Step 1');
+        expect(more()).toBeNull();
+        vi.useRealTimers();
+    });
+
     it('records a refund owed on a cancelled order, no more than is owed, after asking in the same dialog', async () => {
         const owed = order({ status: 'Cancelled', payment_status: 'partially_paid', amount_paid: 200, refund_status: 'ToRefund', refund_due: 200 });
         const { page, element, http } = await open(owed);

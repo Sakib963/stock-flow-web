@@ -158,6 +158,7 @@ export class OnlineOrderComponent {
     readonly draftsOpen = signal(false);
     readonly drafts = signal<OnlineDraft[]>([]);
     readonly draftsLoading = signal(false);
+    readonly discarding = signal<string | null>(null);
     readonly savingDraft = signal(false);
     /** A resumed draft's saved address, chosen once the phone's lookup answers. */
     private _resumeAddress: string | null = null;
@@ -699,12 +700,18 @@ export class OnlineOrderComponent {
         }).subscribe((confirmed) => {
             this._asking.set(false);
             if (!confirmed) return;
+            this.discarding.set(draft.oid);
             this._orders.discardDraft(draft.oid).subscribe({
                 next: () => {
+                    this.discarding.set(null);
                     this.drafts.update((drafts) => drafts.filter((item) => item.oid !== draft.oid));
                     if (this.orderOid() === draft.oid) this.newOrder();
+                    this._message.success(this._translate.instant('sales.online.drafts.discarded'));
                 },
-                error: (error: unknown) => this._message.error(error instanceof HttpErrorResponse && error.status === 409 ? error.error?.message : this._translate.instant('sales.online.drafts.failed.' + failureOf(error))),
+                error: (error: unknown) => {
+                    this.discarding.set(null);
+                    this._message.error(error instanceof HttpErrorResponse && error.status === 409 ? error.error?.message : this._translate.instant('sales.online.drafts.discardFailed.' + failureOf(error)));
+                },
             });
         });
     }

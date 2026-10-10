@@ -1,0 +1,81 @@
+<nz-modal [nzVisible]="visible()" [nzTitle]="'sales.return.action.create.title' | translate" [nzFooter]="footer" [nzWidth]="640" nzCentered (nzOnCancel)="close()">
+    <ng-container *nzModalContent>
+        @if (confirming()) {
+            <p class="m-0 text-sm font-semibold text-ink" data-dialog="confirm">{{ 'sales.return.action.create.confirmTitle' | translate: { units: (units() | digits), number: order().invoice_no } }}</p>
+            <p class="mt-1 mb-0 text-sm text-ink-muted">{{ 'sales.return.action.create.confirmBody' | translate }}</p>
+        } @else {
+            <div class="mb-2 flex items-center justify-between gap-2">
+                <p class="m-0 text-sm text-ink-body">{{ 'sales.return.whatCameBack' | translate }}</p>
+                <button nz-button nzType="link" nzSize="small" type="button" class="px-0" data-dialog="all" (click)="all()">{{ 'sales.return.everything' | translate }}</button>
+            </div>
+            <ul class="m-0 mb-4 flex list-none flex-col gap-2 p-0">
+                @for (pick of picks(); track pick.order_item_oid; let i = $index) {
+                    <li class="rounded-control border border-line p-3" [attr.data-pick]="pick.order_item_oid">
+                        <span class="block text-[13px] font-semibold text-ink">{{ pick.product_name }}</span>
+                        <span class="block text-xs text-ink-muted">{{ 'sales.return.canReturn' | translate: { count: (pick.returnable | digits), price: (pick.per_unit | money) } }}</span>
+                        <div class="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
+                            <div>
+                                <label class="mb-1 block text-xs text-ink-body" [for]="'return-qty-' + i">{{ 'sales.return.quantity' | translate }}</label>
+                                <nz-input-number class="w-full font-mono" [nzId]="'return-qty-' + i" [nzMin]="0" [nzMax]="pick.returnable" [nzPrecision]="0" [ngModel]="pick.quantity" (ngModelChange)="update(i, { quantity: $event ?? 0 })" />
+                            </div>
+                            <div>
+                                <span class="mb-1 block text-xs text-ink-body">{{ 'sales.return.condition' | translate }}</span>
+                                <nz-radio-group class="flex w-full" nzButtonStyle="solid" [nzDisabled]="!pick.quantity" [ngModel]="pick.condition" (ngModelChange)="update(i, { condition: $event })">
+                                    <label nz-radio-button class="flex-1 text-center" nzValue="Good">{{ 'sales.return.conditionValue.Good' | translate }}</label>
+                                    <label nz-radio-button class="flex-1 text-center" nzValue="Damaged">{{ 'sales.return.conditionValue.Damaged' | translate }}</label>
+                                </nz-radio-group>
+                            </div>
+                        </div>
+                    </li>
+                }
+            </ul>
+            <div nz-form nzLayout="vertical">
+                <nz-form-item>
+                    <nz-form-label nzRequired nzFor="return-reason">{{ 'sales.return.reasonLabel' | translate }}</nz-form-label>
+                    <nz-form-control>
+                        <nz-select nzId="return-reason" class="w-full" data-dialog="reason" [nzPlaceHolder]="'sales.order.pickReason' | translate" [ngModel]="reason()" (ngModelChange)="reason.set($event)">
+                            @for (code of reasons; track code) {
+                                <nz-option [nzValue]="code" [nzLabel]="'sales.return.reason.' + code | translate" />
+                            }
+                        </nz-select>
+                    </nz-form-control>
+                </nz-form-item>
+                <nz-form-item>
+                    <nz-form-label [nzRequired]="reason() === 'other'" nzFor="return-note">{{ 'sales.order.note' | translate }}</nz-form-label>
+                    <nz-form-control [nzValidateStatus]="reason() === 'other' && !note().trim() ? 'error' : ''" [nzErrorTip]="'sales.order.noteNeeded' | translate">
+                        <nz-textarea-count [nzMaxCharacterCount]="256">
+                            <textarea nz-input id="return-note" rows="3" maxlength="256" data-dialog="note" [placeholder]="'sales.return.notePlaceholder' | translate" [ngModel]="note()" (ngModelChange)="note.set($event)"></textarea>
+                        </nz-textarea-count>
+                    </nz-form-control>
+                </nz-form-item>
+                @if (canRefundDelivery()) {
+                    <label nz-checkbox class="mb-3" data-dialog="refund-delivery" [ngModel]="refundDelivery()" (ngModelChange)="refundDelivery.set($event)">{{ 'sales.return.refundDelivery' | translate: { amount: (order().delivery_charge | money) } }}</label>
+                }
+            </div>
+            <div class="flex items-center justify-between rounded-control bg-surface-sunken px-3 py-2 text-sm">
+                <span class="text-ink-body">{{ 'sales.return.worth' | translate: { units: (units() | digits) } }}</span>
+                <span class="font-mono font-bold text-ink tabular-nums" data-dialog="value">{{ value() | money }}</span>
+            </div>
+            <p class="mt-2 mb-0 text-xs text-ink-muted">{{ 'sales.return.pendingNote' | translate }}</p>
+        }
+    </ng-container>
+</nz-modal>
+<ng-template #footer>
+    @if (confirming()) {
+        <button nz-button type="button" class="inline-flex items-center gap-1.5" data-dialog="back" [disabled]="saving()" (click)="confirming.set(false)">
+            <ng-icon name="lucideArrowLeft" size="14px" aria-hidden="true" />
+            <span>{{ 'list.back' | translate }}</span>
+        </button>
+    } @else {
+        <button nz-button type="button" class="inline-flex items-center gap-1.5" [disabled]="saving()" (click)="close()">
+            <ng-icon name="lucideX" size="14px" aria-hidden="true" />
+            <span>{{ 'form.confirm.cancel' | translate }}</span>
+        </button>
+    }
+    <button nz-button nzType="primary" type="button" class="inline-flex items-center gap-1.5" data-dialog="submit" [nzLoading]="saving()" [disabled]="incomplete()" (click)="submit()">
+        @if (!saving()) {
+            <ng-icon name="lucideCheck" size="14px" aria-hidden="true" />
+        }
+        <span>{{ 'sales.return.action.create.button' | translate }}</span>
+    </button>
+</ng-template>

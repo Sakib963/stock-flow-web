@@ -59,6 +59,18 @@ export const SALES_ROUTES: Routes = [
                 loadComponent: () => import('./order/pages/order-detail/order-detail.component').then((m) => m.OrderDetailComponent),
             },
             {
+                path: 'returns',
+                canActivate: [permissionGuard],
+                data: { permission: 'sales.return.view' },
+                loadComponent: () => import('./return/pages/return-list/return-list.component').then((m) => m.ReturnListComponent),
+            },
+            {
+                path: 'returns/:oid',
+                canActivate: [permissionGuard],
+                data: { permission: 'sales.return.view' },
+                loadComponent: () => import('./return/pages/return-detail/return-detail.component').then((m) => m.ReturnDetailComponent),
+            },
+            {
                 path: 'customers',
                 canActivate: [permissionGuard],
                 data: { permission: CUSTOMER_LIST.permission },

@@ -1468,7 +1468,7 @@
                 "label": "Movement",
                 "carried_over": "Carried over",
                 "received": "Received",
-                "sold": "Counter sale",
+                "sold": "POS sale",
                 "dispatched": "Dispatched online",
                 "returned": "Returned",
                 "disposed": "Disposed",
@@ -2448,7 +2448,7 @@
         },
         "order": {
             "channel": {
-                "POS": "Counter",
+                "POS": "POS",
                 "ONLINE": "Online"
             },
             "status": {
@@ -2470,6 +2470,7 @@
                 "forbidden": "You do not have permission to see this order.",
                 "server": "Could not load this order. Try again in a moment."
             },
+            "timelineMore": "See more ({{count}} earlier)",
             "section": {
                 "details": "Order",
                 "lines": "Products",
@@ -2538,14 +2539,16 @@
                 "collected": "Collected by the courier",
                 "owed": "{{amount}} owed back to the customer",
                 "refunded": "{{amount}} sent back by {{method}}",
-                "edited": "Order changed"
+                "edited": "Order changed",
+                "parcelUndone": "Not delivered undone: return {{number}} cancelled",
+                "returnConfirmed": "Return {{number}} confirmed"
             },
             "refundOwed": "{{amount}} is owed back to the customer for this cancelled order.",
             "refundAmount": "Amount sent back",
             "refundTooMuch": "That is more than is owed back.",
             "refundMethod": "Sent by",
             "refundMethodPick": "How the money went back",
-            "notDeliveredNote": "The parcel stays out of stock until it is back in the shop and its return is confirmed.",
+            "notDeliveredNote": "A return of the whole parcel is recorded now. Confirm it from Returns once the parcel is back on the shelf.",
             "cancelRefundNote": "Money was paid on this order. It becomes owed back to the customer as soon as the order is cancelled.",
             "delivery": {
                 "Preparing": "Preparing",
@@ -2892,7 +2895,13 @@
                 "discard": "Discard",
                 "resume": "Resume",
                 "empty": "No saved drafts. Save draft keeps an order you cannot finish yet.",
-                "lines": "{{count}} line(s)"
+                "lines": "{{count}} line(s)",
+                "discarded": "Draft discarded.",
+                "discardFailed": {
+                    "network": "Could not reach the server. The draft was not discarded.",
+                    "forbidden": "You do not have permission to discard drafts.",
+                    "server": "The draft was not discarded. Try again in a moment."
+                }
             },
             "edit": {
                 "title": "Change order {{number}}",
@@ -2960,6 +2969,109 @@
                 "empty": "No templates yet. Add the messages your team sends most, such as order received or order sent.",
                 "loadFailed": "Could not load the templates. Check the connection and try again."
             }
+        },
+        "return": {
+            "detailTitle": "Return",
+            "detailLead": "Goods that came back from a sale: what they were, what happened to them and what is owed back.",
+            "backToList": "Back to returns",
+            "loadFailed": {
+                "network": "Could not reach the server to load this return.",
+                "forbidden": "You do not have permission to see this return.",
+                "server": "Could not load this return. Try again in a moment."
+            },
+            "section": {
+                "details": "Return",
+                "lines": "What came back",
+                "forOrder": "Returns"
+            },
+            "number": "Return number",
+            "statusLabel": "Status",
+            "status": {
+                "Pending": "Waiting to confirm",
+                "Returned": "Confirmed",
+                "Cancelled": "Cancelled"
+            },
+            "reasonLabel": "Reason",
+            "reason": {
+                "changed_mind": "Changed their mind",
+                "size_or_fit": "Size or fit",
+                "wrong_item": "Wrong item sent",
+                "damaged_on_arrival": "Damaged on arrival",
+                "not_as_described": "Not as described",
+                "entered_by_mistake": "Entered by mistake",
+                "not_delivered": "Not delivered",
+                "other": "Other"
+            },
+            "order": "Order",
+            "raisedOn": "Raised",
+            "confirmedOn": "Confirmed",
+            "cancelledOn": "Cancelled",
+            "value": "Worth",
+            "refund": "Refund",
+            "dueReduction": "Off what is owed",
+            "moneyPos": "On a POS sale the refund is handed back when the return is confirmed.",
+            "moneyOnline": "When the return is confirmed, the refund becomes owed on the order. Record it there once it is sent.",
+            "openOrder": "Open the order",
+            "waiting": "Waiting for someone who can confirm or cancel returns.",
+            "quantity": "Units",
+            "condition": "Condition",
+            "notePlaceholder": "Anything worth knowing about this return",
+            "conditionValue": {
+                "Good": "Good",
+                "Damaged": "Damaged"
+            },
+            "outcome": "What happened",
+            "outcomeValue": {
+                "Restocked": "Back in stock",
+                "Disposed": "Written off",
+                "waiting": "Not yet"
+            },
+            "checkCondition": "Check each item now that it is in hand. Good goes back on the shelf in the batch it was sold from; Damaged is written off.",
+            "handBack": "Hand back {{amount}} by",
+            "owedAfter": "{{amount}} will be owed back to the customer on the order.",
+            "cancelWhy": "Why is it cancelled?",
+            "cancelParcel": "The parcel goes back to With the courier, so it can still be delivered.",
+            "action": {
+                "create": {
+                    "button": "Return products",
+                    "title": "Return products",
+                    "confirmTitle": "Record a return of {{units}} units on {{number}}?",
+                    "confirmBody": "Nothing moves yet: the stock and the money change when the return is confirmed.",
+                    "done": "Return {{number}} recorded. Confirm it when the goods are in hand."
+                },
+                "confirm": {
+                    "button": "Confirm return",
+                    "title": "Confirm the return",
+                    "confirmTitle": "Confirm return {{number}}?",
+                    "confirmBody": "The stock and the money move now. A confirmed return cannot be undone.",
+                    "done": "Return confirmed"
+                },
+                "cancel": {
+                    "button": "Cancel return",
+                    "title": "Cancel the return",
+                    "confirmTitle": "Cancel return {{number}}?",
+                    "confirmBody": "Nothing has moved yet, so nothing changes in stock or money.",
+                    "done": "Return cancelled"
+                }
+            },
+            "whatCameBack": "How many of each came back?",
+            "everything": "Everything",
+            "canReturn": "Up to {{count}}, {{price}} each",
+            "refundDelivery": "Give back the delivery charge too ({{amount}})",
+            "worth": "{{units}} units, worth",
+            "pendingNote": "The refund is worked out from what was paid. Only money that was paid goes back; the rest lowers what is owed.",
+            "unitsCount": "{{count}} units",
+            "refundShort": "refund {{amount}}",
+            "forOrderFailed": "Could not load the returns of this order. Reload the page to see them.",
+            "searchPlaceholder": "Return number, invoice, customer or phone",
+            "stat": {
+                "pending": "Waiting to confirm",
+                "parcels": "Parcels coming back",
+                "units": "Units back this month",
+                "damaged": "Damaged this month"
+            },
+            "emptyTitle": "No returns yet",
+            "emptyBody": "A return is raised from the order the goods came from."
         }
     }
 }

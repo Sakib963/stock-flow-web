@@ -1,0 +1,267 @@
+<page-header [back]="back" [title]="'sales.return.detailTitle' | translate" [lead]="'sales.return.detailLead' | translate" />
+
+@if (failed(); as failure) {
+    <div class="sf-empty" role="alert">
+        <p class="m-0 text-sm text-ink-body">{{ 'sales.return.loadFailed.' + failure | translate }}</p>
+        <div class="mt-3 flex items-center justify-center gap-2">
+            <button nz-button type="button" class="inline-flex items-center gap-1.5" (click)="backToList()">
+                <ng-icon name="lucideArrowLeft" size="14px" aria-hidden="true" />
+                <span>{{ 'sales.return.backToList' | translate }}</span>
+            </button>
+            <button nz-button nzType="primary" type="button" class="inline-flex items-center gap-1.5" (click)="load()">
+                <ng-icon name="lucideRotateCw" size="14px" aria-hidden="true" />
+                <span>{{ 'form.retry' | translate }}</span>
+            </button>
+        </div>
+    </div>
+} @else {
+    @if (!record()) {
+        <span class="sr-only" role="status">{{ 'form.loading' | translate }}</span>
+    }
+
+    <nz-card [nzTitle]="detailsTitle" data-detail="details">
+        <ng-template #detailsTitle
+            ><h2 class="m-0 flex items-center gap-1.5 text-sm font-bold text-ink"><ng-icon name="lucideInfo" size="14px" class="text-ink-muted" aria-hidden="true" />{{ 'sales.return.section.details' | translate }}</h2></ng-template
+        >
+        @if (ret(); as r) {
+            <dl class="m-0 grid grid-cols-2 gap-x-6 gap-y-4 md:grid-cols-4">
+                <div>
+                    <dt class="text-xs text-ink-muted">{{ 'sales.return.number' | translate }}</dt>
+                    <dd class="mt-1 mb-0 font-mono text-sm font-semibold text-ink">
+                        <span nz-typography nzCopyable [nzCopyText]="r.return_no ?? ''" [nzCopyTooltips]="['copy.hint' | translate, 'copy.copied' | translate]">{{ r.return_no }}</span>
+                    </dd>
+                </div>
+                <div>
+                    <dt class="text-xs text-ink-muted">{{ 'sales.return.statusLabel' | translate }}</dt>
+                    <dd class="mt-1 mb-0" data-detail="status">
+                        @if (statusTone(); as style) {
+                            <status-tag [label]="style.label" [tone]="style.tone" [icon]="style.icon" size="standard" />
+                        }
+                    </dd>
+                </div>
+                <div>
+                    <dt class="text-xs text-ink-muted">{{ 'sales.return.reasonLabel' | translate }}</dt>
+                    <dd class="mt-1 mb-0">
+                        @if (reasonTone(); as style) {
+                            <status-tag [label]="style.label" [tone]="style.tone" [icon]="style.icon" size="standard" />
+                        }
+                    </dd>
+                    @if (reasonText(r); as text) {
+                        <dd class="mt-1 mb-0 text-xs text-ink-body" data-detail="reason-text">{{ text }}</dd>
+                    }
+                </div>
+                <div>
+                    <dt class="text-xs text-ink-muted">{{ 'sales.return.order' | translate }}</dt>
+                    <dd class="mt-1 mb-0 font-mono text-sm font-semibold">
+                        @if (canViewOrders && r.order_oid) {
+                            <a [routerLink]="orderRoute(r.order_oid)">{{ r.invoice_no }}</a>
+                        } @else {
+                            {{ r.invoice_no }}
+                        }
+                    </dd>
+                    <dd class="mt-0.5 mb-0 text-xs text-ink-muted">{{ r.channel ? ('sales.order.channel.' + r.channel | translate) : '' }}</dd>
+                </div>
+                <div>
+                    <dt class="text-xs text-ink-muted">{{ 'sales.order.customer' | translate }}</dt>
+                    <dd class="mt-1 mb-0 text-sm font-semibold text-ink">{{ r.customer_name || ('sales.order.walkIn' | translate) }}</dd>
+                    @if (r.customer_phone) {
+                        <dd class="mt-0.5 mb-0 font-mono text-xs text-ink-muted">{{ r.customer_phone }}</dd>
+                    }
+                </div>
+                <div>
+                    <dt class="text-xs text-ink-muted">{{ 'sales.return.raisedOn' | translate }}</dt>
+                    <dd class="mt-1 mb-0 text-sm font-semibold text-ink">{{ r.created_on ? (r.created_on | recordDate: language() : 'date-time-12') : '' }}</dd>
+                    <dd class="mt-0.5 mb-0 text-xs text-ink-muted">{{ r.created_by }}</dd>
+                </div>
+                @if (r.status !== 'Pending' && r.edited_on) {
+                    <div>
+                        <dt class="text-xs text-ink-muted">{{ (r.status === 'Returned' ? 'sales.return.confirmedOn' : 'sales.return.cancelledOn') | translate }}</dt>
+                        <dd class="mt-1 mb-0 text-sm font-semibold text-ink">{{ r.edited_on | recordDate: language() : 'date-time-12' }}</dd>
+                        <dd class="mt-0.5 mb-0 text-xs text-ink-muted">{{ r.edited_by }}</dd>
+                    </div>
+                }
+            </dl>
+        } @else {
+            <nz-skeleton nzActive [nzTitle]="false" [nzParagraph]="{ rows: 3 }" />
+        }
+    </nz-card>
+
+    <nz-card class="mt-2 block md:mt-4" [nzTitle]="numbersTitle" data-detail="numbers">
+        <ng-template #numbersTitle
+            ><h2 class="m-0 flex items-center gap-1.5 text-sm font-bold text-ink"><ng-icon name="lucideWallet" size="14px" class="text-ink-muted" aria-hidden="true" />{{ 'sales.order.section.numbers' | translate }}</h2></ng-template
+        >
+        @if (record(); as r) {
+            <dl class="m-0 grid grid-cols-2 gap-x-6 gap-y-3 md:grid-cols-4">
+                <div>
+                    <dt class="text-xs text-ink-muted">{{ 'sales.return.value' | translate }}</dt>
+                    <dd class="mt-1 mb-0 font-mono text-lg font-bold text-ink tabular-nums">{{ r.return_value | money }}</dd>
+                </div>
+                <div>
+                    <dt class="text-xs text-ink-muted">{{ 'sales.return.refund' | translate }}</dt>
+                    <dd class="mt-1 mb-0 font-mono text-lg font-bold text-ink tabular-nums" data-detail="refund">{{ r.refund_amount | money }}</dd>
+                </div>
+                <div>
+                    <dt class="text-xs text-ink-muted">{{ 'sales.return.dueReduction' | translate }}</dt>
+                    <dd class="mt-1 mb-0 font-mono text-lg font-bold text-ink tabular-nums">{{ r.due_reduction | money }}</dd>
+                </div>
+                <div>
+                    <dt class="text-xs text-ink-muted">{{ 'sales.order.units' | translate }}</dt>
+                    <dd class="mt-1 mb-0 font-mono text-lg font-bold text-ink tabular-nums">{{ r.total_units | digits }}</dd>
+                </div>
+            </dl>
+            <p class="mt-3 mb-0 text-xs text-ink-muted">{{ (r.channel === 'POS' ? 'sales.return.moneyPos' : 'sales.return.moneyOnline') | translate }}</p>
+        } @else {
+            <nz-skeleton nzActive [nzTitle]="false" [nzParagraph]="{ rows: 1 }" />
+        }
+    </nz-card>
+
+    <div class="mt-2 grid grid-cols-1 items-start gap-2 md:mt-4 md:gap-4 lg:grid-cols-3">
+        <div class="flex min-w-0 flex-col gap-2 md:gap-4 lg:col-start-3 lg:row-start-1">
+            <nz-card [nzTitle]="quickTitle" data-detail="quick-actions">
+                <ng-template #quickTitle
+                    ><h2 class="m-0 flex items-center gap-1.5 text-sm font-bold text-ink"><ng-icon name="lucideZap" size="14px" class="text-ink-muted" aria-hidden="true" />{{ 'sales.order.quickActions' | translate }}</h2></ng-template
+                >
+                @if (record(); as r) {
+                    <div class="flex flex-col gap-2">
+                        @if (actions().confirm) {
+                            <button nz-button nzType="primary" nzBlock type="button" class="inline-flex items-center justify-start gap-2" data-quick="confirm" [disabled]="saving()" (click)="open('confirm')">
+                                <ng-icon name="lucideCircleCheck" size="14px" aria-hidden="true" />
+                                <span>{{ 'sales.return.action.confirm.button' | translate }}</span>
+                            </button>
+                        }
+                        @if (actions().cancel) {
+                            <button nz-button nzDanger nzBlock type="button" class="inline-flex items-center justify-start gap-2" data-quick="cancel" [disabled]="saving()" (click)="open('cancel')">
+                                <ng-icon name="lucideBan" size="14px" aria-hidden="true" />
+                                <span>{{ 'sales.return.action.cancel.button' | translate }}</span>
+                            </button>
+                        }
+                        @if (canViewOrders) {
+                            <a nz-button nzBlock class="inline-flex items-center justify-start gap-2" data-quick="order" [routerLink]="orderRoute(r.order_oid)">
+                                <ng-icon name="lucideReceipt" size="14px" aria-hidden="true" />
+                                <span>{{ 'sales.return.openOrder' | translate }}</span>
+                            </a>
+                        }
+                        @if (r.status === 'Pending' && !actions().confirm && !actions().cancel) {
+                            <p class="m-0 text-xs text-ink-muted" data-quick="none">{{ 'sales.return.waiting' | translate }}</p>
+                        }
+                    </div>
+                } @else {
+                    <nz-skeleton nzActive [nzTitle]="false" [nzParagraph]="{ rows: 2 }" />
+                }
+            </nz-card>
+        </div>
+
+        <div class="flex min-w-0 flex-col gap-2 md:gap-4 lg:col-span-2 lg:row-start-1">
+            <nz-card [nzTitle]="linesTitle" [nzBodyStyle]="{ padding: '0' }" data-detail="lines">
+                <ng-template #linesTitle
+                    ><h2 class="m-0 flex items-center gap-1.5 text-sm font-bold text-ink"><ng-icon name="lucideReceipt" size="14px" class="text-ink-muted" aria-hidden="true" />{{ 'sales.return.section.lines' | translate }}</h2></ng-template
+                >
+                @if (record(); as r) {
+                    <nz-table nzTemplateMode nzSize="small" [nzScroll]="{ x: '560px' }">
+                        <thead>
+                            <tr>
+                                <th>{{ 'sales.order.product' | translate }}</th>
+                                <th nzWidth="90px" class="text-right">{{ 'sales.return.quantity' | translate }}</th>
+                                <th nzWidth="120px">{{ 'sales.return.condition' | translate }}</th>
+                                <th nzWidth="120px">{{ 'sales.return.outcome' | translate }}</th>
+                                <th nzWidth="110px" class="text-right">{{ 'sales.return.value' | translate }}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for (line of r.items; track line.oid) {
+                                <tr>
+                                    <td>
+                                        <span class="block text-[13px] font-semibold text-ink">{{ line.product_name }}</span>
+                                        <span class="block font-mono text-xs text-ink-muted">{{ line.batch_code }}</span>
+                                    </td>
+                                    <td class="text-right font-mono tabular-nums">{{ line.return_quantity | digits }}</td>
+                                    <td>{{ 'sales.return.conditionValue.' + line.condition | translate }}</td>
+                                    <td class="text-ink-body">{{ line.action ? ('sales.return.outcomeValue.' + line.action | translate) : ('sales.return.outcomeValue.waiting' | translate) }}</td>
+                                    <td class="text-right font-mono font-semibold tabular-nums">{{ line.line_refund | money }}</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </nz-table>
+                } @else {
+                    <div class="px-4 py-3"><nz-skeleton nzActive [nzTitle]="false" [nzParagraph]="{ rows: 2 }" /></div>
+                }
+            </nz-card>
+        </div>
+    </div>
+
+    <action-footer>
+        <button nz-button nzType="default" type="button" class="inline-flex items-center gap-1.5" (click)="backToList()">
+            <ng-icon name="lucideArrowLeft" size="14px" aria-hidden="true" />
+            <span>{{ 'sales.return.backToList' | translate }}</span>
+        </button>
+    </action-footer>
+}
+
+<nz-modal [nzVisible]="!!dialog()" [nzTitle]="dialog() ? ('sales.return.action.' + dialog() + '.title' | translate) : ''" [nzFooter]="dialogFooter" nzCentered (nzOnCancel)="dialog.set(null)">
+    <ng-container *nzModalContent>
+        @if (confirming()) {
+            <p class="m-0 text-sm font-semibold text-ink" data-dialog="confirm">{{ 'sales.return.action.' + dialog() + '.confirmTitle' | translate: { number: record()?.return_no ?? '' } }}</p>
+            <p class="mt-1 mb-0 text-sm text-ink-muted">{{ 'sales.return.action.' + dialog() + '.confirmBody' | translate }}</p>
+        } @else if (dialog() === 'confirm') {
+            <p class="mt-0 mb-3 text-sm text-ink-body">{{ 'sales.return.checkCondition' | translate }}</p>
+            <ul class="m-0 mb-3 flex list-none flex-col gap-2 p-0">
+                @for (line of record()?.items ?? []; track line.oid) {
+                    <li class="flex flex-wrap items-center justify-between gap-2 rounded-control border border-line p-2.5" [attr.data-condition]="line.oid">
+                        <span class="text-[13px] font-semibold text-ink">{{ line.product_name }} &times; {{ line.return_quantity | digits }}</span>
+                        <nz-radio-group nzButtonStyle="solid" nzSize="small" [ngModel]="conditions()[line.oid]" (ngModelChange)="setCondition(line.oid, $event)">
+                            <label nz-radio-button nzValue="Good">{{ 'sales.return.conditionValue.Good' | translate }}</label>
+                            <label nz-radio-button nzValue="Damaged">{{ 'sales.return.conditionValue.Damaged' | translate }}</label>
+                        </nz-radio-group>
+                    </li>
+                }
+            </ul>
+            @if (needsMethod()) {
+                <div nz-form nzLayout="vertical">
+                    <nz-form-item class="mb-0">
+                        <nz-form-label nzRequired nzFor="return-refund-method">{{ 'sales.return.handBack' | translate: { amount: (record()?.refund_amount ?? 0 | money) } }}</nz-form-label>
+                        <nz-form-control>
+                            <nz-select nzId="return-refund-method" class="w-full" data-dialog="refund-method" [nzPlaceHolder]="'sales.order.refundMethodPick' | translate" [ngModel]="refundMethod()" (ngModelChange)="refundMethod.set($event)">
+                                @for (method of refundMethods; track method) {
+                                    <nz-option [nzValue]="method" [nzLabel]="'sales.pos.method.' + method | translate" />
+                                }
+                            </nz-select>
+                        </nz-form-control>
+                    </nz-form-item>
+                </div>
+            } @else if ((record()?.refund_amount ?? 0) > 0) {
+                <p class="m-0 rounded-control bg-warning-bg p-2 text-xs text-warning-ink">{{ 'sales.return.owedAfter' | translate: { amount: (record()?.refund_amount ?? 0 | money) } }}</p>
+            }
+        } @else {
+            <div nz-form nzLayout="vertical">
+                <nz-form-item class="mb-0">
+                    <nz-form-label nzRequired nzFor="return-cancel-reason">{{ 'sales.return.cancelWhy' | translate }}</nz-form-label>
+                    <nz-form-control>
+                        <textarea nz-input id="return-cancel-reason" rows="2" maxlength="200" data-dialog="cancel-reason" [ngModel]="cancelReason()" (ngModelChange)="cancelReason.set($event)"></textarea>
+                    </nz-form-control>
+                </nz-form-item>
+                @if (record()?.return_reason === 'not_delivered') {
+                    <p class="mt-3 mb-0 text-xs text-ink-muted">{{ 'sales.return.cancelParcel' | translate }}</p>
+                }
+            </div>
+        }
+    </ng-container>
+</nz-modal>
+<ng-template #dialogFooter>
+    @if (confirming()) {
+        <button nz-button type="button" class="inline-flex items-center gap-1.5" data-dialog="back" [disabled]="saving()" (click)="confirming.set(false)">
+            <ng-icon name="lucideArrowLeft" size="14px" aria-hidden="true" />
+            <span>{{ 'list.back' | translate }}</span>
+        </button>
+    } @else {
+        <button nz-button type="button" class="inline-flex items-center gap-1.5" [disabled]="saving()" (click)="dialog.set(null)">
+            <ng-icon name="lucideX" size="14px" aria-hidden="true" />
+            <span>{{ 'form.confirm.cancel' | translate }}</span>
+        </button>
+    }
+    <button nz-button nzType="primary" type="button" class="inline-flex items-center gap-1.5" data-dialog="submit" [nzDanger]="dialog() === 'cancel'" [nzLoading]="saving()" [disabled]="dialogIncomplete()" (click)="submitDialog()">
+        @if (!saving()) {
+            <ng-icon name="lucideCheck" size="14px" aria-hidden="true" />
+        }
+        <span>{{ dialog() ? ('sales.return.action.' + dialog() + '.button' | translate) : '' }}</span>
+    </button>
+</ng-template>

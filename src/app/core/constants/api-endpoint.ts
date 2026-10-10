@@ -146,6 +146,12 @@ export class APIEndpoint {
     static readonly DELIVER_ORDER = '/api/v1/sales/order/deliver-order';
     static readonly MARK_ORDER_NOT_DELIVERED = '/api/v1/sales/order/mark-order-not-delivered';
     static readonly RECORD_ORDER_REFUND = '/api/v1/sales/order/record-order-refund';
+    static readonly GET_RETURN_LIST = '/api/v1/sales/return/get-return-list';
+    static readonly GET_RETURN_DETAILS = '/api/v1/sales/return/get-return-details';
+    static readonly GET_RETURNS_FOR_ORDER = '/api/v1/sales/return/get-returns-for-order';
+    static readonly CREATE_RETURN = '/api/v1/sales/return/create-return';
+    static readonly CONFIRM_RETURN = '/api/v1/sales/return/confirm-return';
+    static readonly CANCEL_RETURN = '/api/v1/sales/return/cancel-return';
     static readonly GET_CUSTOMER_LIST = '/api/v1/sales/customer/get-customer-list';
     static readonly GET_CUSTOMER_DETAILS = '/api/v1/sales/customer/get-customer-details';
     static readonly CREATE_CUSTOMER = '/api/v1/sales/customer/create-customer';

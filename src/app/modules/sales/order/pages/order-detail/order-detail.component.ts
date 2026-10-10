@@ -1,9 +1,9 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { NgIcon, provideIcons } from '@ng-icons/core';
-import { lucideMessageSquareText, lucidePencil, lucideArrowLeft, lucideBan, lucideHandCoins, lucideCheck, lucideCircleCheck, lucideHistory, lucideInfo, lucideMapPin, lucidePackage, lucidePackageCheck, lucidePackageX, lucidePrinter, lucideReceipt, lucideRotateCw, lucideTruck, lucideUserRound, lucideWallet, lucideX, lucideZap } from '@ng-icons/lucide';
+import { lucideMessageSquareText, lucidePencil, lucideArrowLeft, lucideBan, lucideHandCoins, lucideCheck, lucideCircleCheck, lucideHistory, lucideInfo, lucideMapPin, lucidePackage, lucidePackageCheck, lucidePackageX, lucidePrinter, lucideReceipt, lucideRotateCw, lucideTruck, lucideUndo2, lucideUserRound, lucideWallet, lucideX, lucideZap } from '@ng-icons/lucide';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzCardModule } from 'ng-zorro-antd/card';
 import { NzFormModule } from 'ng-zorro-antd/form';
@@ -31,6 +31,11 @@ import { SalesSettingsService } from '@app/modules/sales/settings/services/sales
 import { fillMessage, templatesFor } from '@app/modules/sales/settings/utils/fill-message';
 import { MessageTemplate } from '@app/core/models/message-template.model';
 import { OrderService } from '@app/modules/sales/order/services/order.service';
+import { CreatedReturn, OrderReturn } from '@app/core/models/return.model';
+import { RETURN_STATUS } from '@app/modules/sales/return/config/return-list.config';
+import { ReturnCreateDialogComponent } from '@app/modules/sales/return/components/return-create-dialog/return-create-dialog.component';
+import { RETURN_ROUTES } from '@app/modules/sales/return/constants/return-routes';
+import { ReturnService } from '@app/modules/sales/return/services/return.service';
 import { ActionFooterComponent } from '@app/shared/components/action-footer/action-footer.component';
 import { PageHeaderComponent } from '@app/shared/components/page-header/page-header.component';
 import { StatusTagComponent } from '@app/shared/components/status-tag/status-tag.component';
@@ -42,6 +47,9 @@ import { printInvoice } from '@app/shared/utils/invoice/invoice';
 import { confirmAction } from '@app/shared/utils/confirm-action/confirm-action';
 import { failureKey, failureOf } from '@app/shared/utils/request-failure/request-failure';
 import { resolveTone } from '@app/shared/utils/tone-map/tone-map';
+
+const TIMELINE_STEP = 5;
+const RETURNABLE = ['Purchased', 'Delivered', 'PartiallyReturned'];
 
 /** The server writes these few reasons as fixed English sentences; each has a label in both languages. */
 const FIXED_REASONS: Record<string, string> = {
@@ -64,8 +72,8 @@ type Dialog = 'confirm' | 'cancel' | 'dispatch' | 'notDelivered' | 'refund';
  */
 @Component({
     selector: 'order-detail',
-    imports: [FormsModule, RouterLink, NgIcon, NzButtonModule, NzCardModule, NzFormModule, NzInputModule, NzInputNumberModule, NzModalModule, NzRadioModule, NzSelectModule, NzSkeletonModule, NzTableModule, NzTimelineModule, NzTypographyModule, TranslatePipe, PageHeaderComponent, ActionFooterComponent, StatusTagComponent, DigitsPipe, MoneyPipe, RecordDatePipe],
-    providers: [MoneyPipe, DigitsPipe, provideIcons({ lucideMessageSquareText, lucidePencil, lucideArrowLeft, lucideBan, lucideHandCoins, lucideCheck, lucideCircleCheck, lucideHistory, lucideInfo, lucideMapPin, lucidePackage, lucidePackageCheck, lucidePackageX, lucidePrinter, lucideReceipt, lucideRotateCw, lucideTruck, lucideUserRound, lucideWallet, lucideX, lucideZap })],
+    imports: [FormsModule, RouterLink, NgIcon, NzButtonModule, NzCardModule, NzFormModule, NzInputModule, NzInputNumberModule, NzModalModule, NzRadioModule, NzSelectModule, NzSkeletonModule, NzTableModule, NzTimelineModule, NzTypographyModule, TranslatePipe, PageHeaderComponent, ActionFooterComponent, StatusTagComponent, ReturnCreateDialogComponent, DigitsPipe, MoneyPipe, RecordDatePipe],
+    providers: [MoneyPipe, DigitsPipe, provideIcons({ lucideMessageSquareText, lucidePencil, lucideArrowLeft, lucideBan, lucideHandCoins, lucideCheck, lucideCircleCheck, lucideHistory, lucideInfo, lucideMapPin, lucidePackage, lucidePackageCheck, lucidePackageX, lucidePrinter, lucideReceipt, lucideRotateCw, lucideTruck, lucideUndo2, lucideUserRound, lucideWallet, lucideX, lucideZap })],
     templateUrl: './order-detail.component.html',
     styleUrl: './order-detail.component.scss',
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -101,13 +109,25 @@ export class OrderDetailComponent {
     readonly deliveryTone = computed(() => this.toneOf(DELIVERY_STATUS, this.record()?.online?.delivery_status));
     readonly paymentTone = computed(() => this.toneOf(PAYMENT_STATUS, this.order()?.payment_status));
 
-    /** What the courier collects, or what is still owed at the counter: the total less what is paid. */
+    /**
+     * What the courier collects, or what is still owed at the counter: what the customer keeps, less the
+     * money the business keeps of what they paid, as the customer record counts it. A parcel that came
+     * back was never sold, so nothing is owed on it.
+     */
     readonly due = computed(() => {
         const o = this.record();
-        if (!o || o.payment_status === 'paid' || o.status === 'Cancelled') return 0;
-        return Math.max(0, o.total_amount - (o.payment_status === 'partially_paid' ? o.amount_paid : 0));
+        if (!o || o.payment_status === 'paid' || o.status === 'Cancelled' || (o.status === 'Returned' && !o.sold_on)) return 0;
+        const kept = o.items.reduce((sum, line) => sum + (line.quantity - line.returned_qty) * (line.unit_price - line.discount), 0) + o.delivery_charge;
+        const held = (o.payment_status === 'unpaid' ? 0 : o.amount_paid) - o.amount_refunded - o.refund_due;
+        return Math.max(0, kept - held);
     });
     readonly units = computed(() => (this.record()?.items ?? []).reduce((sum, line) => sum + line.quantity, 0));
+
+    readonly timelineShown = signal(TIMELINE_STEP);
+    readonly timelineMore = signal(false);
+    readonly timeline = computed(() => [...(this.record()?.status_history ?? [])].reverse());
+    readonly timelineVisible = computed(() => this.timeline().slice(0, this.timelineShown()));
+    private _timelineTimer?: ReturnType<typeof setTimeout>;
 
     /** Each action appears only when the person holds it and the order is in the state it leaves. */
     readonly actions = computed(() => {
@@ -127,9 +147,19 @@ export class OrderDetailComponent {
             notDelivered: all && online && o.status === 'Confirmed' && delivery === 'WithCourier' && can('deliver'),
             cancel: online && open && can('cancel'),
             refund: all && online && o.refund_status === 'ToRefund' && can('refund'),
+            return: all && !!o && RETURNABLE.includes(o.status) && this._session.can('sales.return.create') && Object.values(this.returnable()).some((left) => left > 0),
         };
     });
     readonly anyAction = computed(() => Object.values(this.actions()).some(Boolean));
+
+    private readonly _returns = inject(ReturnService);
+    readonly canViewReturns = this.scope === 'all' && this._session.can('sales.return.view');
+    readonly returnRoute = RETURN_ROUTES.detail;
+    readonly returns = signal<OrderReturn[]>([]);
+    private readonly _returnable = signal<Record<string, number> | null>(null);
+    /** Without the returns read, a line can take back what was sold less what was returned; the server checks Pending ones. */
+    readonly returnable = computed(() => this._returnable() ?? Object.fromEntries((this.record()?.items ?? []).map((line) => [line.oid, line.quantity - line.returned_qty])));
+    readonly returning = signal(false);
 
     // The action dialog and what it holds.
     readonly dialog = signal<Dialog | null>(null);
@@ -169,6 +199,16 @@ export class OrderDetailComponent {
     constructor() {
         this.load();
         this.loadTemplates();
+        inject(DestroyRef).onDestroy(() => clearTimeout(this._timelineTimer));
+    }
+
+    /** The entries are already loaded; the short pause tells the person something was added below. */
+    showMoreTimeline(): void {
+        this.timelineMore.set(true);
+        this._timelineTimer = setTimeout(() => {
+            this.timelineShown.update((shown) => shown + TIMELINE_STEP);
+            this.timelineMore.set(false);
+        }, 400);
     }
 
     load(): void {
@@ -177,6 +217,8 @@ export class OrderDetailComponent {
         this._orders.details(this.oid, this.scope).subscribe({
             next: (details) => {
                 this.record.set(details);
+                this.timelineShown.set(TIMELINE_STEP);
+                this.loadReturns();
                 this.loading.set(false);
             },
             error: (error: unknown) => {
@@ -184,6 +226,26 @@ export class OrderDetailComponent {
                 this.failed.set(failureOf(error));
             },
         });
+    }
+
+    private loadReturns(): void {
+        if (!this.canViewReturns) return;
+        this._returns.forOrder(this.oid).subscribe({
+            next: ({ returns, returnable }) => {
+                this.returns.set(returns);
+                this._returnable.set(Object.fromEntries(returnable.map((line) => [line.order_item_oid, line.returnable])));
+            },
+            error: () => this._message.warning(this._translate.instant('sales.return.forOrderFailed')),
+        });
+    }
+
+    returnRaised(created: CreatedReturn): void {
+        if (this.canViewReturns) void this._router.navigateByUrl(RETURN_ROUTES.detail(created.return_oid));
+        else this.load();
+    }
+
+    returnStatusTone(value: string) {
+        return this.toneOf(RETURN_STATUS, value);
     }
 
     backToList(): void {
@@ -239,11 +301,13 @@ export class OrderDetailComponent {
         if (entry.kind === 'Order' && entry.to_status === 'Cancelled') return withNote(t('sales.order.cancelReason.' + code));
         if (entry.kind === 'Order' && entry.to_status === 'Confirmed') return withNote(t('sales.order.confirmedVia.' + code));
         if (entry.kind === 'Delivery' && entry.to_status === 'Failed') return withNote(t('sales.order.notDeliveredReason.' + code));
+        if (entry.kind === 'Delivery' && entry.from_status === 'Failed' && entry.to_status === 'WithCourier') return t('sales.order.reason.parcelUndone', { number: raw });
+        if ((entry.kind === 'Order' && /Returned$/.test(entry.to_status)) || entry.to_status === 'BackInShop') return t('sales.order.reason.returnConfirmed', { number: raw });
         if (entry.kind === 'Delivery' && entry.to_status === 'WithCourier') {
             const [courier, ...consignment] = raw.split(' ');
             return [t('sales.order.couriers.' + courier), ...consignment].join(' ');
         }
-        if (entry.kind === 'Refund' && entry.from_status === 'None') return t('sales.order.reason.owed', { amount: this._money.transform(Number(raw)) });
+        if (entry.kind === 'Refund' && /^\d+$/.test(raw)) return t('sales.order.reason.owed', { amount: this._money.transform(Number(raw)) });
         const refund = entry.kind === 'Refund' ? /^(\d+) by (\w+)$/.exec(code) : null;
         if (refund) return withNote(t('sales.order.reason.refunded', { amount: this._money.transform(Number(refund[1])), method: t('sales.pos.method.' + refund[2]) }));
         return raw;
