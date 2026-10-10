@@ -91,9 +91,9 @@ describe('OrderDetailComponent', () => {
         http.verify();
     });
 
-    it('offers nothing on a counter sale, which only a return can undo', async () => {
+    it('offers only the invoice on a POS sale, which only a return can undo', async () => {
         const { element } = await open(order({ channel: 'POS', status: 'Purchased', online: null }));
-        expect(quick(element)).toEqual(['none']);
+        expect(quick(element)).toEqual(['print', 'none']);
     });
 
     it('asks inside the same dialog, with no second modal on top, and Back returns to the details', async () => {

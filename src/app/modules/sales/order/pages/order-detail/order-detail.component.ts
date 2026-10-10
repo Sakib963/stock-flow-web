@@ -259,10 +259,10 @@ export class OrderDetailComponent {
         return [online.address_line, bn ? online.thana_name_bn : online.thana_name_en, bn ? online.district_name_bn : online.district_name_en, online.postal_code].filter(Boolean).join(', ');
     }
 
-    /** The same A4 invoice the online order prints at Create, drawn from the order as it stands now (sales REQ-57). */
+    /** The same A4 invoice the online order prints at Create, drawn from the order as it stands now (sales REQ-57); a POS sale has no ship to or delivery. */
     print(): void {
         const o = this.record();
-        if (!o?.online) return;
+        if (!o) return;
         const t = (key: string, params?: Record<string, unknown>) => this._translate.instant('sales.online.invoice.' + key, params);
         const money = (value: number) => this._money.transform(value);
         const business = this._session.business();
@@ -279,10 +279,10 @@ export class OrderDetailComponent {
                 [t('date'), new RecordDatePipe().transform(o.created_on, this.language(), 'date-time-12')],
             ],
             billedTo: { label: t('billedTo'), lines: [o.customer_name ?? '', o.customer_phone ?? ''] },
-            shipTo: { label: t('shipTo'), lines: [o.online.recipient_name ?? '', o.online.recipient_phone ?? o.customer_phone ?? '', this.placeOf(o)] },
+            shipTo: o.online ? { label: t('shipTo'), lines: [o.online.recipient_name ?? '', o.online.recipient_phone ?? o.customer_phone ?? '', this.placeOf(o)] } : null,
             columns: { item: t('item'), quantity: t('quantity'), price: t('price'), amount: t('amount') },
             lines: o.items.map((line) => ({ name: line.product_name, quantity: this._digits.transform(line.quantity), price: money(line.unit_price), amount: money(line.unit_price * line.quantity) })),
-            totals: rows([t('subtotal'), money(o.subtotal)], o.discount_total ? [t('discount'), '-' + money(o.discount_total)] : null, [t('delivery'), money(o.delivery_charge)], [t('total'), money(o.total_amount)], paid ? [t('paid'), '-' + money(paid)] : null, [t('collect'), t('withCurrency', { amount: money(this.due()) })]),
+            totals: rows([t('subtotal'), money(o.subtotal)], o.discount_total ? [t('discount'), '-' + money(o.discount_total)] : null, o.online ? [t('delivery'), money(o.delivery_charge)] : null, [t('total'), money(o.total_amount)], paid ? [t('paid'), '-' + money(paid)] : null, [t(o.online ? 'collect' : 'owed'), t('withCurrency', { amount: money(this.due()) })]),
             notes: rows(o.payment_type ? [t('payment'), this._translate.instant('sales.online.terms.' + o.payment_type)] : null, o.notes ? [t('note'), o.notes] : null),
             thanks: t('thanks'),
             poweredBy: t('poweredBy'),

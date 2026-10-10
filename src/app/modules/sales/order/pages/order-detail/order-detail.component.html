@@ -202,7 +202,7 @@
                                 <span>{{ 'sales.return.action.create.button' | translate }}</span>
                             </button>
                         }
-                        @if (record()?.online) {
+                        @if (record()) {
                             <button nz-button nzBlock type="button" class="inline-flex items-center justify-start gap-2" data-quick="print" (click)="print()">
                                 <ng-icon name="lucidePrinter" size="14px" aria-hidden="true" />
                                 <span>{{ 'sales.online.invoice.print' | translate }}</span>

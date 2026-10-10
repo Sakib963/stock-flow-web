@@ -18,7 +18,7 @@ export interface InvoiceContent {
     /** Invoice number and date: label and value. */
     meta: [string, string][];
     billedTo: { label: string; lines: string[] };
-    shipTo: { label: string; lines: string[] };
+    shipTo: { label: string; lines: string[] } | null;
     columns: { item: string; quantity: string; price: string; amount: string };
     lines: { name: string; quantity: string; price: string; amount: string }[];
     /** Subtotal, discount, delivery, total, paid and to collect, as label and value. The last is the one the courier reads. */
@@ -67,7 +67,8 @@ export const drawInvoice = (doc: Document, content: InvoiceContent, qr: string |
     head.append(business, meta);
 
     const parties = styled(doc.createElement('div'), { display: 'flex', gap: '8mm', margin: '6mm 0' });
-    parties.append(block(doc, content.billedTo), block(doc, content.shipTo));
+    parties.append(block(doc, content.billedTo));
+    if (content.shipTo) parties.append(block(doc, content.shipTo));
 
     const table = styled(doc.createElement('table'), { width: '100%', 'border-collapse': 'collapse' });
     const header = doc.createElement('tr');
