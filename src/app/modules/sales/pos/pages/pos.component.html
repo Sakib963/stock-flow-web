@@ -73,14 +73,15 @@
                     </div>
                 }
             } @else {
-                <nz-table nzTemplateMode nzSize="small">
+                <!-- Fixed, so a long name takes one line and a cart of ten still shows most of its lines. -->
+                <nz-table nzTemplateMode nzSize="small" nzTableLayout="fixed">
                     <thead>
                         <tr>
                             <th nzWidth="36px" class="text-center">#</th>
                             <th>{{ 'sales.pos.product' | translate }}</th>
                             <th nzWidth="128px" class="text-center">{{ 'sales.pos.quantity' | translate }}</th>
                             <th nzWidth="96px" class="text-right">{{ 'sales.pos.price' | translate }}</th>
-                            <th nzWidth="132px" class="text-right whitespace-nowrap">{{ 'sales.pos.discountPerUnit' | translate }}</th>
+                            <th nzWidth="112px" class="text-right whitespace-nowrap">{{ 'sales.pos.discountPerUnit' | translate }}</th>
                             <th nzWidth="108px" class="text-right">{{ 'sales.pos.lineTotal' | translate }}</th>
                             <th nzWidth="44px">
                                 <span class="sr-only">{{ 'sales.pos.removeLine' | translate }}</span>
@@ -257,8 +258,8 @@
 <!-- The batch sets the limit, so each line says its own. -->
 <ng-template #productName let-line>
     @let limit = discountCap(line) > 0 ? ('sales.pos.discountUpTo' | translate: { max: (discountCap(line) | money) }) : ('sales.pos.noDiscount' | translate);
-    <span class="flex items-center gap-1 text-[13px] font-semibold text-ink">
-        <span class="min-w-0">{{ line.product_name }}</span>
+    <span class="flex min-w-0 items-center gap-1 text-[13px] font-semibold text-ink">
+        <span class="min-w-0 truncate" nz-tooltip [nzTooltipTitle]="line.product_name">{{ line.product_name }}</span>
         <ng-icon name="lucideInfo" size="13px" class="flex-none cursor-help text-ink-muted" tabindex="0" data-pos="discount-limit" nz-tooltip [nzTooltipTitle]="limit" [attr.aria-label]="limit" />
     </span>
 </ng-template>

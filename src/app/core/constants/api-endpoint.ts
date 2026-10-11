@@ -167,6 +167,7 @@ export class APIEndpoint {
     static readonly CONFIRM_PRE_ORDER = '/api/v1/sales/pre-order/confirm-pre-order';
     static readonly CANCEL_PRE_ORDER = '/api/v1/sales/pre-order/cancel-pre-order';
     static readonly RECORD_PRE_ORDER_REFUND = '/api/v1/sales/pre-order/record-pre-order-refund';
+    static readonly GET_PRE_ORDER_FOR_CONVERSION = '/api/v1/sales/pre-order/get-pre-order-for-conversion';
     static readonly FIND_OPEN_BOOKINGS = '/api/v1/sales/pre-order/find-open-bookings';
     static readonly GET_PRODUCT_LIST_FOR_PRE_ORDER = '/api/v1/sales/pre-order/get-product-list-for-pre-order';
     static readonly GET_CUSTOMER_LIST = '/api/v1/sales/customer/get-customer-list';

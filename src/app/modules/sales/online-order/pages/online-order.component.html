@@ -1,4 +1,4 @@
-<page-header [title]="editingOid ? ('sales.online.edit.title' | translate: { number: editingInvoice() ?? '' }) : ('sales.online.title' | translate)" [compact]="true">
+<page-header [title]="editingOid ? ('sales.online.edit.title' | translate: { number: editingInvoice() ?? '' }) : booking() ? ('sales.preOrder.convert.title' | translate: { number: booking()!.preorder_no }) : ('sales.online.title' | translate)" [compact]="true">
     @if (canCreate && !editingOid) {
         <button nz-button type="button" class="inline-flex items-center gap-1.5" data-online="drafts" (click)="openDrafts()">
             <ng-icon name="lucideFileClock" size="14px" aria-hidden="true" />
@@ -28,7 +28,7 @@
 } @else if (!setup()) {
     <section class="rounded-container border border-line bg-white p-4"><nz-skeleton [nzActive]="true" [nzParagraph]="{ rows: 6 }" /></section>
 } @else {
-    <div class="grid min-h-0 flex-1 grid-cols-1 gap-2 md:gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.25fr)_minmax(0,0.9fr)]">
+    <div class="grid min-h-0 flex-1 grid-cols-1 gap-2 md:gap-4 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.5fr)_minmax(0,0.9fr)] min-[1600px]:grid-cols-[minmax(0,1fr)_minmax(0,1.25fr)_minmax(0,0.9fr)]">
         <!-- Customer: phone first, then who they are and where the parcel goes. -->
         <section class="flex min-h-0 flex-col rounded-container border border-line bg-white" data-online="customer" [class.ring-2]="attention() === 'customer'" [class.ring-warning]="attention() === 'customer'" [attr.aria-label]="'sales.online.customer' | translate">
             <div class="min-h-0 flex-1 overflow-y-auto p-3 md:p-4" nz-form nzLayout="vertical">
@@ -36,7 +36,7 @@
                 <div class="relative">
                     <button nz-button nzType="link" nzSize="small" type="button" class="absolute top-0 right-0 z-1 inline-flex items-center gap-1 px-0" data-online="paste-toggle" [attr.aria-expanded]="pasteOpen()" (click)="pasteOpen.set(!pasteOpen())">
                         <ng-icon name="lucideClipboardPaste" size="14px" aria-hidden="true" />
-                        <span>{{ 'sales.online.paste.open' | translate }}</span>
+                        <span>{{ (stacked() || wide() ? 'sales.online.paste.open' : 'sales.online.paste.short') | translate }}</span>
                     </button>
                     <nz-form-item class="mb-0">
                         <nz-form-label nzRequired nzFor="online-phone">{{ 'sales.online.phone' | translate }}</nz-form-label>
@@ -179,6 +179,13 @@
                         <p class="m-0 mb-2 text-xs text-warning-ink" data-online="no-place">{{ 'sales.online.noCandidates' | translate }}</p>
                     }
                 }
+                <!-- Said plainly when there is nothing to pick, so the moderator asks for the address instead of hunting for one. -->
+                @if (!savedAddresses().length && !newAddress() && lookup().state === 'done') {
+                    <p class="m-0 mb-2 flex items-start gap-1.5 rounded-control border border-warning bg-warning-bg p-2 text-xs text-warning-ink" data-online="no-address">
+                        <ng-icon name="lucideMapPin" size="13px" class="mt-px shrink-0" aria-hidden="true" />
+                        {{ customer() ? ('sales.online.noSavedAddress' | translate: { name: customer()!.name }) : ('sales.online.newNoAddress' | translate) }}
+                    </p>
+                }
                 <nz-radio-group class="flex w-full flex-col gap-2" data-online="addresses" [ngModel]="addressChoice()" (ngModelChange)="addressChoice.set($event)">
                     @for (address of savedAddresses(); track address.oid) {
                         <label nz-radio class="m-0 rounded-control border border-line p-2" [nzValue]="address.oid">
@@ -199,7 +206,7 @@
                     }
                 </nz-radio-group>
                 @if (!newAddress()) {
-                    <button nz-button nzBlock type="button" class="mt-2 inline-flex items-center justify-center gap-1.5" data-online="add-address" [disabled]="!normalizedPhone()" (click)="openAddress()">
+                    <button nz-button nzBlock type="button" class="mt-2 inline-flex items-center justify-center gap-1.5" data-online="add-address" [nzType]="!savedAddresses().length && lookup().state === 'done' ? 'primary' : 'default'" [disabled]="!normalizedPhone()" (click)="openAddress()">
                         <ng-icon name="lucidePlus" size="14px" aria-hidden="true" />
                         <span>{{ 'sales.online.addAddress' | translate }}</span>
                     </button>
@@ -209,6 +216,11 @@
 
         <!-- Products, added as at the counter (REQ-37). Its lines scroll inside it. -->
         <section class="flex min-h-0 flex-col gap-3 rounded-container border border-line bg-white p-3 md:p-4" data-online="products" [class.ring-2]="attention() === 'products'" [class.ring-warning]="attention() === 'products'" [attr.aria-label]="'sales.online.products' | translate">
+            @if (booking(); as b) {
+                <booking-lines [preorderNo]="b.preorder_no" [lines]="b.lines" [inOrder]="unitsByProduct()" (find)="findBooked($event)" />
+            } @else if (bookingFailed(); as failure) {
+                <p class="m-0 rounded-control border border-danger bg-danger-bg p-3 text-xs text-danger-ink" role="alert" data-online="booking-failed">{{ failure }}</p>
+            }
             <product-search [browse]="true" (picked)="add($event)" />
             <h2 class="m-0 flex items-center gap-1.5 text-sm font-bold text-ink">
                 <ng-icon name="lucidePackage" size="14px" class="text-ink-muted" aria-hidden="true" />
@@ -216,15 +228,16 @@
                 <span class="rounded-full bg-surface-sunken px-2 text-xs font-semibold text-ink-muted">{{ units() | digits }}</span>
             </h2>
             <div class="-mx-3 flex min-h-0 flex-1 flex-col overflow-y-auto border-t border-line md:-mx-4" data-online="lines">
-                @if (wide() && lines().length) {
-                    <nz-table nzTemplateMode nzSize="small">
+                <!-- A table from a laptop up, so a cart of six still fits; on a tablet or phone each line is a card. -->
+                @if (!stacked() && lines().length) {
+                    <nz-table nzTemplateMode nzSize="small" nzTableLayout="fixed">
                         <thead>
                             <tr>
                                 <th>{{ 'sales.online.product' | translate }}</th>
-                                <th nzWidth="124px" class="text-center">{{ 'sales.online.quantity' | translate }}</th>
-                                <th nzWidth="104px" class="text-right whitespace-nowrap">{{ 'sales.online.discountPerUnit' | translate }}</th>
-                                <th nzWidth="96px" class="text-right">{{ 'sales.online.lineTotal' | translate }}</th>
-                                <th nzWidth="40px">
+                                <th [nzWidth]="wide() ? '124px' : '56px'" class="text-center">{{ (wide() ? 'sales.online.quantity' : 'sales.online.quantityShort') | translate }}</th>
+                                <th [nzWidth]="wide() ? '104px' : '68px'" class="text-right whitespace-nowrap">{{ (wide() ? 'sales.online.discountPerUnit' : 'sales.online.discountShort') | translate }}</th>
+                                <th [nzWidth]="wide() ? '96px' : '92px'" class="text-right">{{ 'sales.online.lineTotal' | translate }}</th>
+                                <th [nzWidth]="wide() ? '40px' : '44px'">
                                     <span class="sr-only">{{ 'sales.online.removeLine' | translate }}</span>
                                 </th>
                             </tr>
@@ -234,9 +247,15 @@
                                 @let short = line.quantity > line.sellable;
                                 <tr [class.bg-danger-bg]="short" [attr.data-line]="i">
                                     <td><ng-container [ngTemplateOutlet]="lineName" [ngTemplateOutletContext]="{ $implicit: line, short }" /></td>
-                                    <td class="text-center"><ng-container [ngTemplateOutlet]="stepper" [ngTemplateOutletContext]="{ $implicit: line, i }" /></td>
+                                    <td class="text-center">
+                                        @if (wide()) {
+                                            <ng-container [ngTemplateOutlet]="stepper" [ngTemplateOutletContext]="{ $implicit: line, i }" />
+                                        } @else {
+                                            <input nz-input type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="off" class="h-8 w-12 px-1 text-center font-mono tabular-nums" [attr.aria-label]="'sales.online.quantityOf' | translate: { name: line.product_name }" [ngModel]="line.quantity" (ngModelChange)="setQuantity(i, $event)" />
+                                        }
+                                    </td>
                                     <td class="text-right"><ng-container [ngTemplateOutlet]="discountField" [ngTemplateOutletContext]="{ $implicit: line, i }" /></td>
-                                    <td class="text-right font-mono text-[13px] font-semibold text-ink tabular-nums">{{ lineTotal(line) | money }}</td>
+                                    <td class="text-right font-mono text-[13px] font-semibold whitespace-nowrap text-ink tabular-nums">{{ lineTotal(line) | money }}</td>
                                     <td class="text-right">
                                         <button nz-button nzType="text" nzSize="small" type="button" nz-tooltip [nzTooltipTitle]="'sales.online.removeLine' | translate" [attr.aria-label]="'sales.online.removeLine' | translate" (click)="remove(i)">
                                             <ng-icon name="lucideTrash2" size="14px" class="text-ink-muted" aria-hidden="true" />
@@ -520,9 +539,33 @@
             }
         </span>
         <div class="min-w-0">
-            <span class="block text-[13px] font-semibold text-ink">{{ line.product_name }}</span>
-            <span class="block font-mono text-xs text-ink-muted">{{ line.batch_code }} · {{ line.selling_price | money }}</span>
-            <span class="block text-xs" [class.text-danger-ink]="short" [class.text-ink-muted]="!short">{{ 'sales.online.sellable' | translate: { count: (line.sellable | digits) } }}</span>
+            <span class="block truncate text-[13px] font-semibold text-ink" nz-tooltip [nzTooltipTitle]="line.product_name">{{ line.product_name }}</span>
+            <span class="block truncate text-xs text-ink-muted"
+                ><span class="font-mono">{{ line.batch_code }} · {{ line.selling_price | money }}</span> · <span [class.text-danger-ink]="short">{{ 'sales.online.sellable' | translate: { count: (line.sellable | digits) } }}</span></span
+            >
+            <!-- A booked product: what the booked price means on this batch, and a tap to use it when the batch allows it. -->
+            @if (bookedFor(line); as booked) {
+                @let hint = bookedHint(line, booked);
+                <span class="mt-0.5 flex min-w-0 items-center gap-x-2 text-xs" data-online="booked-hint">
+                    <span class="min-w-0 truncate" [class.text-ink-body]="hint.allowed" [class.text-danger-ink]="!hint.allowed" nz-tooltip [nzTooltipTitle]="hintText">
+                        {{ 'sales.preOrder.convert.hintShort' | translate: { price: (booked.unit_price | money) } }}{{ hint.allowed ? '' : ('sales.preOrder.convert.hintShortOver' | translate) }}
+                        <ng-template #hintText>
+                            @if (hint.discount === 0) {
+                                {{ 'sales.preOrder.convert.hintSame' | translate: { price: (booked.unit_price | money) } }}
+                            } @else if (hint.discount < 0) {
+                                {{ 'sales.preOrder.convert.hintAbove' | translate: { price: (booked.unit_price | money) } }}
+                            } @else if (hint.allowed) {
+                                {{ 'sales.preOrder.convert.hintOk' | translate: { price: (booked.unit_price | money), amount: (hint.discount | money), max: (discountCap(line) | money) } }}
+                            } @else {
+                                {{ 'sales.preOrder.convert.hintOver' | translate: { price: (booked.unit_price | money), amount: (hint.discount | money), max: (discountCap(line) | money) } }}
+                            }
+                        </ng-template>
+                    </span>
+                    @if (hint.allowed && hint.discount > 0 && line.discount !== hint.discount) {
+                        <button nz-button nzType="link" nzSize="small" type="button" class="h-auto shrink-0 p-0" data-online="use-booked" (click)="useBookedPrice(line, hint.discount)">{{ 'sales.preOrder.convert.useBookedPrice' | translate }}</button>
+                    }
+                </span>
+            }
         </div>
     </div>
 </ng-template>
@@ -541,7 +584,7 @@
 
 <ng-template #discountField let-line let-i="i">
     @if (discountCap(line) > 0) {
-        <nz-input-number class="w-24" [nzMin]="0" [nzMax]="discountCap(line)" [nzStep]="1" [nzPrecision]="0" [attr.aria-label]="'sales.online.discountPerUnit' | translate" [ngModel]="line.discount" (ngModelChange)="setDiscount(i, $event)" />
+        <nz-input-number class="w-full max-w-24" [nzMin]="0" [nzMax]="discountCap(line)" [nzStep]="1" [nzPrecision]="0" [attr.aria-label]="'sales.online.discountPerUnit' | translate" [ngModel]="line.discount" (ngModelChange)="setDiscount(i, $event)" />
     } @else {
         <span class="text-xs text-ink-muted" nz-tooltip [nzTooltipTitle]="'sales.online.noDiscount' | translate">&ndash;</span>
     }

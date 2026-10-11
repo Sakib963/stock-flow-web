@@ -70,6 +70,8 @@ export interface OnlineOrderPayload {
     blocked_acknowledged: boolean;
     notes: string | null;
     lines: { inventory_oid: string; quantity: number; discount: number }[];
+    /** The booking this order is made from; the server converts it in the same step. */
+    pre_order_oid?: string | null;
 }
 
 export interface OnlineOrderResult {

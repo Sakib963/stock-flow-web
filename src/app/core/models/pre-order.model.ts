@@ -1,3 +1,5 @@
+import { PosBatch } from '@app/core/models/pos.model';
+
 export type PreOrderStatus = 'Pending' | 'Confirmed' | 'Converted' | 'Cancelled';
 export type PreOrderCancelReason = 'changed_mind' | 'unreachable' | 'stock_not_coming' | 'other';
 export const PRE_ORDER_CANCEL_REASONS: PreOrderCancelReason[] = ['changed_mind', 'unreachable', 'stock_not_coming', 'other'];
@@ -90,4 +92,31 @@ export interface PreOrderProduct extends PriceHints {
     sku: string | null;
     sellable: number;
     price: number;
+}
+
+/** A booked line as the online order page converts it: the batches of its product an order can take. */
+export interface ConversionLine {
+    oid: string;
+    product_oid: string;
+    product_name: string;
+    sku: string | null;
+    quantity: number;
+    /** The approximate price booked: a hint, never the order's price. */
+    unit_price: number;
+    batches: PosBatch[];
+}
+
+/** A booking opened on the online order page to become an order (pre-order REQ-07). */
+export interface ConversionBooking {
+    oid: string;
+    preorder_no: string;
+    status: PreOrderStatus;
+    customer_phone: string;
+    customer_name: string;
+    /** The advance still held, which becomes what the order has been paid. */
+    advance: number;
+    advance_method: AdvanceMethod | null;
+    advance_reference: string | null;
+    notes: string | null;
+    lines: ConversionLine[];
 }

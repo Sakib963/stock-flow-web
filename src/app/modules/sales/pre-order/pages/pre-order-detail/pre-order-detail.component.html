@@ -117,6 +117,15 @@
                 >
                 @if (record()) {
                     <div class="flex flex-col gap-2">
+                        @if (actions().convert) {
+                            <button nz-button nzType="primary" nzBlock type="button" class="inline-flex items-center justify-start gap-2" data-quick="convert" [disabled]="saving() || notInStock().length > 0" (click)="convert()">
+                                <ng-icon name="lucideShoppingBag" size="14px" aria-hidden="true" />
+                                <span>{{ 'sales.preOrder.convert.button' | translate }}</span>
+                            </button>
+                            @if (notInStock().length) {
+                                <p class="m-0 text-xs text-warning-ink" data-quick="not-ready">{{ 'sales.preOrder.notReady' | translate: { names: notInStock().join(', ') } }}</p>
+                            }
+                        }
                         @if (actions().confirm) {
                             <button nz-button nzType="primary" nzBlock type="button" class="inline-flex items-center justify-start gap-2" data-quick="confirm" [nzLoading]="saving()" (click)="confirm()">
                                 @if (!saving()) {

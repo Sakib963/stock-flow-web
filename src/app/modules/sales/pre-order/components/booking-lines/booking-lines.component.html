@@ -1,0 +1,42 @@
+<!-- One bar, so the cart below keeps its room; the list itself opens on demand. -->
+<section class="flex flex-wrap items-center gap-x-3 gap-y-1 rounded-control border border-primary-soft bg-primary-wash px-3 py-2" data-booking="lines">
+    <span class="flex min-w-0 items-center gap-1.5 text-shell-title font-semibold text-ink">
+        <ng-icon name="lucideCalendarClock" size="14px" class="shrink-0 text-primary" aria-hidden="true" />
+        <span class="truncate">{{ preorderNo() }}</span>
+    </span>
+    @if (left()) {
+        <span class="text-xs font-semibold text-ink-body" data-booking="left">{{ 'sales.preOrder.convert.left' | translate: { count: (left() | digits), total: (lines().length | digits) } }}</span>
+    } @else {
+        <span class="inline-flex items-center gap-1 text-xs font-semibold text-success-ink" data-booking="all-in"><ng-icon name="lucideCircleCheck" size="13px" aria-hidden="true" />{{ 'sales.preOrder.convert.allIn' | translate }}</span>
+    }
+    @if (notInStock().length) {
+        <span class="inline-flex cursor-help items-center gap-1 text-xs font-semibold text-warning-ink" role="alert" data-booking="not-ready" nz-tooltip [nzTooltipTitle]="'sales.preOrder.convert.notReady' | translate: { names: notInStock().join(', ') }"> <ng-icon name="lucideTriangleAlert" size="13px" aria-hidden="true" />{{ 'sales.preOrder.convert.notInStock' | translate: { count: (notInStock().length | digits) } }} </span>
+    }
+    <button nz-button nzSize="small" type="button" class="ml-auto inline-flex items-center gap-1" data-booking="see-all" nz-popover nzPopoverTrigger="click" nzPopoverPlacement="bottomRight" [nzPopoverVisible]="listOpen()" (nzPopoverVisibleChange)="listOpen.set($event)" [nzPopoverTitle]="'sales.preOrder.convert.allTitle' | translate: { number: preorderNo() }" [nzPopoverContent]="list">
+        <span>{{ (left() ? 'sales.preOrder.convert.pick' : 'sales.preOrder.convert.seeBooking') | translate: { count: (lines().length | digits) } }}</span>
+        <ng-icon name="lucideChevronDown" size="13px" aria-hidden="true" />
+    </button>
+</section>
+
+<ng-template #list>
+    <p class="m-0 mb-1 text-xs text-ink-muted">{{ 'sales.preOrder.convert.tapToSearch' | translate }}</p>
+    <ul class="-mx-3 m-0 max-h-80 w-96 max-w-[85vw] list-none overflow-y-auto p-0" data-booking="all">
+        @for (line of ordered(); track line.oid) {
+            <li>
+                <button nz-button nzType="text" nzBlock type="button" class="flex h-auto items-center gap-2 rounded-none px-3 py-1.5 text-left" [attr.data-booked]="line.product_oid" [attr.aria-label]="'sales.preOrder.convert.findLabel' | translate: { name: line.product_name }" (click)="pick(line)">
+                    @if (done(line)) {
+                        <ng-icon name="lucideCircleCheck" size="14px" class="shrink-0 text-success-ink" aria-hidden="true" />
+                    } @else {
+                        <ng-icon name="lucideSearch" size="14px" class="shrink-0 text-primary" aria-hidden="true" />
+                    }
+                    <span class="min-w-0 flex-1 truncate text-shell-title" [class.font-semibold]="!done(line)" [class.text-ink]="!done(line)" [class.text-ink-muted]="done(line)">{{ line.product_name }}</span>
+                    @if (!done(line) && !line.batches.length) {
+                        <span class="shrink-0 text-xs text-danger-ink" data-booked-state="no-stock">{{ 'sales.preOrder.convert.noStock' | translate }}</span>
+                    }
+                    <span class="shrink-0 text-xs text-ink-muted">~{{ line.unit_price | money }}</span>
+                    <span class="w-12 shrink-0 text-right font-mono text-xs font-semibold tabular-nums" [class.text-success-ink]="done(line)" [class.text-ink]="!done(line)">{{ units(line) | digits }}/{{ line.quantity | digits }}</span>
+                </button>
+            </li>
+        }
+    </ul>
+</ng-template>

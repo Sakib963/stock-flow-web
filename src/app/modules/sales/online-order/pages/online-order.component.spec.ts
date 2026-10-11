@@ -289,7 +289,36 @@ describe('OnlineOrderComponent', () => {
 
     it('opens a Pending order to change it, with its advance, and saves over it rather than placing a new one', async () => {
         const { fixture, page, http, element } = await open(true, false, 'o-9');
-        const pending = { oid: 'o-9', invoice_no: '2610060004', draft_label: null, customer_name: 'Person A', customer_phone: '01987654321', notes: null, payment_type: 'ADVANCE', payment_method: 'bkash', payment_reference: 'TX1', amount_paid: 200, delivery_charge: 120, total_amount: 1570, created_on: new Date().toISOString(), saved_by: null, source_oid: 's-1', customer_address_oid: 'a-1', recipient_name: null, recipient_phone: null, address_line: null, area_text: null, postal_code: null, district_oid: null, district_name_en: null, district_name_bn: null, thana_oid: null, thana_name_en: null, thana_name_bn: null, lines: [{ ...batch(), sellable: 4, quantity: 1, discount: 0 }] };
+        const pending = {
+            oid: 'o-9',
+            invoice_no: '2610060004',
+            draft_label: null,
+            customer_name: 'Person A',
+            customer_phone: '01987654321',
+            notes: null,
+            payment_type: 'ADVANCE',
+            payment_method: 'bkash',
+            payment_reference: 'TX1',
+            amount_paid: 200,
+            delivery_charge: 120,
+            total_amount: 1570,
+            created_on: new Date().toISOString(),
+            saved_by: null,
+            source_oid: 's-1',
+            customer_address_oid: 'a-1',
+            recipient_name: null,
+            recipient_phone: null,
+            address_line: null,
+            area_text: null,
+            postal_code: null,
+            district_oid: null,
+            district_name_en: null,
+            district_name_bn: null,
+            thana_oid: null,
+            thana_name_en: null,
+            thana_name_bn: null,
+            lines: [{ ...batch(), sellable: 4, quantity: 1, discount: 0 }],
+        };
         http.expectOne((r) => r.url.includes(APIEndpoint.GET_ONLINE_ORDER_FOR_EDIT)).flush({ code: 200, data: pending });
         knownCustomer(page, http);
         fixture.detectChanges();
@@ -301,5 +330,54 @@ describe('OnlineOrderComponent', () => {
         page.create();
         http.expectNone((r) => r.url.includes(APIEndpoint.CREATE_ONLINE_ORDER));
         expect(http.expectOne((r) => r.url.includes(APIEndpoint.EDIT_ONLINE_ORDER)).request.body).toMatchObject({ oid: 'o-9', payment_type: 'ADVANCE', amount_paid: 200, lines: [{ inventory_oid: 'i-1', quantity: 1, discount: 0 }] });
+    });
+
+    it('makes the order from a booking: its lines wait for a batch, the advance is taken as paid, and the booking goes with Create', async () => {
+        localStorage.removeItem('sf.online.unsent');
+        await TestBed.configureTestingModule({
+            imports: [OnlineOrderComponent],
+            providers: [provideRouter([]), provideHttpClient(), provideHttpClientTesting(), provideNzI18n(en_US), provideTranslateService({ fallbackLang: 'en' }), ...OVERLAY_PROVIDERS, { provide: SessionService, useValue: { can: () => true, menu: () => [], business: () => null, user: () => ({ name: 'Moderator' }) } }, { provide: ActivatedRoute, useValue: { snapshot: { paramMap: convertToParamMap({}), queryParamMap: convertToParamMap({ convert: 'b-1' }) } } }],
+        }).compileComponents();
+        const fixture = TestBed.createComponent(OnlineOrderComponent);
+        const page = fixture.componentInstance;
+        fixture.detectChanges();
+        const http = TestBed.inject(HttpTestingController);
+        http.expectOne((r) => r.url.includes(APIEndpoint.GET_ONLINE_ORDER_SETUP)).flush({ code: 200, data: SETUP });
+        http.expectOne((r) => r.url.includes(APIEndpoint.GET_PRE_ORDER_FOR_CONVERSION)).flush({
+            code: 200,
+            data: { oid: 'b-1', preorder_no: 'PRE-2610-0001', status: 'Pending', customer_phone: '01987654321', customer_name: 'Person A', advance: 500, advance_method: 'bkash', advance_reference: '9AB3XK2', notes: 'Size M', lines: [{ oid: 'l-1', product_oid: 'p-1', product_name: 'Floral print kurti', sku: 'KURTI-38', quantity: 2, unit_price: 1400, batches: [batch()] }] },
+        });
+        TestBed.tick();
+        http.expectOne((r) => r.url.includes(APIEndpoint.FIND_CUSTOMER_BY_PHONE)).flush({ code: 200, data: { phone: '01987654321', customer: { oid: 'c-1', name: 'Person A', phone: '01987654321', gender: null, age_band: null, flag: 'None', flag_reason: null, status: 'Active' }, addresses: [saved()], last_orders: [] } });
+        TestBed.tick();
+        page.sourceOid.set('s-1');
+
+        expect([page.phone(), page.notes(), page.method(), page.reference()]).toEqual(['01987654321', 'Size M', 'bkash', '9AB3XK2']);
+        expect(page.blocker()).toBe('sales.online.blocker.booked');
+
+        page.add(batch());
+        TestBed.tick();
+        expect(page.lines()[0]).toMatchObject({ inventory_oid: 'i-1', quantity: 2, discount: 0 });
+        const line = page.lines()[0];
+        expect(page.bookedHint(line, page.bookedFor(line)!)).toEqual({ discount: 50, allowed: true });
+        page.useBookedPrice(line, 50);
+        expect(page.lines()[0].discount).toBe(50);
+        expect([page.paymentType(), page.advance()]).toEqual(['ADVANCE', 500]);
+        expect(page.blocker()).toBeNull();
+
+        answerYes(fixture);
+        page.create();
+        expect(http.expectOne((r) => r.url.includes(APIEndpoint.CREATE_ONLINE_ORDER)).request.body).toMatchObject({ pre_order_oid: 'b-1', payment_type: 'ADVANCE', amount_paid: 500, lines: [{ inventory_oid: 'i-1', quantity: 2, discount: 50 }] });
+    });
+
+    it('says so when a known customer has no saved address, and makes adding one the main button', async () => {
+        const { fixture, page, http, element } = await open();
+        page.phone.set('01987654321');
+        TestBed.tick();
+        http.expectOne((r) => r.url.includes(APIEndpoint.FIND_CUSTOMER_BY_PHONE)).flush({ code: 200, data: { phone: '01987654321', customer: { oid: 'c-1', name: 'Person A', phone: '01987654321', gender: null, age_band: null, flag: 'None', flag_reason: null, status: 'Active' }, addresses: [], last_orders: [] } });
+        TestBed.tick();
+        fixture.detectChanges();
+        expect(element.querySelector('[data-online="no-address"]')).not.toBeNull();
+        expect(element.querySelector('[data-online="add-address"]')?.classList.contains('ant-btn-primary')).toBe(true);
     });
 });

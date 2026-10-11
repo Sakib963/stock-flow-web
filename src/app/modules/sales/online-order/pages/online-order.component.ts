@@ -1,6 +1,6 @@
 import { NgTemplateOutlet } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
-import { ChangeDetectionStrategy, Component, computed, effect, inject, signal, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, signal, untracked, viewChild } from '@angular/core';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
@@ -35,6 +35,9 @@ import { SessionService } from '@app/core/services/session/session.service';
 import { AddressFormComponent } from '@app/modules/sales/customer/components/address-form/address-form.component';
 import { CUSTOMER_ROUTES } from '@app/modules/sales/customer/constants/customer-routes';
 import { OnlineOrderService } from '@app/modules/sales/online-order/services/online-order.service';
+import { ConversionBooking, ConversionLine } from '@app/core/models/pre-order.model';
+import { BookingLinesComponent } from '@app/modules/sales/pre-order/components/booking-lines/booking-lines.component';
+import { PreOrderService } from '@app/modules/sales/pre-order/services/pre-order.service';
 import { PageHeaderComponent } from '@app/shared/components/page-header/page-header.component';
 import { ProductSearchComponent } from '@app/shared/components/product-search/product-search.component';
 import { StatusTagComponent } from '@app/shared/components/status-tag/status-tag.component';
@@ -68,7 +71,7 @@ interface Pasted {
 }
 
 /** The part of the page each reason points at, lit for a moment when Create is pressed too early. */
-const BLOCKER_PART: Record<string, Part> = { phone: 'customer', phoneInvalid: 'customer', lookingUp: 'customer', name: 'customer', address: 'customer', empty: 'products', stock: 'products', source: 'summary', advance: 'summary', blocked: 'summary' };
+const BLOCKER_PART: Record<string, Part> = { phone: 'customer', phoneInvalid: 'customer', lookingUp: 'customer', name: 'customer', address: 'customer', empty: 'products', stock: 'products', booked: 'products', bookedAdvance: 'summary', bookedAdvanceOver: 'products', source: 'summary', advance: 'summary', blocked: 'summary' };
 type Part = 'customer' | 'products' | 'summary';
 type RequiredField = 'phone' | 'name' | 'source' | 'advance';
 /** Blockers a form field shows under itself, so they need no message as well. */
@@ -88,7 +91,7 @@ const DAY_MS = 24 * 60 * 60 * 1000;
  */
 @Component({
     selector: 'online-order',
-    imports: [FormsModule, RouterLink, NgTemplateOutlet, NgIcon, NzButtonModule, NzCheckboxModule, NzDrawerModule, NzFormModule, NzInputModule, NzInputNumberModule, NzModalModule, NzPopoverModule, NzRadioModule, NzSelectModule, NzSkeletonModule, NzSpinModule, NzTableModule, NzTooltipModule, NzTypographyModule, TranslatePipe, PageHeaderComponent, ProductSearchComponent, StatusTagComponent, AddressFormComponent, DigitsPipe, MoneyPipe, RecordDatePipe],
+    imports: [FormsModule, RouterLink, NgTemplateOutlet, NgIcon, NzButtonModule, NzCheckboxModule, NzDrawerModule, NzFormModule, NzInputModule, NzInputNumberModule, NzModalModule, NzPopoverModule, NzRadioModule, NzSelectModule, NzSkeletonModule, NzSpinModule, NzTableModule, NzTooltipModule, NzTypographyModule, TranslatePipe, PageHeaderComponent, ProductSearchComponent, StatusTagComponent, AddressFormComponent, BookingLinesComponent, DigitsPipe, MoneyPipe, RecordDatePipe],
     providers: [DigitsPipe, MoneyPipe, provideIcons({ lucideEraser, lucideExternalLink, lucideFileClock, lucideHistory, lucidePlay, lucideCheck, lucideCircleAlert, lucideCircleCheck, lucideClipboardPaste, lucideMapPin, lucideMinus, lucidePackage, lucidePencil, lucidePlus, lucidePrinter, lucideRotateCw, lucideScanText, lucideSend, lucideSettings2, lucideTrash2, lucideTriangleAlert, lucideUserRound, lucideX })],
     templateUrl: './online-order.component.html',
     styleUrl: './online-order.component.scss',
@@ -104,6 +107,7 @@ export class OnlineOrderComponent {
     private readonly _money = inject(MoneyPipe);
     private readonly _session = inject(SessionService);
     private readonly _products = inject(ProductSearchService);
+    private readonly _bookings = inject(PreOrderService);
 
     readonly language = inject(LanguageService).current;
     readonly canCreate = this._session.can('sales.online.create');
@@ -111,6 +115,10 @@ export class OnlineOrderComponent {
     /** Set on the edit route: the page fills from a Pending order and saves over it (REQ-52). */
     readonly editingOid = inject(ActivatedRoute).snapshot.paramMap.get('oid');
     readonly editingInvoice = signal<string | null>(null);
+    /** A booking opened here to become an order (pre-order REQ-07): its lines arrive without a batch. */
+    readonly convertOid = this.editingOid ? null : inject(ActivatedRoute).snapshot.queryParamMap.get('convert');
+    readonly booking = signal<ConversionBooking | null>(null);
+    readonly bookingFailed = signal<string | null>(null);
     readonly canSave = this.editingOid ? this._session.can('sales.order.edit') : this.canCreate;
     readonly canViewCustomers = this._session.can('sales.customer.view');
     readonly canEditCharges = this._session.can('sales.settings.edit');
@@ -223,6 +231,13 @@ export class OnlineOrderComponent {
     /** What the courier collects at the door: the total less what was paid (REQ-116). */
     readonly collect = computed(() => Math.max(0, this.total() - this.paid()));
     readonly units = computed(() => this.lines().reduce((sum, line) => sum + line.quantity, 0));
+    readonly unitsByProduct = computed(() => {
+        const units = new Map<string, number>();
+        for (const line of this.lines()) units.set(line.product_oid, (units.get(line.product_oid) ?? 0) + line.quantity);
+        return units;
+    });
+    /** Booked products not yet in the order with every booked unit: Create waits for them (REQ-08). */
+    readonly bookedLeft = computed(() => (this.booking()?.lines ?? []).filter((line) => (this.unitsByProduct().get(line.product_oid) ?? 0) < line.quantity).length);
 
     /** Why Create cannot be pressed yet, so the button never sits disabled without saying why. */
     readonly blocker = computed<string | null>(() => {
@@ -230,6 +245,7 @@ export class OnlineOrderComponent {
         if (this.lookup().state === 'loading') return 'sales.online.blocker.lookingUp';
         if (this.isNewCustomer() && !this.customerName().trim()) return 'sales.online.blocker.name';
         if (!this.chosenAddress()) return 'sales.online.blocker.address';
+        if (this.bookedLeft()) return 'sales.online.blocker.booked';
         if (!this.lines().length) return 'sales.online.blocker.empty';
         if (this.lines().some((line) => line.quantity > line.sellable)) return 'sales.online.blocker.stock';
         if (!this.sourceOid()) return 'sales.online.blocker.source';
@@ -237,6 +253,9 @@ export class OnlineOrderComponent {
             const advance = this.advance();
             if (!advance || advance < 1 || advance >= this.total()) return 'sales.online.blocker.advance';
         }
+        const booking = this.booking();
+        if (booking?.advance && booking.advance > this.total()) return 'sales.online.blocker.bookedAdvanceOver';
+        if (booking?.advance && this.paid() !== booking.advance) return 'sales.online.blocker.bookedAdvance';
         if (this.customer()?.flag === 'Blocked' && !this.blockedAcknowledged()) return 'sales.online.blocker.blocked';
         return null;
     });
@@ -258,11 +277,23 @@ export class OnlineOrderComponent {
     constructor() {
         this.loadSetup();
         if (this.editingOid) this.loadForEdit(this.editingOid);
+        else if (this.convertOid) this.loadBooking(this.convertOid);
         else {
             this.restore();
             // What is typed is kept in this browser, so a reload by mistake loses nothing (the user, 2026-10-05).
             effect(() => remember(UNSENT_KEY, this.dirty() ? this.snapshot() : null));
         }
+        // A booking's advance is what the order has been paid (REQ-10): an advance, or prepaid once it covers the total.
+        effect(() => {
+            const booking = this.booking();
+            if (!booking?.advance) return;
+            // Before any goods the total is only the delivery charge, which says nothing about prepaid.
+            const covers = this.lines().length > 0 && booking.advance >= this.total();
+            untracked(() => {
+                this.paymentType.set(covers ? 'PREPAID' : 'ADVANCE');
+                this.advance.set(covers ? null : booking.advance);
+            });
+        });
         // A known phone starts on its default address; a new one waits for the moderator to add one.
         toObservable(this.lookup)
             .pipe(takeUntilDestroyed())
@@ -275,6 +306,43 @@ export class OnlineOrderComponent {
                 } else if (this.addressChoice() !== 'new' && !saved.some((address) => address.oid === this.addressChoice())) this.addressChoice.set(saved.find((address) => address.is_default)?.oid ?? saved[0]?.oid ?? (this.newAddress() ? 'new' : null));
                 this.blockedAcknowledged.set(false);
             });
+    }
+
+    /** The booking's customer, note and advance arrive filled; its lines wait for a batch each. */
+    loadBooking(oid: string): void {
+        this.bookingFailed.set(null);
+        this._bookings.forConversion(oid).subscribe({
+            next: (booking) => {
+                this.booking.set(booking);
+                this.phone.set(booking.customer_phone);
+                if (booking.notes) this.notes.set(booking.notes);
+                if (booking.advance) {
+                    if (booking.advance_method) this.method.set(booking.advance_method);
+                    this.reference.set(booking.advance_reference ?? '');
+                }
+            },
+            error: (error: unknown) => this.bookingFailed.set(error instanceof HttpErrorResponse && error.status === 409 && error.error?.message ? error.error.message : this._translate.instant('sales.preOrder.loadFailed.' + failureOf(error))),
+        });
+    }
+
+    /** A booked product tapped in the booking's list: the search opens on it, and its batch is picked as usual. */
+    findBooked(line: ConversionLine): void {
+        this.search()?.searchFor(line.product_name);
+    }
+
+    bookedFor(line: CartLine): ConversionLine | null {
+        return this.booking()?.lines.find((booked) => booked.product_oid === line.product_oid) ?? null;
+    }
+
+    /** What the booked price means on this line's batch: the per-unit discount, and whether the batch allows it. */
+    bookedHint(line: CartLine, booked: ConversionLine): { discount: number; allowed: boolean } {
+        const discount = line.selling_price - booked.unit_price;
+        return { discount, allowed: discount >= 0 && discount <= this.discountCap(line) };
+    }
+
+    useBookedPrice(line: CartLine, discount: number): void {
+        const at = this.lines().findIndex((candidate) => candidate.inventory_oid === line.inventory_oid);
+        if (at >= 0) this.setDiscount(at, discount);
     }
 
     loadSetup(): void {
@@ -431,7 +499,11 @@ export class OnlineOrderComponent {
             this.patch(at, { quantity: line.quantity + 1, sellable: batch.sellable_quantity, selling_price: batch.selling_price, maximum_discount: batch.maximum_discount });
             return;
         }
-        this.lines.update((lines) => [...lines, { inventory_oid: batch.inventory_oid, product_oid: batch.product_oid, product_name: batch.product_name, image_url: batch.image_url, batch_code: batch.batch_code, expiry_date: batch.expiry_date, selling_price: batch.selling_price, maximum_discount: batch.maximum_discount, sellable: batch.sellable_quantity, quantity: 1, discount: 0 }]);
+        // A booked product arrives with the units still to add for the booking, as far as the batch has them.
+        const booked = this.booking()?.lines.find((line) => line.product_oid === batch.product_oid);
+        const wanted = booked ? booked.quantity - (this.unitsByProduct().get(batch.product_oid) ?? 0) : 1;
+        const quantity = Math.max(1, Math.min(wanted, batch.sellable_quantity));
+        this.lines.update((lines) => [...lines, { inventory_oid: batch.inventory_oid, product_oid: batch.product_oid, product_name: batch.product_name, image_url: batch.image_url, batch_code: batch.batch_code, expiry_date: batch.expiry_date, selling_price: batch.selling_price, maximum_discount: batch.maximum_discount, sellable: batch.sellable_quantity, quantity, discount: 0 }]);
     }
 
     step(index: number, by: number): void {
@@ -502,6 +574,7 @@ export class OnlineOrderComponent {
                         blocked_acknowledged: this.blockedAcknowledged(),
                         notes: this.notes().trim() || null,
                         lines: this.lines().map(({ inventory_oid, quantity, discount }) => ({ inventory_oid, quantity, discount })),
+                        pre_order_oid: this.booking()?.oid ?? null,
                     },
                     !!this.editingOid
                 )
@@ -519,6 +592,12 @@ export class OnlineOrderComponent {
                         this.unanswered.set(false);
                         this._products.forget();
                         const placed = { invoice_no, total: this.total(), collect: this.collect(), customer_oid };
+                        const booking = this.booking();
+                        if (booking) {
+                            this._message.success(this._translate.instant('sales.preOrder.convert.done', { number: booking.preorder_no, invoice: invoice_no }));
+                            this.booking.set(null);
+                            void this._router.navigate([], { queryParams: {} });
+                        }
                         this.newOrder();
                         this.done.set(placed);
                     },

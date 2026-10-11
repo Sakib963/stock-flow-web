@@ -1020,7 +1020,7 @@
                 "givenAway": "Given away, all time",
                 "returned": "Returned, all time",
                 "damaged": "Damaged, all time",
-                "booked": "Booked, not ordered"
+                "booked": "Pre-ordered, not ordered"
             },
             "stockState": {
                 "low": "Running low, time to reorder",
@@ -2724,7 +2724,8 @@
                     "network": "Could not reach the server to read the message. Type the phone and address instead.",
                     "forbidden": "You do not have permission to read messages here.",
                     "server": "Could not read that message. Type the phone and address instead."
-                }
+                },
+                "short": "Paste"
             },
             "risk": {
                 "orders": "Orders {{orders}} · delivered {{delivered}} · came back {{refused}}",
@@ -2789,7 +2790,10 @@
                 "stock": "A line asks for more than can be sold. Reduce it or remove it.",
                 "source": "Pick where the order came from.",
                 "advance": "Type the advance paid: more than 0 and less than the total.",
-                "blocked": "This customer is blocked. Tick that you know before creating."
+                "blocked": "This customer is blocked. Tick that you know before creating.",
+                "booked": "Add every pre-ordered product to the order first.",
+                "bookedAdvance": "The pre-order's advance must be what this order has been paid.",
+                "bookedAdvanceOver": "The pre-order's advance is more than this order's total. Add the products the customer paid for."
             },
             "confirmCreate": {
                 "title": "Create this order of {{total}}?",
@@ -2914,7 +2918,11 @@
                 "confirmBody": "The new total is {{total}}, {{collect}} to collect ({{terms}}). The stock it holds follows the new lines.",
                 "saved": "Order {{number}} changed.",
                 "loadFailed": "Could not open the order to change it. Try again in a moment."
-            }
+            },
+            "noSavedAddress": "{{name}} has no saved address yet. Ask for it and add it below.",
+            "newNoAddress": "A new customer has no address yet. Add the address the parcel goes to.",
+            "quantityShort": "Qty",
+            "discountShort": "Off/unit"
         },
         "settings": {
             "title": "Sales settings",
@@ -3169,17 +3177,17 @@
             }
         },
         "preOrder": {
-            "add": "New booking",
-            "edit": "Edit booking",
-            "createTitle": "New booking",
-            "editTitle": "Edit booking",
-            "formLead": "A booking holds no stock. Prices are approximate: the real price is set from the batch when it becomes an order.",
-            "detailTitle": "Booking",
-            "detailLead": "What the customer booked, against what can be sold now.",
-            "searchPlaceholder": "Booking number, name or phone",
-            "emptyTitle": "No bookings yet",
-            "emptyBody": "Book a product for a customer before it is in stock, and see how many are wanted before you buy.",
-            "number": "Booking no.",
+            "add": "New pre-order",
+            "edit": "Edit pre-order",
+            "createTitle": "New pre-order",
+            "editTitle": "Edit pre-order",
+            "formLead": "A pre-order holds no stock. Prices are approximate: the real price is set from the batch when it becomes an order.",
+            "detailTitle": "Pre-order",
+            "detailLead": "What the customer pre-ordered, against what can be sold now.",
+            "searchPlaceholder": "Pre-order number, name or phone",
+            "emptyTitle": "No pre-orders yet",
+            "emptyBody": "Take a pre-order for a product before it is in stock, and see how many are wanted before you buy.",
+            "number": "Pre-order no.",
             "customer": "Customer",
             "statusLabel": "Status",
             "status": {
@@ -3194,7 +3202,7 @@
             "readyFilter": "Ready to become an order",
             "overdueFilter": "Past the expected date",
             "stat": {
-                "open": "Open bookings",
+                "open": "Open pre-orders",
                 "ready": "Ready now",
                 "overdue": "Past expected date",
                 "advance": "Advance held"
@@ -3205,7 +3213,7 @@
             "sellable": "Can sell now",
             "sellableNow": "{{count}} can be sold now",
             "advance": "Advance paid",
-            "advanceHelper": "What the customer says they paid ahead. It becomes the order’s paid amount when the booking turns into an order.",
+            "advanceHelper": "What the customer says they paid ahead. It becomes the order’s paid amount when the pre-order becomes an order.",
             "advanceOver": "The advance is more than the approximate total.",
             "method": "Paid by",
             "methodPlaceholder": "How they paid",
@@ -3219,10 +3227,10 @@
             "reference": "Transaction ID",
             "referenceHelper": "The bKash or Nagad transaction ID, so the payment can be found again.",
             "expected": "Expected by",
-            "expectedHelper": "When you expect the stock. Past this date the booking shows as overdue.",
+            "expectedHelper": "When you expect the stock. Past this date the pre-order shows as overdue.",
             "expectedPlaceholder": "Pick a date",
             "noDate": "Not set",
-            "bookedOn": "Booked on",
+            "bookedOn": "Taken on",
             "phone": "Phone",
             "phoneHelper": "The customer is found by phone. A new phone adds them to the customer book.",
             "name": "Name",
@@ -3231,14 +3239,14 @@
             "notes": "Note",
             "notesPlaceholder": "Size, colour, anything the customer asked for",
             "section": {
-                "details": "Booking details",
-                "lines": "Products booked",
+                "details": "Pre-order details",
+                "lines": "Products pre-ordered",
                 "customer": "Customer",
                 "summary": "Summary"
             },
             "productPlaceholder": "Search any product, in stock or not",
             "noLines": "Add at least one product.",
-            "lockedLines": "This booking is confirmed, so its products and units stay as booked. Prices can still change.",
+            "lockedLines": "This pre-order is confirmed, so its products and units stay as they are. Prices can still change.",
             "removeLine": "Remove this product",
             "convertedTo": "Order",
             "cancelReason": "Why cancelled",
@@ -3252,35 +3260,35 @@
             },
             "refund": "Advance to refund",
             "refundDue": "Advance to give back",
-            "refundHelper": "All of the advance, part of it when a booking fee is kept, or none. It stays owed until you record it as given.",
+            "refundHelper": "All of the advance, part of it when a pre-order fee is kept, or none. It stays owed until you record it as given.",
             "refundOf": "Out of {{amount}} paid",
             "refundOwed": "Still owed to the customer",
             "refundGiven": "Given back",
             "refundNone": "Nothing to give back",
-            "final": "This booking is final and can no longer be edited.",
-            "backToBooking": "Back to the booking",
-            "backToList": "Back to bookings",
-            "created": "Booking {{number}} saved.",
-            "updated": "Booking saved.",
+            "final": "This pre-order is final and can no longer be edited.",
+            "backToBooking": "Back to the pre-order",
+            "backToList": "Back to pre-orders",
+            "created": "Pre-order {{number}} saved.",
+            "updated": "Pre-order saved.",
             "confirmCreate": {
-                "title": "Save this booking?",
-                "body": "No stock is held. The customer’s booking is saved as Pending."
+                "title": "Save this pre-order?",
+                "body": "No stock is held. The pre-order is saved as Pending."
             },
             "confirmEdit": {
                 "title": "Save changes to {{number}}?",
-                "body": "The booking still holds no stock."
+                "body": "The pre-order still holds no stock."
             },
             "action": {
                 "confirm": {
-                    "button": "Confirm booking",
+                    "button": "Confirm pre-order",
                     "confirmTitle": "Confirm {{number}}?",
-                    "confirmBody": "You are accepting the booking. After this, its products and units stay as booked.",
-                    "done": "Booking confirmed."
+                    "confirmBody": "You are accepting the pre-order. After this, its products and units stay as they are.",
+                    "done": "Pre-order confirmed."
                 },
                 "cancel": {
-                    "button": "Cancel booking",
-                    "title": "Cancel this booking",
-                    "done": "Booking cancelled."
+                    "button": "Cancel pre-order",
+                    "title": "Cancel this pre-order",
+                    "done": "Pre-order cancelled."
                 },
                 "refund": {
                     "button": "Record refund given",
@@ -3290,30 +3298,30 @@
                 }
             },
             "loadFailed": {
-                "network": "Could not reach the server to load this booking.",
-                "forbidden": "You do not have permission to see bookings.",
-                "server": "Could not load this booking. Try again in a moment.",
-                "notFound": "No booking with that number."
+                "network": "Could not reach the server to load this pre-order.",
+                "forbidden": "You do not have permission to see pre-orders.",
+                "server": "Could not load this pre-order. Try again in a moment.",
+                "notFound": "No pre-order with that number."
             },
             "lookupFailed": "Could not check this number.",
             "noProduct": "No product in the catalogue matches.",
             "byProduct": {
                 "button": "By product",
-                "title": "Booked products",
-                "lead": "Units customers booked, against what can be sold now. Buy what is still to get.",
-                "back": "By booking",
+                "title": "Pre-ordered products",
+                "lead": "Units customers pre-ordered, against what can be sold now. Buy what is still to get.",
+                "back": "By pre-order",
                 "product": "Product",
-                "units": "Units booked",
-                "bookings": "Bookings",
+                "units": "Units pre-ordered",
+                "bookings": "Pre-orders",
                 "sellable": "Can sell now",
                 "toGet": "Still to get",
-                "oldest": "Oldest booking",
+                "oldest": "Oldest pre-order",
                 "searchPlaceholder": "Product name or SKU",
-                "emptyTitle": "Nothing booked",
-                "emptyBody": "Products on open bookings show here, with how many are still to get.",
+                "emptyTitle": "Nothing pre-ordered",
+                "emptyBody": "Products on open pre-orders show here, with how many are still to get.",
                 "stat": {
-                    "products": "Products booked",
-                    "units": "Units booked",
+                    "products": "Products pre-ordered",
+                    "units": "Units pre-ordered",
                     "toGet": "Still to get"
                 }
             },
@@ -3327,7 +3335,7 @@
                     "Blocked": "Blocked: {{reason}}. Think before taking an advance.",
                     "Watch": "On watch: {{reason}}"
                 },
-                "openBookings": "Open bookings already: {{count}}"
+                "openBookings": "Open pre-orders already: {{count}}"
             },
             "expectIn": {
                 "week": "In a week",
@@ -3367,7 +3375,30 @@
                 "nothing": "No phone or name found in that message. Type them instead.",
                 "failed": "Could not read the message. Type the phone and name instead."
             },
-            "alreadyBooked": "Already booked for this customer on {{number}} ({{count}})"
+            "alreadyBooked": "Already pre-ordered for this customer on {{number}} ({{count}})",
+            "convert": {
+                "button": "Make the order",
+                "title": "Order from pre-order {{number}}",
+                "done": "{{number}} is now order {{invoice}}.",
+                "left": "{{count}} of {{total}} to add",
+                "allIn": "All in the order",
+                "findLabel": "Search for {{name}}",
+                "hintSame": "Pre-order price {{price}}",
+                "hintAbove": "Pre-order price {{price}}, above this batch",
+                "hintOk": "Pre-order price {{price}}, {{amount}} off",
+                "hintOver": "Pre-order price {{price}}: {{amount}} off is over the {{max}} limit",
+                "useBookedPrice": "Use it",
+                "noStock": "No stock",
+                "allTitle": "Pre-order {{number}}",
+                "seeBooking": "See the pre-order ({{count}})",
+                "notReady": "This cannot become an order yet: {{names}} not in stock. All products go together.",
+                "notInStock": "{{count}} not in stock",
+                "pick": "Products ({{count}})",
+                "tapToSearch": "Tap a product to search for it.",
+                "hintShort": "Pre-order {{price}}",
+                "hintShortOver": ": over the limit"
+            },
+            "notReady": "Cannot become an order yet: {{names}} not in stock. All products go together."
         }
     }
 }

@@ -3,7 +3,7 @@ import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@a
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { NgIcon, provideIcons } from '@ng-icons/core';
-import { lucideArrowLeft, lucideBan, lucideCalendarCheck, lucideCheck, lucideHandCoins, lucideHistory, lucideInfo, lucidePackage, lucidePencil, lucideRotateCw, lucideX, lucideZap } from '@ng-icons/lucide';
+import { lucideArrowLeft, lucideBan, lucideCalendarCheck, lucideCheck, lucideShoppingBag, lucideHandCoins, lucideHistory, lucideInfo, lucidePackage, lucidePencil, lucideRotateCw, lucideX, lucideZap } from '@ng-icons/lucide';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzCardModule } from 'ng-zorro-antd/card';
 import { NzFormModule } from 'ng-zorro-antd/form';
@@ -41,7 +41,7 @@ import { resolveTone } from '@app/shared/utils/tone-map/tone-map';
 @Component({
     selector: 'pre-order-detail',
     imports: [FormsModule, RouterLink, NgIcon, NzButtonModule, NzCardModule, NzFormModule, NzInputModule, NzInputNumberModule, NzModalModule, NzSelectModule, NzSkeletonModule, NzTableModule, NzTimelineModule, NzTypographyModule, TranslatePipe, PageHeaderComponent, ActionFooterComponent, StatusTagComponent, DigitsPipe, MoneyPipe, RecordDatePipe],
-    providers: [MoneyPipe, provideIcons({ lucideArrowLeft, lucideBan, lucideCalendarCheck, lucideCheck, lucideHandCoins, lucideHistory, lucideInfo, lucidePackage, lucidePencil, lucideRotateCw, lucideX, lucideZap })],
+    providers: [MoneyPipe, provideIcons({ lucideArrowLeft, lucideBan, lucideCalendarCheck, lucideCheck, lucideShoppingBag, lucideHandCoins, lucideHistory, lucideInfo, lucidePackage, lucidePencil, lucideRotateCw, lucideX, lucideZap })],
     templateUrl: './pre-order-detail.component.html',
     styleUrl: './pre-order-detail.component.scss',
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -79,12 +79,15 @@ export class PreOrderDetailComponent {
         const status = this.record()?.status;
         const open = status === 'Pending' || status === 'Confirmed';
         return {
+            convert: open && this._session.can('sales.pre-order.convert') && this._session.can('sales.online.create'),
             edit: open && this._session.can('sales.pre-order.edit'),
             confirm: status === 'Pending' && this._session.can('sales.pre-order.confirm'),
             cancel: open && this._session.can('sales.pre-order.cancel'),
             refund: status === 'Cancelled' && this.refundOwed() > 0 && this._session.can('sales.pre-order.cancel'),
         };
     });
+    /** Products without enough sellable stock for their units: all go together, so none can go yet. */
+    readonly notInStock = computed(() => (this.record()?.lines ?? []).filter((line) => line.sellable < line.quantity).map((line) => line.product_name));
     readonly anyAction = computed(() => Object.values(this.actions()).some(Boolean));
 
     readonly cancelling = signal(false);
@@ -107,6 +110,11 @@ export class PreOrderDetailComponent {
 
     backToList(): void {
         void this._router.navigateByUrl(PRE_ORDER_ROUTES.list);
+    }
+
+    /** Opens the online order page with the booking filled in; the order is made there (REQ-07). */
+    convert(): void {
+        void this._router.navigate(['/app/sales/online-order'], { queryParams: { convert: this.oid } });
     }
 
     edit(): void {

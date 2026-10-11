@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable, inject, signal } from '@angular/core';
 import { APIEndpoint } from '@app/core/constants/api-endpoint';
 import { ChatReading, PhoneLookup } from '@app/core/models/online-order.model';
-import { OpenBookingLine, PreOrderCancelReason, PreOrderDetails, PreOrderPayload, PreOrderProduct } from '@app/core/models/pre-order.model';
+import { ConversionBooking, OpenBookingLine, PreOrderCancelReason, PreOrderDetails, PreOrderPayload, PreOrderProduct } from '@app/core/models/pre-order.model';
 import { environment } from '@env/environment';
 import { Observable, finalize, map } from 'rxjs';
 
@@ -16,6 +16,11 @@ export class PreOrderService {
     /** Never cached: each line's sellable now is live stock. */
     details(oid: string): Observable<PreOrderDetails> {
         return this._http.get<{ data: PreOrderDetails }>(`${this._base}${APIEndpoint.GET_PRE_ORDER_DETAILS}/${oid}`).pipe(map((response) => response.data));
+    }
+
+    /** A booking opened to become an online order, with its products' batches. Never cached: it carries stock. */
+    forConversion(oid: string): Observable<ConversionBooking> {
+        return this._http.get<{ data: ConversionBooking }>(`${this._base}${APIEndpoint.GET_PRE_ORDER_FOR_CONVERSION}/${oid}`).pipe(map((response) => response.data));
     }
 
     /** POSTs, so a customer's phone stays out of URLs. */

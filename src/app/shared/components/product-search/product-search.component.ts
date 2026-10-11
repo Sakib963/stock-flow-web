@@ -111,6 +111,16 @@ export class ProductSearchComponent {
         this.select().focus();
     }
 
+    /** Opens the list already searching for `text`, typed into the box as if by hand, so the person picks the batch as usual. */
+    searchFor(text: string): void {
+        this.focus();
+        this.select().setOpenState(true);
+        const box = (this._host().nativeElement as HTMLElement).querySelector<HTMLInputElement>('input');
+        if (!box) return this.typed(text);
+        box.value = text;
+        box.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+
     typed(value: string): void {
         this._arrowed = false;
         this.text.set(value);
