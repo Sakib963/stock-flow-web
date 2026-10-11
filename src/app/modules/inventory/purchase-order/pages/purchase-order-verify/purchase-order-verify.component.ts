@@ -12,7 +12,7 @@ import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { RequestFailure } from '@app/core/models/api.model';
 import { HasUnsavedChanges } from '@app/core/guards/unsaved-changes/unsaved-changes.guard';
 import { PageBack } from '@app/core/models/page-header.model';
-import { BUDGET_KEYS, PurchaseOrderDetails, PurchaseOrderLine, VerifyLinePayload } from '@app/core/models/purchase-order.model';
+import { PurchaseOrderDetails, PurchaseOrderLine, VerifyLinePayload } from '@app/core/models/purchase-order.model';
 import { LanguageService } from '@app/core/services/language/language.service';
 import { BatchExpiryComponent } from '@app/shared/components/batch-expiry/batch-expiry.component';
 import { VerifyLineDrawerComponent } from '@app/modules/inventory/purchase-order/components/verify-line-drawer/verify-line-drawer.component';
@@ -36,9 +36,10 @@ import { failureOf } from '@app/shared/utils/request-failure/request-failure';
  * differs. An expanded row only shows what was recorded. Nothing moves until
  * Verify, which adds every batch in one step and cannot be undone.
  */
+import { BudgetTotalsComponent } from '@app/shared/components/budget-totals/budget-totals.component';
 @Component({
     selector: 'purchase-order-verify',
-    imports: [NgIcon, NzButtonModule, NzProgressModule, NzSkeletonModule, NzTableModule, TranslatePipe, PageHeaderComponent, ActionFooterComponent, StatusTagComponent, VerifyLineDrawerComponent, MoneyPipe, DigitsPipe, RecordDatePipe, BatchExpiryComponent],
+    imports: [NgIcon, NzButtonModule, NzProgressModule, NzSkeletonModule, NzTableModule, TranslatePipe, BudgetTotalsComponent, PageHeaderComponent, ActionFooterComponent, StatusTagComponent, VerifyLineDrawerComponent, MoneyPipe, DigitsPipe, RecordDatePipe, BatchExpiryComponent],
     providers: [MoneyPipe, provideIcons({ lucideArrowLeft, lucideCheck, lucideChevronDown, lucideChevronUp, lucideChevronsUpDown, lucideListChecks, lucidePackageCheck, lucidePencil, lucideRotateCw, lucideX })],
     templateUrl: './purchase-order-verify.component.html',
     styleUrl: './purchase-order-verify.component.scss',
@@ -54,7 +55,6 @@ export class PurchaseOrderVerifyComponent implements HasUnsavedChanges {
     private readonly _money = inject(MoneyPipe);
 
     readonly language = inject(LanguageService).current;
-    readonly budgetKeys = BUDGET_KEYS;
     readonly oid = this._route.snapshot.paramMap.get('oid') ?? '';
     readonly back: PageBack = { route: PURCHASE_ORDER_ROUTES.detail(this.oid) };
 

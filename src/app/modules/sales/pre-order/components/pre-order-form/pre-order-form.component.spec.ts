@@ -140,6 +140,41 @@ describe('PreOrderFormComponent', () => {
         expect(form.form.controls.expected_date.value?.getTime()).toBe(expected.getTime());
     });
 
+    it('greys out days already past and refuses to save one, but lets an overdue booking keep its own date', async () => {
+        const { form, http } = await open();
+        const yesterday = new Date();
+        yesterday.setHours(0, 0, 0, 0);
+        yesterday.setDate(yesterday.getDate() - 1);
+        expect(form.disabledDate(yesterday)).toBe(true);
+        expect(form.disabledDate(new Date())).toBe(false);
+
+        form.products.set([KURTI]);
+        form.add(KURTI.product_oid);
+        form.form.patchValue({ phone: '01711000111' });
+        lookUp(http, 'Nusrat');
+        form.form.patchValue({ expected_date: yesterday });
+        expect(form.blocker()).toBe('sales.preOrder.blocker.pastDate');
+        expect(form.valid()).toBe(false);
+        form.expectIn(7);
+        expect(form.valid()).toBe(true);
+    });
+
+    it('says in the footer what still stops Save, one thing at a time', async () => {
+        const { fixture, form, http, element } = await open();
+        fixture.detectChanges();
+        expect(element.querySelector('[data-pre-order="blocker"]')?.textContent).toContain('sales.preOrder.blocker.phone');
+        form.form.patchValue({ phone: '01711000111' });
+        lookUp(http, null);
+        expect(form.blocker()).toBe('sales.preOrder.blocker.name');
+        form.form.patchValue({ name: 'Nusrat' });
+        expect(form.blocker()).toBe('sales.preOrder.blocker.lines');
+        form.products.set([KURTI]);
+        form.add(KURTI.product_oid);
+        fixture.detectChanges();
+        expect(form.blocker()).toBeNull();
+        expect(element.querySelector('[data-pre-order="blocker"]')).toBeNull();
+    });
+
     it('fills the phone and name from a pasted chat message', async () => {
         const { form, http } = await open();
         form.pasteOpen.set(true);

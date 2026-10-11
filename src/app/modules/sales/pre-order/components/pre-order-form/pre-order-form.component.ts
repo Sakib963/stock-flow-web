@@ -1,15 +1,19 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, computed, effect, inject, input, output, signal } from '@angular/core';
+import { NgTemplateOutlet } from '@angular/common';
+import { ChangeDetectionStrategy, Component, DestroyRef, computed, effect, inject, input, output, signal, viewChild } from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { NgIcon, provideIcons } from '@ng-icons/core';
-import { lucideCircleCheck, lucideClipboardPaste, lucideClock, lucidePackage, lucideReceipt, lucideRotateCw, lucideTrash2, lucideTriangleAlert, lucideUserRound } from '@ng-icons/lucide';
+import { lucideCheck, lucideCircleAlert, lucideClipboardPaste, lucideMinus, lucidePackage, lucidePlus, lucideRotateCw, lucideScanText, lucideTrash2, lucideTriangleAlert, lucideUserRound, lucideX } from '@ng-icons/lucide';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
 import { NzFormModule } from 'ng-zorro-antd/form';
 import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzInputNumberModule } from 'ng-zorro-antd/input-number';
-import { NzSelectModule } from 'ng-zorro-antd/select';
+import { NzModalModule } from 'ng-zorro-antd/modal';
+import { NzSelectComponent, NzSelectModule } from 'ng-zorro-antd/select';
 import { NzSpinModule } from 'ng-zorro-antd/spin';
+import { NzTableModule } from 'ng-zorro-antd/table';
+import { NzTooltipModule } from 'ng-zorro-antd/tooltip';
 import { TranslatePipe } from '@ngx-translate/core';
 import { Subject, catchError, debounceTime, distinctUntilChanged, map, of, switchMap } from 'rxjs';
 import { RequestFailure } from '@app/core/models/api.model';
@@ -24,6 +28,7 @@ import { categoryGroups } from '@app/shared/utils/category-groups/category-group
 import { mobileValidator, normalizePhone } from '@app/shared/utils/phone/phone';
 import { failureOf } from '@app/shared/utils/request-failure/request-failure';
 import { revealErrors } from '@app/shared/utils/reveal-errors/reveal-errors';
+import { viewportWidth } from '@app/shared/utils/viewport/viewport';
 
 interface BookedLine extends PriceHints {
     product_oid: string;
@@ -34,16 +39,25 @@ interface BookedLine extends PriceHints {
     unit_price: number;
 }
 
+const startOfToday = (): Date => {
+    const day = new Date();
+    day.setHours(0, 0, 0, 0);
+    return day;
+};
+
 /**
- * The booking form, rendered by the create page and the edit page. A Confirmed booking keeps its
- * products and units (REQ-05), so `locked` leaves only prices, money, customer and date open.
+ * The booking form, rendered by the create page and the edit page in the online order page's three
+ * columns: the customer, the products scrolling in their own column, and the money with Save pinned
+ * below it. A Confirmed booking keeps its products and units (REQ-05), so `locked` leaves only
+ * prices, money, customer and date open.
  */
 @Component({
     selector: 'pre-order-form',
-    imports: [FormsModule, ReactiveFormsModule, NgIcon, NzButtonModule, NzDatePickerModule, NzFormModule, NzInputModule, NzInputNumberModule, NzSelectModule, NzSpinModule, TranslatePipe, StatusTagComponent, DigitsPipe, MoneyPipe],
-    providers: [provideIcons({ lucideCircleCheck, lucideClipboardPaste, lucideClock, lucidePackage, lucideReceipt, lucideRotateCw, lucideTrash2, lucideTriangleAlert, lucideUserRound })],
+    imports: [FormsModule, ReactiveFormsModule, NgTemplateOutlet, NgIcon, NzButtonModule, NzDatePickerModule, NzFormModule, NzInputModule, NzInputNumberModule, NzModalModule, NzSelectModule, NzSpinModule, NzTableModule, NzTooltipModule, TranslatePipe, StatusTagComponent, DigitsPipe, MoneyPipe],
+    providers: [provideIcons({ lucideCheck, lucideCircleAlert, lucideClipboardPaste, lucideMinus, lucidePackage, lucidePlus, lucideRotateCw, lucideScanText, lucideTrash2, lucideTriangleAlert, lucideUserRound, lucideX })],
     templateUrl: './pre-order-form.component.html',
     styleUrl: './pre-order-form.component.scss',
+    host: { class: 'flex min-h-0 flex-1 flex-col' },
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PreOrderFormComponent {
@@ -59,7 +73,16 @@ export class PreOrderFormComponent {
     ] as const;
 
     readonly editing = input<PreOrderDetails | null>(null);
+    readonly saveLabel = input('sales.preOrder.add');
+    readonly saving = input(false);
     readonly submitted = output<void>();
+
+    private readonly _width = viewportWidth();
+    /** Below a laptop the columns stack, each line is a card, and the money and Save are a bar pinned to the bottom. */
+    readonly stacked = computed(() => this._width() < 1024);
+    /** The products column is wide enough for a stepper from here; below it the units are typed. */
+    readonly wide = computed(() => this._width() >= 1600);
+    readonly picker = viewChild<NzSelectComponent>('picker');
 
     readonly locked = computed(() => this.editing()?.status === 'Confirmed');
     readonly lines = signal<BookedLine[]>([]);
@@ -105,7 +128,26 @@ export class PreOrderFormComponent {
     readonly advance = computed(() => this._value().advance_paid ?? 0);
     /** What is left to collect when the order is delivered, on the approximate prices. */
     readonly balance = computed(() => Math.max(this.total() - this.advance(), 0));
-    readonly remaining = computed(() => [!this._value().phone?.trim(), this.needsName(), !this.lines().length].filter(Boolean).length);
+    /** A day already behind us. A booking already overdue keeps its own date, so an edit can still save. */
+    readonly pastDate = computed(() => {
+        const day = this._value().expected_date;
+        if (!day || day >= startOfToday()) return false;
+        return toDay(day) !== this.editing()?.expected_date;
+    });
+    readonly phoneInvalid = computed(() => !!this._value().phone?.trim() && !normalizePhone(this._value().phone ?? ''));
+
+    /** The first thing still stopping Save, said in the footer as the online order page does. */
+    readonly blocker = computed<string | null>(() => {
+        if (!this._value().phone?.trim()) return 'sales.preOrder.blocker.phone';
+        if (this.phoneInvalid()) return 'sales.preOrder.blocker.phoneInvalid';
+        if (this.known() === undefined) return this.lookupFailed() ? 'sales.preOrder.blocker.lookupFailed' : 'sales.preOrder.blocker.lookingUp';
+        if (this.needsName()) return 'sales.preOrder.blocker.name';
+        if (!this.lines().length) return 'sales.preOrder.blocker.lines';
+        if (this.pastDate()) return 'sales.preOrder.blocker.pastDate';
+        if (this.advanceOver()) return 'sales.preOrder.blocker.advanceOver';
+        if (this.needsMethod()) return 'sales.preOrder.blocker.method';
+        return null;
+    });
 
     readonly products = signal<PreOrderProduct[]>([]);
     readonly productGroups = computed(() => categoryGroups(this.products()));
@@ -116,6 +158,9 @@ export class PreOrderFormComponent {
     readonly lookupFailed = signal(false);
     private _lastSearch = '';
     private readonly _typed = new Subject<string>();
+
+    /** Days before today cannot be picked: stock cannot be expected in the past. */
+    readonly disabledDate = (day: Date): boolean => day < startOfToday();
 
     constructor() {
         const destroyRef = inject(DestroyRef);
@@ -217,6 +262,11 @@ export class PreOrderFormComponent {
         });
     }
 
+    openPaste(): void {
+        this.pasteResult.set(null);
+        this.pasteOpen.set(true);
+    }
+
     search(text: string): void {
         this._lastSearch = text;
         this.searching.set(true);
@@ -231,6 +281,13 @@ export class PreOrderFormComponent {
         const phone = this.form.controls.phone.value;
         this.form.controls.phone.setValue('');
         this.form.controls.phone.setValue(phone);
+    }
+
+    /** The empty products column's button: open the search, ready to type. */
+    findProduct(): void {
+        const picker = this.picker();
+        picker?.focus();
+        picker?.setOpenState(true);
     }
 
     add(oid: string | null): void {
@@ -248,9 +305,14 @@ export class PreOrderFormComponent {
         this.lines.update((all) => [...all, { ...rest, quantity: 1, unit_price: product.usual_price ?? product.price_to ?? price }]);
     }
 
-    setQuantity(index: number, quantity: number | null): void {
+    setQuantity(index: number, quantity: number | string | null): void {
         this._linesTouched.set(true);
-        this.lines.update((all) => all.map((line, i) => (i === index ? { ...line, quantity: Math.max(1, quantity ?? 1) } : line)));
+        const units = Math.floor(Number(quantity) || 1);
+        this.lines.update((all) => all.map((line, i) => (i === index ? { ...line, quantity: Math.max(1, units) } : line)));
+    }
+
+    step(index: number, by: 1 | -1): void {
+        this.setQuantity(index, this.lines()[index].quantity + by);
     }
 
     setPrice(index: number, price: number | null): void {
@@ -260,8 +322,7 @@ export class PreOrderFormComponent {
 
     /** Set the date the stock is expected, a number of days from today. */
     expectIn(days: number): void {
-        const day = new Date();
-        day.setHours(0, 0, 0, 0);
+        const day = startOfToday();
         day.setDate(day.getDate() + days);
         this.form.controls.expected_date.setValue(day);
         this.form.controls.expected_date.markAsDirty();
@@ -285,7 +346,7 @@ export class PreOrderFormComponent {
     valid(): boolean {
         this.tried.set(true);
         revealErrors(this.form);
-        return this.form.valid && !!this.lines().length && !this.needsName() && !this.needsMethod() && !this.advanceOver() && this.known() !== undefined;
+        return this.form.valid && !this.blocker();
     }
 
     markPristine(): void {

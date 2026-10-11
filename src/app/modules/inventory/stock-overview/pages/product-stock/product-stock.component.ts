@@ -57,9 +57,10 @@ interface Figure {
  * One product's stock: its batches, each with its price, budget, expiry and stickers. Cost and profit
  * appear only for someone the server sent them to; the page never guesses.
  */
+import { BudgetTotalsComponent } from '@app/shared/components/budget-totals/budget-totals.component';
 @Component({
     selector: 'product-stock',
-    imports: [FormsModule, NgIcon, NzButtonModule, NzCardModule, NzDropdownModule, NzMenuModule, NzSkeletonModule, NzSwitchModule, NzTableModule, NzTimelineModule, NzTooltipModule, RouterLink, TranslatePipe, PageHeaderComponent, StatusTagComponent, ActionFooterComponent, BatchExpiryComponent, BatchPriceDialogComponent, BatchBudgetDialogComponent, StickerDialogComponent, NzTypographyModule, DigitsPipe, MoneyPipe, RecordDatePipe],
+    imports: [FormsModule, NgIcon, NzButtonModule, NzCardModule, NzDropdownModule, NzMenuModule, NzSkeletonModule, NzSwitchModule, NzTableModule, NzTimelineModule, NzTooltipModule, RouterLink, TranslatePipe, PageHeaderComponent, StatusTagComponent, ActionFooterComponent, BatchExpiryComponent, BatchPriceDialogComponent, BatchBudgetDialogComponent, StickerDialogComponent, BudgetTotalsComponent, NzTypographyModule, DigitsPipe, MoneyPipe, RecordDatePipe],
     providers: [provideIcons({ lucideArrowLeft, lucideArrowLeftRight, lucideBadgeDollarSign, lucideBanknote, lucideBoxes, lucideCalendarClock, lucideEllipsis, lucideFileSpreadsheet, lucideHistory, lucideInfo, lucideLock, lucidePackageCheck, lucidePercent, lucidePrinter, lucideRotateCw, lucideShoppingCart, lucideSlidersHorizontal, lucideTag, lucideTrash2, lucideTrendingDown, lucideTrendingUp, lucideWallet, lucideWrench, lucideZap })],
     templateUrl: './product-stock.component.html',
     styleUrl: './product-stock.component.scss',
@@ -107,6 +108,8 @@ export class ProductStockComponent {
     readonly menuOpen = signal<string | null>(null);
     readonly pricing = signal<StockBatch | null>(null);
     readonly budgeting = signal<StockBatch | null>(null);
+    /** The batch whose budget breakdown is open under it. */
+    readonly budgetShown = signal<string | null>(null);
     readonly labelling = signal<StockBatch | null>(null);
 
     readonly canViewMovements = computed(() => this._session.can('inventory.stock-movement.view'));

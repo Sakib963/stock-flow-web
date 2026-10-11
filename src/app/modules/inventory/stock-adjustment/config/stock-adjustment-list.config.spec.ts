@@ -6,9 +6,7 @@ describe('the stock adjustments list config', () => {
     it('is closed without the view permission and offers New adjustment only to those allowed, with no list download (a report covers it)', () => {
         expect(STOCK_ADJUSTMENT_LIST.permission).toBe('inventory.stock-adjustment.view');
         const actions = STOCK_ADJUSTMENT_LIST.header.actions ?? [];
-        expect(actions.map((a) => [a.key, a.permission])).toEqual([
-            ['create', 'inventory.stock-adjustment.create'],
-        ]);
+        expect(actions.map((a) => [a.key, a.permission])).toEqual([['create', 'inventory.stock-adjustment.create']]);
     });
 
     it('draws values at cost only for someone who may see money', () => {

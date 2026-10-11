@@ -1,0 +1,23 @@
+<nz-table nzTemplateMode nzSize="small" nzTableLayout="fixed" data-budget="totals">
+    <thead>
+        <tr>
+            <th>{{ 'inventory.purchaseOrder.budgets.budget' | translate }}</th>
+            <th class="text-right">{{ 'inventory.purchaseOrder.budgets.perUnit' | translate }}</th>
+            <th class="text-right">{{ 'inventory.purchaseOrder.budgets.forUnits' | translate: { count: (units() | digits) } }}</th>
+        </tr>
+    </thead>
+    <tbody>
+        @for (row of rows(); track row.key) {
+            <tr [attr.data-budget-row]="row.key">
+                <td class="text-xs text-ink-body">{{ 'inventory.purchaseOrder.budgets.' + row.key | translate }}</td>
+                <td class="text-right font-mono text-xs text-ink tabular-nums">{{ row.perUnit === null ? '–' : (row.perUnit | money) }}</td>
+                <td class="text-right font-mono text-xs text-ink tabular-nums">{{ row.total === null ? '–' : (row.total | money) }}</td>
+            </tr>
+        }
+        <tr data-budget-row="total">
+            <td class="text-xs font-bold text-ink">{{ 'inventory.purchaseOrder.budgets.total' | translate }}</td>
+            <td class="text-right font-mono text-xs font-bold text-ink tabular-nums">{{ perUnit() | money }}</td>
+            <td class="text-right font-mono text-xs font-bold text-ink tabular-nums" data-budget="total">{{ total() | money }}</td>
+        </tr>
+    </tbody>
+</nz-table>

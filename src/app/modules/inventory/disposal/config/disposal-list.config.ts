@@ -49,9 +49,7 @@ export const DISPOSAL_LIST: ListShellPageConfig = {
             { key: 'created_by', label: 'inventory.disposal.createdBy', type: 'user', width: 16, name: 'created_by_name', hidden: true },
         ],
         layouts: [{ type: 'table' }],
-        rowActions: [
-            { key: 'view', label: 'inventory.disposal.view', icon: 'lucideEye', permission: 'inventory.product-dispose.view', stateful: false, run: { kind: 'navigate', route: DISPOSAL_ROUTES.detailPattern } },
-        ],
+        rowActions: [{ key: 'view', label: 'inventory.disposal.view', icon: 'lucideEye', permission: 'inventory.product-dispose.view', stateful: false, run: { kind: 'navigate', route: DISPOSAL_ROUTES.detailPattern } }],
         rowActionStyle: 'inline',
         phoneRowActionStyle: 'menu',
         empty: { icon: 'lucideTrash2', title: 'inventory.disposal.emptyTitle', body: 'inventory.disposal.emptyBody', action: 'create' },

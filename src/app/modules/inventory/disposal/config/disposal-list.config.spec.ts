@@ -6,9 +6,7 @@ describe('the disposals list config', () => {
     it('is closed without the view permission and offers New disposal only to those allowed, with no list download (a report covers it)', () => {
         expect(DISPOSAL_LIST.permission).toBe('inventory.product-dispose.view');
         const actions = DISPOSAL_LIST.header.actions ?? [];
-        expect(actions.map((a) => [a.key, a.permission])).toEqual([
-            ['create', 'inventory.product-dispose.create'],
-        ]);
+        expect(actions.map((a) => [a.key, a.permission])).toEqual([['create', 'inventory.product-dispose.create']]);
     });
 
     it('draws values at cost only for someone who may see money', () => {

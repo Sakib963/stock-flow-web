@@ -15,17 +15,17 @@ import { PreOrderDetails } from '@app/core/models/pre-order.model';
 import { PreOrderFormComponent } from '@app/modules/sales/pre-order/components/pre-order-form/pre-order-form.component';
 import { PRE_ORDER_ROUTES } from '@app/modules/sales/pre-order/constants/pre-order-routes';
 import { PreOrderService } from '@app/modules/sales/pre-order/services/pre-order.service';
-import { FormPageComponent } from '@app/shared/components/form-page/form-page.component';
 import { PageHeaderComponent } from '@app/shared/components/page-header/page-header.component';
 import { confirmAction } from '@app/shared/utils/confirm-action/confirm-action';
 import { failureKey, failureOf } from '@app/shared/utils/request-failure/request-failure';
 
 @Component({
     selector: 'pre-order-edit',
-    imports: [NgIcon, NzButtonModule, NzSkeletonModule, TranslatePipe, PageHeaderComponent, FormPageComponent, PreOrderFormComponent],
+    imports: [NgIcon, NzButtonModule, NzSkeletonModule, TranslatePipe, PageHeaderComponent, PreOrderFormComponent],
     providers: [provideIcons({ lucideArrowLeft, lucideRotateCw })],
     templateUrl: './pre-order-edit.component.html',
     styleUrl: './pre-order-edit.component.scss',
+    host: { class: 'flex min-h-0 flex-col lg:h-full' },
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PreOrderEditComponent implements HasUnsavedChanges {

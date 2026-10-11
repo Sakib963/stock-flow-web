@@ -29,9 +29,10 @@ const discountWithinPrice = (group: AbstractControl): ValidationErrors | null =>
  * arrived, the price billed, what the stock is for, how it sells and the budgets set against it.
  * "Save, next line" moves straight on to the next line still to check.
  */
+import { BudgetTotalsComponent } from '@app/shared/components/budget-totals/budget-totals.component';
 @Component({
     selector: 'verify-line-drawer',
-    imports: [DigitsPipe, MoneyPipe, NgIcon, ReactiveFormsModule, NzButtonModule, NzDatePickerModule, NzDrawerModule, NzFormModule, NzInputModule, NzInputNumberModule, NzRadioModule, TranslatePipe],
+    imports: [DigitsPipe, MoneyPipe, NgIcon, ReactiveFormsModule, NzButtonModule, NzDatePickerModule, NzDrawerModule, NzFormModule, NzInputModule, NzInputNumberModule, NzRadioModule, TranslatePipe, BudgetTotalsComponent],
     providers: [provideIcons({ lucideArrowRight, lucideCheck })],
     templateUrl: './verify-line-drawer.component.html',
     styleUrl: './verify-line-drawer.component.scss',
@@ -70,6 +71,8 @@ export class VerifyLineDrawerComponent {
     );
 
     private readonly _value = toSignal(this.form.valueChanges, { initialValue: this.form.getRawValue() });
+    readonly budgets = computed(() => this._value());
+    readonly receivedUnits = computed(() => Number(this._value().received_quantity ?? 0));
 
     readonly forSale = computed(() => this._value().intended_use === 'for_sale');
 

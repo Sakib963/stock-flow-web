@@ -17,7 +17,7 @@ import { NzTimelineModule } from 'ng-zorro-antd/timeline';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { RequestFailure } from '@app/core/models/api.model';
 import { PageBack } from '@app/core/models/page-header.model';
-import { BUDGET_KEYS, PAYMENT_STATUSES, PaymentStatus, PurchaseOrderDetails, PurchaseOrderLine, PurchaseOrderReport, PurchaseOrderRow } from '@app/core/models/purchase-order.model';
+import { PAYMENT_STATUSES, PaymentStatus, PurchaseOrderDetails, PurchaseOrderLine, PurchaseOrderReport, PurchaseOrderRow } from '@app/core/models/purchase-order.model';
 import { LanguageService } from '@app/core/services/language/language.service';
 import { SessionService } from '@app/core/services/session/session.service';
 import { PAYMENT_STATUS, PURCHASE_ORDER_STATUS } from '@app/modules/inventory/purchase-order/config/purchase-order-list.config';
@@ -54,9 +54,10 @@ interface OrderStat {
  * One purchase order. Its state decides what it offers: a Submitted order can be verified, edited
  * or cancelled; payment can be recorded until it is cancelled; a Verified or Cancelled order is final.
  */
+import { BudgetTotalsComponent } from '@app/shared/components/budget-totals/budget-totals.component';
 @Component({
     selector: 'purchase-order-detail',
-    imports: [NgIcon, ReactiveFormsModule, NzButtonModule, NzCardModule, NzFormModule, NzInputModule, NzInputNumberModule, NzModalModule, NzRadioModule, NzSkeletonModule, NzTableModule, NzTimelineModule, TranslatePipe, PageHeaderComponent, StatusTagComponent, ActionFooterComponent, NzTypographyModule, MoneyPipe, RecordDatePipe, DigitsPipe, BatchExpiryComponent],
+    imports: [NgIcon, ReactiveFormsModule, NzButtonModule, NzCardModule, NzFormModule, NzInputModule, NzInputNumberModule, NzModalModule, NzRadioModule, NzSkeletonModule, NzTableModule, NzTimelineModule, TranslatePipe, BudgetTotalsComponent, PageHeaderComponent, StatusTagComponent, ActionFooterComponent, NzTypographyModule, MoneyPipe, RecordDatePipe, DigitsPipe, BatchExpiryComponent],
     providers: [
         MoneyPipe,
         provideIcons({
@@ -102,7 +103,6 @@ export class PurchaseOrderDetailComponent {
     readonly language = inject(LanguageService).current;
     readonly oid = this._route.snapshot.paramMap.get('oid') ?? '';
     readonly back: PageBack = { route: PURCHASE_ORDER_ROUTES.list };
-    readonly budgetKeys = BUDGET_KEYS;
     readonly paymentStatuses = PAYMENT_STATUSES;
 
     /** The list's row for this order, when the page was opened from the list. */

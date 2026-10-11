@@ -29,9 +29,10 @@ const number = (value: unknown): number | null => (value === null || value === u
  * One adjustment line, added or changed in a drawer: every field at full width, so no picker is cut
  * short, and the product's batches shown with what each holds and has free.
  */
+import { BudgetTotalsComponent } from '@app/shared/components/budget-totals/budget-totals.component';
 @Component({
     selector: 'adjustment-line-drawer',
-    imports: [DigitsPipe, MoneyPipe, FormsModule, NgIcon, ReactiveFormsModule, NzButtonModule, NzDatePickerModule, NzDrawerModule, NzFormModule, NzInputModule, NzInputNumberModule, NzRadioModule, NzSelectModule, NzSpinModule, TranslatePipe],
+    imports: [DigitsPipe, MoneyPipe, FormsModule, NgIcon, ReactiveFormsModule, NzButtonModule, NzDatePickerModule, NzDrawerModule, NzFormModule, NzInputModule, NzInputNumberModule, NzRadioModule, NzSelectModule, NzSpinModule, TranslatePipe, BudgetTotalsComponent],
     providers: [provideIcons({ lucideCheck, lucideX })],
     templateUrl: './adjustment-line-drawer.component.html',
     styleUrl: './adjustment-line-drawer.component.scss',

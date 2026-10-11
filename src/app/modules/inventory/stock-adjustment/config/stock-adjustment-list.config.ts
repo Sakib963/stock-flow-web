@@ -29,9 +29,7 @@ export const STOCK_ADJUSTMENT_LIST: ListShellPageConfig = {
     permission: 'inventory.stock-adjustment.view',
     header: {
         count: true,
-        actions: [
-            { key: 'create', label: 'inventory.stockAdjustment.add', icon: 'lucidePlus', permission: 'inventory.stock-adjustment.create', primary: true, run: { kind: 'navigate', route: STOCK_ADJUSTMENT_ROUTES.create } },
-        ],
+        actions: [{ key: 'create', label: 'inventory.stockAdjustment.add', icon: 'lucidePlus', permission: 'inventory.stock-adjustment.create', primary: true, run: { kind: 'navigate', route: STOCK_ADJUSTMENT_ROUTES.create } }],
     },
     stats: [
         { key: 'draft', label: 'inventory.stockAdjustment.stat.draft', icon: 'lucideFilePen', tone: 'warning' },

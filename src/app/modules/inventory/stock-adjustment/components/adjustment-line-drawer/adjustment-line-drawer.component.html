@@ -169,6 +169,7 @@
                             </nz-form-item>
                         }
                     </div>
+                    <budget-totals class="mb-6" [budgets]="value()" [units]="value().quantity ?? 0" />
                     <nz-form-item>
                         <nz-form-label nzFor="al-remarks">{{ 'inventory.purchaseOrder.budgets.remarks' | translate }}</nz-form-label>
                         <nz-form-control>

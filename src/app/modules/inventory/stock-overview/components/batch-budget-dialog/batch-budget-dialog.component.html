@@ -23,7 +23,7 @@
                             <input nz-input id="bb-remarks" formControlName="cost_remarks" type="text" autocomplete="off" />
                         </nz-form-control>
                     </nz-form-item>
-                    <p class="m-0 text-xs text-ink-body">{{ 'inventory.stockOverview.budget.total' | translate: { total: (perUnit() | money) } }}</p>
+                    <budget-totals [budgets]="budgets()" [units]="current.initial_quantity" />
                 </form>
             }
         }

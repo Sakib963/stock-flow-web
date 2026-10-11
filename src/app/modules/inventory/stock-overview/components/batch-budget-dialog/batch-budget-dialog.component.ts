@@ -20,9 +20,10 @@ import { failureKey } from '@app/shared/utils/request-failure/request-failure';
 import { revealErrors } from '@app/shared/utils/reveal-errors/reveal-errors';
 
 /** A batch's five budgets per unit and its remark, confirmed in the same dialog before saving. */
+import { BudgetTotalsComponent } from '@app/shared/components/budget-totals/budget-totals.component';
 @Component({
     selector: 'batch-budget-dialog',
-    imports: [NgIcon, ReactiveFormsModule, NzButtonModule, NzFormModule, NzInputModule, NzInputNumberModule, NzModalModule, TranslatePipe, DigitsPipe, MoneyPipe],
+    imports: [NgIcon, ReactiveFormsModule, NzButtonModule, NzFormModule, NzInputModule, NzInputNumberModule, NzModalModule, TranslatePipe, BudgetTotalsComponent, DigitsPipe, MoneyPipe],
     providers: [provideIcons({ lucideArrowLeft, lucideCheck, lucideX })],
     templateUrl: './batch-budget-dialog.component.html',
     styleUrl: './batch-budget-dialog.component.scss',
@@ -54,6 +55,7 @@ export class BatchBudgetDialogComponent {
     });
 
     private readonly _value = toSignal(this.form.valueChanges, { initialValue: this.form.getRawValue() });
+    readonly budgets = computed(() => this._value());
 
     readonly perUnit = computed(() => BUDGET_KEYS.reduce((sum, key) => sum + Number(this._value()[key] ?? 0), 0));
 

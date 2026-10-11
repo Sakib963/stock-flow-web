@@ -1,10 +1,8 @@
-<page-header [back]="back" [title]="'sales.preOrder.editTitle' | translate" [lead]="'sales.preOrder.formLead' | translate" />
+<page-header [back]="back" [title]="'sales.preOrder.editTitle' | translate" [compact]="true" />
 
 @if (booking(); as record) {
     @if (record.status === 'Pending' || record.status === 'Confirmed') {
-        <form-page [framed]="false" [formId]="editor()?.formId ?? ''" [saving]="saving()" [remaining]="editor()?.remaining() ?? 0" saveLabel="form.saveChanges" (cancel)="cancel()">
-            <pre-order-form [editing]="record" (submitted)="save()" />
-        </form-page>
+        <pre-order-form saveLabel="form.saveChanges" [editing]="record" [saving]="saving()" (submitted)="save()" />
     } @else {
         <div class="sf-empty" role="alert" data-pre-order="final">
             <p class="m-0 text-sm text-ink-body">{{ 'sales.preOrder.final' | translate }}</p>

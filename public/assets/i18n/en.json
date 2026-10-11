@@ -1390,7 +1390,11 @@
                 "content_creation_cost": "Content creation",
                 "influencer_cost": "Influencer",
                 "remarks": "Remarks",
-                "remarksPlaceholder": "For example, Eid campaign stock"
+                "remarksPlaceholder": "For example, Eid campaign stock",
+                "budget": "Budget",
+                "perUnit": "Per unit",
+                "forUnits": "For {{count}} units",
+                "total": "Total"
             },
             "verifyDrawer": {
                 "ordered": "Ordered {{quantity}} × {{price}}",
@@ -3398,7 +3402,24 @@
                 "hintShort": "Pre-order {{price}}",
                 "hintShortOver": ": over the limit"
             },
-            "notReady": "Cannot become an order yet: {{names}} not in stock. All products go together."
+            "notReady": "Cannot become an order yet: {{names}} not in stock. All products go together.",
+            "start": {
+                "title": "Start with the customer",
+                "body": "Paste their chat message, or type their phone. A returning customer brings their record and open pre-orders."
+            },
+            "emptyLines": "Search for the products the customer asked for, in stock or not.",
+            "blocker": {
+                "phone": "Type the customer's phone, or paste their message.",
+                "phoneInvalid": "The phone needs 11 digits starting 01.",
+                "lookingUp": "Wait a moment, looking up the phone.",
+                "lookupFailed": "The phone could not be checked. Press Try again under it.",
+                "name": "Give the new customer's name.",
+                "lines": "Add at least one product.",
+                "pastDate": "The expected date has already passed. Pick today or a later day.",
+                "advanceOver": "The advance is more than the approximate total.",
+                "method": "Pick how the advance was paid."
+            },
+            "priceShort": "Price"
         }
     }
 }

@@ -177,7 +177,10 @@
                                 @if (seesMoney()) {
                                     <td nzAlign="right" class="tabular-nums">
                                         <span class="block text-ink">{{ batch.cost_price | money }}</span>
-                                        <span class="block text-xs text-ink-muted">{{ 'inventory.stockOverview.plusBudget' | translate: { budget: (batch.budget_per_unit ?? 0 | money) } }}</span>
+                                        <!-- The budget's breakdown opens under the batch, so it reads without the edit dialog. -->
+                                        <button nz-button nzType="link" nzSize="small" type="button" class="h-auto p-0 text-xs" data-batch-budget [attr.aria-expanded]="budgetShown() === batch.oid" (click)="budgetShown.set(budgetShown() === batch.oid ? null : batch.oid)">
+                                            {{ 'inventory.stockOverview.plusBudget' | translate: { budget: (batch.budget_per_unit ?? 0 | money) } }}
+                                        </button>
                                     </td>
                                 }
                                 <td nzAlign="right" class="tabular-nums">
@@ -230,6 +233,11 @@
                                     </nz-dropdown-menu>
                                 </td>
                             </tr>
+                            @if (seesMoney()) {
+                                <tr [nzExpand]="budgetShown() === batch.oid">
+                                    <budget-totals class="max-w-xl" [budgets]="batch" [units]="batch.initial_quantity" />
+                                </tr>
+                            }
                         }
                     </tbody>
                 </nz-table>
@@ -339,7 +347,9 @@
                                 <tr>
                                     <td nzAlign="right" class="text-ink-soft tabular-nums">{{ i + 1 | digits }}</td>
                                     <td class="whitespace-nowrap tabular-nums text-ink-muted">{{ move.created_on | recordDate: language() : 'date-time-12' }}</td>
-                                    <td><span class="inline-flex items-center font-mono text-xs whitespace-nowrap text-ink-body" nz-typography nzCopyable [nzCopyText]="move.batch_code" [nzCopyTooltips]="['copy.hint' | translate, 'copy.copied' | translate]">{{ move.batch_code }}</span></td>
+                                    <td>
+                                        <span class="inline-flex items-center font-mono text-xs whitespace-nowrap text-ink-body" nz-typography nzCopyable [nzCopyText]="move.batch_code" [nzCopyTooltips]="['copy.hint' | translate, 'copy.copied' | translate]">{{ move.batch_code }}</span>
+                                    </td>
                                     <td>
                                         @if (reasonOf(move.reason); as style) {
                                             <status-tag [label]="style.label" [tone]="style.tone" [icon]="style.icon" />

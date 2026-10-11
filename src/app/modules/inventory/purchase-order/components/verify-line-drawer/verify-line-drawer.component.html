@@ -80,6 +80,7 @@
                         </nz-form-item>
                     }
                 </div>
+                <budget-totals class="mb-6" [budgets]="budgets()" [units]="receivedUnits()" />
                 <nz-form-item>
                     <nz-form-label nzFor="vl-remarks">{{ 'inventory.purchaseOrder.budgets.remarks' | translate }}</nz-form-label>
                     <nz-form-control [nzErrorTip]="'form.tooLong' | translate: { max: 500 } | digits">
