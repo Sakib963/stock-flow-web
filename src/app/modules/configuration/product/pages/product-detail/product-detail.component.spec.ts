@@ -20,7 +20,7 @@ const DETAILS = {
             sellable: 4,
             batches: [{ oid: 'i-1', batch_code: 'B-0917', warehouse_name: 'Main', received_on: '2026-09-17T10:00:00.000', on_hand: 12, held: 8, sellable: 4, cost_price: 450, selling_price: 890 }],
         },
-        lifetime: { sold: 31, returned: 2, damaged: 1, last_sold_on: null },
+        lifetime: { sold: 31, returned: 2, damaged: 1, given_away: 3, last_sold_on: null },
         activity: [],
     },
 };
@@ -50,6 +50,14 @@ describe('ProductDetailComponent', () => {
         expect(fixture.componentInstance.stats()[0]).toEqual(expect.objectContaining({ key: 'sellable', value: 4 }));
         expect(fixture.componentInstance.stockState()).toBe('low');
         expect(stats).toContain('31');
+    });
+
+    it('shows units given away apart from units sold', async () => {
+        const fixture = await open();
+        const stats = fixture.componentInstance.stats();
+
+        expect(stats.find((stat) => stat.key === 'givenAway')?.value).toBe(3);
+        expect(stats.find((stat) => stat.key === 'sold')?.value).toBe(31);
     });
 
     it('lists each batch with where it is, what is held, and what it cost', async () => {

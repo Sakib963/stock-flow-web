@@ -73,6 +73,8 @@ export interface ProductLifetime {
     sold: number;
     returned: number;
     damaged: number;
+    /** Units that left as giveaways: not sold, so never in sold. */
+    given_away: number;
     last_sold_on: string | null;
 }
 

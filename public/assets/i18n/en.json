@@ -1017,6 +1017,7 @@
                 "onHand": "In the warehouse",
                 "held": "Held for online orders",
                 "sold": "Sold, all time",
+                "givenAway": "Given away, all time",
                 "returned": "Returned, all time",
                 "damaged": "Damaged, all time"
             },

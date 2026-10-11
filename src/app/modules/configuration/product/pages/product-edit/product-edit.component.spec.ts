@@ -32,7 +32,7 @@ const open = async (): Promise<ComponentFixture<ProductEditComponent>> => {
     const fixture = TestBed.createComponent(ProductEditComponent);
     fixture.detectChanges();
     const http = TestBed.inject(HttpTestingController);
-    http.expectOne((r) => r.url.includes(APIEndpoint.GET_PRODUCT_DETAILS)).flush({ data: { details: KURTI, stock: { on_hand: 0, held: 0, sellable: 0, batches: [] }, lifetime: { sold: 0, returned: 0, damaged: 0, last_sold_on: null }, activity: [] } });
+    http.expectOne((r) => r.url.includes(APIEndpoint.GET_PRODUCT_DETAILS)).flush({ data: { details: KURTI, stock: { on_hand: 0, held: 0, sellable: 0, batches: [] }, lifetime: { sold: 0, returned: 0, damaged: 0, given_away: 0, last_sold_on: null }, activity: [] } });
     fixture.detectChanges();
     http.expectOne((r) => r.url.endsWith(APIEndpoint.GET_SUB_CATEGORY_LIST_FOR_DROPDOWN)).flush({ data: [{ value: 'sc-1', label: 'Kurti', groupLabel: 'Clothing' }] });
     http.expectOne((r) => r.url.endsWith(APIEndpoint.GET_BRAND_LIST_FOR_DROPDOWN)).flush({ data: [] });
