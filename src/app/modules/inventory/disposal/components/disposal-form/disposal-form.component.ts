@@ -125,7 +125,9 @@ export class DisposalFormComponent {
         // A stored line knows only its own batch; the drawer fetches the product's others when it opens.
         this.lines.set(
             lines.map((line) => {
-                const batch = line.inventory_oid ? { oid: line.inventory_oid, batch_code: line.batch_code ?? '', intended_use: 'for_sale' as const, on_hand: line.on_hand ?? 0, free: line.free ?? 0, cost_price: line.cost_price, selling_price: null, maximum_discount: null, warehouse_name: line.warehouse_name, expiry_date: line.expiry_date } : null;
+                const batch = line.inventory_oid
+                    ? { oid: line.inventory_oid, batch_code: line.batch_code ?? '', intended_use: 'for_sale' as const, on_hand: line.on_hand ?? 0, free: line.free ?? 0, cost_price: line.cost_price, selling_price: null, maximum_discount: null, warehouse_name: line.warehouse_name, expiry_date: line.expiry_date }
+                    : null;
                 return {
                     product: { oid: line.product_oid, name: line.product_name, sku: line.sku, has_expiry: false, unit_type: line.unit_type, photo_thumb: null, batches: batch ? [batch] : [] },
                     batch,

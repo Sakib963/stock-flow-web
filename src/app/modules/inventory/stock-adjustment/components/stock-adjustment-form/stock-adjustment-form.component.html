@@ -121,12 +121,8 @@
         }
 
         <div class="flex items-baseline justify-end gap-6 border-t border-line px-4 py-3 md:px-5" data-form="total">
-            <span class="text-xs text-ink-muted"
-                >{{ 'inventory.stockAdjustment.unitsIn' | translate }} <span class="ml-1 font-mono text-lg font-bold text-ink tabular-nums">{{ unitsIn() | digits }}</span></span
-            >
-            <span class="text-xs text-ink-muted"
-                >{{ 'inventory.stockAdjustment.unitsOut' | translate }} <span class="ml-1 font-mono text-lg font-bold text-ink tabular-nums">{{ unitsOut() | digits }}</span></span
-            >
+            <span class="text-xs text-ink-muted">{{ 'inventory.stockAdjustment.unitsIn' | translate }} <span class="ml-1 font-mono text-lg font-bold text-ink tabular-nums">{{ unitsIn() | digits }}</span></span>
+            <span class="text-xs text-ink-muted">{{ 'inventory.stockAdjustment.unitsOut' | translate }} <span class="ml-1 font-mono text-lg font-bold text-ink tabular-nums">{{ unitsOut() | digits }}</span></span>
         </div>
     </section>
 </form>

@@ -11,25 +11,9 @@ import { OVERLAY_PROVIDERS } from '@app/shared/constants/overlay-providers';
 import { ProductStockComponent } from './product-stock.component';
 
 const batch = (over: Partial<StockBatch>): StockBatch => ({
-    oid: 'i-1',
-    batch_code: 'B-7KQ4-M2XH',
-    intended_use: 'for_sale',
-    status: 'ready_for_sale',
-    received_on: '2026-09-30T08:00:00.000',
-    expiry_date: null,
-    initial_quantity: 10,
-    on_hand: 10,
-    held: 2,
-    sellable: 8,
-    selling_price: 500,
-    maximum_discount: 50,
-    priced: true,
-    warehouse_name: 'Main',
-    aisle_name: null,
-    purchase_oid: 'po-1',
-    po_number: 'PO-2609-0001',
-    supplier_name: 'Beauty house',
-    ...over,
+    oid: 'i-1', batch_code: 'B-7KQ4-M2XH', intended_use: 'for_sale', status: 'ready_for_sale', received_on: '2026-09-30T08:00:00.000', expiry_date: null,
+    initial_quantity: 10, on_hand: 10, held: 2, sellable: 8, selling_price: 500, maximum_discount: 50, priced: true,
+    warehouse_name: 'Main', aisle_name: null, purchase_oid: 'po-1', po_number: 'PO-2609-0001', supplier_name: 'Beauty house', ...over,
 });
 
 const OWNER_VIEW: ProductStock = {
