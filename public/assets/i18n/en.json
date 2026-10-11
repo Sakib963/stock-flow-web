@@ -3098,7 +3098,9 @@
             "status": {
                 "Draft": "Draft",
                 "Given": "Given",
-                "Cancelled": "Cancelled"
+                "Cancelled": "Cancelled",
+                "Held": "In a parcel",
+                "Returned": "Came back"
             },
             "stat": {
                 "drafts": "Drafts to give",
@@ -3147,6 +3149,21 @@
                     "title": "Cancel the giveaway",
                     "done": "Giveaway cancelled"
                 }
+            },
+            "orderLabel": "Order",
+            "order": {
+                "add": "Add gift",
+                "section": "Gifts in this parcel",
+                "title": "Add a gift to this order",
+                "lead": "The gift is held with the order and leaves when it is dispatched. It is never part of the sale.",
+                "confirmTitle": "Add {{units}} gift units to {{number}}?",
+                "confirmBody": "The units are held now and leave with the parcel. Take the gift out any time before dispatch.",
+                "added": "Gift {{number}} added to the parcel.",
+                "remove": "Take out",
+                "removeTitle": "Take {{number}} out of the parcel?",
+                "removeBody": "Its units are free again. Nothing has left the shelf.",
+                "removed": "Gift taken out of the parcel.",
+                "loadFailed": "Could not load the gifts of this order. Reload the page to see them."
             }
         }
     }

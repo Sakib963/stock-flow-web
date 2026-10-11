@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject, signal } from '@angular/core';
 import { APIEndpoint } from '@app/core/constants/api-endpoint';
-import { CreateGiveaway, GiveawayDetails } from '@app/core/models/giveaway.model';
+import { AddOrderGift, CreateGiveaway, GiveawayDetails, OrderGift } from '@app/core/models/giveaway.model';
 import { environment } from '@env/environment';
 import { Observable, finalize, map } from 'rxjs';
 
@@ -23,6 +23,19 @@ export class GiveawayService {
 
     give(oid: string): Observable<unknown> {
         return this.write(APIEndpoint.GIVE_GIVEAWAY, { oid });
+    }
+
+    /** The gifts in an order's parcel. */
+    forOrder(order_oid: string): Observable<OrderGift[]> {
+        return this._http.get<{ data: { rows: OrderGift[] } }>(`${this._base}${APIEndpoint.GET_GIVEAWAY_LIST}`, { params: { order_oid, limit: 100 } }).pipe(map((response) => response.data.rows));
+    }
+
+    addToOrder(body: AddOrderGift): Observable<{ oid: string; giveaway_no: string }> {
+        return this.write(APIEndpoint.ADD_ORDER_GIFT, body);
+    }
+
+    removeFromOrder(oid: string): Observable<unknown> {
+        return this.write(APIEndpoint.REMOVE_ORDER_GIFT, { oid });
     }
 
     cancel(oid: string, reason: string): Observable<unknown> {

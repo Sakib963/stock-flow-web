@@ -1,7 +1,7 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideArrowLeft, lucideBan, lucideCheck, lucideGift, lucideHistory, lucideInfo, lucidePackage, lucideRotateCw, lucideX, lucideZap } from '@ng-icons/lucide';
 import { NzButtonModule } from 'ng-zorro-antd/button';
@@ -22,6 +22,7 @@ import { LanguageService } from '@app/core/services/language/language.service';
 import { SessionService } from '@app/core/services/session/session.service';
 import { GIVEAWAY_STATUS } from '@app/modules/sales/giveaway/config/giveaway-list.config';
 import { GIVEAWAY_ROUTES } from '@app/modules/sales/giveaway/constants/giveaway-routes';
+import { ORDER_ROUTES } from '@app/modules/sales/order/constants/order-routes';
 import { GiveawayService } from '@app/modules/sales/giveaway/services/giveaway.service';
 import { ActionFooterComponent } from '@app/shared/components/action-footer/action-footer.component';
 import { PageHeaderComponent } from '@app/shared/components/page-header/page-header.component';
@@ -36,7 +37,7 @@ import { resolveTone } from '@app/shared/utils/tone-map/tone-map';
 /** One giveaway. A Draft moves nothing; Give takes every line from free stock at once, and is never undone. */
 @Component({
     selector: 'giveaway-detail',
-    imports: [FormsModule, NgIcon, NzButtonModule, NzCardModule, NzFormModule, NzInputModule, NzModalModule, NzSkeletonModule, NzTableModule, NzTimelineModule, NzTypographyModule, TranslatePipe, PageHeaderComponent, ActionFooterComponent, StatusTagComponent, DigitsPipe, MoneyPipe, RecordDatePipe],
+    imports: [FormsModule, RouterLink, NgIcon, NzButtonModule, NzCardModule, NzFormModule, NzInputModule, NzModalModule, NzSkeletonModule, NzTableModule, NzTimelineModule, NzTypographyModule, TranslatePipe, PageHeaderComponent, ActionFooterComponent, StatusTagComponent, DigitsPipe, MoneyPipe, RecordDatePipe],
     providers: [provideIcons({ lucideArrowLeft, lucideBan, lucideCheck, lucideGift, lucideHistory, lucideInfo, lucidePackage, lucideRotateCw, lucideX, lucideZap })],
     templateUrl: './giveaway-detail.component.html',
     styleUrl: './giveaway-detail.component.scss',
@@ -55,6 +56,8 @@ export class GiveawayDetailComponent {
     readonly oid = this._route.snapshot.paramMap.get('oid') ?? '';
     readonly back: PageBack = { route: GIVEAWAY_ROUTES.list };
     readonly seesMoney = this._session.can('inventory.stock-value.view');
+    readonly canViewOrders = this._session.can('sales.order.view');
+    readonly orderRoute = ORDER_ROUTES.detail;
 
     private readonly _seed = this.seedFromList();
     readonly record = signal<GiveawayDetails | null>(null);

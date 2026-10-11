@@ -3,7 +3,7 @@ import { ChangeDetectionStrategy, Component, DestroyRef, computed, inject, signa
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { NgIcon, provideIcons } from '@ng-icons/core';
-import { lucideMessageSquareText, lucidePencil, lucideArrowLeft, lucideBan, lucideHandCoins, lucideCheck, lucideCircleCheck, lucideHistory, lucideInfo, lucideMapPin, lucidePackage, lucidePackageCheck, lucidePackageX, lucidePrinter, lucideReceipt, lucideRotateCw, lucideTruck, lucideUndo2, lucideUserRound, lucideWallet, lucideX, lucideZap } from '@ng-icons/lucide';
+import { lucideMessageSquareText, lucidePencil, lucideArrowLeft, lucideBan, lucideHandCoins, lucideCheck, lucideCircleCheck, lucideGift, lucideHistory, lucideInfo, lucideMapPin, lucidePackage, lucidePackageCheck, lucidePackageX, lucidePrinter, lucideReceipt, lucideRotateCw, lucideTruck, lucideUndo2, lucideUserRound, lucideWallet, lucideX, lucideZap } from '@ng-icons/lucide';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzCardModule } from 'ng-zorro-antd/card';
 import { NzFormModule } from 'ng-zorro-antd/form';
@@ -36,6 +36,11 @@ import { RETURN_STATUS } from '@app/modules/sales/return/config/return-list.conf
 import { ReturnCreateDialogComponent } from '@app/modules/sales/return/components/return-create-dialog/return-create-dialog.component';
 import { RETURN_ROUTES } from '@app/modules/sales/return/constants/return-routes';
 import { ReturnService } from '@app/modules/sales/return/services/return.service';
+import { OrderGift } from '@app/core/models/giveaway.model';
+import { GIVEAWAY_STATUS } from '@app/modules/sales/giveaway/config/giveaway-list.config';
+import { OrderGiftDialogComponent } from '@app/modules/sales/giveaway/components/order-gift-dialog.component';
+import { GIVEAWAY_ROUTES } from '@app/modules/sales/giveaway/constants/giveaway-routes';
+import { GiveawayService } from '@app/modules/sales/giveaway/services/giveaway.service';
 import { ActionFooterComponent } from '@app/shared/components/action-footer/action-footer.component';
 import { PageHeaderComponent } from '@app/shared/components/page-header/page-header.component';
 import { StatusTagComponent } from '@app/shared/components/status-tag/status-tag.component';
@@ -72,8 +77,8 @@ type Dialog = 'confirm' | 'cancel' | 'dispatch' | 'notDelivered' | 'refund';
  */
 @Component({
     selector: 'order-detail',
-    imports: [FormsModule, RouterLink, NgIcon, NzButtonModule, NzCardModule, NzFormModule, NzInputModule, NzInputNumberModule, NzModalModule, NzRadioModule, NzSelectModule, NzSkeletonModule, NzTableModule, NzTimelineModule, NzTypographyModule, TranslatePipe, PageHeaderComponent, ActionFooterComponent, StatusTagComponent, ReturnCreateDialogComponent, DigitsPipe, MoneyPipe, RecordDatePipe],
-    providers: [MoneyPipe, DigitsPipe, provideIcons({ lucideMessageSquareText, lucidePencil, lucideArrowLeft, lucideBan, lucideHandCoins, lucideCheck, lucideCircleCheck, lucideHistory, lucideInfo, lucideMapPin, lucidePackage, lucidePackageCheck, lucidePackageX, lucidePrinter, lucideReceipt, lucideRotateCw, lucideTruck, lucideUndo2, lucideUserRound, lucideWallet, lucideX, lucideZap })],
+    imports: [FormsModule, RouterLink, NgIcon, NzButtonModule, NzCardModule, NzFormModule, NzInputModule, NzInputNumberModule, NzModalModule, NzRadioModule, NzSelectModule, NzSkeletonModule, NzTableModule, NzTimelineModule, NzTypographyModule, TranslatePipe, PageHeaderComponent, ActionFooterComponent, StatusTagComponent, ReturnCreateDialogComponent, OrderGiftDialogComponent, DigitsPipe, MoneyPipe, RecordDatePipe],
+    providers: [MoneyPipe, DigitsPipe, provideIcons({ lucideMessageSquareText, lucidePencil, lucideArrowLeft, lucideBan, lucideHandCoins, lucideCheck, lucideCircleCheck, lucideGift, lucideHistory, lucideInfo, lucideMapPin, lucidePackage, lucidePackageCheck, lucidePackageX, lucidePrinter, lucideReceipt, lucideRotateCw, lucideTruck, lucideUndo2, lucideUserRound, lucideWallet, lucideX, lucideZap })],
     templateUrl: './order-detail.component.html',
     styleUrl: './order-detail.component.scss',
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -147,6 +152,7 @@ export class OrderDetailComponent {
             notDelivered: all && online && o.status === 'Confirmed' && delivery === 'WithCourier' && can('deliver'),
             cancel: online && open && can('cancel'),
             refund: all && online && o.refund_status === 'ToRefund' && can('refund'),
+            gift: all && online && open && this._session.can('sales.giveaway.create'),
             return: all && !!o && RETURNABLE.includes(o.status) && this._session.can('sales.return.create') && Object.values(this.returnable()).some((left) => left > 0),
         };
     });
@@ -160,6 +166,14 @@ export class OrderDetailComponent {
     /** Without the returns read, a line can take back what was sold less what was returned; the server checks Pending ones. */
     readonly returnable = computed(() => this._returnable() ?? Object.fromEntries((this.record()?.items ?? []).map((line) => [line.oid, line.quantity - line.returned_qty])));
     readonly returning = signal(false);
+
+    private readonly _giveaways = inject(GiveawayService);
+    readonly canViewGifts = this.scope === 'all' && this._session.can('sales.giveaway.view');
+    readonly canRemoveGift = this._session.can('sales.giveaway.cancel');
+    readonly giftRoute = GIVEAWAY_ROUTES.detail;
+    readonly gifts = signal<OrderGift[]>([]);
+    readonly gifting = signal(false);
+    readonly removingGift = signal<string | null>(null);
 
     // The action dialog and what it holds.
     readonly dialog = signal<Dialog | null>(null);
@@ -219,6 +233,7 @@ export class OrderDetailComponent {
                 this.record.set(details);
                 this.timelineShown.set(TIMELINE_STEP);
                 this.loadReturns();
+                this.loadGifts();
                 this.loading.set(false);
             },
             error: (error: unknown) => {
@@ -236,6 +251,43 @@ export class OrderDetailComponent {
                 this._returnable.set(Object.fromEntries(returnable.map((line) => [line.order_item_oid, line.returnable])));
             },
             error: () => this._message.warning(this._translate.instant('sales.return.forOrderFailed')),
+        });
+    }
+
+    loadGifts(): void {
+        if (!this.canViewGifts || this.record()?.channel !== 'ONLINE') return;
+        this._giveaways.forOrder(this.oid).subscribe({
+            next: (gifts) => this.gifts.set(gifts),
+            error: () => this._message.warning(this._translate.instant('sales.giveaway.order.loadFailed')),
+        });
+    }
+
+    giftStatusTone(value: string) {
+        return this.toneOf(GIVEAWAY_STATUS, value);
+    }
+
+    removeGift(gift: OrderGift): void {
+        confirmAction(this._modal, {
+            title: this._translate.instant('sales.giveaway.order.removeTitle', { number: gift.giveaway_no }),
+            body: this._translate.instant('sales.giveaway.order.removeBody'),
+            ok: this._translate.instant('sales.giveaway.order.remove'),
+            cancel: this._translate.instant('form.confirm.cancel'),
+            danger: true,
+        }).subscribe((confirmed) => {
+            if (!confirmed) return;
+            this.removingGift.set(gift.oid);
+            this._giveaways.removeFromOrder(gift.oid).subscribe({
+                next: () => {
+                    this.removingGift.set(null);
+                    this._message.success(this._translate.instant('sales.giveaway.order.removed'));
+                    this.loadGifts();
+                },
+                error: (error: unknown) => {
+                    this.removingGift.set(null);
+                    this._message.error(error instanceof HttpErrorResponse && error.status === 409 ? error.error?.message : this._translate.instant(failureKey(error, 'form.saveFailed')));
+                    this.loadGifts();
+                },
+            });
         });
     }
 

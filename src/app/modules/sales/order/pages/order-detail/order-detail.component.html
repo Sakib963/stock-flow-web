@@ -196,6 +196,12 @@
                                 <span>{{ 'sales.order.action.refund.button' | translate }}</span>
                             </button>
                         }
+                        @if (actions().gift) {
+                            <button nz-button nzBlock type="button" class="inline-flex items-center justify-start gap-2" data-quick="gift" [disabled]="saving()" (click)="gifting.set(true)">
+                                <ng-icon name="lucideGift" size="14px" aria-hidden="true" />
+                                <span>{{ 'sales.giveaway.order.add' | translate }}</span>
+                            </button>
+                        }
                         @if (actions().return) {
                             <button nz-button nzBlock type="button" class="inline-flex items-center justify-start gap-2" data-quick="return" [disabled]="saving()" (click)="returning.set(true)">
                                 <ng-icon name="lucideUndo2" size="14px" aria-hidden="true" />
@@ -341,6 +347,34 @@
                             </div>
                         }
                     </dl>
+                </nz-card>
+            }
+            @if (gifts().length) {
+                <nz-card [nzTitle]="giftsTitle" data-detail="gifts">
+                    <ng-template #giftsTitle
+                        ><h2 class="m-0 flex items-center gap-1.5 text-sm font-bold text-ink"><ng-icon name="lucideGift" size="14px" class="text-ink-muted" aria-hidden="true" />{{ 'sales.giveaway.order.section' | translate }}</h2></ng-template
+                    >
+                    <ul class="m-0 flex list-none flex-col gap-2 p-0">
+                        @for (gift of gifts(); track gift.oid) {
+                            <li class="rounded-control border border-line p-2.5" [attr.data-gift]="gift.oid">
+                                <div class="flex items-center justify-between gap-2">
+                                    <a class="font-mono text-[13px] font-semibold" [routerLink]="giftRoute(gift.oid)">{{ gift.giveaway_no }}</a>
+                                    @if (giftStatusTone(gift.status); as style) {
+                                        <status-tag [label]="style.label" [tone]="style.tone" [icon]="style.icon" />
+                                    }
+                                </div>
+                                <p class="mt-1 mb-0 text-xs text-ink-body">{{ 'sales.return.unitsCount' | translate: { count: (gift.units | digits) } }} &middot; {{ gift.note }}</p>
+                                @if (gift.status === 'Held' && canRemoveGift) {
+                                    <button nz-button nzSize="small" nzDanger type="button" class="mt-2 inline-flex items-center gap-1" data-gift-remove [nzLoading]="removingGift() === gift.oid" [disabled]="!!removingGift()" (click)="removeGift(gift)">
+                                        @if (removingGift() !== gift.oid) {
+                                            <ng-icon name="lucideX" size="13px" aria-hidden="true" />
+                                        }
+                                        <span>{{ 'sales.giveaway.order.remove' | translate }}</span>
+                                    </button>
+                                }
+                            </li>
+                        }
+                    </ul>
                 </nz-card>
             }
             @if (returns().length) {
@@ -524,4 +558,7 @@
 </ng-template>
 @if (record(); as o) {
     <return-create-dialog [order]="o" [returnable]="returnable()" [(visible)]="returning" (created)="returnRaised($event)" />
+    @if (actions().gift) {
+        <order-gift-dialog [orderOid]="o.oid" [invoiceNo]="o.invoice_no" [(visible)]="gifting" (added)="loadGifts()" />
+    }
 }

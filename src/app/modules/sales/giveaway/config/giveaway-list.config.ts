@@ -5,7 +5,9 @@ import { GIVEAWAY_ROUTES } from '@app/modules/sales/giveaway/constants/giveaway-
 
 export const GIVEAWAY_STATUS: ToneMap = {
     Draft: { label: 'sales.giveaway.status.Draft', tone: 'warning', icon: 'lucideClock' },
+    Held: { label: 'sales.giveaway.status.Held', tone: 'progress', icon: 'lucidePackage' },
     Given: { label: 'sales.giveaway.status.Given', tone: 'success', icon: 'lucideGift' },
+    Returned: { label: 'sales.giveaway.status.Returned', tone: 'neutral', icon: 'lucideUndo2' },
     Cancelled: { label: 'sales.giveaway.status.Cancelled', tone: 'neutral', icon: 'lucideX' },
 };
 

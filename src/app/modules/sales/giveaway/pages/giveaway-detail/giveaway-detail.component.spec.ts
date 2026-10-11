@@ -17,6 +17,8 @@ const record = (over: Partial<GiveawayDetails> = {}): GiveawayDetails => ({
     oid: OID,
     giveaway_no: 'GFT-2610-0001',
     customer_oid: null,
+    order_oid: null,
+    invoice_no: null,
     recipient_name: 'A younger brother',
     recipient_phone: null,
     address_line: null,

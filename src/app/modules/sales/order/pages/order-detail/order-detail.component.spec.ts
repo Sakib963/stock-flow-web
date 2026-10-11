@@ -258,4 +258,22 @@ describe('OrderDetailComponent', () => {
         page.copied(templates[0]);
         expect(http.expectOne((r) => r.url.includes(APIEndpoint.RECORD_MESSAGE_COPIED)).request.body).toEqual({ order_oid: OID, template_oid: 't-1' });
     });
+    it('lists the gifts in the parcel, offers Add gift before dispatch, and takes a held gift out after asking', async () => {
+        const granted = ['sales.order.view', 'sales.order.confirm', 'sales.order.cancel', 'sales.online.view', 'sales.giveaway.view', 'sales.giveaway.create', 'sales.giveaway.cancel'];
+        const { fixture, page, http, element } = await open(order(), granted);
+        http.expectOne((r) => r.url.includes(APIEndpoint.GET_GIVEAWAY_LIST)).flush({ code: 200, data: { rows: [{ oid: 'g-1', giveaway_no: 'GFT-2610-0002', status: 'Held', units: 1, note: 'Thank you' }] } });
+        fixture.detectChanges();
+        expect(quick(element)).toContain('gift');
+        expect(element.querySelector('[data-gift="g-1"]')?.textContent).toContain('GFT-2610-0002');
+        answer(fixture);
+        page.removeGift(page.gifts()[0]);
+        expect(http.expectOne((r) => r.url.includes(APIEndpoint.REMOVE_ORDER_GIFT)).request.body).toEqual({ oid: 'g-1' });
+    });
+
+    it('offers no Add gift once the parcel has left', async () => {
+        const { http, element, fixture } = await open(order({ status: 'Confirmed', dispatched_on: '2026-10-06T10:00:00.000' }), ['sales.order.view', 'sales.online.view', 'sales.giveaway.view', 'sales.giveaway.create']);
+        http.expectOne((r) => r.url.includes(APIEndpoint.GET_GIVEAWAY_LIST)).flush({ code: 200, data: { rows: [] } });
+        fixture.detectChanges();
+        expect(quick(element)).not.toContain('gift');
+    });
 });

@@ -1,0 +1,55 @@
+<nz-modal [nzVisible]="visible()" [nzTitle]="'sales.giveaway.order.title' | translate" [nzFooter]="footer" [nzWidth]="560" nzCentered (nzOnCancel)="close()">
+    <ng-container *nzModalContent>
+        @if (confirming()) {
+            <p class="m-0 text-sm font-semibold text-ink" data-dialog="confirm">{{ 'sales.giveaway.order.confirmTitle' | translate: { units: (units() | digits), number: invoiceNo() } }}</p>
+            <p class="mt-1 mb-0 text-sm text-ink-muted">{{ 'sales.giveaway.order.confirmBody' | translate }}</p>
+        } @else {
+            <p class="mt-0 mb-3 text-sm text-ink-body">{{ 'sales.giveaway.order.lead' | translate }}</p>
+            <product-search [browse]="true" (picked)="add($event)" />
+            <ul class="m-0 mt-3 mb-4 flex list-none flex-col gap-2 p-0">
+                @for (line of lines(); track line.inventory_oid; let i = $index) {
+                    <li class="flex items-center gap-3 rounded-control border border-line p-3" [attr.data-line]="line.inventory_oid">
+                        <div class="min-w-0 flex-1">
+                            <span class="block text-[13px] font-semibold text-ink">{{ line.product_name }}</span>
+                            <span class="block font-mono text-xs text-ink-muted">{{ line.batch_code }}</span>
+                            <span class="block text-xs" [class.text-ink-muted]="line.quantity <= line.sellable" [class.text-danger-ink]="line.quantity > line.sellable">{{ 'sales.giveaway.free' | translate: { count: (line.sellable | digits) } }}</span>
+                        </div>
+                        <nz-input-number class="w-24 shrink-0 font-mono" [nzId]="'gift-qty-' + i" [attr.aria-label]="'sales.order.units' | translate" [nzMin]="1" [nzMax]="line.sellable" [nzPrecision]="0" [ngModel]="line.quantity" (ngModelChange)="setQuantity(i, $event)" />
+                        <button nz-button nzType="text" nzDanger type="button" class="sf-icon-btn shrink-0" [attr.aria-label]="'sales.giveaway.remove' | translate" (click)="remove(i)">
+                            <ng-icon name="lucideTrash2" size="14px" aria-hidden="true" />
+                        </button>
+                    </li>
+                }
+            </ul>
+            <div nz-form nzLayout="vertical">
+                <nz-form-item class="mb-0">
+                    <nz-form-label nzRequired nzFor="gift-note">{{ 'sales.giveaway.note' | translate }}</nz-form-label>
+                    <nz-form-control>
+                        <nz-textarea-count [nzMaxCharacterCount]="256">
+                            <textarea nz-input id="gift-note" rows="2" maxlength="256" data-dialog="note" [placeholder]="'sales.giveaway.notePlaceholder' | translate" [ngModel]="note()" (ngModelChange)="note.set($event)"></textarea>
+                        </nz-textarea-count>
+                    </nz-form-control>
+                </nz-form-item>
+            </div>
+        }
+    </ng-container>
+</nz-modal>
+<ng-template #footer>
+    @if (confirming()) {
+        <button nz-button type="button" class="inline-flex items-center gap-1.5" data-dialog="back" [disabled]="saving()" (click)="confirming.set(false)">
+            <ng-icon name="lucideArrowLeft" size="14px" aria-hidden="true" />
+            <span>{{ 'list.back' | translate }}</span>
+        </button>
+    } @else {
+        <button nz-button type="button" class="inline-flex items-center gap-1.5" [disabled]="saving()" (click)="close()">
+            <ng-icon name="lucideX" size="14px" aria-hidden="true" />
+            <span>{{ 'form.confirm.cancel' | translate }}</span>
+        </button>
+    }
+    <button nz-button nzType="primary" type="button" class="inline-flex items-center gap-1.5" data-dialog="submit" [nzLoading]="saving()" [disabled]="incomplete()" (click)="submit()">
+        @if (!saving()) {
+            <ng-icon name="lucideCheck" size="14px" aria-hidden="true" />
+        }
+        <span>{{ 'sales.giveaway.order.add' | translate }}</span>
+    </button>
+</ng-template>

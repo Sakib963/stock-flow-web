@@ -157,6 +157,8 @@ export class APIEndpoint {
     static readonly CREATE_GIVEAWAY = '/api/v1/sales/giveaway/create-giveaway';
     static readonly GIVE_GIVEAWAY = '/api/v1/sales/giveaway/give-giveaway';
     static readonly CANCEL_GIVEAWAY = '/api/v1/sales/giveaway/cancel-giveaway';
+    static readonly ADD_ORDER_GIFT = '/api/v1/sales/giveaway/add-order-gift';
+    static readonly REMOVE_ORDER_GIFT = '/api/v1/sales/giveaway/remove-order-gift';
     static readonly GET_CUSTOMER_LIST = '/api/v1/sales/customer/get-customer-list';
     static readonly GET_CUSTOMER_DETAILS = '/api/v1/sales/customer/get-customer-details';
     static readonly CREATE_CUSTOMER = '/api/v1/sales/customer/create-customer';

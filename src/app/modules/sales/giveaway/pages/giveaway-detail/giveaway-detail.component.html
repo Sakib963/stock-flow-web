@@ -51,6 +51,18 @@
                     <dd class="mt-1 mb-0 text-sm font-semibold text-ink">{{ g.created_on ? (g.created_on | recordDate: language() : 'date-time-12') : '' }}</dd>
                     <dd class="mt-0.5 mb-0 text-xs text-ink-muted">{{ g.created_by }}</dd>
                 </div>
+                @if (g.order_oid) {
+                    <div>
+                        <dt class="text-xs text-ink-muted">{{ 'sales.giveaway.orderLabel' | translate }}</dt>
+                        <dd class="mt-1 mb-0 font-mono text-sm font-semibold" data-detail="order">
+                            @if (canViewOrders) {
+                                <a [routerLink]="orderRoute(g.order_oid)">{{ g.invoice_no }}</a>
+                            } @else {
+                                {{ g.invoice_no }}
+                            }
+                        </dd>
+                    </div>
+                }
                 @if (g.address_line) {
                     <div class="col-span-2">
                         <dt class="text-xs text-ink-muted">{{ 'sales.giveaway.address' | translate }}</dt>
