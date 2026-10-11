@@ -160,6 +160,7 @@ export class APIEndpoint {
     static readonly ADD_ORDER_GIFT = '/api/v1/sales/giveaway/add-order-gift';
     static readonly REMOVE_ORDER_GIFT = '/api/v1/sales/giveaway/remove-order-gift';
     static readonly GET_PRE_ORDER_LIST = '/api/v1/sales/pre-order/get-pre-order-list';
+    static readonly GET_PRE_ORDERS_BY_PRODUCT = '/api/v1/sales/pre-order/get-pre-orders-by-product';
     static readonly GET_PRE_ORDER_DETAILS = '/api/v1/sales/pre-order/get-pre-order-details';
     static readonly CREATE_PRE_ORDER = '/api/v1/sales/pre-order/create-pre-order';
     static readonly UPDATE_PRE_ORDER = '/api/v1/sales/pre-order/update-pre-order';

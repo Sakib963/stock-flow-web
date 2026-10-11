@@ -65,6 +65,8 @@ export interface ProductStock {
     on_hand: number;
     held: number;
     sellable: number;
+    /** Units on open pre-order bookings: wanted, but holding nothing until a booking becomes an order. */
+    booked: number;
     batches: ProductBatch[];
 }
 

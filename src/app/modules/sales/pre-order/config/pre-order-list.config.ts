@@ -14,7 +14,10 @@ export const PRE_ORDER_LIST: ListShellPageConfig = {
     permission: 'sales.pre-order.view',
     header: {
         count: true,
-        actions: [{ key: 'create', label: 'sales.preOrder.add', icon: 'lucidePlus', permission: 'sales.pre-order.create', primary: true, run: { kind: 'navigate', route: PRE_ORDER_ROUTES.create } }],
+        actions: [
+            { key: 'by-product', label: 'sales.preOrder.byProduct.button', icon: 'lucidePackage', permission: 'sales.pre-order.view', run: { kind: 'navigate', route: PRE_ORDER_ROUTES.byProduct } },
+            { key: 'create', label: 'sales.preOrder.add', icon: 'lucidePlus', permission: 'sales.pre-order.create', primary: true, run: { kind: 'navigate', route: PRE_ORDER_ROUTES.create } },
+        ],
     },
     stats: [
         { key: 'open', label: 'sales.preOrder.stat.open', icon: 'lucideCalendarClock' },

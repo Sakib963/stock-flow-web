@@ -1019,7 +1019,8 @@
                 "sold": "Sold, all time",
                 "givenAway": "Given away, all time",
                 "returned": "Returned, all time",
-                "damaged": "Damaged, all time"
+                "damaged": "Damaged, all time",
+                "booked": "Booked, not ordered"
             },
             "stockState": {
                 "low": "Running low, time to reorder",
@@ -3293,7 +3294,28 @@
                 "notFound": "No booking with that number."
             },
             "lookupFailed": "Could not check this number.",
-            "noProduct": "No product in the catalogue matches."
+            "noProduct": "No product in the catalogue matches.",
+            "byProduct": {
+                "button": "By product",
+                "title": "Booked products",
+                "lead": "Units customers booked, against what can be sold now. Buy what is still to get.",
+                "back": "By booking",
+                "product": "Product",
+                "units": "Units booked",
+                "bookings": "Bookings",
+                "sellable": "Can sell now",
+                "toGet": "Still to get",
+                "oldest": "Oldest booking",
+                "searchPlaceholder": "Product name or SKU",
+                "emptyTitle": "Nothing booked",
+                "emptyBody": "Products on open bookings show here, with how many are still to get.",
+                "stat": {
+                    "products": "Products booked",
+                    "units": "Units booked",
+                    "toGet": "Still to get"
+                }
+            },
+            "listTitle": "Pre-orders"
         }
     }
 }

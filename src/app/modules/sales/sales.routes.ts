@@ -95,6 +95,12 @@ export const SALES_ROUTES: Routes = [
                 loadComponent: () => import('./pre-order/pages/pre-order-list/pre-order-list.component').then((m) => m.PreOrderListComponent),
             },
             {
+                path: 'pre-orders/by-product',
+                canActivate: [permissionGuard],
+                data: { permission: 'sales.pre-order.view' },
+                loadComponent: () => import('./pre-order/pages/pre-order-by-product/pre-order-by-product.component').then((m) => m.PreOrderByProductComponent),
+            },
+            {
                 path: 'pre-orders/new',
                 canActivate: [permissionGuard],
                 canDeactivate: [unsavedChangesGuard],

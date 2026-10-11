@@ -18,6 +18,7 @@ const DETAILS = {
             on_hand: 12,
             held: 8,
             sellable: 4,
+            booked: 6,
             batches: [{ oid: 'i-1', batch_code: 'B-0917', warehouse_name: 'Main', received_on: '2026-09-17T10:00:00.000', on_hand: 12, held: 8, sellable: 4, cost_price: 450, selling_price: 890 }],
         },
         lifetime: { sold: 31, returned: 2, damaged: 1, given_away: 3, last_sold_on: null },
@@ -58,6 +59,12 @@ describe('ProductDetailComponent', () => {
 
         expect(stats.find((stat) => stat.key === 'givenAway')?.value).toBe(3);
         expect(stats.find((stat) => stat.key === 'sold')?.value).toBe(31);
+    });
+
+    it('shows units on open bookings, which hold nothing, beside what is held for orders', async () => {
+        const stats = (await open()).componentInstance.stats();
+        expect(stats.find((stat) => stat.key === 'booked')?.value).toBe(6);
+        expect(stats.find((stat) => stat.key === 'held')?.value).toBe(8);
     });
 
     it('lists each batch with where it is, what is held, and what it cost', async () => {

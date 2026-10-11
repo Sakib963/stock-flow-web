@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { NgIcon, provideIcons } from '@ng-icons/core';
-import { lucideArrowLeft, lucideArrowLeftRight, lucideBoxes, lucideChartColumn, lucideHandCoins, lucideHistory, lucideImageOff, lucideInfo, lucideLock, lucidePackageCheck, lucidePencil, lucideRotateCw, lucideShoppingCart, lucideTrash2, lucideTruck, lucideUndo2, lucideZap, lucideCircleX, lucideGift } from '@ng-icons/lucide';
+import { lucideArrowLeft, lucideArrowLeftRight, lucideBoxes, lucideCalendarClock, lucideChartColumn, lucideHandCoins, lucideHistory, lucideImageOff, lucideInfo, lucideLock, lucidePackageCheck, lucidePencil, lucideRotateCw, lucideShoppingCart, lucideTrash2, lucideTruck, lucideUndo2, lucideZap, lucideCircleX, lucideGift } from '@ng-icons/lucide';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzCardModule } from 'ng-zorro-antd/card';
 import { NzImageModule } from 'ng-zorro-antd/image';
@@ -46,7 +46,7 @@ import { resolveTone } from '@app/shared/utils/tone-map/tone-map';
 @Component({
     selector: 'product-detail',
     imports: [NgIcon, NzButtonModule, NzCardModule, NzImageModule, NzSkeletonModule, NzTableModule, NzTimelineModule, NzTooltipModule, RouterLink, TranslatePipe, PageHeaderComponent, StatusTagComponent, ActionFooterComponent, NzTypographyModule, BatchExpiryComponent, DigitsPipe, MoneyPipe, RecordDatePipe],
-    providers: [provideIcons({ lucideArrowLeft, lucideArrowLeftRight, lucideBoxes, lucideChartColumn, lucideCircleX, lucideGift, lucideHandCoins, lucideHistory, lucideImageOff, lucideInfo, lucideLock, lucidePackageCheck, lucidePencil, lucideRotateCw, lucideShoppingCart, lucideTrash2, lucideTruck, lucideUndo2, lucideZap })],
+    providers: [provideIcons({ lucideArrowLeft, lucideArrowLeftRight, lucideBoxes, lucideCalendarClock, lucideChartColumn, lucideCircleX, lucideGift, lucideHandCoins, lucideHistory, lucideImageOff, lucideInfo, lucideLock, lucidePackageCheck, lucidePencil, lucideRotateCw, lucideShoppingCart, lucideTrash2, lucideTruck, lucideUndo2, lucideZap })],
     templateUrl: './product-detail.component.html',
     styleUrl: './product-detail.component.scss',
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -116,6 +116,7 @@ export class ProductDetailComponent {
             { key: 'sellable', label: 'configuration.product.detailStat.sellable', value: stock.sellable, icon: 'lucidePackageCheck' },
             { key: 'onHand', label: 'configuration.product.detailStat.onHand', value: stock.on_hand, icon: 'lucideBoxes' },
             { key: 'held', label: 'configuration.product.detailStat.held', value: stock.held, icon: 'lucideLock' },
+            { key: 'booked', label: 'configuration.product.detailStat.booked', value: stock.booked, icon: 'lucideCalendarClock' },
             { key: 'sold', label: 'configuration.product.detailStat.sold', value: lifetime.sold, icon: 'lucideHandCoins' },
             { key: 'givenAway', label: 'configuration.product.detailStat.givenAway', value: lifetime.given_away, icon: 'lucideGift' },
             { key: 'returned', label: 'configuration.product.detailStat.returned', value: lifetime.returned, icon: 'lucideUndo2' },
