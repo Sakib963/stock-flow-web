@@ -21,20 +21,24 @@
                     (nzOpenChange)="opened($event)"
                     (ngModelChange)="pickProduct($event)"
                 >
-                    @for (option of options(); track option.oid) {
-                        <nz-option nzCustomContent [nzValue]="option.oid" [nzLabel]="option.name">
-                            <span class="block text-[13px] font-semibold text-ink">{{ option.name }}</span>
-                            <span class="block text-xs text-ink-muted">
-                                @if (option.sku) {
-                                    <span class="font-mono">{{ option.sku }}</span> &middot;
-                                }
-                                @if (option.batches.length) {
-                                    {{ 'inventory.disposal.drawer.batchCount' | translate: { count: option.batches.length } | digits }}
-                                } @else {
-                                    {{ 'inventory.disposal.drawer.noBatchesShort' | translate }}
-                                }
-                            </span>
-                        </nz-option>
+                    @for (group of optionGroups(); track group.label) {
+                        <nz-option-group [nzLabel]="group.label">
+                            @for (option of group.rows; track option.oid) {
+                                <nz-option nzCustomContent [nzValue]="option.oid" [nzLabel]="option.name">
+                                    <span class="block text-[13px] font-semibold text-ink">{{ option.name }}</span>
+                                    <span class="block text-xs text-ink-muted">
+                                        @if (option.sku) {
+                                            <span class="font-mono">{{ option.sku }}</span> &middot;
+                                        }
+                                        @if (option.batches.length) {
+                                            {{ 'inventory.disposal.drawer.batchCount' | translate: { count: option.batches.length } | digits }}
+                                        } @else {
+                                            {{ 'inventory.disposal.drawer.noBatchesShort' | translate }}
+                                        }
+                                    </span>
+                                </nz-option>
+                            }
+                        </nz-option-group>
                     }
                 </nz-select>
             </nz-form-control>

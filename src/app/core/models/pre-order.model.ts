@@ -90,6 +90,8 @@ export interface PreOrderProduct extends PriceHints {
     product_oid: string;
     product_name: string;
     sku: string | null;
+    category_name?: string | null;
+    sub_category_name?: string | null;
     sellable: number;
     price: number;
 }

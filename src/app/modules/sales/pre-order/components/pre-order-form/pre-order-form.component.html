@@ -118,23 +118,27 @@
             <p class="m-0 mb-2 text-xs text-ink-muted" data-pre-order="locked">{{ 'sales.preOrder.lockedLines' | translate }}</p>
         } @else {
             <nz-select class="w-full" nzShowSearch nzServerSearch nzAllowClear data-pre-order="product-search" [nzPlaceHolder]="'sales.preOrder.productPlaceholder' | translate" [nzLoading]="searching()" [nzNotFoundContent]="productState" [ngModel]="picked()" [ngModelOptions]="{ standalone: true }" (nzOnSearch)="search($event)" (ngModelChange)="add($event)">
-                @for (product of products(); track product.product_oid) {
-                    <nz-option nzCustomContent [nzValue]="product.product_oid" [nzLabel]="product.product_name">
-                        <span class="flex items-center justify-between gap-3">
-                            <span class="min-w-0 truncate"
-                                >{{ product.product_name }}
-                                @if (product.sku) {
-                                    <span class="font-mono text-xs text-ink-muted">· {{ product.sku }}</span>
-                                }
-                            </span>
-                            <span class="flex shrink-0 items-center gap-2 text-xs">
-                                @if (product.usual_price !== null) {
-                                    <span class="text-ink-muted">{{ 'sales.preOrder.picker.usual' | translate: { price: (product.usual_price | money) } }}</span>
-                                }
-                                <span [class.text-success-ink]="product.sellable > 0" [class.text-ink-muted]="product.sellable <= 0">{{ product.sellable > 0 ? ('sales.preOrder.picker.inStock' | translate: { count: (product.sellable | digits) }) : ('sales.preOrder.picker.outOfStock' | translate) }}</span>
-                            </span>
-                        </span>
-                    </nz-option>
+                @for (group of productGroups(); track group.label) {
+                    <nz-option-group [nzLabel]="group.label">
+                        @for (product of group.rows; track product.product_oid) {
+                            <nz-option nzCustomContent [nzValue]="product.product_oid" [nzLabel]="product.product_name">
+                                <span class="flex items-center justify-between gap-3">
+                                    <span class="min-w-0 truncate"
+                                        >{{ product.product_name }}
+                                        @if (product.sku) {
+                                            <span class="font-mono text-xs text-ink-muted">· {{ product.sku }}</span>
+                                        }
+                                    </span>
+                                    <span class="flex shrink-0 items-center gap-2 text-xs">
+                                        @if (product.usual_price !== null) {
+                                            <span class="text-ink-muted">{{ 'sales.preOrder.picker.usual' | translate: { price: (product.usual_price | money) } }}</span>
+                                        }
+                                        <span [class.text-success-ink]="product.sellable > 0" [class.text-ink-muted]="product.sellable <= 0">{{ product.sellable > 0 ? ('sales.preOrder.picker.inStock' | translate: { count: (product.sellable | digits) }) : ('sales.preOrder.picker.outOfStock' | translate) }}</span>
+                                    </span>
+                                </span>
+                            </nz-option>
+                        }
+                    </nz-option-group>
                 }
             </nz-select>
         }

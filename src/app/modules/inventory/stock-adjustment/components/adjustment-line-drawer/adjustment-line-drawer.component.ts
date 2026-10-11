@@ -21,6 +21,7 @@ import { batchesFor, directionOf, isNewBatch, lineProblem } from '@app/modules/i
 import { DigitsPipe } from '@app/shared/pipes/digits/digits.pipe';
 import { MoneyPipe } from '@app/shared/pipes/money/money.pipe';
 import { fromDay, toDay } from '@app/shared/utils/calendar-day/calendar-day';
+import { categoryGroups } from '@app/shared/utils/category-groups/category-groups';
 
 const number = (value: unknown): number | null => (value === null || value === undefined || value === '' ? null : Number(value));
 
@@ -96,6 +97,7 @@ export class AdjustmentLineDrawerComponent {
         const found = this.results();
         return own && !found.some((p) => p.oid === own.oid) ? [own, ...found] : found;
     });
+    readonly optionGroups = computed(() => categoryGroups(this.options()));
     readonly aislesHere = computed(() => this.aisles().filter((aisle) => aisle.warehouse_oid === this.value().warehouse_oid));
     readonly problem = computed(() => (this.tried() ? lineProblem(this.reason(), this.draft()) : null));
 

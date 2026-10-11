@@ -20,6 +20,7 @@ import { StatusTagComponent } from '@app/shared/components/status-tag/status-tag
 import { DigitsPipe } from '@app/shared/pipes/digits/digits.pipe';
 import { MoneyPipe } from '@app/shared/pipes/money/money.pipe';
 import { fromDay, toDay } from '@app/shared/utils/calendar-day/calendar-day';
+import { categoryGroups } from '@app/shared/utils/category-groups/category-groups';
 import { mobileValidator, normalizePhone } from '@app/shared/utils/phone/phone';
 import { failureOf } from '@app/shared/utils/request-failure/request-failure';
 import { revealErrors } from '@app/shared/utils/reveal-errors/reveal-errors';
@@ -107,6 +108,7 @@ export class PreOrderFormComponent {
     readonly remaining = computed(() => [!this._value().phone?.trim(), this.needsName(), !this.lines().length].filter(Boolean).length);
 
     readonly products = signal<PreOrderProduct[]>([]);
+    readonly productGroups = computed(() => categoryGroups(this.products()));
     readonly searching = signal(false);
     /** Cleared right after a pick, so the box is ready for the next product. */
     readonly picked = signal<string | null>(null);

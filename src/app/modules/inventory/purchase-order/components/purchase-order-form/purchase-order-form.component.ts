@@ -22,6 +22,7 @@ import { PurchaseOrderService } from '@app/modules/inventory/purchase-order/serv
 import { DigitsPipe } from '@app/shared/pipes/digits/digits.pipe';
 import { MoneyPipe } from '@app/shared/pipes/money/money.pipe';
 import { RecordDatePipe } from '@app/shared/pipes/record-date/record-date.pipe';
+import { categoryGroups } from '@app/shared/utils/category-groups/category-groups';
 import { revealErrors } from '@app/shared/utils/reveal-errors/reveal-errors';
 import { fromDay, toDay } from '@app/shared/utils/calendar-day/calendar-day';
 
@@ -30,6 +31,8 @@ interface LineProduct {
     oid: string;
     name: string;
     sku: string | null;
+    category_name?: string | null;
+    sub_category_name?: string | null;
     sellable: number;
     restock_threshold: number;
     sold_30_days: number | null;
@@ -206,10 +209,10 @@ export class PurchaseOrderFormComponent {
     }
 
     /** What a row's product picker offers: its own product, then the search results while it is the one searching. */
-    optionsFor(row: number): LineProduct[] {
+    optionsFor(row: number) {
         const own = this.products()[this.lines.at(row).controls.product_oid.value];
         const found = this.searchRow() === row ? this.results() : [];
-        return own && !found.some((p) => p.oid === own.oid) ? [own, ...found] : found;
+        return categoryGroups(own && !found.some((p) => p.oid === own.oid) ? [own, ...found] : found);
     }
 
     /** How many other lines already carry this product, so it is marked rather than refused: two warehouses is a real case. */

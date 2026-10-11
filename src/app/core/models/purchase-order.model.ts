@@ -175,6 +175,8 @@ export interface PurchasableProduct {
     name: string;
     sku: string | null;
     restock_threshold: number;
+    category_name?: string | null;
+    sub_category_name?: string | null;
     photo_thumb: string | null;
     sellable: number;
     sold_30_days: number;

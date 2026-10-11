@@ -104,6 +104,8 @@ export interface AdjustableProduct {
     oid: string;
     name: string;
     sku: string | null;
+    category_name?: string | null;
+    sub_category_name?: string | null;
     has_expiry: boolean;
     unit_type: string | null;
     photo_thumb: string | null;

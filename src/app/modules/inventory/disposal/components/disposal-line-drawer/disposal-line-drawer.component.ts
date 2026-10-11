@@ -19,6 +19,7 @@ import { DigitsPipe } from '@app/shared/pipes/digits/digits.pipe';
 import { MoneyPipe } from '@app/shared/pipes/money/money.pipe';
 import { RecordDatePipe } from '@app/shared/pipes/record-date/record-date.pipe';
 import { LanguageService } from '@app/core/services/language/language.service';
+import { categoryGroups } from '@app/shared/utils/category-groups/category-groups';
 
 /**
  * One disposal line, added or changed in a drawer: the product, a batch with something free, how
@@ -73,6 +74,7 @@ export class DisposalLineDrawerComponent {
         const found = this.results();
         return own && !found.some((p) => p.oid === own.oid) ? [own, ...found] : found;
     });
+    readonly optionGroups = computed(() => categoryGroups(this.options()));
     readonly problem = computed(() => {
         this.value();
         return this.tried() ? lineProblem(this.draft()) : null;
