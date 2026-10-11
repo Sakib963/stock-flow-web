@@ -1,0 +1,96 @@
+<page-header [back]="back" [title]="'sales.deliveryBatch.createTitle' | translate" [lead]="'sales.deliveryBatch.createLead' | translate" />
+
+<nz-card [nzBodyStyle]="{ padding: '0' }" data-batch="new">
+    <div class="grid grid-cols-1 gap-x-4 border-b border-line px-4 pt-4 md:grid-cols-3" nz-form nzLayout="vertical">
+        <nz-form-item>
+            <nz-form-label nzRequired nzFor="batch-courier" [nzTooltipTitle]="'sales.deliveryBatch.courierHelper' | translate">{{ 'sales.order.courier' | translate }}</nz-form-label>
+            <nz-form-control>
+                <nz-select nzId="batch-courier" class="w-full" data-batch="courier" [ngModel]="courier()" (ngModelChange)="courier.set($event)">
+                    @for (value of couriers; track value) {
+                        <nz-option [nzValue]="value" [nzLabel]="'sales.order.couriers.' + value | translate" />
+                    }
+                </nz-select>
+            </nz-form-control>
+        </nz-form-item>
+        <nz-form-item class="md:col-span-2">
+            <nz-form-label nzFor="batch-note">{{ 'sales.deliveryBatch.note' | translate }}</nz-form-label>
+            <nz-form-control>
+                <input nz-input id="batch-note" type="text" maxlength="500" autocomplete="off" [attr.placeholder]="'sales.deliveryBatch.notePlaceholder' | translate" [ngModel]="note()" (ngModelChange)="note.set($event)" />
+            </nz-form-control>
+        </nz-form-item>
+    </div>
+
+    @if (failed(); as failure) {
+        <div class="sf-empty" role="alert">
+            <p class="m-0 text-sm text-ink-body">{{ 'sales.deliveryBatch.readyFailed.' + failure | translate }}</p>
+            <button nz-button type="button" class="mt-3 inline-flex items-center gap-1.5" (click)="load()">
+                <ng-icon name="lucideRotateCw" size="14px" aria-hidden="true" />
+                <span>{{ 'form.retry' | translate }}</span>
+            </button>
+        </div>
+    } @else if (orders(); as list) {
+        @if (list.length) {
+            <nz-table nzTemplateMode nzSize="small" [nzScroll]="{ x: '760px' }" data-batch="ready">
+                <thead>
+                    <tr>
+                        <th nzWidth="44px" [nzChecked]="allTicked()" [nzIndeterminate]="someTicked()" [attr.aria-label]="'sales.deliveryBatch.tickAll' | translate" (nzCheckedChange)="tickAll($event)"></th>
+                        <th nzWidth="130px">{{ 'sales.order.invoice' | translate }}</th>
+                        <th>{{ 'sales.deliveryBatch.recipient' | translate }}</th>
+                        <th>{{ 'sales.deliveryBatch.place' | translate }}</th>
+                        <th nzWidth="120px">{{ 'sales.deliveryBatch.packing' | translate }}</th>
+                        <th nzWidth="70px" class="text-right">{{ 'sales.order.units' | translate }}</th>
+                        <th nzWidth="120px" class="text-right">{{ 'sales.deliveryBatch.toCollect' | translate }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (order of list; track order.oid) {
+                        <tr [attr.data-order]="order.invoice_no">
+                            <td [nzChecked]="ticked().has(order.oid)" [attr.aria-label]="order.invoice_no" (nzCheckedChange)="tick(order.oid, $event)"></td>
+                            <td>
+                                <span class="block font-mono text-xs font-semibold text-ink">{{ order.invoice_no }}</span>
+                                <span class="block text-xs text-ink-muted">{{ order.created_on | recordDate: language() : 'date' }}</span>
+                            </td>
+                            <td>
+                                <span class="block text-shell-title font-semibold text-ink">{{ order.recipient_name }}</span>
+                                <span class="block font-mono text-xs text-ink-muted">{{ order.recipient_phone }}</span>
+                            </td>
+                            <td class="text-xs text-ink-body">{{ place(order) }}</td>
+                            <td>
+                                @if (order.delivery_status && deliveryTones[order.delivery_status]; as tone) {
+                                    <status-tag [label]="tone.label" [tone]="tone.tone" [icon]="tone.icon" />
+                                }
+                            </td>
+                            <td class="text-right font-mono tabular-nums">{{ order.units | digits }}</td>
+                            <td class="text-right font-mono font-semibold tabular-nums">{{ order.to_collect | money }}</td>
+                        </tr>
+                    }
+                </tbody>
+            </nz-table>
+        } @else {
+            <div class="sf-empty" data-batch="none-ready">
+                <ng-icon name="lucidePackage" size="28px" class="text-ink-faint" aria-hidden="true" />
+                <p class="m-0 mt-2 text-sm font-semibold text-ink">{{ 'sales.deliveryBatch.noneReady' | translate }}</p>
+                <p class="m-0 mt-1 text-xs text-ink-muted">{{ 'sales.deliveryBatch.noneReadyBody' | translate }}</p>
+                <a nz-button class="mt-3" [routerLink]="ordersRoute">{{ 'sales.deliveryBatch.openOrders' | translate }}</a>
+            </div>
+        }
+    } @else {
+        <div class="p-4"><nz-skeleton nzActive [nzTitle]="false" [nzParagraph]="{ rows: 5 }" /></div>
+    }
+</nz-card>
+
+<action-footer>
+    <ng-container footerNote>
+        <span data-batch="summary">{{ 'sales.deliveryBatch.summary' | translate: { count: (chosen().length | digits), total: (orders()?.length ?? 0 | digits), amount: (toCollect() | money) } }}</span>
+    </ng-container>
+    <button nz-button type="button" class="inline-flex items-center gap-1.5" [disabled]="saving()" (click)="cancel()">
+        <ng-icon name="lucideX" size="14px" aria-hidden="true" />
+        <span>{{ 'form.cancel' | translate }}</span>
+    </button>
+    <button nz-button nzType="primary" type="button" class="inline-flex items-center gap-1.5" data-batch="save" [nzLoading]="saving()" [disabled]="!chosen().length || saving()" (click)="save()">
+        @if (!saving()) {
+            <ng-icon name="lucideTruck" size="14px" aria-hidden="true" />
+        }
+        <span>{{ 'sales.deliveryBatch.save' | translate }}</span>
+    </button>
+</action-footer>

@@ -89,6 +89,24 @@ export const SALES_ROUTES: Routes = [
                 loadComponent: () => import('./giveaway/pages/giveaway-detail/giveaway-detail.component').then((m) => m.GiveawayDetailComponent),
             },
             {
+                path: 'delivery-batches',
+                canActivate: [permissionGuard],
+                data: { permission: 'sales.delivery-batch.view' },
+                loadComponent: () => import('./delivery-batch/pages/delivery-batch-list/delivery-batch-list.component').then((m) => m.DeliveryBatchListComponent),
+            },
+            {
+                path: 'delivery-batches/new',
+                canActivate: [permissionGuard],
+                data: { permission: 'sales.delivery-batch.create' },
+                loadComponent: () => import('./delivery-batch/pages/delivery-batch-create/delivery-batch-create.component').then((m) => m.DeliveryBatchCreateComponent),
+            },
+            {
+                path: 'delivery-batches/:oid',
+                canActivate: [permissionGuard],
+                data: { permission: 'sales.delivery-batch.view' },
+                loadComponent: () => import('./delivery-batch/pages/delivery-batch-detail/delivery-batch-detail.component').then((m) => m.DeliveryBatchDetailComponent),
+            },
+            {
                 path: 'pre-orders',
                 canActivate: [permissionGuard],
                 data: { permission: 'sales.pre-order.view' },

@@ -2700,6 +2700,10 @@
                 "copied": "Copied",
                 "notLogged": "Copying it was not recorded on the order. The message itself was copied.",
                 "loadFailed": "Could not load the message templates. Reload the page to try again."
+            },
+            "label": {
+                "print": "Print delivery label",
+                "notYet": "Confirm the order to print its label."
             }
         },
         "online": {
@@ -3420,6 +3424,115 @@
                 "method": "Pick how the advance was paid."
             },
             "priceShort": "Price"
+        },
+        "deliveryBatch": {
+            "add": "New batch",
+            "createTitle": "New delivery batch",
+            "createLead": "Every order ready to send is ticked. Untick any that are not going with today's pickup.",
+            "detailTitle": "Delivery batch",
+            "detailLead": "One courier pickup: its orders, the courier file, the labels, and the handover.",
+            "searchPlaceholder": "Batch number",
+            "emptyTitle": "No delivery batches yet",
+            "emptyBody": "Make a batch when a courier comes to collect: it gathers the orders ready to send, writes the courier's file and prints every label.",
+            "number": "Batch no.",
+            "statusLabel": "Status",
+            "status": {
+                "Open": "Open",
+                "HandedOver": "Handed to courier",
+                "Cancelled": "Cancelled"
+            },
+            "stat": {
+                "open": "Open batches",
+                "handedOver": "Handed to courier"
+            },
+            "orders": "Orders",
+            "delivered": "Delivered",
+            "toCollect": "To collect",
+            "madeOn": "Made on",
+            "handedOverOn": "Handed over on",
+            "note": "Note",
+            "notePlaceholder": "For example, evening pickup",
+            "cancelNote": "Why cancelled",
+            "courierHelper": "The courier collecting these parcels. Every order in the batch is dispatched with it.",
+            "recipient": "Recipient",
+            "place": "Area",
+            "packing": "Packing",
+            "tickAll": "Tick every order",
+            "tickFirst": "Tick the orders first.",
+            "summary": "{{count}} of {{total}} orders ticked, {{amount}} to collect",
+            "save": "Make batch",
+            "created": "Batch {{number}} made.",
+            "confirmCreate": {
+                "title": "Make a {{courier}} batch of {{count}} orders?",
+                "body": "Nothing is dispatched yet: that happens at Handed to courier. The courier collects {{amount}}."
+            },
+            "noneReady": "No orders are ready to send",
+            "noneReadyBody": "An online order is ready once it is confirmed and not yet with a courier.",
+            "openOrders": "Open orders",
+            "readyFailed": {
+                "network": "Could not reach the server to load the orders ready to send.",
+                "forbidden": "You do not have permission to make delivery batches.",
+                "server": "Could not load the orders ready to send. Try again in a moment."
+            },
+            "loadFailed": {
+                "network": "Could not reach the server to load this batch.",
+                "forbidden": "You do not have permission to see delivery batches.",
+                "server": "Could not load this batch. Try again in a moment.",
+                "notFound": "No delivery batch with that number."
+            },
+            "backToList": "Back to delivery batches",
+            "section": {
+                "details": "Batch",
+                "orders": "Orders in this batch"
+            },
+            "ordersUnits": "{{orders}} orders, {{units}} units",
+            "unitsShort": "{{count}} units",
+            "noOrders": "No orders in this batch.",
+            "printOne": "Print this label",
+            "pathaoOnly": "Only Pathao's upload file can be made so far.",
+            "fileFailed": "Could not make the upload file. Try again in a moment.",
+            "leftOut": "Left out, no longer ready: {{numbers}}. Open each order to see why.",
+            "movedOn": "Someone else changed this batch a moment ago. It has been reloaded.",
+            "nothingToDo": "Nothing to do on this batch now.",
+            "action": {
+                "file": "Download Pathao file",
+                "labelsAll": "Print all labels ({{count}})",
+                "labelsTicked": "Print ticked labels ({{count}})",
+                "add": {
+                    "button": "Add orders",
+                    "title": "Add orders ready to send",
+                    "submit": "Add {{count}} orders",
+                    "done": "Orders added."
+                },
+                "takeOut": {
+                    "button": "Take out",
+                    "buttonCount": "Take out ticked ({{count}})",
+                    "title": "Take {{count}} orders out of this batch?",
+                    "body": "They stay ready to send and can go in another batch.",
+                    "done": "Orders taken out.",
+                    "notAll": "A batch needs at least one order. Cancel the batch instead."
+                },
+                "handOver": {
+                    "button": "Handed to courier",
+                    "title": "Hand {{number}} to {{courier}}?",
+                    "body": "{{count}} orders are dispatched now: their stock leaves the shelf and they show as with the courier. {{amount}} to collect.",
+                    "done": "Orders dispatched: {{count}}."
+                },
+                "deliver": {
+                    "button": "Mark delivered",
+                    "buttonCount": "Mark ticked delivered ({{count}})",
+                    "title": "Mark {{count}} orders delivered?",
+                    "body": "Each becomes a sale and its payment is taken as collected by the courier. Record a parcel that came back on its own order as Not delivered.",
+                    "done": "Orders delivered: {{count}}.",
+                    "tickFirst": "Tick the orders the courier delivered."
+                },
+                "cancel": {
+                    "button": "Cancel batch",
+                    "title": "Cancel this batch",
+                    "body": "Its orders are freed for another batch. Nothing was dispatched.",
+                    "done": "Batch cancelled."
+                }
+            }
         }
     }
 }

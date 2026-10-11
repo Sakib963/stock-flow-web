@@ -3,9 +3,10 @@ import { ChangeDetectionStrategy, Component, DestroyRef, computed, inject, signa
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { NgIcon, provideIcons } from '@ng-icons/core';
-import { lucideMessageSquareText, lucidePencil, lucideArrowLeft, lucideBan, lucideHandCoins, lucideCheck, lucideCircleCheck, lucideGift, lucideHistory, lucideInfo, lucideMapPin, lucidePackage, lucidePackageCheck, lucidePackageX, lucidePrinter, lucideReceipt, lucideRotateCw, lucideTruck, lucideUndo2, lucideUserRound, lucideWallet, lucideX, lucideZap } from '@ng-icons/lucide';
+import { lucideTag, lucideMessageSquareText, lucidePencil, lucideArrowLeft, lucideBan, lucideHandCoins, lucideCheck, lucideCircleCheck, lucideGift, lucideHistory, lucideInfo, lucideMapPin, lucidePackage, lucidePackageCheck, lucidePackageX, lucidePrinter, lucideReceipt, lucideRotateCw, lucideTruck, lucideUndo2, lucideUserRound, lucideWallet, lucideX, lucideZap } from '@ng-icons/lucide';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzCardModule } from 'ng-zorro-antd/card';
+import { NzTooltipModule } from 'ng-zorro-antd/tooltip';
 import { NzFormModule } from 'ng-zorro-antd/form';
 import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzMessageService } from 'ng-zorro-antd/message';
@@ -48,6 +49,7 @@ import { DigitsPipe } from '@app/shared/pipes/digits/digits.pipe';
 import { MoneyPipe } from '@app/shared/pipes/money/money.pipe';
 import { RecordDatePipe } from '@app/shared/pipes/record-date/record-date.pipe';
 import { environment } from '@env/environment';
+import { isLabelable, labelContent, printLabel } from '@app/shared/utils/delivery-label/delivery-label';
 import { printInvoice } from '@app/shared/utils/invoice/invoice';
 import { confirmAction } from '@app/shared/utils/confirm-action/confirm-action';
 import { failureKey, failureOf } from '@app/shared/utils/request-failure/request-failure';
@@ -77,8 +79,8 @@ type Dialog = 'confirm' | 'cancel' | 'dispatch' | 'notDelivered' | 'refund';
  */
 @Component({
     selector: 'order-detail',
-    imports: [FormsModule, RouterLink, NgIcon, NzButtonModule, NzCardModule, NzFormModule, NzInputModule, NzInputNumberModule, NzModalModule, NzRadioModule, NzSelectModule, NzSkeletonModule, NzTableModule, NzTimelineModule, NzTypographyModule, TranslatePipe, PageHeaderComponent, ActionFooterComponent, StatusTagComponent, ReturnCreateDialogComponent, OrderGiftDialogComponent, DigitsPipe, MoneyPipe, RecordDatePipe],
-    providers: [MoneyPipe, DigitsPipe, provideIcons({ lucideMessageSquareText, lucidePencil, lucideArrowLeft, lucideBan, lucideHandCoins, lucideCheck, lucideCircleCheck, lucideGift, lucideHistory, lucideInfo, lucideMapPin, lucidePackage, lucidePackageCheck, lucidePackageX, lucidePrinter, lucideReceipt, lucideRotateCw, lucideTruck, lucideUndo2, lucideUserRound, lucideWallet, lucideX, lucideZap })],
+    imports: [FormsModule, RouterLink, NgIcon, NzButtonModule, NzCardModule, NzTooltipModule, NzFormModule, NzInputModule, NzInputNumberModule, NzModalModule, NzRadioModule, NzSelectModule, NzSkeletonModule, NzTableModule, NzTimelineModule, NzTypographyModule, TranslatePipe, PageHeaderComponent, ActionFooterComponent, StatusTagComponent, ReturnCreateDialogComponent, OrderGiftDialogComponent, DigitsPipe, MoneyPipe, RecordDatePipe],
+    providers: [MoneyPipe, DigitsPipe, provideIcons({ lucideTag, lucideMessageSquareText, lucidePencil, lucideArrowLeft, lucideBan, lucideHandCoins, lucideCheck, lucideCircleCheck, lucideGift, lucideHistory, lucideInfo, lucideMapPin, lucidePackage, lucidePackageCheck, lucidePackageX, lucidePrinter, lucideReceipt, lucideRotateCw, lucideTruck, lucideUndo2, lucideUserRound, lucideWallet, lucideX, lucideZap })],
     templateUrl: './order-detail.component.html',
     styleUrl: './order-detail.component.scss',
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -127,6 +129,16 @@ export class OrderDetailComponent {
         return Math.max(0, kept - held);
     });
     readonly units = computed(() => (this.record()?.items ?? []).reduce((sum, line) => sum + line.quantity, 0));
+    /**
+     * The delivery label is for a parcel still on its way out: an online order confirmed and not yet
+     * delivered or back in the shop. Before confirmation it waits; after the journey there is nothing to label.
+     */
+    readonly label = computed<'ready' | 'notYet' | null>(() => {
+        const o = this.record();
+        if (!o || o.channel !== 'ONLINE') return null;
+        if (o.status === 'Pending' || o.status === 'Draft') return 'notYet';
+        return isLabelable(o.status, o.online?.delivery_status ?? null) ? 'ready' : null;
+    });
 
     readonly timelineShown = signal(TIMELINE_STEP);
     readonly timelineMore = signal(false);
@@ -339,6 +351,22 @@ export class OrderDetailComponent {
             thanks: t('thanks'),
             poweredBy: t('poweredBy'),
         });
+    }
+
+    /** The parcel's label, in English as the courier reads it: the business, the order, the recipient with the tracker QR, and what the courier collects. */
+    printLabel(): void {
+        const o = this.record();
+        if (!o || this.label() !== 'ready') return;
+        const online = o.online;
+        const address = [online?.address_line, online?.area_text, online?.thana_name_en, online?.district_name_en, online?.postal_code].filter(Boolean).join(', ');
+        const business = this._session.business();
+        printLabel(
+            labelContent(
+                { invoice_no: o.invoice_no, created_on: o.created_on, units: this.units(), courier: online?.courier ?? null, consignment_no: online?.consignment_no ?? null, recipient_name: online?.recipient_name || o.customer_name, recipient_phone: online?.recipient_phone || o.customer_phone, address, to_collect: this.due(), tracking_token: o.tracking_token },
+                business ? { name: business.name ?? '', logoUrl: business.logoUrl ?? null, address: business.address ?? null, phone: business.phone ?? null } : null,
+                environment.trackerUrl
+            )
+        );
     }
 
     /** The timeline stores codes and the server's own wording; this says them in the reader's language. */

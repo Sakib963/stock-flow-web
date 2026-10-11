@@ -1,4 +1,4 @@
-import QRCode from 'qrcode';
+import { printPage } from '@app/shared/utils/print-page/print-page';
 import { styled } from '@app/shared/utils/styled/styled';
 
 /**
@@ -107,24 +107,4 @@ export const drawInvoice = (doc: Document, content: InvoiceContent, qr: string |
 };
 
 /** Prints on A4 through a hidden frame holding only the invoice. */
-export const printInvoice = (content: InvoiceContent): void => {
-    const frame = styled(document.createElement('iframe'), { position: 'fixed', right: '0', bottom: '0', width: '210mm', height: '0', border: '0', visibility: 'hidden' });
-    document.body.appendChild(frame);
-    const doc = frame.contentDocument!;
-    const page = doc.createElement('style');
-    page.textContent = '@page { size: A4; margin: 12mm; } html, body { margin: 0; padding: 0; }';
-    doc.head.appendChild(page);
-    styled(doc.body, { margin: '0', background: '#fff', '-webkit-print-color-adjust': 'exact', 'print-color-adjust': 'exact' });
-    const done = () => frame.remove();
-    const qr = content.track ? QRCode.toDataURL(content.track.url, { margin: 0, width: 240 }).catch(() => null) : Promise.resolve(null);
-    void qr.then(async (code) => {
-        doc.body.appendChild(drawInvoice(doc, content, code));
-        // The logo and the QR must be on the page before it prints; one that cannot load prints without it.
-        await Promise.all([...doc.images].map((image) => (image.complete ? null : new Promise((ready) => ((image.onload = ready), (image.onerror = ready))))));
-        await doc.fonts.ready;
-        frame.contentWindow!.addEventListener('afterprint', done);
-        setTimeout(done, 120_000);
-        frame.contentWindow!.focus();
-        frame.contentWindow!.print();
-    });
-};
+export const printInvoice = (content: InvoiceContent): void => printPage('@page { size: A4; margin: 12mm; }', content.track?.url ?? null, (doc, qr) => drawInvoice(doc, content, qr));

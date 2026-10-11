@@ -159,6 +159,15 @@ export class APIEndpoint {
     static readonly CANCEL_GIVEAWAY = '/api/v1/sales/giveaway/cancel-giveaway';
     static readonly ADD_ORDER_GIFT = '/api/v1/sales/giveaway/add-order-gift';
     static readonly REMOVE_ORDER_GIFT = '/api/v1/sales/giveaway/remove-order-gift';
+    static readonly GET_DELIVERY_BATCH_LIST = '/api/v1/sales/delivery-batch/get-delivery-batch-list';
+    static readonly GET_DELIVERY_BATCH_DETAILS = '/api/v1/sales/delivery-batch/get-delivery-batch-details';
+    static readonly GET_ORDERS_READY_TO_SEND = '/api/v1/sales/delivery-batch/get-orders-ready-to-send';
+    static readonly CREATE_DELIVERY_BATCH = '/api/v1/sales/delivery-batch/create-delivery-batch';
+    static readonly UPDATE_DELIVERY_BATCH_ORDERS = '/api/v1/sales/delivery-batch/update-delivery-batch-orders';
+    static readonly GET_DELIVERY_BATCH_UPLOAD_FILE = '/api/v1/sales/delivery-batch/get-delivery-batch-upload-file';
+    static readonly HAND_OVER_DELIVERY_BATCH = '/api/v1/sales/delivery-batch/hand-over-delivery-batch';
+    static readonly DELIVER_DELIVERY_BATCH = '/api/v1/sales/delivery-batch/deliver-delivery-batch';
+    static readonly CANCEL_DELIVERY_BATCH = '/api/v1/sales/delivery-batch/cancel-delivery-batch';
     static readonly GET_PRE_ORDER_LIST = '/api/v1/sales/pre-order/get-pre-order-list';
     static readonly GET_PRE_ORDERS_BY_PRODUCT = '/api/v1/sales/pre-order/get-pre-orders-by-product';
     static readonly GET_PRE_ORDER_DETAILS = '/api/v1/sales/pre-order/get-pre-order-details';

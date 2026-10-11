@@ -71,24 +71,35 @@ const quick = (element: HTMLElement) => [...element.querySelectorAll('[data-quic
 describe('OrderDetailComponent', () => {
     it('offers Confirm and Cancel on a Pending online order, and nothing that comes later', async () => {
         const { element } = await open(order());
-        expect(quick(element)).toEqual(['confirm', 'edit', 'cancel', 'print']);
+        expect(quick(element)).toEqual(['confirm', 'edit', 'cancel', 'print', 'label']);
     });
 
     it('offers Deliver and Not delivered once the parcel is with the courier, and no Cancel', async () => {
         const { element } = await open(order({ status: 'Confirmed', dispatched_on: '2026-10-05T12:00:00.000', online: { ...order().online!, delivery_status: 'WithCourier' } }));
-        expect(quick(element)).toEqual(['deliver', 'not-delivered', 'print']);
+        expect(quick(element)).toEqual(['deliver', 'not-delivered', 'print', 'label']);
     });
 
     it('hides an action from someone without its permission', async () => {
         const { element } = await open(order({ status: 'Confirmed', online: { ...order().online!, delivery_status: 'Preparing' } }), ['sales.order.view']);
-        expect(quick(element)).toEqual(['print', 'none']);
+        expect(quick(element)).toEqual(['print', 'label', 'none']);
     });
 
     it('offers only Confirm and Cancel in Order history, on its own permissions, even with the parcel ready to send', async () => {
         const history = ['sales.order-history.view', 'sales.order-history.confirm', 'sales.order-history.cancel', 'sales.order.dispatch'];
         const { element, http } = await open(order({ status: 'Confirmed', online: { ...order().online!, delivery_status: 'Preparing' } }), history, 'history');
-        expect(quick(element)).toEqual(['cancel', 'print']);
+        expect(quick(element)).toEqual(['cancel', 'print', 'label']);
         http.verify();
+    });
+
+    it('offers the delivery label while the parcel is on its way out, waits on a Pending order, and drops it once delivered', async () => {
+        const pending = await open(order());
+        expect(pending.element.querySelector<HTMLButtonElement>('[data-quick="label"]')!.disabled).toBe(true);
+        TestBed.resetTestingModule();
+        const packed = await open(order({ status: 'Confirmed', online: { ...order().online!, delivery_status: 'Packed' } }));
+        expect(packed.element.querySelector<HTMLButtonElement>('[data-quick="label"]')!.disabled).toBe(false);
+        TestBed.resetTestingModule();
+        const delivered = await open(order({ status: 'Delivered', online: { ...order().online!, delivery_status: 'Delivered' } }));
+        expect(quick(delivered.element)).not.toContain('label');
     });
 
     it('offers only the invoice on a POS sale, which only a return can undo', async () => {

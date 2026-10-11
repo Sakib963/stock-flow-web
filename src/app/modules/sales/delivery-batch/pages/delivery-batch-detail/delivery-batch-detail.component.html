@@ -1,0 +1,323 @@
+<page-header [back]="back" [title]="'sales.deliveryBatch.detailTitle' | translate" [lead]="'sales.deliveryBatch.detailLead' | translate" />
+
+@if (failed(); as failure) {
+    <div class="sf-empty" role="alert">
+        <p class="m-0 text-sm text-ink-body">{{ 'sales.deliveryBatch.loadFailed.' + failure | translate }}</p>
+        <div class="mt-3 flex items-center justify-center gap-2">
+            <button nz-button type="button" class="inline-flex items-center gap-1.5" (click)="backToList()">
+                <ng-icon name="lucideArrowLeft" size="14px" aria-hidden="true" />
+                <span>{{ 'sales.deliveryBatch.backToList' | translate }}</span>
+            </button>
+            <button nz-button nzType="primary" type="button" class="inline-flex items-center gap-1.5" (click)="load()">
+                <ng-icon name="lucideRotateCw" size="14px" aria-hidden="true" />
+                <span>{{ 'form.retry' | translate }}</span>
+            </button>
+        </div>
+    </div>
+} @else {
+    <nz-card [nzTitle]="detailsTitle" data-detail="details">
+        <ng-template #detailsTitle
+            ><h2 class="m-0 flex items-center gap-1.5 text-sm font-bold text-ink"><ng-icon name="lucideInfo" size="14px" class="text-ink-muted" aria-hidden="true" />{{ 'sales.deliveryBatch.section.details' | translate }}</h2></ng-template
+        >
+        @if (record(); as b) {
+            <dl class="m-0 grid grid-cols-2 gap-x-6 gap-y-4 md:grid-cols-4">
+                <div>
+                    <dt class="text-xs text-ink-muted">{{ 'sales.deliveryBatch.number' | translate }}</dt>
+                    <dd class="mt-1 mb-0 font-mono text-sm font-semibold text-ink">
+                        <span nz-typography nzCopyable [nzCopyText]="b.batch_no" [nzCopyTooltips]="['copy.hint' | translate, 'copy.copied' | translate]">{{ b.batch_no }}</span>
+                    </dd>
+                </div>
+                <div>
+                    <dt class="text-xs text-ink-muted">{{ 'sales.deliveryBatch.statusLabel' | translate }}</dt>
+                    <dd class="mt-1 mb-0" data-detail="status">
+                        @if (statusTone(); as style) {
+                            <status-tag [label]="style.label" [tone]="style.tone" [icon]="style.icon" size="standard" />
+                        }
+                    </dd>
+                </div>
+                <div>
+                    <dt class="text-xs text-ink-muted">{{ 'sales.order.courier' | translate }}</dt>
+                    <dd class="mt-1 mb-0 text-sm font-semibold text-ink">{{ 'sales.order.couriers.' + b.courier | translate }}</dd>
+                </div>
+                <div>
+                    <dt class="text-xs text-ink-muted">{{ 'sales.deliveryBatch.toCollect' | translate }}</dt>
+                    <dd class="mt-1 mb-0 font-mono text-sm font-semibold text-ink tabular-nums" data-detail="to-collect">{{ toCollect() | money }}</dd>
+                    <dd class="mt-0.5 mb-0 text-xs text-ink-muted">{{ 'sales.deliveryBatch.ordersUnits' | translate: { orders: (orders().length | digits), units: (units() | digits) } }}</dd>
+                </div>
+                <div>
+                    <dt class="text-xs text-ink-muted">{{ 'sales.deliveryBatch.madeOn' | translate }}</dt>
+                    <dd class="mt-1 mb-0 text-sm font-semibold text-ink">{{ b.created_on | recordDate: language() : 'date-time-12' }}</dd>
+                    <dd class="mt-0.5 mb-0 text-xs text-ink-muted">{{ b.created_by }}</dd>
+                </div>
+                @if (b.handed_over_on) {
+                    <div>
+                        <dt class="text-xs text-ink-muted">{{ 'sales.deliveryBatch.handedOverOn' | translate }}</dt>
+                        <dd class="mt-1 mb-0 text-sm font-semibold text-ink">{{ b.handed_over_on | recordDate: language() : 'date-time-12' }}</dd>
+                        <dd class="mt-0.5 mb-0 text-xs text-ink-muted">{{ b.handed_over_by }}</dd>
+                    </div>
+                }
+                @if (b.note) {
+                    <div class="col-span-2">
+                        <dt class="text-xs text-ink-muted">{{ 'sales.deliveryBatch.note' | translate }}</dt>
+                        <dd class="mt-1 mb-0 text-sm text-ink">{{ b.note }}</dd>
+                    </div>
+                }
+                @if (b.cancel_note) {
+                    <div class="col-span-2">
+                        <dt class="text-xs text-ink-muted">{{ 'sales.deliveryBatch.cancelNote' | translate }}</dt>
+                        <dd class="mt-1 mb-0 text-sm text-ink">{{ b.cancel_note }}</dd>
+                    </div>
+                }
+            </dl>
+        } @else {
+            <nz-skeleton nzActive [nzTitle]="false" [nzParagraph]="{ rows: 3 }" />
+        }
+    </nz-card>
+
+    <div class="mt-2 grid grid-cols-1 items-start gap-2 md:mt-4 md:gap-4 lg:grid-cols-3">
+        <div class="flex min-w-0 flex-col gap-2 md:gap-4 lg:col-start-3 lg:row-start-1">
+            <nz-card [nzTitle]="quickTitle" data-detail="quick-actions">
+                <ng-template #quickTitle
+                    ><h2 class="m-0 flex items-center gap-1.5 text-sm font-bold text-ink"><ng-icon name="lucideZap" size="14px" class="text-ink-muted" aria-hidden="true" />{{ 'sales.order.quickActions' | translate }}</h2></ng-template
+                >
+                @if (record(); as b) {
+                    <div class="flex flex-col gap-2">
+                        @if (actions().handOver) {
+                            <button nz-button nzType="primary" nzBlock type="button" class="inline-flex items-center justify-start gap-2" data-quick="hand-over" [disabled]="saving() || !orders().length" (click)="handOver()">
+                                <ng-icon name="lucideTruck" size="14px" aria-hidden="true" />
+                                <span>{{ 'sales.deliveryBatch.action.handOver.button' | translate }}</span>
+                            </button>
+                        }
+                        @if (actions().deliver) {
+                            <span class="block" nz-tooltip [nzTooltipTitle]="withCourier().length ? null : ('sales.deliveryBatch.action.deliver.tickFirst' | translate)">
+                                <button nz-button nzType="primary" nzBlock type="button" class="inline-flex items-center justify-start gap-2" data-quick="deliver" [disabled]="saving() || !withCourier().length" (click)="deliver()">
+                                    <ng-icon name="lucidePackageCheck" size="14px" aria-hidden="true" />
+                                    <span>{{ 'sales.deliveryBatch.action.deliver.buttonCount' | translate: { count: (withCourier().length | digits) } }}</span>
+                                </button>
+                            </span>
+                        }
+                        @if (actions().file) {
+                            <span class="block" nz-tooltip [nzTooltipTitle]="b.courier === 'Pathao' ? null : ('sales.deliveryBatch.pathaoOnly' | translate)">
+                                <button nz-button nzBlock type="button" class="inline-flex items-center justify-start gap-2" data-quick="file" [nzLoading]="downloading()" [disabled]="b.courier !== 'Pathao'" (click)="download()">
+                                    @if (!downloading()) {
+                                        <ng-icon name="lucideDownload" size="14px" aria-hidden="true" />
+                                    }
+                                    <span>{{ 'sales.deliveryBatch.action.file' | translate }}</span>
+                                </button>
+                            </span>
+                        }
+                        @if (actions().labels) {
+                            <button nz-button nzBlock type="button" class="inline-flex items-center justify-start gap-2" data-quick="labels-all" [disabled]="!printable().length" (click)="print(orders())">
+                                <ng-icon name="lucideTag" size="14px" aria-hidden="true" />
+                                <span>{{ 'sales.deliveryBatch.action.labelsAll' | translate: { count: (printable().length | digits) } }}</span>
+                            </button>
+                            <span class="block" nz-tooltip [nzTooltipTitle]="chosen().length ? null : ('sales.deliveryBatch.tickFirst' | translate)">
+                                <button nz-button nzBlock type="button" class="inline-flex items-center justify-start gap-2" data-quick="labels-ticked" [disabled]="!chosen().length" (click)="print(chosen())">
+                                    <ng-icon name="lucideTag" size="14px" aria-hidden="true" />
+                                    <span>{{ 'sales.deliveryBatch.action.labelsTicked' | translate: { count: (chosen().length | digits) } }}</span>
+                                </button>
+                            </span>
+                        }
+                        @if (actions().add) {
+                            <button nz-button nzBlock type="button" class="inline-flex items-center justify-start gap-2" data-quick="add" [disabled]="saving()" (click)="openAdd()">
+                                <ng-icon name="lucidePlus" size="14px" aria-hidden="true" />
+                                <span>{{ 'sales.deliveryBatch.action.add.button' | translate }}</span>
+                            </button>
+                        }
+                        @if (actions().takeOut) {
+                            <span class="block" nz-tooltip [nzTooltipTitle]="chosen().length ? null : ('sales.deliveryBatch.tickFirst' | translate)">
+                                <button nz-button nzBlock type="button" class="inline-flex items-center justify-start gap-2" data-quick="take-out" [disabled]="saving() || !chosen().length" (click)="takeOut()">
+                                    <ng-icon name="lucideMinus" size="14px" aria-hidden="true" />
+                                    <span>{{ 'sales.deliveryBatch.action.takeOut.buttonCount' | translate: { count: (chosen().length | digits) } }}</span>
+                                </button>
+                            </span>
+                        }
+                        @if (actions().cancel) {
+                            <button nz-button nzDanger nzBlock type="button" class="inline-flex items-center justify-start gap-2" data-quick="cancel" [disabled]="saving()" (click)="openCancel()">
+                                <ng-icon name="lucideBan" size="14px" aria-hidden="true" />
+                                <span>{{ 'sales.deliveryBatch.action.cancel.button' | translate }}</span>
+                            </button>
+                        }
+                        @if (!anyAction()) {
+                            <p class="m-0 text-xs text-ink-muted" data-quick="none">{{ 'sales.deliveryBatch.nothingToDo' | translate }}</p>
+                        }
+                    </div>
+                } @else {
+                    <nz-skeleton nzActive [nzTitle]="false" [nzParagraph]="{ rows: 3 }" />
+                }
+            </nz-card>
+            <nz-card [nzTitle]="historyTitle" data-detail="timeline">
+                <ng-template #historyTitle
+                    ><h2 class="m-0 flex items-center gap-1.5 text-sm font-bold text-ink"><ng-icon name="lucideHistory" size="14px" class="text-ink-muted" aria-hidden="true" />{{ 'sales.order.section.timeline' | translate }}</h2></ng-template
+                >
+                @if (record(); as b) {
+                    <nz-timeline>
+                        @for (entry of b.activity; track $index; let first = $first) {
+                            <nz-timeline-item [nzColor]="first ? 'blue' : 'gray'">
+                                <p class="m-0 text-shell-title font-semibold text-ink">{{ entry.title }}</p>
+                                @if (entry.description) {
+                                    <p class="mt-0.5 mb-0 text-xs text-ink-body">{{ entry.description }}</p>
+                                }
+                                <p class="mt-0.5 mb-0 text-xs text-ink-muted">{{ entry.performed_by }} &middot; {{ entry.performed_on | recordDate: language() : 'date-time-12' }}</p>
+                            </nz-timeline-item>
+                        }
+                    </nz-timeline>
+                } @else {
+                    <nz-skeleton nzActive [nzTitle]="false" [nzParagraph]="{ rows: 3 }" />
+                }
+            </nz-card>
+        </div>
+
+        <div class="flex min-w-0 flex-col gap-2 md:gap-4 lg:col-span-2 lg:row-start-1">
+            <nz-card [nzTitle]="ordersTitle" [nzBodyStyle]="{ padding: '0' }" data-detail="orders">
+                <ng-template #ordersTitle
+                    ><h2 class="m-0 flex items-center gap-1.5 text-sm font-bold text-ink"><ng-icon name="lucidePackage" size="14px" class="text-ink-muted" aria-hidden="true" />{{ 'sales.deliveryBatch.section.orders' | translate }}</h2></ng-template
+                >
+                @if (record()) {
+                    <nz-table nzTemplateMode nzSize="small" [nzScroll]="{ x: '720px' }">
+                        <thead>
+                            <tr>
+                                <th nzWidth="44px" [nzChecked]="allTicked()" [nzIndeterminate]="someTicked()" [attr.aria-label]="'sales.deliveryBatch.tickAll' | translate" (nzCheckedChange)="tickAll($event)"></th>
+                                <th nzWidth="130px">{{ 'sales.order.invoice' | translate }}</th>
+                                <th>{{ 'sales.deliveryBatch.recipient' | translate }}</th>
+                                <th>{{ 'sales.deliveryBatch.place' | translate }}</th>
+                                <th nzWidth="130px">{{ 'sales.deliveryBatch.statusLabel' | translate }}</th>
+                                <th nzWidth="110px" class="text-right">{{ 'sales.deliveryBatch.toCollect' | translate }}</th>
+                                <th nzWidth="48px">
+                                    <span class="sr-only">{{ 'sales.deliveryBatch.printOne' | translate }}</span>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for (order of orders(); track order.oid) {
+                                <tr [attr.data-order]="order.invoice_no">
+                                    <td [nzChecked]="ticked().has(order.oid)" [attr.aria-label]="order.invoice_no" (nzCheckedChange)="tick(order.oid, $event)"></td>
+                                    <td>
+                                        @if (canViewOrders) {
+                                            <a class="block font-mono text-xs font-semibold" [routerLink]="orderRoute(order.oid)">{{ order.invoice_no }}</a>
+                                        } @else {
+                                            <span class="block font-mono text-xs font-semibold text-ink">{{ order.invoice_no }}</span>
+                                        }
+                                        <span class="block text-xs text-ink-muted">{{ 'sales.deliveryBatch.unitsShort' | translate: { count: (order.units | digits) } }}</span>
+                                    </td>
+                                    <td>
+                                        <span class="block text-shell-title font-semibold text-ink">{{ order.recipient_name }}</span>
+                                        <span class="block font-mono text-xs text-ink-muted">{{ order.recipient_phone }}</span>
+                                    </td>
+                                    <td class="text-xs text-ink-body">{{ place(order) }}</td>
+                                    <td>
+                                        @if (order.status !== 'Confirmed' && orderTones[order.status]; as tone) {
+                                            <status-tag [label]="tone.label" [tone]="tone.tone" [icon]="tone.icon" />
+                                        } @else if (order.delivery_status && deliveryTones[order.delivery_status]; as tone) {
+                                            <status-tag [label]="tone.label" [tone]="tone.tone" [icon]="tone.icon" />
+                                        }
+                                    </td>
+                                    <td class="text-right font-mono font-semibold tabular-nums">{{ order.to_collect | money }}</td>
+                                    <td class="text-right">
+                                        @if (labelled(order)) {
+                                            <button nz-button nzType="text" nzSize="small" type="button" nz-tooltip [nzTooltipTitle]="'sales.deliveryBatch.printOne' | translate" [attr.aria-label]="'sales.deliveryBatch.printOne' | translate" (click)="print([order])">
+                                                <ng-icon name="lucideTag" size="14px" class="text-ink-muted" aria-hidden="true" />
+                                            </button>
+                                        }
+                                    </td>
+                                </tr>
+                            } @empty {
+                                <tr>
+                                    <td colspan="7" class="py-6 text-center text-xs text-ink-muted">{{ 'sales.deliveryBatch.noOrders' | translate }}</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </nz-table>
+                } @else {
+                    <div class="px-4 py-3"><nz-skeleton nzActive [nzTitle]="false" [nzParagraph]="{ rows: 4 }" /></div>
+                }
+            </nz-card>
+        </div>
+    </div>
+
+    <action-footer>
+        <button nz-button type="button" class="inline-flex items-center gap-1.5" (click)="backToList()">
+            <ng-icon name="lucideArrowLeft" size="14px" aria-hidden="true" />
+            <span>{{ 'sales.deliveryBatch.backToList' | translate }}</span>
+        </button>
+    </action-footer>
+}
+
+<!-- Orders confirmed since the batch was made, to add before the rider comes. -->
+<nz-modal [nzVisible]="adding()" [nzTitle]="'sales.deliveryBatch.action.add.title' | translate" [nzFooter]="addFooter" nzWidth="720px" (nzOnCancel)="adding.set(false)">
+    <ng-container *nzModalContent>
+        @if (readyFailed(); as failure) {
+            <p class="m-0 text-sm text-danger-ink" role="alert">{{ 'sales.deliveryBatch.readyFailed.' + failure | translate }}</p>
+        } @else if (ready(); as list) {
+            @if (list.length) {
+                <nz-table nzTemplateMode nzSize="small" [nzScroll]="{ y: '360px' }" data-dialog="ready">
+                    <thead>
+                        <tr>
+                            <th nzWidth="44px">
+                                <span class="sr-only">{{ 'sales.deliveryBatch.tickAll' | translate }}</span>
+                            </th>
+                            <th nzWidth="130px">{{ 'sales.order.invoice' | translate }}</th>
+                            <th>{{ 'sales.deliveryBatch.recipient' | translate }}</th>
+                            <th nzWidth="110px" class="text-right">{{ 'sales.deliveryBatch.toCollect' | translate }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (order of list; track order.oid) {
+                            <tr>
+                                <td [nzChecked]="toAdd().has(order.oid)" [attr.aria-label]="order.invoice_no" (nzCheckedChange)="tickToAdd(order.oid, $event)"></td>
+                                <td class="font-mono text-xs font-semibold">{{ order.invoice_no }}</td>
+                                <td>
+                                    <span class="block text-shell-title text-ink">{{ order.recipient_name }}</span>
+                                    <span class="block text-xs text-ink-muted">{{ place(order) }}</span>
+                                </td>
+                                <td class="text-right font-mono tabular-nums">{{ order.to_collect | money }}</td>
+                            </tr>
+                        }
+                    </tbody>
+                </nz-table>
+            } @else {
+                <p class="m-0 text-sm text-ink-muted">{{ 'sales.deliveryBatch.noneReady' | translate }}</p>
+            }
+        } @else {
+            <nz-skeleton nzActive [nzTitle]="false" [nzParagraph]="{ rows: 3 }" />
+        }
+    </ng-container>
+</nz-modal>
+<ng-template #addFooter>
+    <button nz-button type="button" class="inline-flex items-center gap-1.5" [disabled]="saving()" (click)="adding.set(false)">
+        <ng-icon name="lucideX" size="14px" aria-hidden="true" />
+        <span>{{ 'form.confirm.cancel' | translate }}</span>
+    </button>
+    <button nz-button nzType="primary" type="button" class="inline-flex items-center gap-1.5" data-dialog="add" [nzLoading]="saving()" [disabled]="!toAdd().size" (click)="submitAdd()">
+        @if (!saving()) {
+            <ng-icon name="lucidePlus" size="14px" aria-hidden="true" />
+        }
+        <span>{{ 'sales.deliveryBatch.action.add.submit' | translate: { count: (toAdd().size | digits) } }}</span>
+    </button>
+</ng-template>
+
+<nz-modal [nzVisible]="cancelling()" [nzTitle]="'sales.deliveryBatch.action.cancel.title' | translate" [nzFooter]="cancelFooter" nzCentered (nzOnCancel)="cancelling.set(false)">
+    <ng-container *nzModalContent>
+        <p class="mt-0 mb-3 text-xs text-ink-muted">{{ 'sales.deliveryBatch.action.cancel.body' | translate }}</p>
+        <div nz-form nzLayout="vertical">
+            <nz-form-item class="mb-0">
+                <nz-form-label nzRequired nzFor="batch-cancel-note">{{ 'sales.deliveryBatch.cancelNote' | translate }}</nz-form-label>
+                <nz-form-control>
+                    <textarea nz-input id="batch-cancel-note" rows="2" maxlength="500" data-dialog="cancel-note" [ngModel]="cancelNote()" (ngModelChange)="cancelNote.set($event)"></textarea>
+                </nz-form-control>
+            </nz-form-item>
+        </div>
+    </ng-container>
+</nz-modal>
+<ng-template #cancelFooter>
+    <button nz-button type="button" class="inline-flex items-center gap-1.5" [disabled]="saving()" (click)="cancelling.set(false)">
+        <ng-icon name="lucideX" size="14px" aria-hidden="true" />
+        <span>{{ 'form.confirm.cancel' | translate }}</span>
+    </button>
+    <button nz-button nzType="primary" nzDanger type="button" class="inline-flex items-center gap-1.5" data-dialog="cancel" [nzLoading]="saving()" [disabled]="cancelNote().trim().length < 3" (click)="submitCancel()">
+        @if (!saving()) {
+            <ng-icon name="lucideCheck" size="14px" aria-hidden="true" />
+        }
+        <span>{{ 'sales.deliveryBatch.action.cancel.button' | translate }}</span>
+    </button>
+</ng-template>

@@ -214,6 +214,14 @@
                                 <span>{{ 'sales.online.invoice.print' | translate }}</span>
                             </button>
                         }
+                        @if (label(); as state) {
+                            <span class="block" nz-tooltip [nzTooltipTitle]="state === 'notYet' ? ('sales.order.label.notYet' | translate) : null">
+                                <button nz-button nzBlock type="button" class="inline-flex items-center justify-start gap-2" data-quick="label" [disabled]="state !== 'ready'" (click)="printLabel()">
+                                    <ng-icon name="lucideTag" size="14px" aria-hidden="true" />
+                                    <span>{{ 'sales.order.label.print' | translate }}</span>
+                                </button>
+                            </span>
+                        }
                         @if (canViewCustomers && record()?.customer_oid) {
                             <a nz-button nzBlock class="inline-flex items-center justify-start gap-2" [routerLink]="customerRoute.detail(record()!.customer_oid!)">
                                 <ng-icon name="lucideUserRound" size="14px" aria-hidden="true" />

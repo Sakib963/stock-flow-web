@@ -3,9 +3,15 @@ import { ReceiptContent, drawReceipt } from './receipt';
 const content = (over: Partial<ReceiptContent> = {}): ReceiptContent => ({
     business: 'A boutique',
     contact: ['House 5, Road 2, Dhaka', '01711000000'],
-    meta: [['Invoice', '2610040001'], ['Customer', 'A customer with a rather long name']],
+    meta: [
+        ['Invoice', '2610040001'],
+        ['Customer', 'A customer with a rather long name'],
+    ],
     lines: [{ name: 'Floral print kurti x2', amount: '2,900.00' }],
-    totals: [['Subtotal', '2,900.00'], ['Discount', '-100.00']],
+    totals: [
+        ['Subtotal', '2,900.00'],
+        ['Discount', '-100.00'],
+    ],
     total: ['Total', '2,800.00 BDT'],
     payment: [['Paid by', 'Cash']],
     thanks: 'Thank you!',
