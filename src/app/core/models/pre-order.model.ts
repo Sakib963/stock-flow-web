@@ -1,0 +1,71 @@
+export type PreOrderStatus = 'Pending' | 'Confirmed' | 'Converted' | 'Cancelled';
+export type PreOrderCancelReason = 'changed_mind' | 'unreachable' | 'stock_not_coming' | 'other';
+export const PRE_ORDER_CANCEL_REASONS: PreOrderCancelReason[] = ['changed_mind', 'unreachable', 'stock_not_coming', 'other'];
+export type AdvanceMethod = 'cash' | 'bkash' | 'nagad' | 'card' | 'other';
+export const ADVANCE_METHODS: AdvanceMethod[] = ['cash', 'bkash', 'nagad', 'card', 'other'];
+
+/** A booked line names a product, never a batch. Its price is approximate: the real one comes from the batch at conversion. */
+export interface PreOrderLine {
+    oid: string;
+    product_oid: string;
+    product_name: string;
+    sku: string | null;
+    quantity: number;
+    unit_price: number;
+    total: number;
+    /** Units that could be sold now, across the product's batches. */
+    sellable: number;
+}
+
+export interface PreOrderActivity {
+    title: string;
+    description: string | null;
+    performed_by: string;
+    performed_on: string;
+}
+
+export interface PreOrderDetails {
+    oid: string;
+    preorder_no: string;
+    customer_oid: string;
+    customer_name: string;
+    customer_phone: string;
+    status: PreOrderStatus;
+    total_amount: number;
+    advance_paid: number;
+    advance_method: AdvanceMethod | null;
+    advance_reference: string | null;
+    advance_refund_due: number;
+    advance_refunded: number;
+    refunded_on: string | null;
+    expected_date: string | null;
+    notes: string | null;
+    cancel_reason: PreOrderCancelReason | null;
+    cancel_note: string | null;
+    converted_order_oid: string | null;
+    converted_invoice_no: string | null;
+    created_on: string;
+    created_by: string;
+    lines: PreOrderLine[];
+    activity: PreOrderActivity[];
+}
+
+export interface PreOrderPayload {
+    oid: string;
+    customer: { phone: string; name: string | null };
+    lines: { product_oid: string; quantity: number; unit_price: number }[];
+    advance_paid: number;
+    advance_method: AdvanceMethod | null;
+    advance_reference: string | null;
+    expected_date: string | null;
+    notes: string | null;
+}
+
+/** A catalogue product to book, stock or not. `price` is a starting point for the approximate price. */
+export interface PreOrderProduct {
+    product_oid: string;
+    product_name: string;
+    sku: string | null;
+    sellable: number;
+    price: number;
+}

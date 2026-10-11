@@ -89,6 +89,32 @@ export const SALES_ROUTES: Routes = [
                 loadComponent: () => import('./giveaway/pages/giveaway-detail/giveaway-detail.component').then((m) => m.GiveawayDetailComponent),
             },
             {
+                path: 'pre-orders',
+                canActivate: [permissionGuard],
+                data: { permission: 'sales.pre-order.view' },
+                loadComponent: () => import('./pre-order/pages/pre-order-list/pre-order-list.component').then((m) => m.PreOrderListComponent),
+            },
+            {
+                path: 'pre-orders/new',
+                canActivate: [permissionGuard],
+                canDeactivate: [unsavedChangesGuard],
+                data: { permission: 'sales.pre-order.create' },
+                loadComponent: () => import('./pre-order/pages/pre-order-create/pre-order-create.component').then((m) => m.PreOrderCreateComponent),
+            },
+            {
+                path: 'pre-orders/:oid/edit',
+                canActivate: [permissionGuard],
+                canDeactivate: [unsavedChangesGuard],
+                data: { permission: 'sales.pre-order.edit' },
+                loadComponent: () => import('./pre-order/pages/pre-order-edit/pre-order-edit.component').then((m) => m.PreOrderEditComponent),
+            },
+            {
+                path: 'pre-orders/:oid',
+                canActivate: [permissionGuard],
+                data: { permission: 'sales.pre-order.view' },
+                loadComponent: () => import('./pre-order/pages/pre-order-detail/pre-order-detail.component').then((m) => m.PreOrderDetailComponent),
+            },
+            {
                 path: 'customers',
                 canActivate: [permissionGuard],
                 data: { permission: CUSTOMER_LIST.permission },

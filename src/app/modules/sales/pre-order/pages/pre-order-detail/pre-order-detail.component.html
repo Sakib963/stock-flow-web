@@ -1,0 +1,273 @@
+<page-header [back]="back" [title]="'sales.preOrder.detailTitle' | translate" [lead]="'sales.preOrder.detailLead' | translate" />
+
+@if (failed(); as failure) {
+    <div class="sf-empty" role="alert">
+        <p class="m-0 text-sm text-ink-body">{{ 'sales.preOrder.loadFailed.' + failure | translate }}</p>
+        <div class="mt-3 flex items-center justify-center gap-2">
+            <button nz-button type="button" class="inline-flex items-center gap-1.5" (click)="backToList()">
+                <ng-icon name="lucideArrowLeft" size="14px" aria-hidden="true" />
+                <span>{{ 'sales.preOrder.backToList' | translate }}</span>
+            </button>
+            <button nz-button nzType="primary" type="button" class="inline-flex items-center gap-1.5" (click)="load()">
+                <ng-icon name="lucideRotateCw" size="14px" aria-hidden="true" />
+                <span>{{ 'form.retry' | translate }}</span>
+            </button>
+        </div>
+    </div>
+} @else {
+    @if (!record()) {
+        <span class="sr-only" role="status">{{ 'form.loading' | translate }}</span>
+    }
+
+    <nz-card [nzTitle]="detailsTitle" data-detail="details">
+        <ng-template #detailsTitle
+            ><h2 class="m-0 flex items-center gap-1.5 text-sm font-bold text-ink"><ng-icon name="lucideInfo" size="14px" class="text-ink-muted" aria-hidden="true" />{{ 'sales.preOrder.section.details' | translate }}</h2></ng-template
+        >
+        @if (booking(); as b) {
+            <dl class="m-0 grid grid-cols-2 gap-x-6 gap-y-4 md:grid-cols-4">
+                <div>
+                    <dt class="text-xs text-ink-muted">{{ 'sales.preOrder.number' | translate }}</dt>
+                    <dd class="mt-1 mb-0 font-mono text-sm font-semibold text-ink">
+                        <span nz-typography nzCopyable [nzCopyText]="b.preorder_no ?? ''" [nzCopyTooltips]="['copy.hint' | translate, 'copy.copied' | translate]">{{ b.preorder_no }}</span>
+                    </dd>
+                </div>
+                <div>
+                    <dt class="text-xs text-ink-muted">{{ 'sales.preOrder.statusLabel' | translate }}</dt>
+                    <dd class="mt-1 mb-0" data-detail="status">
+                        @if (statusTone(); as style) {
+                            <status-tag [label]="style.label" [tone]="style.tone" [icon]="style.icon" size="standard" />
+                        }
+                    </dd>
+                </div>
+                <div>
+                    <dt class="text-xs text-ink-muted">{{ 'sales.preOrder.customer' | translate }}</dt>
+                    <dd class="mt-1 mb-0 text-sm font-semibold text-ink">{{ b.customer_name }}</dd>
+                    <dd class="mt-0.5 mb-0 font-mono text-xs text-ink-muted">{{ b.customer_phone }}</dd>
+                </div>
+                <div>
+                    <dt class="text-xs text-ink-muted">{{ 'sales.preOrder.bookedOn' | translate }}</dt>
+                    <dd class="mt-1 mb-0 text-sm font-semibold text-ink">{{ b.created_on ? (b.created_on | recordDate: language() : 'date-time-12') : '' }}</dd>
+                    <dd class="mt-0.5 mb-0 text-xs text-ink-muted">{{ b.created_by }}</dd>
+                </div>
+                <div>
+                    <dt class="text-xs text-ink-muted">{{ 'sales.preOrder.expected' | translate }}</dt>
+                    <dd class="mt-1 mb-0 text-sm font-semibold text-ink">{{ b.expected_date ? (b.expected_date | recordDate: language() : 'date') : ('sales.preOrder.noDate' | translate) }}</dd>
+                </div>
+                <div>
+                    <dt class="text-xs text-ink-muted">{{ 'sales.preOrder.approxTotal' | translate }}</dt>
+                    <dd class="mt-1 mb-0 font-mono text-sm font-semibold text-ink tabular-nums">{{ b.total_amount | money }}</dd>
+                </div>
+                <div>
+                    <dt class="text-xs text-ink-muted">{{ 'sales.preOrder.advance' | translate }}</dt>
+                    <dd class="mt-1 mb-0 font-mono text-sm font-semibold text-ink tabular-nums">{{ b.advance_paid | money }}</dd>
+                    @if (b.advance_method) {
+                        <dd class="mt-0.5 mb-0 text-xs text-ink-muted">
+                            {{ 'sales.preOrder.methods.' + b.advance_method | translate }}
+                            @if (b.advance_reference) {
+                                <span class="font-mono">· {{ b.advance_reference }}</span>
+                            }
+                        </dd>
+                    }
+                </div>
+                @if (b.converted_order_oid) {
+                    <div>
+                        <dt class="text-xs text-ink-muted">{{ 'sales.preOrder.convertedTo' | translate }}</dt>
+                        <dd class="mt-1 mb-0 font-mono text-sm font-semibold" data-detail="order">
+                            @if (canViewOrders) {
+                                <a [routerLink]="orderRoute(b.converted_order_oid)">{{ b.converted_invoice_no }}</a>
+                            } @else {
+                                {{ b.converted_invoice_no }}
+                            }
+                        </dd>
+                    </div>
+                }
+                @if (b.status === 'Cancelled') {
+                    <div>
+                        <dt class="text-xs text-ink-muted">{{ 'sales.preOrder.cancelReason' | translate }}</dt>
+                        <dd class="mt-1 mb-0 text-sm text-ink">{{ b.cancel_reason ? ('sales.preOrder.reasons.' + b.cancel_reason | translate) : '' }}</dd>
+                        @if (b.cancel_note) {
+                            <dd class="mt-0.5 mb-0 text-xs text-ink-muted">{{ b.cancel_note }}</dd>
+                        }
+                    </div>
+                    <div data-detail="refund">
+                        <dt class="text-xs text-ink-muted">{{ 'sales.preOrder.refund' | translate }}</dt>
+                        <dd class="mt-1 mb-0 font-mono text-sm font-semibold text-ink tabular-nums">{{ b.advance_refund_due | money }}</dd>
+                        <dd class="mt-0.5 mb-0 text-xs" [class.text-warning-ink]="refundOwed() > 0" [class.text-ink-muted]="refundOwed() <= 0">
+                            {{ (refundOwed() > 0 ? 'sales.preOrder.refundOwed' : b.advance_refund_due ? 'sales.preOrder.refundGiven' : 'sales.preOrder.refundNone') | translate }}
+                        </dd>
+                    </div>
+                }
+                @if (b.notes) {
+                    <div class="col-span-2">
+                        <dt class="text-xs text-ink-muted">{{ 'sales.preOrder.notes' | translate }}</dt>
+                        <dd class="mt-1 mb-0 text-sm text-ink">{{ b.notes }}</dd>
+                    </div>
+                }
+            </dl>
+        } @else {
+            <nz-skeleton nzActive [nzTitle]="false" [nzParagraph]="{ rows: 3 }" />
+        }
+    </nz-card>
+
+    <div class="mt-2 grid grid-cols-1 items-start gap-2 md:mt-4 md:gap-4 lg:grid-cols-3">
+        <div class="flex min-w-0 flex-col gap-2 md:gap-4 lg:col-start-3 lg:row-start-1">
+            <nz-card [nzTitle]="quickTitle" data-detail="quick-actions">
+                <ng-template #quickTitle
+                    ><h2 class="m-0 flex items-center gap-1.5 text-sm font-bold text-ink"><ng-icon name="lucideZap" size="14px" class="text-ink-muted" aria-hidden="true" />{{ 'sales.order.quickActions' | translate }}</h2></ng-template
+                >
+                @if (record()) {
+                    <div class="flex flex-col gap-2">
+                        @if (actions().confirm) {
+                            <button nz-button nzType="primary" nzBlock type="button" class="inline-flex items-center justify-start gap-2" data-quick="confirm" [nzLoading]="saving()" (click)="confirm()">
+                                @if (!saving()) {
+                                    <ng-icon name="lucideCalendarCheck" size="14px" aria-hidden="true" />
+                                }
+                                <span>{{ 'sales.preOrder.action.confirm.button' | translate }}</span>
+                            </button>
+                        }
+                        @if (actions().edit) {
+                            <button nz-button nzBlock type="button" class="inline-flex items-center justify-start gap-2" data-quick="edit" [disabled]="saving()" (click)="edit()">
+                                <ng-icon name="lucidePencil" size="14px" aria-hidden="true" />
+                                <span>{{ 'sales.preOrder.edit' | translate }}</span>
+                            </button>
+                        }
+                        @if (actions().refund) {
+                            <button nz-button nzType="primary" nzBlock type="button" class="inline-flex items-center justify-start gap-2" data-quick="refund" [nzLoading]="saving()" (click)="recordRefund()">
+                                @if (!saving()) {
+                                    <ng-icon name="lucideHandCoins" size="14px" aria-hidden="true" />
+                                }
+                                <span>{{ 'sales.preOrder.action.refund.button' | translate }}</span>
+                            </button>
+                        }
+                        @if (actions().cancel) {
+                            <button nz-button nzDanger nzBlock type="button" class="inline-flex items-center justify-start gap-2" data-quick="cancel" [disabled]="saving()" (click)="openCancel()">
+                                <ng-icon name="lucideBan" size="14px" aria-hidden="true" />
+                                <span>{{ 'sales.preOrder.action.cancel.button' | translate }}</span>
+                            </button>
+                        }
+                        @if (!anyAction()) {
+                            <p class="m-0 text-xs text-ink-muted" data-quick="none">{{ 'sales.order.nothingToDo' | translate }}</p>
+                        }
+                    </div>
+                } @else {
+                    <nz-skeleton nzActive [nzTitle]="false" [nzParagraph]="{ rows: 2 }" />
+                }
+            </nz-card>
+            <nz-card [nzTitle]="historyTitle" data-detail="timeline">
+                <ng-template #historyTitle
+                    ><h2 class="m-0 flex items-center gap-1.5 text-sm font-bold text-ink"><ng-icon name="lucideHistory" size="14px" class="text-ink-muted" aria-hidden="true" />{{ 'sales.order.section.timeline' | translate }}</h2></ng-template
+                >
+                @if (record(); as b) {
+                    <nz-timeline>
+                        @for (entry of b.activity; track $index; let first = $first) {
+                            <nz-timeline-item [nzColor]="first ? 'blue' : 'gray'">
+                                <p class="m-0 text-[13px] font-semibold text-ink">{{ entry.title }}</p>
+                                @if (entry.description) {
+                                    <p class="mt-0.5 mb-0 text-xs text-ink-body">{{ entry.description }}</p>
+                                }
+                                <p class="mt-0.5 mb-0 text-xs text-ink-muted">{{ entry.performed_by }} &middot; {{ entry.performed_on | recordDate: language() : 'date-time-12' }}</p>
+                            </nz-timeline-item>
+                        }
+                    </nz-timeline>
+                } @else {
+                    <nz-skeleton nzActive [nzTitle]="false" [nzParagraph]="{ rows: 3 }" />
+                }
+            </nz-card>
+        </div>
+
+        <div class="flex min-w-0 flex-col gap-2 md:gap-4 lg:col-span-2 lg:row-start-1">
+            <nz-card [nzTitle]="linesTitle" [nzBodyStyle]="{ padding: '0' }" data-detail="lines">
+                <ng-template #linesTitle
+                    ><h2 class="m-0 flex items-center gap-1.5 text-sm font-bold text-ink"><ng-icon name="lucidePackage" size="14px" class="text-ink-muted" aria-hidden="true" />{{ 'sales.preOrder.section.lines' | translate }}</h2></ng-template
+                >
+                @if (record(); as b) {
+                    <nz-table nzTemplateMode nzSize="small" [nzScroll]="{ x: '560px' }">
+                        <thead>
+                            <tr>
+                                <th>{{ 'sales.order.product' | translate }}</th>
+                                <th nzWidth="80px" class="text-right">{{ 'sales.order.units' | translate }}</th>
+                                <th nzWidth="150px" class="text-right">{{ 'sales.preOrder.approxPrice' | translate }}</th>
+                                <th nzWidth="120px" class="text-right">{{ 'sales.preOrder.lineTotal' | translate }}</th>
+                                <th nzWidth="110px" class="text-right">{{ 'sales.preOrder.sellable' | translate }}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for (line of b.lines; track line.oid) {
+                                <tr [attr.data-line]="line.product_oid">
+                                    <td>
+                                        <span class="block text-[13px] font-semibold text-ink">{{ line.product_name }}</span>
+                                        @if (line.sku) {
+                                            <span class="block font-mono text-xs text-ink-muted">{{ line.sku }}</span>
+                                        }
+                                    </td>
+                                    <td class="text-right font-mono tabular-nums">{{ line.quantity | digits }}</td>
+                                    <td class="text-right font-mono tabular-nums">{{ line.unit_price | money }}</td>
+                                    <td class="text-right font-mono tabular-nums">{{ line.total | money }}</td>
+                                    <td class="text-right font-mono tabular-nums" [class.text-success-ink]="line.sellable >= line.quantity" [class.text-ink-muted]="line.sellable < line.quantity">{{ line.sellable | digits }}</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </nz-table>
+                    <div class="flex justify-end gap-6 border-t border-line px-4 py-3 text-sm">
+                        <span class="text-ink-body"
+                            >{{ 'sales.order.units' | translate }}: <span class="font-mono font-semibold text-ink tabular-nums">{{ units() | digits }}</span></span
+                        >
+                        <span class="text-ink-body"
+                            >{{ 'sales.preOrder.approxTotal' | translate }}: <span class="font-mono font-semibold text-ink tabular-nums">{{ b.total_amount | money }}</span></span
+                        >
+                    </div>
+                } @else {
+                    <div class="px-4 py-3"><nz-skeleton nzActive [nzTitle]="false" [nzParagraph]="{ rows: 2 }" /></div>
+                }
+            </nz-card>
+        </div>
+    </div>
+
+    <action-footer>
+        <button nz-button nzType="default" type="button" class="inline-flex items-center gap-1.5" (click)="backToList()">
+            <ng-icon name="lucideArrowLeft" size="14px" aria-hidden="true" />
+            <span>{{ 'sales.preOrder.backToList' | translate }}</span>
+        </button>
+    </action-footer>
+}
+
+<nz-modal [nzVisible]="cancelling()" [nzTitle]="'sales.preOrder.action.cancel.title' | translate" [nzFooter]="cancelFooter" nzCentered (nzOnCancel)="cancelling.set(false)">
+    <ng-container *nzModalContent>
+        <div nz-form nzLayout="vertical">
+            <nz-form-item>
+                <nz-form-label nzRequired nzFor="pre-order-cancel-reason">{{ 'sales.preOrder.cancelReason' | translate }}</nz-form-label>
+                <nz-form-control>
+                    <nz-select nzId="pre-order-cancel-reason" data-dialog="cancel-reason" [nzPlaceHolder]="'sales.preOrder.reasonPlaceholder' | translate" [ngModel]="cancelReason()" (ngModelChange)="cancelReason.set($event)">
+                        @for (reason of reasons; track reason) {
+                            <nz-option [nzValue]="reason" [nzLabel]="'sales.preOrder.reasons.' + reason | translate" />
+                        }
+                    </nz-select>
+                </nz-form-control>
+            </nz-form-item>
+            <nz-form-item>
+                <nz-form-label nzFor="pre-order-cancel-note" [nzRequired]="cancelReason() === 'other'">{{ 'sales.preOrder.cancelNote' | translate }}</nz-form-label>
+                <nz-form-control>
+                    <textarea nz-input id="pre-order-cancel-note" rows="2" maxlength="256" data-dialog="cancel-note" [ngModel]="cancelNote()" (ngModelChange)="cancelNote.set($event)"></textarea>
+                </nz-form-control>
+            </nz-form-item>
+            <nz-form-item class="mb-0">
+                <nz-form-label nzFor="pre-order-refund" [nzTooltipTitle]="'sales.preOrder.refundHelper' | translate">{{ 'sales.preOrder.refundDue' | translate }}</nz-form-label>
+                <nz-form-control [nzExtra]="'sales.preOrder.refundOf' | translate: { amount: (record()?.advance_paid | money) }">
+                    <nz-input-number nzId="pre-order-refund" class="w-full font-mono" data-dialog="refund" [nzMin]="0" [nzMax]="record()?.advance_paid ?? 0" [nzPrecision]="0" [nzDisabled]="!record()?.advance_paid" [ngModel]="refundDue()" (ngModelChange)="refundDue.set($event ?? 0)" />
+                </nz-form-control>
+            </nz-form-item>
+        </div>
+    </ng-container>
+</nz-modal>
+<ng-template #cancelFooter>
+    <button nz-button type="button" class="inline-flex items-center gap-1.5" [disabled]="saving()" (click)="cancelling.set(false)">
+        <ng-icon name="lucideX" size="14px" aria-hidden="true" />
+        <span>{{ 'form.confirm.cancel' | translate }}</span>
+    </button>
+    <button nz-button nzType="primary" nzDanger type="button" class="inline-flex items-center gap-1.5" data-dialog="submit" [nzLoading]="saving()" [disabled]="!cancelReady()" (click)="submitCancel()">
+        @if (!saving()) {
+            <ng-icon name="lucideCheck" size="14px" aria-hidden="true" />
+        }
+        <span>{{ 'sales.preOrder.action.cancel.button' | translate }}</span>
+    </button>
+</ng-template>

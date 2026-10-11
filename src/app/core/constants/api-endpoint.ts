@@ -159,6 +159,14 @@ export class APIEndpoint {
     static readonly CANCEL_GIVEAWAY = '/api/v1/sales/giveaway/cancel-giveaway';
     static readonly ADD_ORDER_GIFT = '/api/v1/sales/giveaway/add-order-gift';
     static readonly REMOVE_ORDER_GIFT = '/api/v1/sales/giveaway/remove-order-gift';
+    static readonly GET_PRE_ORDER_LIST = '/api/v1/sales/pre-order/get-pre-order-list';
+    static readonly GET_PRE_ORDER_DETAILS = '/api/v1/sales/pre-order/get-pre-order-details';
+    static readonly CREATE_PRE_ORDER = '/api/v1/sales/pre-order/create-pre-order';
+    static readonly UPDATE_PRE_ORDER = '/api/v1/sales/pre-order/update-pre-order';
+    static readonly CONFIRM_PRE_ORDER = '/api/v1/sales/pre-order/confirm-pre-order';
+    static readonly CANCEL_PRE_ORDER = '/api/v1/sales/pre-order/cancel-pre-order';
+    static readonly RECORD_PRE_ORDER_REFUND = '/api/v1/sales/pre-order/record-pre-order-refund';
+    static readonly GET_PRODUCT_LIST_FOR_PRE_ORDER = '/api/v1/sales/pre-order/get-product-list-for-pre-order';
     static readonly GET_CUSTOMER_LIST = '/api/v1/sales/customer/get-customer-list';
     static readonly GET_CUSTOMER_DETAILS = '/api/v1/sales/customer/get-customer-details';
     static readonly CREATE_CUSTOMER = '/api/v1/sales/customer/create-customer';

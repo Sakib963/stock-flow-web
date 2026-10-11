@@ -3166,6 +3166,134 @@
                 "removed": "Gift taken out of the parcel.",
                 "loadFailed": "Could not load the gifts of this order. Reload the page to see them."
             }
+        },
+        "preOrder": {
+            "add": "New booking",
+            "edit": "Edit booking",
+            "createTitle": "New booking",
+            "editTitle": "Edit booking",
+            "formLead": "A booking holds no stock. Prices are approximate: the real price is set from the batch when it becomes an order.",
+            "detailTitle": "Booking",
+            "detailLead": "What the customer booked, against what can be sold now.",
+            "searchPlaceholder": "Booking number, name or phone",
+            "emptyTitle": "No bookings yet",
+            "emptyBody": "Book a product for a customer before it is in stock, and see how many are wanted before you buy.",
+            "number": "Booking no.",
+            "customer": "Customer",
+            "statusLabel": "Status",
+            "status": {
+                "Pending": "Pending",
+                "Confirmed": "Confirmed",
+                "Converted": "Became an order",
+                "Cancelled": "Cancelled"
+            },
+            "ready": "Ready",
+            "readyYes": "Ready",
+            "readyNo": "Waiting",
+            "readyFilter": "Ready to become an order",
+            "overdueFilter": "Past the expected date",
+            "stat": {
+                "open": "Open bookings",
+                "ready": "Ready now",
+                "overdue": "Past expected date",
+                "advance": "Advance held"
+            },
+            "approxTotal": "Approximate total",
+            "approxPrice": "Approximate price",
+            "lineTotal": "Total",
+            "sellable": "Can sell now",
+            "sellableNow": "{{count}} can be sold now",
+            "advance": "Advance paid",
+            "advanceHelper": "What the customer says they paid ahead. It becomes the order’s paid amount when the booking turns into an order.",
+            "advanceOver": "The advance is more than the approximate total.",
+            "method": "Paid by",
+            "methodPlaceholder": "How they paid",
+            "methods": {
+                "cash": "Cash",
+                "bkash": "bKash",
+                "nagad": "Nagad",
+                "card": "Card",
+                "other": "Other"
+            },
+            "reference": "Transaction ID",
+            "referenceHelper": "The bKash or Nagad transaction ID, so the payment can be found again.",
+            "expected": "Expected by",
+            "expectedHelper": "When you expect the stock. Past this date the booking shows as overdue.",
+            "expectedPlaceholder": "Pick a date",
+            "noDate": "Not set",
+            "bookedOn": "Booked on",
+            "phone": "Phone",
+            "phoneHelper": "The customer is found by phone. A new phone adds them to the customer book.",
+            "name": "Name",
+            "nameHelper": "Needed only for a new customer.",
+            "newCustomer": "New customer: type their name.",
+            "notes": "Note",
+            "notesPlaceholder": "Size, colour, anything the customer asked for",
+            "section": {
+                "details": "Booking details",
+                "lines": "Products booked"
+            },
+            "productPlaceholder": "Search any product, in stock or not",
+            "noLines": "Add at least one product.",
+            "lockedLines": "This booking is confirmed, so its products and units stay as booked. Prices can still change.",
+            "removeLine": "Remove this product",
+            "convertedTo": "Order",
+            "cancelReason": "Why cancelled",
+            "cancelNote": "Note",
+            "reasonPlaceholder": "Pick a reason",
+            "reasons": {
+                "changed_mind": "Customer changed their mind",
+                "unreachable": "Could not reach the customer",
+                "stock_not_coming": "The stock will not come",
+                "other": "Other"
+            },
+            "refund": "Advance to refund",
+            "refundDue": "Advance to give back",
+            "refundHelper": "All of the advance, part of it when a booking fee is kept, or none. It stays owed until you record it as given.",
+            "refundOf": "Out of {{amount}} paid",
+            "refundOwed": "Still owed to the customer",
+            "refundGiven": "Given back",
+            "refundNone": "Nothing to give back",
+            "final": "This booking is final and can no longer be edited.",
+            "backToBooking": "Back to the booking",
+            "backToList": "Back to bookings",
+            "created": "Booking {{number}} saved.",
+            "updated": "Booking saved.",
+            "confirmCreate": {
+                "title": "Save this booking?",
+                "body": "No stock is held. The customer’s booking is saved as Pending."
+            },
+            "confirmEdit": {
+                "title": "Save changes to {{number}}?",
+                "body": "The booking still holds no stock."
+            },
+            "action": {
+                "confirm": {
+                    "button": "Confirm booking",
+                    "confirmTitle": "Confirm {{number}}?",
+                    "confirmBody": "You are accepting the booking. After this, its products and units stay as booked.",
+                    "done": "Booking confirmed."
+                },
+                "cancel": {
+                    "button": "Cancel booking",
+                    "title": "Cancel this booking",
+                    "done": "Booking cancelled."
+                },
+                "refund": {
+                    "button": "Record refund given",
+                    "confirmTitle": "Record the refund as given?",
+                    "confirmBody": "You gave {{amount}} back to {{name}}.",
+                    "done": "Refund recorded."
+                }
+            },
+            "loadFailed": {
+                "network": "Could not reach the server to load this booking.",
+                "forbidden": "You do not have permission to see bookings.",
+                "server": "Could not load this booking. Try again in a moment.",
+                "notFound": "No booking with that number."
+            },
+            "lookupFailed": "Could not check this number.",
+            "noProduct": "No product in the catalogue matches."
         }
     }
 }

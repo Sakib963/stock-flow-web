@@ -1,0 +1,147 @@
+<!-- Three columns from a tablet up: who books, the money, then what they booked. -->
+<form nz-form nzLayout="vertical" class="grid grid-cols-1 items-start gap-x-4 md:grid-cols-3" [id]="formId" [formGroup]="form" (ngSubmit)="submitted.emit()">
+    <nz-form-item>
+        <nz-form-label nzRequired nzFor="pre-order-phone" [nzTooltipTitle]="'sales.preOrder.phoneHelper' | translate">{{ 'sales.preOrder.phone' | translate }}</nz-form-label>
+        <nz-form-control [nzErrorTip]="phoneError" [nzExtra]="phoneExtra">
+            <input nz-input id="pre-order-phone" formControlName="phone" type="tel" inputmode="tel" autocomplete="off" class="font-mono" placeholder="01XXXXXXXXX" data-pre-order="phone" [attr.aria-invalid]="invalid('phone')" />
+        </nz-form-control>
+        <ng-template #phoneError let-control>
+            @if (control.hasError('required')) {
+                {{ 'form.required' | translate }}
+            } @else if (control.hasError('phone')) {
+                {{ 'sales.customer.phoneInvalid' | translate }}
+            }
+        </ng-template>
+        <ng-template #phoneExtra>
+            @if (known()) {
+                <span class="inline-flex items-center gap-1 text-ink-body" data-pre-order="known"><ng-icon name="lucideUserRound" size="12px" aria-hidden="true" />{{ known() }}</span>
+            } @else if (known() === null) {
+                <span data-pre-order="new">{{ 'sales.preOrder.newCustomer' | translate }}</span>
+            } @else if (lookupFailed()) {
+                <span class="inline-flex items-center gap-1 text-danger-ink" role="alert" data-pre-order="lookup-failed"
+                    >{{ 'sales.preOrder.lookupFailed' | translate }} <button nz-button nzType="link" nzSize="small" type="button" class="h-auto p-0" (click)="retryLookup()">{{ 'form.retry' | translate }}</button></span
+                >
+            }
+        </ng-template>
+    </nz-form-item>
+
+    <nz-form-item>
+        <nz-form-label nzFor="pre-order-name" [nzRequired]="known() === null" [nzTooltipTitle]="'sales.preOrder.nameHelper' | translate">{{ 'sales.preOrder.name' | translate }}</nz-form-label>
+        <nz-form-control [nzValidateStatus]="tried() && needsName() ? 'error' : ''" [nzErrorTip]="'form.required' | translate">
+            <input nz-input id="pre-order-name" formControlName="name" type="text" autocomplete="off" maxlength="255" data-pre-order="name" [attr.placeholder]="known() || ('sales.customer.namePlaceholder' | translate)" [readonly]="!!known()" />
+        </nz-form-control>
+    </nz-form-item>
+
+    <nz-form-item>
+        <nz-form-label nzFor="pre-order-expected" [nzTooltipTitle]="'sales.preOrder.expectedHelper' | translate">{{ 'sales.preOrder.expected' | translate }}</nz-form-label>
+        <nz-form-control>
+            <nz-date-picker nzId="pre-order-expected" class="w-full" formControlName="expected_date" nzFormat="dd MMM yyyy" [nzPlaceHolder]="'sales.preOrder.expectedPlaceholder' | translate" />
+        </nz-form-control>
+    </nz-form-item>
+
+    <nz-form-item>
+        <nz-form-label nzFor="pre-order-advance" [nzTooltipTitle]="'sales.preOrder.advanceHelper' | translate">{{ 'sales.preOrder.advance' | translate }}</nz-form-label>
+        <nz-form-control [nzValidateStatus]="tried() && advanceOver() ? 'error' : ''" [nzErrorTip]="'sales.preOrder.advanceOver' | translate">
+            <nz-input-number nzId="pre-order-advance" class="w-full font-mono" formControlName="advance_paid" data-pre-order="advance" [nzMin]="0" [nzPrecision]="0" />
+        </nz-form-control>
+    </nz-form-item>
+
+    <nz-form-item>
+        <nz-form-label nzFor="pre-order-method" [nzRequired]="form.controls.advance_paid.value > 0">{{ 'sales.preOrder.method' | translate }}</nz-form-label>
+        <nz-form-control [nzValidateStatus]="tried() && needsMethod() ? 'error' : ''" [nzErrorTip]="'form.required' | translate">
+            <nz-select nzId="pre-order-method" formControlName="advance_method" data-pre-order="method" [nzDisabled]="!form.controls.advance_paid.value" [nzPlaceHolder]="'sales.preOrder.methodPlaceholder' | translate">
+                @for (method of methods; track method) {
+                    <nz-option [nzValue]="method" [nzLabel]="'sales.preOrder.methods.' + method | translate" />
+                }
+            </nz-select>
+        </nz-form-control>
+    </nz-form-item>
+
+    <nz-form-item>
+        <nz-form-label nzFor="pre-order-reference" [nzTooltipTitle]="'sales.preOrder.referenceHelper' | translate">{{ 'sales.preOrder.reference' | translate }}</nz-form-label>
+        <nz-form-control>
+            <input nz-input id="pre-order-reference" formControlName="advance_reference" type="text" autocomplete="off" maxlength="64" class="font-mono" [readonly]="!form.controls.advance_paid.value" />
+        </nz-form-control>
+    </nz-form-item>
+
+    <nz-form-item class="md:col-span-3">
+        <nz-form-label nzFor="pre-order-notes">{{ 'sales.preOrder.notes' | translate }}</nz-form-label>
+        <nz-form-control>
+            <nz-textarea-count [nzMaxCharacterCount]="256">
+                <textarea nz-input id="pre-order-notes" formControlName="notes" rows="2" maxlength="256" [placeholder]="'sales.preOrder.notesPlaceholder' | translate"></textarea>
+            </nz-textarea-count>
+        </nz-form-control>
+    </nz-form-item>
+
+    <section class="mb-4 md:col-span-3" data-pre-order="lines">
+        <h2 class="m-0 mb-2 flex items-center gap-1.5 text-sm font-bold text-ink"><ng-icon name="lucidePackage" size="14px" class="text-ink-muted" aria-hidden="true" />{{ 'sales.preOrder.section.lines' | translate }}</h2>
+        @if (locked()) {
+            <p class="m-0 mb-2 text-xs text-ink-muted" data-pre-order="locked">{{ 'sales.preOrder.lockedLines' | translate }}</p>
+        } @else {
+            <nz-select class="w-full" nzShowSearch nzServerSearch nzAllowClear data-pre-order="product-search" [nzPlaceHolder]="'sales.preOrder.productPlaceholder' | translate" [nzLoading]="searching()" [nzNotFoundContent]="productState" [ngModel]="picked()" [ngModelOptions]="{ standalone: true }" (nzOnSearch)="search($event)" (ngModelChange)="add($event)">
+                @for (product of products(); track product.product_oid) {
+                    <nz-option nzCustomContent [nzValue]="product.product_oid" [nzLabel]="product.product_name">
+                        <span class="flex items-center justify-between gap-3">
+                            <span class="min-w-0 truncate"
+                                >{{ product.product_name }}
+                                @if (product.sku) {
+                                    <span class="font-mono text-xs text-ink-muted">· {{ product.sku }}</span>
+                                }
+                            </span>
+                            <span class="shrink-0 text-xs text-ink-muted">{{ 'sales.preOrder.sellableNow' | translate: { count: (product.sellable | digits) } }}</span>
+                        </span>
+                    </nz-option>
+                }
+            </nz-select>
+        }
+
+        <ng-template #productState>
+            @if (searching()) {
+                <span class="flex items-center gap-2 text-xs text-ink-muted"><nz-spin nzSimple nzSize="small" />{{ 'sales.pos.searching' | translate }}</span>
+            } @else if (searchFailed(); as kind) {
+                <span class="flex items-center gap-2 text-xs text-danger-ink" role="alert"
+                    >{{ 'sales.pos.searchFailed.' + kind | translate }} <button nz-button nzType="link" nzSize="small" type="button" class="h-auto p-0" (click)="retrySearch()"><ng-icon name="lucideRotateCw" size="12px" aria-hidden="true" />{{ 'form.retry' | translate }}</button></span
+                >
+            } @else {
+                <span class="text-xs text-ink-muted">{{ 'sales.preOrder.noProduct' | translate }}</span>
+            }
+        </ng-template>
+
+        <ul class="m-0 mt-3 flex list-none flex-col gap-2 p-0">
+            @for (line of lines(); track line.product_oid; let i = $index) {
+                <li class="flex flex-col gap-3 rounded-control border border-line p-3 lg:flex-row lg:items-center" [attr.data-line]="line.product_oid">
+                    <div class="min-w-0 flex-1">
+                        <span class="block text-[13px] font-semibold text-ink">{{ line.product_name }}</span>
+                        @if (line.sku) {
+                            <span class="block font-mono text-xs text-ink-muted">{{ line.sku }}</span>
+                        }
+                        <span class="block text-xs text-ink-muted">{{ 'sales.preOrder.sellableNow' | translate: { count: (line.sellable | digits) } }}</span>
+                    </div>
+                    <div class="flex items-end gap-3">
+                        <label class="flex flex-col gap-1 text-xs text-ink-muted">
+                            {{ 'sales.order.units' | translate }}
+                            <nz-input-number class="w-16 font-mono sm:w-20" [nzId]="'pre-order-qty-' + i" [nzMin]="1" [nzPrecision]="0" [nzDisabled]="locked()" [ngModel]="line.quantity" [ngModelOptions]="{ standalone: true }" (ngModelChange)="setQuantity(i, $event)" />
+                        </label>
+                        <label class="flex flex-col gap-1 text-xs text-ink-muted">
+                            {{ 'sales.preOrder.approxPrice' | translate }}
+                            <nz-input-number class="w-24 font-mono sm:w-28" [nzId]="'pre-order-price-' + i" [nzMin]="0" [nzPrecision]="0" [ngModel]="line.unit_price" [ngModelOptions]="{ standalone: true }" (ngModelChange)="setPrice(i, $event)" />
+                        </label>
+                        <span class="ml-auto pb-1.5 text-right font-mono text-sm font-semibold text-ink tabular-nums">{{ line.quantity * line.unit_price | money }}</span>
+                        @if (!locked()) {
+                            <button nz-button nzType="text" nzDanger type="button" class="sf-icon-btn shrink-0" [attr.aria-label]="'sales.preOrder.removeLine' | translate" (click)="remove(i)">
+                                <ng-icon name="lucideTrash2" size="14px" aria-hidden="true" />
+                            </button>
+                        }
+                    </div>
+                </li>
+            } @empty {
+                <li class="rounded-control border border-dashed p-4 text-center text-sm" [class.border-line]="!tried()" [class.text-ink-muted]="!tried()" [class.border-danger]="tried()" [class.text-danger-ink]="tried()" data-pre-order="no-lines">{{ 'sales.preOrder.noLines' | translate }}</li>
+            }
+        </ul>
+        @if (lines().length) {
+            <p class="m-0 mt-3 flex justify-end gap-2 text-sm text-ink-body" data-pre-order="total">
+                {{ 'sales.preOrder.approxTotal' | translate }}: <span class="font-mono font-semibold text-ink tabular-nums">{{ total() | money }}</span>
+            </p>
+        }
+    </section>
+</form>
