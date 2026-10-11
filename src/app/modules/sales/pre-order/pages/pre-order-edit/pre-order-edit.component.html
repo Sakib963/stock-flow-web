@@ -2,7 +2,7 @@
 
 @if (booking(); as record) {
     @if (record.status === 'Pending' || record.status === 'Confirmed') {
-        <form-page [formId]="editor()?.formId ?? ''" [saving]="saving()" [remaining]="editor()?.remaining() ?? 0" saveLabel="form.saveChanges" (cancel)="cancel()">
+        <form-page [framed]="false" [formId]="editor()?.formId ?? ''" [saving]="saving()" [remaining]="editor()?.remaining() ?? 0" saveLabel="form.saveChanges" (cancel)="cancel()">
             <pre-order-form [editing]="record" (submitted)="save()" />
         </form-page>
     } @else {

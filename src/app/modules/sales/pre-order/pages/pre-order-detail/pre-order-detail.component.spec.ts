@@ -35,7 +35,7 @@ const record = (over: Partial<PreOrderDetails> = {}): PreOrderDetails => ({
     converted_invoice_no: null,
     created_on: '2026-10-11T10:00:00.000',
     created_by: 'Owner',
-    lines: [{ oid: 'l-1', product_oid: 'p-kurti', product_name: 'Block print kurti', sku: 'KURTI-1', quantity: 2, unit_price: 1500, total: 3000, sellable: 0 }],
+    lines: [{ oid: 'l-1', product_oid: 'p-kurti', product_name: 'Block print kurti', sku: 'KURTI-1', quantity: 2, unit_price: 1500, total: 3000, sellable: 0, usual_price: null, sales: 0, last_price: null, price_from: null, price_to: null }],
     activity: [{ title: 'Booking saved', description: 'PRE-2610-0001 for Nusrat, 1 line(s)', performed_by: 'Owner', performed_on: '2026-10-11T10:00:00.000' }],
     ...over,
 });

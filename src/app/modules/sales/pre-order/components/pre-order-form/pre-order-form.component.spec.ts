@@ -8,7 +8,9 @@ import { APIEndpoint } from '@app/core/constants/api-endpoint';
 import { PreOrderDetails } from '@app/core/models/pre-order.model';
 import { PreOrderFormComponent } from './pre-order-form.component';
 
-const KURTI = { product_oid: 'p-kurti', product_name: 'Block print kurti', sku: 'KURTI-1', sellable: 0, price: 1500 };
+const NO_HISTORY = { usual_price: null, sales: 0, last_price: null, price_from: null, price_to: null };
+const KURTI = { product_oid: 'p-kurti', product_name: 'Block print kurti', sku: 'KURTI-1', sellable: 0, price: 1500, ...NO_HISTORY };
+const SCARF = { product_oid: 'p-scarf', product_name: 'Silk scarf', sku: null, sellable: 4, price: 1600, usual_price: 1400, sales: 3, last_price: 1450, price_from: 1450, price_to: 1450 };
 
 const open = async (editing?: PreOrderDetails) => {
     await TestBed.configureTestingModule({
@@ -21,7 +23,10 @@ const open = async (editing?: PreOrderDetails) => {
     return { fixture, form: fixture.componentInstance, http: TestBed.inject(HttpTestingController), element: fixture.nativeElement as HTMLElement };
 };
 
-const lookUp = (http: HttpTestingController, name: string | null) => http.expectOne((r) => r.url.includes(APIEndpoint.FIND_CUSTOMER_BY_PHONE)).flush({ code: 200, data: { phone: '01711000111', customer: name ? { oid: 'c-1', name } : null } });
+const lookUp = (http: HttpTestingController, name: string | null, open: object[] = []) => {
+    http.expectOne((r) => r.url.includes(APIEndpoint.FIND_CUSTOMER_BY_PHONE)).flush({ code: 200, data: { phone: '01711000111', customer: name ? { oid: 'c-1', name, flag: 'None' } : null } });
+    if (name) http.expectOne((r) => r.url.includes(APIEndpoint.FIND_OPEN_BOOKINGS)).flush({ code: 200, data: open });
+};
 
 describe('PreOrderFormComponent', () => {
     it('asks a new phone for a name, and sends the booking at its approximate price with no advance method', async () => {
@@ -88,7 +93,7 @@ describe('PreOrderFormComponent', () => {
             converted_invoice_no: null,
             created_on: '2026-10-11T10:00:00.000',
             created_by: 'Owner',
-            lines: [{ oid: 'l-1', product_oid: 'p-kurti', product_name: 'Block print kurti', sku: 'KURTI-1', quantity: 2, unit_price: 1500, total: 3000, sellable: 0 }],
+            lines: [{ oid: 'l-1', product_oid: 'p-kurti', product_name: 'Block print kurti', sku: 'KURTI-1', quantity: 2, unit_price: 1500, total: 3000, sellable: 0, ...NO_HISTORY }],
             activity: [],
         });
         fixture.detectChanges();
@@ -99,5 +104,74 @@ describe('PreOrderFormComponent', () => {
         form.setPrice(0, 1400);
         expect(form.total()).toBe(2800);
         expect(form.dirty()).toBe(true);
+    });
+
+    it('starts a product at what customers usually paid, and a hint tap uses another price', async () => {
+        const { fixture, form, element } = await open();
+        form.products.set([SCARF]);
+        form.add(SCARF.product_oid);
+        expect(form.lines()[0].unit_price).toBe(1400);
+        fixture.detectChanges();
+        const now = element.querySelector<HTMLButtonElement>('[data-hint="now"]')!;
+        expect(now.textContent).toContain('sales.preOrder.hint.now');
+        now.click();
+        expect(form.lines()[0].unit_price).toBe(1450);
+        expect(element.querySelector('[data-pre-order="ready"]')).not.toBeNull();
+    });
+
+    it('fills the advance as half or all of the total, and shows what is left to collect', async () => {
+        const { form } = await open();
+        form.products.set([SCARF]);
+        form.add(SCARF.product_oid);
+        form.setQuantity(0, 3);
+        form.advanceShare(0.5);
+        expect(form.form.controls.advance_paid.value).toBe(2100);
+        expect(form.balance()).toBe(2100);
+        form.advanceShare(1);
+        expect(form.balance()).toBe(0);
+    });
+
+    it('sets the expected date a week out in one tap', async () => {
+        const { form } = await open();
+        form.expectIn(7);
+        const expected = new Date();
+        expected.setHours(0, 0, 0, 0);
+        expected.setDate(expected.getDate() + 7);
+        expect(form.form.controls.expected_date.value?.getTime()).toBe(expected.getTime());
+    });
+
+    it('fills the phone and name from a pasted chat message', async () => {
+        const { form, http } = await open();
+        form.pasteOpen.set(true);
+        form.pasteText.set('Name: Nusrat Jahan, phone 01711000111, the blue kurti please');
+        form.readPaste();
+        http.expectOne((r) => r.url.includes(APIEndpoint.READ_CHAT_MESSAGE)).flush({ code: 200, data: { phone: '01711000111', name: 'Nusrat Jahan', other_phones: [], address_line: null, area: null, location: null, lookup: null } });
+        lookUp(http, null);
+        expect(form.form.controls.phone.value).toBe('01711000111');
+        expect(form.form.controls.name.value).toBe('Nusrat Jahan');
+        expect(form.pasteOpen()).toBe(false);
+    });
+
+    it('says so when a pasted message holds no phone or name, and keeps it open to fix', async () => {
+        const { form, http } = await open();
+        form.pasteOpen.set(true);
+        form.pasteText.set('hello, is this available?');
+        form.readPaste();
+        http.expectOne((r) => r.url.includes(APIEndpoint.READ_CHAT_MESSAGE)).flush({ code: 200, data: { phone: null, name: null, other_phones: [], address_line: null, area: null, location: null, lookup: null } });
+        expect(form.pasteResult()).toBe('nothing');
+        expect(form.pasteOpen()).toBe(true);
+    });
+
+    it('warns on a line when the customer already has that product on an open booking', async () => {
+        const { fixture, form, http, element } = await open();
+        form.form.patchValue({ phone: '01711000111' });
+        lookUp(http, 'Nusrat', [{ oid: 'b-9', preorder_no: 'PRE-2610-0009', status: 'Pending', product_oid: 'p-scarf', quantity: 2 }]);
+        form.products.set([SCARF, KURTI]);
+        form.add(SCARF.product_oid);
+        form.add(KURTI.product_oid);
+        fixture.detectChanges();
+        expect(form.openBookingCount()).toBe(1);
+        expect(element.querySelectorAll('[data-pre-order="already-booked"]').length).toBe(1);
+        expect(element.querySelector('[data-line="p-scarf"] [data-pre-order="already-booked"]')).not.toBeNull();
     });
 });

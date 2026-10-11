@@ -4,8 +4,21 @@ export const PRE_ORDER_CANCEL_REASONS: PreOrderCancelReason[] = ['changed_mind',
 export type AdvanceMethod = 'cash' | 'bkash' | 'nagad' | 'card' | 'other';
 export const ADVANCE_METHODS: AdvanceMethod[] = ['cash', 'bkash', 'nagad', 'card', 'other'];
 
+/** What a product really goes for, to guide the approximate price. Null where there is no history. */
+export interface PriceHints {
+    /** Median paid per unit after discount on sales in the last 180 days. */
+    usual_price: number | null;
+    sales: number;
+    last_price: number | null;
+    /** The price range of batches with stock now. */
+    price_from: number | null;
+    price_to: number | null;
+    /** Absent for someone without `inventory.stock-value.view`. */
+    last_cost?: number | null;
+}
+
 /** A booked line names a product, never a batch. Its price is approximate: the real one comes from the batch at conversion. */
-export interface PreOrderLine {
+export interface PreOrderLine extends PriceHints {
     oid: string;
     product_oid: string;
     product_name: string;
@@ -61,8 +74,17 @@ export interface PreOrderPayload {
     notes: string | null;
 }
 
+/** One line of a customer's open booking, to warn before the same product is booked twice for them. */
+export interface OpenBookingLine {
+    oid: string;
+    preorder_no: string;
+    status: PreOrderStatus;
+    product_oid: string;
+    quantity: number;
+}
+
 /** A catalogue product to book, stock or not. `price` is a starting point for the approximate price. */
-export interface PreOrderProduct {
+export interface PreOrderProduct extends PriceHints {
     product_oid: string;
     product_name: string;
     sku: string | null;

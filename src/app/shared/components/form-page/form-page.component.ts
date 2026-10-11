@@ -30,6 +30,8 @@ export class FormPageComponent {
     readonly submitting = input<boolean | null>(null);
     /** How many required fields are still not filled. Zero hides the note. */
     readonly remaining = input(0);
+    /** False when the form draws its own section cards, as one laid out like the online order page does. */
+    readonly framed = input(true);
 
     readonly cancel = output<void>();
 }

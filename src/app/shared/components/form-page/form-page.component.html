@@ -1,5 +1,5 @@
 <div class="w-full">
-    <div class="rounded-container border border-line bg-white px-4 pt-4 md:px-5 md:pt-5">
+    <div [class]="framed() ? 'rounded-container border border-line bg-white px-4 pt-4 md:px-5 md:pt-5' : ''">
         <ng-content />
     </div>
 

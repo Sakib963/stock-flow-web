@@ -1,5 +1,5 @@
 <page-header [back]="back" [title]="'sales.preOrder.createTitle' | translate" [lead]="'sales.preOrder.formLead' | translate" />
 
-<form-page [formId]="editor()?.formId ?? ''" [saving]="saving()" [remaining]="editor()?.remaining() ?? 0" saveLabel="sales.preOrder.add" (cancel)="cancel()">
+<form-page [framed]="false" [formId]="editor()?.formId ?? ''" [saving]="saving()" [remaining]="editor()?.remaining() ?? 0" saveLabel="sales.preOrder.add" (cancel)="cancel()">
     <pre-order-form (submitted)="save()" />
 </form-page>

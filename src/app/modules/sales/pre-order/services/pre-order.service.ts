@@ -1,8 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject, signal } from '@angular/core';
 import { APIEndpoint } from '@app/core/constants/api-endpoint';
-import { PhoneLookup } from '@app/core/models/online-order.model';
-import { PreOrderCancelReason, PreOrderDetails, PreOrderPayload, PreOrderProduct } from '@app/core/models/pre-order.model';
+import { ChatReading, PhoneLookup } from '@app/core/models/online-order.model';
+import { OpenBookingLine, PreOrderCancelReason, PreOrderDetails, PreOrderPayload, PreOrderProduct } from '@app/core/models/pre-order.model';
 import { environment } from '@env/environment';
 import { Observable, finalize, map } from 'rxjs';
 
@@ -21,6 +21,16 @@ export class PreOrderService {
     /** POSTs, so a customer's phone stays out of URLs. */
     findCustomer(phone: string): Observable<PhoneLookup> {
         return this._http.post<{ data: PhoneLookup }>(`${this._base}${APIEndpoint.FIND_CUSTOMER_BY_PHONE}`, { phone }).pipe(map((response) => response.data));
+    }
+
+    /** The open bookings this phone already has. */
+    openBookings(phone: string): Observable<OpenBookingLine[]> {
+        return this._http.post<{ data: OpenBookingLine[] }>(`${this._base}${APIEndpoint.FIND_OPEN_BOOKINGS}`, { phone }).pipe(map((response) => response.data));
+    }
+
+    /** The online order's chat reader: the phone and name a pasted message holds. */
+    readMessage(text: string): Observable<ChatReading> {
+        return this._http.post<{ data: ChatReading }>(`${this._base}${APIEndpoint.READ_CHAT_MESSAGE}`, { text }).pipe(map((response) => response.data));
     }
 
     products(search: string): Observable<PreOrderProduct[]> {

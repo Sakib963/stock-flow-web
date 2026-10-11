@@ -3232,7 +3232,9 @@
             "notesPlaceholder": "Size, colour, anything the customer asked for",
             "section": {
                 "details": "Booking details",
-                "lines": "Products booked"
+                "lines": "Products booked",
+                "customer": "Customer",
+                "summary": "Summary"
             },
             "productPlaceholder": "Search any product, in stock or not",
             "noLines": "Add at least one product.",
@@ -3315,7 +3317,57 @@
                     "toGet": "Still to get"
                 }
             },
-            "listTitle": "Pre-orders"
+            "listTitle": "Pre-orders",
+            "snapshot": {
+                "orders": "{{count}} orders",
+                "delivered": "{{count}} delivered",
+                "refused": "{{count}} refused",
+                "noOrders": "No orders with you yet",
+                "flag": {
+                    "Blocked": "Blocked: {{reason}}. Think before taking an advance.",
+                    "Watch": "On watch: {{reason}}"
+                },
+                "openBookings": "Open bookings already: {{count}}"
+            },
+            "expectIn": {
+                "week": "In a week",
+                "twoWeeks": "In 2 weeks",
+                "month": "In a month"
+            },
+            "picker": {
+                "usual": "usually {{price}}",
+                "inStock": "{{count}} in stock",
+                "outOfStock": "Not in stock"
+            },
+            "readyNow": "Ready now",
+            "waitingFor": "Waiting for {{count}}",
+            "hint": {
+                "usual": "Usually {{price}} · {{count}} sales",
+                "now": "Selling now {{price}}",
+                "nowRange": "Selling now {{from}} to {{to}}",
+                "cost": "Last bought at {{price}}",
+                "none": "Never sold and not in stock: type the price you told the customer.",
+                "use": "Use this price"
+            },
+            "advanceShare": {
+                "none": "None",
+                "half": "Half",
+                "full": "Full"
+            },
+            "summary": {
+                "products": "Products",
+                "toCollect": "To collect on delivery",
+                "deliveryNote": "On the approximate prices. The delivery charge is added when it becomes an order."
+            },
+            "paste": {
+                "open": "Paste from chat",
+                "label": "Paste the customer's message",
+                "placeholder": "Name, phone and anything else they wrote",
+                "read": "Fill from message",
+                "nothing": "No phone or name found in that message. Type them instead.",
+                "failed": "Could not read the message. Type the phone and name instead."
+            },
+            "alreadyBooked": "Already booked for this customer on {{number}} ({{count}})"
         }
     }
 }
