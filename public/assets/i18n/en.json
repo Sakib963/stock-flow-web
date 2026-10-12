@@ -3704,5 +3704,67 @@
             "retry": "Try again",
             "readOnly": "You can see these details but not change them. Ask your admin if something needs changing."
         }
+    },
+    "activityLog": {
+        "title": "Activity",
+        "lead": "Everything your team did, as it happened: who, what, when and from where.",
+        "searchPlaceholder": "Search what was done, or who did it",
+        "when": "When",
+        "person": "Person",
+        "area": "Area",
+        "onlyAttention": "Only worth a look",
+        "pulse": {
+            "actions": "Actions",
+            "people": "People active",
+            "busiest": "Busiest hour",
+            "attention": "Worth a look",
+            "showThese": "Show only these",
+            "showAll": "Showing only these. Tap to see all"
+        },
+        "feed": "What happened",
+        "today": "Today",
+        "yesterday": "Yesterday",
+        "entries": "{{count}} actions",
+        "worthALook": "Worth a look",
+        "device": "{{browser}} on {{os}}",
+        "open": "Open",
+        "openRecord": "Open the record",
+        "empty": "Nothing happened in this period",
+        "emptyHint": "Try a longer period, or clear a filter.",
+        "retry": "Try again",
+        "failed": {
+            "network": "The activity could not be loaded. Check your connection and try again.",
+            "forbidden": "You do not have permission to see the activity.",
+            "server": "The activity could not be loaded. Try again in a moment."
+        },
+        "heatmap": {
+            "title": "When your team works",
+            "cell": "{{day}}, {{from}} to {{to}}: {{count}} actions",
+            "less": "Less",
+            "more": "More",
+            "empty": "Nothing to show for this period yet."
+        },
+        "peopleTitle": "Who did what",
+        "lastSeen": "Last active {{when}}",
+        "nobody": "Nobody yet in this period.",
+        "areasTitle": "Where the work happened",
+        "hourSpan": "{{from}} to {{to}}",
+        "days": {
+            "1": "Mon",
+            "2": "Tue",
+            "3": "Wed",
+            "4": "Thu",
+            "5": "Fri",
+            "6": "Sat",
+            "7": "Sun"
+        },
+        "areas": {
+            "sales": "Sales",
+            "inventory": "Inventory",
+            "configuration": "Setup",
+            "settings": "Business",
+            "security": "Sign-in",
+            "other": "Other"
+        }
     }
 }

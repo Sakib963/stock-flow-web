@@ -33,6 +33,10 @@ export const routes: Routes = [
                 loadChildren: () => import('@app/modules/settings/settings.routes').then((m) => m.SETTINGS_ROUTES),
             },
             {
+                path: 'activity-log',
+                loadChildren: () => import('@app/modules/activity-log/activity-log.routes').then((m) => m.ACTIVITY_LOG_ROUTES),
+            },
+            {
                 path: 'configuration',
                 loadChildren: () => import('@app/modules/configuration/configuration.routes').then((m) => m.CONFIGURATION_ROUTES),
             },

@@ -1,0 +1,29 @@
+@if (empty()) {
+    <p class="m-0 py-4 text-center text-xs text-ink-muted">{{ 'activityLog.heatmap.empty' | translate }}</p>
+} @else {
+    <div class="grid grid-cols-[auto_1fr] items-center gap-x-2 gap-y-[3px]" role="img" [attr.aria-label]="'activityLog.heatmap.title' | translate" data-activity="heatmap">
+        <span></span>
+        <div class="relative h-3.5">
+            @for (mark of marks; track mark) {
+                <span class="absolute top-0 text-[10px] leading-none text-ink-soft" [style.left.%]="(mark / 24) * 100">{{ clock(mark) }}</span>
+            }
+        </div>
+        @for (row of rows(); track row.day) {
+            <span class="text-[10px] leading-none text-ink-muted">{{ row.label }}</span>
+            <div class="grid grid-cols-24 gap-[3px]">
+                @for (cell of row.cells; track cell.hour) {
+                    <span class="aspect-square min-w-0 rounded-[2px]" [class]="cell.shade" nz-tooltip [nzTooltipTitle]="cell.tip" [attr.data-actions]="cell.actions"></span>
+                }
+            </div>
+        }
+    </div>
+    <div class="mt-2 flex items-center justify-end gap-1 text-[10px] text-ink-soft">
+        <span>{{ 'activityLog.heatmap.less' | translate }}</span>
+        <span class="size-2.5 rounded-[2px] bg-line-soft"></span>
+        <span class="size-2.5 rounded-[2px] bg-primary/15"></span>
+        <span class="size-2.5 rounded-[2px] bg-primary/35"></span>
+        <span class="size-2.5 rounded-[2px] bg-primary/60"></span>
+        <span class="size-2.5 rounded-[2px] bg-primary"></span>
+        <span>{{ 'activityLog.heatmap.more' | translate }}</span>
+    </div>
+}

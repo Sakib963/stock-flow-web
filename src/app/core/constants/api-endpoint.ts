@@ -217,4 +217,8 @@ export class APIEndpoint {
     static readonly GET_MESSAGE_TEMPLATES = '/api/v1/sales/settings/get-message-templates';
     static readonly SAVE_MESSAGE_TEMPLATE = '/api/v1/sales/settings/save-message-template';
     static readonly RECORD_MESSAGE_COPIED = '/api/v1/sales/settings/record-message-copied';
+
+    // Activity log
+    static readonly GET_ACTIVITY_LOG_LIST = '/api/v1/activity-log/get-activity-log-list';
+    static readonly GET_ACTIVITY_LOG_SUMMARY = '/api/v1/activity-log/get-activity-log-summary';
 }
