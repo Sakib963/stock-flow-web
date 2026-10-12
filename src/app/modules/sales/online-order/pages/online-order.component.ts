@@ -46,7 +46,7 @@ import { MoneyPipe } from '@app/shared/pipes/money/money.pipe';
 import { RecordDatePipe } from '@app/shared/pipes/record-date/record-date.pipe';
 import { ProductSearchService } from '@app/core/services/product-search/product-search.service';
 import { environment } from '@env/environment';
-import { InvoiceContent, printInvoice } from '@app/shared/utils/invoice/invoice';
+import { InvoiceContent, invoiceLinks, printInvoice } from '@app/shared/utils/invoice/invoice';
 import { confirmAction } from '@app/shared/utils/confirm-action/confirm-action';
 import { normalizePhone } from '@app/shared/utils/phone/phone';
 import { failureOf } from '@app/shared/utils/request-failure/request-failure';
@@ -898,6 +898,7 @@ export class OnlineOrderComponent {
             lines: this.lines().map((line) => ({ name: line.product_name, quantity: this._digits.transform(line.quantity), price: money(line.selling_price), amount: money(line.selling_price * line.quantity) })),
             totals: rows([t('subtotal'), money(this.subtotal())], this.discountTotal() ? [t('discount'), '-' + money(this.discountTotal())] : null, [t('delivery'), money(this.deliveryCharge())], [t('total'), money(this.total())], paid ? [t('paid'), '-' + money(paid)] : null, [t('collect'), t('withCurrency', { amount: money(Math.max(0, this.total() - paid)) })]),
             notes: rows([t('payment'), terms + method], this.notes().trim() ? [t('note'), this.notes().trim()] : null),
+            links: invoiceLinks(business),
             thanks: t('thanks'),
             poweredBy: t('poweredBy'),
         };

@@ -1,8 +1,9 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable, computed, inject, signal } from '@angular/core';
+import { Injectable, computed, effect, inject, signal, untracked } from '@angular/core';
 import { APIEndpoint } from '@app/core/constants/api-endpoint';
 import { environment } from '@env/environment';
 import { LanguageService } from '@app/core/services/language/language.service';
+import { ConfigVersionService } from '@app/core/services/config-version/config-version.service';
 import { firstValueFrom } from 'rxjs';
 import { MenuItem, SessionPayload, SessionUser } from '@app/core/models/session.model';
 import { setBusinessZone } from '@app/shared/utils/business-time/business-time';
@@ -20,6 +21,7 @@ import { setBusinessZone } from '@app/shared/utils/business-time/business-time';
 export class SessionService {
     private readonly _http = inject(HttpClient);
     private readonly _language = inject(LanguageService);
+    private readonly _versions = inject(ConfigVersionService);
 
     private readonly _payload = signal<SessionPayload | null>(null);
     readonly loaded = computed(() => this._payload() !== null);
@@ -57,11 +59,33 @@ export class SessionService {
     private readonly _permissions = computed(() => new Set(this._payload()?.permissions ?? []));
 
     async load(owner: string): Promise<void> {
-        const response = await firstValueFrom(this._http.get<{ data: SessionPayload }>(`${environment.baseUrl}${APIEndpoint.GET_USER_INFO}`));
-        this._payload.set(response?.data ?? null);
-        setBusinessZone(response?.data?.business?.timeZone);
+        const response = await firstValueFrom(this._http.get<{ data: SessionPayload }>(`${environment.baseUrl}${APIEndpoint.GET_USER_INFO}`, { observe: 'response' }));
+        this._payload.set(response.body?.data ?? null);
+        setBusinessZone(response.body?.data?.business?.timeZone);
         this._loadedFor.set(owner);
+        this._loadedVersion = Number(response.headers.get('X-Config-Version')) || null;
     }
+
+    /** The config version this payload was built at, from the answer that carried it. */
+    private _loadedVersion: number | null = null;
+    private _reloading = false;
+
+    /**
+     * A role, the menu or the business settings changed since this tab loaded: some answer named a
+     * newer config version. The payload is read again in the background, once, for whoever is
+     * signed in; the browser's ETag check makes it cheap, and the shell redraws from the signals.
+     */
+    private readonly _followChanges = effect(() => {
+        const latest = this._versions.latest();
+        untracked(() => {
+            const owner = this._loadedFor();
+            if (latest === null || this._loadedVersion === null || latest <= this._loadedVersion || !owner || this._reloading) return;
+            this._reloading = true;
+            this.load(owner)
+                .catch(() => undefined)
+                .finally(() => (this._reloading = false));
+        });
+    });
 
     /** The person changed their own profile: the header and the account panel show it at once, without reloading the payload. */
     updateUser(changes: Partial<SessionUser>): void {
@@ -71,6 +95,7 @@ export class SessionService {
     clear(): void {
         this._payload.set(null);
         this._loadedFor.set(null);
+        this._loadedVersion = null;
     }
 
     /**

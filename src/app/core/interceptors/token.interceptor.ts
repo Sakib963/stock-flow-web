@@ -1,9 +1,10 @@
-import { HttpErrorResponse, HttpInterceptorFn, HttpRequest } from '@angular/common/http';
+import { HttpErrorResponse, HttpInterceptorFn, HttpRequest, HttpResponse } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { AuthService } from '@app/core/services/auth/auth.service';
+import { ConfigVersionService } from '@app/core/services/config-version/config-version.service';
 import { APIEndpoint } from '@app/core/constants/api-endpoint';
 import { environment } from '@env/environment';
-import { catchError, switchMap, throwError } from 'rxjs';
+import { catchError, switchMap, tap, throwError } from 'rxjs';
 
 /**
  * Attaches the bearer token to API calls, and renews it once when the server says it has expired.
@@ -17,6 +18,7 @@ import { catchError, switchMap, throwError } from 'rxjs';
  */
 export const tokenInterceptor: HttpInterceptorFn = (request, next) => {
     const auth = inject(AuthService);
+    const versions = inject(ConfigVersionService);
 
     const toApi = request.url.startsWith(`${environment.baseUrl}/api/`);
     const isSignIn = request.url.includes(APIEndpoint.SIGN_IN);
@@ -31,7 +33,10 @@ export const tokenInterceptor: HttpInterceptorFn = (request, next) => {
     };
 
     return next(authorise(request)).pipe(
+        // Every guarded answer names the server's config version; a newer one makes the session reload.
+        tap((event) => toApi && event instanceof HttpResponse && versions.seen(event.headers.get('X-Config-Version'))),
         catchError((error: HttpErrorResponse) => {
+            if (toApi) versions.seen(error.headers?.get('X-Config-Version') ?? null);
             if (error.status !== 401 || exempt || !toApi) return throwError(() => error);
 
             // One retry, and only one: the replay is not wrapped in this handler, so a second 401

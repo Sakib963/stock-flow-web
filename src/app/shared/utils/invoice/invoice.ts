@@ -1,5 +1,6 @@
 import { printPage } from '@app/shared/utils/print-page/print-page';
 import { styled } from '@app/shared/utils/styled/styled';
+import { SessionBusiness } from '@app/core/models/session.model';
 
 /**
  * The A4 invoice of an online order (sales REQ-57, REQ-58): the business, the invoice number and
@@ -24,6 +25,8 @@ export interface InvoiceContent {
     /** Subtotal, discount, delivery, total, paid and to collect, as label and value. The last is the one the courier reads. */
     totals: [string, string][];
     notes: [string, string][];
+    /** The business's website and pages, printed in the footer so a customer can find it again. */
+    links: string[];
     thanks: string;
     poweredBy: string;
 }
@@ -102,9 +105,14 @@ export const drawInvoice = (doc: Document, content: InvoiceContent, qr: string |
         code.alt = '';
         page.append(code, text(doc, 'div', content.track.label, { 'font-size': '9px', 'text-align': 'center' }));
     }
-    page.append(text(doc, 'div', content.thanks, { 'text-align': 'center', 'margin-top': '10mm', 'font-weight': '700' }), text(doc, 'div', content.poweredBy, { 'text-align': 'center', color: '#555', 'font-size': '10px' }));
+    if (content.links.length) page.append(text(doc, 'div', content.links.join('   |   '), { 'text-align': 'center', 'margin-top': '8mm', 'font-size': '11px', color: '#333' }));
+    page.append(text(doc, 'div', content.thanks, { 'text-align': 'center', 'margin-top': content.links.length ? '3mm' : '10mm', 'font-weight': '700' }), text(doc, 'div', content.poweredBy, { 'text-align': 'center', color: '#555', 'font-size': '10px' }));
     return page;
 };
+
+/** The website and pages as a customer reads them on paper: no https:// and no trailing slash. */
+export const invoiceLinks = (business: SessionBusiness | null): string[] =>
+    [business?.website, business?.facebookUrl, business?.instagramUrl].filter((link): link is string => !!link).map((link) => link.replace(/^https?:\/\//i, '').replace(/\/+$/, ''));
 
 /** Prints on A4 through a hidden frame holding only the invoice. */
 export const printInvoice = (content: InvoiceContent): void => printPage('@page { size: A4; margin: 12mm; }', content.track?.url ?? null, (doc, qr) => drawInvoice(doc, content, qr));

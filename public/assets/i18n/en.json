@@ -3657,5 +3657,52 @@
     },
     "timeline": {
         "more": "See more ({{count}} earlier)"
+    },
+    "settings": {
+        "business": {
+            "title": "Business settings",
+            "lead": "Your business name, logo and contact details, as they appear on receipts, invoices, labels and the tracking page.",
+            "logo": "Logo",
+            "logoHelp": "Printed at the top of the invoice and the label. JPG, PNG or WebP, up to {{size}} MB.",
+            "logoAdd": "Add logo",
+            "logoChange": "Change logo",
+            "logoRemove": "Remove",
+            "logoCancel": "Cancel upload",
+            "logoUploading": "Uploading {{percent}}%",
+            "logoWrongType": "That file is not a JPG, PNG or WebP picture.",
+            "logoTooLarge": "That picture is larger than {{size}} MB. Pick a smaller one.",
+            "logoNotSetUp": "Picture upload is not set up yet. Save without a logo for now.",
+            "logoFailed": {
+                "network": "The logo could not be uploaded. Check your connection and try again.",
+                "forbidden": "You do not have permission to do that.",
+                "server": "The logo could not be uploaded. Try again in a moment."
+            },
+            "name": "Business name",
+            "nameError": "Write the business name, at least 2 letters.",
+            "phone": "Phone",
+            "phoneSecond": "Second phone",
+            "address": "Address",
+            "website": "Website",
+            "facebook": "Facebook page",
+            "instagram": "Instagram",
+            "linksHelp": "Printed in the invoice footer, so customers can find you again. www.yourshop.com is enough.",
+            "save": "Save settings",
+            "confirmTitle": "Save the business settings?",
+            "confirmBody": "Every receipt, invoice, label and the tracking page will show the new details, and everyone signed in sees them on their next click.",
+            "saved": "Settings saved",
+            "invalid": "Some details are not right. Check the web addresses and try again.",
+            "saveFailed": {
+                "network": "The settings were not saved. Check your connection and try again.",
+                "forbidden": "You do not have permission to do that.",
+                "server": "The settings were not saved. Try again in a moment."
+            },
+            "loadFailed": {
+                "network": "The settings could not be loaded. Check your connection and try again.",
+                "forbidden": "You do not have permission to do that.",
+                "server": "The settings could not be loaded. Try again in a moment."
+            },
+            "retry": "Try again",
+            "readOnly": "You can see these details but not change them. Ask your admin if something needs changing."
+        }
     }
 }

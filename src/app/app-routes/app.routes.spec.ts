@@ -98,4 +98,11 @@ describe('shell routing after sign-in', () => {
         await navigation;
         expect(router.url).toBe('/app/sales/orders');
     });
+
+    it('opens the business settings page with what it needs to ask before saving', async () => {
+        const navigation = router.navigateByUrl('/app/settings');
+        await flushBootPayload(['settings.business.view', 'settings.business.edit']);
+        expect(await navigation).toBe(true);
+        expect(router.url).toBe('/app/settings');
+    });
 });

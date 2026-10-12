@@ -209,6 +209,11 @@ export class APIEndpoint {
     static readonly GET_ONLINE_DRAFTS = '/api/v1/sales/online/get-online-drafts';
     static readonly DISCARD_ONLINE_DRAFT = '/api/v1/sales/online/discard-online-draft';
     static readonly UPDATE_DELIVERY_CHARGES = '/api/v1/sales/settings/update-delivery-charges';
+
+    // Business settings: the name, logo and contact details everything printed carries
+    static readonly GET_BUSINESS_SETTINGS = '/api/v1/configuration/settings/get-settings';
+    static readonly UPDATE_BUSINESS_SETTINGS = '/api/v1/configuration/settings/update-settings';
+    static readonly SIGN_SETTINGS_LOGO_UPLOAD = '/api/v1/configuration/settings/sign-settings-logo-upload';
     static readonly GET_MESSAGE_TEMPLATES = '/api/v1/sales/settings/get-message-templates';
     static readonly SAVE_MESSAGE_TEMPLATE = '/api/v1/sales/settings/save-message-template';
     static readonly RECORD_MESSAGE_COPIED = '/api/v1/sales/settings/record-message-copied';

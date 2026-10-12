@@ -1,0 +1,110 @@
+<page-header [title]="'settings.business.title' | translate" [lead]="'settings.business.lead' | translate" />
+
+@if (loaded()) {
+    <ng-template #fields>
+        <!-- A file picker closed without choosing fires a native cancel that bubbles; it must not reach the form page. -->
+        <div class="mb-5 flex flex-wrap items-center gap-4" (cancel)="$event.stopPropagation()" data-settings="logo">
+            <div class="grid size-24 flex-none place-items-center overflow-hidden rounded-container border border-line bg-surface-sunken">
+                @if (logo(); as src) {
+                    <img [src]="src" [alt]="'settings.business.logo' | translate" class="size-full object-contain p-1.5" [class.opacity-40]="uploading() !== null" />
+                } @else {
+                    <ng-icon name="lucideImagePlus" size="24px" class="text-ink-faint" aria-hidden="true" />
+                }
+            </div>
+            <div class="flex min-w-0 flex-col gap-1.5">
+                <span class="text-sm font-semibold text-ink">{{ 'settings.business.logo' | translate }}</span>
+                <span class="text-xs text-ink-muted">{{ 'settings.business.logoHelp' | translate: { size: 15 } | digits }}</span>
+                @if (canEdit) {
+                    <div class="flex flex-wrap items-center gap-1.5">
+                        <nz-upload [nzAccept]="accept" [nzBeforeUpload]="pick" [nzShowUploadList]="false" [nzDisabled]="uploading() !== null">
+                            <button nz-button nzSize="small" type="button" class="inline-flex items-center gap-1.5" [disabled]="uploading() !== null" data-settings="pick-logo">
+                                <ng-icon name="lucideImagePlus" size="13px" aria-hidden="true" />
+                                <span>{{ (logo() ? 'settings.business.logoChange' : 'settings.business.logoAdd') | translate }}</span>
+                            </button>
+                        </nz-upload>
+                        @if (logo() || uploading() !== null) {
+                            <button nz-button nzSize="small" nzDanger type="button" class="inline-flex items-center gap-1.5" (click)="removeLogo()">
+                                <ng-icon name="lucideTrash2" size="13px" aria-hidden="true" />
+                                <span>{{ (uploading() !== null ? 'settings.business.logoCancel' : 'settings.business.logoRemove') | translate }}</span>
+                            </button>
+                        }
+                        @if (uploading() !== null) {
+                            <span class="text-xs text-ink-muted tabular-nums">{{ 'settings.business.logoUploading' | translate: { percent: uploading() } | digits }}</span>
+                        }
+                    </div>
+                }
+                @if (logoError(); as key) {
+                    <p class="m-0 text-xs text-danger-ink" role="alert">{{ key | translate: { size: 15 } | digits }}</p>
+                }
+            </div>
+        </div>
+
+        <form nz-form nzLayout="vertical" class="grid grid-cols-1 items-start gap-x-4 md:grid-cols-3" [id]="formId" [formGroup]="form" (ngSubmit)="save()">
+            <nz-form-item>
+                <nz-form-label nzRequired nzFor="settings-name">{{ 'settings.business.name' | translate }}</nz-form-label>
+                <nz-form-control [nzErrorTip]="'settings.business.nameError' | translate">
+                    <input nz-input id="settings-name" formControlName="name" maxlength="128" autocomplete="organization" data-settings="name" />
+                </nz-form-control>
+            </nz-form-item>
+            <nz-form-item>
+                <nz-form-label nzFor="settings-phone">{{ 'settings.business.phone' | translate }}</nz-form-label>
+                <nz-form-control>
+                    <input nz-input id="settings-phone" formControlName="phone_primary" maxlength="32" inputmode="tel" autocomplete="tel" class="font-mono" />
+                </nz-form-control>
+            </nz-form-item>
+            <nz-form-item>
+                <nz-form-label nzFor="settings-phone-2">{{ 'settings.business.phoneSecond' | translate }}</nz-form-label>
+                <nz-form-control>
+                    <input nz-input id="settings-phone-2" formControlName="phone_secondary" maxlength="32" inputmode="tel" class="font-mono" />
+                </nz-form-control>
+            </nz-form-item>
+            <nz-form-item class="md:col-span-3">
+                <nz-form-label nzFor="settings-address">{{ 'settings.business.address' | translate }}</nz-form-label>
+                <nz-form-control>
+                    <textarea nz-input id="settings-address" formControlName="address" rows="2" maxlength="500" autocomplete="street-address"></textarea>
+                </nz-form-control>
+            </nz-form-item>
+            <nz-form-item>
+                <nz-form-label nzFor="settings-website" [nzTooltipTitle]="'settings.business.linksHelp' | translate">{{ 'settings.business.website' | translate }}</nz-form-label>
+                <nz-form-control>
+                    <input nz-input id="settings-website" formControlName="website" maxlength="255" inputmode="url" placeholder="www.yourshop.com" data-settings="website" />
+                </nz-form-control>
+            </nz-form-item>
+            <nz-form-item>
+                <nz-form-label nzFor="settings-facebook" [nzTooltipTitle]="'settings.business.linksHelp' | translate">{{ 'settings.business.facebook' | translate }}</nz-form-label>
+                <nz-form-control>
+                    <input nz-input id="settings-facebook" formControlName="facebook_url" maxlength="255" inputmode="url" placeholder="facebook.com/yourshop" />
+                </nz-form-control>
+            </nz-form-item>
+            <nz-form-item>
+                <nz-form-label nzFor="settings-instagram" [nzTooltipTitle]="'settings.business.linksHelp' | translate">{{ 'settings.business.instagram' | translate }}</nz-form-label>
+                <nz-form-control>
+                    <input nz-input id="settings-instagram" formControlName="instagram_url" maxlength="255" inputmode="url" placeholder="instagram.com/yourshop" />
+                </nz-form-control>
+            </nz-form-item>
+        </form>
+    </ng-template>
+
+    @if (canEdit) {
+        <form-page [formId]="formId" [saving]="saving()" saveLabel="settings.business.save" (cancel)="cancel()">
+            <ng-container [ngTemplateOutlet]="fields" />
+        </form-page>
+    } @else {
+        <div class="rounded-container border border-line bg-white p-4 md:p-5">
+            <p class="mt-0 mb-4 text-xs text-ink-muted">{{ 'settings.business.readOnly' | translate }}</p>
+            <ng-container [ngTemplateOutlet]="fields" />
+        </div>
+    }
+} @else if (failed(); as failure) {
+    <div class="sf-empty" role="alert">
+        <p class="m-0 text-sm text-ink-body">{{ 'settings.business.loadFailed.' + failure | translate }}</p>
+        <button nz-button type="button" class="mt-3 inline-flex items-center gap-1.5" (click)="load()">
+            <ng-icon name="lucideRotateCw" size="14px" aria-hidden="true" />
+            <span>{{ 'settings.business.retry' | translate }}</span>
+        </button>
+    </div>
+} @else {
+    <div class="rounded-container border border-line bg-white p-4 md:p-5" role="status">
+        <nz-skeleton nzActive [nzAvatar]="{ shape: 'square', size: 'large' }" [nzParagraph]="{ rows: 5 }" />
+    </div>
+}

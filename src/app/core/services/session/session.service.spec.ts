@@ -2,6 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { provideTranslateService } from '@ngx-translate/core';
+import { ConfigVersionService } from '@app/core/services/config-version/config-version.service';
 import { SessionService } from './session.service';
 import { SessionPayload } from '@app/core/models/session.model';
 import { LanguageService } from '@app/core/services/language/language.service';
@@ -45,11 +46,29 @@ describe('SessionService', () => {
         const load = service.load('token');
         TestBed.inject(HttpTestingController)
             .expectOne((r) => r.url.includes(APIEndpoint.GET_USER_INFO))
-            .flush({ code: 200, data: payload });
+            .flush({ code: 200, data: payload }, { headers: { 'X-Config-Version': '41' } });
         await load;
     });
 
     afterEach(() => localStorage.clear());
+
+    it('reads the payload again when an answer names a newer config version, and not for an older or the same one', async () => {
+        const http = TestBed.inject(HttpTestingController);
+        const versions = TestBed.inject(ConfigVersionService);
+        versions.seen('41');
+        TestBed.tick();
+        http.expectNone((r) => r.url.includes(APIEndpoint.GET_USER_INFO));
+
+        versions.seen('42');
+        TestBed.tick();
+        http.expectOne((r) => r.url.includes(APIEndpoint.GET_USER_INFO)).flush({ code: 200, data: { ...payload, business: { ...payload.business, name: 'Renamed' } } }, { headers: { 'X-Config-Version': '42' } });
+        await new Promise((resolve) => setTimeout(resolve));
+        expect(service.business()?.name).toBe('Renamed');
+
+        versions.seen('42');
+        TestBed.tick();
+        http.expectNone((r) => r.url.includes(APIEndpoint.GET_USER_INFO));
+    });
 
     it('exposes who is signed in and the business', () => {
         expect(service.loaded()).toBe(true);

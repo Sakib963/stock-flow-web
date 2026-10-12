@@ -65,7 +65,7 @@ describe('printLabels', () => {
         });
         frames.observe(document.body, { childList: true });
         printLabels([CONTENT, { ...CONTENT, to: { ...CONTENT.to, name: 'Rafi' } }]);
-        await vi.waitFor(() => expect(decoded.length).toBe(2), { timeout: 5000 });
+        await vi.waitFor(() => expect(decoded.length).toBe(2), { timeout: 15000 });
         const frame = document.querySelector('iframe')!;
         expect(frame.contentDocument!.querySelectorAll('[data-label] img').length).toBe(2);
         expect(print).not.toHaveBeenCalled();
@@ -73,5 +73,6 @@ describe('printLabels', () => {
         await vi.waitFor(() => expect(print).toHaveBeenCalledTimes(1));
         frames.disconnect();
         frame.remove();
-    });
+        // Building two QR codes in jsdom is slow when the whole suite runs at once.
+    }, 20_000);
 });

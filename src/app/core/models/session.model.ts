@@ -55,6 +55,10 @@ export interface SessionBusiness {
     /** Printed under the name on a counter receipt. */
     address?: string | null;
     phone?: string | null;
+    /** The invoice footer. */
+    website?: string | null;
+    facebookUrl?: string | null;
+    instagramUrl?: string | null;
 }
 
 export interface SessionCounters {

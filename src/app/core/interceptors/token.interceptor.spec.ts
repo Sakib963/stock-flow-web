@@ -1,3 +1,4 @@
+import { ConfigVersionService } from '@app/core/services/config-version/config-version.service';
 import { HttpClient, provideHttpClient, withInterceptors } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
@@ -152,5 +153,12 @@ describe('tokenInterceptor', () => {
 
         expect(await failed).toBe(401);
         backend.expectNone(isRenewal);
+    });
+
+    it('records the config version an API answer names, for the session to follow', () => {
+        const versions = TestBed.inject(ConfigVersionService);
+        TestBed.inject(HttpClient).get(`${environment.baseUrl}/api/v1/anything`).subscribe();
+        TestBed.inject(HttpTestingController).expectOne(`${environment.baseUrl}/api/v1/anything`).flush({}, { headers: { 'X-Config-Version': '7' } });
+        expect(versions.latest()).toBe(7);
     });
 });

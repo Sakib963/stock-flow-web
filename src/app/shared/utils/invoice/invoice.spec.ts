@@ -1,4 +1,4 @@
-import { InvoiceContent, drawInvoice } from './invoice';
+import { InvoiceContent, drawInvoice, invoiceLinks } from './invoice';
 
 const content = (over: Partial<InvoiceContent> = {}): InvoiceContent => ({
     business: 'A boutique',
@@ -22,6 +22,7 @@ const content = (over: Partial<InvoiceContent> = {}): InvoiceContent => ({
         ['To collect', '2,860.00 BDT'],
     ],
     notes: [['Payment', 'COD']],
+    links: [],
     thanks: 'Thank you for your order!',
     poweredBy: 'Powered by StockFlow',
     ...over,
@@ -43,5 +44,12 @@ describe('drawInvoice', () => {
     it('shows a name or an address as text, never as markup', () => {
         const invoice = drawInvoice(document, content({ shipTo: { label: 'Ship to', lines: ['<img src=x onerror=alert(1)>'] } }));
         expect(invoice.querySelector('img')).toBeNull();
+    });
+
+    it('lists the website and pages in the footer, read as a customer would type them, and nothing when there are none', () => {
+        const links = invoiceLinks({ name: 'A boutique', logoUrl: null, orderSystem: 'both', timeZone: 'Asia/Dhaka', website: 'https://www.aboutique.test/', facebookUrl: 'https://facebook.com/aboutique', instagramUrl: null });
+        expect(links).toEqual(['www.aboutique.test', 'facebook.com/aboutique']);
+        expect(drawInvoice(document, content({ links })).textContent).toContain('www.aboutique.test   |   facebook.com/aboutique');
+        expect(drawInvoice(document, content()).textContent).not.toContain('|');
     });
 });

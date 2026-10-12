@@ -49,7 +49,7 @@ import { MoneyPipe } from '@app/shared/pipes/money/money.pipe';
 import { RecordDatePipe } from '@app/shared/pipes/record-date/record-date.pipe';
 import { environment } from '@env/environment';
 import { isLabelable, labelContent, printLabel } from '@app/shared/utils/delivery-label/delivery-label';
-import { printInvoice } from '@app/shared/utils/invoice/invoice';
+import { invoiceLinks, printInvoice } from '@app/shared/utils/invoice/invoice';
 import { confirmAction } from '@app/shared/utils/confirm-action/confirm-action';
 import { failureKey, failureOf } from '@app/shared/utils/request-failure/request-failure';
 import { RecordTimelineComponent } from '@app/shared/components/record-timeline/record-timeline.component';
@@ -324,6 +324,7 @@ export class OrderDetailComponent {
             lines: o.items.map((line) => ({ name: line.product_name, quantity: this._digits.transform(line.quantity), price: money(line.unit_price), amount: money(line.unit_price * line.quantity) })),
             totals: rows([t('subtotal'), money(o.subtotal)], o.discount_total ? [t('discount'), '-' + money(o.discount_total)] : null, o.online ? [t('delivery'), money(o.delivery_charge)] : null, [t('total'), money(o.total_amount)], paid ? [t('paid'), '-' + money(paid)] : null, [t(o.online ? 'collect' : 'owed'), t('withCurrency', { amount: money(this.due()) })]),
             notes: rows(o.payment_type ? [t('payment'), this._translate.instant('sales.online.terms.' + o.payment_type)] : null, o.notes ? [t('note'), o.notes] : null),
+            links: invoiceLinks(business),
             thanks: t('thanks'),
             poweredBy: t('poweredBy'),
         });
