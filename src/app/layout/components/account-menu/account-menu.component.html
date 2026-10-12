@@ -1,7 +1,7 @@
 <div class="flex min-h-0 flex-1 flex-col">
     <div class="min-h-0 flex-1 overflow-y-auto" data-shell="account-scroll">
         <div class="flex flex-col items-center gap-1 border-b border-line-soft px-4 pt-5 pb-4 text-center">
-            <nz-avatar [nzText]="session.initials()" [nzSize]="64" class="mb-2 text-xl font-bold" />
+            <nz-avatar [nzSrc]="session.user()?.photo ?? undefined" [nzText]="session.initials()" [nzSize]="64" class="mb-2 text-xl font-bold" />
             <span class="w-full truncate text-sm font-bold text-ink">{{ session.user()?.name }}</span>
             <span class="w-full truncate text-shell-note font-semibold text-primary">
                 {{ session.user()?.role }}
@@ -25,12 +25,8 @@
 
             <li nz-menu-divider></li>
 
-            <li nz-menu-item nzDisabled nz-tooltip nzTooltipPlacement="left" [nzTooltipTitle]="'shell.accountSoon' | translate">
-                <ng-icon name="lucideCircleUser" size="15px" class="mr-2 align-middle" />{{ 'shell.myProfile' | translate }}<badge class="ml-2 align-middle">{{ 'shell.soon' | translate }}</badge>
-            </li>
-            <li nz-menu-item nzDisabled nz-tooltip nzTooltipPlacement="left" [nzTooltipTitle]="'shell.accountSoon' | translate">
-                <ng-icon name="lucideKeyRound" size="15px" class="mr-2 align-middle" />{{ 'shell.changePassword' | translate }}<badge class="ml-2 align-middle">{{ 'shell.soon' | translate }}</badge>
-            </li>
+            <li nz-menu-item (click)="state.openProfile()" data-shell="my-profile"><ng-icon name="lucideCircleUser" size="15px" class="mr-2 align-middle" />{{ 'shell.myProfile' | translate }}</li>
+            <li nz-menu-item (click)="state.openPassword()" data-shell="change-password"><ng-icon name="lucideKeyRound" size="15px" class="mr-2 align-middle" />{{ 'shell.changePassword' | translate }}</li>
             <li nz-menu-item (click)="state.openSessions()"><ng-icon name="lucideMonitorSmartphone" size="15px" class="mr-2 align-middle" />{{ 'shell.sessions.menu' | translate }}</li>
             @if (!state.isPhone()) {
                 <li nz-menu-item (click)="state.openShortcuts()"><ng-icon name="lucideKeyboard" size="15px" class="mr-2 align-middle" />{{ 'shell.keyboardShortcuts' | translate }}<span class="ml-2 align-middle font-mono text-shell-meta text-ink-faint">?</span></li>

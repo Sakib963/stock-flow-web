@@ -30,7 +30,10 @@ export const STOCK_MOVEMENT_LIST: ListShellPageConfig = {
     filter: {
         render: 'modal',
         search: { placeholder: 'inventory.stockMovement.searchPlaceholder' },
-        fields: [{ key: 'reason', label: 'inventory.stockMovement.reason.label', type: 'multi-select', choices: REASONS.map((value) => ({ value, label: `inventory.stockMovement.reason.${value}` })) }],
+        fields: [
+            { key: 'when', label: 'inventory.stockMovement.when', type: 'date-range', fromKey: 'date_from', toKey: 'date_to', presets: ['today', 'yesterday', 'last-7-days', 'this-month', 'last-month'], max: 'today' },
+            { key: 'reason', label: 'inventory.stockMovement.reason.label', type: 'multi-select', choices: REASONS.map((value) => ({ value, label: `inventory.stockMovement.reason.${value}` })) },
+        ],
     },
     table: {
         key: 'inventory.stock-movement',

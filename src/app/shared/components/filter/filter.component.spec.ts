@@ -1,10 +1,11 @@
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
+import { provideNzDateFnsAdapter } from 'ng-zorro-antd/core/time';
 import { provideNzI18n, en_US } from 'ng-zorro-antd/i18n';
-import { provideTranslateService } from '@ngx-translate/core';
+import { TranslateService, provideTranslateService } from '@ngx-translate/core';
 import { APIEndpoint } from '@app/core/constants/api-endpoint';
-import { FilterConfig, RemoteChoices } from '@app/core/models/filter.model';
+import { FilterConfig, FilterField, RemoteChoices } from '@app/core/models/filter.model';
 import { SessionService } from '@app/core/services/session/session.service';
 import { FilterComponent } from './filter.component';
 
@@ -20,10 +21,12 @@ describe('FilterComponent', () => {
     async function render(config: FilterConfig = CONFIG, values: Record<string, string | null> = {}) {
         await TestBed.configureTestingModule({
             imports: [FilterComponent],
-            providers: [provideHttpClient(), provideHttpClientTesting(), provideNzI18n(en_US), provideTranslateService({ fallbackLang: 'en' }), { provide: SessionService, useValue: { can: (code: string) => code !== 'configuration.brands.view' } }],
+            providers: [provideHttpClient(), provideHttpClientTesting(), provideNzI18n(en_US), provideNzDateFnsAdapter(), provideTranslateService({ fallbackLang: 'en' }), { provide: SessionService, useValue: { can: (code: string) => code !== 'configuration.brands.view' } }],
         }).compileComponents();
 
         const fixture = TestBed.createComponent(FilterComponent);
+        TestBed.inject(TranslateService).setTranslation('en', { list: { dateSpan: '{{from}} to {{to}}', dateFrom: 'from {{from}}', dateTo: 'until {{to}}' } });
+        TestBed.inject(TranslateService).use('en');
         fixture.componentRef.setInput('config', config);
         fixture.componentRef.setInput('values', values);
         fixture.detectChanges();
@@ -85,7 +88,7 @@ describe('FilterComponent', () => {
     it('leaves out a field it cannot draw yet rather than showing a control that does nothing', async () => {
         const remote: FilterConfig = {
             ...CONFIG,
-            fields: [STATUS, { key: 'placed', label: { en: 'Placed', bn: 'দেওয়া' }, type: 'date-range', fromKey: 'from', toKey: 'to' }, { key: 'supplier', label: { en: 'Supplier', bn: 'সরবরাহকারী' }, type: 'select', choices: { endpoint: APIEndpoint.GET_CATEGORY_LIST, search: { key: 'search' } } }],
+            fields: [STATUS, { key: 'total', label: { en: 'Total', bn: 'মোট' }, type: 'number-range', fromKey: 'min', toKey: 'max', format: 'money' }, { key: 'supplier', label: { en: 'Supplier', bn: 'সরবরাহকারী' }, type: 'select', choices: { endpoint: APIEndpoint.GET_CATEGORY_LIST, search: { key: 'search' } } }],
         };
         const { cmp } = await render(remote);
 
@@ -139,6 +142,50 @@ describe('FilterComponent', () => {
         it('leaves out a remote field whose endpoint the person may not call', async () => {
             const { cmp } = await render({ render: 'modal', fields: [STATUS, { ...CATEGORY, permission: 'configuration.brands.view' }] });
             expect(cmp.fields().map((f) => f.key)).toEqual(['status']);
+        });
+    });
+
+    describe('a date range', () => {
+        const PLACED: FilterConfig = { render: 'modal', fields: [{ key: 'placed', label: { en: 'Placed', bn: 'সময়' }, type: 'date-range', fromKey: 'date_from', toKey: 'date_to', presets: ['today', 'last-7-days'], max: 'today' }] };
+        const range = (cmp: FilterComponent) => cmp.fields()[0] as Extract<FilterField, { type: 'date-range' }>;
+
+        it('writes both ends at once as calendar days, and reads them back as one chip', async () => {
+            const { cmp } = await render(PLACED);
+            cmp.setRange(range(cmp), [new Date(2026, 9, 1, 23, 30), new Date(2026, 9, 12)]);
+            expect(cmp.values()).toEqual({ date_from: '2026-10-01', date_to: '2026-10-12' });
+            expect(cmp.chips().map((c) => c.text)).toEqual(['Placed: 1 Oct 2026 to 12 Oct 2026']);
+        });
+
+        it('reads one day as one date, and a link holding only a start as from', async () => {
+            const { cmp } = await render(PLACED, { date_from: '2026-10-05', date_to: '2026-10-05' });
+            expect(cmp.chips()[0].text).toBe('Placed: 5 Oct 2026');
+            TestBed.resetTestingModule();
+            const open = await render(PLACED, { date_from: '2026-10-05' });
+            expect(open.cmp.chips()[0].text).toBe('Placed: from 5 Oct 2026');
+        });
+
+        it('empties both ends when its chip is closed or the filters are cleared', async () => {
+            const { cmp } = await render(PLACED, { date_from: '2026-10-01', date_to: '2026-10-12' });
+            cmp.clear(range(cmp));
+            expect(cmp.values()).toEqual({ date_from: null, date_to: null });
+            expect(cmp.chips()).toEqual([]);
+        });
+
+        it('offers its presets on the business calendar, and no day after its max', async () => {
+            const { cmp } = await render(PLACED);
+            const setup = cmp.rangeSetup()['placed'];
+            const [from, to] = setup.presets['list.datePresets.last-7-days'];
+            expect(Math.round((to.getTime() - from.getTime()) / 86_400_000)).toBe(6);
+            const tomorrow = new Date(to);
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            expect(setup.disabled(to)).toBe(false);
+            expect(setup.disabled(tomorrow)).toBe(true);
+        });
+
+        it('is drawn as a range picker in the panel', async () => {
+            const { cmp, el } = await render({ ...PLACED, render: 'row' });
+            expect(cmp.fields().length).toBe(1);
+            expect(el.querySelector('nz-range-picker')).not.toBeNull();
         });
     });
 });

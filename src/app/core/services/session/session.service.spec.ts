@@ -57,6 +57,14 @@ describe('SessionService', () => {
         expect(service.business()?.name).toBe('Arithma Labs');
     });
 
+    it('shows a profile the person just saved at once, keeping their role and permissions', () => {
+        service.updateUser({ name: 'Nusrat Jahan', photo: 'https://res.cloudinary.com/x/image/upload/v1/stockflow/people/n.jpg' });
+        expect(service.user()?.name).toBe('Nusrat Jahan');
+        expect(service.initials()).toBe('NJ');
+        expect(service.user()?.role).toBe('Owner');
+        expect(service.loaded()).toBe(true);
+    });
+
     it('answers can() from the permission set', () => {
         expect(service.can('sales.order.confirm')).toBe(true);
         expect(service.can('sales.order.refund')).toBe(false);

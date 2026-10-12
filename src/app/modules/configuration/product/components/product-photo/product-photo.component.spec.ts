@@ -3,7 +3,7 @@ import { NzUploadFile } from 'ng-zorro-antd/upload';
 import { provideNzI18n, en_US } from 'ng-zorro-antd/i18n';
 import { provideTranslateService } from '@ngx-translate/core';
 import { Subject } from 'rxjs';
-import { PhotoUpload } from '@app/core/models/product.model';
+import { PhotoUpload } from '@app/core/models/photo-upload.model';
 import { ProductService } from '@app/modules/configuration/product/services/product.service';
 import { ProductPhotoComponent } from './product-photo.component';
 

@@ -24,6 +24,14 @@
     @if (state.sessionsOpen()) {
         <sessions-dialog (close)="state.closeSessions()" />
     }
+
+    @if (state.profileOpen()) {
+        <profile-dialog (close)="state.closeProfile()" />
+    }
+
+    @if (state.passwordOpen()) {
+        <password-dialog (close)="state.closePassword()" />
+    }
 </div>
 
 <!-- The width check wraps the whole drawer, not just its `nzVisible`: nz-drawer builds its content
@@ -36,6 +44,8 @@
 <!-- Search is a sheet from the top on a phone: it is a field you type into, so it belongs where
      the keyboard pushes it. On a wide window the field and its panel are in the header itself. -->
 <nz-modal [nzVisible]="state.isPhone() && state.openPanel() === 'search'" [nzContent]="searchSheet" [nzFooter]="null" [nzClosable]="false" [nzWidth]="state.sheetWidth" [nzStyle]="{ top: '12px' }" [nzBodyStyle]="{ padding: '0' }" nzWrapClassName="overlay-sheet" (nzOnCancel)="closePanel()" />
+
+<nz-drawer [nzVisible]="state.openPanel() === 'notes'" [nzTitle]="'shell.notes.title' | translate" [nzContent]="notesDrawer" nzPlacement="right" [nzWidth]="state.panelWidth" [nzBodyStyle]="drawerBody" (nzOnClose)="closePanel()" />
 
 <nz-drawer [nzVisible]="state.openPanel() === 'notifications'" [nzTitle]="'shell.notifications' | translate" [nzExtra]="notifyActions" [nzContent]="notifyDrawer" nzPlacement="right" [nzWidth]="state.panelWidth" [nzBodyStyle]="drawerBody" (nzOnClose)="closePanel()" />
 
@@ -52,6 +62,13 @@
     <button type="button" class="ml-2 cursor-pointer rounded-sm px-1.5 py-1 text-shell-note/none font-semibold text-primary bn:leading-normal not-disabled:hover:bg-primary-wash disabled:cursor-default disabled:text-ink-faint" [disabled]="!notifications.hasUnread()" (click)="notifications.markAllRead()">
         {{ 'shell.markAllRead' | translate }}
     </button>
+</ng-template>
+
+<!-- Inside an @if so the panel is made when it opens and reads the notes afresh each time. -->
+<ng-template #notesDrawer>
+    @if (state.openPanel() === 'notes') {
+        <notes-panel />
+    }
 </ng-template>
 
 <ng-template #notifyDrawer>

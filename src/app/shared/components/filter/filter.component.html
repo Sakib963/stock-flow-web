@@ -100,7 +100,7 @@
 <ng-template #control let-field let-block="block" let-draft="draft">
     @switch (field.type) {
         @case ('text') {
-            <input nz-input type="text" class="text-xs" [class.w-40]="!block" [class.w-full]="block" [disabled]="disabled(field)" [ngModel]="valueOf(field, draft)" (ngModelChange)="set(field, $event, draft)" [attr.placeholder]="(field.placeholder ?? field.label) | text" [attr.aria-label]="field.label | text" />
+            <input nz-input type="text" class="text-xs" [class.w-40]="!block" [class.w-full]="block" [disabled]="disabled(field)" [ngModel]="valueOf(field, draft)" (ngModelChange)="set(field, $event, draft)" [attr.placeholder]="field.placeholder ?? field.label | text" [attr.aria-label]="field.label | text" />
         }
         @case ('select') {
             <nz-select class="text-xs" [class.w-40]="!block" [class.w-full]="block" [nzShowSearch]="isRemoteChoices(field)" [nzLoading]="remoteLoading(field)" [nzAllowClear]="!field.required" [nzDisabled]="disabled(field)" [nzPlaceHolder]="field.label | text" [ngModel]="valueOf(field, draft)" (ngModelChange)="set(field, $event, draft)" (nzOpenChange)="$event && loadRemoteFor(field)">
@@ -122,6 +122,9 @@
                     <label nz-segmented-item [nzValue]="choice.value">{{ choice.label | text }}</label>
                 }
             </nz-segmented>
+        }
+        @case ('date-range') {
+            <nz-range-picker class="text-xs" [class.w-60]="!block" [class.w-full]="block" nzFormat="dd MMM yyyy" nzDropdownClassName="overlay-range" [nzPlaceHolder]="['list.dateStart' | translate, 'list.dateEnd' | translate]" [nzRanges]="rangeSetup()[field.key].presets" [nzDisabledDate]="rangeSetup()[field.key].disabled" [nzAllowClear]="!field.required" [nzDisabled]="disabled(field)" [nzInputReadOnly]="true" [ngModel]="rangeOf(field, draft)" (ngModelChange)="setRange(field, $event, draft)" [attr.aria-label]="field.label | text" />
         }
         @case ('toggle') {
             <span class="inline-flex items-center gap-1.5 text-xs text-ink-muted">

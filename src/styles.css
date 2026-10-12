@@ -244,6 +244,18 @@ body.lang-bn {
     padding: 0;
 }
 
+/* The list filter's date range. Its two months sit side by side, 560px wide, which runs off a
+   phone; below the phone breakpoint they stack, and the dropdown scrolls if the window is short. */
+@media (width < 48rem) {
+    .overlay-range .ant-picker-panels {
+        flex-direction: column;
+    }
+    .overlay-range .ant-picker-panel-container {
+        max-height: 60dvh;
+        overflow-y: auto;
+    }
+}
+
 /* Every select dropdown, the table's page size changer included.
 
    Its CDK viewport is `overflow: auto` on both axes, with the height set to exactly the option

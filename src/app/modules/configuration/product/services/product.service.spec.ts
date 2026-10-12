@@ -2,7 +2,8 @@ import { HttpBackend, HttpErrorResponse, HttpEventType, HttpXhrBackend, provideH
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { APIEndpoint } from '@app/core/constants/api-endpoint';
-import { PhotoUpload } from '@app/core/models/product.model';
+import { PhotoUpload } from '@app/core/models/photo-upload.model';
+import { PhotoUploadService } from '@app/shared/services/photo-upload/photo-upload.service';
 import { ProductService } from './product.service';
 
 const SIGNED = { cloud_name: 'stockflow', api_key: 'key', folder: 'stockflow/products', timestamp: 1790000000, signature: 'abc' };
@@ -19,7 +20,7 @@ describe('ProductService', () => {
         service = TestBed.inject(ProductService);
         http = TestBed.inject(HttpTestingController);
         // Canvas work is the browser's; what matters here is what happens to the bytes after it.
-        vi.spyOn(service as unknown as { shrink: (file: File) => Promise<Blob> }, 'shrink').mockResolvedValue(new Blob(['photo']));
+        vi.spyOn(TestBed.inject(PhotoUploadService) as unknown as { shrink: (file: File) => Promise<Blob> }, 'shrink').mockResolvedValue(new Blob(['photo']));
     });
 
     afterEach(() => http.verify());

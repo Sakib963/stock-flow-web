@@ -5,6 +5,19 @@ export class APIEndpoint {
     static readonly SIGN_OUT = '/api/v1/auth/sign-out';
     static readonly SIGN_OUT_EVERYWHERE = '/api/v1/auth/sign-out-everywhere';
     static readonly GET_SESSIONS = '/api/v1/auth/get-sessions';
+
+    // A person's own notes
+    static readonly GET_USER_NOTE_LIST = '/api/v1/profile/notes/get-note-list';
+    static readonly CREATE_USER_NOTE = '/api/v1/profile/notes/create-note';
+    static readonly UPDATE_USER_NOTE = '/api/v1/profile/notes/update-note';
+    static readonly DELETE_USER_NOTE = '/api/v1/profile/notes/delete-note';
+
+    // A person's own profile and password
+    static readonly GET_PROFILE_INFO = '/api/v1/profile/profile-info/get-profile-info';
+    static readonly UPDATE_PROFILE_INFO = '/api/v1/profile/profile-info/update-profile-info';
+    static readonly SIGN_PROFILE_PHOTO_UPLOAD = '/api/v1/profile/profile-info/sign-profile-photo-upload';
+    static readonly CHANGE_PASSWORD = '/api/v1/profile/change-password/change-user-password';
+    static readonly VERIFY_PASSWORD_CHANGE = '/api/v1/profile/change-password/verify-otp-for-password-change';
     static readonly SIGN_OUT_SESSION = '/api/v1/auth/sign-out-session';
     static readonly REFRESH_TOKEN = '/api/v1/auth/refresh-token';
     static readonly GET_USER_INFO = '/api/v1/auth/get-user-info';

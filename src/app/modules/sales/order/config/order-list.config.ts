@@ -59,6 +59,7 @@ export const orderList = ({ scope, bothChannels }: { scope: OrderScope; bothChan
             render: 'modal',
             search: { placeholder: 'sales.order.searchPlaceholder' },
             fields: [
+                { key: 'placed', label: 'sales.order.placedOn', type: 'date-range', fromKey: 'date_from', toKey: 'date_to', presets: ['today', 'yesterday', 'last-7-days', 'this-month', 'last-month'], max: 'today' },
                 ...(bothChannels ? [{ key: 'channel', label: 'sales.order.channelLabel', type: 'select' as const, choices: ['POS', 'ONLINE'].map((value) => ({ value, label: `sales.order.channel.${value}` })) }] : []),
                 { key: 'status', label: 'sales.order.statusLabel', type: 'multi-select', choices: Object.keys(ORDER_STATUS).map((value) => ({ value, label: `sales.order.status.${value}` })) },
                 { key: 'delivery_status', label: 'sales.order.deliveryLabel', type: 'multi-select', choices: Object.keys(DELIVERY_STATUS).map((value) => ({ value, label: `sales.order.delivery.${value}` })) },

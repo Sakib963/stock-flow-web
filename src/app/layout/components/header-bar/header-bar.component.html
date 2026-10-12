@@ -49,8 +49,7 @@
             </a>
         }
 
-        <!-- Disabled rather than hidden:the person should see where this lives before it arrives. -->
-        <button type="button" class="sf-icon-btn max-md:hidden" disabled nz-tooltip nzTooltipPlacement="bottom" [nzTooltipTitle]="'shell.notesSoon' | translate">
+        <button type="button" class="sf-icon-btn" data-shell="notes" [class.is-open]="state.openPanel() === 'notes'" [attr.aria-expanded]="state.openPanel() === 'notes'" [attr.aria-label]="'shell.notes.title' | translate" (click)="state.togglePanel('notes')" nz-tooltip nzTooltipPlacement="bottom" [nzTooltipTitle]="'shell.notes.title' | translate">
             <ng-icon name="lucideStickyNote" size="18px" />
         </button>
 
@@ -64,7 +63,7 @@
         </button>
 
         <button #accountTrigger type="button" class="flex cursor-pointer items-center gap-1 rounded-control p-1 hover:bg-surface-page" data-shell="account" [class.bg-surface-page]="state.openPanel() === 'account'" [attr.aria-expanded]="state.openPanel() === 'account'" (click)="state.togglePanel('account')" nz-tooltip nzTooltipPlacement="bottomRight" [nzTooltipTitle]="session.user()?.name || ''">
-            <nz-avatar [nzText]="session.initials()" [nzSize]="30" class="text-shell-hint font-bold" />
+            <nz-avatar [nzSrc]="session.user()?.photo ?? undefined" [nzText]="session.initials()" [nzSize]="30" class="text-shell-hint font-bold" />
             <ng-icon name="lucideChevronDown" size="14px" class="text-ink-faint transition-transform duration-200 ease-shell" [class.rotate-180]="state.openPanel() === 'account'" />
         </button>
     </div>

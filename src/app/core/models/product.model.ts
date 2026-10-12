@@ -95,24 +95,12 @@ export interface ProductDetails {
     activity: ProductActivity[];
 }
 
-/** What the server hands back so the browser can upload one photo straight to Cloudinary. */
-export interface PhotoUploadSignature {
-    cloud_name: string;
-    api_key: string;
-    folder: string;
-    timestamp: number;
-    signature: string;
-}
-
 /** One option in the product form's sub-category picker, grouped under its category. */
 export interface SubCategoryChoice {
     value: string;
     label: string;
     groupLabel: string;
 }
-
-/** Where an upload stands: `progress` runs 0 to 100 while the file travels. */
-export type PhotoUpload = { state: 'uploading'; progress: number } | { state: 'done'; url: string };
 
 /** Which field a 409 or 400 was about, so the form marks the input the person has to change. */
 export type ProductField = 'sku' | 'sub_category_oid' | 'brand_oid';

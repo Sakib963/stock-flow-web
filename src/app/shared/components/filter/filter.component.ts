@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideCheck, lucideEraser, lucideListFilter, lucideRotateCcw, lucideSearch, lucideX } from '@ng-icons/lucide';
 import { NzButtonModule } from 'ng-zorro-antd/button';
+import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
 import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzModalModule, NzModalService } from 'ng-zorro-antd/modal';
 import { NzPopoverModule } from 'ng-zorro-antd/popover';
@@ -13,7 +14,7 @@ import { NzSwitchModule } from 'ng-zorro-antd/switch';
 import { NzTooltipModule } from 'ng-zorro-antd/tooltip';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { Text } from '@app/core/models/config.model';
-import { Choice, FilterField, FilterConfig, FilterValues, RemoteChoices } from '@app/core/models/filter.model';
+import { Choice, DateBound, DatePreset, FilterField, FilterConfig, FilterValues, RemoteChoices } from '@app/core/models/filter.model';
 import { LanguageService } from '@app/core/services/language/language.service';
 import { SessionService } from '@app/core/services/session/session.service';
 import { ChoicesService } from '@app/shared/services/choices/choices.service';
@@ -21,11 +22,39 @@ import { TextPipe } from '@app/shared/pipes/text/text.pipe';
 import { resolveText } from '@app/shared/utils/resolve-text/resolve-text';
 import { matches } from '@app/shared/utils/condition/condition';
 import { isEmptyValue } from '@app/shared/utils/empty-value/empty-value';
+import { RecordDatePipe } from '@app/shared/pipes/record-date/record-date.pipe';
+import { addDays, businessToday } from '@app/shared/utils/business-time/business-time';
+import { fromDay, toDay } from '@app/shared/utils/calendar-day/calendar-day';
 
 const SEPARATOR = ',';
 
-/** What this component draws today. Dates and ranges arrive with the first list that has one. */
-const DRAWN: ReadonlySet<FilterField['type']> = new Set(['text', 'select', 'multi-select', 'segmented', 'toggle']);
+/** What this component draws today. A single date, a month range and a number range arrive with the first list that has one. */
+const DRAWN: ReadonlySet<FilterField['type']> = new Set(['text', 'select', 'multi-select', 'segmented', 'toggle', 'date-range']);
+
+type RangeField = Extract<FilterField, { type: 'date-range' }>;
+
+/** A preset's first and last day, on the business's calendar rather than the viewer's. */
+const presetDays = (preset: DatePreset, today: string): [string, string] => {
+    const monthStart = `${today.slice(0, 8)}01`;
+    switch (preset) {
+        case 'today':
+            return [today, today];
+        case 'yesterday':
+            return [addDays(today, -1), addDays(today, -1)];
+        case 'last-7-days':
+            return [addDays(today, -6), today];
+        case 'last-30-days':
+            return [addDays(today, -29), today];
+        case 'this-month':
+            return [monthStart, today];
+        case 'last-month': {
+            const lastDay = addDays(monthStart, -1);
+            return [`${lastDay.slice(0, 8)}01`, lastDay];
+        }
+    }
+};
+
+const boundDay = (bound: DateBound, today: string): string => (bound === 'today' ? today : addDays(today, bound.days));
 
 const warned = new Set<string>();
 
@@ -34,8 +63,7 @@ const warned = new Set<string>();
  * resolution and a param that follows another filter are not built yet, and a picker loading the
  * wrong list is worse than no picker.
  */
-const drawsRemote = (source: RemoteChoices): boolean =>
-    !source.search && !source.pageSize && !source.resolve && !source.group && !source.sub && Object.values(source.params ?? {}).every((param) => typeof param !== 'object');
+const drawsRemote = (source: RemoteChoices): boolean => !source.search && !source.pageSize && !source.resolve && !source.group && !source.sub && Object.values(source.params ?? {}).every((param) => typeof param !== 'object');
 
 /**
  * Search and the fields that narrow a list, with what is applied read back as chips.
@@ -53,7 +81,7 @@ const drawsRemote = (source: RemoteChoices): boolean =>
  */
 @Component({
     selector: 'list-filter',
-    imports: [NgTemplateOutlet, FormsModule, NgIcon, NzButtonModule, NzInputModule, NzModalModule, NzPopoverModule, NzSegmentedModule, NzSelectModule, NzSwitchModule, NzTooltipModule, TranslatePipe, TextPipe],
+    imports: [NgTemplateOutlet, FormsModule, NgIcon, NzButtonModule, NzDatePickerModule, NzInputModule, NzModalModule, NzPopoverModule, NzSegmentedModule, NzSelectModule, NzSwitchModule, NzTooltipModule, TranslatePipe, TextPipe],
     providers: [ChoicesService, provideIcons({ lucideCheck, lucideEraser, lucideListFilter, lucideRotateCcw, lucideSearch, lucideX })],
     templateUrl: './filter.component.html',
     styleUrl: './filter.component.scss',
@@ -65,6 +93,7 @@ export class FilterComponent {
     private readonly _modal = inject(NzModalService);
     private readonly _choices = inject(ChoicesService);
     private readonly _session = inject(SessionService);
+    private readonly _dates = new RecordDatePipe();
 
     readonly config = input.required<FilterConfig>();
     /** Exactly what goes in the query string: strings or null, never objects. */
@@ -203,6 +232,44 @@ export class FilterComponent {
     }
     private readonly _lists = new Map<string, { value: string; list: string[] }>();
 
+    /** The same array for the same pair of days, for the reason listOf gives. */
+    rangeOf(field: RangeField, draft?: boolean): (Date | null)[] {
+        const source = this.source(draft);
+        const value = `${source[field.fromKey] ?? ''}~${source[field.toKey] ?? ''}`;
+        const kept = this._ranges.get(field.key);
+        if (kept?.value === value) return kept.range;
+        const range = source[field.fromKey] || source[field.toKey] ? [fromDay(source[field.fromKey] ?? null), fromDay(source[field.toKey] ?? null)] : [];
+        this._ranges.set(field.key, { value, range });
+        return range;
+    }
+    private readonly _ranges = new Map<string, { value: string; range: (Date | null)[] }>();
+
+    /** Both ends in one write, so a range never sends a request with only its start. */
+    setRange(field: RangeField, dates: (Date | null)[] | null, draft?: boolean): void {
+        const [from, to] = dates ?? [];
+        this.writeAll({ [field.fromKey]: toDay(from ?? null), [field.toKey]: toDay(to ?? null) }, draft);
+    }
+
+    /**
+     * Per range field, its presets as the picker wants them (a translated label and two days) and
+     * the days after its `max`, which cannot be picked: a sale tomorrow has not happened. Built once
+     * per language rather than on every redraw, which the picker would read as a new input each time.
+     */
+    readonly rangeSetup = computed(() => {
+        this._language.current();
+        const today = businessToday();
+        const setup: Record<string, { presets: Record<string, Date[]>; disabled: (date: Date) => boolean }> = {};
+        for (const field of this.fields()) {
+            if (field.type !== 'date-range') continue;
+            const last = field.max ? boundDay(field.max, today) : null;
+            setup[field.key] = {
+                presets: Object.fromEntries((field.presets ?? []).map((preset) => [this._translate.instant('list.datePresets.' + preset), presetDays(preset, today).map((day) => fromDay(day)!)])),
+                disabled: (date: Date) => !!last && toDay(date)! > last,
+            };
+        }
+        return setup;
+    });
+
     toggleOf(field: FilterField, draft?: boolean): boolean {
         return this.valueOf(field, draft) === 'true';
     }
@@ -226,8 +293,8 @@ export class FilterComponent {
     readonly chips = computed(() => {
         const values = this.values();
         return this.fields()
-            .filter((field) => !isEmptyValue(values[field.key]))
-            .map((field) => ({ field, text: this.readBack(field, String(values[field.key])) }));
+            .filter((field) => this.holds(field, values))
+            .map((field) => ({ field, text: this.readBack(field, String(values[field.key]), values) }));
     });
 
     readonly appliedCount = computed(() => this.chips().length);
@@ -238,7 +305,7 @@ export class FilterComponent {
     /** A required field has no chip to close: the list has nothing to show without it. */
     clear(field: FilterField): void {
         if (field.required) return;
-        this.write(field.key, null);
+        this.writeAll(Object.fromEntries(this.keysOf(field).map((key) => [key, null])));
     }
 
     /** Everything that narrowed the list, search included, which no chip stands for. */
@@ -287,16 +354,29 @@ export class FilterComponent {
     /** A required field keeps its value: the list has nothing to show without one. */
     private cleared(from: FilterValues): FilterValues {
         const next: Record<string, string | null> = { ...from };
-        for (const field of this.fields()) if (!field.required) next[field.key] = null;
+        for (const field of this.fields()) if (!field.required) for (const key of this.keysOf(field)) next[key] = null;
         return next;
     }
 
+    /** The query keys a field writes: a range writes its two ends, never its own key. */
+    private keysOf(field: FilterField): string[] {
+        return field.type === 'date-range' ? [field.fromKey, field.toKey] : [field.key];
+    }
+
+    private holds(field: FilterField, values: FilterValues): boolean {
+        return this.keysOf(field).some((key) => !isEmptyValue(values[key]));
+    }
+
     private write(key: string, value: string | null, draft?: boolean): void {
+        this.writeAll({ [key]: value }, draft);
+    }
+
+    private writeAll(changes: Record<string, string | null>, draft?: boolean): void {
         if (draft) {
-            this._draft.set({ ...(this._draft() ?? this.values()), [key]: value });
+            this._draft.set({ ...(this._draft() ?? this.values()), ...changes });
             return;
         }
-        this.values.set({ ...this.values(), [key]: value });
+        this.values.set({ ...this.values(), ...changes });
     }
 
     /**
@@ -308,8 +388,14 @@ export class FilterComponent {
         return resolveText(text, this._language.current(), (key) => this._translate.instant(key));
     }
 
-    private readBack(field: FilterField, raw: string): string {
+    private readBack(field: FilterField, raw: string, values: FilterValues): string {
         if (field.type === 'toggle') return this.label(field.label);
+        if (field.type === 'date-range') {
+            const language = this._language.current();
+            const [from, to] = [values[field.fromKey], values[field.toKey]].map((day) => (day ? this._dates.transform(day, language) : ''));
+            const span = from && to ? (from === to ? from : this._translate.instant('list.dateSpan', { from, to })) : from ? this._translate.instant('list.dateFrom', { from }) : this._translate.instant('list.dateTo', { to });
+            return `${this.label(field.label)}: ${span}`;
+        }
         const choices = this.choicesOf(field);
         const parts = raw.split(SEPARATOR);
         const named = parts.map((value) => {

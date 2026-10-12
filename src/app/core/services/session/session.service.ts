@@ -4,7 +4,7 @@ import { APIEndpoint } from '@app/core/constants/api-endpoint';
 import { environment } from '@env/environment';
 import { LanguageService } from '@app/core/services/language/language.service';
 import { firstValueFrom } from 'rxjs';
-import { MenuItem, SessionPayload } from '@app/core/models/session.model';
+import { MenuItem, SessionPayload, SessionUser } from '@app/core/models/session.model';
 import { setBusinessZone } from '@app/shared/utils/business-time/business-time';
 
 /**
@@ -61,6 +61,11 @@ export class SessionService {
         this._payload.set(response?.data ?? null);
         setBusinessZone(response?.data?.business?.timeZone);
         this._loadedFor.set(owner);
+    }
+
+    /** The person changed their own profile: the header and the account panel show it at once, without reloading the payload. */
+    updateUser(changes: Partial<SessionUser>): void {
+        this._payload.update((payload) => (payload ? { ...payload, user: { ...payload.user, ...changes } } : payload));
     }
 
     clear(): void {

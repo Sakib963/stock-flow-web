@@ -11,13 +11,7 @@ import { lucideArrowLeft, lucideArrowRight, lucideCircle, lucideCircleCheck, luc
 import { AuthShellComponent } from '@app/modules/auth/components/auth-shell/auth-shell.component';
 import { RecoveryFailure, RecoveryService } from '@app/modules/auth/services/recovery.service';
 import { DigitsPipe } from '@app/shared/pipes/digits/digits.pipe';
-
-/** The three rules, checked live so the list can tick off as the user types. */
-const RULES = {
-    length: (v: string) => v.length >= 8,
-    letter: (v: string) => /[A-Za-z]/.test(v),
-    number: (v: string) => /[0-9]/.test(v),
-};
+import { passwordRules } from '@app/shared/utils/password-rules/password-rules';
 
 @Component({
     selector: 'reset-password',
@@ -61,14 +55,7 @@ export class ResetPasswordComponent implements OnInit, AfterViewInit {
     private readonly _confirm = signal('');
     private readonly _confirmBlurred = signal(false);
 
-    readonly rules = computed(() => {
-        const value = this._password();
-        return [
-            { key: 'auth.reset.ruleLength', met: RULES.length(value) },
-            { key: 'auth.reset.ruleLetter', met: RULES.letter(value) },
-            { key: 'auth.reset.ruleNumber', met: RULES.number(value) },
-        ];
-    });
+    readonly rules = computed(() => passwordRules(this._password()));
     readonly passwordValid = computed(() => this.rules().every((r) => r.met));
 
     /** Counts down from the server's expiry, not from page load: the user may walk to the phone. */

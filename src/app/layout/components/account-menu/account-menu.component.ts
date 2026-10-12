@@ -5,20 +5,18 @@ import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzMenuModule } from 'ng-zorro-antd/menu';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzModalService } from 'ng-zorro-antd/modal';
-import { NzTooltipModule } from 'ng-zorro-antd/tooltip';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideCircleUser, lucideGlobe, lucideKeyRound, lucideKeyboard, lucideLogOut, lucideMonitorSmartphone } from '@ng-icons/lucide';
 import { AuthService } from '@app/core/services/auth/auth.service';
 import { LanguageService } from '@app/core/services/language/language.service';
 import { SessionService } from '@app/core/services/session/session.service';
-import { BadgeComponent } from '@app/layout/components/badge/badge.component';
 import { ShellStateService } from '@app/layout/services/shell-state/shell-state.service';
 
 /** The body of the right-hand drawer: who is signed in, the language switch, and the ways out. */
 @Component({
     selector: 'account-menu',
-    imports: [NzAvatarModule, NzButtonModule, NzMenuModule, NzTooltipModule, TranslatePipe, NgIcon, BadgeComponent],
+    imports: [NzAvatarModule, NzButtonModule, NzMenuModule, TranslatePipe, NgIcon],
     providers: [provideIcons({ lucideCircleUser, lucideGlobe, lucideKeyRound, lucideKeyboard, lucideLogOut, lucideMonitorSmartphone })],
     // The host draws no box of its own, so the menu stays the direct child of the CDK overlay.
     host: { class: 'contents' },

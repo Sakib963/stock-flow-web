@@ -2,7 +2,7 @@ import { MenuItem } from '@app/core/models/session.model';
 import { AppNotification } from '@app/core/models/notification.model';
 
 /** Which header overlay is showing. Only ever one, so this is a value rather than a flag each. */
-export type HeaderPanel = 'search' | 'notifications' | 'account';
+export type HeaderPanel = 'search' | 'notes' | 'notifications' | 'account';
 
 /** A section of the search panel, already numbered so arrow keys can address a row by index. */
 export interface SearchGroup {
