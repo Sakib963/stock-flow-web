@@ -179,18 +179,15 @@
             >
             @if (record(); as loaded) {
                 @if (loaded.activity.length) {
-                    <nz-timeline>
-                        @for (entry of loaded.activity; track entry.oid; let first = $first) {
-                            <!-- The newest in the accent, the rest quiet: the eye lands on what changed last. -->
-                            <nz-timeline-item [nzColor]="first ? 'blue' : 'gray'">
-                                <p class="m-0 text-[13px] font-semibold text-ink">{{ entry.action }}</p>
-                                @if (entry.description) {
-                                    <p class="mt-0.5 mb-0 text-xs text-ink-body">{{ entry.description }}</p>
-                                }
-                                <p class="mt-0.5 mb-0 text-xs text-ink-muted">{{ entry.user }} &middot; {{ entry.date | recordDate: language() : 'date-time-12' }}</p>
-                            </nz-timeline-item>
-                        }
-                    </nz-timeline>
+                    <record-timeline [entries]="loaded.activity">
+                        <ng-template let-entry>
+                            <p class="m-0 text-[13px] font-semibold text-ink">{{ entry.action }}</p>
+                            @if (entry.description) {
+                                <p class="mt-0.5 mb-0 text-xs text-ink-body">{{ entry.description }}</p>
+                            }
+                            <p class="mt-0.5 mb-0 text-xs text-ink-muted">{{ entry.user }} &middot; {{ entry.date | recordDate: language() : 'date-time-12' }}</p>
+                        </ng-template>
+                    </record-timeline>
                 } @else {
                     <p class="m-0 text-xs text-ink-muted">{{ 'configuration.warehouse.noActivity' | translate }}</p>
                 }

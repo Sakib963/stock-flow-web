@@ -9,7 +9,6 @@ import { NzMenuModule } from 'ng-zorro-antd/menu';
 import { NzSkeletonModule } from 'ng-zorro-antd/skeleton';
 import { NzSwitchModule } from 'ng-zorro-antd/switch';
 import { NzTableModule } from 'ng-zorro-antd/table';
-import { NzTimelineModule } from 'ng-zorro-antd/timeline';
 import { NzTooltipModule } from 'ng-zorro-antd/tooltip';
 import { FormsModule } from '@angular/forms';
 import { NzMessageService } from 'ng-zorro-antd/message';
@@ -58,9 +57,10 @@ interface Figure {
  * appear only for someone the server sent them to; the page never guesses.
  */
 import { BudgetTotalsComponent } from '@app/shared/components/budget-totals/budget-totals.component';
+import { RecordTimelineComponent } from '@app/shared/components/record-timeline/record-timeline.component';
 @Component({
     selector: 'product-stock',
-    imports: [FormsModule, NgIcon, NzButtonModule, NzCardModule, NzDropdownModule, NzMenuModule, NzSkeletonModule, NzSwitchModule, NzTableModule, NzTimelineModule, NzTooltipModule, RouterLink, TranslatePipe, PageHeaderComponent, StatusTagComponent, ActionFooterComponent, BatchExpiryComponent, BatchPriceDialogComponent, BatchBudgetDialogComponent, StickerDialogComponent, BudgetTotalsComponent, NzTypographyModule, DigitsPipe, MoneyPipe, RecordDatePipe],
+    imports: [RecordTimelineComponent, FormsModule, NgIcon, NzButtonModule, NzCardModule, NzDropdownModule, NzMenuModule, NzSkeletonModule, NzSwitchModule, NzTableModule, NzTooltipModule, RouterLink, TranslatePipe, PageHeaderComponent, StatusTagComponent, ActionFooterComponent, BatchExpiryComponent, BatchPriceDialogComponent, BatchBudgetDialogComponent, StickerDialogComponent, BudgetTotalsComponent, NzTypographyModule, DigitsPipe, MoneyPipe, RecordDatePipe],
     providers: [provideIcons({ lucideArrowLeft, lucideArrowLeftRight, lucideBadgeDollarSign, lucideBanknote, lucideBoxes, lucideCalendarClock, lucideEllipsis, lucideFileSpreadsheet, lucideHistory, lucideInfo, lucideLock, lucidePackageCheck, lucidePercent, lucidePrinter, lucideRotateCw, lucideShoppingCart, lucideSlidersHorizontal, lucideTag, lucideTrash2, lucideTrendingDown, lucideTrendingUp, lucideWallet, lucideWrench, lucideZap })],
     templateUrl: './product-stock.component.html',
     styleUrl: './product-stock.component.scss',

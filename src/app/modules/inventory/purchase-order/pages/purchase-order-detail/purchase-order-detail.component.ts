@@ -13,7 +13,6 @@ import { NzModalModule } from 'ng-zorro-antd/modal';
 import { NzRadioModule } from 'ng-zorro-antd/radio';
 import { NzSkeletonModule } from 'ng-zorro-antd/skeleton';
 import { NzTableModule } from 'ng-zorro-antd/table';
-import { NzTimelineModule } from 'ng-zorro-antd/timeline';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { RequestFailure } from '@app/core/models/api.model';
 import { PageBack } from '@app/core/models/page-header.model';
@@ -55,9 +54,10 @@ interface OrderStat {
  * or cancelled; payment can be recorded until it is cancelled; a Verified or Cancelled order is final.
  */
 import { BudgetTotalsComponent } from '@app/shared/components/budget-totals/budget-totals.component';
+import { RecordTimelineComponent } from '@app/shared/components/record-timeline/record-timeline.component';
 @Component({
     selector: 'purchase-order-detail',
-    imports: [NgIcon, ReactiveFormsModule, NzButtonModule, NzCardModule, NzFormModule, NzInputModule, NzInputNumberModule, NzModalModule, NzRadioModule, NzSkeletonModule, NzTableModule, NzTimelineModule, TranslatePipe, BudgetTotalsComponent, PageHeaderComponent, StatusTagComponent, ActionFooterComponent, NzTypographyModule, MoneyPipe, RecordDatePipe, DigitsPipe, BatchExpiryComponent],
+    imports: [RecordTimelineComponent, NgIcon, ReactiveFormsModule, NzButtonModule, NzCardModule, NzFormModule, NzInputModule, NzInputNumberModule, NzModalModule, NzRadioModule, NzSkeletonModule, NzTableModule, TranslatePipe, BudgetTotalsComponent, PageHeaderComponent, StatusTagComponent, ActionFooterComponent, NzTypographyModule, MoneyPipe, RecordDatePipe, DigitsPipe, BatchExpiryComponent],
     providers: [
         MoneyPipe,
         provideIcons({

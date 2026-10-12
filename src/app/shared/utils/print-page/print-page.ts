@@ -17,8 +17,9 @@ export const printPage = (pageCss: string, qrUrl: string | null, draw: (doc: Doc
     const qr = qrUrl ? QRCode.toDataURL(qrUrl, { margin: 0, width: 240 }).catch(() => null) : Promise.resolve(null);
     void qr.then(async (code) => {
         doc.body.appendChild(draw(doc, code));
-        // The logo and the QR must be on the page before it prints; one that cannot load prints without it.
-        await Promise.all([...doc.images].map((image) => (image.complete ? null : new Promise((ready) => ((image.onload = ready), (image.onerror = ready))))));
+        // Loaded is not enough: the frame is never painted, and Chrome prints an image it has not decoded yet
+        // as blank, which is why the QR printed only sometimes. One that cannot load prints without it.
+        await Promise.all([...doc.images].map((image) => image.decode().catch(() => null)));
         await doc.fonts.ready;
         frame.contentWindow!.addEventListener('afterprint', done);
         setTimeout(done, 120_000);

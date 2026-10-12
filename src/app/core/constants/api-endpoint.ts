@@ -141,9 +141,6 @@ export class APIEndpoint {
     static readonly CANCEL_ORDER_HISTORY = '/api/v1/sales/order-history/cancel-order';
     static readonly CONFIRM_ORDER = '/api/v1/sales/order/confirm-order';
     static readonly CANCEL_ORDER = '/api/v1/sales/order/cancel-order';
-    static readonly MARK_ORDER_PACKED = '/api/v1/sales/order/mark-order-packed';
-    static readonly DISPATCH_ORDER = '/api/v1/sales/order/dispatch-order';
-    static readonly DELIVER_ORDER = '/api/v1/sales/order/deliver-order';
     static readonly MARK_ORDER_NOT_DELIVERED = '/api/v1/sales/order/mark-order-not-delivered';
     static readonly RECORD_ORDER_REFUND = '/api/v1/sales/order/record-order-refund';
     static readonly GET_RETURN_LIST = '/api/v1/sales/return/get-return-list';

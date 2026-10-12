@@ -12,7 +12,6 @@ import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzModalModule, NzModalService } from 'ng-zorro-antd/modal';
 import { NzSkeletonModule } from 'ng-zorro-antd/skeleton';
 import { NzTableModule } from 'ng-zorro-antd/table';
-import { NzTimelineModule } from 'ng-zorro-antd/timeline';
 import { NzTypographyModule } from 'ng-zorro-antd/typography';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { RequestFailure } from '@app/core/models/api.model';
@@ -32,12 +31,13 @@ import { MoneyPipe } from '@app/shared/pipes/money/money.pipe';
 import { RecordDatePipe } from '@app/shared/pipes/record-date/record-date.pipe';
 import { confirmAction } from '@app/shared/utils/confirm-action/confirm-action';
 import { failureKey, failureOf } from '@app/shared/utils/request-failure/request-failure';
+import { RecordTimelineComponent } from '@app/shared/components/record-timeline/record-timeline.component';
 import { resolveTone } from '@app/shared/utils/tone-map/tone-map';
 
 /** One giveaway. A Draft moves nothing; Give takes every line from free stock at once, and is never undone. */
 @Component({
     selector: 'giveaway-detail',
-    imports: [FormsModule, RouterLink, NgIcon, NzButtonModule, NzCardModule, NzFormModule, NzInputModule, NzModalModule, NzSkeletonModule, NzTableModule, NzTimelineModule, NzTypographyModule, TranslatePipe, PageHeaderComponent, ActionFooterComponent, StatusTagComponent, DigitsPipe, MoneyPipe, RecordDatePipe],
+    imports: [RecordTimelineComponent, FormsModule, RouterLink, NgIcon, NzButtonModule, NzCardModule, NzFormModule, NzInputModule, NzModalModule, NzSkeletonModule, NzTableModule, NzTypographyModule, TranslatePipe, PageHeaderComponent, ActionFooterComponent, StatusTagComponent, DigitsPipe, MoneyPipe, RecordDatePipe],
     providers: [provideIcons({ lucideArrowLeft, lucideBan, lucideCheck, lucideGift, lucideHistory, lucideInfo, lucidePackage, lucideRotateCw, lucideX, lucideZap })],
     templateUrl: './giveaway-detail.component.html',
     styleUrl: './giveaway-detail.component.scss',

@@ -113,21 +113,19 @@
             >
             @if (data(); as loaded) {
                 @if (loaded.activity.length) {
-                    <nz-timeline>
-                        @for (entry of loaded.activity; track entry.oid; let first = $first) {
-                            <nz-timeline-item [nzColor]="first ? 'blue' : 'gray'">
-                                @if (changeRoute(entry); as route) {
-                                    <a class="m-0 text-[13px] font-semibold" [routerLink]="route">{{ entry.action }}</a>
-                                } @else {
-                                    <p class="m-0 text-[13px] font-semibold text-ink">{{ entry.action }}</p>
-                                }
-                                @if (entry.description) {
-                                    <p class="mt-0.5 mb-0 text-xs text-ink-body">{{ entry.description }}</p>
-                                }
-                                <p class="mt-0.5 mb-0 text-xs text-ink-muted">{{ entry.user }} &middot; {{ entry.date | recordDate: language() : 'date-time-12' }}</p>
-                            </nz-timeline-item>
-                        }
-                    </nz-timeline>
+                    <record-timeline [entries]="loaded.activity">
+                        <ng-template let-entry>
+                            @if (changeRoute(entry); as route) {
+                                <a class="m-0 text-[13px] font-semibold" [routerLink]="route">{{ entry.action }}</a>
+                            } @else {
+                                <p class="m-0 text-[13px] font-semibold text-ink">{{ entry.action }}</p>
+                            }
+                            @if (entry.description) {
+                                <p class="mt-0.5 mb-0 text-xs text-ink-body">{{ entry.description }}</p>
+                            }
+                            <p class="mt-0.5 mb-0 text-xs text-ink-muted">{{ entry.user }} &middot; {{ entry.date | recordDate: language() : 'date-time-12' }}</p>
+                        </ng-template>
+                    </record-timeline>
                 } @else {
                     <p class="m-0 text-xs text-ink-muted">{{ 'configuration.analytics.changes.empty' | translate }}</p>
                 }

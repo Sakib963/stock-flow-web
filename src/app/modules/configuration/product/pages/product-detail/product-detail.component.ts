@@ -10,7 +10,6 @@ import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzModalService } from 'ng-zorro-antd/modal';
 import { NzSkeletonModule } from 'ng-zorro-antd/skeleton';
 import { NzTableModule } from 'ng-zorro-antd/table';
-import { NzTimelineModule } from 'ng-zorro-antd/timeline';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { RequestFailure } from '@app/core/models/api.model';
 import { PageBack } from '@app/core/models/page-header.model';
@@ -37,6 +36,7 @@ import { RecordDatePipe } from '@app/shared/pipes/record-date/record-date.pipe';
 import { confirmAction } from '@app/shared/utils/confirm-action/confirm-action';
 import { failureKey, failureOf } from '@app/shared/utils/request-failure/request-failure';
 import { localDigits } from '@app/shared/utils/local-digits/local-digits';
+import { RecordTimelineComponent } from '@app/shared/components/record-timeline/record-timeline.component';
 import { resolveTone } from '@app/shared/utils/tone-map/tone-map';
 
 /**
@@ -45,7 +45,7 @@ import { resolveTone } from '@app/shared/utils/tone-map/tone-map';
  */
 @Component({
     selector: 'product-detail',
-    imports: [NgIcon, NzButtonModule, NzCardModule, NzImageModule, NzSkeletonModule, NzTableModule, NzTimelineModule, NzTooltipModule, RouterLink, TranslatePipe, PageHeaderComponent, StatusTagComponent, ActionFooterComponent, NzTypographyModule, BatchExpiryComponent, DigitsPipe, MoneyPipe, RecordDatePipe],
+    imports: [RecordTimelineComponent, NgIcon, NzButtonModule, NzCardModule, NzImageModule, NzSkeletonModule, NzTableModule, NzTooltipModule, RouterLink, TranslatePipe, PageHeaderComponent, StatusTagComponent, ActionFooterComponent, NzTypographyModule, BatchExpiryComponent, DigitsPipe, MoneyPipe, RecordDatePipe],
     providers: [provideIcons({ lucideArrowLeft, lucideArrowLeftRight, lucideBoxes, lucideCalendarClock, lucideChartColumn, lucideCircleX, lucideGift, lucideHandCoins, lucideHistory, lucideImageOff, lucideInfo, lucideLock, lucidePackageCheck, lucidePencil, lucideRotateCw, lucideShoppingCart, lucideTrash2, lucideTruck, lucideUndo2, lucideZap })],
     templateUrl: './product-detail.component.html',
     styleUrl: './product-detail.component.scss',

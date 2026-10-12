@@ -11,7 +11,6 @@ import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzModalModule, NzModalService } from 'ng-zorro-antd/modal';
 import { NzSkeletonModule } from 'ng-zorro-antd/skeleton';
 import { NzTableModule } from 'ng-zorro-antd/table';
-import { NzTimelineModule } from 'ng-zorro-antd/timeline';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { RequestFailure } from '@app/core/models/api.model';
 import { PageBack } from '@app/core/models/page-header.model';
@@ -34,6 +33,7 @@ import { confirmAction } from '@app/shared/utils/confirm-action/confirm-action';
 import { saveDownload } from '@app/shared/utils/download-file/download-file';
 import { failureKey, failureOf } from '@app/shared/utils/request-failure/request-failure';
 import { revealErrors } from '@app/shared/utils/reveal-errors/reveal-errors';
+import { RecordTimelineComponent } from '@app/shared/components/record-timeline/record-timeline.component';
 import { resolveTone } from '@app/shared/utils/tone-map/tone-map';
 
 type Closing = 'reject' | 'cancel';
@@ -44,7 +44,7 @@ type Closing = 'reject' | 'cancel';
  */
 @Component({
     selector: 'stock-adjustment-detail',
-    imports: [NgIcon, ReactiveFormsModule, RouterLink, NzButtonModule, NzCardModule, NzFormModule, NzInputModule, NzModalModule, NzSkeletonModule, NzTableModule, NzTimelineModule, TranslatePipe, PageHeaderComponent, StatusTagComponent, ActionFooterComponent, NzTypographyModule, DigitsPipe, MoneyPipe, RecordDatePipe],
+    imports: [RecordTimelineComponent, NgIcon, ReactiveFormsModule, RouterLink, NzButtonModule, NzCardModule, NzFormModule, NzInputModule, NzModalModule, NzSkeletonModule, NzTableModule, TranslatePipe, PageHeaderComponent, StatusTagComponent, ActionFooterComponent, NzTypographyModule, DigitsPipe, MoneyPipe, RecordDatePipe],
     providers: [MoneyPipe, DigitsPipe, provideIcons({ lucideArrowLeft, lucideBadgeCheck, lucideBan, lucideCircleX, lucideFilePen, lucideFileSpreadsheet, lucideHistory, lucideInfo, lucideListOrdered, lucidePackageMinus, lucidePackagePlus, lucidePencil, lucideRotateCw, lucideWallet, lucideZap })],
     templateUrl: './stock-adjustment-detail.component.html',
     styleUrl: './stock-adjustment-detail.component.scss',

@@ -93,6 +93,19 @@ describe('DeliveryBatchDetailComponent', () => {
         expect(sent.request.body).toEqual({ oid: OID, order_oids: ['1', '2'] });
     });
 
+    it('spins only the pressed action and holds every other one until its answer comes back', async () => {
+        const { fixture, page, element, http } = await open(batch());
+        vi.spyOn(fixture.debugElement.injector.get(NzModalService), 'confirm').mockImplementation(() => ({ afterClose: of(true) }) as unknown as NzModalRef);
+        page.tick('1', true);
+        page.handOver();
+        fixture.detectChanges();
+        const button = (name: string) => element.querySelector<HTMLButtonElement>(`[data-quick="${name}"]`)!;
+        expect(button('hand-over').classList).toContain('ant-btn-loading');
+        for (const other of ['file', 'labels-all', 'labels-ticked', 'add', 'take-out', 'cancel']) expect(button(other).disabled, other).toBe(true);
+        http.expectOne((r) => r.url.includes(APIEndpoint.HAND_OVER_DELIVERY_BATCH)).flush({ code: 200, data: { dispatched: 2, left_out: [] } });
+        expect(page.acting()).toBeNull();
+    });
+
     it('takes the ticked orders out by sending the ones that stay, and never empties the batch', async () => {
         const { fixture, page, http } = await open(batch());
         vi.spyOn(fixture.debugElement.injector.get(NzModalService), 'confirm').mockImplementation(() => ({ afterClose: of(true) }) as unknown as NzModalRef);

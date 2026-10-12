@@ -7,7 +7,6 @@ import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzCardModule } from 'ng-zorro-antd/card';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzSkeletonModule } from 'ng-zorro-antd/skeleton';
-import { NzTimelineModule } from 'ng-zorro-antd/timeline';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { RequestFailure } from '@app/core/models/api.model';
 import { Category, CategoryDetails, CategoryReport } from '@app/core/models/category.model';
@@ -24,6 +23,7 @@ import { MoneyPipe } from '@app/shared/pipes/money/money.pipe';
 import { RecordDatePipe } from '@app/shared/pipes/record-date/record-date.pipe';
 import { saveDownload } from '@app/shared/utils/download-file/download-file';
 import { failureKey, failureOf } from '@app/shared/utils/request-failure/request-failure';
+import { RecordTimelineComponent } from '@app/shared/components/record-timeline/record-timeline.component';
 import { resolveTone } from '@app/shared/utils/tone-map/tone-map';
 
 /**
@@ -32,7 +32,7 @@ import { resolveTone } from '@app/shared/utils/tone-map/tone-map';
  */
 @Component({
     selector: 'category-detail',
-    imports: [NgIcon, NzButtonModule, NzCardModule, NzSkeletonModule, NzTimelineModule, TranslatePipe, PageHeaderComponent, StatusTagComponent, ActionFooterComponent, MoneyPipe, RecordDatePipe],
+    imports: [RecordTimelineComponent, NgIcon, NzButtonModule, NzCardModule, NzSkeletonModule, TranslatePipe, PageHeaderComponent, StatusTagComponent, ActionFooterComponent, MoneyPipe, RecordDatePipe],
     providers: [provideIcons({ lucideArrowLeft, lucideBanknote, lucideBoxes, lucideChartColumn, lucideCircleOff, lucideFileSpreadsheet, lucideHistory, lucideInfo, lucidePackage, lucidePencil, lucideRotateCw, lucideTag, lucideTriangleAlert, lucideZap })],
     templateUrl: './category-detail.component.html',
     styleUrl: './category-detail.component.scss',

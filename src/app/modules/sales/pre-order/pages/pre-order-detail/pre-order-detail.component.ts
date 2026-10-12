@@ -14,7 +14,6 @@ import { NzModalModule, NzModalService } from 'ng-zorro-antd/modal';
 import { NzSelectModule } from 'ng-zorro-antd/select';
 import { NzSkeletonModule } from 'ng-zorro-antd/skeleton';
 import { NzTableModule } from 'ng-zorro-antd/table';
-import { NzTimelineModule } from 'ng-zorro-antd/timeline';
 import { NzTypographyModule } from 'ng-zorro-antd/typography';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { Observable } from 'rxjs';
@@ -35,12 +34,13 @@ import { MoneyPipe } from '@app/shared/pipes/money/money.pipe';
 import { RecordDatePipe } from '@app/shared/pipes/record-date/record-date.pipe';
 import { confirmAction } from '@app/shared/utils/confirm-action/confirm-action';
 import { failureKey, failureOf } from '@app/shared/utils/request-failure/request-failure';
+import { RecordTimelineComponent } from '@app/shared/components/record-timeline/record-timeline.component';
 import { resolveTone } from '@app/shared/utils/tone-map/tone-map';
 
 /** One booking. Nothing here touches stock: Confirm accepts it, Cancel records the advance owed back. */
 @Component({
     selector: 'pre-order-detail',
-    imports: [FormsModule, RouterLink, NgIcon, NzButtonModule, NzCardModule, NzFormModule, NzInputModule, NzInputNumberModule, NzModalModule, NzSelectModule, NzSkeletonModule, NzTableModule, NzTimelineModule, NzTypographyModule, TranslatePipe, PageHeaderComponent, ActionFooterComponent, StatusTagComponent, DigitsPipe, MoneyPipe, RecordDatePipe],
+    imports: [RecordTimelineComponent, FormsModule, RouterLink, NgIcon, NzButtonModule, NzCardModule, NzFormModule, NzInputModule, NzInputNumberModule, NzModalModule, NzSelectModule, NzSkeletonModule, NzTableModule, NzTypographyModule, TranslatePipe, PageHeaderComponent, ActionFooterComponent, StatusTagComponent, DigitsPipe, MoneyPipe, RecordDatePipe],
     providers: [MoneyPipe, provideIcons({ lucideArrowLeft, lucideBan, lucideCalendarCheck, lucideCheck, lucideShoppingBag, lucideHandCoins, lucideHistory, lucideInfo, lucidePackage, lucidePencil, lucideRotateCw, lucideX, lucideZap })],
     templateUrl: './pre-order-detail.component.html',
     styleUrl: './pre-order-detail.component.scss',

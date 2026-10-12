@@ -8,7 +8,6 @@ import { NzCardModule } from 'ng-zorro-antd/card';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzSkeletonModule } from 'ng-zorro-antd/skeleton';
 import { NzTableModule } from 'ng-zorro-antd/table';
-import { NzTimelineModule } from 'ng-zorro-antd/timeline';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { RequestFailure } from '@app/core/models/api.model';
 import { Aisle, AisleDetails, AisleReport } from '@app/core/models/aisle.model';
@@ -27,6 +26,7 @@ import { DigitsPipe } from '@app/shared/pipes/digits/digits.pipe';
 import { RecordDatePipe } from '@app/shared/pipes/record-date/record-date.pipe';
 import { saveDownload } from '@app/shared/utils/download-file/download-file';
 import { failureKey, failureOf } from '@app/shared/utils/request-failure/request-failure';
+import { RecordTimelineComponent } from '@app/shared/components/record-timeline/record-timeline.component';
 import { resolveTone } from '@app/shared/utils/tone-map/tone-map';
 
 /**
@@ -35,7 +35,7 @@ import { resolveTone } from '@app/shared/utils/tone-map/tone-map';
  */
 @Component({
     selector: 'aisle-detail',
-    imports: [RouterLink, NgIcon, NzButtonModule, NzCardModule, NzSkeletonModule, NzTableModule, NzTimelineModule, TranslatePipe, PageHeaderComponent, StatusTagComponent, ActionFooterComponent, MoneyPipe, RecordDatePipe, DigitsPipe],
+    imports: [RecordTimelineComponent, RouterLink, NgIcon, NzButtonModule, NzCardModule, NzSkeletonModule, NzTableModule, TranslatePipe, PageHeaderComponent, StatusTagComponent, ActionFooterComponent, MoneyPipe, RecordDatePipe, DigitsPipe],
     providers: [provideIcons({ lucideArrowLeft, lucideBanknote, lucideBoxes, lucideChartColumn, lucideClipboardList, lucideFileSpreadsheet, lucideGauge, lucideHistory, lucideInfo, lucidePackage, lucidePencil, lucideRotateCw, lucideTriangleAlert, lucideZap })],
     templateUrl: './aisle-detail.component.html',
     styleUrl: './aisle-detail.component.scss',

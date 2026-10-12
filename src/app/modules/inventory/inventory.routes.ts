@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { OVERLAY_PROVIDERS } from '@app/shared/constants/overlay-providers';
+import { firstChildGuard } from '@app/core/guards/first-child/first-child.guard';
 import { permissionGuard } from '@app/core/guards/permission/permission.guard';
 import { unsavedChangesGuard } from '@app/core/guards/unsaved-changes/unsaved-changes.guard';
 import { PURCHASE_ORDER_LIST } from '@app/modules/inventory/purchase-order/config/purchase-order-list.config';
@@ -14,6 +15,7 @@ export const INVENTORY_ROUTES: Routes = [
         path: '',
         providers: [...OVERLAY_PROVIDERS],
         children: [
+            { path: '', pathMatch: 'full', canActivate: [firstChildGuard], children: [] },
             {
                 path: 'overview',
                 canActivate: [permissionGuard],

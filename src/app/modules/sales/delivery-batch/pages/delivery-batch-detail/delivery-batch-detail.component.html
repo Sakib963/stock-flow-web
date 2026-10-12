@@ -83,14 +83,14 @@
                 @if (record(); as b) {
                     <div class="flex flex-col gap-2">
                         @if (actions().handOver) {
-                            <button nz-button nzType="primary" nzBlock type="button" class="inline-flex items-center justify-start gap-2" data-quick="hand-over" [disabled]="saving() || !orders().length" (click)="handOver()">
+                            <button nz-button nzType="primary" nzBlock type="button" class="inline-flex items-center justify-start gap-2" data-quick="hand-over" [nzLoading]="acting() === 'hand-over'" [disabled]="(busy() && acting() !== 'hand-over') || !orders().length" (click)="handOver()">
                                 <ng-icon name="lucideTruck" size="14px" aria-hidden="true" />
                                 <span>{{ 'sales.deliveryBatch.action.handOver.button' | translate }}</span>
                             </button>
                         }
                         @if (actions().deliver) {
                             <span class="block" nz-tooltip [nzTooltipTitle]="withCourier().length ? null : ('sales.deliveryBatch.action.deliver.tickFirst' | translate)">
-                                <button nz-button nzType="primary" nzBlock type="button" class="inline-flex items-center justify-start gap-2" data-quick="deliver" [disabled]="saving() || !withCourier().length" (click)="deliver()">
+                                <button nz-button nzType="primary" nzBlock type="button" class="inline-flex items-center justify-start gap-2" data-quick="deliver" [nzLoading]="acting() === 'deliver'" [disabled]="(busy() && acting() !== 'deliver') || !withCourier().length" (click)="deliver()">
                                     <ng-icon name="lucidePackageCheck" size="14px" aria-hidden="true" />
                                     <span>{{ 'sales.deliveryBatch.action.deliver.buttonCount' | translate: { count: (withCourier().length | digits) } }}</span>
                                 </button>
@@ -98,7 +98,7 @@
                         }
                         @if (actions().file) {
                             <span class="block" nz-tooltip [nzTooltipTitle]="b.courier === 'Pathao' ? null : ('sales.deliveryBatch.pathaoOnly' | translate)">
-                                <button nz-button nzBlock type="button" class="inline-flex items-center justify-start gap-2" data-quick="file" [nzLoading]="downloading()" [disabled]="b.courier !== 'Pathao'" (click)="download()">
+                                <button nz-button nzBlock type="button" class="inline-flex items-center justify-start gap-2" data-quick="file" [nzLoading]="downloading()" [disabled]="saving() || b.courier !== 'Pathao'" (click)="download()">
                                     @if (!downloading()) {
                                         <ng-icon name="lucideDownload" size="14px" aria-hidden="true" />
                                     }
@@ -107,33 +107,33 @@
                             </span>
                         }
                         @if (actions().labels) {
-                            <button nz-button nzBlock type="button" class="inline-flex items-center justify-start gap-2" data-quick="labels-all" [disabled]="!printable().length" (click)="print(orders())">
+                            <button nz-button nzBlock type="button" class="inline-flex items-center justify-start gap-2" data-quick="labels-all" [disabled]="busy() || !printable().length" (click)="print(orders())">
                                 <ng-icon name="lucideTag" size="14px" aria-hidden="true" />
                                 <span>{{ 'sales.deliveryBatch.action.labelsAll' | translate: { count: (printable().length | digits) } }}</span>
                             </button>
                             <span class="block" nz-tooltip [nzTooltipTitle]="chosen().length ? null : ('sales.deliveryBatch.tickFirst' | translate)">
-                                <button nz-button nzBlock type="button" class="inline-flex items-center justify-start gap-2" data-quick="labels-ticked" [disabled]="!chosen().length" (click)="print(chosen())">
+                                <button nz-button nzBlock type="button" class="inline-flex items-center justify-start gap-2" data-quick="labels-ticked" [disabled]="busy() || !chosen().length" (click)="print(chosen())">
                                     <ng-icon name="lucideTag" size="14px" aria-hidden="true" />
                                     <span>{{ 'sales.deliveryBatch.action.labelsTicked' | translate: { count: (chosen().length | digits) } }}</span>
                                 </button>
                             </span>
                         }
                         @if (actions().add) {
-                            <button nz-button nzBlock type="button" class="inline-flex items-center justify-start gap-2" data-quick="add" [disabled]="saving()" (click)="openAdd()">
+                            <button nz-button nzBlock type="button" class="inline-flex items-center justify-start gap-2" data-quick="add" [nzLoading]="acting() === 'add'" [disabled]="busy() && acting() !== 'add'" (click)="openAdd()">
                                 <ng-icon name="lucidePlus" size="14px" aria-hidden="true" />
                                 <span>{{ 'sales.deliveryBatch.action.add.button' | translate }}</span>
                             </button>
                         }
                         @if (actions().takeOut) {
                             <span class="block" nz-tooltip [nzTooltipTitle]="chosen().length ? null : ('sales.deliveryBatch.tickFirst' | translate)">
-                                <button nz-button nzBlock type="button" class="inline-flex items-center justify-start gap-2" data-quick="take-out" [disabled]="saving() || !chosen().length" (click)="takeOut()">
+                                <button nz-button nzBlock type="button" class="inline-flex items-center justify-start gap-2" data-quick="take-out" [nzLoading]="acting() === 'take-out'" [disabled]="(busy() && acting() !== 'take-out') || !chosen().length" (click)="takeOut()">
                                     <ng-icon name="lucideMinus" size="14px" aria-hidden="true" />
                                     <span>{{ 'sales.deliveryBatch.action.takeOut.buttonCount' | translate: { count: (chosen().length | digits) } }}</span>
                                 </button>
                             </span>
                         }
                         @if (actions().cancel) {
-                            <button nz-button nzDanger nzBlock type="button" class="inline-flex items-center justify-start gap-2" data-quick="cancel" [disabled]="saving()" (click)="openCancel()">
+                            <button nz-button nzDanger nzBlock type="button" class="inline-flex items-center justify-start gap-2" data-quick="cancel" [nzLoading]="acting() === 'cancel'" [disabled]="busy() && acting() !== 'cancel'" (click)="openCancel()">
                                 <ng-icon name="lucideBan" size="14px" aria-hidden="true" />
                                 <span>{{ 'sales.deliveryBatch.action.cancel.button' | translate }}</span>
                             </button>
@@ -151,17 +151,15 @@
                     ><h2 class="m-0 flex items-center gap-1.5 text-sm font-bold text-ink"><ng-icon name="lucideHistory" size="14px" class="text-ink-muted" aria-hidden="true" />{{ 'sales.order.section.timeline' | translate }}</h2></ng-template
                 >
                 @if (record(); as b) {
-                    <nz-timeline>
-                        @for (entry of b.activity; track $index; let first = $first) {
-                            <nz-timeline-item [nzColor]="first ? 'blue' : 'gray'">
-                                <p class="m-0 text-shell-title font-semibold text-ink">{{ entry.title }}</p>
-                                @if (entry.description) {
-                                    <p class="mt-0.5 mb-0 text-xs text-ink-body">{{ entry.description }}</p>
-                                }
-                                <p class="mt-0.5 mb-0 text-xs text-ink-muted">{{ entry.performed_by }} &middot; {{ entry.performed_on | recordDate: language() : 'date-time-12' }}</p>
-                            </nz-timeline-item>
-                        }
-                    </nz-timeline>
+                    <record-timeline [entries]="b.activity">
+                        <ng-template let-entry>
+                            <p class="m-0 text-shell-title font-semibold text-ink">{{ entry.title }}</p>
+                            @if (entry.description) {
+                                <p class="mt-0.5 mb-0 text-xs text-ink-body">{{ entry.description }}</p>
+                            }
+                            <p class="mt-0.5 mb-0 text-xs text-ink-muted">{{ entry.performed_by }} &middot; {{ entry.performed_on | recordDate: language() : 'date-time-12' }}</p>
+                        </ng-template>
+                    </record-timeline>
                 } @else {
                     <nz-skeleton nzActive [nzTitle]="false" [nzParagraph]="{ rows: 3 }" />
                 }
@@ -215,7 +213,7 @@
                                     <td class="text-right font-mono font-semibold tabular-nums">{{ order.to_collect | money }}</td>
                                     <td class="text-right">
                                         @if (labelled(order)) {
-                                            <button nz-button nzType="text" nzSize="small" type="button" nz-tooltip [nzTooltipTitle]="'sales.deliveryBatch.printOne' | translate" [attr.aria-label]="'sales.deliveryBatch.printOne' | translate" (click)="print([order])">
+                                            <button nz-button nzType="text" nzSize="small" type="button" nz-tooltip [nzTooltipTitle]="'sales.deliveryBatch.printOne' | translate" [attr.aria-label]="'sales.deliveryBatch.printOne' | translate" [disabled]="busy()" (click)="print([order])">
                                                 <ng-icon name="lucideTag" size="14px" class="text-ink-muted" aria-hidden="true" />
                                             </button>
                                         }

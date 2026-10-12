@@ -74,9 +74,14 @@ describe('OrderDetailComponent', () => {
         expect(quick(element)).toEqual(['confirm', 'edit', 'cancel', 'print', 'label']);
     });
 
-    it('offers Deliver and Not delivered once the parcel is with the courier, and no Cancel', async () => {
+    it('offers only Not delivered once the parcel is with the courier: it was dispatched and is delivered from its batch', async () => {
         const { element } = await open(order({ status: 'Confirmed', dispatched_on: '2026-10-05T12:00:00.000', online: { ...order().online!, delivery_status: 'WithCourier' } }));
-        expect(quick(element)).toEqual(['deliver', 'not-delivered', 'print', 'label']);
+        expect(quick(element)).toEqual(['not-delivered', 'print', 'label']);
+    });
+
+    it('never offers Packed or Dispatch on a confirmed order: it leaves in a delivery batch', async () => {
+        const { element } = await open(order({ status: 'Confirmed', online: { ...order().online!, delivery_status: 'Preparing' } }));
+        expect(quick(element)).toEqual(['cancel', 'print', 'label']);
     });
 
     it('hides an action from someone without its permission', async () => {
@@ -156,16 +161,16 @@ describe('OrderDetailComponent', () => {
         expect(page.record()?.status).toBe('Confirmed');
     });
 
-    it('spins only the pressed action and holds the others until it is done', async () => {
-        const { fixture, page, element, http } = await open(order({ status: 'Confirmed', online: { ...order().online!, delivery_status: 'Preparing' } }));
-        vi.spyOn(fixture.debugElement.injector.get(NzModalService), 'confirm').mockImplementation(() => ({ afterClose: of(true) }) as unknown as NzModalRef);
-        page.markPacked();
+    it('holds every other action while one is being saved', async () => {
+        const { fixture, page, element, http } = await open(order({ status: 'Confirmed', dispatched_on: '2026-10-05T12:00:00.000', online: { ...order().online!, delivery_status: 'WithCourier' } }));
+        page.open('notDelivered');
+        page.notDeliveredReason.set('refused');
+        page.submitDialog();
+        page.submitDialog();
         fixture.detectChanges();
-        const button = (name: string) => element.querySelector<HTMLButtonElement>(`[data-quick="${name}"]`)!;
-        expect(button('packed').classList).toContain('ant-btn-loading');
-        expect(button('dispatch').disabled).toBe(true);
-        expect(button('cancel').disabled).toBe(true);
-        http.expectOne((r) => r.url.includes(APIEndpoint.MARK_ORDER_PACKED)).flush({ code: 200, data: { oid: OID } });
+        expect(page.acting()).toBe('notDelivered');
+        expect(element.querySelector<HTMLButtonElement>('[data-quick="not-delivered"]')!.disabled).toBe(true);
+        http.expectOne((r) => r.url.includes(APIEndpoint.MARK_ORDER_NOT_DELIVERED)).flush({ code: 200, data: { oid: OID } });
         expect(page.acting()).toBeNull();
     });
 
@@ -203,27 +208,12 @@ describe('OrderDetailComponent', () => {
         expect(quick(element)).not.toContain('return');
     });
 
-    it('shows the latest five steps, and five more under them after See more', async () => {
-        vi.useFakeTimers();
+    it('shows the latest five steps first, through the shared timeline', async () => {
         const steps = Array.from({ length: 12 }, (_, i) => ({ kind: 'Order', from_status: null, to_status: 'Pending', reason: null, performed_by: 'm', performed_by_name: `Step ${i + 1}`, performed_on: '2026-10-05T10:00:00.000' })) as OrderDetails['status_history'];
-        const { fixture, element } = await open(order({ status_history: steps }));
-        const names = () => [...element.querySelectorAll('.ant-timeline-item')].map((node) => node.textContent?.match(/Step \d+/)?.[0]);
-        const more = () => element.querySelector<HTMLButtonElement>('[data-detail="timeline-more"]');
-        expect(names()).toEqual(['Step 12', 'Step 11', 'Step 10', 'Step 9', 'Step 8']);
-
-        more()!.click();
-        fixture.detectChanges();
-        expect(more()!.classList).toContain('ant-btn-loading');
-        vi.advanceTimersByTime(400);
-        fixture.detectChanges();
-        expect(names().length).toBe(10);
-
-        more()!.click();
-        vi.advanceTimersByTime(400);
-        fixture.detectChanges();
-        expect(names().at(-1)).toBe('Step 1');
-        expect(more()).toBeNull();
-        vi.useRealTimers();
+        const { element } = await open(order({ status_history: steps }));
+        const names = [...element.querySelectorAll('.ant-timeline-item')].map((node) => node.textContent?.match(/Step \d+/)?.[0]);
+        expect(names).toEqual(['Step 12', 'Step 11', 'Step 10', 'Step 9', 'Step 8']);
+        expect(element.querySelector('[data-timeline="more"]')).not.toBeNull();
     });
 
     it('records a refund owed on a cancelled order, no more than is owed, after asking in the same dialog', async () => {

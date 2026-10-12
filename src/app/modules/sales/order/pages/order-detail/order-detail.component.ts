@@ -1,9 +1,9 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { ChangeDetectionStrategy, Component, DestroyRef, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { NgIcon, provideIcons } from '@ng-icons/core';
-import { lucideTag, lucideMessageSquareText, lucidePencil, lucideArrowLeft, lucideBan, lucideHandCoins, lucideCheck, lucideCircleCheck, lucideGift, lucideHistory, lucideInfo, lucideMapPin, lucidePackage, lucidePackageCheck, lucidePackageX, lucidePrinter, lucideReceipt, lucideRotateCw, lucideTruck, lucideUndo2, lucideUserRound, lucideWallet, lucideX, lucideZap } from '@ng-icons/lucide';
+import { lucideTag, lucideMessageSquareText, lucidePencil, lucideArrowLeft, lucideBan, lucideHandCoins, lucideCheck, lucideCircleCheck, lucideGift, lucideHistory, lucideInfo, lucideMapPin, lucidePackageX, lucidePrinter, lucideReceipt, lucideRotateCw, lucideUndo2, lucideUserRound, lucideWallet, lucideX, lucideZap } from '@ng-icons/lucide';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzCardModule } from 'ng-zorro-antd/card';
 import { NzTooltipModule } from 'ng-zorro-antd/tooltip';
@@ -16,12 +16,11 @@ import { NzRadioModule } from 'ng-zorro-antd/radio';
 import { NzSelectModule } from 'ng-zorro-antd/select';
 import { NzSkeletonModule } from 'ng-zorro-antd/skeleton';
 import { NzTableModule } from 'ng-zorro-antd/table';
-import { NzTimelineModule } from 'ng-zorro-antd/timeline';
 import { NzTypographyModule } from 'ng-zorro-antd/typography';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { Observable, finalize } from 'rxjs';
 import { RequestFailure } from '@app/core/models/api.model';
-import { CANCEL_REASONS, CONFIRMED_VIA, COURIERS, CancelReason, ConfirmedVia, Courier, NOT_DELIVERED_REASONS, NotDeliveredReason, OrderDetails, OrderScope, REFUND_METHODS, RefundMethod } from '@app/core/models/order.model';
+import { CANCEL_REASONS, CONFIRMED_VIA, CancelReason, ConfirmedVia, NOT_DELIVERED_REASONS, NotDeliveredReason, OrderDetails, OrderScope, REFUND_METHODS, RefundMethod } from '@app/core/models/order.model';
 import { PageBack } from '@app/core/models/page-header.model';
 import { LanguageService } from '@app/core/services/language/language.service';
 import { SessionService } from '@app/core/services/session/session.service';
@@ -53,9 +52,9 @@ import { isLabelable, labelContent, printLabel } from '@app/shared/utils/deliver
 import { printInvoice } from '@app/shared/utils/invoice/invoice';
 import { confirmAction } from '@app/shared/utils/confirm-action/confirm-action';
 import { failureKey, failureOf } from '@app/shared/utils/request-failure/request-failure';
+import { RecordTimelineComponent } from '@app/shared/components/record-timeline/record-timeline.component';
 import { resolveTone } from '@app/shared/utils/tone-map/tone-map';
 
-const TIMELINE_STEP = 5;
 const RETURNABLE = ['Purchased', 'Delivered', 'PartiallyReturned'];
 
 /** The server writes these few reasons as fixed English sentences; each has a label in both languages. */
@@ -69,8 +68,8 @@ const FIXED_REASONS: Record<string, string> = {
     'Online order edited': 'edited',
 };
 
-/** The actions that open a dialog for their details; Packed and Deliver only ask. */
-type Dialog = 'confirm' | 'cancel' | 'dispatch' | 'notDelivered' | 'refund';
+/** The actions that open a dialog for their details. Packing, dispatch and delivery happen in a delivery batch. */
+type Dialog = 'confirm' | 'cancel' | 'notDelivered' | 'refund';
 
 /**
  * One order (sales: order record page). The order leads, then its numbers, lines, where it goes and
@@ -79,8 +78,8 @@ type Dialog = 'confirm' | 'cancel' | 'dispatch' | 'notDelivered' | 'refund';
  */
 @Component({
     selector: 'order-detail',
-    imports: [FormsModule, RouterLink, NgIcon, NzButtonModule, NzCardModule, NzTooltipModule, NzFormModule, NzInputModule, NzInputNumberModule, NzModalModule, NzRadioModule, NzSelectModule, NzSkeletonModule, NzTableModule, NzTimelineModule, NzTypographyModule, TranslatePipe, PageHeaderComponent, ActionFooterComponent, StatusTagComponent, ReturnCreateDialogComponent, OrderGiftDialogComponent, DigitsPipe, MoneyPipe, RecordDatePipe],
-    providers: [MoneyPipe, DigitsPipe, provideIcons({ lucideTag, lucideMessageSquareText, lucidePencil, lucideArrowLeft, lucideBan, lucideHandCoins, lucideCheck, lucideCircleCheck, lucideGift, lucideHistory, lucideInfo, lucideMapPin, lucidePackage, lucidePackageCheck, lucidePackageX, lucidePrinter, lucideReceipt, lucideRotateCw, lucideTruck, lucideUndo2, lucideUserRound, lucideWallet, lucideX, lucideZap })],
+    imports: [RecordTimelineComponent, FormsModule, RouterLink, NgIcon, NzButtonModule, NzCardModule, NzTooltipModule, NzFormModule, NzInputModule, NzInputNumberModule, NzModalModule, NzRadioModule, NzSelectModule, NzSkeletonModule, NzTableModule, NzTypographyModule, TranslatePipe, PageHeaderComponent, ActionFooterComponent, StatusTagComponent, ReturnCreateDialogComponent, OrderGiftDialogComponent, DigitsPipe, MoneyPipe, RecordDatePipe],
+    providers: [MoneyPipe, DigitsPipe, provideIcons({ lucideTag, lucideMessageSquareText, lucidePencil, lucideArrowLeft, lucideBan, lucideHandCoins, lucideCheck, lucideCircleCheck, lucideGift, lucideHistory, lucideInfo, lucideMapPin, lucidePackageX, lucidePrinter, lucideReceipt, lucideRotateCw, lucideUndo2, lucideUserRound, lucideWallet, lucideX, lucideZap })],
     templateUrl: './order-detail.component.html',
     styleUrl: './order-detail.component.scss',
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -140,11 +139,7 @@ export class OrderDetailComponent {
         return isLabelable(o.status, o.online?.delivery_status ?? null) ? 'ready' : null;
     });
 
-    readonly timelineShown = signal(TIMELINE_STEP);
-    readonly timelineMore = signal(false);
     readonly timeline = computed(() => [...(this.record()?.status_history ?? [])].reverse());
-    readonly timelineVisible = computed(() => this.timeline().slice(0, this.timelineShown()));
-    private _timelineTimer?: ReturnType<typeof setTimeout>;
 
     /** Each action appears only when the person holds it and the order is in the state it leaves. */
     readonly actions = computed(() => {
@@ -158,9 +153,6 @@ export class OrderDetailComponent {
             confirm: online && o.status === 'Pending' && can('confirm'),
             // The edit opens the online order page, which needs the online channel as well.
             edit: all && online && o.status === 'Pending' && can('edit') && this._session.can('sales.online.view'),
-            packed: all && online && o.status === 'Confirmed' && delivery === 'Preparing' && can('dispatch'),
-            dispatch: all && online && o.status === 'Confirmed' && !o.dispatched_on && (delivery === 'Preparing' || delivery === 'Packed') && can('dispatch'),
-            deliver: all && online && o.status === 'Confirmed' && delivery === 'WithCourier' && can('deliver'),
             notDelivered: all && online && o.status === 'Confirmed' && delivery === 'WithCourier' && can('deliver'),
             cancel: online && open && can('cancel'),
             refund: all && online && o.refund_status === 'ToRefund' && can('refund'),
@@ -190,15 +182,12 @@ export class OrderDetailComponent {
     // The action dialog and what it holds.
     readonly dialog = signal<Dialog | null>(null);
     readonly confirming = signal(false);
-    readonly acting = signal<Dialog | 'packed' | 'deliver' | null>(null);
+    readonly acting = signal<Dialog | null>(null);
     readonly confirmedVias = CONFIRMED_VIA;
     readonly reasonGroups = Object.entries(CANCEL_REASONS);
-    readonly couriers = COURIERS;
     readonly notDeliveredReasons = NOT_DELIVERED_REASONS;
     readonly confirmedVia = signal<ConfirmedVia>('PhoneCall');
     readonly cancelReason = signal<CancelReason | null>(null);
-    readonly courier = signal<Courier | null>(null);
-    readonly consignment = signal('');
     readonly notDeliveredReason = signal<NotDeliveredReason | null>(null);
     readonly refundMethods = REFUND_METHODS;
     readonly refundAmount = signal<number | null>(null);
@@ -209,8 +198,6 @@ export class OrderDetailComponent {
         switch (this.dialog()) {
             case 'cancel':
                 return !this.cancelReason() || (this.cancelReason() === 'other' && !this.note().trim());
-            case 'dispatch':
-                return !this.courier();
             case 'refund': {
                 const amount = this.refundAmount() ?? 0;
                 return amount < 1 || amount > (this.record()?.refund_due ?? 0) || !this.refundMethod() || (this.refundMethod() === 'other' && !this.note().trim());
@@ -225,16 +212,6 @@ export class OrderDetailComponent {
     constructor() {
         this.load();
         this.loadTemplates();
-        inject(DestroyRef).onDestroy(() => clearTimeout(this._timelineTimer));
-    }
-
-    /** The entries are already loaded; the short pause tells the person something was added below. */
-    showMoreTimeline(): void {
-        this.timelineMore.set(true);
-        this._timelineTimer = setTimeout(() => {
-            this.timelineShown.update((shown) => shown + TIMELINE_STEP);
-            this.timelineMore.set(false);
-        }, 400);
     }
 
     load(): void {
@@ -243,7 +220,6 @@ export class OrderDetailComponent {
         this._orders.details(this.oid, this.scope).subscribe({
             next: (details) => {
                 this.record.set(details);
-                this.timelineShown.set(TIMELINE_STEP);
                 this.loadReturns();
                 this.loadGifts();
                 this.loading.set(false);
@@ -437,21 +413,11 @@ export class OrderDetailComponent {
         this.note.set('');
         this.cancelReason.set(null);
         this.notDeliveredReason.set(null);
-        this.courier.set(this.record()?.online?.courier ?? null);
-        this.consignment.set('');
         this.confirmedVia.set('PhoneCall');
         this.refundAmount.set(this.record()?.refund_due ?? null);
         this.refundMethod.set(null);
         this.confirming.set(false);
         this.dialog.set(dialog);
-    }
-
-    markPacked(): void {
-        this.ask('packed', () => this._orders.markPacked(this.oid));
-    }
-
-    deliver(): void {
-        this.ask('deliver', () => this._orders.deliver(this.oid));
     }
 
     /** A dialog asks inside itself: the first press turns the body into the confirmation, never a second modal on top. */
@@ -466,27 +432,14 @@ export class OrderDetailComponent {
         const send: Record<Dialog, () => Observable<unknown>> = {
             confirm: () => this._orders.confirm(this.oid, this.confirmedVia(), note, this.scope),
             cancel: () => this._orders.cancel(this.oid, this.cancelReason()!, note, this.scope),
-            dispatch: () => this._orders.dispatch(this.oid, this.courier()!, this.consignment().trim() || null),
             notDelivered: () => this._orders.notDelivered(this.oid, this.notDeliveredReason()!, note),
             refund: () => this._orders.recordRefund(this.oid, this.refundAmount()!, this.refundMethod()!, note),
         };
         this.run(dialog, send[dialog]);
     }
 
-    private ask(action: 'packed' | 'deliver', send: () => Observable<unknown>): void {
-        const key = 'sales.order.action.' + action;
-        confirmAction(this._modal, {
-            title: this._translate.instant(key + '.confirmTitle', { number: this.record()?.invoice_no ?? '' }),
-            body: this._translate.instant(key + '.confirmBody'),
-            ok: this._translate.instant(key + '.button'),
-            cancel: this._translate.instant('form.confirm.cancel'),
-        }).subscribe((confirmed) => {
-            if (confirmed) this.run(action, send);
-        });
-    }
-
     /** Reloads the order after every action, so the page shows what the server now holds. */
-    private run(action: Dialog | 'packed' | 'deliver', send: () => Observable<unknown>): void {
+    private run(action: Dialog, send: () => Observable<unknown>): void {
         this.acting.set(action);
         send()
             .pipe(finalize(() => this.acting.set(null)))

@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { OVERLAY_PROVIDERS } from '@app/shared/constants/overlay-providers';
+import { firstChildGuard } from '@app/core/guards/first-child/first-child.guard';
 import { permissionGuard } from '@app/core/guards/permission/permission.guard';
 import { unsavedChangesGuard } from '@app/core/guards/unsaved-changes/unsaved-changes.guard';
 import { CATEGORY_LIST } from '@app/modules/configuration/category/config/category-list.config';
@@ -18,6 +19,7 @@ export const CONFIGURATION_ROUTES: Routes = [
         path: '',
         providers: [...OVERLAY_PROVIDERS],
         children: [
+            { path: '', pathMatch: 'full', canActivate: [firstChildGuard], children: [] },
             { path: '', pathMatch: 'full', redirectTo: 'analytics' },
             {
                 path: 'analytics',

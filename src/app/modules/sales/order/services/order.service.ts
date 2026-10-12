@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject, signal } from '@angular/core';
 import { APIEndpoint } from '@app/core/constants/api-endpoint';
-import { CancelReason, ConfirmedVia, Courier, NotDeliveredReason, OrderDetails, OrderScope, RefundMethod } from '@app/core/models/order.model';
+import { CancelReason, ConfirmedVia, NotDeliveredReason, OrderDetails, OrderScope, RefundMethod } from '@app/core/models/order.model';
 import { environment } from '@env/environment';
 import { Observable, finalize, map } from 'rxjs';
 
@@ -23,18 +23,6 @@ export class OrderService {
 
     cancel(oid: string, reason_code: CancelReason, note: string | null, scope: OrderScope = 'all'): Observable<{ refund_due: number }> {
         return this.write<{ refund_due: number }>(scope === 'history' ? APIEndpoint.CANCEL_ORDER_HISTORY : APIEndpoint.CANCEL_ORDER, { oid, reason_code, note });
-    }
-
-    markPacked(oid: string): Observable<unknown> {
-        return this.write(APIEndpoint.MARK_ORDER_PACKED, { oid });
-    }
-
-    dispatch(oid: string, courier: Courier, consignment_no: string | null): Observable<unknown> {
-        return this.write(APIEndpoint.DISPATCH_ORDER, { oid, courier, consignment_no });
-    }
-
-    deliver(oid: string): Observable<unknown> {
-        return this.write(APIEndpoint.DELIVER_ORDER, { oid });
     }
 
     notDelivered(oid: string, reason: NotDeliveredReason, note: string | null): Observable<unknown> {

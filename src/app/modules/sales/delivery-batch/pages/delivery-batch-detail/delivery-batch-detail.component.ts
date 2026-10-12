@@ -12,11 +12,10 @@ import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzModalModule, NzModalService } from 'ng-zorro-antd/modal';
 import { NzSkeletonModule } from 'ng-zorro-antd/skeleton';
 import { NzTableModule } from 'ng-zorro-antd/table';
-import { NzTimelineModule } from 'ng-zorro-antd/timeline';
 import { NzTooltipModule } from 'ng-zorro-antd/tooltip';
 import { NzTypographyModule } from 'ng-zorro-antd/typography';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
-import { Observable } from 'rxjs';
+import { Observable, finalize } from 'rxjs';
 import { RequestFailure } from '@app/core/models/api.model';
 import { BatchOrder, DeliveryBatchDetails, LeftOutOrder } from '@app/core/models/delivery-batch.model';
 import { PageBack } from '@app/core/models/page-header.model';
@@ -37,14 +36,17 @@ import { confirmAction } from '@app/shared/utils/confirm-action/confirm-action';
 import { isLabelable, labelContent, printLabels } from '@app/shared/utils/delivery-label/delivery-label';
 import { saveDownload } from '@app/shared/utils/download-file/download-file';
 import { failureKey, failureOf } from '@app/shared/utils/request-failure/request-failure';
+import { RecordTimelineComponent } from '@app/shared/components/record-timeline/record-timeline.component';
 import { environment } from '@env/environment';
 
 const labelled = (order: BatchOrder) => isLabelable(order.status, order.delivery_status);
 
+type BatchAction = 'hand-over' | 'deliver' | 'add' | 'take-out' | 'cancel';
+
 /** One courier pickup: its orders, the courier's file, the labels, and the handover that dispatches them. */
 @Component({
     selector: 'delivery-batch-detail',
-    imports: [FormsModule, RouterLink, NgIcon, NzButtonModule, NzCardModule, NzFormModule, NzInputModule, NzModalModule, NzSkeletonModule, NzTableModule, NzTimelineModule, NzTooltipModule, NzTypographyModule, TranslatePipe, ActionFooterComponent, PageHeaderComponent, StatusTagComponent, DigitsPipe, MoneyPipe, RecordDatePipe],
+    imports: [RecordTimelineComponent, FormsModule, RouterLink, NgIcon, NzButtonModule, NzCardModule, NzFormModule, NzInputModule, NzModalModule, NzSkeletonModule, NzTableModule, NzTooltipModule, NzTypographyModule, TranslatePipe, ActionFooterComponent, PageHeaderComponent, StatusTagComponent, DigitsPipe, MoneyPipe, RecordDatePipe],
     providers: [MoneyPipe, provideIcons({ lucideArrowLeft, lucideBan, lucideCheck, lucideDownload, lucideHistory, lucideInfo, lucideMinus, lucidePackage, lucidePackageCheck, lucidePlus, lucideRotateCw, lucideTag, lucideTruck, lucideX, lucideZap })],
     templateUrl: './delivery-batch-detail.component.html',
     styleUrl: './delivery-batch-detail.component.scss',
@@ -74,6 +76,9 @@ export class DeliveryBatchDetailComponent {
     readonly failed = signal<RequestFailure | null>(null);
     readonly saving = this._batches.saving;
     readonly downloading = signal(false);
+    /** The action whose request is running: its button spins, and every other action waits for it. */
+    readonly acting = signal<BatchAction | null>(null);
+    readonly busy = computed(() => this.saving() || this.downloading());
     readonly ticked = signal<ReadonlySet<string>>(new Set());
 
     readonly statusTone = computed(() => (this.record() ? DELIVERY_BATCH_STATUS[this.record()!.status] : null));
@@ -178,7 +183,7 @@ export class DeliveryBatchDetailComponent {
 
     download(): void {
         const batch = this.record();
-        if (!batch || this.downloading()) return;
+        if (!batch || this.busy()) return;
         this.downloading.set(true);
         this._batches.uploadFile(this.oid).subscribe({
             next: (response) => {
@@ -212,7 +217,7 @@ export class DeliveryBatchDetailComponent {
 
     submitAdd(): void {
         if (!this.toAdd().size || this.saving()) return;
-        this.send(this._batches.setOrders(this.oid, [...this.orders().map((order) => order.oid), ...this.toAdd()]), 'sales.deliveryBatch.action.add.done');
+        this.send('add', this._batches.setOrders(this.oid, [...this.orders().map((order) => order.oid), ...this.toAdd()]), 'sales.deliveryBatch.action.add.done');
     }
 
     takeOut(): void {
@@ -231,6 +236,7 @@ export class DeliveryBatchDetailComponent {
         }).subscribe((confirmed) => {
             if (confirmed)
                 this.send(
+                    'take-out',
                     this._batches.setOrders(
                         this.oid,
                         staying.map((order) => order.oid)
@@ -251,7 +257,7 @@ export class DeliveryBatchDetailComponent {
             cancel: this._translate.instant('form.confirm.cancel'),
         }).subscribe((confirmed) => {
             if (!confirmed) return;
-            this.send(this._batches.handOver(this.oid), null, (done) => {
+            this.send('hand-over', this._batches.handOver(this.oid), null, (done) => {
                 const result = done as { dispatched: number; left_out: LeftOutOrder[] };
                 this.say('sales.deliveryBatch.action.handOver.done', result.dispatched, result.left_out);
             });
@@ -269,6 +275,7 @@ export class DeliveryBatchDetailComponent {
         }).subscribe((confirmed) => {
             if (!confirmed) return;
             this.send(
+                'deliver',
                 this._batches.deliver(
                     this.oid,
                     going.map((order) => order.oid)
@@ -290,7 +297,7 @@ export class DeliveryBatchDetailComponent {
     submitCancel(): void {
         const note = this.cancelNote().trim();
         if (note.length < 3 || this.saving()) return;
-        this.send(this._batches.cancel(this.oid, note), 'sales.deliveryBatch.action.cancel.done');
+        this.send('cancel', this._batches.cancel(this.oid, note), 'sales.deliveryBatch.action.cancel.done');
     }
 
     private say(key: string, count: number, left_out: LeftOutOrder[]): void {
@@ -298,8 +305,9 @@ export class DeliveryBatchDetailComponent {
         if (left_out.length) this._message.warning(this._translate.instant('sales.deliveryBatch.leftOut', { numbers: left_out.map((order) => order.invoice_no).join(', ') }), { nzDuration: 8000 });
     }
 
-    private send(request: Observable<unknown>, doneKey: string | null, done?: (result: unknown) => void): void {
-        request.subscribe({
+    private send(action: BatchAction, request: Observable<unknown>, doneKey: string | null, done?: (result: unknown) => void): void {
+        this.acting.set(action);
+        request.pipe(finalize(() => this.acting.set(null))).subscribe({
             next: (result) => {
                 this.adding.set(false);
                 this.cancelling.set(false);

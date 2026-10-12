@@ -1,4 +1,4 @@
-import { LabelContent, drawLabel, labelContent } from './delivery-label';
+import { LabelContent, drawLabel, labelContent, printLabels } from './delivery-label';
 
 describe('labelContent', () => {
     const order = { invoice_no: '2610110042', created_on: '2026-10-11T10:00:00.000', units: 3, courier: 'OwnRider', consignment_no: null, recipient_name: 'নুসরাত', recipient_phone: '01711000222', address: 'House 9, Mohammadpur, Dhaka', to_collect: 2450, tracking_token: 'abc' };
@@ -48,5 +48,30 @@ describe('drawLabel', () => {
     it('leaves the QR out when the order has no tracking link', () => {
         const label = drawLabel(document, { ...CONTENT, track: null }, 'data:image/png;base64,AAAA');
         expect(label.querySelectorAll('img').length).toBe(0);
+    });
+});
+
+describe('printLabels', () => {
+    it('prints a batch only once every label has its QR decoded', async () => {
+        const decoded: (() => void)[] = [];
+        const print = vi.fn<() => void>();
+        // jsdom neither decodes images nor loads fonts; a browser's print frame waits on both.
+        const frames = new MutationObserver(() => {
+            const frame = document.querySelector('iframe');
+            if (!frame?.contentWindow) return;
+            frame.contentWindow.print = print;
+            (frame.contentWindow as unknown as typeof window).HTMLImageElement.prototype.decode = () => new Promise<void>((resolve) => decoded.push(resolve));
+            Object.defineProperty(frame.contentDocument!, 'fonts', { value: { ready: Promise.resolve() }, configurable: true });
+        });
+        frames.observe(document.body, { childList: true });
+        printLabels([CONTENT, { ...CONTENT, to: { ...CONTENT.to, name: 'Rafi' } }]);
+        await vi.waitFor(() => expect(decoded.length).toBe(2), { timeout: 5000 });
+        const frame = document.querySelector('iframe')!;
+        expect(frame.contentDocument!.querySelectorAll('[data-label] img').length).toBe(2);
+        expect(print).not.toHaveBeenCalled();
+        decoded.forEach((done) => done());
+        await vi.waitFor(() => expect(print).toHaveBeenCalledTimes(1));
+        frames.disconnect();
+        frame.remove();
     });
 });

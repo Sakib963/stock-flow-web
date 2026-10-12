@@ -6,7 +6,6 @@ import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzCardModule } from 'ng-zorro-antd/card';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzSkeletonModule } from 'ng-zorro-antd/skeleton';
-import { NzTimelineModule } from 'ng-zorro-antd/timeline';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { RequestFailure } from '@app/core/models/api.model';
 import { Supplier, SupplierDetails, SupplierReport } from '@app/core/models/supplier.model';
@@ -24,6 +23,7 @@ import { DigitsPipe } from '@app/shared/pipes/digits/digits.pipe';
 import { RecordDatePipe } from '@app/shared/pipes/record-date/record-date.pipe';
 import { saveDownload } from '@app/shared/utils/download-file/download-file';
 import { failureKey, failureOf } from '@app/shared/utils/request-failure/request-failure';
+import { RecordTimelineComponent } from '@app/shared/components/record-timeline/record-timeline.component';
 import { resolveTone } from '@app/shared/utils/tone-map/tone-map';
 
 /** One number on the record page. `unit` is `%` or a copy key; `note` is a line of context under it. */
@@ -44,7 +44,7 @@ interface SupplierStat {
  */
 @Component({
     selector: 'supplier-detail',
-    imports: [NgIcon, NzButtonModule, NzCardModule, NzSkeletonModule, NzTimelineModule, TranslatePipe, PageHeaderComponent, StatusTagComponent, ActionFooterComponent, MoneyPipe, RecordDatePipe, DigitsPipe],
+    imports: [RecordTimelineComponent, NgIcon, NzButtonModule, NzCardModule, NzSkeletonModule, TranslatePipe, PageHeaderComponent, StatusTagComponent, ActionFooterComponent, MoneyPipe, RecordDatePipe, DigitsPipe],
     providers: [provideIcons({ lucideArrowLeft, lucideBanknote, lucideChartColumn, lucideCircleCheck, lucideClock, lucideFileSpreadsheet, lucideHandCoins, lucideHistory, lucideInfo, lucidePackage, lucidePackageMinus, lucidePencil, lucideReceipt, lucideRotateCw, lucideShoppingCart, lucideTrendingUp, lucideTriangleAlert, lucideTruck, lucideWallet, lucideZap })],
     templateUrl: './supplier-detail.component.html',
     styleUrl: './supplier-detail.component.scss',

@@ -1,0 +1,11 @@
+<!-- Tailwind's preflight makes every svg a block, which takes the illustration off ant's text-align centring. -->
+<nz-result nzStatus="404" class="[&_.ant-result-icon_svg]:mx-auto" [nzTitle]="'shell.notFound.title' | translate" [nzSubTitle]="'shell.notFound.body' | translate" data-page="not-found">
+    @if (home(); as route) {
+        <div nz-result-extra>
+            <a nz-button nzType="primary" class="inline-flex items-center gap-1.5" [routerLink]="route">
+                <ng-icon name="lucideHouse" size="14px" aria-hidden="true" />
+                <span>{{ 'shell.notFound.home' | translate }}</span>
+            </a>
+        </div>
+    }
+</nz-result>

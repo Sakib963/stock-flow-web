@@ -1,0 +1,13 @@
+<div class="max-h-96 overflow-y-auto pt-1 pr-1" data-timeline="scroll">
+    <nz-timeline>
+        @for (entry of visible(); track $index; let first = $first) {
+            <!-- The newest in the accent, the rest quiet: the eye lands on what changed last. -->
+            <nz-timeline-item [nzColor]="first ? 'blue' : 'gray'">
+                <ng-container [ngTemplateOutlet]="item()" [ngTemplateOutletContext]="{ $implicit: entry }" />
+            </nz-timeline-item>
+        }
+    </nz-timeline>
+</div>
+@if (hidden()) {
+    <button nz-button nzBlock type="button" data-timeline="more" (click)="more()">{{ 'timeline.more' | translate: { count: (hidden() | digits) } }}</button>
+}

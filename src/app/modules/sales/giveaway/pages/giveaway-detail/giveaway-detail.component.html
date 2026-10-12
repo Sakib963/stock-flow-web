@@ -127,17 +127,15 @@
                     ><h2 class="m-0 flex items-center gap-1.5 text-sm font-bold text-ink"><ng-icon name="lucideHistory" size="14px" class="text-ink-muted" aria-hidden="true" />{{ 'sales.order.section.timeline' | translate }}</h2></ng-template
                 >
                 @if (record(); as g) {
-                    <nz-timeline>
-                        @for (entry of g.activity; track $index; let first = $first) {
-                            <nz-timeline-item [nzColor]="first ? 'blue' : 'gray'">
-                                <p class="m-0 text-[13px] font-semibold text-ink">{{ entry.title }}</p>
-                                @if (entry.description) {
-                                    <p class="mt-0.5 mb-0 text-xs text-ink-body">{{ entry.description }}</p>
-                                }
-                                <p class="mt-0.5 mb-0 text-xs text-ink-muted">{{ entry.performed_by }} &middot; {{ entry.performed_on | recordDate: language() : 'date-time-12' }}</p>
-                            </nz-timeline-item>
-                        }
-                    </nz-timeline>
+                    <record-timeline [entries]="g.activity">
+                        <ng-template let-entry>
+                            <p class="m-0 text-[13px] font-semibold text-ink">{{ entry.title }}</p>
+                            @if (entry.description) {
+                                <p class="mt-0.5 mb-0 text-xs text-ink-body">{{ entry.description }}</p>
+                            }
+                            <p class="mt-0.5 mb-0 text-xs text-ink-muted">{{ entry.performed_by }} &middot; {{ entry.performed_on | recordDate: language() : 'date-time-12' }}</p>
+                        </ng-template>
+                    </record-timeline>
                 } @else {
                     <nz-skeleton nzActive [nzTitle]="false" [nzParagraph]="{ rows: 3 }" />
                 }

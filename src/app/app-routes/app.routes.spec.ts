@@ -9,12 +9,12 @@ import { Constants } from '@app/core/constants/constants';
 import { SessionPayload } from '@app/core/models/session.model';
 import { AuthService } from '@app/core/services/auth/auth.service';
 
-const payload = (permissions: string[]): SessionPayload => ({
+const payload = (permissions: string[], menu: SessionPayload['menu'] = []): SessionPayload => ({
     version: 'v1',
     user: { name: 'Samiha', email: 'owner@shop.com', mobile_number: null, photo: null, designation: null, role: 'Owner' },
     business: { name: 'Arithma Labs', logoUrl: null, orderSystem: 'both', timeZone: 'Asia/Dhaka' },
     permissions,
-    menu: [],
+    menu,
     counters: { notifications: 0 },
 });
 
@@ -29,10 +29,10 @@ describe('shell routing after sign-in', () => {
     let http: HttpTestingController;
 
     /** The payload request is fired from inside the guard, so it appears a few microtasks in. */
-    const flushBootPayload = async (permissions: string[]) => {
+    const flushBootPayload = async (permissions: string[], menu: SessionPayload['menu'] = []) => {
         for (let attempt = 0; attempt < 50; attempt++) {
             const open = http.match((r) => r.url.includes(APIEndpoint.GET_USER_INFO));
-            if (open.length) return open[0].flush({ code: 200, data: payload(permissions) });
+            if (open.length) return open[0].flush({ code: 200, data: payload(permissions, menu) });
             await new Promise((resolve) => setTimeout(resolve, 10));
         }
         throw new Error('the boot payload was never requested');
@@ -77,5 +77,25 @@ describe('shell routing after sign-in', () => {
 
         expect(await navigation).toBe(false);
         expect(router.url).not.toContain('/app/dashboard');
+    });
+
+    it('shows the not-found page for an address that is no page, inside the shell or a module', async () => {
+        const navigation = router.navigateByUrl('/app/nowhere');
+        await flushBootPayload(['dashboard.overview.view']);
+        expect(await navigation).toBe(true);
+        expect(router.url).toBe('/app/nowhere');
+        expect(router.routerState.snapshot.root.firstChild?.firstChild?.routeConfig?.path).toBe('**');
+
+        expect(await router.navigateByUrl('/app/sales/nowhere')).toBe(true);
+        expect(router.routerState.snapshot.root.firstChild?.firstChild?.routeConfig?.path).toBe('**');
+    });
+
+    it('opens a module address at its first page the person may open', async () => {
+        const orders = { id: 'sales-orders', label: { en: 'Orders', bn: 'অর্ডার' }, description: { en: null, bn: null }, tags: [], icon: null, order: 1, route: '/app/sales/orders', permission: 'sales.order.view', isDisabled: false, disabledMessage: { en: null, bn: null }, isNew: false, children: [] };
+        const group = { ...orders, id: 'sales', route: null, permission: null, children: [orders] };
+        const navigation = router.navigateByUrl('/app/sales');
+        await flushBootPayload(['sales.order.view'], [group]);
+        await navigation;
+        expect(router.url).toBe('/app/sales/orders');
     });
 });

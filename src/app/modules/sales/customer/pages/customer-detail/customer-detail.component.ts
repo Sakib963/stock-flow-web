@@ -12,7 +12,6 @@ import { NzModalModule, NzModalService } from 'ng-zorro-antd/modal';
 import { NzRadioModule } from 'ng-zorro-antd/radio';
 import { NzSkeletonModule } from 'ng-zorro-antd/skeleton';
 import { NzTableModule } from 'ng-zorro-antd/table';
-import { NzTimelineModule } from 'ng-zorro-antd/timeline';
 import { NzTooltipModule } from 'ng-zorro-antd/tooltip';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { RequestFailure } from '@app/core/models/api.model';
@@ -31,6 +30,7 @@ import { MoneyPipe } from '@app/shared/pipes/money/money.pipe';
 import { RecordDatePipe } from '@app/shared/pipes/record-date/record-date.pipe';
 import { confirmAction } from '@app/shared/utils/confirm-action/confirm-action';
 import { failureKey, failureOf } from '@app/shared/utils/request-failure/request-failure';
+import { RecordTimelineComponent } from '@app/shared/components/record-timeline/record-timeline.component';
 import { resolveTone } from '@app/shared/utils/tone-map/tone-map';
 
 interface CustomerStat {
@@ -51,7 +51,7 @@ interface CustomerStat {
  */
 @Component({
     selector: 'customer-detail',
-    imports: [FormsModule, NgIcon, NzButtonModule, NzCardModule, NzDrawerModule, NzInputModule, NzModalModule, NzRadioModule, NzSkeletonModule, NzTableModule, NzTimelineModule, NzTooltipModule, TranslatePipe, PageHeaderComponent, StatusTagComponent, ActionFooterComponent, AddressFormComponent, MoneyPipe, RecordDatePipe],
+    imports: [RecordTimelineComponent, FormsModule, NgIcon, NzButtonModule, NzCardModule, NzDrawerModule, NzInputModule, NzModalModule, NzRadioModule, NzSkeletonModule, NzTableModule, NzTooltipModule, TranslatePipe, PageHeaderComponent, StatusTagComponent, ActionFooterComponent, AddressFormComponent, MoneyPipe, RecordDatePipe],
     providers: [MoneyPipe, provideIcons({ lucideArrowLeft, lucideBan, lucideBanknote, lucideCalendarClock, lucideCheck, lucideCircleCheck, lucideEye, lucideFlag, lucideHandCoins, lucideHistory, lucideInfo, lucideMapPin, lucidePackageCheck, lucidePackageX, lucidePencil, lucidePlus, lucideReceipt, lucideRotateCw, lucideShoppingBag, lucideStar, lucideTrash2, lucideTrendingUp, lucideX, lucideZap })],
     templateUrl: './customer-detail.component.html',
     styleUrl: './customer-detail.component.scss',

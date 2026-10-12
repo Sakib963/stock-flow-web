@@ -9,7 +9,6 @@ import { NzCollapseModule } from 'ng-zorro-antd/collapse';
 import { NzProgressModule } from 'ng-zorro-antd/progress';
 import { NzSegmentedModule } from 'ng-zorro-antd/segmented';
 import { NzSkeletonModule } from 'ng-zorro-antd/skeleton';
-import { NzTimelineModule } from 'ng-zorro-antd/timeline';
 import { TranslatePipe } from '@ngx-translate/core';
 import { RequestFailure } from '@app/core/models/api.model';
 import { AttentionCheck, ConfigurationAnalytics, ConfigurationChange, SpreadGroup } from '@app/core/models/configuration-analytics.model';
@@ -21,6 +20,7 @@ import { PageHeaderComponent } from '@app/shared/components/page-header/page-hea
 import { DigitsPipe } from '@app/shared/pipes/digits/digits.pipe';
 import { MoneyPipe } from '@app/shared/pipes/money/money.pipe';
 import { RecordDatePipe } from '@app/shared/pipes/record-date/record-date.pipe';
+import { RecordTimelineComponent } from '@app/shared/components/record-timeline/record-timeline.component';
 import { failureOf } from '@app/shared/utils/request-failure/request-failure';
 
 /**
@@ -29,7 +29,7 @@ import { failureOf } from '@app/shared/utils/request-failure/request-failure';
  */
 @Component({
     selector: 'configuration-analytics',
-    imports: [FormsModule, RouterLink, NgIcon, NzButtonModule, NzCardModule, NzCollapseModule, NzProgressModule, NzSegmentedModule, NzSkeletonModule, NzTimelineModule, TranslatePipe, PageHeaderComponent, DigitsPipe, MoneyPipe, RecordDatePipe],
+    imports: [RecordTimelineComponent, FormsModule, RouterLink, NgIcon, NzButtonModule, NzCardModule, NzCollapseModule, NzProgressModule, NzSegmentedModule, NzSkeletonModule, TranslatePipe, PageHeaderComponent, DigitsPipe, MoneyPipe, RecordDatePipe],
     providers: [provideIcons({ lucideBellOff, lucideCircleCheck, lucideEyeOff, lucideFactory, lucideFolder, lucideFolderTree, lucideGauge, lucideHistory, lucideImageOff, lucideListChecks, lucidePackage, lucideRotateCw, lucideRows3, lucideChartBar, lucideTag, lucideWarehouse })],
     templateUrl: './configuration-analytics.component.html',
     styleUrl: './configuration-analytics.component.scss',

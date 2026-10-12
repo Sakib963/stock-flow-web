@@ -10,10 +10,9 @@ import { SessionService } from '@app/core/services/session/session.service';
  *
  * A refusal cancels the navigation rather than redirecting anywhere. It used to redirect to the
  * landing route, which froze the tab: the landing route redirects to the dashboard, the dashboard
- * is guarded by this function, and the two bounced off each other forever. Every candidate target
- * has that problem, because a route that exists is guarded and a route that does not falls through
- * the wildcard back to the landing route. Cancelling is the only answer that terminates, and it
- * leaves the person on the page they were already looking at.
+ * is guarded by this function, and the two bounced off each other forever. Every route that exists
+ * is guarded, so any of them can bounce the same way. Cancelling is the only answer that terminates,
+ * and it leaves the person on the page they were already looking at.
  */
 export const permissionGuard: CanActivateFn = (route) => {
     const session = inject(SessionService);

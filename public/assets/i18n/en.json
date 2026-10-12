@@ -183,7 +183,12 @@
         "language": "Language",
         "openMenu": "Open menu",
         "closeMenu": "Close menu",
-        "home": "Home"
+        "home": "Home",
+        "notFound": {
+            "title": "This page does not exist",
+            "body": "The address may be mistyped, or the page has moved. Pick where to go from the menu.",
+            "home": "Back to the start"
+        }
     },
     "dashboard": {
         "title": "Dashboard",
@@ -2477,7 +2482,6 @@
                 "forbidden": "You do not have permission to see this order.",
                 "server": "Could not load this order. Try again in a moment."
             },
-            "timelineMore": "See more ({{count}} earlier)",
             "section": {
                 "details": "Order",
                 "lines": "Products",
@@ -2526,7 +2530,6 @@
             "recipient": "Receives it",
             "address": "Address",
             "courier": "Courier",
-            "consignment": "Consignment number",
             "confirmedHow": "How it was confirmed",
             "cancelledBecause": "Why it was cancelled",
             "refundDue": "{{amount}} to refund",
@@ -2535,7 +2538,6 @@
             "nothingToDo": "Nothing to do on this order now.",
             "movedOn": "Someone else changed this order a moment ago. It has been reloaded.",
             "pickReason": "Pick a reason",
-            "pickCourier": "Pick the courier",
             "notDeliveredWhy": "Why it was not delivered",
             "reason": {
                 "placed": "Online order placed",
@@ -2647,25 +2649,6 @@
                     "confirmTitle": "Confirm order {{number}}?",
                     "confirmBody": "The stock stays held for it, and the order moves on to packing.",
                     "done": "Order confirmed."
-                },
-                "packed": {
-                    "button": "Mark packed",
-                    "confirmTitle": "Mark {{number}} packed?",
-                    "confirmBody": "The parcel is boxed and waits for the courier. Nothing leaves the shelf yet.",
-                    "done": "Marked packed."
-                },
-                "dispatch": {
-                    "title": "Dispatch the order",
-                    "button": "Dispatch",
-                    "confirmTitle": "Dispatch {{number}}?",
-                    "confirmBody": "The held stock leaves the shelf now. After this the order cannot be cancelled, only returned.",
-                    "done": "Dispatched. The stock has left the shelf."
-                },
-                "deliver": {
-                    "button": "Mark delivered",
-                    "confirmTitle": "Mark {{number}} delivered?",
-                    "confirmBody": "It becomes a sale now, and what the courier collected is recorded as paid.",
-                    "done": "Delivered and counted as a sale."
                 },
                 "refund": {
                     "title": "Record a refund",
@@ -3534,5 +3517,8 @@
                 }
             }
         }
+    },
+    "timeline": {
+        "more": "See more ({{count}} earlier)"
     }
 }
