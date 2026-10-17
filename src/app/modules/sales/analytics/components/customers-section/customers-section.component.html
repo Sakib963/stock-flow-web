@@ -1,0 +1,216 @@
+@if (failed(); as failure) {
+    <nz-card class="mt-2 md:mt-4" [nzTitle]="failedTitle" data-analytics="customers-failed">
+        <ng-template #failedTitle
+            ><h3 class="m-0 flex items-center gap-1.5 text-sm font-bold text-ink"><ng-icon name="lucideMapPinned" size="14px" class="text-ink-muted" aria-hidden="true" />{{ 'sales.analytics.customers.map.title' | translate }}</h3></ng-template
+        >
+        <div class="text-center" role="alert">
+            <p class="m-0 text-sm text-ink-body">{{ 'sales.analytics.loadFailed.' + failure | translate }}</p>
+            <button nz-button nzType="primary" type="button" class="mt-3 inline-flex items-center gap-1.5" (click)="reload()">
+                <ng-icon name="lucideRotateCw" size="14px" aria-hidden="true" />
+                <span>{{ 'form.retry' | translate }}</span>
+            </button>
+        </div>
+    </nz-card>
+} @else {
+    @if (!figures()) {
+        <span class="sr-only" role="status">{{ 'form.loading' | translate }}</span>
+    }
+    <!-- The map row stretches: the cards beside the map end where it ends. -->
+    <div class="mt-2 grid grid-cols-1 gap-2 md:mt-4 md:gap-4 lg:grid-cols-3">
+        <nz-card class="h-full lg:col-span-2" [nzTitle]="mapTitle" data-analytics="map">
+            <ng-template #mapTitle
+                ><h3 class="m-0 flex items-center gap-1.5 text-sm font-bold text-ink"><ng-icon name="lucideMapPinned" size="14px" class="text-ink-muted" aria-hidden="true" />{{ 'sales.analytics.customers.map.title' | translate }}</h3></ng-template
+            >
+            @if (figures()) {
+                @if (online()) {
+                    <div class="mb-3 overflow-x-auto">
+                        <nz-segmented [ngModel]="metric()" (ngModelChange)="pickMetric($event)" [attr.aria-label]="'sales.analytics.customers.map.show' | translate">
+                            @for (m of metrics; track m) {
+                                <label nz-segmented-item [nzValue]="m">{{ 'sales.analytics.customers.map.metric.' + m | translate }}</label>
+                            }
+                        </nz-segmented>
+                    </div>
+                    @if (insights().places; as insight) {
+                        <p class="mt-0 mb-3 text-sm text-ink-body" data-insight="places">{{ insight.key | translate: insight.params }}</p>
+                    }
+                    <div class="grid grid-cols-1 gap-4 sm:grid-cols-[minmax(0,20rem)_minmax(0,1fr)]">
+                        <bd-map [values]="mapValues()" [tone]="metric() === 'failed' ? 'danger' : 'primary'" label="sales.analytics.customers.map.title" />
+                        <div>
+                            <p class="mt-0 mb-1 text-xs font-semibold text-ink-muted">{{ 'sales.analytics.customers.map.coverage' | translate: { count: (coverage() | digits), total: (districtCount | digits) } }}</p>
+                            <div class="mb-3 h-1.5 rounded-full bg-line"><span class="block h-full rounded-full bg-primary" [style.width.%]="(coverage() / districtCount) * 100"></span></div>
+                            @if (ranking().length) {
+                                <!-- Every district with a figure, scrolling within the map's height rather than running past it. -->
+                                <ul class="m-0 flex max-h-[24rem] list-none flex-col gap-2 overflow-y-auto p-0 pr-1">
+                                    @for (row of ranking(); track row.oid) {
+                                        <li [attr.data-place]="row.oid">
+                                            <span class="flex items-baseline justify-between gap-2 text-xs">
+                                                <span class="truncate text-ink">{{ row.name }}</span>
+                                                <span class="shrink-0 font-mono text-ink-body tabular-nums">{{ row.shown }}</span>
+                                            </span>
+                                            <span class="mt-1 block h-1.5 rounded-full bg-line"
+                                                ><span class="block h-full rounded-full" [class.bg-primary]="metric() !== 'failed'" [class.bg-danger]="metric() === 'failed'" [style.width.%]="row.width"></span
+                                            ></span>
+                                        </li>
+                                    }
+                                </ul>
+                            } @else {
+                                <p class="m-0 text-xs text-ink-muted">{{ 'sales.analytics.customers.map.empty' | translate }}</p>
+                            }
+                            <p class="mt-3 mb-0 text-xs text-ink-soft">{{ 'sales.analytics.customers.map.note' | translate }}</p>
+                        </div>
+                    </div>
+                } @else {
+                    <p class="m-0 text-xs text-ink-muted">{{ 'sales.analytics.customers.map.counterOnly' | translate }}</p>
+                }
+            } @else {
+                <div class="grid grid-cols-1 gap-4 sm:grid-cols-2" aria-hidden="true">
+                    <div class="aspect-[600/848] w-full animate-pulse rounded-container bg-line-soft"></div>
+                    <nz-skeleton nzActive [nzTitle]="false" [nzParagraph]="{ rows: 9 }" />
+                </div>
+            }
+        </nz-card>
+
+        <!-- Beside the map, the two shorter cards share its height instead of leaving a gap under one. -->
+        <div class="flex flex-col gap-2 md:gap-4">
+            <nz-card [nzTitle]="repeatTitle" data-analytics="repeat">
+                <ng-template #repeatTitle
+                    ><h3 class="m-0 flex items-center gap-1.5 text-sm font-bold text-ink"><ng-icon name="lucideRepeat" size="14px" class="text-ink-muted" aria-hidden="true" />{{ 'sales.analytics.customers.repeat.title' | translate }}</h3></ng-template
+                >
+                @if (figures()) {
+                    @if (repeat(); as r) {
+                        @if (insights().repeat; as insight) {
+                            <p class="mt-0 mb-3 text-sm text-ink-body" data-insight="repeat">{{ insight.key | translate: insight.params }}</p>
+                        }
+                        <div class="grid grid-cols-2 gap-px overflow-hidden rounded-control border border-line bg-line">
+                            <div class="bg-white px-3 py-2.5">
+                                <p class="m-0 text-[11px] font-semibold text-ink-muted">{{ 'sales.analytics.customers.repeat.customers' | translate }}</p>
+                                <p class="mt-1 mb-0 font-mono text-base font-bold text-ink tabular-nums">{{ r.customers | money: 'number' }}</p>
+                            </div>
+                            <div class="bg-white px-3 py-2.5">
+                                <p class="m-0 text-[11px] font-semibold text-ink-muted">{{ 'sales.analytics.customers.repeat.new' | translate }}</p>
+                                <p class="mt-1 mb-0 font-mono text-base font-bold text-ink tabular-nums">{{ r.new_customers | money: 'number' }}</p>
+                            </div>
+                            <div class="bg-white px-3 py-2.5">
+                                <p class="m-0 text-[11px] font-semibold text-ink-muted">{{ 'sales.analytics.customers.repeat.twice' | translate }}</p>
+                                <p class="mt-1 mb-0 font-mono text-base font-bold text-ink tabular-nums">{{ r.bought_twice | money: 'number' }}</p>
+                            </div>
+                            <div class="bg-white px-3 py-2.5">
+                                <p class="m-0 text-[11px] font-semibold text-ink-muted">{{ 'sales.analytics.customers.repeat.daysToSecond' | translate }}</p>
+                                <p class="mt-1 mb-0 font-mono text-base font-bold text-ink tabular-nums">
+                                    {{ r.days_to_second === null ? '-' : ('sales.analytics.customers.repeat.days' | translate: { days: (r.days_to_second | money: 'number') }) }}
+                                </p>
+                            </div>
+                        </div>
+                        <p class="mt-3 mb-0 text-xs text-ink-soft">{{ 'sales.analytics.customers.repeat.note' | translate }}</p>
+                    } @else {
+                        <p class="m-0 text-xs text-ink-muted">{{ 'sales.analytics.customers.repeat.empty' | translate }}</p>
+                    }
+                } @else {
+                    <nz-skeleton nzActive [nzTitle]="false" [nzParagraph]="{ rows: 6 }" />
+                }
+            </nz-card>
+
+            <nz-card class="flex-1" [nzTitle]="winBackTitle" data-analytics="win-back">
+                <ng-template #winBackTitle
+                    ><h3 class="m-0 flex items-center gap-1.5 text-sm font-bold text-ink"><ng-icon name="lucideUserRoundX" size="14px" class="text-ink-muted" aria-hidden="true" />{{ 'sales.analytics.customers.winBack.title' | translate }}</h3></ng-template
+                >
+                @if (figures(); as data) {
+                    @if (data.win_back.length) {
+                        <ul class="m-0 flex list-none flex-col divide-y divide-line-soft p-0">
+                            @for (c of data.win_back; track c.oid) {
+                                <li class="flex items-center justify-between gap-2 py-2" [attr.data-win-back]="c.oid">
+                                    <span class="min-w-0">
+                                        @if (canOpenCustomer) {
+                                            <a class="block truncate text-xs font-semibold" [routerLink]="customerRoute(c.oid)">{{ c.name }}</a>
+                                        } @else {
+                                            <span class="block truncate text-xs font-semibold text-ink">{{ c.name }}</span>
+                                        }
+                                        <span class="block text-[11px] text-ink-soft">{{ 'sales.analytics.customers.winBack.bought' | translate: { count: (c.sales | money: 'number') } }}</span>
+                                    </span>
+                                    <span class="shrink-0 text-right text-[11px] text-ink-muted">
+                                        {{ c.last_bought | recordDate: language() }}
+                                        <span class="block text-warning-ink">{{ 'sales.analytics.customers.winBack.since' | translate: { days: (c.days_since | money: 'number') } }}</span>
+                                    </span>
+                                </li>
+                            }
+                        </ul>
+                        <p class="mt-2 mb-0 text-xs text-ink-soft">{{ 'sales.analytics.customers.winBack.note' | translate }}</p>
+                    } @else {
+                        <p class="m-0 text-xs text-ink-muted">{{ 'sales.analytics.customers.winBack.empty' | translate }}</p>
+                    }
+                } @else {
+                    <nz-skeleton nzActive [nzTitle]="false" [nzParagraph]="{ rows: 6 }" />
+                }
+            </nz-card>
+        </div>
+
+        <nz-card class="h-full lg:col-span-2" [nzTitle]="cohortTitle" data-analytics="cohorts">
+            <ng-template #cohortTitle
+                ><h3 class="m-0 flex items-center gap-1.5 text-sm font-bold text-ink"><ng-icon name="lucideCalendarRange" size="14px" class="text-ink-muted" aria-hidden="true" />{{ 'sales.analytics.customers.cohorts.title' | translate }}</h3></ng-template
+            >
+            @if (figures()) {
+                @if (cohorts().length) {
+                    <div class="overflow-x-auto">
+                        <nz-table nzTemplateMode nzSize="small" class="min-w-[34rem] text-xs [&_th]:whitespace-nowrap">
+                            <thead>
+                                <tr>
+                                    <th class="text-left font-semibold">{{ 'sales.analytics.customers.cohorts.month' | translate }}</th>
+                                    <th class="text-right font-semibold">{{ 'sales.analytics.customers.cohorts.new' | translate }}</th>
+                                    @for (m of months; track m) {
+                                        <th class="text-center font-semibold">{{ 'sales.analytics.customers.cohorts.after' | translate: { months: (m | digits) } }}</th>
+                                    }
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @for (row of cohorts(); track row.cohort) {
+                                    <tr [attr.data-cohort]="row.cohort">
+                                        <td class="whitespace-nowrap text-ink">{{ row.label }}</td>
+                                        <td class="text-right font-mono text-ink-body tabular-nums">{{ row.customers | money: 'number' }}</td>
+                                        @for (cell of row.cells; track cell.month) {
+                                            <td class="p-0.5 text-center">
+                                                <span class="block rounded-control py-1.5 font-mono tabular-nums" [class]="cell.shade" [class.text-ink-soft]="!cell.back" [class.text-ink]="cell.back">{{ cell.back ? (cell.share | digits) + '%' : '-' }}</span>
+                                            </td>
+                                        }
+                                    </tr>
+                                }
+                            </tbody>
+                        </nz-table>
+                    </div>
+                    <p class="mt-3 mb-0 text-xs text-ink-soft">{{ 'sales.analytics.customers.cohorts.note' | translate }}</p>
+                } @else {
+                    <p class="m-0 text-xs text-ink-muted">{{ 'sales.analytics.customers.cohorts.empty' | translate }}</p>
+                }
+            } @else {
+                <nz-skeleton nzActive [nzTitle]="false" [nzParagraph]="{ rows: 6 }" />
+            }
+        </nz-card>
+
+        <nz-card class="h-full" [nzTitle]="agesTitle" data-analytics="ages">
+            <ng-template #agesTitle
+                ><h3 class="m-0 flex items-center gap-1.5 text-sm font-bold text-ink"><ng-icon name="lucideCake" size="14px" class="text-ink-muted" aria-hidden="true" />{{ 'sales.analytics.customers.ages.title' | translate }}</h3></ng-template
+            >
+            @if (figures()) {
+                @if (ages(); as a) {
+                    @if (a.known) {
+                        <ul class="m-0 flex list-none flex-col gap-2.5 p-0">
+                            @for (row of a.bands; track row.band) {
+                                <li [attr.data-age]="row.band">
+                                    <span class="flex items-baseline justify-between gap-2 text-xs">
+                                        <span class="text-ink">{{ 'sales.customer.ageBand.' + row.band | translate }}</span>
+                                        <span class="shrink-0 font-mono text-ink-body tabular-nums">{{ row.customers | money: 'number' }} &middot; {{ row.share | digits }}%</span>
+                                    </span>
+                                    <span class="mt-1 block h-1.5 rounded-full bg-line"><span class="block h-full rounded-full bg-primary" [style.width.%]="row.width"></span></span>
+                                </li>
+                            }
+                        </ul>
+                        <p class="mt-3 mb-0 text-xs text-ink-soft">{{ 'sales.analytics.customers.ages.note' | translate: { unknown: (a.unknown | money: 'number'), total: (a.known + a.unknown | money: 'number') } }}</p>
+                    } @else {
+                        <p class="m-0 text-xs text-ink-muted">{{ 'sales.analytics.customers.ages.empty' | translate }}</p>
+                    }
+                }
+            } @else {
+                <nz-skeleton nzActive [nzTitle]="false" [nzParagraph]="{ rows: 6 }" />
+            }
+        </nz-card>
+    </div>
+}

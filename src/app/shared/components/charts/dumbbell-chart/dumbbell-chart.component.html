@@ -1,0 +1,33 @@
+<div class="mb-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-ink-muted">
+    <span class="inline-flex items-center gap-1.5"><span class="size-2.5 rounded-full bg-danger"></span>{{ firstLabel() | translate }}</span>
+    <span class="inline-flex items-center gap-1.5"><span class="size-2.5 rounded-full bg-success"></span>{{ secondLabel() | translate }}</span>
+</div>
+<ul class="m-0 flex list-none flex-col gap-2 p-0">
+    @for (row of drawn(); track row.key) {
+        <li class="grid grid-cols-[minmax(0,7.5rem)_1fr] items-center gap-x-3 sm:grid-cols-[minmax(0,9rem)_1fr]" [attr.data-dumbbell]="row.key">
+            <span class="truncate text-xs text-ink">{{ row.label }}</span>
+            <!-- The counts live in tooltips a phone or a keyboard cannot open, so they are read out here. -->
+            <span class="sr-only">{{ firstLabel() | translate }}: {{ row.first === null ? '-' : (row.first | digits) + '%' }} ({{ row.firstNote }}). {{ secondLabel() | translate }}: {{ row.second === null ? '-' : (row.second | digits) + '%' }} ({{ row.secondNote }}).</span>
+            <span class="relative h-6" aria-hidden="true">
+                <span class="absolute inset-x-0 top-1/2 h-px bg-line-soft"></span>
+                @if (row.lineWidth) {
+                    <span class="absolute top-1/2 h-0.5 -translate-y-1/2 bg-ink-faint" [style.left.%]="row.lineFrom" [style.width.%]="row.lineWidth"></span>
+                }
+                @if (row.firstAt !== null) {
+                    <span class="absolute top-1/2 size-3 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white bg-danger" [style.left.%]="row.firstAt" nz-tooltip [nzTooltipTitle]="(firstLabel() | translate) + ': ' + (row.first | digits) + '% (' + row.firstNote + ')'" data-dot="first"></span>
+                }
+                @if (row.secondAt !== null) {
+                    <span class="absolute top-1/2 size-3 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white bg-success" [style.left.%]="row.secondAt" nz-tooltip [nzTooltipTitle]="(secondLabel() | translate) + ': ' + (row.second | digits) + '% (' + row.secondNote + ')'" data-dot="second"></span>
+                }
+            </span>
+        </li>
+    }
+</ul>
+<div class="mt-1 grid grid-cols-[minmax(0,7.5rem)_1fr] gap-x-3 sm:grid-cols-[minmax(0,9rem)_1fr]" aria-hidden="true">
+    <span></span>
+    <span class="flex justify-between text-[11px] text-ink-soft tabular-nums">
+        @for (tick of ticks(); track tick) {
+            <span>{{ tick | digits }}%</span>
+        }
+    </span>
+</div>

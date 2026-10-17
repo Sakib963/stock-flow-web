@@ -83,6 +83,7 @@
             "ruleLength": "At least 8 characters",
             "ruleLetter": "At least one letter",
             "ruleNumber": "At least one number",
+            "ruleSymbol": "At least one special character, like - @ # !",
             "errCodeRequired": "Enter the 6 digit code.",
             "errCodeWrong": "That code is not right. Check the email and try again.",
             "errCodeExpired": "That code has expired. Send a new one.",
@@ -156,6 +157,10 @@
         "myProfile": "My profile",
         "changePassword": "Change password",
         "keyboardShortcuts": "Keyboard shortcuts",
+        "myProfileHint": "Your name, mobile and photo",
+        "changePasswordHint": "Confirmed with a code from your email",
+        "sessionsHint": "Where you are signed in",
+        "keyboardShortcutsHint": "Work faster without the mouse",
         "shortcutsTitle": "Keyboard shortcuts",
         "shortcutsSubtitle": "What the shell listens for. More arrive as pages are built.",
         "shortcutSearch": "Search",
@@ -179,6 +184,8 @@
         "yesterday": "Yesterday",
         "soonReason": "This part is not built yet. It will open here as soon as it is ready.",
         "language": "Language",
+        "accountSection": "Your account",
+        "preferencesSection": "Preferences",
         "openMenu": "Open menu",
         "closeMenu": "Close menu",
         "home": "Home",
@@ -195,6 +202,10 @@
             "editTitle": "Edit note",
             "titlePlaceholder": "Title",
             "textPlaceholder": "Write what you need to remember",
+            "viewTitle": "Note",
+            "edit": "Edit note",
+            "saveTitle": "Save this note?",
+            "saveBody": "The note will be saved as it is now. Only you can see it.",
             "save": "Save",
             "back": "Back to notes",
             "delete": "Delete note",
@@ -246,8 +257,10 @@
         "profile": {
             "title": "My profile",
             "name": "Name",
+            "namePlaceholder": "Your full name, for example Nusrat Jahan",
             "nameError": "Write your name, at least 2 letters.",
             "mobile": "Mobile number",
+            "mobilePlaceholder": "01XXXXXXXXX",
             "mobileError": "Enter a mobile number of digits, for example 01711000111.",
             "designation": "Designation",
             "designationHint": "For example, Store manager",
@@ -268,6 +281,10 @@
                 "forbidden": "You do not have permission to do that.",
                 "server": "The photo could not be uploaded. Try again in a moment."
             },
+            "edit": "Edit profile",
+            "editTitle": "Edit my profile",
+            "confirmTitle": "Save your profile?",
+            "confirmBody": "Your name, mobile number, designation and photo change everywhere they are shown.",
             "save": "Save profile",
             "saved": "Profile saved",
             "saveFailed": {
@@ -281,21 +298,33 @@
         },
         "password": {
             "title": "Change password",
+            "lead": "Choose a new password. We email you a code to confirm it is you.",
+            "rulesTitle": "Password rules",
             "stepDetails": "New password",
             "stepCode": "Emailed code",
             "stepDone": "Done",
             "current": "Current password",
+            "currentPlaceholder": "The password you sign in with now",
             "currentRequired": "Enter your current password.",
             "currentWrong": "That is not your current password. Check it and try again.",
             "new": "New password",
             "confirm": "Type the new password again",
+            "newPlaceholder": "At least 8 characters",
+            "confirmPlaceholder": "The same new password again",
             "mismatch": "The two new passwords are not the same.",
-            "show": "Show passwords",
-            "hide": "Hide passwords",
+            "sameAsCurrent": "The new password is the one you use now. Choose a different one.",
+            "strength": "Strength",
+            "strengthWeak": "Weak",
+            "strengthFair": "Fair",
+            "strengthGood": "Good",
+            "strengthStrong": "Strong",
+            "showOne": "Show password",
+            "hideOne": "Hide password",
             "othersSignedOut": "When your password changes, every other device signed in to your account is signed out. This one stays signed in.",
             "sendCode": "Email me a code",
             "codeSent": "We emailed a 6-digit code to {{email}}. It works for 15 minutes.",
             "code": "Code from the email",
+            "codePlaceholder": "6 digits from the email",
             "codeShape": "The code is the 6 digits in the email.",
             "codeWrong": "That code is not right. Check the email and try again.",
             "codeExpired": "That code has expired. Send a new one.",
@@ -303,7 +332,7 @@
             "sendAgain": "Send a new code",
             "change": "Change password",
             "changed": "Your password has been changed.",
-            "othersClosed": "{{count}} other devices were signed out.",
+            "othersClosed": "Other devices signed out: {{count}}.",
             "noOthers": "No other device was signed in.",
             "close": "Done",
             "failed": {
@@ -311,7 +340,14 @@
                 "forbidden": "You do not have permission to do that.",
                 "server": "The password was not changed. Try again in a moment."
             },
-            "cancel": "Cancel"
+            "cancel": "Cancel",
+            "formTitle": "Your password",
+            "confirmSendTitle": "Email the code now?",
+            "confirmSendBody": "We email a 6-digit code to {{email}}. Your password changes only once you enter it.",
+            "confirmChangeTitle": "Change your password now?",
+            "codeResent": "A new code is on its way. The earlier one no longer works.",
+            "sendAgainIn": "You can ask for another in {{seconds}}s",
+            "sendTooMany": "Too many tries. Wait a few minutes and try again."
         }
     },
     "dashboard": {
@@ -2631,6 +2667,7 @@
             "walkIn": "Walk-in customer",
             "statusLabel": "Status",
             "deliveryLabel": "Delivery",
+            "parcelLabel": "Parcel",
             "paymentLabel": "Payment",
             "refundLabel": "Refund",
             "channelLabel": "Channel",
@@ -3559,6 +3596,9 @@
             "status": {
                 "Open": "Open",
                 "HandedOver": "Handed to courier",
+                "Delivered": "Delivered",
+                "PartlyDelivered": "Partly delivered",
+                "NotDelivered": "Not delivered",
                 "Cancelled": "Cancelled"
             },
             "stat": {
@@ -3653,6 +3693,350 @@
                     "done": "Batch cancelled."
                 }
             }
+        },
+        "analytics": {
+            "title": "Sales analytics",
+            "lead": "What sold, what it earned, and where the money went.",
+            "period": "{{from}} to {{to}}, compared with {{previousFrom}} to {{previousTo}}",
+            "notEnough": "Not enough data yet.",
+            "filter": {
+                "when": "Period",
+                "channel": "Channel",
+                "source": "Source",
+                "category": "Category"
+            },
+            "channel": {
+                "POS": "Counter",
+                "ONLINE": "Online"
+            },
+            "loadFailed": {
+                "network": "Could not reach the server. Check the connection and try again.",
+                "forbidden": "You do not have access to sales analytics. Ask the owner if you need it.",
+                "server": "Sales analytics could not be loaded. Try again in a moment."
+            },
+            "tile": {
+                "sales": "Sales",
+                "profit": "Profit",
+                "margin": "Margin",
+                "orders": "Orders sold",
+                "refusal": "Parcels not delivered",
+                "vsPrevious": "vs period before",
+                "level": "Level",
+                "points": "{{points}} pts",
+                "noPrevious": "Nothing to compare yet",
+                "noPreviousWhy": "The period before had no sales, or too few parcels to make a rate.",
+                "refusalNote": "Handed to the courier: {{count}}",
+                "percent": "{{value}}%",
+                "withoutCost": "Cost missing for {{count}} units"
+            },
+            "waterfall": {
+                "title": "Where the money went",
+                "list": "At list price",
+                "discounts": "Discounts",
+                "returns": "Returns",
+                "cost": "Cost of goods",
+                "profit": "Profit",
+                "withoutCost": "{{count}} units sold have no cost price on their batch, so profit is shown higher than it is. Set the cost on those batches.",
+                "note": "Delivery charges are not sales: they go to the courier. Returns confirmed after the period are taken off the month of the sale."
+            },
+            "insight": {
+                "headline": {
+                    "no_sales": "No sales in this period yet.",
+                    "no_previous": "There were no sales in the period before, so there is nothing to compare with yet.",
+                    "sales_up": "Sales are up {{change}}% on the period before.",
+                    "sales_down": "Sales are down {{change}}% on the period before.",
+                    "sales_same": "Sales are level with the period before."
+                },
+                "waterfall": {
+                    "of_every_hundred": "Of every ৳100 at list price, ৳{{profit}} became profit. Discounts took ৳{{discounts}} and returns ৳{{returns}}."
+                },
+                "orders": {
+                    "funnel_clean": "None of the {{placed}} orders placed was lost so far.",
+                    "funnel_leak_confirm": "Most orders are lost before confirming: {{lost}} of {{placed}} were cancelled before anyone confirmed them.",
+                    "funnel_leak_dispatch": "Most orders are lost after confirming: {{lost}} of {{placed}} were cancelled before they were sent.",
+                    "funnel_leak_deliver": "Most orders are lost at the door: {{lost}} of {{placed}} parcels were not delivered.",
+                    "funnel_leak_keep": "Most orders are lost after delivery: {{lost}} of {{placed}} came back in full.",
+                    "confirm_compare": "Confirmed by {{best}}, {{bestRate}}% of parcels came back; by {{worst}}, {{worstRate}}%.",
+                    "terms_compare": "COD parcels came back {{codRate}}% of the time; with an advance, {{advanceRate}}%.",
+                    "place_refusal": "{{place}} returns the most parcels: {{failed}} of {{dispatched}} were not delivered. Consider an advance there.",
+                    "risk_compare": "Warned orders came back {{warnedRate}}% of the time, the rest {{clearRate}}%."
+                },
+                "team": {
+                    "busiest": "The busiest hour is {{day}}, {{from}} to {{to}}, with {{count}} orders.",
+                    "no_discount": "No discount was given on sales in this period.",
+                    "discount_share": "Discounts took {{share}}% of list price. {{atLimit}} of {{discounted}} discounted lines are at their batch's current maximum discount.",
+                    "people_refusal": "{{person}}'s online orders came back {{rate}}% of the time, against {{rest}}% for everyone else."
+                },
+                "products": {
+                    "top_product": "{{product}} made {{share}}% of sales in this period.",
+                    "demand_gap": "{{product}} was asked for {{demand}} times but kept only {{kept}}. Find out what stopped the rest.",
+                    "supplier_returns": "{{supplier}}'s goods come back the most: {{rate}}% of units sold.",
+                    "buyers_top": "{{share}}% of buyers whose gender and age are known are {{gender}}, {{age}}. Known for {{known}}% of buyers.",
+                    "buyers_unknown": "No buyer in this period has a gender and age recorded. Record them on the customer to see who buys."
+                },
+                "customers": {
+                    "top_district": "{{place}} has the most online customers: {{count}}, {{share}}% of them.",
+                    "repeat_rate": "{{rate}}% of the {{customers}} customers in this period had bought before.",
+                    "repeat_counts": "{{returning}} of {{customers}} customers in this period had bought before."
+                }
+            },
+            "orders": {
+                "title": "Online orders",
+                "lead": "Orders placed in the period, followed to where each one is now.",
+                "empty": "No online orders were placed in this period.",
+                "ofParcels": "{{part}} of {{whole}} parcels",
+                "ofDispatched": "of {{count}} sent",
+                "funnel": {
+                    "title": "From placed to kept",
+                    "placed": "Placed",
+                    "confirmed": "Confirmed",
+                    "dispatched": "Handed to courier",
+                    "delivered": "Delivered",
+                    "kept": "Kept",
+                    "cancelledBefore": "{{count}} cancelled before confirming",
+                    "waitingConfirm": "{{count}} still to confirm",
+                    "cancelledAfter": "{{count}} cancelled after confirming",
+                    "waitingDispatch": "{{count}} still to send",
+                    "failed": "{{count}} not delivered",
+                    "withCourier": "{{count}} still with the courier",
+                    "returned": "{{count}} returned in full",
+                    "note": "Each bar is a share of the orders placed in the period. Kept is what the customer did not send back."
+                },
+                "reasons": {
+                    "title": "Why orders were lost",
+                    "cancelled": "Cancelled",
+                    "failed": "Not delivered",
+                    "business": "Our side",
+                    "businessWhy": "The business could not serve this order, so it is not counted against the place, product or source.",
+                    "none": "No order was cancelled or came back undelivered in this period.",
+                    "noReason": "No reason recorded"
+                },
+                "losses": {
+                    "title": "Where orders fall through",
+                    "by": "Show by",
+                    "group": {
+                        "places": "District",
+                        "products": "Product",
+                        "sources": "Source",
+                        "customers": "Customer"
+                    },
+                    "name": {
+                        "places": "District",
+                        "products": "Product",
+                        "sources": "Source",
+                        "customers": "Customer"
+                    },
+                    "placed": "Orders",
+                    "units": "Units ordered",
+                    "cancelRate": "Cancelled by the customer",
+                    "refusalRate": "Not delivered",
+                    "businessLeftOut": "{{count}} cancelled on our side, left out",
+                    "note": "Cancelled counts the customer's side only. Not delivered divides by the parcels handed to the courier. Under 20, the counts are shown instead of a rate.",
+                    "empty": {
+                        "places": "No orders with a district in this period.",
+                        "products": "No products ordered online in this period.",
+                        "sources": "No orders with a source in this period.",
+                        "customers": "No customer cancelled two or more orders in this period."
+                    }
+                },
+                "confirming": {
+                    "title": "Does confirming work?",
+                    "notYet": "Once 20 parcels are sent for two ways of confirming, this compares how often each comes back."
+                },
+                "terms": {
+                    "title": "COD or advance?",
+                    "notYet": "Once 20 parcels are sent both COD and with an advance, this compares how often each comes back.",
+                    "cod": "COD, not delivered",
+                    "advance": "Advance or prepaid, not delivered",
+                    "byPlaceNotYet": "A district shows here once it has 20 parcels sent one way."
+                },
+                "risk": {
+                    "title": "Did the warning help?",
+                    "notYet": "Once 20 warned and 20 clear orders have ended, this compares how often each came back.",
+                    "shown": "At order time",
+                    "kept": "Kept",
+                    "failed": "Not delivered",
+                    "cancelled": "Cancelled",
+                    "refusal": "Not delivered rate",
+                    "bucket": {
+                        "blocked": "Blocked customer",
+                        "watch": "On the watch list",
+                        "under_80": "Received under 80% before",
+                        "from_80": "Received 80% or more before",
+                        "no_history": "First order"
+                    },
+                    "returned": "Returned"
+                },
+                "speed": {
+                    "title": "How long each step takes",
+                    "toConfirm": "To confirm",
+                    "toDispatch": "To send",
+                    "toDeliver": "To deliver",
+                    "byPlace": "Slowest districts to deliver",
+                    "hours": "{{hours}} h",
+                    "days": "{{days}} days",
+                    "note": "The middle order of each step, so one slow parcel does not set it."
+                }
+            },
+            "team": {
+                "arrivals": {
+                    "title": "When orders come in",
+                    "channel": {
+                        "ALL": "All",
+                        "POS": "Counter",
+                        "ONLINE": "Online"
+                    },
+                    "cell": "{{day}}, {{from}} to {{to}}: {{count}} orders",
+                    "note": "Counter sales when they were sold, online orders when they were placed, on the business clock.",
+                    "empty": "No orders came in during this period."
+                },
+                "discounts": {
+                    "title": "Discounts given",
+                    "given": "Discount given",
+                    "share": "Of list price",
+                    "atLimit": "Lines at the current limit",
+                    "byProduct": "Most discount by product",
+                    "none": "No discount was given on sales in this period."
+                },
+                "people": {
+                    "title": "Each person",
+                    "person": "Person",
+                    "sales": "Sales",
+                    "discount": "Discount given",
+                    "taken": "Online orders taken",
+                    "confirmed": "Confirmed",
+                    "cancelled": "Cancelled by customer",
+                    "failed": "Not delivered",
+                    "note": "Sales and discount are on sales they made. Online orders taken are those they placed in the period, and how those ended.",
+                    "empty": "Nobody sold or took an order in this period."
+                }
+            },
+            "tab": {
+                "overview": "Overview",
+                "orders": "Online orders",
+                "team": "Timing and people",
+                "products": "Products and suppliers",
+                "customers": "Customers"
+            },
+            "products": {
+                "best": {
+                    "title": "Best sellers",
+                    "product": "Product",
+                    "keptOfDemand": "Kept of asked for",
+                    "sales": "Sales",
+                    "profit": "Profit",
+                    "margin": "Margin",
+                    "returned": "Returned",
+                    "damaged": "{{count}} damaged",
+                    "note": "Kept of asked for: units the customer kept against every unit ordered, cancelled and returned ones included. Returned counts confirmed returns of these sales.",
+                    "empty": "Nothing sold in this period."
+                },
+                "buyers": {
+                    "title": "Who buys",
+                    "note": "{{unknown}} of {{total}} buyers have no gender or age recorded, and {{walkIn}} sales had no customer. Choose a category to see who buys it.",
+                    "empty": "No sale in this period had a customer recorded."
+                },
+                "ageDemand": {
+                    "title": "What each age group buys",
+                    "units": "{{count}} units",
+                    "note": "The three products each age group kept most of in this period, counting only buyers with an age recorded.",
+                    "empty": "No buyer in this period has an age recorded. Record it on the customer to see what each age group buys."
+                },
+                "together": {
+                    "title": "Bought together",
+                    "orders": "{{count}} orders",
+                    "note": "Two products in the same sale, in at least two sales. Worth a bundle or the same post.",
+                    "empty": "No two products were bought together twice in this period."
+                },
+                "returns": {
+                    "title": "Why products come back",
+                    "damaged": "{{count}} damaged",
+                    "empty": "No confirmed return of this period's sales."
+                },
+                "suppliers": {
+                    "title": "Suppliers",
+                    "supplier": "Supplier",
+                    "kept": "Units kept",
+                    "sales": "Sales",
+                    "margin": "Margin",
+                    "sellThrough": "Sold of what they sent",
+                    "returned": "Returned",
+                    "damaged": "Damaged",
+                    "none": "No supplier",
+                    "note": "Each sale is traced to the supplier of its batch. Sold of what they sent is all time: units kept by customers against units received from that supplier. No supplier is stock added by a stock adjustment."
+                }
+            },
+            "customers": {
+                "map": {
+                    "title": "Where customers are",
+                    "show": "Show",
+                    "metric": {
+                        "customers": "Customers",
+                        "sales": "Sales",
+                        "failed": "Not delivered"
+                    },
+                    "coverage": "Customers in {{count}} of {{total}} districts",
+                    "empty": "No online sale in this period.",
+                    "note": "Online orders by the district saved on the order. Not delivered shows a rate once a district has 20 parcels, the counts before that.",
+                    "counterOnly": "Places come from online orders, which carry an address. Counter sales have none."
+                },
+                "repeat": {
+                    "title": "Who came back",
+                    "customers": "Customers",
+                    "new": "Bought for the first time",
+                    "twice": "Bought twice or more",
+                    "daysToSecond": "Days to the second purchase",
+                    "days": "{{days}} days",
+                    "note": "Customers with a phone on their sale. A walk-in sale with no customer is not counted.",
+                    "empty": "No sale in this period had a customer."
+                },
+                "cohorts": {
+                    "title": "Do new customers come back?",
+                    "month": "First bought in",
+                    "new": "New customers",
+                    "after": "+{{months}} mo",
+                    "note": "Each row is the customers who first bought that month; each cell is the share who bought again that many months later.",
+                    "empty": "No first purchase in the six months up to this period."
+                },
+                "ages": {
+                    "title": "Customers by age",
+                    "note": "{{unknown}} of {{total}} customers who bought in this period have no age recorded.",
+                    "empty": "No customer who bought in this period has an age recorded. Record it on the customer to see your customers by age."
+                },
+                "winBack": {
+                    "title": "Customers to win back",
+                    "bought": "Bought {{count}} times",
+                    "since": "{{days}} days ago",
+                    "note": "Bought twice or more, nothing in the last 60 days. Worth a message.",
+                    "empty": "Nobody who bought twice has gone quiet for 60 days."
+                }
+            },
+            "extras": {
+                "preOrders": {
+                    "title": "Pre-orders",
+                    "sentence": "Of {{booked}} pre-orders taken in this period: {{converted}} became orders, {{cancelled}} cancelled, {{open}} still open.",
+                    "none": "No pre-order was taken in this period.",
+                    "converted": "Became orders, of those decided",
+                    "value": "Value booked",
+                    "openNow": "Open now",
+                    "advanceHeld": "Advance held now",
+                    "note": "Open now and the advance held count every open pre-order, whenever it was taken: that money is held today."
+                },
+                "counter": {
+                    "title": "At the counter",
+                    "sentence": "{{share}}% of counter sales ({{count}} of {{sales}}) had no customer recorded. Asking for the phone builds the customer list.",
+                    "none": "No counter sale in this period.",
+                    "sales": "Counter sales",
+                    "average": "Average sale",
+                    "perSale": "Items per sale",
+                    "withoutCustomer": "With no customer",
+                    "note": "What customers kept: units and value after confirmed returns."
+                }
+            },
+            "split": {
+                "title": "Counter and online",
+                "detail": "{{orders}} orders sold · profit {{profit}} · margin {{margin}}"
+            }
         }
     },
     "timeline": {
@@ -3662,6 +4046,12 @@
         "business": {
             "title": "Business settings",
             "lead": "Your business name, logo and contact details, as they appear on receipts, invoices, labels and the tracking page.",
+            "editTitle": "Edit business settings",
+            "edit": "Edit settings",
+            "details": "Business details",
+            "noLogo": "No logo yet",
+            "notSet": "Not set",
+            "lastEdited": "Last changed",
             "logo": "Logo",
             "logoHelp": "Printed at the top of the invoice and the label. JPG, PNG or WebP, up to {{size}} MB.",
             "logoAdd": "Add logo",
@@ -3685,6 +4075,13 @@
             "website": "Website",
             "facebook": "Facebook page",
             "instagram": "Instagram",
+            "namePlaceholder": "Name printed on your invoices",
+            "phonePlaceholder": "01XXXXXXXXX",
+            "phoneSecondPlaceholder": "Another number customers can call",
+            "addressPlaceholder": "House, road, area, city",
+            "websitePlaceholder": "www.yourshop.com",
+            "facebookPlaceholder": "facebook.com/yourshop",
+            "instagramPlaceholder": "instagram.com/yourshop",
             "linksHelp": "Printed in the invoice footer, so customers can find you again. www.yourshop.com is enough.",
             "save": "Save settings",
             "confirmTitle": "Save the business settings?",
@@ -3701,8 +4098,7 @@
                 "forbidden": "You do not have permission to do that.",
                 "server": "The settings could not be loaded. Try again in a moment."
             },
-            "retry": "Try again",
-            "readOnly": "You can see these details but not change them. Ask your admin if something needs changing."
+            "retry": "Try again"
         }
     },
     "activityLog": {
@@ -3766,5 +4162,11 @@
             "security": "Sign-in",
             "other": "Other"
         }
+    },
+    "charts": {
+        "less": "Fewer",
+        "more": "More",
+        "mapCredit": "Boundaries: {{credit}}",
+        "mapFailed": "The map could not be drawn. Reload the page to try again."
     }
 }

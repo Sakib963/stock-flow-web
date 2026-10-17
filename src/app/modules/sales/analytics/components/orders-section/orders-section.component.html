@@ -1,0 +1,316 @@
+@if (applies()) {
+    @if (failed(); as failure) {
+        <nz-card class="mt-2 md:mt-4" [nzTitle]="failedTitle" data-analytics="orders-failed">
+            <ng-template #failedTitle
+                ><h3 class="m-0 flex items-center gap-1.5 text-sm font-bold text-ink"><ng-icon name="lucideFunnel" size="14px" class="text-ink-muted" aria-hidden="true" />{{ 'sales.analytics.orders.funnel.title' | translate }}</h3></ng-template
+            >
+            <div class="text-center" role="alert">
+                <p class="m-0 text-sm text-ink-body">{{ 'sales.analytics.loadFailed.' + failure | translate }}</p>
+                <button nz-button nzType="primary" type="button" class="mt-3 inline-flex items-center gap-1.5" (click)="reload()">
+                    <ng-icon name="lucideRotateCw" size="14px" aria-hidden="true" />
+                    <span>{{ 'form.retry' | translate }}</span>
+                </button>
+            </div>
+        </nz-card>
+    } @else if (flow()?.funnel?.placed === 0) {
+        <nz-card class="mt-2 md:mt-4" [nzTitle]="emptyTitle" data-analytics="orders-empty">
+            <ng-template #emptyTitle
+                ><h3 class="m-0 flex items-center gap-1.5 text-sm font-bold text-ink"><ng-icon name="lucideFunnel" size="14px" class="text-ink-muted" aria-hidden="true" />{{ 'sales.analytics.orders.funnel.title' | translate }}</h3></ng-template
+            >
+            <p class="m-0 text-sm text-ink-muted">{{ 'sales.analytics.orders.empty' | translate }}</p>
+        </nz-card>
+    } @else {
+        <!-- Every card is drawn at once with its title; its body is a skeleton of its own shape until the figures arrive. -->
+        @if (!flow()) {
+            <span class="sr-only" role="status">{{ 'form.loading' | translate }}</span>
+        }
+        <div class="mt-2 grid grid-cols-1 items-start gap-2 md:mt-4 md:gap-4 lg:grid-cols-3" data-analytics="orders">
+            <nz-card class="lg:col-span-2" [nzTitle]="funnelTitle" data-analytics="funnel">
+                <ng-template #funnelTitle
+                    ><h3 class="m-0 flex items-center gap-1.5 text-sm font-bold text-ink"><ng-icon name="lucideFunnel" size="14px" class="text-ink-muted" aria-hidden="true" />{{ 'sales.analytics.orders.funnel.title' | translate }}</h3></ng-template
+                >
+                @if (flow()) {
+                    @if (insights().funnel; as insight) {
+                        <p class="mt-0 mb-4 text-sm text-ink-body" data-insight="funnel">{{ insight.key | translate: insight.params | digits }}</p>
+                    }
+                    <funnel-chart [steps]="steps()" />
+                    <p class="mt-3 mb-0 text-xs text-ink-soft">{{ 'sales.analytics.orders.funnel.note' | translate }}</p>
+                } @else {
+                    <nz-skeleton nzActive [nzTitle]="false" [nzParagraph]="{ rows: 1, width: '70%' }" />
+                    @for (bar of [100, 82, 76, 63, 58]; track bar) {
+                        <div class="mt-3 grid grid-cols-[minmax(0,7.5rem)_1fr] items-center gap-x-3 sm:grid-cols-[minmax(0,9rem)_1fr]" aria-hidden="true">
+                            <span class="h-3 w-20 rounded-control bg-line-soft"></span>
+                            <span class="h-8 animate-pulse rounded-control bg-line-soft" [style.width.%]="bar"></span>
+                        </div>
+                    }
+                }
+            </nz-card>
+
+            <nz-card [nzTitle]="reasonsTitle" data-analytics="reasons">
+                <ng-template #reasonsTitle
+                    ><h3 class="m-0 flex items-center gap-1.5 text-sm font-bold text-ink"><ng-icon name="lucideCircleX" size="14px" class="text-ink-muted" aria-hidden="true" />{{ 'sales.analytics.orders.reasons.title' | translate }}</h3></ng-template
+                >
+                @if (flow()) {
+                    @if (reasons().cancelled.length || reasons().failed.length) {
+                        @if (reasons().cancelled.length) {
+                            <p class="mt-0 mb-2 text-xs font-semibold text-ink-muted">{{ 'sales.analytics.orders.reasons.cancelled' | translate }}</p>
+                            <ul class="m-0 mb-4 flex list-none flex-col gap-2 p-0">
+                                @for (row of reasons().cancelled; track row.key) {
+                                    <li class="grid grid-cols-[1fr_auto] items-center gap-x-2" [attr.data-reason]="row.key">
+                                        <span class="flex min-w-0 items-center gap-1.5 text-xs text-ink">
+                                            <span class="truncate">{{ row.label | translate }}</span>
+                                            @if (row.business) {
+                                                <span class="shrink-0 rounded-full bg-surface-sunken px-1.5 text-[11px] text-ink-soft" nz-tooltip [nzTooltipTitle]="'sales.analytics.orders.reasons.businessWhy' | translate">{{ 'sales.analytics.orders.reasons.business' | translate }}</span>
+                                                <span class="sr-only">{{ 'sales.analytics.orders.reasons.businessWhy' | translate }}</span>
+                                            }
+                                        </span>
+                                        <span class="font-mono text-xs text-ink-body tabular-nums">{{ row.count | money: 'number' }}</span>
+                                        <span class="col-span-2 mt-0.5 h-1.5 rounded-full bg-surface-sunken"><span class="block h-full rounded-full" [class.bg-danger-border]="!row.business" [class.bg-line]="row.business" [style.width.%]="(row.count / reasons().widest) * 100"></span></span>
+                                    </li>
+                                }
+                            </ul>
+                        }
+                        @if (reasons().failed.length) {
+                            <p class="mt-0 mb-2 text-xs font-semibold text-ink-muted">{{ 'sales.analytics.orders.reasons.failed' | translate }}</p>
+                            <ul class="m-0 flex list-none flex-col gap-2 p-0">
+                                @for (row of reasons().failed; track row.key) {
+                                    <li class="grid grid-cols-[1fr_auto] items-center gap-x-2" [attr.data-failed-reason]="row.key">
+                                        <span class="truncate text-xs text-ink">{{ row.label | translate }}</span>
+                                        <span class="font-mono text-xs text-ink-body tabular-nums">{{ row.count | money: 'number' }}</span>
+                                        <span class="col-span-2 mt-0.5 h-1.5 rounded-full bg-surface-sunken"><span class="block h-full rounded-full bg-danger-border" [style.width.%]="(row.count / reasons().widest) * 100"></span></span>
+                                    </li>
+                                }
+                            </ul>
+                        }
+                    } @else {
+                        <p class="m-0 text-xs text-ink-muted">{{ 'sales.analytics.orders.reasons.none' | translate }}</p>
+                    }
+                } @else {
+                    <nz-skeleton nzActive [nzTitle]="false" [nzParagraph]="{ rows: 8 }" />
+                }
+            </nz-card>
+
+            <nz-card class="lg:col-span-3" [nzTitle]="lossTitle" data-analytics="losses">
+                <ng-template #lossTitle
+                    ><h3 class="m-0 flex items-center gap-1.5 text-sm font-bold text-ink"><ng-icon name="lucideMapPinned" size="14px" class="text-ink-muted" aria-hidden="true" />{{ 'sales.analytics.orders.losses.title' | translate }}</h3></ng-template
+                >
+                <!-- In the body, not the card header, so a phone keeps the title whole. -->
+                <div class="mb-3 overflow-x-auto">
+                    <nz-segmented [ngModel]="grouping()" (ngModelChange)="pick($event)" [attr.aria-label]="'sales.analytics.orders.losses.by' | translate">
+                        @for (g of groupings; track g) {
+                            <label nz-segmented-item [nzValue]="g">{{ 'sales.analytics.orders.losses.group.' + g | translate }}</label>
+                        }
+                    </nz-segmented>
+                </div>
+                @if (flow()) {
+                    @if (grouping() === 'places' && insights().places; as insight) {
+                        <p class="mt-0 mb-3 text-sm text-ink-body" data-insight="places">{{ insight.key | translate: insight.params | digits }}</p>
+                    }
+                    @if (losses().length) {
+                        <div class="overflow-x-auto">
+                            <nz-table nzTemplateMode nzSize="small" class="min-w-[34rem] text-xs [&_td:first-child]:whitespace-nowrap [&_th]:whitespace-nowrap">
+                                <thead>
+                                    <tr>
+                                        <th class="font-semibold">{{ 'sales.analytics.orders.losses.name.' + grouping() | translate }}</th>
+                                        <th class="text-right font-semibold">{{ (grouping() === 'products' ? 'sales.analytics.orders.losses.units' : 'sales.analytics.orders.losses.placed') | translate }}</th>
+                                        <th class="w-[30%] font-semibold">{{ 'sales.analytics.orders.losses.cancelRate' | translate }}</th>
+                                        @if (grouping() === 'places' || grouping() === 'sources') {
+                                            <th class="w-[30%] font-semibold">{{ 'sales.analytics.orders.losses.refusalRate' | translate }}</th>
+                                        }
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @for (row of losses(); track row.key) {
+                                        <tr [attr.data-loss-row]="row.key">
+                                            <td class="max-w-[12rem] truncate text-ink">{{ row.name }}</td>
+                                            <td class="text-right font-mono text-ink-body tabular-nums">{{ row.placed | money: 'number' }}</td>
+                                            <td>
+                                                <span class="flex items-center gap-2">
+                                                    <span class="h-1.5 flex-1 rounded-full bg-surface-sunken"><span class="block h-full rounded-full bg-warning" [style.width.%]="row.cancel.bar ?? 0"></span></span>
+                                                    <span class="w-14 text-right font-mono text-ink-body tabular-nums">{{ row.cancel.text }}</span>
+                                                </span>
+                                                @if (row.business) {
+                                                    <span class="text-[11px] text-ink-soft">{{ 'sales.analytics.orders.losses.businessLeftOut' | translate: { count: (row.business | money: 'number') } }}</span>
+                                                }
+                                            </td>
+                                            @if (row.refusal; as refusal) {
+                                                <td>
+                                                    <span class="flex items-center gap-2">
+                                                        <span class="h-1.5 flex-1 rounded-full bg-surface-sunken"><span class="block h-full rounded-full bg-danger" [style.width.%]="refusal.bar ?? 0"></span></span>
+                                                        <span class="w-14 text-right font-mono text-ink-body tabular-nums">{{ refusal.text }}</span>
+                                                    </span>
+                                                </td>
+                                            }
+                                        </tr>
+                                    }
+                                </tbody>
+                            </nz-table>
+                        </div>
+                        <p class="mt-3 mb-0 text-xs text-ink-soft">{{ 'sales.analytics.orders.losses.note' | translate }}</p>
+                    } @else {
+                        <p class="m-0 text-xs text-ink-muted">{{ 'sales.analytics.orders.losses.empty.' + grouping() | translate }}</p>
+                    }
+                } @else {
+                    <nz-skeleton nzActive [nzTitle]="false" [nzParagraph]="{ rows: 7 }" />
+                }
+            </nz-card>
+        </div>
+
+        <div class="mt-2 grid grid-cols-1 items-start gap-2 md:mt-4 md:gap-4 lg:grid-cols-2">
+            <nz-card [nzTitle]="confirmTitle" data-analytics="confirming">
+                <ng-template #confirmTitle
+                    ><h3 class="m-0 flex items-center gap-1.5 text-sm font-bold text-ink"><ng-icon name="lucidePhoneCall" size="14px" class="text-ink-muted" aria-hidden="true" />{{ 'sales.analytics.orders.confirming.title' | translate }}</h3></ng-template
+                >
+                @if (flow()) {
+                    <p class="mt-0 mb-3 text-sm text-ink-body" data-insight="confirming">
+                        @if (insights().confirming; as insight) {
+                            {{ insight.key | translate: insight.params | digits }}
+                        } @else {
+                            {{ 'sales.analytics.orders.confirming.notYet' | translate }}
+                        }
+                    </p>
+                    @if (confirming().length) {
+                        <ul class="m-0 flex list-none flex-col gap-2.5 p-0">
+                            @for (row of confirming(); track row.key) {
+                                <li class="grid grid-cols-[minmax(0,8rem)_1fr_auto] items-center gap-x-3" [attr.data-confirm]="row.key">
+                                    <span class="truncate text-xs text-ink">{{ row.label | translate }}</span>
+                                    <span class="h-1.5 rounded-full bg-surface-sunken"><span class="block h-full rounded-full bg-danger" [style.width.%]="row.refusal.bar ?? 0"></span></span>
+                                    <span class="inline-flex items-baseline justify-end gap-1 text-xs">
+                                        <span class="font-mono text-ink-body tabular-nums">{{ row.refusal.text }}</span>
+                                        @if (row.refusal.bar !== null) {
+                                            <span class="text-ink-soft">{{ 'sales.analytics.orders.ofDispatched' | translate: { count: (row.dispatched | money: 'number') } }}</span>
+                                        }
+                                    </span>
+                                </li>
+                            }
+                        </ul>
+                    } @else {
+                        <p class="m-0 text-xs text-ink-muted">{{ 'sales.analytics.notEnough' | translate }}</p>
+                    }
+                } @else {
+                    <nz-skeleton nzActive [nzTitle]="false" [nzParagraph]="{ rows: 5 }" />
+                }
+            </nz-card>
+
+            <nz-card [nzTitle]="termsTitle" data-analytics="terms">
+                <ng-template #termsTitle
+                    ><h3 class="m-0 flex items-center gap-1.5 text-sm font-bold text-ink"><ng-icon name="lucideHandCoins" size="14px" class="text-ink-muted" aria-hidden="true" />{{ 'sales.analytics.orders.terms.title' | translate }}</h3></ng-template
+                >
+                @if (flow()) {
+                    <p class="mt-0 mb-3 text-sm text-ink-body" data-insight="terms">
+                        @if (insights().terms; as insight) {
+                            {{ insight.key | translate: insight.params | digits }}
+                        } @else {
+                            {{ 'sales.analytics.orders.terms.notYet' | translate }}
+                        }
+                    </p>
+                    @if (terms().length) {
+                        <div class="mb-4 flex flex-wrap gap-2">
+                            @for (row of terms(); track row.key) {
+                                <span class="inline-flex items-baseline gap-1.5 rounded-control border border-line px-2.5 py-1.5 text-xs" [attr.data-terms]="row.key">
+                                    <span class="font-semibold text-ink">{{ row.label | translate }}</span>
+                                    <span class="font-mono text-ink-body tabular-nums">{{ row.refusal.text }}</span>
+                                    @if (row.refusal.bar !== null) {
+                                        <span class="text-ink-soft">{{ 'sales.analytics.orders.ofDispatched' | translate: { count: (row.dispatched | money: 'number') } }}</span>
+                                    }
+                                </span>
+                            }
+                        </div>
+                    }
+                    @if (termsByPlace().length) {
+                        <dumbbell-chart [rows]="termsByPlace()" firstLabel="sales.analytics.orders.terms.cod" secondLabel="sales.analytics.orders.terms.advance" />
+                    } @else {
+                        <p class="m-0 text-xs text-ink-muted">{{ 'sales.analytics.orders.terms.byPlaceNotYet' | translate }}</p>
+                    }
+                } @else {
+                    <nz-skeleton nzActive [nzTitle]="false" [nzParagraph]="{ rows: 5 }" />
+                }
+            </nz-card>
+
+            <nz-card class="lg:col-span-2" [nzTitle]="riskTitle" data-analytics="risk">
+                <ng-template #riskTitle
+                    ><h3 class="m-0 flex items-center gap-1.5 text-sm font-bold text-ink"><ng-icon name="lucideShieldAlert" size="14px" class="text-ink-muted" aria-hidden="true" />{{ 'sales.analytics.orders.risk.title' | translate }}</h3></ng-template
+                >
+                @if (flow()) {
+                    <p class="mt-0 mb-3 text-sm text-ink-body" data-insight="risk">
+                        @if (insights().risk; as insight) {
+                            {{ insight.key | translate: insight.params | digits }}
+                        } @else {
+                            {{ 'sales.analytics.orders.risk.notYet' | translate }}
+                        }
+                    </p>
+                    <div class="overflow-x-auto">
+                        <nz-table nzTemplateMode nzSize="small" class="min-w-[36rem] text-xs [&_td:first-child]:whitespace-nowrap [&_th]:whitespace-nowrap">
+                            <thead>
+                                <tr>
+                                    <th class="text-left font-semibold">{{ 'sales.analytics.orders.risk.shown' | translate }}</th>
+                                    <th class="text-right font-semibold">{{ 'sales.analytics.orders.risk.kept' | translate }}</th>
+                                    <th class="text-right font-semibold">{{ 'sales.analytics.orders.risk.failed' | translate }}</th>
+                                    <th class="text-right font-semibold">{{ 'sales.analytics.orders.risk.returned' | translate }}</th>
+                                    <th class="text-right font-semibold">{{ 'sales.analytics.orders.risk.cancelled' | translate }}</th>
+                                    <th class="text-right font-semibold">{{ 'sales.analytics.orders.risk.refusal' | translate }}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @for (row of risk(); track row.shown) {
+                                    <tr [attr.data-risk]="row.shown">
+                                        <td>
+                                            <span class="inline-flex items-center gap-1.5 text-ink">
+                                                @if (row.warned) {
+                                                    <ng-icon name="lucideTriangleAlert" size="12px" class="text-warning-ink" aria-hidden="true" />
+                                                }
+                                                {{ 'sales.analytics.orders.risk.bucket.' + row.shown | translate }}
+                                            </span>
+                                        </td>
+                                        <td class="text-right font-mono text-ink-body tabular-nums">{{ row.kept | money: 'number' }}</td>
+                                        <td class="text-right font-mono text-ink-body tabular-nums">{{ row.failed | money: 'number' }}</td>
+                                        <td class="text-right font-mono text-ink-body tabular-nums">{{ row.returned | money: 'number' }}</td>
+                                        <td class="text-right font-mono text-ink-body tabular-nums">{{ row.cancelled | money: 'number' }}</td>
+                                        <td class="text-right font-mono font-semibold tabular-nums" [class.text-danger-ink]="(row.refusal.bar ?? 0) >= 20" [class.text-ink]="(row.refusal.bar ?? 0) < 20">{{ row.refusal.text }}</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </nz-table>
+                    </div>
+                } @else {
+                    <nz-skeleton nzActive [nzTitle]="false" [nzParagraph]="{ rows: 6 }" />
+                }
+            </nz-card>
+
+            <nz-card class="lg:col-span-2" [nzTitle]="speedTitle" data-analytics="speed">
+                <ng-template #speedTitle
+                    ><h3 class="m-0 flex items-center gap-1.5 text-sm font-bold text-ink"><ng-icon name="lucideClock" size="14px" class="text-ink-muted" aria-hidden="true" />{{ 'sales.analytics.orders.speed.title' | translate }}</h3></ng-template
+                >
+                <div class="grid grid-cols-3 gap-px overflow-hidden rounded-control border border-line bg-line">
+                    @for (key of speedSteps; track key; let i = $index) {
+                        <div class="bg-white px-3 py-2.5" [attr.data-speed]="key">
+                            <p class="m-0 text-[11px] font-semibold text-ink-muted">{{ 'sales.analytics.orders.speed.' + key | translate }}</p>
+                            @if (speed()[i]; as step) {
+                                <p class="mt-1 mb-0 font-mono text-base font-bold text-ink tabular-nums">{{ hours(step.hours) }}</p>
+                            } @else {
+                                <span class="mt-1.5 block h-5 w-14 animate-pulse rounded-control bg-line-soft" aria-hidden="true"></span>
+                            }
+                        </div>
+                    }
+                </div>
+                @if (flow()) {
+                    @if (slowest().length) {
+                        <p class="mt-4 mb-2 text-xs font-semibold text-ink-muted">{{ 'sales.analytics.orders.speed.byPlace' | translate }}</p>
+                        <ul class="m-0 flex list-none flex-col gap-2 p-0">
+                            @for (row of slowest(); track row.key) {
+                                <li class="grid grid-cols-[minmax(0,7.5rem)_1fr_auto] items-center gap-x-3" [attr.data-speed-place]="row.key">
+                                    <span class="truncate text-xs text-ink">{{ row.name }}</span>
+                                    <span class="h-1.5 rounded-full bg-surface-sunken"><span class="block h-full rounded-full bg-ink-faint" [style.width.%]="row.width"></span></span>
+                                    <span class="text-right font-mono text-xs text-ink-body tabular-nums">{{ hours(row.hours) }}</span>
+                                </li>
+                            }
+                        </ul>
+                    }
+                    <p class="mt-3 mb-0 text-xs text-ink-soft">{{ 'sales.analytics.orders.speed.note' | translate }}</p>
+                } @else {
+                    <div class="mt-4"><nz-skeleton nzActive [nzTitle]="false" [nzParagraph]="{ rows: 5 }" /></div>
+                }
+            </nz-card>
+        </div>
+    }
+}

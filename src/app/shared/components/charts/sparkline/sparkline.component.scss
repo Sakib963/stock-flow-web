@@ -1,0 +1,23 @@
+// SVG paint takes a colour, not a utility class, so the tone picks the token here.
+.sparkline-line {
+    stroke: var(--color-primary);
+}
+.sparkline-stop {
+    stop-color: var(--color-primary);
+}
+svg[data-tone='success'] {
+    .sparkline-line {
+        stroke: var(--color-success);
+    }
+    .sparkline-stop {
+        stop-color: var(--color-success);
+    }
+}
+svg[data-tone='danger'] {
+    .sparkline-line {
+        stroke: var(--color-danger);
+    }
+    .sparkline-stop {
+        stop-color: var(--color-danger);
+    }
+}

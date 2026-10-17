@@ -1,0 +1,31 @@
+@if (boundaries(); as file) {
+    <svg class="block h-auto w-full" [attr.viewBox]="viewBox()" role="img" [attr.aria-label]="label() | translate" data-map>
+        @for (shape of shapes(); track shape.oid) {
+            <path
+                class="stroke-white transition-[fill,opacity] duration-150"
+                [class]="shape.shade"
+                [class.opacity-60]="hovered() && hovered() !== shape.oid"
+                [attr.d]="shape.d"
+                stroke-width="0.8"
+                [attr.data-district]="shape.oid"
+                nz-tooltip
+                [nzTooltipTitle]="shape.tip"
+                (mouseenter)="hovered.set(shape.oid)"
+                (mouseleave)="hovered.set(null)"
+            ></path>
+        }
+        @for (shape of shapes(); track shape.oid) {
+            @if (shape.labelled) {
+                <g class="pointer-events-none" aria-hidden="true">
+                    <circle [attr.cx]="shape.x" [attr.cy]="shape.y" r="5" class="fill-white stroke-ink" stroke-width="1.5" />
+                    <text [attr.x]="shape.x + 9" [attr.y]="shape.y + 7" class="map-label fill-ink text-[22px] font-semibold">{{ shape.name }}</text>
+                </g>
+            }
+        }
+    </svg>
+    <p class="mt-1 mb-0 text-right text-[11px] text-ink-soft">{{ 'charts.mapCredit' | translate: { credit: file.credit } }}</p>
+} @else if (failed()) {
+    <p class="m-0 text-xs text-ink-muted" role="alert">{{ 'charts.mapFailed' | translate }}</p>
+} @else {
+    <div class="aspect-[600/848] w-full animate-pulse rounded-container bg-line-soft" aria-hidden="true"></div>
+}

@@ -1,0 +1,16 @@
+<ul class="m-0 flex list-none flex-col gap-2.5 p-0">
+    @for (bar of bars(); track bar.key) {
+        <li class="grid grid-cols-[minmax(0,7.5rem)_1fr_auto] items-center gap-x-3 sm:grid-cols-[minmax(0,9rem)_1fr_7rem]" [attr.data-step]="bar.key">
+            <span class="truncate text-xs" [class.font-semibold]="bar.kind !== 'drop'" [class.text-ink]="bar.kind !== 'drop'" [class.text-ink-muted]="bar.kind === 'drop'">{{ bar.label | translate }}</span>
+            <span class="relative h-6 rounded-control bg-surface-sunken">
+                <span class="absolute inset-y-0 transition-[left,width] duration-300 ease-out rounded-control bg-ink-faint data-[kind=drop]:bg-danger-border data-[kind=end]:bg-success data-[negative]:bg-danger" [attr.data-kind]="bar.kind" [attr.data-negative]="bar.value < 0 ? '' : null" [style.left.%]="bar.left" [style.width.%]="bar.width" nz-tooltip [nzTooltipTitle]="(bar.label | translate) + ': ' + (bar.value | money: 'number') + ' (' + (bar.share | digits) + '%)'"></span>
+            </span>
+            <span class="text-right font-mono text-xs tabular-nums" [class.font-bold]="bar.kind === 'end'" [class.text-ink]="bar.kind !== 'drop'" [class.text-ink-muted]="bar.kind === 'drop'">
+                @if (bar.kind === 'drop' && bar.value) {
+                    <span aria-hidden="true">&minus;</span>
+                }
+                {{ bar.value | money: 'number' }}
+            </span>
+        </li>
+    }
+</ul>

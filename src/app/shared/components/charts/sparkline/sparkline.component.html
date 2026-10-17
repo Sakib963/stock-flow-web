@@ -1,0 +1,12 @@
+@if (points()) {
+    <svg class="block h-8 w-full overflow-visible" [attr.viewBox]="'0 0 ' + width + ' ' + height" preserveAspectRatio="none" aria-hidden="true" [attr.data-tone]="tone()">
+        <defs>
+            <linearGradient [attr.id]="gradientId" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" class="sparkline-stop" stop-opacity="0.22" />
+                <stop offset="100%" class="sparkline-stop" stop-opacity="0" />
+            </linearGradient>
+        </defs>
+        <polygon [attr.points]="area()" [attr.fill]="'url(#' + gradientId + ')'" />
+        <polyline class="sparkline-line" [attr.points]="line()" fill="none" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke" />
+    </svg>
+}

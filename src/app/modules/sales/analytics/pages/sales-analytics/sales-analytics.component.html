@@ -1,0 +1,238 @@
+<page-header [title]="'sales.analytics.title' | translate" [lead]="'sales.analytics.lead' | translate" />
+
+<list-filter [config]="filterConfig()" [values]="filters()" (valuesChange)="filters.set($event)" [narrow]="isPhone()" [loading]="!overview() && !failed()" />
+
+<!-- One tab at a time: only the open tab exists, so only its figures are asked for, and a filter
+     change asks again for that tab alone. -->
+<!-- The tab bar is a card like every block below it, and stays at the top while the tab scrolls. -->
+<nz-tabs class="mt-2 md:mt-4 [&_.ant-tabs-nav]:sticky [&_.ant-tabs-nav]:top-0 [&_.ant-tabs-nav]:z-10 [&_.ant-tabs-nav]:shadow-[0_-1rem_0_0_var(--color-surface-page)] [&_.ant-tabs-nav]:mb-0 [&_.ant-tabs-nav]:rounded-container [&_.ant-tabs-nav]:border [&_.ant-tabs-nav]:border-line [&_.ant-tabs-nav]:bg-white [&_.ant-tabs-nav]:px-4 [&_.ant-tabs-nav::before]:border-b-0" [nzSelectedIndex]="tabIndex()" (nzSelectedIndexChange)="pickTab($event)" [nzDestroyInactiveTabPane]="true" data-analytics="tabs">
+    @for (tab of tabs(); track tab) {
+        <nz-tab [nzTitle]="tabTitle">
+            <ng-template #tabTitle
+                ><span class="inline-flex items-center gap-1.5" [attr.data-tab]="tab"><ng-icon [name]="tabIcons[tab]" size="15px" aria-hidden="true" />{{ 'sales.analytics.tab.' + tab | translate }}</span></ng-template
+            >
+            <ng-template nz-tab>
+                @switch (tab) {
+                    @case ('overview') {
+                @if (failed(); as failure) {
+                    <div class="sf-empty mt-2 md:mt-4" role="alert">
+                        <p class="m-0 text-sm text-ink-body">{{ 'sales.analytics.loadFailed.' + failure | translate }}</p>
+                        <div class="mt-3 flex items-center justify-center">
+                            <button nz-button nzType="primary" type="button" class="inline-flex items-center gap-1.5" (click)="reload()">
+                                <ng-icon name="lucideRotateCw" size="14px" aria-hidden="true" />
+                                <span>{{ 'form.retry' | translate }}</span>
+                            </button>
+                        </div>
+                    </div>
+                } @else {
+                    @if (!overview()) {
+                        <span class="sr-only" role="status">{{ 'form.loading' | translate }}</span>
+                    }
+
+                    <!-- The sentence first: what the period means, before any number. -->
+                    <nz-card class="mt-2 md:mt-4" data-analytics="headline">
+                    <div class="flex items-start gap-3">
+                        <span class="mt-0.5 grid size-8 shrink-0 place-items-center rounded-full bg-primary-wash text-primary"><ng-icon name="lucideSparkles" size="16px" aria-hidden="true" /></span>
+                        @if (overview(); as data) {
+                            <div class="min-w-0">
+                                <p class="m-0 text-[15px] font-semibold text-ink">{{ 'sales.analytics.insight.headline.' + data.insights.headline.key | translate: data.insights.headline.params | digits }}</p>
+                                <p class="mt-0.5 mb-0 text-xs text-ink-muted">
+                                    {{ 'sales.analytics.period' | translate: { from: (data.period.date_from | recordDate: language()), to: (data.period.date_to | recordDate: language()), previousFrom: (data.period.previous_from | recordDate: language()), previousTo: (data.period.previous_to | recordDate: language()) } }}
+                                </p>
+                            </div>
+                        } @else {
+                            <nz-skeleton class="flex-1" nzActive [nzTitle]="false" [nzParagraph]="{ rows: 2, width: ['70%', '40%'] }" />
+                        }
+                    </div>
+                    </nz-card>
+
+                    <section class="mt-2 grid grid-cols-2 gap-2 md:mt-4 md:gap-4 lg:auto-cols-fr lg:grid-flow-col" data-analytics="tiles">
+                        @for (tile of tiles(); track tile.key) {
+                            <nz-card class="min-w-0 max-lg:last:odd:col-span-2 [&_.ant-card-body]:flex [&_.ant-card-body]:h-full [&_.ant-card-body]:flex-col [&_.ant-card-body]:p-3 md:[&_.ant-card-body]:p-4" [attr.data-tile]="tile.key">
+                                <p class="m-0 flex items-center gap-1.5 text-xs font-semibold text-ink-muted">
+                                    <ng-icon [name]="tile.icon" size="14px" aria-hidden="true" />
+                                    {{ 'sales.analytics.tile.' + tile.key | translate }}
+                                </p>
+                                <p class="mt-1.5 mb-0 font-mono text-2xl font-bold text-ink tabular-nums">
+                                    {{ tile.value }}
+                                    @if (tile.suffix) {
+                                        <span class="text-base font-semibold text-ink-soft">{{ tile.suffix }}</span>
+                                    }
+                                </p>
+                                <p class="mt-1 mb-0 flex min-h-5 items-center gap-1 text-xs">
+                                    @if (tile.change; as change) {
+                                        <span class="inline-flex items-center gap-0.5 rounded-full px-1.5 py-px font-semibold" [class.bg-success-bg]="change.good" [class.text-success-ink]="change.good" [class.bg-danger-bg]="!change.good" [class.text-danger-ink]="!change.good" [attr.data-change]="change.good ? 'good' : 'bad'">
+                                            <ng-icon [name]="change.up ? 'lucideArrowUpRight' : 'lucideArrowDownRight'" size="12px" aria-hidden="true" />{{ change.key | translate: change.params }}
+                                        </span>
+                                        <span class="text-ink-soft">{{ 'sales.analytics.tile.vsPrevious' | translate }}</span>
+                                    } @else {
+                                        <span class="text-ink-soft" nz-tooltip [nzTooltipTitle]="'sales.analytics.tile.noPreviousWhy' | translate">{{ 'sales.analytics.tile.noPrevious' | translate }}</span>
+                                    }
+                                </p>
+                                @if (tile.note; as note) {
+                                    <p class="mt-1 mb-0 text-xs" [class.text-warning-ink]="tile.key !== 'refusal'" [class.text-ink-soft]="tile.key === 'refusal'" [attr.data-note]="tile.key">{{ note.key | translate: note.params }}</p>
+                                }
+                                @if (tile.trend; as trend) {
+                                    <div class="mt-auto pt-2"><sparkline [values]="trend" [tone]="tile.key === 'profit' ? 'success' : 'primary'" /></div>
+                                }
+                            </nz-card>
+                        } @empty {
+                            <!-- The tile's own shape: its label, the figure, the comparison and the trend line. -->
+                            @for (cell of tileSkeletons(); track cell) {
+                                <nz-card class="max-lg:last:odd:col-span-2 [&_.ant-card-body]:flex [&_.ant-card-body]:flex-col [&_.ant-card-body]:gap-2 [&_.ant-card-body]:p-3 md:[&_.ant-card-body]:p-4" aria-hidden="true">
+                                    <span class="h-3 w-20 rounded-control bg-line-soft"></span>
+                                    <span class="h-7 w-28 animate-pulse rounded-control bg-line-soft"></span>
+                                    <span class="h-3 w-32 rounded-control bg-line-soft"></span>
+                                    @if (cell <= 2) {
+                                        <span class="mt-1 h-8 animate-pulse rounded-control bg-surface-sunken"></span>
+                                    }
+                                </nz-card>
+                            }
+                        }
+                    </section>
+
+                    <!-- Counter against online, only for a business that sells both ways and has not picked one. -->
+                    @if (split(); as rows) {
+                        <nz-card class="mt-2 md:mt-4" [nzTitle]="splitTitle" data-analytics="channel-split">
+                            <ng-template #splitTitle
+                                ><h3 class="m-0 flex items-center gap-1.5 text-sm font-bold text-ink"><ng-icon name="lucideSplit" size="14px" class="text-ink-muted" aria-hidden="true" />{{ 'sales.analytics.split.title' | translate }}</h3></ng-template
+                            >
+                            <div class="flex h-3 overflow-hidden rounded-full bg-line" aria-hidden="true">
+                                @for (row of rows; track row.channel) {
+                                    <span class="h-full" [class.bg-tag-teal-ink]="row.channel === 'POS'" [class.bg-primary]="row.channel === 'ONLINE'" [style.width.%]="row.share"></span>
+                                }
+                            </div>
+                            <div class="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2 sm:gap-4">
+                                @for (row of rows; track row.channel) {
+                                    <div class="flex items-start gap-2.5" [attr.data-channel]="row.channel">
+                                        <span class="mt-1 size-2.5 shrink-0 rounded-full" [class.bg-tag-teal-ink]="row.channel === 'POS'" [class.bg-primary]="row.channel === 'ONLINE'"></span>
+                                        <div class="min-w-0">
+                                            <p class="m-0 text-xs font-semibold text-ink-muted">{{ 'sales.analytics.channel.' + row.channel | translate }} &middot; {{ row.share | digits }}%</p>
+                                            <p class="mt-0.5 mb-0 font-mono text-lg font-bold text-ink tabular-nums">{{ row.sales | money: 'number' }}</p>
+                                            <p class="mt-0.5 mb-0 text-xs text-ink-soft">{{ 'sales.analytics.split.detail' | translate: { orders: (row.orders | money: 'number'), profit: (row.profit | money: 'number'), margin: row.margin } }}</p>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </nz-card>
+                    }
+
+                    <nz-card class="mt-2 md:mt-4" [nzTitle]="waterfallTitle" data-analytics="waterfall">
+                        <ng-template #waterfallTitle
+                            ><h2 class="m-0 flex items-center gap-1.5 text-sm font-bold text-ink"><ng-icon name="lucideChartColumnDecreasing" size="14px" class="text-ink-muted" aria-hidden="true" />{{ 'sales.analytics.waterfall.title' | translate }}</h2></ng-template
+                        >
+                        @if (overview(); as data) {
+                            @if (data.insights.waterfall; as insight) {
+                                <p class="mt-0 mb-4 text-sm text-ink-body" data-analytics="waterfall-insight">{{ 'sales.analytics.insight.waterfall.' + insight.key | translate: insight.params | digits }}</p>
+                                <waterfall-chart [steps]="steps()" />
+                                @if (data.waterfall.units_without_cost) {
+                                    <p class="mt-3 mb-0 text-xs text-warning-ink">{{ 'sales.analytics.waterfall.withoutCost' | translate: { count: (data.waterfall.units_without_cost | money: 'number') } }}</p>
+                                }
+                                <p class="mt-3 mb-0 text-xs text-ink-soft">{{ 'sales.analytics.waterfall.note' | translate }}</p>
+                            } @else {
+                                <p class="m-0 text-xs text-ink-muted">{{ 'sales.analytics.notEnough' | translate }}</p>
+                            }
+                        } @else {
+                            <nz-skeleton nzActive [nzTitle]="false" [nzParagraph]="{ rows: 1, width: '60%' }" />
+                            @for (bar of [{ left: 0, width: 100 }, { left: 96, width: 4 }, { left: 88, width: 8 }, { left: 45, width: 43 }, { left: 0, width: 45 }]; track $index) {
+                                <div class="mt-2.5 grid grid-cols-[minmax(0,7.5rem)_1fr_auto] items-center gap-x-3 sm:grid-cols-[minmax(0,9rem)_1fr_7rem]" aria-hidden="true">
+                                    <span class="h-3 w-16 rounded-control bg-line-soft"></span>
+                                    <span class="relative h-6 rounded-control bg-surface-sunken"><span class="absolute inset-y-0 animate-pulse rounded-control bg-line-soft" [style.left.%]="bar.left" [style.width.%]="bar.width"></span></span>
+                                    <span class="ml-auto h-3 w-14 rounded-control bg-line-soft"></span>
+                                </div>
+                            }
+                        }
+                    </nz-card>
+
+                    <!-- Pre-orders and the counter, each only for someone it applies to; the server leaves out the rest. -->
+                    @if (overview(); as data) {
+                        @if (preOrders() || counter()) {
+                            <div class="mt-2 grid grid-cols-1 items-start gap-2 md:mt-4 md:gap-4 lg:grid-cols-2">
+                                @if (preOrders(); as p) {
+                                    <nz-card [nzTitle]="preOrderTitle" data-analytics="pre-orders">
+                                        <ng-template #preOrderTitle
+                                            ><h3 class="m-0 flex items-center gap-1.5 text-sm font-bold text-ink"><ng-icon name="lucideCalendarCheck" size="14px" class="text-ink-muted" aria-hidden="true" />{{ 'sales.analytics.extras.preOrders.title' | translate }}</h3></ng-template
+                                        >
+                                        <p class="mt-0 mb-3 text-sm text-ink-body">
+                                            @if (p.booked) {
+                                                {{ 'sales.analytics.extras.preOrders.sentence' | translate: { booked: (p.booked | money: 'number'), converted: (p.converted | money: 'number'), cancelled: (p.cancelled | money: 'number'), open: (p.open | money: 'number') } }}
+                                            } @else {
+                                                {{ 'sales.analytics.extras.preOrders.none' | translate }}
+                                            }
+                                        </p>
+                                        <div class="grid grid-cols-2 gap-px overflow-hidden rounded-control border border-line bg-line">
+                                            <div class="bg-white px-3 py-2.5">
+                                                <p class="m-0 text-[11px] font-semibold text-ink-muted">{{ 'sales.analytics.extras.preOrders.converted' | translate }}</p>
+                                                <p class="mt-1 mb-0 font-mono text-base font-bold text-ink tabular-nums">{{ p.convertedShare === null ? '-' : (p.convertedShare | digits) + '%' }}</p>
+                                            </div>
+                                            <div class="bg-white px-3 py-2.5">
+                                                <p class="m-0 text-[11px] font-semibold text-ink-muted">{{ 'sales.analytics.extras.preOrders.value' | translate }}</p>
+                                                <p class="mt-1 mb-0 font-mono text-base font-bold text-ink tabular-nums">{{ p.booked_value | money: 'number' }}</p>
+                                            </div>
+                                            <div class="bg-white px-3 py-2.5">
+                                                <p class="m-0 text-[11px] font-semibold text-ink-muted">{{ 'sales.analytics.extras.preOrders.openNow' | translate }}</p>
+                                                <p class="mt-1 mb-0 font-mono text-base font-bold text-ink tabular-nums">{{ p.open_now | money: 'number' }}</p>
+                                            </div>
+                                            <div class="bg-white px-3 py-2.5">
+                                                <p class="m-0 text-[11px] font-semibold text-ink-muted">{{ 'sales.analytics.extras.preOrders.advanceHeld' | translate }}</p>
+                                                <p class="mt-1 mb-0 font-mono text-base font-bold text-ink tabular-nums">{{ p.advance_held | money: 'number' }}</p>
+                                            </div>
+                                        </div>
+                                        <p class="mt-3 mb-0 text-xs text-ink-soft">{{ 'sales.analytics.extras.preOrders.note' | translate }}</p>
+                                    </nz-card>
+                                }
+                                @if (counter(); as c) {
+                                    <nz-card [nzTitle]="counterTitle" data-analytics="counter">
+                                        <ng-template #counterTitle
+                                            ><h3 class="m-0 flex items-center gap-1.5 text-sm font-bold text-ink"><ng-icon name="lucideStore" size="14px" class="text-ink-muted" aria-hidden="true" />{{ 'sales.analytics.extras.counter.title' | translate }}</h3></ng-template
+                                        >
+                                        <p class="mt-0 mb-3 text-sm text-ink-body">
+                                            @if (c.sales) {
+                                                {{ 'sales.analytics.extras.counter.sentence' | translate: { share: (c.withoutShare | digits), count: (c.without_customer | money: 'number'), sales: (c.sales | money: 'number') } }}
+                                            } @else {
+                                                {{ 'sales.analytics.extras.counter.none' | translate }}
+                                            }
+                                        </p>
+                                        <div class="grid grid-cols-2 gap-px overflow-hidden rounded-control border border-line bg-line">
+                                            <div class="bg-white px-3 py-2.5">
+                                                <p class="m-0 text-[11px] font-semibold text-ink-muted">{{ 'sales.analytics.extras.counter.sales' | translate }}</p>
+                                                <p class="mt-1 mb-0 font-mono text-base font-bold text-ink tabular-nums">{{ c.sales | money: 'number' }}</p>
+                                            </div>
+                                            <div class="bg-white px-3 py-2.5">
+                                                <p class="m-0 text-[11px] font-semibold text-ink-muted">{{ 'sales.analytics.extras.counter.average' | translate }}</p>
+                                                <p class="mt-1 mb-0 font-mono text-base font-bold text-ink tabular-nums">{{ c.average === null ? '-' : (c.average | money: 'number') }}</p>
+                                            </div>
+                                            <div class="bg-white px-3 py-2.5">
+                                                <p class="m-0 text-[11px] font-semibold text-ink-muted">{{ 'sales.analytics.extras.counter.perSale' | translate }}</p>
+                                                <p class="mt-1 mb-0 font-mono text-base font-bold text-ink tabular-nums">{{ c.perSale === null ? '-' : (c.perSale | money: 'number') }}</p>
+                                            </div>
+                                            <div class="bg-white px-3 py-2.5">
+                                                <p class="m-0 text-[11px] font-semibold text-ink-muted">{{ 'sales.analytics.extras.counter.withoutCustomer' | translate }}</p>
+                                                <p class="mt-1 mb-0 font-mono text-base font-bold tabular-nums" [class.text-warning-ink]="(c.withoutShare ?? 0) >= 50" [class.text-ink]="(c.withoutShare ?? 0) < 50">{{ c.withoutShare === null ? '-' : (c.withoutShare | digits) + '%' }}</p>
+                                            </div>
+                                        </div>
+                                        <p class="mt-3 mb-0 text-xs text-ink-soft">{{ 'sales.analytics.extras.counter.note' | translate }}</p>
+                                    </nz-card>
+                                }
+                            </div>
+                        }
+                    }
+                }
+                    }
+                    @case ('orders') {
+                        <orders-section [query]="query()" />
+                    }
+                    @case ('products') {
+                        <products-section [query]="query()" />
+                    }
+                    @case ('customers') {
+                        <customers-section [query]="query()" />
+                    }
+                    @case ('team') {
+                        <team-section [query]="query()" />
+                    }
+                }
+            </ng-template>
+        </nz-tab>
+    }
+</nz-tabs>

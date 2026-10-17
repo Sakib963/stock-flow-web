@@ -1,0 +1,7 @@
+// A white halo keeps a district name readable over any shade; SVG text has no utility for it.
+.map-label {
+    paint-order: stroke;
+    stroke: var(--color-white);
+    stroke-width: 5px;
+    stroke-linejoin: round;
+}

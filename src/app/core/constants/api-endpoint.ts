@@ -100,6 +100,13 @@ export class APIEndpoint {
     static readonly GET_AISLE_LIST_FOR_DROPDOWN = '/api/v1/configuration/aisle/get-aisle-list-for-dropdown';
 
     static readonly GET_CONFIGURATION_ANALYTICS = '/api/v1/configuration/analytics/get-configuration-analytics';
+    static readonly GET_SALES_ANALYTICS_OVERVIEW = '/api/v1/sales/analytics/get-sales-analytics-overview';
+    static readonly GET_SALES_ANALYTICS_ORDERS = '/api/v1/sales/analytics/get-sales-analytics-orders';
+    static readonly GET_SALES_ANALYTICS_TEAM = '/api/v1/sales/analytics/get-sales-analytics-team';
+    static readonly GET_SALES_ANALYTICS_PRODUCTS = '/api/v1/sales/analytics/get-sales-analytics-products';
+    static readonly GET_SALES_ANALYTICS_CUSTOMERS = '/api/v1/sales/analytics/get-sales-analytics-customers';
+    /** A static file in the app, built by tools/map-builder: not on the API server. */
+    static readonly BD_DISTRICT_MAP = 'assets/maps/bd-districts.json';
 
     // Inventory
     static readonly GET_PURCHASE_ORDER_LIST = '/api/v1/inventory/purchase-order/get-purchase-list';
