@@ -1,6 +1,6 @@
 import { Courier, DeliveryStatus } from '@app/core/models/order.model';
 
-export type DeliveryBatchStatus = 'Open' | 'HandedOver' | 'Cancelled';
+export type DeliveryBatchStatus = 'Open' | 'HandedOver' | 'Delivered' | 'PartlyDelivered' | 'NotDelivered' | 'Cancelled';
 
 /** An online order as a batch shows, labels and exports it. Place names are English, as the label prints them. */
 export interface BatchOrder {

@@ -7,6 +7,9 @@ import { DELIVERY_BATCH_ROUTES } from '@app/modules/sales/delivery-batch/constan
 export const DELIVERY_BATCH_STATUS: ToneMap = {
     Open: { label: 'sales.deliveryBatch.status.Open', tone: 'warning', icon: 'lucidePackage' },
     HandedOver: { label: 'sales.deliveryBatch.status.HandedOver', tone: 'progress', icon: 'lucideTruck' },
+    Delivered: { label: 'sales.deliveryBatch.status.Delivered', tone: 'success', icon: 'lucidePackageCheck' },
+    PartlyDelivered: { label: 'sales.deliveryBatch.status.PartlyDelivered', tone: 'warning', icon: 'lucidePackageMinus' },
+    NotDelivered: { label: 'sales.deliveryBatch.status.NotDelivered', tone: 'danger', icon: 'lucidePackageX' },
     Cancelled: { label: 'sales.deliveryBatch.status.Cancelled', tone: 'neutral', icon: 'lucideX' },
 };
 
