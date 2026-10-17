@@ -2,13 +2,13 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { ChangeDetectionStrategy, Component, DestroyRef, inject, output, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { NgIcon, provideIcons } from '@ng-icons/core';
-import { lucideCamera, lucideCheck, lucideRefreshCw, lucideTrash2, lucideX } from '@ng-icons/lucide';
+import { lucideCamera, lucideCheck, lucidePencil, lucideRefreshCw, lucideTrash2, lucideX } from '@ng-icons/lucide';
 import { NzAvatarModule } from 'ng-zorro-antd/avatar';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzFormModule } from 'ng-zorro-antd/form';
 import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzMessageService } from 'ng-zorro-antd/message';
-import { NzModalModule } from 'ng-zorro-antd/modal';
+import { NzModalModule, NzModalService } from 'ng-zorro-antd/modal';
 import { NzSkeletonModule } from 'ng-zorro-antd/skeleton';
 import { NzUploadFile, NzUploadModule } from 'ng-zorro-antd/upload';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
@@ -16,6 +16,7 @@ import { Subscription } from 'rxjs';
 import { Profile } from '@app/core/models/profile.model';
 import { SessionService } from '@app/core/services/session/session.service';
 import { ProfileService } from '@app/layout/services/profile/profile.service';
+import { confirmAction } from '@app/shared/utils/confirm-action/confirm-action';
 import { DigitsPipe } from '@app/shared/pipes/digits/digits.pipe';
 import { failureKey, failureOf } from '@app/shared/utils/request-failure/request-failure';
 import { revealErrors } from '@app/shared/utils/reveal-errors/reveal-errors';
@@ -25,14 +26,14 @@ const MAX_BYTES = 15 * 1024 * 1024;
 const MOBILE = /^\+?[0-9][0-9 -]{5,19}$/;
 
 /**
- * The person's own name, mobile, designation and photo. Email and role are shown but not editable:
- * they are what the person signs in with and may do, which only an admin changes. Saving does not ask
- * first: these are the person's own details, changed back the same way.
+ * The person's own name, mobile, designation and photo. It opens to read, and Edit turns it into the
+ * form. Email and role are shown but not editable: they are what the person signs in with and may do,
+ * which only an admin changes.
  */
 @Component({
     selector: 'profile-dialog',
     imports: [ReactiveFormsModule, NgIcon, NzAvatarModule, NzButtonModule, NzFormModule, NzInputModule, NzModalModule, NzSkeletonModule, NzUploadModule, TranslatePipe, DigitsPipe],
-    providers: [provideIcons({ lucideCamera, lucideCheck, lucideRefreshCw, lucideTrash2, lucideX })],
+    providers: [provideIcons({ lucideCamera, lucideCheck, lucidePencil, lucideRefreshCw, lucideTrash2, lucideX })],
     templateUrl: './profile-dialog.component.html',
     styleUrl: './profile-dialog.component.scss',
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -40,6 +41,7 @@ const MOBILE = /^\+?[0-9][0-9 -]{5,19}$/;
 export class ProfileDialogComponent {
     private readonly _profiles = inject(ProfileService);
     private readonly _message = inject(NzMessageService);
+    private readonly _modal = inject(NzModalService);
     private readonly _translate = inject(TranslateService);
     readonly session = inject(SessionService);
 
@@ -47,6 +49,7 @@ export class ProfileDialogComponent {
     readonly accept = ACCEPT;
 
     readonly profile = signal<Profile | null>(null);
+    readonly editing = signal(false);
     readonly failed = signal(false);
     readonly photo = signal<string | null>(null);
     /** Null while idle, the percentage sent while a photo uploads. */
@@ -70,13 +73,25 @@ export class ProfileDialogComponent {
     load(): void {
         this.failed.set(false);
         this._profiles.profile().subscribe({
-            next: (profile) => {
-                this.profile.set(profile);
-                this.photo.set(profile.photo);
-                this.form.setValue({ name: profile.name ?? '', mobile_number: profile.mobile_number ?? '', designation: profile.designation ?? '' });
-            },
+            next: (profile) => this.profile.set(profile),
             error: () => this.failed.set(true),
         });
+    }
+
+    edit(): void {
+        const profile = this.profile();
+        if (!profile) return;
+        this.photo.set(profile.photo);
+        this.photoError.set(null);
+        this.form.reset({ name: profile.name ?? '', mobile_number: profile.mobile_number ?? '', designation: profile.designation ?? '' });
+        this.editing.set(true);
+    }
+
+    /** Back to reading, dropping what was typed and any photo picked. */
+    cancelEdit(): void {
+        this._upload?.unsubscribe();
+        this.uploading.set(null);
+        this.editing.set(false);
     }
 
     /** nz-upload asks before it uploads; answering false keeps the upload ours, so it is signed and its progress is real. */
@@ -98,6 +113,7 @@ export class ProfileDialogComponent {
                 if (event.state === 'uploading') return this.uploading.set(event.progress);
                 this.uploading.set(null);
                 this.photo.set(event.url);
+                this.form.markAsDirty();
             },
             error: (error: unknown) => {
                 this.uploading.set(null);
@@ -112,17 +128,33 @@ export class ProfileDialogComponent {
         this.uploading.set(null);
         this.photoError.set(null);
         this.photo.set(null);
+        this.form.markAsDirty();
     }
 
     save(): void {
         if (this.form.invalid) return revealErrors(this.form);
         if (this.uploading() !== null || this.saving()) return;
+        if (!this.form.dirty) {
+            this._message.info(this._translate.instant('form.nothingChanged'));
+            return;
+        }
+        confirmAction(this._modal, {
+            title: this._translate.instant('shell.profile.confirmTitle'),
+            body: this._translate.instant('shell.profile.confirmBody'),
+            ok: this._translate.instant('shell.profile.save'),
+            cancel: this._translate.instant('form.confirm.cancel'),
+        }).subscribe((confirmed) => confirmed && this.send());
+    }
+
+    private send(): void {
         const { name, mobile_number, designation } = this.form.getRawValue();
         this._profiles.save({ name: name.trim(), mobile_number: mobile_number.trim(), designation: designation.trim() || null, photo: this.photo() }).subscribe({
             next: (saved) => {
                 this.session.updateUser({ name: saved.name, mobile_number: saved.mobile_number, designation: saved.designation, photo: saved.photo });
+                this.profile.set(saved);
+                this.form.markAsPristine();
+                this.editing.set(false);
                 this._message.success(this._translate.instant('shell.profile.saved'));
-                this.close.emit();
             },
             error: (error: unknown) => this._message.error(this._translate.instant(failureKey(error, 'shell.profile.saveFailed'))),
         });

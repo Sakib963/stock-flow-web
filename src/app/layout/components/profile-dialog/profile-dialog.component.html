@@ -1,4 +1,4 @@
-<nz-modal nzVisible [nzTitle]="'shell.profile.title' | translate" [nzFooter]="profile() ? footer : null" [nzWidth]="640" (nzOnCancel)="close.emit()">
+<nz-modal nzVisible [nzTitle]="(editing() ? 'shell.profile.editTitle' : 'shell.profile.title') | translate" [nzFooter]="profile() ? footer : null" [nzWidth]="640" (nzOnCancel)="close.emit()">
     <ng-container *nzModalContent>
         @if (failed()) {
             <div class="flex flex-col items-start gap-3 py-4" data-profile="failed">
@@ -9,60 +9,85 @@
                 </button>
             </div>
         } @else if (profile(); as p) {
-            <!-- A file picker closed without choosing fires a native cancel that bubbles; it must not reach the modal. -->
-            <div class="flex flex-col gap-5 md:flex-row" (cancel)="$event.stopPropagation()">
-                <div class="flex flex-none flex-col items-center gap-2 md:w-40" data-profile="photo">
-                    <nz-avatar [nzSize]="96" [nzSrc]="photo() ?? undefined" [nzText]="session.initials()" class="text-2xl font-bold" [class.opacity-40]="uploading() !== null" />
-                    @if (uploading() !== null) {
-                        <span class="text-xs text-ink-muted tabular-nums">{{ 'shell.profile.photoUploading' | translate: { percent: uploading() } | digits }}</span>
-                    }
-                    <div class="flex flex-wrap justify-center gap-1.5">
-                        <nz-upload [nzAccept]="accept" [nzBeforeUpload]="pick" [nzShowUploadList]="false" [nzDisabled]="uploading() !== null">
-                            <button nz-button nzSize="small" type="button" class="inline-flex items-center gap-1.5" [disabled]="uploading() !== null" data-profile="pick">
-                                <ng-icon name="lucideCamera" size="13px" aria-hidden="true" />
-                                <span>{{ (photo() ? 'shell.profile.photoChange' : 'shell.profile.photoAdd') | translate }}</span>
-                            </button>
-                        </nz-upload>
-                        @if (photo() || uploading() !== null) {
-                            <button nz-button nzSize="small" nzDanger type="button" class="inline-flex items-center gap-1.5" (click)="removePhoto()" data-profile="remove-photo">
-                                <ng-icon name="lucideTrash2" size="13px" aria-hidden="true" />
-                                <span>{{ (uploading() !== null ? 'shell.profile.photoCancel' : 'shell.profile.photoRemove') | translate }}</span>
-                            </button>
+            @if (!editing()) {
+                <div class="flex flex-col items-center gap-5 md:flex-row md:items-start" data-profile="view">
+                    <div class="flex flex-none justify-center md:w-40">
+                        <nz-avatar [nzSize]="96" [nzSrc]="p.photo ?? undefined" [nzText]="session.initials()" class="text-2xl font-bold" />
+                    </div>
+                    <div class="flex w-full min-w-0 flex-1 flex-col gap-3">
+                        <div class="flex flex-col gap-0.5 text-center md:text-left">
+                            <h3 class="m-0 text-base font-bold break-words text-ink" data-profile="view-name">{{ p.name }}</h3>
+                            @if (p.designation) {
+                                <span class="text-sm text-ink-soft">{{ p.designation }}</span>
+                            }
+                        </div>
+                        <dl class="m-0 grid grid-cols-[auto_1fr] gap-x-4 gap-y-2 rounded-control bg-surface-sunken p-3 text-sm">
+                            <dt class="text-ink-muted">{{ 'shell.profile.mobile' | translate }}</dt>
+                            <dd class="m-0 min-w-0 truncate font-mono text-ink">{{ p.mobile_number || '-' }}</dd>
+                            <dt class="text-ink-muted">{{ 'shell.profile.email' | translate }}</dt>
+                            <dd class="m-0 min-w-0 truncate font-mono text-ink">{{ p.email }}</dd>
+                            <dt class="text-ink-muted">{{ 'shell.profile.role' | translate }}</dt>
+                            <dd class="m-0 text-ink">{{ session.user()?.role }}</dd>
+                        </dl>
+                        <p class="m-0 text-xs text-ink-soft">{{ 'shell.profile.adminOnly' | translate }}</p>
+                    </div>
+                </div>
+            } @else {
+                <!-- A file picker closed without choosing fires a native cancel that bubbles; it must not reach the modal. -->
+                <div class="flex flex-col gap-5 md:flex-row" (cancel)="$event.stopPropagation()">
+                    <div class="flex flex-none flex-col items-center gap-2 md:w-40" data-profile="photo">
+                        <nz-avatar [nzSize]="96" [nzSrc]="photo() ?? undefined" [nzText]="session.initials()" class="text-2xl font-bold" [class.opacity-40]="uploading() !== null" />
+                        @if (uploading() !== null) {
+                            <span class="text-xs text-ink-muted tabular-nums">{{ 'shell.profile.photoUploading' | translate: { percent: uploading() } | digits }}</span>
+                        }
+                        <div class="flex flex-wrap justify-center gap-1.5">
+                            <nz-upload [nzAccept]="accept" [nzBeforeUpload]="pick" [nzShowUploadList]="false" [nzDisabled]="uploading() !== null">
+                                <button nz-button type="button" class="inline-flex items-center gap-1.5" [disabled]="uploading() !== null" data-profile="pick">
+                                    <ng-icon name="lucideCamera" size="13px" aria-hidden="true" />
+                                    <span>{{ (photo() ? 'shell.profile.photoChange' : 'shell.profile.photoAdd') | translate }}</span>
+                                </button>
+                            </nz-upload>
+                            @if (photo() || uploading() !== null) {
+                                <button nz-button nzDanger type="button" class="inline-flex items-center gap-1.5" (click)="removePhoto()" data-profile="remove-photo">
+                                    <ng-icon name="lucideTrash2" size="13px" aria-hidden="true" />
+                                    <span>{{ (uploading() !== null ? 'shell.profile.photoCancel' : 'shell.profile.photoRemove') | translate }}</span>
+                                </button>
+                            }
+                        </div>
+                        @if (photoError(); as key) {
+                            <p class="m-0 text-center text-xs text-danger-ink" role="alert">{{ key | translate: { size: 15 } | digits }}</p>
                         }
                     </div>
-                    @if (photoError(); as key) {
-                        <p class="m-0 text-center text-xs text-danger-ink" role="alert">{{ key | translate: { size: 15 } | digits }}</p>
-                    }
-                </div>
 
-                <form nz-form nzLayout="vertical" class="min-w-0 flex-1" [formGroup]="form" (ngSubmit)="save()">
-                    <nz-form-item>
-                        <nz-form-label nzRequired nzFor="profile-name">{{ 'shell.profile.name' | translate }}</nz-form-label>
-                        <nz-form-control [nzErrorTip]="'shell.profile.nameError' | translate">
-                            <input nz-input id="profile-name" formControlName="name" maxlength="128" autocomplete="name" data-profile="name" />
-                        </nz-form-control>
-                    </nz-form-item>
-                    <nz-form-item>
-                        <nz-form-label nzRequired nzFor="profile-mobile">{{ 'shell.profile.mobile' | translate }}</nz-form-label>
-                        <nz-form-control [nzErrorTip]="'shell.profile.mobileError' | translate">
-                            <input nz-input id="profile-mobile" formControlName="mobile_number" inputmode="tel" autocomplete="tel" class="font-mono" data-profile="mobile" />
-                        </nz-form-control>
-                    </nz-form-item>
-                    <nz-form-item>
-                        <nz-form-label nzFor="profile-designation">{{ 'shell.profile.designation' | translate }}</nz-form-label>
-                        <nz-form-control [nzErrorTip]="'shell.profile.designationError' | translate">
-                            <input nz-input id="profile-designation" formControlName="designation" maxlength="128" autocomplete="organization-title" [placeholder]="'shell.profile.designationHint' | translate" />
-                        </nz-form-control>
-                    </nz-form-item>
-                    <dl class="m-0 grid grid-cols-[auto_1fr] gap-x-4 gap-y-1.5 rounded-control bg-surface-sunken p-3 text-xs">
-                        <dt class="text-ink-muted">{{ 'shell.profile.email' | translate }}</dt>
-                        <dd class="m-0 min-w-0 truncate font-mono text-ink">{{ p.email }}</dd>
-                        <dt class="text-ink-muted">{{ 'shell.profile.role' | translate }}</dt>
-                        <dd class="m-0 text-ink">{{ session.user()?.role }}</dd>
-                        <dd class="col-span-2 m-0 mt-1 text-ink-soft">{{ 'shell.profile.adminOnly' | translate }}</dd>
-                    </dl>
-                </form>
-            </div>
+                    <form nz-form nzLayout="vertical" class="min-w-0 flex-1" [formGroup]="form" (ngSubmit)="save()">
+                        <nz-form-item>
+                            <nz-form-label nzRequired nzFor="profile-name">{{ 'shell.profile.name' | translate }}</nz-form-label>
+                            <nz-form-control [nzErrorTip]="'shell.profile.nameError' | translate">
+                                <input nz-input id="profile-name" formControlName="name" maxlength="128" autocomplete="name" [placeholder]="'shell.profile.namePlaceholder' | translate" data-profile="name" />
+                            </nz-form-control>
+                        </nz-form-item>
+                        <nz-form-item>
+                            <nz-form-label nzRequired nzFor="profile-mobile">{{ 'shell.profile.mobile' | translate }}</nz-form-label>
+                            <nz-form-control [nzErrorTip]="'shell.profile.mobileError' | translate">
+                                <input nz-input id="profile-mobile" formControlName="mobile_number" inputmode="tel" autocomplete="tel" [placeholder]="'shell.profile.mobilePlaceholder' | translate" class="font-mono" data-profile="mobile" />
+                            </nz-form-control>
+                        </nz-form-item>
+                        <nz-form-item>
+                            <nz-form-label nzFor="profile-designation">{{ 'shell.profile.designation' | translate }}</nz-form-label>
+                            <nz-form-control [nzErrorTip]="'shell.profile.designationError' | translate">
+                                <input nz-input id="profile-designation" formControlName="designation" maxlength="128" autocomplete="organization-title" [placeholder]="'shell.profile.designationHint' | translate" />
+                            </nz-form-control>
+                        </nz-form-item>
+                        <dl class="m-0 grid grid-cols-[auto_1fr] gap-x-4 gap-y-1.5 rounded-control bg-surface-sunken p-3 text-xs">
+                            <dt class="text-ink-muted">{{ 'shell.profile.email' | translate }}</dt>
+                            <dd class="m-0 min-w-0 truncate font-mono text-ink">{{ p.email }}</dd>
+                            <dt class="text-ink-muted">{{ 'shell.profile.role' | translate }}</dt>
+                            <dd class="m-0 text-ink">{{ session.user()?.role }}</dd>
+                            <dd class="col-span-2 m-0 mt-1 text-ink-soft">{{ 'shell.profile.adminOnly' | translate }}</dd>
+                        </dl>
+                    </form>
+                </div>
+            }
         } @else {
             <nz-skeleton class="block py-2" [nzActive]="true" [nzAvatar]="{ size: 'large', shape: 'circle' }" [nzParagraph]="{ rows: 4 }" />
         }
@@ -70,12 +95,23 @@
 </nz-modal>
 
 <ng-template #footer>
-    <button nz-button type="button" class="inline-flex items-center gap-1.5" [disabled]="saving()" (click)="close.emit()">
-        <ng-icon name="lucideX" size="14px" aria-hidden="true" />
-        <span>{{ 'shell.profile.cancel' | translate }}</span>
-    </button>
-    <button nz-button nzType="primary" type="button" class="inline-flex items-center gap-1.5" [nzLoading]="saving()" [disabled]="uploading() !== null" (click)="save()" data-profile="save">
-        <ng-icon name="lucideCheck" size="14px" aria-hidden="true" />
-        <span>{{ 'shell.profile.save' | translate }}</span>
-    </button>
+    @if (editing()) {
+        <button nz-button type="button" class="inline-flex items-center gap-1.5" [disabled]="saving()" (click)="cancelEdit()" data-profile="cancel">
+            <ng-icon name="lucideX" size="14px" aria-hidden="true" />
+            <span>{{ 'shell.profile.cancel' | translate }}</span>
+        </button>
+        <button nz-button nzType="primary" type="button" class="inline-flex items-center gap-1.5" [nzLoading]="saving()" [disabled]="uploading() !== null" (click)="save()" data-profile="save">
+            <ng-icon name="lucideCheck" size="14px" aria-hidden="true" />
+            <span>{{ 'shell.profile.save' | translate }}</span>
+        </button>
+    } @else {
+        <button nz-button type="button" class="inline-flex items-center gap-1.5" (click)="close.emit()" data-profile="close">
+            <ng-icon name="lucideX" size="14px" aria-hidden="true" />
+            <span>{{ 'shell.close' | translate }}</span>
+        </button>
+        <button nz-button nzType="primary" type="button" class="inline-flex items-center gap-1.5" (click)="edit()" data-profile="edit">
+            <ng-icon name="lucidePencil" size="14px" aria-hidden="true" />
+            <span>{{ 'shell.profile.edit' | translate }}</span>
+        </button>
+    }
 </ng-template>

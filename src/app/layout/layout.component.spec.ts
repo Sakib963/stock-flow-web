@@ -523,7 +523,7 @@ describe('LayoutComponent', () => {
         expect(overlay('.ant-modal-confirm')).toBeTruthy();
         TestBed.inject(HttpTestingController).expectNone((r) => r.url.includes(APIEndpoint.SIGN_OUT));
 
-        overlay<HTMLButtonElement>('.ant-modal-confirm-btns .ant-btn:not(.ant-btn-dangerous)')!.click();
+        overlay<HTMLButtonElement>('[data-confirm=cancel]')!.click();
         fixture.detectChanges();
         await fixture.whenStable();
     });

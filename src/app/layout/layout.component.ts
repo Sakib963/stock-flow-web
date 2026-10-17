@@ -10,7 +10,6 @@ import { HeaderBarComponent } from '@app/layout/components/header-bar/header-bar
 import { NotificationPanelComponent } from '@app/layout/components/notification-panel/notification-panel.component';
 import { NotesPanelComponent } from '@app/layout/components/notes-panel/notes-panel.component';
 import { ProfileDialogComponent } from '@app/layout/components/profile-dialog/profile-dialog.component';
-import { PasswordDialogComponent } from '@app/layout/components/password-dialog/password-dialog.component';
 import { SearchPanelComponent } from '@app/layout/components/search-panel/search-panel.component';
 import { SessionsDialogComponent } from '@app/layout/components/sessions-dialog/sessions-dialog.component';
 import { SiderComponent } from '@app/layout/components/sider/sider.component';
@@ -34,7 +33,7 @@ import { DigitsPipe } from '@app/shared/pipes/digits/digits.pipe';
  */
 @Component({
     selector: 'layout',
-    imports: [DigitsPipe, RouterOutlet, NzDrawerModule, NzModalModule, TranslatePipe, HeaderBarComponent, SiderComponent, SearchPanelComponent, NotificationPanelComponent, NotesPanelComponent, AccountMenuComponent, ShortcutsDialogComponent, SessionsDialogComponent, ProfileDialogComponent, PasswordDialogComponent],
+    imports: [DigitsPipe, RouterOutlet, NzDrawerModule, NzModalModule, TranslatePipe, HeaderBarComponent, SiderComponent, SearchPanelComponent, NotificationPanelComponent, NotesPanelComponent, AccountMenuComponent, ShortcutsDialogComponent, SessionsDialogComponent, ProfileDialogComponent],
     host: {
         class: 'block h-dvh',
         '(document:keydown)': 'onGlobalKey($event)',

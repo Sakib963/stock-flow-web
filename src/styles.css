@@ -64,6 +64,21 @@
     --color-danger-ink: #a81e14;
     --color-progress-border: #c6bff3;
 
+    /* Note tags only. Seventeen tags need more hues than the status tones, so these four sit beside
+       them at the same strength: a pale tint, a soft border and dark ink, never a saturated fill. */
+    --color-tag-teal-bg: #e6f5f2;
+    --color-tag-teal-border: #b4ddd5;
+    --color-tag-teal-ink: #0e655b;
+    --color-tag-sky-bg: #e8f2fb;
+    --color-tag-sky-border: #bcd7f0;
+    --color-tag-sky-ink: #1b5689;
+    --color-tag-plum-bg: #f5ecf9;
+    --color-tag-plum-border: #dfc8ea;
+    --color-tag-plum-ink: #6e2b82;
+    --color-tag-rose-bg: #fcedf2;
+    --color-tag-rose-border: #f2c3d3;
+    --color-tag-rose-ink: #9c1f4c;
+
     /* Odd list rows. Paler than surface-sunken, so zebra striping guides the eye without reading as a fill. */
     --color-row-zebra: #fcfcfd;
 

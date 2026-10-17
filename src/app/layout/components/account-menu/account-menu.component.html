@@ -1,37 +1,86 @@
 <div class="flex min-h-0 flex-1 flex-col">
-    <div class="min-h-0 flex-1 overflow-y-auto" data-shell="account-scroll">
-        <div class="flex flex-col items-center gap-1 border-b border-line-soft px-4 pt-5 pb-4 text-center">
-            <nz-avatar [nzSrc]="session.user()?.photo ?? undefined" [nzText]="session.initials()" [nzSize]="64" class="mb-2 text-xl font-bold" />
-            <span class="w-full truncate text-sm font-bold text-ink">{{ session.user()?.name }}</span>
-            <span class="w-full truncate text-shell-note font-semibold text-primary">
-                {{ session.user()?.role }}
-                @if (session.user()?.designation) {
-                    &middot; {{ session.user()?.designation }}
-                }
-            </span>
-            <span class="w-full truncate font-mono text-xs text-ink-soft">{{ session.user()?.email }}</span>
+    <div class="flex min-h-0 flex-1 flex-col gap-5 overflow-y-auto px-4 py-4" data-shell="account-scroll">
+        <div class="flex items-center gap-3.5 rounded-container border border-line-soft bg-surface-sunken p-4" data-shell="account-card">
+            <nz-avatar [nzSrc]="session.user()?.photo ?? undefined" [nzText]="session.initials()" [nzSize]="56" class="flex-none text-lg font-bold" />
+            <div class="flex min-w-0 flex-1 flex-col gap-1">
+                <span class="truncate text-base font-bold text-ink">{{ session.user()?.name }}</span>
+                <span class="flex min-w-0 items-center gap-1.5">
+                    <status-tag [label]="session.user()?.role ?? ''" tone="progress" />
+                    @if (session.user()?.designation; as designation) {
+                        @if (designation !== session.user()?.role) {
+                            <span class="truncate text-xs text-ink-muted">{{ designation }}</span>
+                        }
+                    }
+                </span>
+                <span class="truncate text-xs text-ink-soft">{{ session.user()?.email }}</span>
+            </div>
         </div>
 
-        <!-- Every item opens a dialog or acts, none is a place, so a click must not stay highlighted. -->
-        <ul nz-menu nzMode="inline" [nzSelectable]="false" class="w-full">
-            <li class="flex items-center px-4 py-2 text-sm text-ink-body">
-                <ng-icon name="lucideGlobe" size="15px" class="mr-2 text-ink-soft" />
-                <span class="flex-1 truncate">{{ 'shell.language' | translate }}</span>
-                <span class="flex flex-none items-center gap-0.5 rounded-control border border-line bg-surface-page p-0.5">
-                    <button type="button" class="cursor-pointer rounded-sm px-2 py-0.75 text-xs/none" [class]="language.current() === 'en' ? 'bg-white font-bold text-primary-8 shadow-raised' : 'font-semibold text-ink-muted'" (click)="language.use('en')">EN</button>
-                    <button type="button" class="cursor-pointer rounded-sm px-2 py-0.75 font-bangla text-xs/none" [class]="language.current() === 'bn' ? 'bg-white font-bold text-primary-8 shadow-raised' : 'font-semibold text-ink-muted'" (click)="language.use('bn')">বাংলা</button>
-                </span>
-            </li>
+        <section class="flex flex-col gap-2">
+            <h3 class="m-0 text-sm font-bold text-ink">{{ 'shell.accountSection' | translate }}</h3>
+            <!-- No item stays highlighted: the menu closes on a click, so a selected state would never be seen. -->
+            <ul nz-menu nzMode="inline" [nzSelectable]="false" class="overflow-hidden rounded-container border border-line">
+                <li nz-menu-item class="group" [nzPaddingLeft]="16" (click)="state.openProfile()" data-shell="my-profile">
+                    <span class="flex items-center gap-3">
+                        <span class="flex size-9 flex-none items-center justify-center rounded-control bg-surface-sunken text-ink-muted transition-colors duration-200 group-hover:bg-white group-hover:text-primary"><ng-icon name="lucideCircleUser" size="18px" aria-hidden="true" /></span>
+                        <span class="flex min-w-0 flex-1 flex-col gap-0.5">
+                            <span class="truncate text-sm font-bold text-ink transition-colors duration-200 group-hover:text-primary">{{ 'shell.myProfile' | translate }}</span>
+                            <span class="truncate text-xs text-ink-soft">{{ 'shell.myProfileHint' | translate }}</span>
+                        </span>
+                        <ng-icon name="lucideChevronRight" size="16px" class="flex-none text-ink-faint transition-colors duration-200 group-hover:text-primary" aria-hidden="true" />
+                    </span>
+                </li>
+                <li nz-menu-item class="group" [nzPaddingLeft]="16" routerLink="/app/change-password" data-shell="change-password">
+                    <span class="flex items-center gap-3">
+                        <span class="flex size-9 flex-none items-center justify-center rounded-control bg-surface-sunken text-ink-muted transition-colors duration-200 group-hover:bg-white group-hover:text-primary"><ng-icon name="lucideKeyRound" size="18px" aria-hidden="true" /></span>
+                        <span class="flex min-w-0 flex-1 flex-col gap-0.5">
+                            <span class="truncate text-sm font-bold text-ink transition-colors duration-200 group-hover:text-primary">{{ 'shell.changePassword' | translate }}</span>
+                            <span class="truncate text-xs text-ink-soft">{{ 'shell.changePasswordHint' | translate }}</span>
+                        </span>
+                        <ng-icon name="lucideChevronRight" size="16px" class="flex-none text-ink-faint transition-colors duration-200 group-hover:text-primary" aria-hidden="true" />
+                    </span>
+                </li>
+                <li nz-menu-item class="group" [nzPaddingLeft]="16" (click)="state.openSessions()">
+                    <span class="flex items-center gap-3">
+                        <span class="flex size-9 flex-none items-center justify-center rounded-control bg-surface-sunken text-ink-muted transition-colors duration-200 group-hover:bg-white group-hover:text-primary"><ng-icon name="lucideMonitorSmartphone" size="18px" aria-hidden="true" /></span>
+                        <span class="flex min-w-0 flex-1 flex-col gap-0.5">
+                            <span class="truncate text-sm font-bold text-ink transition-colors duration-200 group-hover:text-primary">{{ 'shell.sessions.menu' | translate }}</span>
+                            <span class="truncate text-xs text-ink-soft">{{ 'shell.sessionsHint' | translate }}</span>
+                        </span>
+                        <ng-icon name="lucideChevronRight" size="16px" class="flex-none text-ink-faint transition-colors duration-200 group-hover:text-primary" aria-hidden="true" />
+                    </span>
+                </li>
+            </ul>
+        </section>
 
-            <li nz-menu-divider></li>
-
-            <li nz-menu-item (click)="state.openProfile()" data-shell="my-profile"><ng-icon name="lucideCircleUser" size="15px" class="mr-2 align-middle" />{{ 'shell.myProfile' | translate }}</li>
-            <li nz-menu-item (click)="state.openPassword()" data-shell="change-password"><ng-icon name="lucideKeyRound" size="15px" class="mr-2 align-middle" />{{ 'shell.changePassword' | translate }}</li>
-            <li nz-menu-item (click)="state.openSessions()"><ng-icon name="lucideMonitorSmartphone" size="15px" class="mr-2 align-middle" />{{ 'shell.sessions.menu' | translate }}</li>
-            @if (!state.isPhone()) {
-                <li nz-menu-item (click)="state.openShortcuts()"><ng-icon name="lucideKeyboard" size="15px" class="mr-2 align-middle" />{{ 'shell.keyboardShortcuts' | translate }}<span class="ml-2 align-middle font-mono text-shell-meta text-ink-faint">?</span></li>
-            }
-        </ul>
+        <section class="flex flex-col gap-2">
+            <h3 class="m-0 text-sm font-bold text-ink">{{ 'shell.preferencesSection' | translate }}</h3>
+            <div class="overflow-hidden rounded-container border border-line">
+                <div class="flex items-center gap-3 px-4 py-2.5" data-shell="language">
+                    <span class="flex size-9 flex-none items-center justify-center rounded-control bg-surface-sunken text-ink-muted"><ng-icon name="lucideGlobe" size="18px" aria-hidden="true" /></span>
+                    <span class="min-w-0 flex-1 truncate text-sm font-bold text-ink">{{ 'shell.language' | translate }}</span>
+                    <span class="flex flex-none items-center gap-0.5 rounded-control border border-line bg-surface-page p-0.5">
+                        <button type="button" class="cursor-pointer rounded-sm px-2.5 py-1 text-xs/none" [class]="language.current() === 'en' ? 'bg-white font-bold text-primary-8 shadow-raised' : 'font-semibold text-ink-muted'" (click)="language.use('en')">EN</button>
+                        <button type="button" class="cursor-pointer rounded-sm px-2.5 py-1 font-bangla text-xs/none" [class]="language.current() === 'bn' ? 'bg-white font-bold text-primary-8 shadow-raised' : 'font-semibold text-ink-muted'" (click)="language.use('bn')">বাংলা</button>
+                    </span>
+                </div>
+                @if (!state.isPhone()) {
+                    <ul nz-menu nzMode="inline" [nzSelectable]="false" class="border-t border-line-soft">
+                        <li nz-menu-item class="group" [nzPaddingLeft]="16" (click)="state.openShortcuts()">
+                            <span class="flex items-center gap-3">
+                                <span class="flex size-9 flex-none items-center justify-center rounded-control bg-surface-sunken text-ink-muted transition-colors duration-200 group-hover:bg-white group-hover:text-primary"><ng-icon name="lucideKeyboard" size="18px" aria-hidden="true" /></span>
+                                <span class="flex min-w-0 flex-1 flex-col gap-0.5">
+                                    <span class="truncate text-sm font-bold text-ink transition-colors duration-200 group-hover:text-primary">{{ 'shell.keyboardShortcuts' | translate }}</span>
+                                    <span class="truncate text-xs text-ink-soft">{{ 'shell.keyboardShortcutsHint' | translate }}</span>
+                                </span>
+                                <kbd class="flex-none rounded-sm border border-line bg-white px-1.5 py-0.5 font-mono text-shell-meta text-ink-muted">?</kbd>
+                                <ng-icon name="lucideChevronRight" size="16px" class="flex-none text-ink-faint transition-colors duration-200 group-hover:text-primary" aria-hidden="true" />
+                            </span>
+                        </li>
+                    </ul>
+                }
+            </div>
+        </section>
     </div>
 
     <div class="flex-none border-t border-line-soft p-3" data-shell="account-footer">

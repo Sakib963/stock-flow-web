@@ -133,16 +133,16 @@ describe('Password recovery', () => {
 
             cmp.form.controls.password.setValue('abcdefgh');
             await fixture.whenStable();
-            expect(cmp.rules().map((r) => r.met)).toEqual([true, true, false]);
+            expect(cmp.rules().map((r) => r.met)).toEqual([true, true, false, false]);
 
-            cmp.form.controls.password.setValue('abcdefg1');
+            cmp.form.controls.password.setValue('abcdef-1');
             await fixture.whenStable();
             expect(cmp.passwordValid()).toBe(true);
         });
 
         it('stays quiet about a mismatch until the confirm field is left', async () => {
             const { fixture, cmp } = await render();
-            cmp.form.controls.password.setValue('abcdefg1');
+            cmp.form.controls.password.setValue('abcdef-1');
             cmp.form.controls.confirm.setValue('abc');
             await fixture.whenStable();
             expect(cmp.confirmError()).toBeNull();
@@ -163,7 +163,7 @@ describe('Password recovery', () => {
 
         it('keeps the typed passwords when the code is rejected', async () => {
             const { fixture, cmp } = await render();
-            cmp.form.setValue({ code: '123456', password: 'abcdefg1', confirm: 'abcdefg1' });
+            cmp.form.setValue({ code: '123456', password: 'abcdef-1', confirm: 'abcdef-1' });
             cmp.handleSubmit();
 
             TestBed.inject(HttpTestingController)
@@ -173,13 +173,13 @@ describe('Password recovery', () => {
 
             expect(cmp.codeError()).toBe('auth.reset.errCodeWrong');
             // The whole reason the code and the password share a screen.
-            expect(cmp.form.controls.password.value).toBe('abcdefg1');
-            expect(cmp.form.controls.confirm.value).toBe('abcdefg1');
+            expect(cmp.form.controls.password.value).toBe('abcdef-1');
+            expect(cmp.form.controls.confirm.value).toBe('abcdef-1');
         });
 
         it('separates an expired code from a wrong one', async () => {
             const { fixture, cmp } = await render();
-            cmp.form.setValue({ code: '123456', password: 'abcdefg1', confirm: 'abcdefg1' });
+            cmp.form.setValue({ code: '123456', password: 'abcdef-1', confirm: 'abcdef-1' });
             cmp.handleSubmit();
 
             TestBed.inject(HttpTestingController)
@@ -192,7 +192,7 @@ describe('Password recovery', () => {
 
         it('locks the code field after too many wrong codes', async () => {
             const { fixture, cmp } = await render();
-            cmp.form.setValue({ code: '123456', password: 'abcdefg1', confirm: 'abcdefg1' });
+            cmp.form.setValue({ code: '123456', password: 'abcdef-1', confirm: 'abcdef-1' });
             cmp.handleSubmit();
 
             TestBed.inject(HttpTestingController)
@@ -209,7 +209,7 @@ describe('Password recovery', () => {
             const recovery = TestBed.inject(RecoveryService);
             vi.spyOn(TestBed.inject(Router), 'navigate').mockResolvedValue(true);
 
-            cmp.form.setValue({ code: '123456', password: 'abcdefg1', confirm: 'abcdefg1' });
+            cmp.form.setValue({ code: '123456', password: 'abcdef-1', confirm: 'abcdef-1' });
             cmp.handleSubmit();
             TestBed.inject(HttpTestingController)
                 .expectOne((r) => r.url.includes(APIEndpoint.RESET_PASSWORD))

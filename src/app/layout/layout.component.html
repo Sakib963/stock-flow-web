@@ -28,10 +28,6 @@
     @if (state.profileOpen()) {
         <profile-dialog (close)="state.closeProfile()" />
     }
-
-    @if (state.passwordOpen()) {
-        <password-dialog (close)="state.closePassword()" />
-    }
 </div>
 
 <!-- The width check wraps the whole drawer, not just its `nzVisible`: nz-drawer builds its content
@@ -67,7 +63,7 @@
 <!-- Inside an @if so the panel is made when it opens and reads the notes afresh each time. -->
 <ng-template #notesDrawer>
     @if (state.openPanel() === 'notes') {
-        <notes-panel />
+        <notes-panel (closed)="closePanel()" />
     }
 </ng-template>
 

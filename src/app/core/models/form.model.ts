@@ -6,6 +6,13 @@ export interface ConfirmCopy {
     cancel: string;
     /** The confirming button in red, for an action that ends something, like signing a device out. */
     danger?: boolean;
+    /** The confirming button's icon, when a check does not say what it does. */
+    icon?: string;
+    /**
+     * Work the dialog waits on before closing: the button shows it is busy, and false keeps the dialog
+     * open so the same button tries again. Signing out uses it, since the session ends on the server first.
+     */
+    run?: () => Promise<boolean>;
 }
 
 export interface UniqueValueOptions {

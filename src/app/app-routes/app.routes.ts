@@ -33,6 +33,11 @@ export const routes: Routes = [
                 loadChildren: () => import('@app/modules/settings/settings.routes').then((m) => m.SETTINGS_ROUTES),
             },
             {
+                // A person's own account: every signed-in person has it, so no permission.
+                path: 'change-password',
+                loadComponent: () => import('@app/modules/profile/pages/change-password/change-password.component').then((m) => m.ChangePasswordComponent),
+            },
+            {
                 path: 'activity-log',
                 loadChildren: () => import('@app/modules/activity-log/activity-log.routes').then((m) => m.ACTIVITY_LOG_ROUTES),
             },

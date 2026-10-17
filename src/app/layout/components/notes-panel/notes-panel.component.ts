@@ -1,8 +1,8 @@
 import { TextFieldModule } from '@angular/cdk/text-field';
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { NgIcon, provideIcons } from '@ng-icons/core';
-import { lucideArrowLeft, lucideBell, lucideBoxes, lucideCheck, lucideCircleAlert, lucideCircleCheck, lucideFactory, lucideHeart, lucideLightbulb, lucideListTodo, lucidePhoneCall, lucidePlus, lucideRepeat, lucideRotateCw, lucideSearch, lucideShoppingCart, lucideTag, lucideTrash2, lucideTruck, lucideUndo2, lucideUser, lucideUsers, lucideWallet } from '@ng-icons/lucide';
+import { lucideArrowLeft, lucideBell, lucideBoxes, lucideCheck, lucideCircleAlert, lucideCircleCheck, lucideFactory, lucideHeart, lucideLightbulb, lucideListTodo, lucidePencil, lucidePhoneCall, lucidePlus, lucideRepeat, lucideRotateCw, lucideSearch, lucideShoppingCart, lucideTag, lucideTrash2, lucideTruck, lucideUndo2, lucideUser, lucideUsers, lucideWallet, lucideX } from '@ng-icons/lucide';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzMessageService } from 'ng-zorro-antd/message';
@@ -11,7 +11,7 @@ import { NzSkeletonModule } from 'ng-zorro-antd/skeleton';
 import { NzTagModule } from 'ng-zorro-antd/tag';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { NOTE_TAGS, Note, NoteTag } from '@app/core/models/note.model';
-import { NOTE_TAG_STYLE } from '@app/layout/constants/note-tags';
+import { NOTE_TAG_ALL, NOTE_TAG_OFF, NOTE_TAG_STYLE } from '@app/layout/constants/note-tags';
 import { RequestFailure } from '@app/core/models/api.model';
 import { LanguageService } from '@app/core/services/language/language.service';
 import { NotesService } from '@app/layout/services/notes/notes.service';
@@ -29,14 +29,13 @@ interface Draft {
 }
 
 /**
- * The person's own notes, inside the header drawer: the list with a search, and one note open for
- * writing in its place. Saving does not ask first, unlike the business's records: a note is the
- * person's own and can be changed back the same way. Deleting asks, because it cannot.
+ * The person's own notes, inside the header drawer: the list with a search, one note open to read in
+ * its place, and Edit to write in it. Saving and deleting both ask first.
  */
 @Component({
     selector: 'notes-panel',
     imports: [FormsModule, TextFieldModule, NgIcon, NzButtonModule, NzInputModule, NzSkeletonModule, NzTagModule, TranslatePipe, RecordDatePipe],
-    providers: [provideIcons({ lucideArrowLeft, lucideCheck, lucidePlus, lucideRotateCw, lucideSearch, lucideTrash2, lucideCircleAlert, lucideListTodo, lucideRepeat, lucidePhoneCall, lucideFactory, lucideUser, lucideShoppingCart, lucideBoxes, lucideWallet, lucideTruck, lucideUndo2, lucideTag, lucideLightbulb, lucideBell, lucideUsers, lucideHeart, lucideCircleCheck })],
+    providers: [provideIcons({ lucideArrowLeft, lucideCheck, lucidePencil, lucidePlus, lucideRotateCw, lucideSearch, lucideTrash2, lucideCircleAlert, lucideListTodo, lucideRepeat, lucidePhoneCall, lucideFactory, lucideUser, lucideShoppingCart, lucideBoxes, lucideWallet, lucideTruck, lucideUndo2, lucideTag, lucideLightbulb, lucideBell, lucideUsers, lucideHeart, lucideCircleCheck, lucideX })],
     templateUrl: './notes-panel.component.html',
     styleUrl: './notes-panel.component.scss',
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -50,6 +49,7 @@ export class NotesPanelComponent {
     private readonly _translate = inject(TranslateService);
     readonly language = inject(LanguageService).current;
 
+    readonly closed = output<void>();
     readonly notes = signal<Note[] | null>(null);
     readonly failed = signal<RequestFailure | null>(null);
     readonly query = signal('');
@@ -57,6 +57,10 @@ export class NotesPanelComponent {
     readonly tag = signal<NoteTag | null>(null);
     readonly allTags = NOTE_TAGS;
     readonly tagStyle = NOTE_TAG_STYLE;
+    readonly tagOff = NOTE_TAG_OFF;
+    readonly allOn = NOTE_TAG_ALL;
+    /** The note open to read, with no field to type in. */
+    readonly viewing = signal<Note | null>(null);
     readonly draft = signal<Draft | null>(null);
     private readonly _original = signal<Draft | null>(null);
     readonly saving = this._notes.saving;
@@ -104,11 +108,21 @@ export class NotesPanelComponent {
     }
 
     startNew(): void {
-        this.edit({ oid: crypto.randomUUID(), isNew: true, title: '', text: '', tags: [] });
+        this.viewing.set(null);
+        this.write({ oid: crypto.randomUUID(), isNew: true, title: '', text: '', tags: [] });
     }
 
     open(note: Note): void {
-        this.edit({ oid: note.oid, isNew: false, title: note.note_title ?? '', text: note.note_text ?? '', tags: [...(note.tags ?? [])] });
+        this.viewing.set(note);
+    }
+
+    edit(): void {
+        const note = this.viewing();
+        if (note) this.write({ oid: note.oid, isNew: false, title: note.note_title ?? '', text: note.note_text ?? '', tags: [...(note.tags ?? [])] });
+    }
+
+    toList(): void {
+        this.viewing.set(null);
     }
 
     setTitle(title: string): void {
@@ -128,7 +142,7 @@ export class NotesPanelComponent {
         this.tag.set(this.tag() === tag ? null : tag);
     }
 
-    /** Back to the list, asking first when something written would be lost. */
+    /** Out of writing, back to the note being read or to the list, asking first when something written would be lost. */
     back(): void {
         if (!this.changed() || this.empty()) return this.close();
         confirmAction(this._modal, {
@@ -142,7 +156,16 @@ export class NotesPanelComponent {
 
     save(): void {
         const draft = this.draft();
-        if (!draft || this.empty() || this.saving()) return;
+        if (!draft || this.empty() || !this.changed() || this.saving()) return;
+        confirmAction(this._modal, {
+            title: this._translate.instant('shell.notes.saveTitle'),
+            body: this._translate.instant('shell.notes.saveBody'),
+            ok: this._translate.instant('shell.notes.save'),
+            cancel: this._translate.instant('form.confirm.cancel'),
+        }).subscribe((confirmed) => confirmed && this.send(draft));
+    }
+
+    private send(draft: Draft): void {
         const title = draft.title.trim() || null;
         const text = draft.text.trim() || null;
         // Tags are optional: none goes as null, in the set's order.
@@ -151,6 +174,7 @@ export class NotesPanelComponent {
             next: () => {
                 this._message.success(this._translate.instant('shell.notes.saved'));
                 this.close();
+                this.viewing.set(null);
                 this.load();
             },
             error: (error: unknown) => this._message.error(this._translate.instant(failureKey(error, 'shell.notes.saveFailed'))),
@@ -158,8 +182,8 @@ export class NotesPanelComponent {
     }
 
     remove(): void {
-        const draft = this.draft();
-        if (!draft || draft.isNew) return;
+        const note = this.viewing();
+        if (!note) return;
         confirmAction(this._modal, {
             title: this._translate.instant('shell.notes.deleteTitle'),
             body: this._translate.instant('shell.notes.deleteBody'),
@@ -168,10 +192,10 @@ export class NotesPanelComponent {
             danger: true,
         }).subscribe((confirmed) => {
             if (!confirmed) return;
-            this._notes.remove(draft.oid).subscribe({
+            this._notes.remove(note.oid).subscribe({
                 next: () => {
                     this._message.success(this._translate.instant('shell.notes.deleted'));
-                    this.close();
+                    this.viewing.set(null);
                     this.load();
                 },
                 error: (error: unknown) => this._message.error(this._translate.instant(failureKey(error, 'shell.notes.deleteFailed'))),
@@ -179,7 +203,7 @@ export class NotesPanelComponent {
         });
     }
 
-    private edit(draft: Draft): void {
+    private write(draft: Draft): void {
         this.draft.set(draft);
         this._original.set(draft);
     }

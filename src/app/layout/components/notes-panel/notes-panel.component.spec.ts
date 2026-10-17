@@ -47,6 +47,17 @@ describe('NotesPanelComponent', () => {
         expect(page.visible()).toEqual([]);
     });
 
+    it('starts a new note from beside the search, and closes the drawer from the bar at the bottom', async () => {
+        const { fixture, page, element } = await open();
+        const closed = vi.fn();
+        page.closed.subscribe(closed);
+        element.querySelector<HTMLButtonElement>('[data-notes="close"]')!.click();
+        expect(closed).toHaveBeenCalled();
+        element.querySelector<HTMLButtonElement>('[data-notes="new"]')!.click();
+        fixture.detectChanges();
+        expect(element.querySelector('[data-notes="editor"]')).toBeTruthy();
+    });
+
     it('says there are no notes yet, and what they are for', async () => {
         const { element } = await open([]);
         expect(element.querySelector('.sf-empty')?.textContent).toContain('shell.notes.empty');
@@ -54,6 +65,7 @@ describe('NotesPanelComponent', () => {
 
     it('saves a new note under the id it made, then reads the list again', async () => {
         const { page, http, fixture } = await open();
+        answer(fixture);
         page.startNew();
         fixture.detectChanges();
         expect(page.empty()).toBe(true);
@@ -67,8 +79,10 @@ describe('NotesPanelComponent', () => {
     });
 
     it('edits a note in place and keeps it open when the save fails', async () => {
-        const { page, http } = await open();
+        const { page, http, fixture } = await open();
+        answer(fixture);
         page.open(NOTES[0]);
+        page.edit();
         page.setTitle('Call the supplier today');
         page.save();
         http.expectOne((r) => r.url.includes(APIEndpoint.UPDATE_USER_NOTE)).flush({ code: 500 }, { status: 500, statusText: 'Server error' });
@@ -79,10 +93,12 @@ describe('NotesPanelComponent', () => {
         const { page, fixture } = await open();
         const confirm = answer(fixture, false);
         page.open(NOTES[0]);
+        page.edit();
         page.back();
         expect(page.draft()).toBeNull();
         expect(confirm).not.toHaveBeenCalled();
         page.open(NOTES[0]);
+        page.edit();
         page.setText('Changed');
         page.back();
         expect(confirm).toHaveBeenCalled();
@@ -110,8 +126,10 @@ describe('NotesPanelComponent', () => {
     });
 
     it('sends tags in the set\'s order, and none as nothing', async () => {
-        const { page, http } = await open();
+        const { page, http, fixture } = await open();
+        answer(fixture);
         page.open(NOTES[1]);
+        page.edit();
         page.toggleTag('payment');
         page.toggleTag('important');
         expect(page.changed()).toBe(true);
@@ -120,8 +138,10 @@ describe('NotesPanelComponent', () => {
     });
 
     it('takes every tag off as null, and a tag toggled back is no change', async () => {
-        const { page, http } = await open();
+        const { page, http, fixture } = await open();
+        answer(fixture);
         page.open(NOTES[0]);
+        page.edit();
         page.toggleTag('supplier');
         page.toggleTag('supplier');
         expect(page.changed()).toBe(false);
@@ -145,5 +165,30 @@ describe('NotesPanelComponent', () => {
         const cards = element.querySelectorAll('[data-notes="card"]');
         expect(cards[0].querySelectorAll('nz-tag').length).toBe(2);
         expect(cards[1].querySelectorAll('nz-tag').length).toBe(0);
+    });
+
+    it('opens a note to read, and writes in it only after Edit', async () => {
+        const { page, fixture, element } = await open();
+        page.open(NOTES[0]);
+        fixture.detectChanges();
+        expect(element.querySelector('[data-notes="view"]')?.textContent).toContain('About the late kurti batch');
+        expect(element.querySelector('textarea')).toBeNull();
+        page.edit();
+        fixture.detectChanges();
+        expect(element.querySelector('[data-notes="editor"] textarea')).not.toBeNull();
+        page.back();
+        fixture.detectChanges();
+        expect(element.querySelector('[data-notes="view"]')).not.toBeNull();
+    });
+
+    it('asks before saving, and sends nothing when the answer is no', async () => {
+        const { page, http, fixture } = await open();
+        const confirm = answer(fixture, false);
+        page.open(NOTES[0]);
+        page.edit();
+        page.setTitle('Call the supplier today');
+        page.save();
+        expect(confirm).toHaveBeenCalled();
+        http.expectNone((r) => r.url.includes(APIEndpoint.UPDATE_USER_NOTE));
     });
 });

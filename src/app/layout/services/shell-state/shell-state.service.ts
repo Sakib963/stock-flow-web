@@ -65,7 +65,6 @@ export class ShellStateService {
     readonly shortcutsOpen = signal(false);
     readonly sessionsOpen = signal(false);
     readonly profileOpen = signal(false);
-    readonly passwordOpen = signal(false);
 
     /**
      * The panel the person just dismissed, as opposed to one that closed because the page changed.
@@ -199,16 +198,6 @@ export class ShellStateService {
 
     closeProfile(): void {
         this.profileOpen.set(false);
-        this.dismissed.set('account');
-    }
-
-    openPassword(): void {
-        this.openPanel.set(null);
-        this.passwordOpen.set(true);
-    }
-
-    closePassword(): void {
-        this.passwordOpen.set(false);
         this.dismissed.set('account');
     }
 
