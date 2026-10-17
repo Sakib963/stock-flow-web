@@ -1,0 +1,53 @@
+<nz-drawer [nzVisible]="open()" nzWidth="min(480px, 100vw)" nzPlacement="right" [nzTitle]="(line() ? 'marketing.campaign.partnerDrawer.editTitle' : 'marketing.campaign.partnerDrawer.addTitle') | translate" [nzContent]="body" [nzFooter]="footer" (nzOnClose)="closed.emit()" />
+
+<ng-template #body>
+    <div nz-form nzLayout="vertical">
+        <nz-form-item>
+            <nz-form-label nzRequired nzFor="cp-partner">{{ 'marketing.campaign.partner' | translate }}</nz-form-label>
+            <nz-form-control>
+                <nz-select nzId="cp-partner" class="w-full" nzShowSearch [ngModel]="partnerOid()" (ngModelChange)="partnerOid.set($event)" [nzLoading]="choicesLoading()" [nzDisabled]="!!line()" [nzPlaceHolder]="'marketing.campaign.partnerPlaceholder' | translate" [nzNotFoundContent]="'marketing.campaign.partnerDrawer.none' | translate">
+                    @if (line(); as current) {
+                        <nz-option [nzValue]="current.partner_oid" [nzLabel]="current.name" />
+                    }
+                    @for (partner of offered(); track partner.oid) {
+                        @if (partner.oid !== line()?.partner_oid) {
+                            <nz-option [nzValue]="partner.oid" [nzLabel]="partner.name" />
+                        }
+                    }
+                </nz-select>
+            </nz-form-control>
+        </nz-form-item>
+
+        <nz-form-item>
+            <nz-form-label nzRequired nzFor="cp-fee" [nzTooltipTitle]="'marketing.campaign.feeHelper' | translate">{{ 'marketing.campaign.fee' | translate }}</nz-form-label>
+            <nz-form-control>
+                <nz-input-number nzId="cp-fee" class="w-full font-mono" [ngModel]="fee()" (ngModelChange)="fee.set($event)" [nzMin]="0" [nzPrecision]="0" [nzPlaceHolder]="'marketing.campaign.feePlaceholder' | translate" />
+            </nz-form-control>
+        </nz-form-item>
+
+        <nz-form-item class="mb-0">
+            <nz-form-label nzFor="cp-note">{{ 'marketing.campaign.partnerNote' | translate }}</nz-form-label>
+            <nz-form-control>
+                <input nz-input id="cp-note" type="text" maxlength="500" autocomplete="off" [ngModel]="note()" (ngModelChange)="note.set($event)" [attr.placeholder]="'marketing.campaign.partnerNotePlaceholder' | translate" />
+            </nz-form-control>
+        </nz-form-item>
+    </div>
+</ng-template>
+
+<ng-template #footer>
+    <div class="flex flex-col gap-2">
+        @if (incomplete()) {
+            <p class="m-0 text-xs text-danger-ink" role="alert" data-drawer="problem">{{ 'marketing.campaign.partnerDrawer.incomplete' | translate }}</p>
+        }
+        <div class="flex items-center justify-end gap-2">
+            <button nz-button type="button" class="inline-flex items-center gap-1.5" (click)="closed.emit()">
+                <ng-icon name="lucideX" size="14px" aria-hidden="true" />
+                <span>{{ 'form.cancel' | translate }}</span>
+            </button>
+            <button nz-button nzType="primary" type="button" class="inline-flex items-center gap-1.5" data-drawer="save" (click)="save()">
+                <ng-icon name="lucideCheck" size="14px" aria-hidden="true" />
+                <span>{{ (line() ? 'marketing.campaign.partnerDrawer.save' : 'marketing.campaign.partnerDrawer.add') | translate }}</span>
+            </button>
+        </div>
+    </div>
+</ng-template>

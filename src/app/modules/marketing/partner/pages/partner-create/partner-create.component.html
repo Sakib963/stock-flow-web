@@ -1,0 +1,5 @@
+<page-header [back]="back" [title]="'marketing.partner.createTitle' | translate" [lead]="'marketing.partner.formLead' | translate" />
+
+<form-page [formId]="editor()?.formId ?? ''" [saving]="saving()" [remaining]="editor()?.remaining() ?? 0" (cancel)="cancel()">
+    <partner-form (submitted)="save()" />
+</form-page>

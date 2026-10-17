@@ -1,0 +1,5 @@
+<page-header [back]="back" [title]="'marketing.campaign.createTitle' | translate" [lead]="'marketing.campaign.formLead' | translate" />
+
+<form-page [formId]="editor()?.formId ?? ''" [saving]="campaigns.saving()" [remaining]="editor()?.remaining() ?? 0" (cancel)="cancel()">
+    <campaign-form (submitted)="save()" />
+</form-page>

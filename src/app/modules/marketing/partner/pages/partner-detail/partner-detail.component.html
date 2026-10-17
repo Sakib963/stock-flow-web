@@ -1,0 +1,181 @@
+<page-header [back]="back" [title]="'marketing.partner.detailTitle' | translate" [lead]="'marketing.partner.detailLead' | translate">
+    @if (canEdit()) {
+        <button nz-button nzType="primary" type="button" class="inline-flex items-center gap-1.5" (click)="edit()">
+            <ng-icon name="lucidePencil" size="14px" aria-hidden="true" />
+            <span>{{ 'marketing.partner.edit' | translate }}</span>
+        </button>
+    }
+</page-header>
+
+@if (failed(); as failure) {
+    <div class="sf-empty" role="alert">
+        <p class="m-0 text-sm text-ink-body">{{ 'marketing.partner.loadFailed.' + failure | translate }}</p>
+        <div class="mt-3 flex items-center justify-center gap-2">
+            <button nz-button nzType="default" type="button" class="inline-flex items-center gap-1.5" (click)="backToList()">
+                <ng-icon name="lucideArrowLeft" size="14px" aria-hidden="true" />
+                <span>{{ 'marketing.partner.backToList' | translate }}</span>
+            </button>
+            <button nz-button nzType="primary" type="button" class="inline-flex items-center gap-1.5" (click)="load()">
+                <ng-icon name="lucideRotateCw" size="14px" aria-hidden="true" />
+                <span>{{ 'form.retry' | translate }}</span>
+            </button>
+        </div>
+    </div>
+} @else {
+    @if (loading()) {
+        <span class="sr-only" role="status">{{ 'form.loading' | translate }}</span>
+    }
+
+    <nz-card [nzTitle]="detailsTitle" data-detail="details">
+        <ng-template #detailsTitle
+            ><h2 class="m-0 flex items-center gap-1.5 text-sm font-bold text-ink"><ng-icon name="lucideInfo" size="14px" class="text-ink-muted" aria-hidden="true" />{{ 'marketing.partner.section.details' | translate }}</h2></ng-template
+        >
+        @if (partner(); as details) {
+            <dl class="m-0 grid grid-cols-2 gap-x-6 gap-y-4 md:grid-cols-3">
+                <div>
+                    <dt class="text-xs text-ink-muted">{{ 'marketing.partner.name' | translate }}</dt>
+                    <dd class="mt-1 mb-0 text-sm font-semibold text-ink">{{ details.name }}</dd>
+                </div>
+                <div>
+                    <dt class="text-xs text-ink-muted">{{ 'marketing.partner.type.label' | translate }}</dt>
+                    <dd class="mt-1 mb-0">
+                        @if (typeTone(); as style) {
+                            <status-tag [label]="style.label" [tone]="style.tone" size="standard" />
+                        }
+                    </dd>
+                </div>
+                <div>
+                    <dt class="text-xs text-ink-muted">{{ 'marketing.partner.status.label' | translate }}</dt>
+                    <dd class="mt-1 mb-0">
+                        @if (statusTone(); as style) {
+                            <status-tag [label]="style.label" [tone]="style.tone" [icon]="style.icon" size="standard" />
+                        }
+                    </dd>
+                </div>
+                <div>
+                    <dt class="text-xs text-ink-muted">{{ 'marketing.partner.platforms' | translate }}</dt>
+                    <dd class="mt-1 mb-0 flex flex-wrap gap-1" data-detail="platforms">
+                        @for (item of platforms(); track item.platform) {
+                            <status-tag [label]="item.style.label" [tone]="item.style.tone" />
+                        } @empty {
+                            <span class="text-sm text-ink-muted">{{ 'marketing.partner.notSet' | translate }}</span>
+                        }
+                    </dd>
+                </div>
+                <div>
+                    <dt class="text-xs text-ink-muted">{{ 'marketing.partner.handle' | translate }}</dt>
+                    <dd class="mt-1 mb-0 text-sm font-semibold break-all text-ink">{{ details.handle || ('marketing.partner.notSet' | translate) }}</dd>
+                </div>
+                <div>
+                    <dt class="text-xs text-ink-muted">{{ 'marketing.partner.phone' | translate }}</dt>
+                    <dd class="mt-1 mb-0 font-mono text-sm font-semibold text-ink">{{ details.phone_number || ('marketing.partner.notSet' | translate) }}</dd>
+                </div>
+                <div>
+                    <dt class="text-xs text-ink-muted">{{ 'marketing.partner.paymentMethod.label' | translate }}</dt>
+                    <dd class="mt-1 mb-0 text-sm font-semibold text-ink">{{ details.payment_method ? ('marketing.partner.paymentMethod.' + details.payment_method | translate) : ('marketing.partner.notSet' | translate) }}</dd>
+                    @if (details.payment_account) {
+                        <dd class="mt-0.5 mb-0 font-mono text-xs text-ink-muted">{{ details.payment_account }}</dd>
+                    }
+                </div>
+                <div>
+                    <dt class="text-xs text-ink-muted">{{ 'marketing.partner.created' | translate }}</dt>
+                    <dd class="mt-1 mb-0 text-sm font-semibold text-ink">
+                        @if (details.created_on) {
+                            {{ details.created_on | recordDate: language() : 'date' }}
+                        } @else {
+                            {{ 'marketing.partner.notSet' | translate }}
+                        }
+                    </dd>
+                </div>
+                <div>
+                    <dt class="text-xs text-ink-muted">{{ 'marketing.partner.lastTouchedOn' | translate }}</dt>
+                    <dd class="mt-1 mb-0 text-sm font-semibold text-ink">
+                        @if (details.last_action_on) {
+                            {{ details.last_action_on | recordDate: language() : 'date' }}
+                        } @else {
+                            {{ 'marketing.partner.notSet' | translate }}
+                        }
+                    </dd>
+                </div>
+                <div class="col-span-2 border-t border-line-soft pt-4 md:col-span-3" data-detail="note">
+                    <dt class="text-xs text-ink-muted">{{ 'marketing.partner.note' | translate }}</dt>
+                    <dd class="mt-1 mb-0">
+                        @if (details.note) {
+                            <p class="m-0 max-w-[75ch] text-sm leading-relaxed whitespace-pre-line text-ink-body">{{ details.note }}</p>
+                        } @else {
+                            <span class="text-sm text-ink-muted">{{ 'marketing.partner.notSet' | translate }}</span>
+                        }
+                    </dd>
+                </div>
+            </dl>
+        } @else {
+            <nz-skeleton nzActive [nzTitle]="false" [nzParagraph]="{ rows: 5 }" />
+        }
+    </nz-card>
+
+    <div class="mt-2 grid grid-cols-1 items-start gap-2 md:mt-4 md:gap-4 lg:grid-cols-3">
+        @if (record()?.campaigns; as campaigns) {
+            <nz-card class="lg:col-start-3 lg:row-start-1" [nzTitle]="campaignsTitle" data-detail="campaigns">
+                <ng-template #campaignsTitle
+                    ><h2 class="m-0 flex items-center gap-1.5 text-sm font-bold text-ink"><ng-icon name="lucideRocket" size="14px" class="text-ink-muted" aria-hidden="true" />{{ 'marketing.partner.campaigns' | translate }}</h2></ng-template
+                >
+                @if (owedTotal(); as owed) {
+                    <p class="mt-0 mb-3 text-sm font-semibold text-warning-ink" data-partner-owed>{{ 'marketing.partner.owedTotal' | translate: { amount: (owed | money) } }}</p>
+                }
+                @if (campaigns.length) {
+                    <ul class="m-0 flex list-none flex-col divide-y divide-line-soft p-0">
+                        @for (campaign of campaigns; track campaign.oid) {
+                            <li class="flex items-start justify-between gap-3 py-2" [attr.data-campaign]="campaign.oid">
+                                <span class="min-w-0">
+                                    <a class="block truncate text-[13px] font-semibold" [routerLink]="campaignRoute(campaign.oid)">{{ campaign.name }}</a>
+                                    <span class="block text-xs text-ink-muted"><span class="font-mono">{{ campaign.campaign_no }}</span> &middot; {{ 'marketing.campaign.status.' + campaign.status | translate }}</span>
+                                </span>
+                                <span class="shrink-0 text-right">
+                                    <span class="block font-mono text-[13px] text-ink tabular-nums">{{ campaign.agreed_fee | money }}</span>
+                                    @if (campaign.past_due) {
+                                        <span class="block text-xs font-semibold text-warning-ink" data-campaign-past-due>{{ 'marketing.partner.pastDue' | translate: { count: campaign.past_due } | digits }}</span>
+                                    }
+                                    @if (campaign.owed !== undefined && campaign.owed > 0) {
+                                        <span class="block text-xs text-warning-ink">{{ 'marketing.campaign.payment.owed' | translate: { amount: (campaign.owed | money) } }}</span>
+                                    }
+                                </span>
+                            </li>
+                        }
+                    </ul>
+                } @else {
+                    <p class="m-0 text-xs text-ink-muted">{{ 'marketing.partner.noCampaigns' | translate }}</p>
+                }
+            </nz-card>
+        }
+
+        <nz-card [class]="record()?.campaigns ? 'lg:col-span-2 lg:row-start-1' : 'lg:col-span-3 lg:row-start-1'" [nzTitle]="activityTitle" data-detail="activity">
+            <ng-template #activityTitle
+                ><h2 class="m-0 flex items-center gap-1.5 text-sm font-bold text-ink"><ng-icon name="lucideHistory" size="14px" class="text-ink-muted" aria-hidden="true" />{{ 'marketing.partner.activity' | translate }}</h2></ng-template
+            >
+            @if (record(); as loaded) {
+                @if (loaded.activity.length) {
+                    <record-timeline [entries]="loaded.activity">
+                        <ng-template let-entry>
+                            <p class="m-0 text-[13px] font-semibold text-ink">{{ entry.action }}</p>
+                            @if (entry.description) {
+                                <p class="mt-0.5 mb-0 text-xs text-ink-body">{{ entry.description }}</p>
+                            }
+                            <p class="mt-0.5 mb-0 text-xs text-ink-muted">{{ entry.user }} &middot; {{ entry.date | recordDate: language() : 'date-time-12' }}</p>
+                        </ng-template>
+                    </record-timeline>
+                } @else {
+                    <p class="m-0 text-xs text-ink-muted">{{ 'marketing.partner.noActivity' | translate }}</p>
+                }
+            } @else {
+                <nz-skeleton nzActive [nzTitle]="false" [nzParagraph]="{ rows: 4 }" />
+            }
+        </nz-card>
+    </div>
+
+    <action-footer>
+        <button nz-button nzType="default" type="button" class="inline-flex items-center gap-1.5" (click)="goBack()">
+            <ng-icon name="lucideArrowLeft" size="14px" aria-hidden="true" />
+            <span>{{ 'list.back' | translate }}</span>
+        </button>
+    </action-footer>
+}

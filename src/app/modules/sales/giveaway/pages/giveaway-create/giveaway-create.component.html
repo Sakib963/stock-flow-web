@@ -1,5 +1,9 @@
 <page-header [back]="back" [title]="'sales.giveaway.createTitle' | translate" [lead]="'sales.giveaway.createLead' | translate" />
 
+@if (campaign; as c) {
+    <p class="mt-0 mb-2 rounded-control border border-line bg-surface-sunken px-3 py-2 text-xs text-ink-body md:mb-4" data-giveaway="campaign">{{ 'sales.giveaway.forCampaign' | translate: { number: c.number, partner: c.partner } }}</p>
+}
+
 <div class="grid grid-cols-1 items-start gap-2 md:gap-4 lg:grid-cols-2">
     <nz-card [nzTitle]="recipientTitle" data-giveaway="recipient">
         <ng-template #recipientTitle

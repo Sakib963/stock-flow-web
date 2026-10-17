@@ -46,6 +46,8 @@ export interface CreateGiveaway {
     recipient_phone: string | null;
     address_line: string | null;
     note: string;
+    /** Set when the gift is for a partner on a campaign; it then counts in the campaign's cost. */
+    campaign_partner_oid?: string | null;
     lines: { inventory_oid: string; quantity: number }[];
 }
 

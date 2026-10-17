@@ -228,4 +228,24 @@ export class APIEndpoint {
     // Activity log
     static readonly GET_ACTIVITY_LOG_LIST = '/api/v1/activity-log/get-activity-log-list';
     static readonly GET_ACTIVITY_LOG_SUMMARY = '/api/v1/activity-log/get-activity-log-summary';
+
+    // Marketing
+    static readonly GET_PARTNER_LIST = '/api/v1/marketing/partner/get-partner-list';
+    static readonly GET_PARTNER_DETAILS = '/api/v1/marketing/partner/get-partner-details';
+    static readonly CREATE_PARTNER = '/api/v1/marketing/partner/create-partner';
+    static readonly UPDATE_PARTNER_DETAILS = '/api/v1/marketing/partner/update-partner-details';
+    static readonly CHECK_PARTNER_AVAILABILITY = '/api/v1/marketing/partner/check-partner-availability';
+    static readonly GET_CAMPAIGN_LIST = '/api/v1/marketing/campaign/get-campaign-list';
+    static readonly GET_CAMPAIGN_DETAILS = '/api/v1/marketing/campaign/get-campaign-details';
+    static readonly GET_PARTNERS_FOR_CAMPAIGN = '/api/v1/marketing/campaign/get-partners-for-campaign';
+    static readonly GET_BATCHES_FOR_CAMPAIGN = '/api/v1/marketing/campaign/get-batches-for-campaign';
+    static readonly CREATE_CAMPAIGN = '/api/v1/marketing/campaign/create-campaign';
+    static readonly UPDATE_CAMPAIGN = '/api/v1/marketing/campaign/update-campaign';
+    static readonly START_CAMPAIGN = '/api/v1/marketing/campaign/start-campaign';
+    static readonly COMPLETE_CAMPAIGN = '/api/v1/marketing/campaign/complete-campaign';
+    static readonly CANCEL_CAMPAIGN = '/api/v1/marketing/campaign/cancel-campaign';
+    static readonly CREATE_CAMPAIGN_DELIVERABLE = '/api/v1/marketing/campaign/create-campaign-deliverable';
+    static readonly UPDATE_CAMPAIGN_DELIVERABLE = '/api/v1/marketing/campaign/update-campaign-deliverable';
+    static readonly DELETE_CAMPAIGN_DELIVERABLE = '/api/v1/marketing/campaign/delete-campaign-deliverable';
+    static readonly CREATE_PARTNER_PAYMENT = '/api/v1/marketing/partner-payment/create-partner-payment';
 }

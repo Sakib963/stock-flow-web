@@ -1,0 +1,89 @@
+<!-- Three columns from a tablet up: who the partner is, where they post and how to reach them, then how to pay them. -->
+<form nz-form nzLayout="vertical" class="grid grid-cols-1 items-start gap-x-4 md:grid-cols-3" [id]="formId" [formGroup]="form" (ngSubmit)="submitted.emit()">
+    <nz-form-item>
+        <nz-form-label nzRequired nzFor="partner-name" [nzTooltipTitle]="'marketing.partner.nameHelper' | translate">{{ 'marketing.partner.name' | translate }}</nz-form-label>
+        <nz-form-control nzHasFeedback [nzErrorTip]="nameError" [nzValidatingTip]="'form.checking' | translate">
+            <input nz-input id="partner-name" formControlName="name" type="text" autocomplete="off" [attr.placeholder]="'marketing.partner.namePlaceholder' | translate" [attr.aria-invalid]="invalid('name')" />
+        </nz-form-control>
+        <ng-template #nameError let-control>
+            @if (control.hasError('taken')) {
+                {{ 'marketing.partner.nameTaken' | translate }}
+            } @else if (control.hasError('required')) {
+                {{ 'form.required' | translate }}
+            } @else if (control.hasError('maxlength')) {
+                {{ 'form.tooLong' | translate: { max: 255 } | digits }}
+            }
+        </ng-template>
+    </nz-form-item>
+
+    <nz-form-item>
+        <nz-form-label nzRequired nzFor="partner-type" [nzTooltipTitle]="'marketing.partner.typeHelper' | translate">{{ 'marketing.partner.type.label' | translate }}</nz-form-label>
+        <nz-form-control [nzErrorTip]="'marketing.partner.typeRequired' | translate">
+            <nz-select nzId="partner-type" formControlName="partner_type" [nzPlaceHolder]="'marketing.partner.typePlaceholder' | translate" [attr.aria-invalid]="invalid('partner_type')">
+                @for (type of types; track type) {
+                    <nz-option [nzValue]="type" [nzLabel]="'marketing.partner.type.' + type | translate" />
+                }
+            </nz-select>
+        </nz-form-control>
+    </nz-form-item>
+
+    <nz-form-item>
+        <nz-form-label nzRequired nzFor="partner-status" [nzTooltipTitle]="'marketing.partner.statusHelper' | translate">{{ 'marketing.partner.status.label' | translate }}</nz-form-label>
+        <nz-form-control>
+            <nz-select nzId="partner-status" formControlName="status" [nzPlaceHolder]="'marketing.partner.statusPlaceholder' | translate">
+                <nz-option nzValue="Active" [nzLabel]="'marketing.partner.status.Active' | translate" />
+                <nz-option nzValue="Inactive" [nzLabel]="'marketing.partner.status.Inactive' | translate" />
+            </nz-select>
+        </nz-form-control>
+    </nz-form-item>
+
+    <nz-form-item>
+        <nz-form-label nzFor="partner-platforms" [nzTooltipTitle]="'marketing.partner.platformsHelper' | translate">{{ 'marketing.partner.platforms' | translate }}</nz-form-label>
+        <nz-form-control>
+            <nz-select nzId="partner-platforms" nzMode="multiple" formControlName="platforms" [nzPlaceHolder]="'marketing.partner.platformsPlaceholder' | translate">
+                @for (platform of platformChoices; track platform) {
+                    <nz-option [nzValue]="platform" [nzLabel]="'marketing.partner.platform.' + platform | translate" />
+                }
+            </nz-select>
+        </nz-form-control>
+    </nz-form-item>
+
+    <nz-form-item>
+        <nz-form-label nzFor="partner-handle" [nzTooltipTitle]="'marketing.partner.handleHelper' | translate">{{ 'marketing.partner.handle' | translate }}</nz-form-label>
+        <nz-form-control [nzErrorTip]="'form.tooLong' | translate: { max: 255 } | digits">
+            <input nz-input id="partner-handle" formControlName="handle" type="text" autocomplete="off" [attr.placeholder]="'marketing.partner.handlePlaceholder' | translate" [attr.aria-invalid]="invalid('handle')" />
+        </nz-form-control>
+    </nz-form-item>
+
+    <nz-form-item>
+        <nz-form-label nzFor="partner-phone" [nzTooltipTitle]="'marketing.partner.phoneHelper' | translate">{{ 'marketing.partner.phone' | translate }}</nz-form-label>
+        <nz-form-control [nzErrorTip]="'marketing.partner.phoneInvalid' | translate">
+            <input nz-input id="partner-phone" formControlName="phone_number" type="tel" autocomplete="off" class="font-mono" [attr.placeholder]="'marketing.partner.phonePlaceholder' | translate" [attr.aria-invalid]="invalid('phone_number')" />
+        </nz-form-control>
+    </nz-form-item>
+
+    <nz-form-item>
+        <nz-form-label nzFor="partner-payment-method" [nzTooltipTitle]="'marketing.partner.paymentHelper' | translate">{{ 'marketing.partner.paymentMethod.label' | translate }}</nz-form-label>
+        <nz-form-control>
+            <nz-select nzId="partner-payment-method" formControlName="payment_method" nzAllowClear [nzPlaceHolder]="'marketing.partner.paymentMethodPlaceholder' | translate">
+                @for (method of paymentMethods; track method) {
+                    <nz-option [nzValue]="method" [nzLabel]="'marketing.partner.paymentMethod.' + method | translate" />
+                }
+            </nz-select>
+        </nz-form-control>
+    </nz-form-item>
+
+    <nz-form-item class="md:col-span-2">
+        <nz-form-label nzFor="partner-payment-account" [nzTooltipTitle]="'marketing.partner.paymentAccountHelper' | translate">{{ 'marketing.partner.paymentAccount' | translate }}</nz-form-label>
+        <nz-form-control [nzErrorTip]="'form.tooLong' | translate: { max: 255 } | digits">
+            <input nz-input id="partner-payment-account" formControlName="payment_account" type="text" autocomplete="off" [attr.placeholder]="'marketing.partner.paymentAccountPlaceholder' | translate" [attr.aria-invalid]="invalid('payment_account')" />
+        </nz-form-control>
+    </nz-form-item>
+
+    <nz-form-item class="md:col-span-3">
+        <nz-form-label nzFor="partner-note" [nzTooltipTitle]="'marketing.partner.noteHelper' | translate">{{ 'marketing.partner.note' | translate }}</nz-form-label>
+        <nz-form-control [nzErrorTip]="'form.tooLong' | translate: { max: 1000 } | digits">
+            <textarea nz-input id="partner-note" formControlName="note" rows="3" [attr.placeholder]="'marketing.partner.notePlaceholder' | translate" [attr.aria-invalid]="invalid('note')"></textarea>
+        </nz-form-control>
+    </nz-form-item>
+</form>

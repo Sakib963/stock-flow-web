@@ -1,7 +1,7 @@
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
-import { provideRouter } from '@angular/router';
+import { ActivatedRoute, convertToParamMap, provideRouter } from '@angular/router';
 import { provideNzI18n, en_US } from 'ng-zorro-antd/i18n';
 import { provideTranslateService } from '@ngx-translate/core';
 import { APIEndpoint } from '@app/core/constants/api-endpoint';
@@ -12,10 +12,10 @@ import { GiveawayCreateComponent } from './giveaway-create.component';
 
 const SCARF: PosBatch = { product_oid: 'p-1', product_name: 'Silk scarf', image_url: null, sku: 'SCARF-1', inventory_oid: 'b-1', batch_code: 'B-1', expiry_date: null, quantity_available: 5, sellable_quantity: 3, selling_price: 1450, maximum_discount: 0 };
 
-const open = async () => {
+const open = async (query: Record<string, string> = {}) => {
     await TestBed.configureTestingModule({
         imports: [GiveawayCreateComponent],
-        providers: [provideRouter([]), provideHttpClient(), provideHttpClientTesting(), provideNzI18n(en_US), provideTranslateService({ fallbackLang: 'en' }), ...OVERLAY_PROVIDERS, { provide: SessionService, useValue: { can: () => true, menu: () => [], business: () => null, user: () => ({ name: 'Owner' }) } }],
+        providers: [provideRouter([]), provideHttpClient(), provideHttpClientTesting(), provideNzI18n(en_US), provideTranslateService({ fallbackLang: 'en' }), ...OVERLAY_PROVIDERS, { provide: SessionService, useValue: { can: () => true, menu: () => [], business: () => null, user: () => ({ name: 'Owner' }) } }, { provide: ActivatedRoute, useValue: { snapshot: { queryParamMap: convertToParamMap(query) } } }],
     }).compileComponents();
     const fixture = TestBed.createComponent(GiveawayCreateComponent);
     fixture.detectChanges();
@@ -23,6 +23,13 @@ const open = async () => {
 };
 
 describe('GiveawayCreateComponent', () => {
+    it('opened from a campaign, fills in the partner and sends the gift for their line on the campaign', async () => {
+        const { page, element } = await open({ campaign_partner: 'cp-1', campaign: 'CM-2610-0001', partner: 'Style Diaries' });
+        expect(page.name()).toBe('Style Diaries');
+        expect(element.querySelector('[data-giveaway="campaign"]')).not.toBeNull();
+        expect(page.campaign?.line).toBe('cp-1');
+    });
+
     it('refuses to save without a name, a reason and a product, and sends nothing', async () => {
         const { fixture, page, http, element } = await open();
         page.save();

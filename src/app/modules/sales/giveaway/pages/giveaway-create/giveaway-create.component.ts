@@ -1,7 +1,7 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideCheck, lucideGift, lucidePackage, lucideTrash2, lucideUserRound, lucideX } from '@ng-icons/lucide';
 import { NzButtonModule } from 'ng-zorro-antd/button';
@@ -47,6 +47,7 @@ export class GiveawayCreateComponent {
     private readonly _translate = inject(TranslateService);
     private readonly _message = inject(NzMessageService);
     private readonly _modal = inject(NzModalService);
+    private readonly _query = inject(ActivatedRoute).snapshot.queryParamMap;
 
     readonly back: PageBack = { route: GIVEAWAY_ROUTES.list };
     readonly saving = this._giveaways.saving;
@@ -59,6 +60,14 @@ export class GiveawayCreateComponent {
     readonly tried = signal(false);
     /** Made once per page, so a retried Save finds the draft it already saved. */
     private readonly _oid = crypto.randomUUID();
+    /** Opened from a campaign: the gift is for that partner and counts in the campaign's cost. */
+    readonly campaign = this._query.get('campaign_partner') ? { line: this._query.get('campaign_partner')!, number: this._query.get('campaign') ?? '', partner: this._query.get('partner') ?? '' } : null;
+
+    constructor() {
+        if (!this.campaign) return;
+        this.name.set(this.campaign.partner);
+        this.note.set(this._translate.instant('sales.giveaway.forCampaignNote', { number: this.campaign.number }));
+    }
 
     readonly phoneInvalid = computed(() => !!this.phone().trim() && !normalizePhone(this.phone()));
     readonly over = computed(() => this.lines().some((line) => line.quantity > line.sellable));
@@ -104,6 +113,7 @@ export class GiveawayCreateComponent {
                     recipient_phone: this.phone().trim() || null,
                     address_line: this.address().trim() || null,
                     note: this.note().trim(),
+                    campaign_partner_oid: this.campaign?.line ?? null,
                     lines: this.lines().map((line) => ({ inventory_oid: line.inventory_oid, quantity: line.quantity })),
                 })
                 .subscribe({

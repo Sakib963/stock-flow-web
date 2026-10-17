@@ -1,0 +1,177 @@
+<form nz-form nzLayout="vertical" [id]="formId" [formGroup]="form" (ngSubmit)="submitted.emit()">
+    <div class="grid grid-cols-1 items-start gap-x-4 md:grid-cols-3" data-form="header">
+        <nz-form-item class="md:col-span-2">
+            <nz-form-label nzRequired nzFor="campaign-name" [nzTooltipTitle]="'marketing.campaign.nameHelper' | translate">{{ 'marketing.campaign.name' | translate }}</nz-form-label>
+            <nz-form-control [nzErrorTip]="'form.required' | translate">
+                <input nz-input id="campaign-name" formControlName="name" type="text" autocomplete="off" [attr.placeholder]="'marketing.campaign.namePlaceholder' | translate" [attr.aria-invalid]="invalid('name')" />
+            </nz-form-control>
+        </nz-form-item>
+
+        <nz-form-item>
+            <nz-form-label nzRequired nzFor="campaign-type" [nzTooltipTitle]="'marketing.campaign.typeHelper' | translate">{{ 'marketing.campaign.type.label' | translate }}</nz-form-label>
+            <nz-form-control [nzErrorTip]="'marketing.campaign.typeRequired' | translate">
+                <nz-select nzId="campaign-type" formControlName="promotion_type" [nzPlaceHolder]="'marketing.campaign.typePlaceholder' | translate" [attr.aria-invalid]="invalid('promotion_type')">
+                    @for (type of types; track type) {
+                        <nz-option [nzValue]="type" [nzLabel]="'marketing.campaign.type.' + type | translate" />
+                    }
+                </nz-select>
+            </nz-form-control>
+        </nz-form-item>
+
+        <nz-form-item>
+            <nz-form-label nzRequired nzFor="campaign-posting" [nzTooltipTitle]="'marketing.campaign.postingHelper' | translate">{{ 'marketing.campaign.posting' | translate }}</nz-form-label>
+            <nz-form-control [nzErrorTip]="'marketing.campaign.postingRequired' | translate">
+                <nz-range-picker nzId="campaign-posting" class="w-full" formControlName="posting" nzFormat="dd MMM yyyy" [nzPlaceHolder]="['marketing.campaign.postingFrom' | translate, 'marketing.campaign.postingTo' | translate]" />
+            </nz-form-control>
+        </nz-form-item>
+
+        <nz-form-item>
+            <nz-form-label nzFor="campaign-measure" [nzTooltipTitle]="'marketing.campaign.measureHelper' | translate">{{ 'marketing.campaign.measureEnd' | translate }}</nz-form-label>
+            <nz-form-control>
+                <nz-date-picker nzId="campaign-measure" class="w-full" formControlName="measure_end" nzFormat="dd MMM yyyy" [nzDisabledDate]="beforePostingEnd" [nzPlaceHolder]="'marketing.campaign.measurePlaceholder' | translate" />
+            </nz-form-control>
+        </nz-form-item>
+
+        <nz-form-item>
+            <nz-form-label nzFor="campaign-ad-spend" [nzTooltipTitle]="'marketing.campaign.adSpendHelper' | translate">{{ 'marketing.campaign.adSpend' | translate }}</nz-form-label>
+            <nz-form-control>
+                <nz-input-number nzId="campaign-ad-spend" class="w-full font-mono" formControlName="ad_spend" [nzMin]="0" [nzPrecision]="0" [nzPlaceHolder]="'marketing.campaign.adSpendPlaceholder' | translate" />
+            </nz-form-control>
+        </nz-form-item>
+
+        <nz-form-item>
+            <nz-form-label nzFor="campaign-other-cost" [nzTooltipTitle]="'marketing.campaign.otherCostHelper' | translate">{{ 'marketing.campaign.otherCost' | translate }}</nz-form-label>
+            <nz-form-control>
+                <nz-input-number nzId="campaign-other-cost" class="w-full font-mono" formControlName="other_cost" [nzMin]="0" [nzPrecision]="0" [nzPlaceHolder]="'marketing.campaign.otherCostPlaceholder' | translate" />
+            </nz-form-control>
+        </nz-form-item>
+
+        <nz-form-item class="md:col-span-2">
+            <nz-form-label nzFor="campaign-other-note" [nzTooltipTitle]="'marketing.campaign.otherCostNoteHelper' | translate">{{ 'marketing.campaign.otherCostNote' | translate }}</nz-form-label>
+            <nz-form-control [nzErrorTip]="'form.tooLong' | translate: { max: 500 } | digits">
+                <input nz-input id="campaign-other-note" formControlName="other_cost_note" type="text" autocomplete="off" [attr.placeholder]="'marketing.campaign.otherCostNotePlaceholder' | translate" />
+            </nz-form-control>
+        </nz-form-item>
+
+        <nz-form-item class="md:col-span-3">
+            <nz-form-label nzFor="campaign-note" [nzTooltipTitle]="'marketing.campaign.noteHelper' | translate">{{ 'marketing.campaign.note' | translate }}</nz-form-label>
+            <nz-form-control [nzErrorTip]="'form.tooLong' | translate: { max: 1000 } | digits">
+                <textarea nz-input id="campaign-note" formControlName="note" rows="2" [attr.placeholder]="'marketing.campaign.notePlaceholder' | translate"></textarea>
+            </nz-form-control>
+        </nz-form-item>
+    </div>
+
+    <section class="-mx-4 border-t border-line md:-mx-5" data-form="batches" [attr.aria-label]="'marketing.campaign.batches' | translate">
+        <div class="flex flex-wrap items-center justify-between gap-2 px-4 py-3 md:px-5">
+            <h2 class="m-0 flex items-center gap-1.5 text-sm font-bold text-ink">
+                <ng-icon name="lucidePackage" size="14px" class="text-ink-muted" aria-hidden="true" />
+                {{ 'marketing.campaign.batches' | translate }}
+                <span class="rounded-full bg-surface-sunken px-2 text-xs font-semibold text-ink-muted">{{ batches().length | digits }}</span>
+            </h2>
+            <button nz-button type="button" class="inline-flex items-center gap-1.5" data-form="add-batch" (click)="batchDrawer.set(true)">
+                <ng-icon name="lucidePlus" size="14px" aria-hidden="true" />
+                <span>{{ 'marketing.campaign.addBatch' | translate }}</span>
+            </button>
+        </div>
+        @if (batchRows().length) {
+            <nz-table nzTemplateMode nzSize="small" [nzScroll]="{ x: '640px' }">
+                <thead>
+                    <tr>
+                        <th>{{ 'marketing.campaign.product' | translate }}</th>
+                        <th nzWidth="120px">{{ 'marketing.campaign.batch' | translate }}</th>
+                        <th nzWidth="80px" class="text-right">{{ 'marketing.campaign.units' | translate }}</th>
+                        <th nzWidth="110px" class="text-right">{{ 'marketing.campaign.budgetPerUnit' | translate }}</th>
+                        <th nzWidth="120px" class="text-right">{{ 'marketing.campaign.budgetBatch' | translate }}</th>
+                        <th nzWidth="48px">
+                            <span class="sr-only">{{ 'marketing.campaign.removeBatch' | translate }}</span>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (row of batchRows(); track row.inventory_oid; let i = $index) {
+                        <tr [attr.data-batch]="row.inventory_oid">
+                            <td>
+                                <span class="block text-[13px] font-semibold text-ink">{{ row.product_name }}</span>
+                                <span class="block font-mono text-xs text-ink-muted">{{ row.sku }}</span>
+                            </td>
+                            <td class="font-mono text-xs text-ink">{{ row.batch_code }}</td>
+                            <td class="text-right font-mono text-[13px] text-ink">{{ row.units | digits }}</td>
+                            <td class="text-right font-mono text-[13px] text-ink">{{ row.perUnit | money }}</td>
+                            <td class="text-right font-mono text-[13px] text-ink">{{ row.total | money }}</td>
+                            <td class="text-right">
+                                <button nz-button nzType="text" nzSize="small" type="button" nz-tooltip [nzTooltipTitle]="'marketing.campaign.removeBatch' | translate" [attr.aria-label]="'marketing.campaign.removeBatch' | translate" (click)="removeBatch(i)">
+                                    <ng-icon name="lucideTrash2" size="14px" class="text-ink-muted" aria-hidden="true" />
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </nz-table>
+        } @else {
+            <div class="px-4 pb-6 text-center md:px-5" data-form="batches-empty">
+                <p class="m-0 text-[13px] font-semibold text-ink">{{ 'marketing.campaign.noBatchesTitle' | translate }}</p>
+                <p class="mx-auto mt-1 mb-0 max-w-[48ch] text-xs text-ink-muted">{{ 'marketing.campaign.noBatchesBody' | translate }}</p>
+            </div>
+        }
+    </section>
+
+    <section class="-mx-4 border-t border-line md:-mx-5" data-form="partners" [attr.aria-label]="'marketing.campaign.partnersTitle' | translate">
+        <div class="flex flex-wrap items-center justify-between gap-2 px-4 py-3 md:px-5">
+            <h2 class="m-0 flex items-center gap-1.5 text-sm font-bold text-ink">
+                <ng-icon name="lucideHandshake" size="14px" class="text-ink-muted" aria-hidden="true" />
+                {{ 'marketing.campaign.partnersTitle' | translate }}
+                <span class="rounded-full bg-surface-sunken px-2 text-xs font-semibold text-ink-muted">{{ partners().length | digits }}</span>
+            </h2>
+            <button nz-button type="button" class="inline-flex items-center gap-1.5" data-form="add-partner" (click)="openPartner(null)">
+                <ng-icon name="lucidePlus" size="14px" aria-hidden="true" />
+                <span>{{ 'marketing.campaign.addPartner' | translate }}</span>
+            </button>
+        </div>
+        @if (partnersFailed()) {
+            <p class="mx-4 mt-0 mb-3 text-xs text-danger-ink md:mx-5" role="alert">{{ 'marketing.campaign.partnersFailed' | translate }}</p>
+        }
+        @if (partners().length) {
+            <nz-table nzTemplateMode nzSize="small" [nzScroll]="{ x: '560px' }">
+                <thead>
+                    <tr>
+                        <th>{{ 'marketing.campaign.partner' | translate }}</th>
+                        <th nzWidth="130px" class="text-right">{{ 'marketing.campaign.fee' | translate }}</th>
+                        <th>{{ 'marketing.campaign.partnerNote' | translate }}</th>
+                        <th nzWidth="88px">
+                            <span class="sr-only">{{ 'marketing.campaign.lineActions' | translate }}</span>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (row of partners(); track row.partner_oid; let i = $index) {
+                        <tr [attr.data-partner]="row.partner_oid">
+                            <td>
+                                <span class="block text-[13px] font-semibold text-ink">{{ row.name }}</span>
+                                <span class="block text-xs text-ink-muted">{{ 'marketing.partner.type.' + row.partner_type | translate }}</span>
+                            </td>
+                            <td class="text-right font-mono text-[13px] text-ink">{{ row.agreed_fee | money }}</td>
+                            <td class="text-xs text-ink-body">{{ row.note }}</td>
+                            <td class="text-right whitespace-nowrap">
+                                <button nz-button nzType="text" nzSize="small" type="button" nz-tooltip [nzTooltipTitle]="'marketing.campaign.editPartner' | translate" [attr.aria-label]="'marketing.campaign.editPartner' | translate" (click)="openPartner(i)">
+                                    <ng-icon name="lucidePencil" size="14px" class="text-ink-muted" aria-hidden="true" />
+                                </button>
+                                <button nz-button nzType="text" nzSize="small" type="button" nz-tooltip [nzTooltipTitle]="'marketing.campaign.removePartner' | translate" [attr.aria-label]="'marketing.campaign.removePartner' | translate" (click)="removePartner(i)">
+                                    <ng-icon name="lucideTrash2" size="14px" class="text-ink-muted" aria-hidden="true" />
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </nz-table>
+        } @else {
+            <p class="mx-4 mt-0 mb-4 text-xs text-ink-muted md:mx-5" data-form="partners-empty">{{ 'marketing.campaign.noPartners' | translate }}</p>
+        }
+        <div class="flex items-baseline justify-end gap-3 border-t border-line px-4 py-3 md:px-5" data-form="fees">
+            <span class="text-xs text-ink-muted">{{ 'marketing.campaign.feesTotal' | translate }}</span>
+            <span class="font-mono text-lg font-bold text-ink tabular-nums">{{ fees() | money }}</span>
+        </div>
+    </section>
+</form>
+
+<campaign-batch-drawer [open]="batchDrawer()" [taken]="takenBatches()" (saved)="addBatch($event)" (closed)="batchDrawer.set(false)" />
+<campaign-partner-drawer [open]="partnerDrawer()" [line]="partnerLine()" [choices]="partnerChoices()" [choicesLoading]="partnersLoading()" [taken]="takenPartners()" (saved)="savePartner($event)" (closed)="closePartner()" />

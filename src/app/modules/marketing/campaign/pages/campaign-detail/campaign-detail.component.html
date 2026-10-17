@@ -1,0 +1,553 @@
+<page-header [back]="back" [title]="'marketing.campaign.detailTitle' | translate" [lead]="'marketing.campaign.detailLead' | translate">
+    @if (actions().edit) {
+        <button nz-button nzType="primary" type="button" class="inline-flex items-center gap-1.5" (click)="edit()">
+            <ng-icon name="lucidePencil" size="14px" aria-hidden="true" />
+            <span>{{ 'marketing.campaign.edit' | translate }}</span>
+        </button>
+    }
+</page-header>
+
+@if (failed(); as failure) {
+    <div class="sf-empty" role="alert">
+        <p class="m-0 text-sm text-ink-body">{{ 'marketing.campaign.loadFailed.' + failure | translate }}</p>
+        <div class="mt-3 flex items-center justify-center gap-2">
+            <button nz-button nzType="default" type="button" class="inline-flex items-center gap-1.5" (click)="backToList()">
+                <ng-icon name="lucideArrowLeft" size="14px" aria-hidden="true" />
+                <span>{{ 'marketing.campaign.backToList' | translate }}</span>
+            </button>
+            <button nz-button nzType="primary" type="button" class="inline-flex items-center gap-1.5" (click)="load()">
+                <ng-icon name="lucideRotateCw" size="14px" aria-hidden="true" />
+                <span>{{ 'form.retry' | translate }}</span>
+            </button>
+        </div>
+    </div>
+} @else {
+    @if (loading()) {
+        <span class="sr-only" role="status">{{ 'form.loading' | translate }}</span>
+    }
+
+    <nz-card [nzTitle]="detailsTitle" data-detail="details">
+        <ng-template #detailsTitle
+            ><h2 class="m-0 flex items-center gap-1.5 text-sm font-bold text-ink"><ng-icon name="lucideInfo" size="14px" class="text-ink-muted" aria-hidden="true" />{{ 'marketing.campaign.section.details' | translate }}</h2></ng-template
+        >
+        @if (campaign(); as c) {
+            <dl class="m-0 grid grid-cols-2 gap-x-6 gap-y-4 md:grid-cols-4">
+                <div>
+                    <dt class="text-xs text-ink-muted">{{ 'marketing.campaign.number' | translate }}</dt>
+                    <dd class="mt-1 mb-0 font-mono text-sm font-semibold text-ink">{{ c.campaign_no }}</dd>
+                </div>
+                <div>
+                    <dt class="text-xs text-ink-muted">{{ 'marketing.campaign.name' | translate }}</dt>
+                    <dd class="mt-1 mb-0 text-sm font-semibold text-ink">{{ c.name }}</dd>
+                </div>
+                <div>
+                    <dt class="text-xs text-ink-muted">{{ 'marketing.campaign.type.label' | translate }}</dt>
+                    <dd class="mt-1 mb-0">
+                        @if (typeTone(); as style) {
+                            <status-tag [label]="style.label" [tone]="style.tone" size="standard" />
+                        }
+                    </dd>
+                </div>
+                <div>
+                    <dt class="text-xs text-ink-muted">{{ 'marketing.campaign.status.label' | translate }}</dt>
+                    <dd class="mt-1 mb-0" data-detail="status">
+                        @if (statusTone(); as style) {
+                            <status-tag [label]="style.label" [tone]="style.tone" [icon]="style.icon" size="standard" />
+                        }
+                    </dd>
+                </div>
+                <div>
+                    <dt class="text-xs text-ink-muted">{{ 'marketing.campaign.posting' | translate }}</dt>
+                    <dd class="mt-1 mb-0 text-sm font-semibold text-ink">
+                        @if (c.posting_start) {
+                            {{ c.posting_start | recordDate: language() : 'date' }} &ndash; {{ c.posting_end | recordDate: language() : 'date' }}
+                        }
+                    </dd>
+                </div>
+                <div>
+                    <dt class="text-xs text-ink-muted">{{ 'marketing.campaign.measuring' | translate }}</dt>
+                    <dd class="mt-1 mb-0 text-sm font-semibold text-ink">
+                        @if (c.measure_end) {
+                            {{ c.posting_start | recordDate: language() : 'date' }} &ndash; {{ c.measure_end | recordDate: language() : 'date' }}
+                        }
+                    </dd>
+                </div>
+                <div>
+                    <dt class="text-xs text-ink-muted">{{ 'marketing.campaign.created' | translate }}</dt>
+                    <dd class="mt-1 mb-0 text-sm font-semibold text-ink">
+                        @if (c.created_on) {
+                            {{ c.created_on | recordDate: language() : 'date' }}
+                        }
+                    </dd>
+                    @if (c.created_by) {
+                        <dd class="mt-0.5 mb-0 text-xs text-ink-muted">{{ c.created_by }}</dd>
+                    }
+                </div>
+                @if (c.note || c.cancel_note) {
+                    <div class="col-span-2 border-t border-line-soft pt-4 md:col-span-4" data-detail="note">
+                        @if (c.cancel_note) {
+                            <dt class="text-xs text-ink-muted">{{ 'marketing.campaign.cancelNote' | translate }}</dt>
+                            <dd class="mt-1 mb-3 text-sm text-danger-ink">{{ c.cancel_note }}</dd>
+                        }
+                        @if (c.note) {
+                            <dt class="text-xs text-ink-muted">{{ 'marketing.campaign.note' | translate }}</dt>
+                            <dd class="mt-1 mb-0 max-w-[75ch] text-sm whitespace-pre-line text-ink-body">{{ c.note }}</dd>
+                        }
+                    </div>
+                }
+            </dl>
+        } @else {
+            <nz-skeleton nzActive [nzTitle]="false" [nzParagraph]="{ rows: 3 }" />
+        }
+    </nz-card>
+
+    <!-- Planned against agreed (REQ-07): what the promoted batches set aside, beside what was agreed. -->
+    <nz-card class="mt-2 block md:mt-4" [nzTitle]="costsTitle" data-detail="costs">
+        <ng-template #costsTitle
+            ><h2 class="m-0 flex items-center gap-1.5 text-sm font-bold text-ink"><ng-icon name="lucideWallet" size="14px" class="text-ink-muted" aria-hidden="true" />{{ 'marketing.campaign.section.costs' | translate }}</h2></ng-template
+        >
+        @if (record(); as loaded) {
+            <!-- REQ-08: a kind of cost over the promoted batches' budget for it. Nothing changes unless the person updates the batch. -->
+            @for (tip of loaded.costs.over; track tip.kind) {
+                <div class="mb-3 flex items-start gap-2 rounded-control border border-warning-border bg-warning-bg px-3 py-2 text-xs text-ink-body" role="note" [attr.data-over]="tip.kind">
+                    <ng-icon name="lucideTriangleAlert" size="14px" class="mt-0.5 shrink-0 text-warning-ink" aria-hidden="true" />
+                    <span>
+                        {{ 'marketing.campaign.overTip' | translate: { kind: ('marketing.campaign.budget.' + tip.kind | translate), over: (tip.over | money), planned: (tip.planned | money) } }}
+                        @if (canOpenStock) {
+                            <a class="font-semibold" [routerLink]="productStock(tip.product_oid)">{{ 'marketing.campaign.overTipLink' | translate: { batch: tip.batch_code } }}</a>
+                        }
+                    </span>
+                </div>
+            }
+            <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
+                <dl class="m-0 flex flex-col gap-1.5 text-sm" data-cost="planned">
+                    <p class="m-0 text-xs font-semibold text-ink-muted">{{ 'marketing.campaign.planned' | translate }}</p>
+                    @for (kind of budgetKinds; track kind) {
+                        <div class="flex justify-between">
+                            <dt class="text-ink-body">{{ 'marketing.campaign.budget.' + kind | translate }}</dt>
+                            <dd class="m-0 font-mono tabular-nums">{{ loaded.costs.planned[kind] | money }}</dd>
+                        </div>
+                    }
+                    <div class="flex justify-between border-t border-line-soft pt-1.5 font-bold">
+                        <dt>{{ 'marketing.campaign.plannedTotal' | translate }}</dt>
+                        <dd class="m-0 font-mono tabular-nums">{{ loaded.costs.planned.total | money }}</dd>
+                    </div>
+                </dl>
+                <dl class="m-0 flex flex-col gap-1.5 text-sm" data-cost="agreed">
+                    <p class="m-0 text-xs font-semibold text-ink-muted">{{ 'marketing.campaign.agreed' | translate }}</p>
+                    <div class="flex justify-between">
+                        <dt class="text-ink-body">{{ 'marketing.campaign.feesTotal' | translate }}</dt>
+                        <dd class="m-0 font-mono tabular-nums">{{ loaded.costs.agreed.fees | money }}</dd>
+                    </div>
+                    <div class="flex justify-between">
+                        <dt class="text-ink-body">{{ 'marketing.campaign.adSpend' | translate }}</dt>
+                        <dd class="m-0 font-mono tabular-nums">
+                            @if (loaded.costs.agreed.ad_spend === null) {
+                                <span class="font-sans text-xs text-ink-muted">{{ 'marketing.campaign.notRecorded' | translate }}</span>
+                            } @else {
+                                {{ loaded.costs.agreed.ad_spend | money }}
+                            }
+                        </dd>
+                    </div>
+                    <div class="flex justify-between">
+                        <dt class="text-ink-body">{{ 'marketing.campaign.otherCost' | translate }}</dt>
+                        <dd class="m-0 font-mono tabular-nums">
+                            @if (loaded.costs.agreed.other_cost === null) {
+                                <span class="font-sans text-xs text-ink-muted">{{ 'marketing.campaign.notRecorded' | translate }}</span>
+                            } @else {
+                                {{ loaded.costs.agreed.other_cost | money }}
+                            }
+                        </dd>
+                    </div>
+                    @if (loaded.details.other_cost_note) {
+                        <p class="m-0 text-xs text-ink-muted">{{ loaded.details.other_cost_note }}</p>
+                    }
+                    <div class="flex justify-between">
+                        <dt class="text-ink-body">{{ 'marketing.campaign.productsGiven' | translate }}</dt>
+                        <dd class="m-0 font-mono tabular-nums">
+                            @if (loaded.costs.agreed.products === null) {
+                                <span class="font-sans text-xs text-ink-muted">{{ 'marketing.campaign.notShown' | translate }}</span>
+                            } @else {
+                                {{ loaded.costs.agreed.products | money }}
+                            }
+                        </dd>
+                    </div>
+                    <div class="flex justify-between border-t border-line-soft pt-1.5 font-bold">
+                        <dt>{{ 'marketing.campaign.agreedTotal' | translate }}</dt>
+                        <dd class="m-0 font-mono tabular-nums">{{ loaded.costs.agreed.total | money }}</dd>
+                    </div>
+                </dl>
+                <div class="flex flex-col justify-center rounded-control px-4 py-3" [class.bg-warning-bg]="loaded.costs.difference > 0" [class.bg-surface-sunken]="loaded.costs.difference <= 0" data-cost="difference">
+                    <p class="m-0 text-xs font-semibold text-ink-muted">{{ 'marketing.campaign.difference' | translate }}</p>
+                    <p class="mt-1 mb-0 font-mono text-xl font-bold tabular-nums" [class.text-warning-ink]="loaded.costs.difference > 0" [class.text-ink]="loaded.costs.difference <= 0">
+                        {{ (loaded.costs.difference < 0 ? -loaded.costs.difference : loaded.costs.difference) | money }}
+                    </p>
+                    <p class="mt-0.5 mb-0 text-xs text-ink-body">
+                        {{ (loaded.costs.difference > 0 ? 'marketing.campaign.overBudget' : loaded.costs.difference < 0 ? 'marketing.campaign.underBudget' : 'marketing.campaign.onBudget') | translate }}
+                    </p>
+                </div>
+            </div>
+        } @else {
+            <nz-skeleton nzActive [nzTitle]="false" [nzParagraph]="{ rows: 5 }" />
+        }
+    </nz-card>
+
+    <div class="mt-2 grid grid-cols-1 items-start gap-2 md:mt-4 md:gap-4 lg:grid-cols-2">
+        <nz-card [nzTitle]="batchesTitle" data-detail="batches">
+            <ng-template #batchesTitle
+                ><h2 class="m-0 flex items-center gap-1.5 text-sm font-bold text-ink"><ng-icon name="lucidePackage" size="14px" class="text-ink-muted" aria-hidden="true" />{{ 'marketing.campaign.batches' | translate }}</h2></ng-template
+            >
+            @if (record()) {
+                <nz-table nzTemplateMode nzSize="small" [nzScroll]="{ x: '480px' }">
+                    <thead>
+                        <tr>
+                            <th>{{ 'marketing.campaign.product' | translate }}</th>
+                            <th nzWidth="80px" class="text-right">{{ 'marketing.campaign.units' | translate }}</th>
+                            <th nzWidth="100px" class="text-right">{{ 'marketing.campaign.budgetPerUnit' | translate }}</th>
+                            <th nzWidth="110px" class="text-right">{{ 'marketing.campaign.budgetBatch' | translate }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (row of batchRows(); track row.inventory_oid) {
+                            <tr>
+                                <td>
+                                    <span class="block text-[13px] font-semibold text-ink">{{ row.product_name }}</span>
+                                    <span class="block font-mono text-xs text-ink-muted">{{ row.batch_code }}</span>
+                                </td>
+                                <td class="text-right font-mono text-[13px]">{{ row.units | digits }}</td>
+                                <td class="text-right font-mono text-[13px]">{{ row.perUnit | money }}</td>
+                                <td class="text-right font-mono text-[13px]">{{ row.total | money }}</td>
+                            </tr>
+                        }
+                    </tbody>
+                </nz-table>
+            } @else {
+                <nz-skeleton nzActive [nzTitle]="false" [nzParagraph]="{ rows: 3 }" />
+            }
+        </nz-card>
+
+        <nz-card [nzTitle]="partnersTitle" data-detail="partners">
+            <ng-template #partnersTitle
+                ><h2 class="m-0 flex items-center gap-1.5 text-sm font-bold text-ink"><ng-icon name="lucideHandshake" size="14px" class="text-ink-muted" aria-hidden="true" />{{ 'marketing.campaign.partnersTitle' | translate }}</h2></ng-template
+            >
+            @if (record(); as loaded) {
+                @if (loaded.partners.length) {
+                    <ul class="m-0 flex list-none flex-col divide-y divide-line-soft p-0">
+                        @for (row of loaded.partners; track row.partner_oid) {
+                            <li class="py-2" [attr.data-partner]="row.partner_oid">
+                                <div class="flex items-start justify-between gap-3">
+                                    <span class="min-w-0">
+                                        <span class="block text-[13px] font-semibold text-ink">{{ row.name }}</span>
+                                        <span class="block text-xs text-ink-muted">{{ 'marketing.partner.type.' + row.partner_type | translate }}{{ row.note ? ' · ' + row.note : '' }}</span>
+                                    </span>
+                                    <span class="shrink-0 text-right">
+                                        <span class="block font-mono text-[13px] text-ink tabular-nums">{{ row.agreed_fee | money }}</span>
+                                        @if (loaded.payments_shown) {
+                                            <span class="block text-xs" [class.text-warning-ink]="row.owed! > 0" [class.text-success-ink]="row.owed === 0" data-partner-owed>
+                                                {{ row.owed! > 0 ? ('marketing.campaign.payment.owed' | translate: { amount: (row.owed | money) }) : ('marketing.campaign.payment.settled' | translate) }}
+                                            </span>
+                                            @if (row.paid! > row.agreed_fee) {
+                                                <span class="block text-xs text-ink-muted">{{ 'marketing.campaign.payment.over' | translate: { amount: (row.paid! - row.agreed_fee | money) } }}</span>
+                                            }
+                                        }
+                                    </span>
+                                </div>
+                                @if (loaded.payments_shown && row.payments?.length) {
+                                    <ul class="mt-1.5 mb-0 flex list-none flex-col gap-0.5 rounded-control bg-surface-sunken px-2.5 py-1.5 text-xs" data-partner-payments>
+                                        @for (paid of row.payments; track paid.oid) {
+                                            <li class="flex justify-between gap-2">
+                                                <span class="text-ink-body">{{ paid.paid_on | recordDate: language() : 'date' }} &middot; {{ 'marketing.partner.paymentMethod.' + paid.payment_method | translate }}{{ paid.reference ? ' · ' + paid.reference : '' }}</span>
+                                                <span class="shrink-0 font-mono text-ink tabular-nums">{{ paid.amount | money }}</span>
+                                            </li>
+                                        }
+                                    </ul>
+                                }
+                                @if (row.deliverables?.length) {
+                                    <ul class="mt-1.5 mb-0 flex list-none flex-col gap-1 text-xs" data-partner-deliverables>
+                                        @for (promise of row.deliverables; track promise.oid) {
+                                            <li class="flex flex-wrap items-center gap-x-2 gap-y-1" [attr.data-deliverable]="promise.oid">
+                                                <ng-icon name="lucideMegaphone" size="12px" class="text-ink-muted" aria-hidden="true" />
+                                                <span class="text-ink">{{ 'marketing.campaign.deliverable.line' | translate: { count: promise.quantity, kind: ('marketing.campaign.deliverable.kind.' + promise.kind | translate) } | digits }}</span>
+                                                @if (deliverableTone[promise.status]; as tone) {
+                                                    <status-tag [label]="tone.label" [tone]="tone.tone" [icon]="tone.icon" />
+                                                }
+                                                <span class="text-ink-muted">
+                                                    @if (promise.posted_on) {
+                                                        {{ 'marketing.campaign.deliverable.postedOn' | translate: { date: (promise.posted_on | recordDate: language() : 'date') } }}
+                                                    } @else {
+                                                        {{ 'marketing.campaign.deliverable.dueOn' | translate: { date: (promise.due_on | recordDate: language() : 'date') } }}
+                                                    }
+                                                </span>
+                                                @if (promise.past_due) {
+                                                    <span class="font-semibold text-warning-ink" data-past-due>{{ 'marketing.campaign.deliverable.pastDue' | translate }}</span>
+                                                }
+                                                @if (promise.link) {
+                                                    <a class="inline-flex items-center gap-0.5" [href]="promise.link" target="_blank" rel="noopener noreferrer">{{ 'marketing.campaign.deliverable.open' | translate }}<ng-icon name="lucideExternalLink" size="11px" aria-hidden="true" /></a>
+                                                }
+                                                @if (canPromise()) {
+                                                    <button nz-button nzType="link" type="button" class="h-auto p-0 text-xs" data-deliverable-change (click)="openDeliverable(row, promise)">{{ 'marketing.campaign.deliverable.change' | translate }}</button>
+                                                    @if (promise.status === 'Pending') {
+                                                        <button nz-button nzType="link" nzDanger type="button" class="h-auto p-0 text-xs" data-deliverable-remove (click)="removeDeliverable(promise)">{{ 'marketing.campaign.deliverable.remove' | translate }}</button>
+                                                    }
+                                                }
+                                            </li>
+                                        }
+                                    </ul>
+                                }
+                                @if (row.giveaways?.length) {
+                                    <ul class="mt-1.5 mb-0 flex list-none flex-col gap-0.5 text-xs" data-partner-gifts>
+                                        @for (gift of row.giveaways; track gift.oid) {
+                                            <li class="flex justify-between gap-2">
+                                                <span class="text-ink-body"><ng-icon name="lucideGift" size="12px" class="mr-1 align-[-1px] text-ink-muted" aria-hidden="true" />@if (canOpenGift) {<a class="font-mono" [routerLink]="giveawayRoute(gift.oid)">{{ gift.giveaway_no }}</a>} @else {<span class="font-mono">{{ gift.giveaway_no }}</span>} &middot; {{ 'sales.giveaway.status.' + gift.status | translate }} &middot; {{ 'marketing.campaign.giftUnits' | translate: { count: gift.units } | digits }}</span>
+                                                @if (gift.cost !== undefined) {
+                                                    <span class="shrink-0 font-mono text-ink tabular-nums">{{ gift.cost | money }}</span>
+                                                }
+                                            </li>
+                                        }
+                                    </ul>
+                                }
+                                @if (canPromise() && row.oid) {
+                                    <button nz-button type="button" class="mt-2 mr-2 inline-flex items-center gap-1.5" data-partner-promise (click)="openDeliverable(row)">
+                                        <ng-icon name="lucideMegaphone" size="14px" aria-hidden="true" />
+                                        <span>{{ 'marketing.campaign.deliverable.add' | translate }}</span>
+                                    </button>
+                                }
+                                @if (canGive && row.oid && (loaded.details.status === 'Planned' || loaded.details.status === 'Live')) {
+                                    <button nz-button type="button" class="mt-2 mr-2 inline-flex items-center gap-1.5" data-partner-give (click)="giveProducts(row)">
+                                        <ng-icon name="lucideGift" size="14px" aria-hidden="true" />
+                                        <span>{{ 'marketing.campaign.giveProducts' | translate }}</span>
+                                    </button>
+                                }
+                                @if (loaded.payments_shown && canPay && row.oid && loaded.details.status !== 'Cancelled') {
+                                    <button nz-button type="button" class="mt-2 inline-flex items-center gap-1.5" data-partner-pay (click)="openPayment(row)">
+                                        <ng-icon name="lucideBanknote" size="14px" aria-hidden="true" />
+                                        <span>{{ 'marketing.campaign.payment.record' | translate }}</span>
+                                    </button>
+                                }
+                            </li>
+                        }
+                    </ul>
+                } @else {
+                    <p class="m-0 text-xs text-ink-muted">{{ 'marketing.campaign.noPartners' | translate }}</p>
+                }
+            } @else {
+                <nz-skeleton nzActive [nzTitle]="false" [nzParagraph]="{ rows: 3 }" />
+            }
+        </nz-card>
+    </div>
+
+    <div class="mt-2 grid grid-cols-1 items-start gap-2 md:mt-4 md:gap-4 lg:grid-cols-3">
+        @if (anyAction()) {
+            <nz-card class="lg:col-start-3 lg:row-start-1" [nzTitle]="quickTitle" data-detail="quick-actions">
+                <ng-template #quickTitle
+                    ><h2 class="m-0 flex items-center gap-1.5 text-sm font-bold text-ink"><ng-icon name="lucideZap" size="14px" class="text-ink-muted" aria-hidden="true" />{{ 'marketing.campaign.quickActions' | translate }}</h2></ng-template
+                >
+                <div class="flex flex-col gap-2">
+                    @if (actions().start) {
+                        <button nz-button nzBlock type="button" class="inline-flex items-center justify-start gap-2" data-quick="start" [nzLoading]="acting() === 'start'" [disabled]="!!acting()" (click)="press('start')">
+                            @if (acting() !== 'start') {
+                                <ng-icon name="lucidePlay" size="14px" aria-hidden="true" />
+                            }
+                            <span>{{ 'marketing.campaign.action.start.button' | translate }}</span>
+                        </button>
+                    }
+                    @if (actions().complete) {
+                        <button nz-button nzBlock type="button" class="inline-flex items-center justify-start gap-2" data-quick="complete" [nzLoading]="acting() === 'complete'" [disabled]="!!acting()" (click)="press('complete')">
+                            @if (acting() !== 'complete') {
+                                <ng-icon name="lucideCircleCheck" size="14px" aria-hidden="true" />
+                            }
+                            <span>{{ 'marketing.campaign.action.complete.button' | translate }}</span>
+                        </button>
+                    }
+                    @if (actions().cancel) {
+                        <button nz-button nzBlock nzDanger type="button" class="inline-flex items-center justify-start gap-2" data-quick="cancel" [disabled]="!!acting()" (click)="openCancel()">
+                            <ng-icon name="lucideBan" size="14px" aria-hidden="true" />
+                            <span>{{ 'marketing.campaign.action.cancel.button' | translate }}</span>
+                        </button>
+                    }
+                </div>
+            </nz-card>
+        }
+
+        <nz-card [class]="anyAction() ? 'lg:col-span-2 lg:row-start-1' : 'lg:col-span-3 lg:row-start-1'" [nzTitle]="activityTitle" data-detail="activity">
+            <ng-template #activityTitle
+                ><h2 class="m-0 flex items-center gap-1.5 text-sm font-bold text-ink"><ng-icon name="lucideHistory" size="14px" class="text-ink-muted" aria-hidden="true" />{{ 'marketing.campaign.activity' | translate }}</h2></ng-template
+            >
+            @if (record(); as loaded) {
+                @if (loaded.activity.length) {
+                    <record-timeline [entries]="loaded.activity">
+                        <ng-template let-entry>
+                            <p class="m-0 text-[13px] font-semibold text-ink">{{ entry.action }}</p>
+                            @if (entry.description) {
+                                <p class="mt-0.5 mb-0 text-xs text-ink-body">{{ entry.description }}</p>
+                            }
+                            <p class="mt-0.5 mb-0 text-xs text-ink-muted">{{ entry.user }} &middot; {{ entry.date | recordDate: language() : 'date-time-12' }}</p>
+                        </ng-template>
+                    </record-timeline>
+                } @else {
+                    <p class="m-0 text-xs text-ink-muted">{{ 'marketing.campaign.noActivity' | translate }}</p>
+                }
+            } @else {
+                <nz-skeleton nzActive [nzTitle]="false" [nzParagraph]="{ rows: 4 }" />
+            }
+        </nz-card>
+    </div>
+
+    <action-footer>
+        <button nz-button nzType="default" type="button" class="inline-flex items-center gap-1.5" (click)="goBack()">
+            <ng-icon name="lucideArrowLeft" size="14px" aria-hidden="true" />
+            <span>{{ 'list.back' | translate }}</span>
+        </button>
+    </action-footer>
+}
+
+<nz-modal [nzVisible]="cancelling()" [nzTitle]="'marketing.campaign.action.cancel.title' | translate" [nzFooter]="cancelFooter" nzCentered (nzOnCancel)="cancelling.set(false)">
+    <ng-container *nzModalContent>
+        <p class="mt-0 mb-3 text-xs text-ink-muted">{{ 'marketing.campaign.action.cancel.body' | translate }}</p>
+        <div nz-form nzLayout="vertical">
+            <nz-form-item class="mb-0">
+                <nz-form-label nzRequired nzFor="campaign-cancel-note">{{ 'marketing.campaign.cancelNote' | translate }}</nz-form-label>
+                <nz-form-control>
+                    <textarea nz-input id="campaign-cancel-note" rows="2" maxlength="500" data-dialog="cancel-note" [attr.placeholder]="'marketing.campaign.cancelNotePlaceholder' | translate" [ngModel]="cancelNote()" (ngModelChange)="cancelNote.set($event)"></textarea>
+                </nz-form-control>
+            </nz-form-item>
+        </div>
+    </ng-container>
+</nz-modal>
+<ng-template #cancelFooter>
+    <button nz-button type="button" class="inline-flex items-center gap-1.5" [disabled]="!!acting()" (click)="cancelling.set(false)">
+        <ng-icon name="lucideX" size="14px" aria-hidden="true" />
+        <span>{{ 'form.confirm.cancel' | translate }}</span>
+    </button>
+    <button nz-button nzType="primary" nzDanger type="button" class="inline-flex items-center gap-1.5" data-dialog="cancel" [nzLoading]="acting() === 'cancel'" [disabled]="cancelNote().trim().length < 3" (click)="submitCancel()">
+        @if (acting() !== 'cancel') {
+            <ng-icon name="lucideBan" size="14px" aria-hidden="true" />
+        }
+        <span>{{ 'marketing.campaign.action.cancel.button' | translate }}</span>
+    </button>
+</ng-template>
+
+<nz-modal [nzVisible]="!!paying()" [nzTitle]="'marketing.campaign.payment.title' | translate: { name: paying()?.name }" [nzFooter]="paymentFooter" nzCentered (nzOnCancel)="paying.set(null)">
+    <ng-container *nzModalContent>
+        <p class="mt-0 mb-3 text-xs text-ink-muted">{{ 'marketing.campaign.payment.lead' | translate }}</p>
+        <div nz-form nzLayout="vertical" class="grid grid-cols-1 gap-x-3 sm:grid-cols-2">
+            <nz-form-item>
+                <nz-form-label nzRequired nzFor="payment-amount">{{ 'marketing.campaign.payment.amount' | translate }}</nz-form-label>
+                <nz-form-control>
+                    <nz-input-number nzId="payment-amount" class="w-full font-mono" [ngModel]="payAmount()" (ngModelChange)="payAmount.set($event)" [nzMin]="1" [nzPrecision]="0" [nzPlaceHolder]="'marketing.campaign.payment.amountPlaceholder' | translate" />
+                </nz-form-control>
+            </nz-form-item>
+            <nz-form-item>
+                <nz-form-label nzRequired nzFor="payment-date">{{ 'marketing.campaign.payment.date' | translate }}</nz-form-label>
+                <nz-form-control>
+                    <nz-date-picker nzId="payment-date" class="w-full" nzFormat="dd MMM yyyy" [ngModel]="payDate()" (ngModelChange)="payDate.set($event)" [nzPlaceHolder]="'marketing.campaign.payment.datePlaceholder' | translate" />
+                </nz-form-control>
+            </nz-form-item>
+            <nz-form-item>
+                <nz-form-label nzRequired nzFor="payment-method">{{ 'marketing.partner.paymentMethod.label' | translate }}</nz-form-label>
+                <nz-form-control>
+                    <nz-select nzId="payment-method" [ngModel]="payMethod()" (ngModelChange)="payMethod.set($event)" [nzPlaceHolder]="'marketing.partner.paymentMethodPlaceholder' | translate">
+                        @for (method of paymentMethods; track method) {
+                            <nz-option [nzValue]="method" [nzLabel]="'marketing.partner.paymentMethod.' + method | translate" />
+                        }
+                    </nz-select>
+                </nz-form-control>
+            </nz-form-item>
+            <nz-form-item>
+                <nz-form-label nzFor="payment-reference">{{ 'marketing.campaign.payment.reference' | translate }}</nz-form-label>
+                <nz-form-control>
+                    <input nz-input id="payment-reference" type="text" maxlength="255" autocomplete="off" [ngModel]="payReference()" (ngModelChange)="payReference.set($event)" [attr.placeholder]="'marketing.campaign.payment.referencePlaceholder' | translate" />
+                </nz-form-control>
+            </nz-form-item>
+            <nz-form-item class="mb-0 sm:col-span-2">
+                <nz-form-label nzFor="payment-note">{{ 'marketing.campaign.payment.note' | translate }}</nz-form-label>
+                <nz-form-control>
+                    <input nz-input id="payment-note" type="text" maxlength="500" autocomplete="off" [ngModel]="payNote()" (ngModelChange)="payNote.set($event)" [attr.placeholder]="'marketing.campaign.payment.notePlaceholder' | translate" />
+                </nz-form-control>
+            </nz-form-item>
+        </div>
+    </ng-container>
+</nz-modal>
+<ng-template #paymentFooter>
+    <button nz-button type="button" class="inline-flex items-center gap-1.5" [disabled]="recording()" (click)="paying.set(null)">
+        <ng-icon name="lucideX" size="14px" aria-hidden="true" />
+        <span>{{ 'form.confirm.cancel' | translate }}</span>
+    </button>
+    <button nz-button nzType="primary" type="button" class="inline-flex items-center gap-1.5" data-dialog="pay" [nzLoading]="recording()" [disabled]="!payReady()" (click)="submitPayment()">
+        @if (!recording()) {
+            <ng-icon name="lucideCheck" size="14px" aria-hidden="true" />
+        }
+        <span>{{ 'marketing.campaign.payment.save' | translate }}</span>
+    </button>
+</ng-template>
+
+<nz-modal [nzVisible]="!!promising()" [nzTitle]="(promising()?.deliverable ? 'marketing.campaign.deliverable.changeTitle' : 'marketing.campaign.deliverable.addTitle') | translate: { name: promising()?.line?.name }" [nzFooter]="deliverableFooter" nzCentered (nzOnCancel)="promising.set(null)">
+    <ng-container *nzModalContent>
+        <div nz-form nzLayout="vertical" class="grid grid-cols-1 gap-x-3 sm:grid-cols-2">
+            <nz-form-item>
+                <nz-form-label nzRequired nzFor="deliverable-kind">{{ 'marketing.campaign.deliverable.kindLabel' | translate }}</nz-form-label>
+                <nz-form-control>
+                    <nz-select nzId="deliverable-kind" [ngModel]="dKind()" (ngModelChange)="dKind.set($event)" [nzPlaceHolder]="'marketing.campaign.deliverable.kindPlaceholder' | translate">
+                        @for (kind of deliverableKinds; track kind) {
+                            <nz-option [nzValue]="kind" [nzLabel]="'marketing.campaign.deliverable.kind.' + kind | translate" />
+                        }
+                    </nz-select>
+                </nz-form-control>
+            </nz-form-item>
+            <nz-form-item>
+                <nz-form-label nzRequired nzFor="deliverable-quantity" [nzTooltipTitle]="'marketing.campaign.deliverable.quantityHelper' | translate">{{ 'marketing.campaign.deliverable.quantity' | translate }}</nz-form-label>
+                <nz-form-control>
+                    <nz-input-number nzId="deliverable-quantity" class="w-full font-mono" [ngModel]="dQuantity()" (ngModelChange)="dQuantity.set($event)" [nzMin]="1" [nzMax]="365" [nzPrecision]="0" [nzPlaceHolder]="'marketing.campaign.deliverable.quantityPlaceholder' | translate" />
+                </nz-form-control>
+            </nz-form-item>
+            <nz-form-item>
+                <nz-form-label nzRequired nzFor="deliverable-due">{{ 'marketing.campaign.deliverable.due' | translate }}</nz-form-label>
+                <nz-form-control>
+                    <nz-date-picker nzId="deliverable-due" class="w-full" nzFormat="dd MMM yyyy" [ngModel]="dDue()" (ngModelChange)="dDue.set($event)" [nzPlaceHolder]="'marketing.campaign.deliverable.duePlaceholder' | translate" />
+                </nz-form-control>
+            </nz-form-item>
+            <nz-form-item>
+                <nz-form-label nzRequired nzFor="deliverable-status" [nzTooltipTitle]="'marketing.campaign.deliverable.statusHelper' | translate">{{ 'marketing.campaign.deliverable.statusLabel' | translate }}</nz-form-label>
+                <nz-form-control>
+                    <nz-select nzId="deliverable-status" [ngModel]="dStatus()" (ngModelChange)="dStatus.set($event)" [nzPlaceHolder]="'marketing.campaign.deliverable.statusPlaceholder' | translate">
+                        @for (status of deliverableStatuses; track status) {
+                            <nz-option [nzValue]="status" [nzLabel]="'marketing.campaign.deliverable.status.' + status | translate" />
+                        }
+                    </nz-select>
+                </nz-form-control>
+            </nz-form-item>
+            @if (dPostedShown()) {
+                <nz-form-item>
+                    <nz-form-label nzFor="deliverable-posted" [nzTooltipTitle]="'marketing.campaign.deliverable.postedHelper' | translate">{{ 'marketing.campaign.deliverable.posted' | translate }}</nz-form-label>
+                    <nz-form-control>
+                        <nz-date-picker nzId="deliverable-posted" class="w-full" nzFormat="dd MMM yyyy" [ngModel]="dPosted()" (ngModelChange)="dPosted.set($event)" [nzPlaceHolder]="'marketing.campaign.deliverable.postedPlaceholder' | translate" />
+                    </nz-form-control>
+                </nz-form-item>
+            }
+            <nz-form-item [class]="dPostedShown() ? '' : 'sm:col-span-2'">
+                <nz-form-label nzFor="deliverable-link">{{ 'marketing.campaign.deliverable.link' | translate }}</nz-form-label>
+                <nz-form-control>
+                    <input nz-input id="deliverable-link" type="url" maxlength="500" autocomplete="off" [ngModel]="dLink()" (ngModelChange)="dLink.set($event)" [attr.placeholder]="'marketing.campaign.deliverable.linkPlaceholder' | translate" />
+                </nz-form-control>
+            </nz-form-item>
+            <nz-form-item class="mb-0 sm:col-span-2">
+                <nz-form-label nzFor="deliverable-note">{{ 'marketing.campaign.deliverable.note' | translate }}</nz-form-label>
+                <nz-form-control>
+                    <input nz-input id="deliverable-note" type="text" maxlength="500" autocomplete="off" [ngModel]="dNote()" (ngModelChange)="dNote.set($event)" [attr.placeholder]="'marketing.campaign.deliverable.notePlaceholder' | translate" />
+                </nz-form-control>
+            </nz-form-item>
+        </div>
+    </ng-container>
+</nz-modal>
+<ng-template #deliverableFooter>
+    <button nz-button type="button" class="inline-flex items-center gap-1.5" [disabled]="savingDeliverable()" (click)="promising.set(null)">
+        <ng-icon name="lucideX" size="14px" aria-hidden="true" />
+        <span>{{ 'form.confirm.cancel' | translate }}</span>
+    </button>
+    <button nz-button nzType="primary" type="button" class="inline-flex items-center gap-1.5" data-dialog="deliverable" [nzLoading]="savingDeliverable()" [disabled]="!dReady()" (click)="submitDeliverable()">
+        @if (!savingDeliverable()) {
+            <ng-icon name="lucideCheck" size="14px" aria-hidden="true" />
+        }
+        <span>{{ 'marketing.campaign.deliverable.save' | translate }}</span>
+    </button>
+</ng-template>
