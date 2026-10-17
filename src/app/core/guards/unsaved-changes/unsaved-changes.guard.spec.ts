@@ -3,12 +3,14 @@ import { FormControl, FormGroup } from '@angular/forms';
 import { provideNzI18n, en_US } from 'ng-zorro-antd/i18n';
 import { NzModalService } from 'ng-zorro-antd/modal';
 import { provideTranslateService } from '@ngx-translate/core';
+import { Subject } from 'rxjs';
 import { unsavedChangesGuard } from './unsaved-changes.guard';
 
 const run = (component: unknown) => TestBed.runInInjectionContext(() => unsavedChangesGuard(component as never, null as never, null as never, null as never));
 
 describe('unsavedChangesGuard', () => {
     let confirmed: (ok: boolean) => void;
+    let asked: { nzData: { icon?: string; danger?: boolean } };
 
     beforeEach(() => {
         TestBed.resetTestingModule();
@@ -19,8 +21,14 @@ describe('unsavedChangesGuard', () => {
                 {
                     provide: NzModalService,
                     useValue: {
-                        confirm: (options: { nzOnOk: () => void; nzOnCancel: () => void }) => {
-                            confirmed = (ok) => (ok ? options.nzOnOk() : options.nzOnCancel());
+                        confirm: (options: typeof asked) => {
+                            asked = options;
+                            const afterClose = new Subject<boolean | undefined>();
+                            confirmed = (ok) => {
+                                afterClose.next(ok);
+                                afterClose.complete();
+                            };
+                            return { afterClose };
                         },
                     },
                 },
@@ -54,6 +62,13 @@ describe('unsavedChangesGuard', () => {
         const answer = run({ form });
         confirmed(true);
         await expect(answer).resolves.toBe(true);
+    });
+
+    it('asks with icons on both buttons, Discard in red with a bin', () => {
+        const form = new FormGroup({ name: new FormControl('') });
+        form.markAsDirty();
+        run({ form });
+        expect(asked.nzData).toEqual(expect.objectContaining({ icon: 'lucideTrash2', danger: true }));
     });
 
     // A saved form marks itself pristine before navigating, so saving never asks.

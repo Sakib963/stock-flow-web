@@ -22,6 +22,7 @@ import { TextPipe } from '@app/shared/pipes/text/text.pipe';
 import { ListStore } from '@app/shared/services/list-store/list-store.service';
 import { moveColumn, visibleColumns } from '@app/shared/utils/column-order/column-order';
 import { matches } from '@app/shared/utils/condition/condition';
+import { confirmAction } from '@app/shared/utils/confirm-action/confirm-action';
 import { fillRoute } from '@app/shared/utils/fill-route/fill-route';
 import { resolveText } from '@app/shared/utils/resolve-text/resolve-text';
 import { isPhoneWidth, viewportWidth } from '@app/shared/utils/viewport/viewport';
@@ -277,13 +278,8 @@ export class TableComponent {
         // must not be what silences it.
         const confirm = action.confirm ?? (action.danger ? GENERIC_CONFIRM : null);
         if (confirm) {
-            this._modal.confirm({
-                nzTitle: this.copy(confirm.title),
-                nzContent: this.copy(confirm.body),
-                nzOkText: this.copy(confirm.ok),
-                nzOkDanger: !!action.danger,
-                nzCancelText: this._translate.instant('list.cancel'),
-                nzOnOk: () => this.dispatch(action, row),
+            confirmAction(this._modal, { title: this.copy(confirm.title), body: this.copy(confirm.body), ok: this.copy(confirm.ok), cancel: this._translate.instant('list.cancel'), danger: !!action.danger }).subscribe((yes) => {
+                if (yes) this.dispatch(action, row);
             });
             return;
         }

@@ -3,6 +3,8 @@ import { AbstractControl } from '@angular/forms';
 import { CanDeactivateFn } from '@angular/router';
 import { NzModalService } from 'ng-zorro-antd/modal';
 import { TranslateService } from '@ngx-translate/core';
+import { firstValueFrom } from 'rxjs';
+import { confirmAction } from '@app/shared/utils/confirm-action/confirm-action';
 
 /**
  * A page that knows for itself whether it holds unsaved work.
@@ -44,18 +46,16 @@ export const unsavedChangesGuard: CanDeactivateFn<MaybeForm> = (component) => {
     const translate = inject(TranslateService);
     const modal = inject(NzModalService);
 
-    // Resolved by whichever button is pressed. Closing it any other way keeps the person on the
-    // page, which is the safe answer: nothing typed is lost by staying.
-    return new Promise<boolean>((resolve) => {
-        modal.confirm({
-            nzTitle: translate.instant('form.leave.title'),
-            nzContent: translate.instant('form.leave.body'),
-            nzOkText: translate.instant('form.leave.discard'),
-            nzOkDanger: true,
-            nzCancelText: translate.instant('form.leave.stay'),
-            nzCentered: true,
-            nzOnOk: () => resolve(true),
-            nzOnCancel: () => resolve(false),
-        });
-    });
+    // Closing it any way but Discard keeps the person on the page, which is the safe answer:
+    // nothing typed is lost by staying.
+    return firstValueFrom(
+        confirmAction(modal, {
+            title: translate.instant('form.leave.title'),
+            body: translate.instant('form.leave.body'),
+            ok: translate.instant('form.leave.discard'),
+            cancel: translate.instant('form.leave.stay'),
+            danger: true,
+            icon: 'lucideTrash2',
+        })
+    );
 };
