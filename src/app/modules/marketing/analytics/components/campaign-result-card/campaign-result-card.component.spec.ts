@@ -7,10 +7,40 @@ import { CampaignResultCardComponent } from './campaign-result-card.component';
 
 // The worked example of the marketing analytics document.
 const EXAMPLE: CampaignResult = {
-    oid: 'c-1', campaign_no: 'CM-2609-0001', name: 'Winter dresses', promotion_type: 'InfluencerPost', status: 'Completed', cost: 15000, no_cost_recorded: false,
-    window_from: '2026-09-02', window_to: '2026-09-15', before_from: '2026-08-19', before_to: '2026-09-01', days: 14, so_far: false,
-    promoted_before: 40, promoted_window: 70, rest_before: 500, rest_window: 600, business_before: 0, business_window: 0, first_time: 3, first_time_promoted: 2, not_judged: [], floor: 20,
-    verdict: 'rose_not_paid', trend_percent: 20, expected: 48, extra: 22, profit_per_unit: 600, extra_profit: 13200, return_per_taka: 0.88, overlaps: [],
+    oid: 'c-1',
+    campaign_no: 'CM-2609-0001',
+    name: 'Winter dresses',
+    promotion_type: 'InfluencerPost',
+    status: 'Completed',
+    cost: 15000,
+    no_cost_recorded: false,
+    window_from: '2026-09-02',
+    window_to: '2026-09-15',
+    before_from: '2026-08-19',
+    before_to: '2026-09-01',
+    days: 14,
+    so_far: false,
+    promoted_before: 40,
+    promoted_window: 70,
+    rest_before: 500,
+    rest_window: 600,
+    business_before: 0,
+    business_window: 0,
+    first_time: 3,
+    first_time_promoted: 2,
+    not_judged: [],
+    floor: 20,
+    verdict: 'rose_not_paid',
+    trend_percent: 20,
+    expected: 48,
+    extra: 22,
+    profit_per_unit: 600,
+    extra_profit: 13200,
+    return_per_taka: 0.88,
+    overlaps: [],
+    brought: [],
+    usual: [],
+    districts: [],
 };
 
 const open = async (result: CampaignResult) => {
@@ -22,7 +52,7 @@ const open = async (result: CampaignResult) => {
 };
 
 describe('CampaignResultCardComponent', () => {
-    it('explains the verdict in seven steps with the campaign\'s own numbers', async () => {
+    it("explains the verdict in seven steps with the campaign's own numbers", async () => {
         const card = (await open(EXAMPLE)).componentInstance;
         expect(card.steps().map((s) => s.key)).toEqual(['periods', 'rest.more', 'expected', 'actual.rise', 'earned', 'cost', 'verdict.rose_not_paid']);
         expect(card.steps()[1].params).toEqual(expect.objectContaining({ before: 500, window: 600, percent: 20 }));

@@ -30,11 +30,17 @@
             <p class="m-0 mb-1.5 text-xs font-semibold text-ink-muted">{{ 'marketing.analytics.result.promoted' | translate }}</p>
             <div class="flex flex-col gap-1.5 text-xs">
                 <div>
-                    <span class="flex justify-between"><span class="text-ink-body">{{ 'marketing.analytics.result.before' | translate }}</span><span class="font-mono tabular-nums">{{ r.promoted_before | digits }}</span></span>
+                    <span class="flex justify-between"
+                        ><span class="text-ink-body">{{ 'marketing.analytics.result.before' | translate }}</span
+                        ><span class="font-mono tabular-nums">{{ r.promoted_before | digits }}</span></span
+                    >
                     <span class="mt-0.5 block h-1.5 rounded-full bg-line"><span class="block h-full rounded-full bg-ink-soft" [style.width.%]="bars().before"></span></span>
                 </div>
                 <div>
-                    <span class="flex justify-between"><span class="text-ink-body">{{ 'marketing.analytics.result.inWindow' | translate }}</span><span class="font-mono tabular-nums">{{ r.promoted_window | digits }}</span></span>
+                    <span class="flex justify-between"
+                        ><span class="text-ink-body">{{ 'marketing.analytics.result.inWindow' | translate }}</span
+                        ><span class="font-mono tabular-nums">{{ r.promoted_window | digits }}</span></span
+                    >
                     <span class="mt-0.5 block h-1.5 rounded-full bg-line"><span class="block h-full rounded-full bg-primary" [style.width.%]="bars().window"></span></span>
                 </div>
             </div>
@@ -98,6 +104,27 @@
     }
 
     <nz-collapse class="mt-3" [nzBordered]="false" nzGhost>
+        @if (r.first_time) {
+            <nz-collapse-panel [nzHeader]="broughtHeader" data-brought>
+                @if (broughtKnown()) {
+                    <pyramid-chart [rows]="brought()" leftLabel="sales.customer.gender.Female" rightLabel="sales.customer.gender.Male" />
+                    <p class="mt-2 mb-0 text-xs text-ink-muted">{{ 'marketing.analytics.brought.known' | translate: { known: broughtKnown(), total: r.first_time } | digits }}</p>
+                } @else {
+                    <p class="m-0 text-xs text-ink-muted">{{ 'marketing.analytics.brought.unknown' | translate }}</p>
+                }
+                @if (usualTop(); as usual) {
+                    <p class="mt-1 mb-0 text-xs text-ink-body" data-usual>{{ 'marketing.analytics.brought.usual' | translate: { share: usual.share, gender: ('sales.customer.gender.' + usual.gender | translate), age: ('sales.customer.ageBand.' + usual.age_band | translate) } | digits }}</p>
+                }
+                @if (r.districts.length) {
+                    <p class="mt-2 mb-1 text-xs font-semibold text-ink-muted">{{ 'marketing.analytics.brought.districts' | translate }}</p>
+                    <div class="flex flex-wrap gap-1.5" data-districts>
+                        @for (district of r.districts; track district.oid) {
+                            <span class="rounded-full border border-line px-2 py-0.5 text-xs text-ink-body">{{ language() === 'bn' ? district.name_bn : district.name_en }} &middot; {{ district.customers | digits }}</span>
+                        }
+                    </div>
+                }
+            </nz-collapse-panel>
+        }
         <nz-collapse-panel [nzHeader]="howHeader" data-how>
             <ol class="m-0 flex flex-col gap-1.5 pl-5 text-xs leading-relaxed text-ink-body">
                 @for (step of steps(); track step.key) {
@@ -107,6 +134,9 @@
             <p class="mt-2 mb-0 text-xs text-ink-muted">{{ 'marketing.analytics.how.caveat' | translate }}</p>
         </nz-collapse-panel>
     </nz-collapse>
+    <ng-template #broughtHeader
+        ><span class="inline-flex items-center gap-1.5 text-xs font-semibold text-ink"><ng-icon name="lucideUsers" size="13px" aria-hidden="true" />{{ 'marketing.analytics.brought.title' | translate }}</span></ng-template
+    >
     <ng-template #howHeader
         ><span class="inline-flex items-center gap-1.5 text-xs font-semibold text-ink"><ng-icon name="lucideCircleHelp" size="13px" aria-hidden="true" />{{ 'marketing.analytics.how.title' | translate }}</span></ng-template
     >

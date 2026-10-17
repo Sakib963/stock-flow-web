@@ -1,4 +1,5 @@
 import { PromotionType } from '@app/core/models/campaign.model';
+import { PartnerType } from '@app/core/models/partner.model';
 import { SalesChannel, SalesPeriod } from '@app/core/models/sales-analytics.model';
 
 export interface MarketingCampaignWindow {
@@ -65,6 +66,30 @@ export interface CampaignResult {
     /** The cost then leaves out products given, and the money figures above are null. */
     money_hidden?: boolean;
     overlaps: { oid: string; campaign_no: string; name: string; days: number; products: string[] }[];
+    /** Who it brought (REQ-09): its first-time customers, and the buyers of the window before, by what is recorded on them. */
+    brought: AudienceGroup[];
+    usual: AudienceGroup[];
+    districts: { oid: string; name_en: string; name_bn: string; customers: number }[];
+}
+
+export interface AudienceGroup {
+    gender: 'Female' | 'Male' | null;
+    age_band: string | null;
+    customers: number;
+}
+
+/** Promotion types and partners compared over the period's campaigns (REQ-10, REQ-11). */
+export interface MarketingComparisons {
+    period: SalesPeriod;
+    types: { promotion_type: PromotionType; campaigns: number; judged: number; cost: number; first_time: number; cost_per_first_time: number | null; return_per_taka: number | null }[];
+    partners: { oid: string; name: string; partner_type: PartnerType; campaigns: number; fees: number; average_extra: number | null; first_time: number; on_time: number; late: number; missed: number; return_per_taka: number | null }[];
+}
+
+/** Online order sources compared (REQ-02); profit is null for someone who may not see buying prices. */
+export interface MarketingSources {
+    applies: boolean;
+    period?: SalesPeriod;
+    sources: { oid: string; name: string; platform: string; placed: number; sold: number; cancelled: number; refused: number; sales: number; profit: number | null; first_time: number }[];
 }
 
 export interface CampaignResults {

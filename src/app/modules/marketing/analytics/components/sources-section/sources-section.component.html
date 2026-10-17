@@ -1,0 +1,83 @@
+<nz-card class="mt-2 md:mt-4" [nzTitle]="sourcesTitle" data-analytics="sources">
+    <ng-template #sourcesTitle
+        ><h2 class="m-0 flex items-center gap-1.5 text-sm font-bold text-ink"><ng-icon name="lucideMegaphone" size="14px" class="text-ink-muted" aria-hidden="true" />{{ 'marketing.analytics.sources.title' | translate }}</h2></ng-template
+    >
+    @if (failed(); as failure) {
+        <div class="text-center" role="alert">
+            <p class="m-0 text-sm text-ink-body">{{ 'marketing.analytics.loadFailed.' + failure | translate }}</p>
+            <button nz-button nzType="primary" type="button" class="mt-3 inline-flex items-center gap-1.5" (click)="load()">
+                <ng-icon name="lucideRotateCw" size="14px" aria-hidden="true" />
+                <span>{{ 'form.retry' | translate }}</span>
+            </button>
+        </div>
+    } @else if (data(); as loaded) {
+        @if (!loaded.applies) {
+            <p class="m-0 text-sm text-ink-muted" data-sources="counter-only">{{ 'marketing.analytics.sources.counterOnly' | translate }}</p>
+        } @else if (rows().length) {
+            <div class="overflow-x-auto">
+                <nz-table nzTemplateMode nzSize="small" class="min-w-176 text-xs [&_th]:whitespace-nowrap">
+                    <thead>
+                        <tr>
+                            <th>{{ 'marketing.analytics.sources.source' | translate }}</th>
+                            <th class="text-right">{{ 'marketing.analytics.sources.placed' | translate }}</th>
+                            <th class="text-right">{{ 'marketing.analytics.sources.sold' | translate }}</th>
+                            <th class="text-right">{{ 'marketing.analytics.sources.cancelled' | translate }}</th>
+                            <th class="text-right">{{ 'marketing.analytics.sources.refused' | translate }}</th>
+                            <th class="text-right">{{ 'marketing.analytics.sources.average' | translate }}</th>
+                            <th class="text-right">{{ 'marketing.analytics.sources.firstTime' | translate }}</th>
+                            <th>{{ 'marketing.analytics.sources.sales' | translate }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (row of rows(); track row.oid) {
+                            <tr [attr.data-source]="row.oid">
+                                <td>
+                                    <span class="block font-semibold text-ink">{{ row.name }}</span>
+                                    <span class="block text-ink-muted">{{ row.platform }}</span>
+                                </td>
+                                <td class="text-right font-mono tabular-nums">{{ row.placed | digits }}</td>
+                                <td class="text-right font-mono tabular-nums">{{ row.sold | digits }}</td>
+                                <td class="text-right font-mono tabular-nums">
+                                    @if (row.cancelRate.percent !== null) {
+                                        {{ row.cancelRate.percent | digits }}%
+                                    } @else {
+                                        {{ row.cancelRate.count | digits }} / {{ row.cancelRate.of | digits }}
+                                    }
+                                </td>
+                                <td class="text-right font-mono tabular-nums">
+                                    @if (row.refusalRate.percent !== null) {
+                                        {{ row.refusalRate.percent | digits }}%
+                                    } @else {
+                                        {{ row.refusalRate.count | digits }} / {{ row.refusalRate.of | digits }}
+                                    }
+                                </td>
+                                <td class="text-right font-mono tabular-nums">
+                                    @if (row.average !== null) {
+                                        {{ row.average | money }}
+                                    } @else {
+                                        -
+                                    }
+                                </td>
+                                <td class="text-right font-mono tabular-nums">{{ row.first_time | digits }}</td>
+                                <td class="min-w-40">
+                                    <span class="flex justify-between gap-2">
+                                        <span class="font-mono tabular-nums">{{ row.sales | money }}</span>
+                                        @if (row.profit !== null) {
+                                            <span class="text-ink-muted">{{ 'marketing.analytics.sources.profit' | translate: { amount: (row.profit | money) } }}</span>
+                                        }
+                                    </span>
+                                    <span class="mt-1 block h-1.5 rounded-full bg-line"><span class="block h-full rounded-full bg-primary" [style.width.%]="row.width"></span></span>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </nz-table>
+            </div>
+            <p class="mt-3 mb-0 text-xs text-ink-soft">{{ 'marketing.analytics.sources.note' | translate: { floor: floor } | digits }}</p>
+        } @else {
+            <p class="m-0 text-sm text-ink-muted">{{ 'marketing.analytics.sources.empty' | translate }}</p>
+        }
+    } @else {
+        <nz-skeleton nzActive [nzTitle]="false" [nzParagraph]="{ rows: 5 }" />
+    }
+</nz-card>

@@ -13,66 +13,93 @@
         </div>
     </div>
 } @else {
-    @if (!overview()) {
-        <span class="sr-only" role="status">{{ 'form.loading' | translate }}</span>
-    }
+    <nz-tabs
+        class="mt-2 md:mt-4 [&_.ant-tabs-nav]:sticky [&_.ant-tabs-nav]:top-0 [&_.ant-tabs-nav]:z-10 [&_.ant-tabs-nav]:shadow-[0_-1rem_0_0_var(--color-surface-page)] [&_.ant-tabs-nav]:mb-0 [&_.ant-tabs-nav]:rounded-container [&_.ant-tabs-nav]:border [&_.ant-tabs-nav]:border-line [&_.ant-tabs-nav]:bg-white [&_.ant-tabs-nav]:px-4 [&_.ant-tabs-nav::before]:border-b-0"
+        [nzSelectedIndex]="tabIndex()"
+        (nzSelectedIndexChange)="pickTab($event)"
+        [nzDestroyInactiveTabPane]="true"
+        data-analytics="tabs"
+    >
+        @for (tab of tabs(); track tab) {
+            <nz-tab [nzTitle]="tabTitle">
+                <ng-template #tabTitle
+                    ><span class="inline-flex items-center gap-1.5" [attr.data-tab]="tab"><ng-icon [name]="tabIcons[tab]" size="15px" aria-hidden="true" />{{ 'marketing.analytics.tab.' + tab | translate }}</span></ng-template
+                >
+                <ng-template nz-tab>
+                    @switch (tab) {
+                        @case ('sources') {
+                            <sources-section [query]="query()" />
+                        }
+                        @case ('compare') {
+                            <comparisons-section [query]="query()" />
+                        }
+                        @default {
+                            @if (!overview()) {
+                                <span class="sr-only" role="status">{{ 'form.loading' | translate }}</span>
+                            }
 
-    <nz-card class="mt-2 md:mt-4" [nzTitle]="timelineTitle" data-analytics="timeline">
-        <ng-template #timelineTitle
-            ><h2 class="m-0 flex items-center gap-1.5 text-sm font-bold text-ink"><ng-icon name="lucideChartLine" size="14px" class="text-ink-muted" aria-hidden="true" />{{ 'marketing.analytics.timeline.title' | translate }}</h2></ng-template
-        >
-        @if (overview(); as data) {
-            <p class="mt-0 mb-3 text-sm text-ink-body">{{ 'marketing.analytics.timeline.summary' | translate: { campaigns: bands().length, firstTime: firstTime() } | digits }}</p>
-            <campaign-timeline [values]="values()" [bands]="bands()" [pins]="pins()" [startLabel]="edges().start" [endLabel]="edges().end" [label]="timelineLabel()" />
-            <p class="mt-2 mb-0 text-xs text-ink-soft">{{ 'marketing.analytics.timeline.note' | translate }}</p>
-        } @else {
-            <div class="h-48 animate-pulse rounded-container bg-line-soft motion-reduce:animate-none" aria-hidden="true"></div>
-        }
-    </nz-card>
+                            <nz-card class="mt-2 md:mt-4" [nzTitle]="timelineTitle" data-analytics="timeline">
+                                <ng-template #timelineTitle
+                                    ><h2 class="m-0 flex items-center gap-1.5 text-sm font-bold text-ink"><ng-icon name="lucideChartLine" size="14px" class="text-ink-muted" aria-hidden="true" />{{ 'marketing.analytics.timeline.title' | translate }}</h2></ng-template
+                                >
+                                @if (overview(); as data) {
+                                    <p class="mt-0 mb-3 text-sm text-ink-body">{{ 'marketing.analytics.timeline.summary' | translate: { campaigns: bands().length, firstTime: firstTime() } | digits }}</p>
+                                    <campaign-timeline [values]="values()" [bands]="bands()" [pins]="pins()" [startLabel]="edges().start" [endLabel]="edges().end" [label]="timelineLabel()" />
+                                    <p class="mt-2 mb-0 text-xs text-ink-soft">{{ 'marketing.analytics.timeline.note' | translate }}</p>
+                                } @else {
+                                    <div class="h-48 animate-pulse rounded-container bg-line-soft motion-reduce:animate-none" aria-hidden="true"></div>
+                                }
+                            </nz-card>
 
-    <section class="mt-2 md:mt-4" data-analytics="results" [attr.aria-label]="'marketing.analytics.results.title' | translate">
-        <h2 class="m-0 mb-2 flex items-center gap-1.5 text-sm font-bold text-ink md:mb-3"><ng-icon name="lucideRocket" size="14px" class="text-ink-muted" aria-hidden="true" />{{ 'marketing.analytics.results.title' | translate }}</h2>
-        @if (results(); as list) {
-            @if (list.length) {
-                <div class="grid grid-cols-1 items-start gap-2 md:gap-4 lg:grid-cols-2">
-                    @for (result of list; track result.oid) {
-                        <campaign-result-card [result]="result" [canOpen]="canOpenCampaign" />
+                            <section class="mt-2 md:mt-4" data-analytics="results" [attr.aria-label]="'marketing.analytics.results.title' | translate">
+                                <h2 class="m-0 mb-2 flex items-center gap-1.5 text-sm font-bold text-ink md:mb-3"><ng-icon name="lucideRocket" size="14px" class="text-ink-muted" aria-hidden="true" />{{ 'marketing.analytics.results.title' | translate }}</h2>
+                                @if (results(); as list) {
+                                    @if (list.length) {
+                                        <div class="grid grid-cols-1 items-start gap-2 md:gap-4 lg:grid-cols-2">
+                                            @for (result of list; track result.oid) {
+                                                <campaign-result-card [result]="result" [canOpen]="canOpenCampaign" />
+                                            }
+                                        </div>
+                                    } @else {
+                                        <nz-card>
+                                            <p class="m-0 text-sm text-ink-muted" data-results-empty>{{ 'marketing.analytics.results.empty' | translate }}</p>
+                                        </nz-card>
+                                    }
+                                } @else {
+                                    <div class="grid grid-cols-1 gap-2 md:gap-4 lg:grid-cols-2">
+                                        @for (card of [1, 2]; track card) {
+                                            <nz-card><nz-skeleton nzActive [nzTitle]="false" [nzParagraph]="{ rows: 6 }" /></nz-card>
+                                        }
+                                    </div>
+                                }
+                            </section>
+
+                            @if (overview()?.given; as given) {
+                                <nz-card class="mt-2 md:mt-4" [nzTitle]="givenTitle" data-analytics="given">
+                                    <ng-template #givenTitle
+                                        ><h2 class="m-0 flex items-center gap-1.5 text-sm font-bold text-ink"><ng-icon name="lucideGift" size="14px" class="text-ink-muted" aria-hidden="true" />{{ 'marketing.analytics.given.title' | translate }}</h2></ng-template
+                                    >
+                                    <dl class="m-0 grid grid-cols-2 gap-x-6 gap-y-3 md:grid-cols-3">
+                                        <div>
+                                            <dt class="text-xs text-ink-muted">{{ 'marketing.analytics.given.toPartners' | translate }}</dt>
+                                            <dd class="mt-1 mb-0 font-mono text-lg font-bold text-ink tabular-nums">{{ given.to_partners | money }}</dd>
+                                        </div>
+                                        <div>
+                                            <dt class="text-xs text-ink-muted">{{ 'marketing.analytics.given.gifts' | translate }}</dt>
+                                            <dd class="mt-1 mb-0 font-mono text-lg font-bold text-ink tabular-nums">{{ given.gifts | money }}</dd>
+                                        </div>
+                                        <div>
+                                            <dt class="text-xs text-ink-muted">{{ 'marketing.analytics.given.units' | translate }}</dt>
+                                            <dd class="mt-1 mb-0 font-mono text-lg font-bold text-ink tabular-nums">{{ given.units | digits }}</dd>
+                                        </div>
+                                    </dl>
+                                    <p class="mt-3 mb-0 text-xs text-ink-soft">{{ 'marketing.analytics.given.note' | translate }}</p>
+                                </nz-card>
+                            }
+                        }
                     }
-                </div>
-            } @else {
-                <nz-card>
-                    <p class="m-0 text-sm text-ink-muted" data-results-empty>{{ 'marketing.analytics.results.empty' | translate }}</p>
-                </nz-card>
-            }
-        } @else {
-            <div class="grid grid-cols-1 gap-2 md:gap-4 lg:grid-cols-2">
-                @for (card of [1, 2]; track card) {
-                    <nz-card><nz-skeleton nzActive [nzTitle]="false" [nzParagraph]="{ rows: 6 }" /></nz-card>
-                }
-            </div>
+                </ng-template>
+            </nz-tab>
         }
-    </section>
-
-    @if (overview()?.given; as given) {
-        <nz-card class="mt-2 md:mt-4" [nzTitle]="givenTitle" data-analytics="given">
-            <ng-template #givenTitle
-                ><h2 class="m-0 flex items-center gap-1.5 text-sm font-bold text-ink"><ng-icon name="lucideGift" size="14px" class="text-ink-muted" aria-hidden="true" />{{ 'marketing.analytics.given.title' | translate }}</h2></ng-template
-            >
-            <dl class="m-0 grid grid-cols-2 gap-x-6 gap-y-3 md:grid-cols-3">
-                <div>
-                    <dt class="text-xs text-ink-muted">{{ 'marketing.analytics.given.toPartners' | translate }}</dt>
-                    <dd class="mt-1 mb-0 font-mono text-lg font-bold text-ink tabular-nums">{{ given.to_partners | money }}</dd>
-                </div>
-                <div>
-                    <dt class="text-xs text-ink-muted">{{ 'marketing.analytics.given.gifts' | translate }}</dt>
-                    <dd class="mt-1 mb-0 font-mono text-lg font-bold text-ink tabular-nums">{{ given.gifts | money }}</dd>
-                </div>
-                <div>
-                    <dt class="text-xs text-ink-muted">{{ 'marketing.analytics.given.units' | translate }}</dt>
-                    <dd class="mt-1 mb-0 font-mono text-lg font-bold text-ink tabular-nums">{{ given.units | digits }}</dd>
-                </div>
-            </dl>
-            <p class="mt-3 mb-0 text-xs text-ink-soft">{{ 'marketing.analytics.given.note' | translate }}</p>
-        </nz-card>
-    }
+    </nz-tabs>
 }

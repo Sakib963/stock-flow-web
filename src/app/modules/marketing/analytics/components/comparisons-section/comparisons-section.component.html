@@ -1,0 +1,122 @@
+@if (failed(); as failure) {
+    <nz-card class="mt-2 md:mt-4">
+        <div class="text-center" role="alert">
+            <p class="m-0 text-sm text-ink-body">{{ 'marketing.analytics.loadFailed.' + failure | translate }}</p>
+            <button nz-button nzType="primary" type="button" class="mt-3 inline-flex items-center gap-1.5" (click)="load()">
+                <ng-icon name="lucideRotateCw" size="14px" aria-hidden="true" />
+                <span>{{ 'form.retry' | translate }}</span>
+            </button>
+        </div>
+    </nz-card>
+} @else {
+    <nz-card class="mt-2 md:mt-4" [nzTitle]="typesTitle" data-analytics="types">
+        <ng-template #typesTitle
+            ><h2 class="m-0 flex items-center gap-1.5 text-sm font-bold text-ink"><ng-icon name="lucideShapes" size="14px" class="text-ink-muted" aria-hidden="true" />{{ 'marketing.analytics.types.title' | translate }}</h2></ng-template
+        >
+        @if (data(); as loaded) {
+            @if (loaded.types.length) {
+                <div class="overflow-x-auto">
+                    <nz-table nzTemplateMode nzSize="small" class="min-w-136 text-xs [&_th]:whitespace-nowrap">
+                        <thead>
+                            <tr>
+                                <th>{{ 'marketing.campaign.type.label' | translate }}</th>
+                                <th class="text-right">{{ 'marketing.analytics.compare.campaigns' | translate }}</th>
+                                <th class="text-right">{{ 'marketing.analytics.compare.cost' | translate }}</th>
+                                <th class="text-right">{{ 'marketing.analytics.compare.firstTime' | translate }}</th>
+                                <th class="text-right">{{ 'marketing.analytics.compare.costPerFirst' | translate }}</th>
+                                <th class="text-right">{{ 'marketing.analytics.compare.perTaka' | translate }}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for (row of loaded.types; track row.promotion_type) {
+                                <tr [attr.data-type]="row.promotion_type">
+                                    <td class="font-semibold text-ink">{{ 'marketing.campaign.type.' + row.promotion_type | translate }}</td>
+                                    <td class="text-right font-mono tabular-nums">{{ row.campaigns | digits }}</td>
+                                    <td class="text-right font-mono tabular-nums">{{ row.cost | money }}</td>
+                                    <td class="text-right font-mono tabular-nums">{{ row.first_time | digits }}</td>
+                                    <td class="text-right font-mono tabular-nums">
+                                        @if (row.cost_per_first_time !== null) {
+                                            {{ row.cost_per_first_time | money }}
+                                        } @else {
+                                            -
+                                        }
+                                    </td>
+                                    <td class="text-right font-mono font-semibold tabular-nums">
+                                        @if (row.return_per_taka !== null) {
+                                            {{ row.return_per_taka | money }}
+                                        } @else {
+                                            -
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </nz-table>
+                </div>
+                <p class="mt-3 mb-0 text-xs text-ink-soft">{{ 'marketing.analytics.types.note' | translate }}</p>
+            } @else {
+                <p class="m-0 text-sm text-ink-muted">{{ 'marketing.analytics.results.empty' | translate }}</p>
+            }
+        } @else {
+            <nz-skeleton nzActive [nzTitle]="false" [nzParagraph]="{ rows: 4 }" />
+        }
+    </nz-card>
+
+    <nz-card class="mt-2 md:mt-4" [nzTitle]="partnersTitle" data-analytics="partners">
+        <ng-template #partnersTitle
+            ><h2 class="m-0 flex items-center gap-1.5 text-sm font-bold text-ink"><ng-icon name="lucideHandshake" size="14px" class="text-ink-muted" aria-hidden="true" />{{ 'marketing.analytics.partners.title' | translate }}</h2></ng-template
+        >
+        @if (data(); as loaded) {
+            @if (loaded.partners.length) {
+                <div class="overflow-x-auto">
+                    <nz-table nzTemplateMode nzSize="small" class="min-w-176 text-xs [&_th]:whitespace-nowrap">
+                        <thead>
+                            <tr>
+                                <th>{{ 'marketing.campaign.partner' | translate }}</th>
+                                <th class="text-right">{{ 'marketing.analytics.compare.campaigns' | translate }}</th>
+                                <th class="text-right">{{ 'marketing.analytics.compare.fees' | translate }}</th>
+                                <th class="text-right">{{ 'marketing.analytics.compare.averageExtra' | translate }}</th>
+                                <th class="text-right">{{ 'marketing.analytics.compare.firstTime' | translate }}</th>
+                                <th class="text-right">{{ 'marketing.analytics.compare.delivered' | translate }}</th>
+                                <th class="text-right">{{ 'marketing.analytics.compare.perTaka' | translate }}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for (row of loaded.partners; track row.oid) {
+                                <tr [attr.data-partner]="row.oid">
+                                    <td>
+                                        <span class="block font-semibold text-ink">{{ row.name }}</span>
+                                        <span class="block text-ink-muted">{{ 'marketing.partner.type.' + row.partner_type | translate }}</span>
+                                    </td>
+                                    <td class="text-right font-mono tabular-nums">{{ row.campaigns | digits }}</td>
+                                    <td class="text-right font-mono tabular-nums">{{ row.fees | money }}</td>
+                                    <td class="text-right font-mono tabular-nums">
+                                        @if (row.average_extra !== null) {
+                                            {{ row.average_extra | digits }}
+                                        } @else {
+                                            -
+                                        }
+                                    </td>
+                                    <td class="text-right font-mono tabular-nums">{{ row.first_time | digits }}</td>
+                                    <td class="text-right" data-delivered>{{ 'marketing.analytics.compare.deliveredValue' | translate: { onTime: row.on_time, late: row.late, missed: row.missed } | digits }}</td>
+                                    <td class="text-right font-mono font-semibold tabular-nums">
+                                        @if (row.return_per_taka !== null) {
+                                            {{ row.return_per_taka | money }}
+                                        } @else {
+                                            -
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </nz-table>
+                </div>
+                <p class="mt-3 mb-0 text-xs text-ink-soft">{{ 'marketing.analytics.partners.note' | translate }}</p>
+            } @else {
+                <p class="m-0 text-sm text-ink-muted">{{ 'marketing.analytics.partners.empty' | translate }}</p>
+            }
+        } @else {
+            <nz-skeleton nzActive [nzTitle]="false" [nzParagraph]="{ rows: 4 }" />
+        }
+    </nz-card>
+}

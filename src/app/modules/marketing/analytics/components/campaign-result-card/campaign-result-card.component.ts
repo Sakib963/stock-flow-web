@@ -5,10 +5,12 @@ import { lucideCircleHelp, lucideTriangleAlert, lucideUsers } from '@ng-icons/lu
 import { NzCardModule } from 'ng-zorro-antd/card';
 import { NzCollapseModule } from 'ng-zorro-antd/collapse';
 import { TranslatePipe } from '@ngx-translate/core';
-import { CampaignResult, CampaignVerdict } from '@app/core/models/marketing-analytics.model';
+import { CUSTOMER_AGE_BANDS } from '@app/core/models/customer.model';
+import { AudienceGroup, CampaignResult, CampaignVerdict } from '@app/core/models/marketing-analytics.model';
 import { ToneStyle } from '@app/core/models/config.model';
 import { LanguageService } from '@app/core/services/language/language.service';
 import { CAMPAIGN_ROUTES } from '@app/modules/marketing/campaign/constants/campaign-routes';
+import { PyramidChartComponent, PyramidRow } from '@app/shared/components/charts/pyramid-chart/pyramid-chart.component';
 import { StatusTagComponent } from '@app/shared/components/status-tag/status-tag.component';
 import { DigitsPipe } from '@app/shared/pipes/digits/digits.pipe';
 import { MoneyPipe } from '@app/shared/pipes/money/money.pipe';
@@ -27,7 +29,7 @@ const VERDICT: Record<CampaignVerdict, ToneStyle> = {
  */
 @Component({
     selector: 'campaign-result-card',
-    imports: [RouterLink, NgIcon, NzCardModule, NzCollapseModule, TranslatePipe, StatusTagComponent, DigitsPipe, MoneyPipe, RecordDatePipe],
+    imports: [RouterLink, NgIcon, NzCardModule, NzCollapseModule, TranslatePipe, PyramidChartComponent, StatusTagComponent, DigitsPipe, MoneyPipe, RecordDatePipe],
     providers: [provideIcons({ lucideCircleHelp, lucideTriangleAlert, lucideUsers })],
     templateUrl: './campaign-result-card.component.html',
     styleUrl: './campaign-result-card.component.scss',
@@ -43,6 +45,23 @@ export class CampaignResultCardComponent {
     readonly campaignRoute = CAMPAIGN_ROUTES.detail;
 
     readonly verdict = computed(() => VERDICT[this.result().verdict]);
+
+    /** Women left, men right, by age band, for the first-time customers with both recorded. */
+    readonly brought = computed<PyramidRow[]>(() => {
+        const rows = this.result().brought ?? [];
+        const count = (gender: string, band: string) => rows.filter((r) => r.gender === gender && r.age_band === band).reduce((sum, r) => sum + r.customers, 0);
+        return CUSTOMER_AGE_BANDS.map((band) => ({ key: band, label: `sales.customer.ageBand.${band}`, left: count('Female', band), right: count('Male', band) }));
+    });
+    readonly broughtKnown = computed(() => (this.result().brought ?? []).filter((r) => r.gender && r.age_band).reduce((sum, r) => sum + r.customers, 0));
+    /** The largest group among the buyers before the campaign, to set the newcomers against. */
+    readonly usualTop = computed(() => this.largest(this.result().usual ?? []));
+
+    private largest(groups: AudienceGroup[]): { gender: string; age_band: string; share: number } | null {
+        const known = groups.filter((g) => g.gender && g.age_band);
+        const total = known.reduce((sum, g) => sum + g.customers, 0);
+        const top = known.reduce<AudienceGroup | null>((best, g) => (!best || g.customers > best.customers ? g : best), null);
+        return top && total ? { gender: top.gender!, age_band: top.age_band!, share: Math.round((top.customers / total) * 100) } : null;
+    }
     readonly judged = computed(() => this.result().verdict !== 'too_little');
     readonly bars = computed(() => {
         const { promoted_before, promoted_window } = this.result();

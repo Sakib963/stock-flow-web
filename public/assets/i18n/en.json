@@ -4614,6 +4614,53 @@
                     }
                 },
                 "caveat": "What this does not prove: the rise happened during the window, and something else may also have helped, such as a competitor running out of stock. The comparison takes out what lifted the whole business, not what lifted only these products."
+            },
+            "tab": {
+                "overview": "Campaigns",
+                "sources": "Order sources",
+                "compare": "Partners and types"
+            },
+            "brought": {
+                "title": "Who it brought",
+                "known": "{{known}} of {{total}} first-time customers have a gender and age recorded.",
+                "unknown": "None of the first-time customers has a gender and age recorded yet.",
+                "usual": "Your usual buyers before it: mostly {{gender}}, {{age}} ({{share}}%).",
+                "districts": "Where its customers live"
+            },
+            "sources": {
+                "title": "Which page brings orders that stick",
+                "counterOnly": "Order sources are the pages and accounts online orders come in through. You sell at the counter only, so there is nothing to compare.",
+                "source": "Source",
+                "placed": "Orders placed",
+                "sold": "Sold",
+                "cancelled": "Cancelled",
+                "refused": "Refused at the door",
+                "average": "Average sale",
+                "firstTime": "First-time customers",
+                "sales": "Sales kept",
+                "profit": "Profit {{amount}}",
+                "note": "Orders placed in the period, whenever they were delivered. Cancelled is out of orders placed, refused out of those not cancelled. Under {{floor}} orders a rate says little, so the count is shown instead. A cancellation by the business (out of stock, a duplicate, cannot deliver) is not held against the page.",
+                "empty": "No online order came in during this period. Pick a longer period."
+            },
+            "types": {
+                "title": "Which kind of promotion paid best",
+                "note": "Only campaigns that could be judged count toward extra profit per ৳1. Cost per first-time customer is the cost of every campaign of that kind, divided by the people who bought for the first time during them."
+            },
+            "partners": {
+                "title": "Which partner returned the most",
+                "note": "Average extra is the extra units across the partner’s judged campaigns. A campaign shared by several partners counts in full for each of them, because its result cannot be split.",
+                "empty": "No partner worked on a campaign in this period."
+            },
+            "compare": {
+                "campaigns": "Campaigns",
+                "cost": "Cost",
+                "fees": "Paid",
+                "firstTime": "First-time customers",
+                "costPerFirst": "Cost per first-time customer",
+                "perTaka": "Extra profit per ৳1",
+                "averageExtra": "Average extra units",
+                "delivered": "Posts",
+                "deliveredValue": "{{onTime}} on time, {{late}} late, {{missed}} missed"
             }
         }
     }

@@ -249,5 +249,7 @@ export class APIEndpoint {
     static readonly DELETE_CAMPAIGN_DELIVERABLE = '/api/v1/marketing/campaign/delete-campaign-deliverable';
     static readonly GET_MARKETING_ANALYTICS_OVERVIEW = '/api/v1/marketing/analytics/get-marketing-analytics-overview';
     static readonly GET_MARKETING_CAMPAIGN_RESULTS = '/api/v1/marketing/analytics/get-marketing-campaign-results';
+    static readonly GET_MARKETING_COMPARISONS = '/api/v1/marketing/analytics/get-marketing-comparisons';
+    static readonly GET_MARKETING_SOURCES = '/api/v1/marketing/analytics/get-marketing-sources';
     static readonly CREATE_PARTNER_PAYMENT = '/api/v1/marketing/partner-payment/create-partner-payment';
 }
