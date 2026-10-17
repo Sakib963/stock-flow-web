@@ -1,0 +1,89 @@
+<page-header [title]="'settings.business.title' | translate" [lead]="'settings.business.lead' | translate">
+    @if (canEdit) {
+        <button nz-button nzType="primary" type="button" class="inline-flex items-center gap-1.5" (click)="edit()" data-settings="edit">
+            <ng-icon name="lucidePencil" size="14px" aria-hidden="true" />
+            <span>{{ 'settings.business.edit' | translate }}</span>
+        </button>
+    }
+</page-header>
+
+@if (failed(); as failure) {
+    <div class="sf-empty" role="alert">
+        <p class="m-0 text-sm text-ink-body">{{ 'settings.business.loadFailed.' + failure | translate }}</p>
+        <button nz-button type="button" class="mt-3 inline-flex items-center gap-1.5" (click)="load()">
+            <ng-icon name="lucideRotateCw" size="14px" aria-hidden="true" />
+            <span>{{ 'settings.business.retry' | translate }}</span>
+        </button>
+    </div>
+} @else {
+    <nz-card [nzTitle]="detailsTitle" data-settings="details">
+        <ng-template #detailsTitle
+            ><h2 class="m-0 flex items-center gap-1.5 text-sm font-bold text-ink"><ng-icon name="lucideInfo" size="14px" class="text-ink-muted" aria-hidden="true" />{{ 'settings.business.details' | translate }}</h2></ng-template
+        >
+        @if (settings(); as details) {
+            <div class="flex flex-col gap-5 md:flex-row md:items-start">
+                <div class="grid size-24 flex-none place-items-center overflow-hidden rounded-container border border-line bg-surface-sunken">
+                    @if (details.logo_url) {
+                        <img [src]="details.logo_url" [alt]="'settings.business.logo' | translate" class="size-full object-contain p-1.5" />
+                    } @else {
+                        <ng-icon name="lucideImage" size="24px" class="text-ink-faint" [attr.aria-label]="'settings.business.noLogo' | translate" />
+                    }
+                </div>
+                <dl class="m-0 grid min-w-0 flex-1 grid-cols-2 gap-x-6 gap-y-4 md:grid-cols-3">
+                    <div>
+                        <dt class="text-xs text-ink-muted">{{ 'settings.business.name' | translate }}</dt>
+                        <dd class="mt-1 mb-0 text-sm font-semibold text-ink">{{ details.name || ('settings.business.notSet' | translate) }}</dd>
+                    </div>
+                    <div>
+                        <dt class="text-xs text-ink-muted">{{ 'settings.business.phone' | translate }}</dt>
+                        <dd class="mt-1 mb-0 font-mono text-sm font-semibold text-ink">{{ details.phone_primary || ('settings.business.notSet' | translate) }}</dd>
+                    </div>
+                    <div>
+                        <dt class="text-xs text-ink-muted">{{ 'settings.business.phoneSecond' | translate }}</dt>
+                        <dd class="mt-1 mb-0 font-mono text-sm font-semibold text-ink">{{ details.phone_secondary || ('settings.business.notSet' | translate) }}</dd>
+                    </div>
+                    <div class="col-span-2 md:col-span-3">
+                        <dt class="text-xs text-ink-muted">{{ 'settings.business.address' | translate }}</dt>
+                        <dd class="mt-1 mb-0 text-sm font-semibold whitespace-pre-line text-ink">{{ details.address || ('settings.business.notSet' | translate) }}</dd>
+                    </div>
+                    <div class="min-w-0">
+                        <dt class="text-xs text-ink-muted">{{ 'settings.business.website' | translate }}</dt>
+                        <dd class="mt-1 mb-0 truncate text-sm font-semibold text-ink">{{ details.website || ('settings.business.notSet' | translate) }}</dd>
+                    </div>
+                    <div class="min-w-0">
+                        <dt class="text-xs text-ink-muted">{{ 'settings.business.facebook' | translate }}</dt>
+                        <dd class="mt-1 mb-0 truncate text-sm font-semibold text-ink">{{ details.facebook_url || ('settings.business.notSet' | translate) }}</dd>
+                    </div>
+                    <div class="min-w-0">
+                        <dt class="text-xs text-ink-muted">{{ 'settings.business.instagram' | translate }}</dt>
+                        <dd class="mt-1 mb-0 truncate text-sm font-semibold text-ink">{{ details.instagram_url || ('settings.business.notSet' | translate) }}</dd>
+                    </div>
+                    <div>
+                        <dt class="text-xs text-ink-muted">{{ 'settings.business.lastEdited' | translate }}</dt>
+                        <dd class="mt-1 mb-0 text-sm font-semibold text-ink">
+                            @if (details.edited_on) {
+                                {{ details.edited_on | recordDate: language() : 'date' }}
+                            } @else {
+                                {{ 'settings.business.notSet' | translate }}
+                            }
+                        </dd>
+                        @if (details.edited_by) {
+                            <dd class="mt-0.5 mb-0 text-xs text-ink-muted">{{ details.edited_by }}</dd>
+                        }
+                    </div>
+                </dl>
+            </div>
+        } @else {
+            <div role="status" [attr.aria-label]="'form.loading' | translate">
+                <nz-skeleton nzActive [nzAvatar]="{ shape: 'square', size: 'large' }" [nzParagraph]="{ rows: 4 }" />
+            </div>
+        }
+    </nz-card>
+
+    <action-footer>
+        <button nz-button nzType="default" type="button" class="inline-flex items-center gap-1.5" (click)="goBack()" data-settings="back">
+            <ng-icon name="lucideArrowLeft" size="14px" aria-hidden="true" />
+            <span>{{ 'list.back' | translate }}</span>
+        </button>
+    </action-footer>
+}

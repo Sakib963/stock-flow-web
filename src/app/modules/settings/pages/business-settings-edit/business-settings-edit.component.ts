@@ -1,7 +1,7 @@
-import { NgTemplateOutlet } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideImagePlus, lucideRotateCw, lucideTrash2 } from '@ng-icons/lucide';
 import { NzButtonModule } from 'ng-zorro-antd/button';
@@ -14,8 +14,10 @@ import { NzUploadFile, NzUploadModule } from 'ng-zorro-antd/upload';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { Subscription } from 'rxjs';
 import { BusinessSettings } from '@app/core/models/business-settings.model';
+import { PageBack } from '@app/core/models/page-header.model';
 import { RequestFailure } from '@app/core/models/api.model';
 import { SessionService } from '@app/core/services/session/session.service';
+import { SETTINGS_PAGES } from '@app/modules/settings/constants/settings-routes';
 import { BusinessSettingsService } from '@app/modules/settings/services/business-settings.service';
 import { FormPageComponent } from '@app/shared/components/form-page/form-page.component';
 import { PageHeaderComponent } from '@app/shared/components/page-header/page-header.component';
@@ -28,26 +30,26 @@ const ACCEPT = 'image/jpeg,image/png,image/webp';
 const MAX_BYTES = 15 * 1024 * 1024;
 
 /**
- * The business as its customers see it: the name, logo, address and phones every receipt, invoice,
- * label and the tracking page carry, and the website and pages the invoice footer lists. Saving
+ * Editing the business details every receipt, invoice, label and the tracking page carry. Saving
  * reaches every open tab: the server bumps the config version and each tab reloads on its next request.
  */
 @Component({
-    selector: 'business-settings',
-    imports: [NgTemplateOutlet, ReactiveFormsModule, NgIcon, NzButtonModule, NzFormModule, NzInputModule, NzSkeletonModule, NzUploadModule, TranslatePipe, DigitsPipe, FormPageComponent, PageHeaderComponent],
+    selector: 'business-settings-edit',
+    imports: [ReactiveFormsModule, NgIcon, NzButtonModule, NzFormModule, NzInputModule, NzSkeletonModule, NzUploadModule, TranslatePipe, DigitsPipe, FormPageComponent, PageHeaderComponent],
     providers: [provideIcons({ lucideImagePlus, lucideRotateCw, lucideTrash2 })],
-    templateUrl: './business-settings.component.html',
-    styleUrl: './business-settings.component.scss',
+    templateUrl: './business-settings-edit.component.html',
+    styleUrl: './business-settings-edit.component.scss',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class BusinessSettingsComponent {
+export class BusinessSettingsEditComponent {
     private readonly _settings = inject(BusinessSettingsService);
     private readonly _session = inject(SessionService);
     private readonly _modal = inject(NzModalService);
     private readonly _message = inject(NzMessageService);
     private readonly _translate = inject(TranslateService);
+    private readonly _router = inject(Router);
 
-    readonly canEdit = this._session.can('settings.business.edit');
+    readonly back: PageBack = { route: SETTINGS_PAGES.view };
     readonly accept = ACCEPT;
     readonly formId = 'business-settings-form';
 
@@ -73,7 +75,6 @@ export class BusinessSettingsComponent {
 
     constructor() {
         inject(DestroyRef).onDestroy(() => this._upload?.unsubscribe());
-        if (!this.canEdit) this.form.disable();
         this.load();
     }
 
@@ -116,6 +117,7 @@ export class BusinessSettingsComponent {
                 if (event.state === 'uploading') return this.uploading.set(event.progress);
                 this.uploading.set(null);
                 this.logo.set(event.url);
+                this.form.markAsDirty();
             },
             error: (error: unknown) => {
                 this.uploading.set(null);
@@ -130,12 +132,17 @@ export class BusinessSettingsComponent {
         this.uploading.set(null);
         this.logoError.set(null);
         this.logo.set(null);
+        this.form.markAsDirty();
     }
 
     /** What every printed page carries changes for everyone, so it asks first. */
     save(): void {
         if (this.form.invalid) return revealErrors(this.form);
         if (this.uploading() !== null || this.saving()) return;
+        if (!this.form.dirty) {
+            this._message.info(this._translate.instant('form.nothingChanged'));
+            return;
+        }
         confirmAction(this._modal, {
             title: this._translate.instant('settings.business.confirmTitle'),
             body: this._translate.instant('settings.business.confirmBody'),
@@ -145,8 +152,7 @@ export class BusinessSettingsComponent {
     }
 
     cancel(): void {
-        const loaded = this.loaded();
-        if (loaded) this.load();
+        void this._router.navigateByUrl(SETTINGS_PAGES.view);
     }
 
     private send(): void {
@@ -164,14 +170,13 @@ export class BusinessSettingsComponent {
                 instagram_url: text(value.instagram_url),
             })
             .subscribe({
-                next: (saved) => {
-                    this.loaded.set(saved);
-                    this.form.patchValue({ website: saved.website ?? '', facebook_url: saved.facebook_url ?? '', instagram_url: saved.instagram_url ?? '' });
+                next: () => {
                     this.form.markAsPristine();
                     this._message.success(this._translate.instant('settings.business.saved'));
                     // This tab shows the new name at once; every other tab follows on its next request.
                     const owner = this._session.loadedFor();
                     if (owner) void this._session.load(owner).catch(() => undefined);
+                    void this._router.navigateByUrl(SETTINGS_PAGES.view);
                 },
                 error: (error: unknown) => {
                     const key = error instanceof HttpErrorResponse && error.status === 400 ? 'settings.business.invalid' : failureKey(error, 'settings.business.saveFailed');

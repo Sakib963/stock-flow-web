@@ -1,7 +1,7 @@
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
-import { provideRouter } from '@angular/router';
+import { Router, provideRouter } from '@angular/router';
 import { NzModalRef, NzModalService } from 'ng-zorro-antd/modal';
 import { provideNzI18n, en_US } from 'ng-zorro-antd/i18n';
 import { NzUploadFile } from 'ng-zorro-antd/upload';
@@ -13,30 +13,32 @@ import { PhotoUpload } from '@app/core/models/photo-upload.model';
 import { SessionService } from '@app/core/services/session/session.service';
 import { BusinessSettingsService } from '@app/modules/settings/services/business-settings.service';
 import { OVERLAY_PROVIDERS } from '@app/shared/constants/overlay-providers';
-import { BusinessSettingsComponent } from './business-settings.component';
+import { BusinessSettingsEditComponent } from './business-settings-edit.component';
 
 const SETTINGS: BusinessSettings = { name: 'A boutique', logo_url: null, address: null, phone_primary: '01711000111', phone_secondary: null, website: 'https://www.aboutique.test', facebook_url: null, instagram_url: null, edited_on: null, edited_by: null };
 
 const open = async (granted = ['settings.business.view', 'settings.business.edit']) => {
     const load = vi.fn(() => Promise.resolve());
     await TestBed.configureTestingModule({
-        imports: [BusinessSettingsComponent],
+        imports: [BusinessSettingsEditComponent],
         providers: [provideRouter([]), provideHttpClient(), provideHttpClientTesting(), provideNzI18n(en_US), provideTranslateService({ fallbackLang: 'en' }), ...OVERLAY_PROVIDERS, { provide: SessionService, useValue: { can: (code: string) => granted.includes(code), loadedFor: () => 'session-1', load, menu: () => [] } }],
     }).compileComponents();
-    const fixture = TestBed.createComponent(BusinessSettingsComponent);
+    const fixture = TestBed.createComponent(BusinessSettingsEditComponent);
     const http = TestBed.inject(HttpTestingController);
+    const go = vi.spyOn(TestBed.inject(Router), 'navigateByUrl').mockResolvedValue(true);
     fixture.detectChanges();
     http.expectOne((r) => r.url.includes(APIEndpoint.GET_BUSINESS_SETTINGS)).flush({ code: 200, data: SETTINGS });
     fixture.detectChanges();
-    return { fixture, page: fixture.componentInstance, http, load };
+    return { fixture, page: fixture.componentInstance, http, load, go };
 };
 
-describe('BusinessSettingsComponent', () => {
+describe('BusinessSettingsEditComponent', () => {
     it('fills the form from the settings, and saves only after asking, then reloads this tab at once', async () => {
         const { fixture, page, http, load } = await open();
         expect(page.form.getRawValue().website).toBe('https://www.aboutique.test');
         const ask = vi.spyOn(fixture.debugElement.injector.get(NzModalService), 'confirm').mockImplementation(() => ({ afterClose: of(true) }) as unknown as NzModalRef);
         page.form.patchValue({ name: '  A new name  ', address: 'House 5, Road 2' });
+        page.form.markAsDirty();
         page.save();
         expect(ask).toHaveBeenCalled();
         const sent = http.expectOne((r) => r.url.includes(APIEndpoint.UPDATE_BUSINESS_SETTINGS));
@@ -52,14 +54,26 @@ describe('BusinessSettingsComponent', () => {
         http.expectNone((r) => r.url.includes(APIEndpoint.UPDATE_BUSINESS_SETTINGS));
     });
 
-    it('shows the details to someone who may only look, with nothing to change and no Save', async () => {
-        const { page, fixture } = await open(['settings.business.view']);
-        expect(page.form.disabled).toBe(true);
-        expect((fixture.nativeElement as HTMLElement).querySelector('[data-settings="pick-logo"]')).toBeNull();
-        expect((fixture.nativeElement as HTMLElement).textContent).toContain('settings.business.readOnly');
+    it('calls nothing when nothing was changed', async () => {
+        const { fixture, page, http } = await open();
+        const ask = vi.spyOn(fixture.debugElement.injector.get(NzModalService), 'confirm');
+        page.save();
+        expect(ask).not.toHaveBeenCalled();
+        http.expectNone((r) => r.url.includes(APIEndpoint.UPDATE_BUSINESS_SETTINGS));
     });
 
-    it('holds Save while the logo uploads, then saves the uploaded logo', async () => {
+    it('goes back to the settings page after saving, without asking about unsaved work', async () => {
+        const { fixture, page, http, go } = await open();
+        vi.spyOn(fixture.debugElement.injector.get(NzModalService), 'confirm').mockImplementation(() => ({ afterClose: of(true) }) as unknown as NzModalRef);
+        page.form.patchValue({ address: 'House 5, Road 2' });
+        page.form.markAsDirty();
+        page.save();
+        http.expectOne((r) => r.url.includes(APIEndpoint.UPDATE_BUSINESS_SETTINGS)).flush({ code: 200, data: SETTINGS });
+        expect(page.form.dirty).toBe(false);
+        expect(go).toHaveBeenCalledWith('/app/settings');
+    });
+
+    it('holds Save while the logo uploads, then saves a logo-only change', async () => {
         const { fixture, page, http } = await open();
         vi.spyOn(fixture.debugElement.injector.get(NzModalService), 'confirm').mockImplementation(() => ({ afterClose: of(true) }) as unknown as NzModalRef);
         vi.spyOn(TestBed.inject(BusinessSettingsService), 'uploadLogo').mockReturnValue(of<PhotoUpload[]>({ state: 'uploading', progress: 30 }, { state: 'done', url: 'https://res.cloudinary.com/x/image/upload/v1/stockflow/branding/logo.png' }));
