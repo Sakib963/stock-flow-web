@@ -4618,7 +4618,8 @@
             "tab": {
                 "overview": "Campaigns",
                 "sources": "Order sources",
-                "compare": "Partners and types"
+                "compare": "Partners and types",
+                "next": "What next"
             },
             "brought": {
                 "title": "Who it brought",
@@ -4661,6 +4662,36 @@
                 "averageExtra": "Average extra units",
                 "delivered": "Posts",
                 "deliveredValue": "{{onTime}} on time, {{late}} late, {{missed}} missed"
+            },
+            "next": {
+                "title": "What to promote next",
+                "empty": "Nothing stands out yet in this period. Pick a longer period, or come back once a few campaigns have run.",
+                "ratio": "Every ৳1 spent brought {{ratio}} of extra profit.",
+                "rising": {
+                    "title": "Rising with no campaign behind it",
+                    "body": "sold {{window}} against {{before}} in the same number of days before. Growing like the rest of the business, it would have sold about {{expected}}: {{extra}} more, and nobody paid for it. A promotion could push it further.",
+                    "note": "Only products no campaign promoted, with at least {{floor}} units sold in both periods."
+                },
+                "type": {
+                    "title": "The kind of promotion that paid back",
+                    "body": "{{type}} paid for itself in {{paid}} of {{campaigns}} campaigns."
+                },
+                "partner": {
+                    "title": "The partner to work with again",
+                    "body": "was on {{campaigns}} campaigns, and {{paid}} of them paid for themselves."
+                },
+                "audience": {
+                    "title": "Buyers no campaign has reached",
+                    "body": "{{category}} sold {{sales}} in this period, and none of its products was in a campaign.",
+                    "age": "Most of its buyers are {{age}} ({{share}}% of the {{known}} with an age recorded).",
+                    "ageFew": "Only {{known}} of its {{buyers}} buyers have an age recorded, under {{floor}}, too few to say who they are.",
+                    "districts": "Most of its parcels went to {{districts}}."
+                },
+                "arrivals": {
+                    "title": "When to post",
+                    "body": "Most orders arrive on {{weekday}}, and around {{hour}}. Post or boost a little before then.",
+                    "note": "{{day}} of {{total}} orders came on that day, and {{inHour}} in that hour on any day. Online orders count when placed, counter sales when sold."
+                }
             }
         }
     }

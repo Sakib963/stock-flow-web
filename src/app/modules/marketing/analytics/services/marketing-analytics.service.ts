@@ -3,7 +3,7 @@ import { Injectable, inject } from '@angular/core';
 import { Observable, map } from 'rxjs';
 import { environment } from '@env/environment';
 import { APIEndpoint } from '@app/core/constants/api-endpoint';
-import { CampaignResults, MarketingComparisons, MarketingOverview, MarketingSources } from '@app/core/models/marketing-analytics.model';
+import { CampaignResults, MarketingComparisons, MarketingNext, MarketingOverview, MarketingSources } from '@app/core/models/marketing-analytics.model';
 import { SalesAnalyticsQuery } from '@app/core/models/sales-analytics.model';
 
 const paramsOf = (query: SalesAnalyticsQuery) => Object.fromEntries(Object.entries(query).filter((pair): pair is [string, string] => !!pair[1]));
@@ -23,6 +23,10 @@ export class MarketingAnalyticsService {
 
     sources(query: SalesAnalyticsQuery): Observable<MarketingSources> {
         return this._http.get<{ data: MarketingSources }>(`${environment.baseUrl}${APIEndpoint.GET_MARKETING_SOURCES}`, { params: paramsOf(query) }).pipe(map((response) => response.data));
+    }
+
+    next(query: SalesAnalyticsQuery): Observable<MarketingNext> {
+        return this._http.get<{ data: MarketingNext }>(`${environment.baseUrl}${APIEndpoint.GET_MARKETING_NEXT}`, { params: paramsOf(query) }).pipe(map((response) => response.data));
     }
 
     results(query: SalesAnalyticsQuery): Observable<CampaignResults> {

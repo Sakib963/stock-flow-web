@@ -1,0 +1,80 @@
+<nz-card class="mt-2 md:mt-4" [nzTitle]="nextTitle" data-analytics="next">
+    <ng-template #nextTitle
+        ><h2 class="m-0 flex items-center gap-1.5 text-sm font-bold text-ink"><ng-icon name="lucideLightbulb" size="14px" class="text-ink-muted" aria-hidden="true" />{{ 'marketing.analytics.next.title' | translate }}</h2></ng-template
+    >
+    @if (failed(); as failure) {
+        <div class="text-center" role="alert">
+            <p class="m-0 text-sm text-ink-body">{{ 'marketing.analytics.loadFailed.' + failure | translate }}</p>
+            <button nz-button nzType="primary" type="button" class="mt-3 inline-flex items-center gap-1.5" (click)="load()">
+                <ng-icon name="lucideRotateCw" size="14px" aria-hidden="true" />
+                <span>{{ 'form.retry' | translate }}</span>
+            </button>
+        </div>
+    } @else if (data(); as loaded) {
+        <ul class="m-0 flex list-none flex-col gap-4 p-0">
+            @for (s of loaded.suggestions; track s.kind) {
+                <li class="flex gap-3" [attr.data-suggestion]="s.kind">
+                    <span class="flex size-8 shrink-0 items-center justify-center rounded-full bg-line-soft text-ink-muted"><ng-icon [name]="icons[s.kind]" size="16px" aria-hidden="true" /></span>
+                    <div class="min-w-0">
+                        <h3 class="m-0 text-sm font-semibold text-ink">{{ 'marketing.analytics.next.' + s.kind + '.title' | translate }}</h3>
+                        @switch (s.kind) {
+                            @case ('rising') {
+                                @for (p of s.products; track p.oid) {
+                                    <p class="mt-1 mb-0 text-sm text-ink-body">
+                                        @if (canOpenProduct) {
+                                            <a [routerLink]="productRoute(p.oid)" class="font-semibold">{{ p.name }}</a>
+                                        } @else {
+                                            <span class="font-semibold">{{ p.name }}</span>
+                                        }
+                                        {{ 'marketing.analytics.next.rising.body' | translate: { window: p.units_window, before: p.units_before, expected: p.expected, extra: p.extra } | digits }}
+                                    </p>
+                                }
+                                <p class="mt-1 mb-0 text-xs text-ink-soft">{{ 'marketing.analytics.next.rising.note' | translate: { floor: s.floor } | digits }}</p>
+                            }
+                            @case ('type') {
+                                <p class="mt-1 mb-0 text-sm text-ink-body">{{ 'marketing.analytics.next.type.body' | translate: { type: ('marketing.campaign.type.' + s.promotion_type | translate), paid: s.paid, campaigns: s.campaigns } | digits }}</p>
+                                @if (s.return_per_taka !== null) {
+                                    <p class="mt-1 mb-0 text-sm text-ink-body">{{ 'marketing.analytics.next.ratio' | translate: { ratio: (s.return_per_taka | money) } }}</p>
+                                }
+                            }
+                            @case ('partner') {
+                                <p class="mt-1 mb-0 text-sm text-ink-body">
+                                    @if (canOpenPartner) {
+                                        <a [routerLink]="partnerRoute(s.oid)" class="font-semibold">{{ s.name }}</a>
+                                    } @else {
+                                        <span class="font-semibold">{{ s.name }}</span>
+                                    }
+                                    {{ 'marketing.analytics.next.partner.body' | translate: { paid: s.paid, campaigns: s.campaigns } | digits }}
+                                </p>
+                                @if (s.return_per_taka !== null) {
+                                    <p class="mt-1 mb-0 text-sm text-ink-body">{{ 'marketing.analytics.next.ratio' | translate: { ratio: (s.return_per_taka | money) } }}</p>
+                                }
+                            }
+                            @case ('audience') {
+                                <p class="mt-1 mb-0 text-sm text-ink-body">{{ 'marketing.analytics.next.audience.body' | translate: { category: s.category.name, sales: (s.sales | money) } }}</p>
+                                <p class="mt-1 mb-0 text-sm text-ink-body">
+                                    @if (s.age_band) {
+                                        {{ 'marketing.analytics.next.audience.age' | translate: { age: ('sales.customer.ageBand.' + s.age_band | translate), share: s.age_share, known: s.known } | digits }}
+                                    } @else {
+                                        {{ 'marketing.analytics.next.audience.ageFew' | translate: { known: s.known, buyers: s.buyers, floor: s.floor } | digits }}
+                                    }
+                                </p>
+                                @if (s.districts.length) {
+                                    <p class="mt-1 mb-0 text-sm text-ink-body">{{ 'marketing.analytics.next.audience.districts' | translate: { districts: districts(s.districts) } }}</p>
+                                }
+                            }
+                            @case ('arrivals') {
+                                <p class="mt-1 mb-0 text-sm text-ink-body">{{ 'marketing.analytics.next.arrivals.body' | translate: { weekday: weekday(s.weekday), hour: hour(s.hour) } }}</p>
+                                <p class="mt-1 mb-0 text-xs text-ink-soft">{{ 'marketing.analytics.next.arrivals.note' | translate: { day: s.weekday_orders, inHour: s.hour_orders, total: s.total } | digits }}</p>
+                            }
+                        }
+                    </div>
+                </li>
+            } @empty {
+                <li class="text-sm text-ink-muted" data-next-empty>{{ 'marketing.analytics.next.empty' | translate }}</li>
+            }
+        </ul>
+    } @else {
+        <nz-skeleton nzActive [nzTitle]="false" [nzParagraph]="{ rows: 6 }" />
+    }
+</nz-card>

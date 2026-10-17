@@ -251,5 +251,6 @@ export class APIEndpoint {
     static readonly GET_MARKETING_CAMPAIGN_RESULTS = '/api/v1/marketing/analytics/get-marketing-campaign-results';
     static readonly GET_MARKETING_COMPARISONS = '/api/v1/marketing/analytics/get-marketing-comparisons';
     static readonly GET_MARKETING_SOURCES = '/api/v1/marketing/analytics/get-marketing-sources';
+    static readonly GET_MARKETING_NEXT = '/api/v1/marketing/analytics/get-marketing-next';
     static readonly CREATE_PARTNER_PAYMENT = '/api/v1/marketing/partner-payment/create-partner-payment';
 }

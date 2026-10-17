@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, computed, effect, inject, signal, untracked } from '@angular/core';
 import { NgIcon, provideIcons } from '@ng-icons/core';
-import { lucideChartLine, lucideChartPie, lucideGift, lucideHandshake, lucideMegaphone, lucideRocket, lucideRotateCw } from '@ng-icons/lucide';
+import { lucideChartLine, lucideChartPie, lucideGift, lucideHandshake, lucideLightbulb, lucideMegaphone, lucideRocket, lucideRotateCw } from '@ng-icons/lucide';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzCardModule } from 'ng-zorro-antd/card';
 import { NzSkeletonModule } from 'ng-zorro-antd/skeleton';
@@ -16,6 +16,7 @@ import { SessionService } from '@app/core/services/session/session.service';
 import { CampaignResultCardComponent } from '@app/modules/marketing/analytics/components/campaign-result-card/campaign-result-card.component';
 import { ComparisonsSectionComponent } from '@app/modules/marketing/analytics/components/comparisons-section/comparisons-section.component';
 import { SourcesSectionComponent } from '@app/modules/marketing/analytics/components/sources-section/sources-section.component';
+import { NextSectionComponent } from '@app/modules/marketing/analytics/components/next-section/next-section.component';
 import { MarketingAnalyticsService } from '@app/modules/marketing/analytics/services/marketing-analytics.service';
 import { CampaignTimelineComponent, TimelineBand, TimelinePin } from '@app/shared/components/charts/campaign-timeline/campaign-timeline.component';
 import { FilterComponent } from '@app/shared/components/filter/filter.component';
@@ -33,8 +34,8 @@ import { isPhoneWidth, viewportWidth } from '@app/shared/utils/viewport/viewport
  */
 @Component({
     selector: 'marketing-analytics',
-    imports: [NgIcon, NzButtonModule, NzCardModule, NzSkeletonModule, NzTabsModule, TranslatePipe, DigitsPipe, MoneyPipe, FilterComponent, PageHeaderComponent, CampaignTimelineComponent, CampaignResultCardComponent, SourcesSectionComponent, ComparisonsSectionComponent],
-    providers: [provideIcons({ lucideChartLine, lucideChartPie, lucideGift, lucideHandshake, lucideMegaphone, lucideRocket, lucideRotateCw })],
+    imports: [NgIcon, NzButtonModule, NzCardModule, NzSkeletonModule, NzTabsModule, TranslatePipe, DigitsPipe, MoneyPipe, FilterComponent, PageHeaderComponent, CampaignTimelineComponent, CampaignResultCardComponent, SourcesSectionComponent, ComparisonsSectionComponent, NextSectionComponent],
+    providers: [provideIcons({ lucideChartLine, lucideChartPie, lucideGift, lucideHandshake, lucideLightbulb, lucideMegaphone, lucideRocket, lucideRotateCw })],
     templateUrl: './marketing-analytics.component.html',
     styleUrl: './marketing-analytics.component.scss',
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -55,9 +56,9 @@ export class MarketingAnalyticsComponent {
 
     /** Sources are where online orders come in: the tab only for someone who sells online and has not narrowed the page to the counter. */
     readonly showsSources = computed(() => this._session.can('sales.online.view') && this.filters()['channel'] !== 'POS');
-    readonly tabIcons = { overview: 'lucideChartPie', sources: 'lucideMegaphone', compare: 'lucideHandshake' } as const;
-    readonly tabs = computed(() => (this.showsSources() ? (['overview', 'sources', 'compare'] as const) : (['overview', 'compare'] as const)));
-    readonly tab = signal<'overview' | 'sources' | 'compare'>('overview');
+    readonly tabIcons = { overview: 'lucideChartPie', sources: 'lucideMegaphone', compare: 'lucideHandshake', next: 'lucideLightbulb' } as const;
+    readonly tabs = computed(() => (this.showsSources() ? (['overview', 'sources', 'compare', 'next'] as const) : (['overview', 'compare', 'next'] as const)));
+    readonly tab = signal<'overview' | 'sources' | 'compare' | 'next'>('overview');
     readonly tabIndex = computed(() => Math.max(0, (this.tabs() as readonly string[]).indexOf(this.tab())));
 
     readonly overview = signal<MarketingOverview | null>(null);

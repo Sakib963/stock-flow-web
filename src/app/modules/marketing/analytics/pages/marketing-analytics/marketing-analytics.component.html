@@ -33,6 +33,9 @@
                         @case ('compare') {
                             <comparisons-section [query]="query()" />
                         }
+                        @case ('next') {
+                            <next-section [query]="query()" />
+                        }
                         @default {
                             @if (!overview()) {
                                 <span class="sr-only" role="status">{{ 'form.loading' | translate }}</span>

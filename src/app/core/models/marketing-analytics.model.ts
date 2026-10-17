@@ -96,3 +96,16 @@ export interface CampaignResults {
     period: SalesPeriod;
     results: CampaignResult[];
 }
+
+/** One written suggestion of What next (REQ-12); return_per_taka is null for someone who may not see buying prices. */
+export type MarketingSuggestion =
+    | { kind: 'rising'; floor: number; products: { oid: string; name: string; units_before: number; units_window: number; expected: number; extra: number }[] }
+    | { kind: 'type'; promotion_type: PromotionType; paid: number; campaigns: number; return_per_taka: number | null }
+    | { kind: 'partner'; oid: string; name: string; paid: number; campaigns: number; return_per_taka: number | null }
+    | { kind: 'audience'; floor: number; category: { oid: string; name: string }; sales: number; buyers: number; known: number; age_band: string | null; age_share: number | null; districts: { oid: string; name_en: string; name_bn: string; orders: number }[] }
+    | { kind: 'arrivals'; total: number; weekday: number; weekday_orders: number; hour: number; hour_orders: number };
+
+export interface MarketingNext {
+    period: SalesPeriod;
+    suggestions: MarketingSuggestion[];
+}
