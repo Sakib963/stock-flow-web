@@ -1,0 +1,300 @@
+<page-header [back]="back" [title]="'administration.feature.detailTitle' | translate" [lead]="'administration.feature.detailLead' | translate">
+    @if (canEdit()) {
+        <button nz-button nzType="primary" type="button" class="inline-flex items-center gap-1.5" (click)="edit()">
+            <ng-icon name="lucidePencil" size="14px" aria-hidden="true" />
+            <span>{{ 'administration.feature.edit' | translate }}</span>
+        </button>
+    }
+</page-header>
+
+@if (failed(); as failure) {
+    <div class="sf-empty" role="alert">
+        <p class="m-0 text-sm text-ink-body">{{ 'administration.feature.loadFailed.' + failure | translate }}</p>
+        <div class="mt-3 flex items-center justify-center gap-2">
+            <button nz-button nzType="default" type="button" class="inline-flex items-center gap-1.5" (click)="backToList()">
+                <ng-icon name="lucideArrowLeft" size="14px" aria-hidden="true" />
+                <span>{{ 'administration.feature.backToList' | translate }}</span>
+            </button>
+            <button nz-button nzType="primary" type="button" class="inline-flex items-center gap-1.5" (click)="load()">
+                <ng-icon name="lucideRotateCw" size="14px" aria-hidden="true" />
+                <span>{{ 'form.retry' | translate }}</span>
+            </button>
+        </div>
+    </div>
+} @else {
+    @if (loading()) {
+        <span class="sr-only" role="status">{{ 'form.loading' | translate }}</span>
+    }
+
+    <nz-card [nzTitle]="detailsTitle" data-detail="details">
+        <ng-template #detailsTitle
+            ><h2 class="m-0 flex items-center gap-1.5 text-sm font-bold text-ink"><ng-icon name="lucideInfo" size="14px" class="text-ink-muted" aria-hidden="true" />{{ 'administration.feature.section.details' | translate }}</h2></ng-template
+        >
+        @if (feature(); as f) {
+            <dl class="m-0 grid grid-cols-2 gap-x-6 gap-y-4 md:grid-cols-3">
+                <div>
+                    <dt class="text-xs text-ink-muted">{{ 'administration.feature.labelEn' | translate }}</dt>
+                    <dd class="mt-1 mb-0 text-sm font-semibold text-ink">{{ f.label }}</dd>
+                </div>
+                <div>
+                    <dt class="text-xs text-ink-muted">{{ 'administration.feature.labelBn' | translate }}</dt>
+                    <dd class="mt-1 mb-0 text-sm font-semibold text-ink">{{ f.label_bn || ('administration.feature.notSet' | translate) }}</dd>
+                </div>
+                <div>
+                    <dt class="text-xs text-ink-muted">{{ 'administration.feature.state.label' | translate }}</dt>
+                    <dd class="mt-1 mb-0">
+                        @if (stateTone(); as style) {
+                            <status-tag [label]="style.label" [tone]="style.tone" [icon]="style.icon" size="standard" />
+                        }
+                    </dd>
+                </div>
+                <div>
+                    <dt class="text-xs text-ink-muted">{{ 'administration.feature.kind.label' | translate }}</dt>
+                    <dd class="mt-1 mb-0">
+                        @if (kindTone(); as style) {
+                            <status-tag [label]="style.label" [tone]="style.tone" size="standard" />
+                        }
+                    </dd>
+                </div>
+                <div>
+                    <dt class="text-xs text-ink-muted">{{ 'administration.feature.module' | translate }}</dt>
+                    <dd class="mt-1 mb-0 text-sm font-semibold text-ink">
+                        @if (f.module_oid) {
+                            <a [routerLink]="detailRoute(f.module_oid)">{{ language() === 'bn' ? f.module_label_bn || f.module_label : f.module_label }}</a>
+                        } @else {
+                            {{ 'administration.feature.topLevel' | translate }}
+                        }
+                    </dd>
+                </div>
+                <div>
+                    <dt class="text-xs text-ink-muted">{{ 'administration.feature.route' | translate }}</dt>
+                    <dd class="mt-1 mb-0 font-mono text-sm break-all text-ink">{{ f.route || ('administration.feature.notSet' | translate) }}</dd>
+                </div>
+                <div>
+                    <dt class="text-xs text-ink-muted">{{ 'administration.feature.newBadge' | translate }}</dt>
+                    <dd class="mt-1 mb-0 text-sm font-semibold text-ink">{{ (f.is_new ? 'administration.feature.yes' : 'administration.feature.no') | translate }}</dd>
+                </div>
+                <div>
+                    <dt class="text-xs text-ink-muted">{{ 'administration.feature.lastTouchedOn' | translate }}</dt>
+                    <dd class="mt-1 mb-0 text-sm font-semibold text-ink">
+                        @if (f.last_action_on) {
+                            {{ f.last_action_on | recordDate: language() : 'date' }}
+                        } @else {
+                            {{ 'administration.feature.notSet' | translate }}
+                        }
+                    </dd>
+                </div>
+                <div>
+                    <dt class="text-xs text-ink-muted">{{ 'administration.feature.tags' | translate }}</dt>
+                    <dd class="mt-1 mb-0 flex flex-wrap gap-1">
+                        @for (tag of f.tags ?? []; track tag) {
+                            <status-tag [label]="{ en: tag, bn: tag }" tone="neutral" />
+                        } @empty {
+                            <span class="text-sm text-ink-muted">{{ 'administration.feature.notSet' | translate }}</span>
+                        }
+                    </dd>
+                </div>
+                @if (f.state === 'Disabled') {
+                    <div class="col-span-2 border-t border-line-soft pt-4 md:col-span-3" data-detail="reason">
+                        <dt class="text-xs text-ink-muted">{{ 'administration.feature.reason' | translate }}</dt>
+                        <dd class="mt-1 mb-0 text-sm text-ink-body">{{ offThroughModule() ? (language() === 'bn' ? f.module_reason_bn : f.module_reason_en) : language() === 'bn' ? f.disabled_message_bn : f.disabled_message_en }}</dd>
+                    </div>
+                }
+                @if (offThroughModule()) {
+                    <div class="col-span-2 md:col-span-3" data-detail="through-module">
+                        <p class="m-0 text-xs font-semibold text-warning-ink">{{ 'administration.feature.throughModule' | translate: { state: ('administration.feature.state.' + f.state | translate) } }}</p>
+                    </div>
+                }
+                <div class="col-span-2 border-t border-line-soft pt-4 md:col-span-3">
+                    <dt class="text-xs text-ink-muted">{{ 'administration.feature.description' | translate }}</dt>
+                    <dd class="mt-1 mb-0">
+                        @if (f.description_en || f.description_bn) {
+                            <p class="m-0 max-w-[75ch] text-sm leading-relaxed text-ink-body">{{ f.description_en || ('administration.feature.notSet' | translate) }}</p>
+                            <p class="mt-1 mb-0 max-w-[75ch] text-sm leading-relaxed text-ink-body">{{ f.description_bn || ('administration.feature.notSet' | translate) }}</p>
+                        } @else {
+                            <span class="text-sm text-ink-muted">{{ 'administration.feature.notSet' | translate }}</span>
+                        }
+                    </dd>
+                </div>
+            </dl>
+        } @else {
+            <nz-skeleton nzActive [nzTitle]="false" [nzParagraph]="{ rows: 5 }" />
+        }
+    </nz-card>
+
+    @if (record(); as loaded) {
+        @if (loaded.details.kind === 'Module') {
+            <nz-card class="mt-2 md:mt-4" [nzTitle]="featuresTitle" data-detail="features">
+                <ng-template #featuresTitle
+                    ><h2 class="m-0 flex items-center gap-1.5 text-sm font-bold text-ink"><ng-icon name="lucideListTree" size="14px" class="text-ink-muted" aria-hidden="true" />{{ 'administration.feature.features' | translate }}</h2></ng-template
+                >
+                <ul class="m-0 flex list-none flex-col divide-y divide-line-soft p-0">
+                    @for (child of loaded.features; track child.oid) {
+                        <li class="flex items-center justify-between gap-3 py-2" [attr.data-feature]="child.oid">
+                            <span class="min-w-0">
+                                <a class="block truncate text-[13px] font-semibold" [routerLink]="detailRoute(child.oid)">{{ label(child) }}</a>
+                                <span class="block truncate font-mono text-xs text-ink-muted">{{ child.route }}</span>
+                            </span>
+                            <status-tag [label]="states[child.state].label" [tone]="states[child.state].tone" [icon]="states[child.state].icon" />
+                        </li>
+                    } @empty {
+                        <li class="py-2 text-xs text-ink-muted">{{ 'administration.feature.noFeatures' | translate }}</li>
+                    }
+                </ul>
+            </nz-card>
+        } @else {
+            <nz-card class="mt-2 md:mt-4" [nzTitle]="actionsTitle" data-detail="actions">
+                <ng-template #actionsTitle
+                    ><h2 class="m-0 flex items-center gap-1.5 text-sm font-bold text-ink"><ng-icon name="lucideKeyRound" size="14px" class="text-ink-muted" aria-hidden="true" />{{ 'administration.feature.actions' | translate }}</h2></ng-template
+                >
+                <ul class="m-0 flex list-none flex-col divide-y divide-line-soft p-0">
+                    @for (action of loaded.actions; track action.code) {
+                        <li class="flex flex-col gap-1 py-2 md:flex-row md:items-center md:justify-between md:gap-3" [attr.data-action]="action.code">
+                            <span class="font-mono text-[13px] text-ink">{{ action.code }}</span>
+                            <span class="flex flex-wrap gap-1">
+                                @for (role of action.roles; track role) {
+                                    <status-tag [label]="{ en: role, bn: role }" tone="neutral" />
+                                } @empty {
+                                    <span class="text-xs text-ink-muted">{{ 'administration.feature.noRole' | translate }}</span>
+                                }
+                            </span>
+                        </li>
+                    } @empty {
+                        <li class="py-2 text-xs text-ink-muted">{{ 'administration.feature.noActions' | translate }}</li>
+                    }
+                </ul>
+                <p class="mt-3 mb-0 text-xs text-ink-soft">{{ 'administration.feature.actionsNote' | translate }}</p>
+            </nz-card>
+        }
+    }
+
+    <div class="mt-2 grid grid-cols-1 items-start gap-2 md:mt-4 md:gap-4 lg:grid-cols-3">
+        @if (canEdit() && record(); as loaded) {
+            <nz-card class="lg:col-start-3 lg:row-start-1" [nzTitle]="switchTitle" data-detail="switch">
+                <ng-template #switchTitle
+                    ><h2 class="m-0 flex items-center gap-1.5 text-sm font-bold text-ink"><ng-icon name="lucidePower" size="14px" class="text-ink-muted" aria-hidden="true" />{{ 'administration.feature.switch.title' | translate }}</h2></ng-template
+                >
+                @if (loaded.details.locked) {
+                    <p class="m-0 text-xs text-ink-muted" data-switch="locked">{{ 'administration.feature.switch.locked' | translate }}</p>
+                } @else {
+                    <div class="flex flex-col gap-2">
+                        @if (loaded.details.own_state !== 'On') {
+                            <button nz-button nzType="primary" type="button" class="inline-flex items-center justify-center gap-1.5" [disabled]="!!pending() && pending() !== 'On'" [nzLoading]="pending() === 'On'" (click)="turnOn()" data-switch="On">
+                                @if (pending() !== 'On') {
+                                    <ng-icon name="lucidePower" size="14px" aria-hidden="true" />
+                                }
+                                <span>{{ 'administration.feature.switch.On.button' | translate }}</span>
+                            </button>
+                        }
+                        @if (loaded.details.own_state !== 'Disabled') {
+                            <button nz-button nzType="default" type="button" class="inline-flex items-center justify-center gap-1.5" [disabled]="!!pending() && pending() !== 'Disabled'" [nzLoading]="pending() === 'Disabled'" (click)="openDisable()" data-switch="Disabled">
+                                @if (pending() !== 'Disabled') {
+                                    <ng-icon name="lucideBan" size="14px" aria-hidden="true" />
+                                }
+                                <span>{{ 'administration.feature.switch.Disabled.button' | translate }}</span>
+                            </button>
+                        }
+                        @if (loaded.details.own_state !== 'Hidden') {
+                            <button nz-button nzType="default" nzDanger type="button" class="inline-flex items-center justify-center gap-1.5" [disabled]="!!pending() && pending() !== 'Hidden'" [nzLoading]="pending() === 'Hidden'" (click)="hide()" data-switch="Hidden">
+                                @if (pending() !== 'Hidden') {
+                                    <ng-icon name="lucideEyeOff" size="14px" aria-hidden="true" />
+                                }
+                                <span>{{ 'administration.feature.switch.Hidden.button' | translate }}</span>
+                            </button>
+                        }
+                    </div>
+                    <p class="mt-3 mb-0 text-xs text-ink-soft">{{ (loaded.details.kind === 'Module' ? 'administration.feature.switch.noteModule' : 'administration.feature.switch.note') | translate }}</p>
+                }
+            </nz-card>
+        }
+
+        <nz-card [class]="canEdit() && record() ? 'lg:col-span-2 lg:row-start-1' : 'lg:col-span-3 lg:row-start-1'" [nzTitle]="activityTitle" data-detail="activity">
+            <ng-template #activityTitle
+                ><h2 class="m-0 flex items-center gap-1.5 text-sm font-bold text-ink"><ng-icon name="lucideHistory" size="14px" class="text-ink-muted" aria-hidden="true" />{{ 'administration.feature.activity' | translate }}</h2></ng-template
+            >
+            @if (record(); as loaded) {
+                @if (loaded.activity.length) {
+                    <record-timeline [entries]="loaded.activity">
+                        <ng-template let-entry>
+                            <p class="m-0 text-[13px] font-semibold text-ink">{{ entry.action }}</p>
+                            @if (entry.description) {
+                                <p class="mt-0.5 mb-0 text-xs text-ink-body">{{ entry.description }}</p>
+                            }
+                            <p class="mt-0.5 mb-0 text-xs text-ink-muted">{{ entry.user }} &middot; {{ entry.date | recordDate: language() : 'date-time-12' }}</p>
+                        </ng-template>
+                    </record-timeline>
+                } @else {
+                    <p class="m-0 text-xs text-ink-muted">{{ 'administration.feature.noActivity' | translate }}</p>
+                }
+            } @else {
+                <nz-skeleton nzActive [nzTitle]="false" [nzParagraph]="{ rows: 4 }" />
+            }
+        </nz-card>
+    </div>
+
+    <action-footer>
+        <button nz-button nzType="default" type="button" class="inline-flex items-center gap-1.5" (click)="goBack()">
+            <ng-icon name="lucideArrowLeft" size="14px" aria-hidden="true" />
+            <span>{{ 'list.back' | translate }}</span>
+        </button>
+    </action-footer>
+}
+
+<nz-modal [nzVisible]="disabling()" [nzTitle]="'administration.feature.switch.Disabled.title' | translate: { name: label(feature()) }" [nzContent]="disableBody" [nzFooter]="disableFooter" nzCentered [nzClosable]="!pending()" [nzMaskClosable]="!pending()" (nzOnCancel)="pending() || disabling.set(false)">
+    <ng-template #disableBody>
+        @if (disableStep() === 'reason') {
+            <form nz-form nzLayout="vertical" [formGroup]="reasonForm" (ngSubmit)="toConfirm()" data-step="reason">
+                <p class="mt-0 mb-3 text-[13px] text-ink-body">{{ 'administration.feature.switch.Disabled.reasonBody' | translate }}</p>
+                <nz-form-item>
+                    <nz-form-label nzRequired nzFor="reason-en">{{ 'administration.feature.reasonEn' | translate }}</nz-form-label>
+                    <nz-form-control [nzErrorTip]="'administration.feature.reasonRequired' | translate">
+                        <input nz-input id="reason-en" formControlName="reason_en" maxlength="256" [attr.placeholder]="'administration.feature.reasonEnPlaceholder' | translate" />
+                    </nz-form-control>
+                </nz-form-item>
+                <nz-form-item class="mb-0">
+                    <nz-form-label nzRequired nzFor="reason-bn">{{ 'administration.feature.reasonBn' | translate }}</nz-form-label>
+                    <nz-form-control [nzErrorTip]="'administration.feature.reasonRequired' | translate">
+                        <input nz-input id="reason-bn" formControlName="reason_bn" maxlength="256" [attr.placeholder]="'administration.feature.reasonBnPlaceholder' | translate" />
+                    </nz-form-control>
+                </nz-form-item>
+            </form>
+        } @else {
+            <div data-step="confirm">
+                <p class="mt-0 mb-3 text-[13px] text-ink-body">{{ 'administration.feature.switch.Disabled.body' | translate }}</p>
+                <dl class="m-0 flex flex-col gap-2 rounded-control bg-surface-sunken px-3 py-2">
+                    <div>
+                        <dt class="text-xs text-ink-muted">{{ 'administration.feature.reasonEn' | translate }}</dt>
+                        <dd class="mt-0.5 mb-0 text-[13px] text-ink">{{ reasonForm.getRawValue().reason_en }}</dd>
+                    </div>
+                    <div>
+                        <dt class="text-xs text-ink-muted">{{ 'administration.feature.reasonBn' | translate }}</dt>
+                        <dd class="mt-0.5 mb-0 text-[13px] text-ink">{{ reasonForm.getRawValue().reason_bn }}</dd>
+                    </div>
+                </dl>
+            </div>
+        }
+    </ng-template>
+    <ng-template #disableFooter>
+        @if (disableStep() === 'reason') {
+            <button nz-button type="button" class="inline-flex items-center gap-1.5" (click)="disabling.set(false)" data-reason="cancel">
+                <ng-icon name="lucideX" size="14px" aria-hidden="true" />
+                <span>{{ 'form.confirm.cancel' | translate }}</span>
+            </button>
+            <button nz-button nzType="primary" type="button" class="inline-flex items-center gap-1.5" (click)="toConfirm()" data-reason="next">
+                <ng-icon name="lucideArrowRight" size="14px" aria-hidden="true" />
+                <span>{{ 'administration.feature.switch.Disabled.next' | translate }}</span>
+            </button>
+        } @else {
+            <button nz-button type="button" class="inline-flex items-center gap-1.5" [disabled]="!!pending()" (click)="disableStep.set('reason')" data-reason="back">
+                <ng-icon name="lucideArrowLeft" size="14px" aria-hidden="true" />
+                <span>{{ 'administration.feature.switch.Disabled.back' | translate }}</span>
+            </button>
+            <button nz-button nzType="primary" nzDanger type="button" class="inline-flex items-center gap-1.5" [nzLoading]="pending() === 'Disabled'" (click)="disableNow()" data-reason="disable">
+                @if (pending() !== 'Disabled') {
+                    <ng-icon name="lucideBan" size="14px" aria-hidden="true" />
+                }
+                <span>{{ 'administration.feature.switch.Disabled.button' | translate }}</span>
+            </button>
+        }
+    </ng-template>
+</nz-modal>

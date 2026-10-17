@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject, signal } from '@angular/core';
 import { APIEndpoint } from '@app/core/constants/api-endpoint';
-import { FeatureDetails, FeaturePayload, FeatureSwitch } from '@app/core/models/feature.model';
+import { FeatureDetails, FeaturePayload, FeatureSwitch, FeatureTree } from '@app/core/models/feature.model';
 import { environment } from '@env/environment';
 import { Observable, finalize, map } from 'rxjs';
 
@@ -10,6 +10,10 @@ export class FeatureService {
     private readonly _http = inject(HttpClient);
 
     readonly saving = signal(false);
+
+    tree(): Observable<FeatureTree> {
+        return this._http.get<{ data: FeatureTree }>(`${environment.baseUrl}${APIEndpoint.GET_FEATURE_TREE}`).pipe(map((response) => response.data));
+    }
 
     details(oid: string): Observable<FeatureDetails> {
         return this._http.get<{ data: FeatureDetails }>(`${environment.baseUrl}${APIEndpoint.GET_FEATURE_DETAILS}/${oid}`).pipe(map((response) => response.data));

@@ -15,8 +15,8 @@ import { HasUnsavedChanges } from '@app/core/guards/unsaved-changes/unsaved-chan
 import { RequestFailure } from '@app/core/models/api.model';
 import { Feature, FeaturePayload } from '@app/core/models/feature.model';
 import { PageBack } from '@app/core/models/page-header.model';
-import { FEATURE_ROUTES } from '@app/modules/system/feature/constants/feature-routes';
-import { FeatureService } from '@app/modules/system/feature/services/feature.service';
+import { FEATURE_ROUTES } from '@app/modules/administration/feature/constants/feature-routes';
+import { FeatureService } from '@app/modules/administration/feature/services/feature.service';
 import { FormPageComponent } from '@app/shared/components/form-page/form-page.component';
 import { PageHeaderComponent } from '@app/shared/components/page-header/page-header.component';
 import { DigitsPipe } from '@app/shared/pipes/digits/digits.pipe';
@@ -113,12 +113,12 @@ export class FeatureEditComponent implements HasUnsavedChanges {
             is_new: raw.is_new,
         };
         const t = (key: string, params?: object) => this._translate.instant(key, params);
-        confirmAction(this._modal, { title: t('system.feature.confirmEdit.title'), body: t('system.feature.confirmEdit.body', { name: payload.label }), ok: t('form.saveChanges'), cancel: t('form.confirm.cancel') }).subscribe((confirmed) => {
+        confirmAction(this._modal, { title: t('administration.feature.confirmEdit.title', { name: payload.label }), body: t('administration.feature.confirmEdit.body'), ok: t('form.saveChanges'), cancel: t('form.confirm.cancel') }).subscribe((confirmed) => {
             if (!confirmed) return;
             this._features.update(payload).subscribe({
                 next: (changed) => {
                     this.form.markAsPristine();
-                    this._message[changed ? 'success' : 'info'](t(changed ? 'system.feature.updated' : 'form.nothingChanged'));
+                    this._message[changed ? 'success' : 'info'](t(changed ? 'administration.feature.updated' : 'form.nothingChanged'));
                     void this._router.navigateByUrl(FEATURE_ROUTES.detail(this._oid));
                 },
                 error: (error: unknown) => this._message.error(t(failureKey(error, 'form.saveFailed'))),

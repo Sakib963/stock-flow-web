@@ -4695,7 +4695,7 @@
             }
         }
     },
-    "system": {
+    "administration": {
         "feature": {
             "searchPlaceholder": "Search by name, route or permission",
             "emptyTitle": "Nothing in the registry",
@@ -4777,7 +4777,7 @@
             },
             "switch": {
                 "title": "On, disabled or hidden",
-                "locked": "The System module is always on: it is where features are turned back on.",
+                "locked": "The feature registry, the module it sits in and the System module are always on: the registry is where features are turned back on.",
                 "note": "Disabled and hidden both stop everyone using it, you included. Its records stay, and reports keep counting them.",
                 "noteModule": "Disabling or hiding a module does the same to every feature in it. Records stay, and reports keep counting them.",
                 "On": {
@@ -4788,9 +4788,12 @@
                 },
                 "Disabled": {
                     "title": "Disable {{name}}?",
-                    "body": "It stays in the menu, greyed, with this reason. Nobody can open it or use it, you included, until it is turned on.",
+                    "body": "It stays in the menu, greyed, with the reason you wrote. Nobody can open it or use it, you included, until it is turned on.",
                     "button": "Disable",
-                    "done": "Disabled. Everyone sees it greyed from their next click."
+                    "done": "Disabled. Everyone sees it greyed from their next click.",
+                    "reasonBody": "People see this reason beside the greyed entry, in their language.",
+                    "next": "Continue",
+                    "back": "Change the reason"
                 },
                 "Hidden": {
                     "title": "Hide {{name}}?",
@@ -4798,7 +4801,11 @@
                     "button": "Hide",
                     "done": "Hidden from everyone."
                 }
-            }
+            },
+            "showTree": "Feature tree",
+            "treeTitle": "Feature tree",
+            "treeNote": "Every module, its features, and the actions in each, which are what a role is granted.",
+            "closeTree": "Close"
         }
     }
 }

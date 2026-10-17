@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { NgIcon, provideIcons } from '@ng-icons/core';
-import { lucideCheck, lucideCircleCheck, lucideLogOut, lucidePlay, lucideTrash2, lucideX } from '@ng-icons/lucide';
+import { lucideBan, lucideCheck, lucideCircleCheck, lucideEyeOff, lucideLogOut, lucidePlay, lucidePower, lucideTrash2, lucideX } from '@ng-icons/lucide';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NZ_MODAL_DATA, NzModalRef } from 'ng-zorro-antd/modal';
 import { ConfirmCopy } from '@app/core/models/form.model';
@@ -13,7 +13,7 @@ import { ConfirmCopy } from '@app/core/models/form.model';
 @Component({
     selector: 'confirm-body',
     imports: [NgIcon, NzButtonModule],
-    providers: [provideIcons({ lucideCheck, lucideCircleCheck, lucideLogOut, lucidePlay, lucideTrash2, lucideX })],
+    providers: [provideIcons({ lucideBan, lucideCheck, lucideCircleCheck, lucideEyeOff, lucideLogOut, lucidePlay, lucidePower, lucideTrash2, lucideX })],
     templateUrl: './confirm-body.component.html',
     styleUrl: './confirm-body.component.scss',
     changeDetection: ChangeDetectionStrategy.OnPush,

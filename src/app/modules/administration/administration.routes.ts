@@ -2,11 +2,11 @@ import { Routes } from '@angular/router';
 import { firstChildGuard } from '@app/core/guards/first-child/first-child.guard';
 import { permissionGuard } from '@app/core/guards/permission/permission.guard';
 import { unsavedChangesGuard } from '@app/core/guards/unsaved-changes/unsaved-changes.guard';
-import { FEATURE_LIST } from '@app/modules/system/feature/config/feature-list.config';
+import { FEATURE_LIST } from '@app/modules/administration/feature/config/feature-list.config';
 import { OVERLAY_PROVIDERS } from '@app/shared/constants/overlay-providers';
 
 /** Everything under /app/system. Each URL is the route of its menu item. */
-export const SYSTEM_ROUTES: Routes = [
+export const ADMINISTRATION_ROUTES: Routes = [
     {
         path: '',
         providers: [...OVERLAY_PROVIDERS],

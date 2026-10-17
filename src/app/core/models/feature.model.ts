@@ -21,7 +21,7 @@ export interface Feature {
     kind: FeatureKind;
     state: FeatureState;
     own_state: FeatureState;
-    /** The System module and its pages, which are always on. */
+    /** The registry, its module and the System module, which are always on. */
     locked: boolean;
     module_oid: string | null;
     module_label: string | null;
@@ -71,4 +71,10 @@ export interface FeatureSwitch {
     state: FeatureState;
     reason_en?: string;
     reason_bn?: string;
+}
+
+/** The Feature tree drawer: every menu entry, and every action the product has. */
+export interface FeatureTree {
+    features: { oid: string; parent_oid: string | null; slug: string; label: string; label_bn: string; route: string | null; permission_code: string | null; kind: FeatureKind; state: FeatureState }[];
+    actions: { code: string; module: string; feature: string; action: string; label: string }[];
 }

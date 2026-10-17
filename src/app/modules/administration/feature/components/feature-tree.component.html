@@ -1,0 +1,42 @@
+<nz-drawer [nzVisible]="open()" nzWidth="min(560px, 100vw)" nzPlacement="right" [nzTitle]="'administration.feature.treeTitle' | translate" [nzContent]="treeBody" [nzFooter]="treeFooter" (nzOnClose)="closed.emit()" />
+
+<ng-template #treeBody>
+    @if (failed(); as failure) {
+        <div class="text-center" role="alert">
+            <p class="m-0 text-sm text-ink-body">{{ 'administration.feature.loadFailed.' + failure | translate }}</p>
+            <button nz-button nzType="primary" type="button" class="mt-3 inline-flex items-center gap-1.5" (click)="load()">
+                <ng-icon name="lucideRotateCw" size="14px" aria-hidden="true" />
+                <span>{{ 'form.retry' | translate }}</span>
+            </button>
+        </div>
+    } @else if (data()) {
+        <p class="mt-0 mb-3 text-xs text-ink-soft">{{ 'administration.feature.treeNote' | translate }}</p>
+        <nz-tree [nzData]="nodes()" nzBlockNode nzShowLine [nzTreeTemplate]="nodeTemplate" data-registry="tree" />
+        <ng-template #nodeTemplate let-node>
+            @if (node.origin.action; as action) {
+                <span class="flex min-h-6 items-center gap-2 py-0.5" [attr.data-action]="action.code">
+                    <span class="font-mono text-xs text-ink-body">{{ action.code }}</span>
+                </span>
+            } @else {
+                <span class="flex min-h-7 items-center justify-between gap-2 py-0.5" [attr.data-node]="node.key">
+                    <span class="min-w-0 truncate text-[13px] text-ink" [class.font-semibold]="!node.origin.entry?.parent_oid">{{ node.title }}</span>
+                    @if (node.origin.entry; as entry) {
+                        <status-tag [label]="states[entry.state].label" [tone]="states[entry.state].tone" [icon]="states[entry.state].icon" />
+                    }
+                </span>
+            }
+        </ng-template>
+    } @else {
+        <span class="sr-only" role="status">{{ 'form.loading' | translate }}</span>
+        <nz-skeleton nzActive [nzTitle]="false" [nzParagraph]="{ rows: 10 }" />
+    }
+</ng-template>
+
+<ng-template #treeFooter>
+    <div class="flex justify-end">
+        <button nz-button nzType="default" type="button" class="inline-flex items-center gap-1.5" (click)="closed.emit()">
+            <ng-icon name="lucideX" size="14px" aria-hidden="true" />
+            <span>{{ 'administration.feature.closeTree' | translate }}</span>
+        </button>
+    </div>
+</ng-template>

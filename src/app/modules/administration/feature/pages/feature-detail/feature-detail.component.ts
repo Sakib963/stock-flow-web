@@ -3,7 +3,7 @@ import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@a
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { NgIcon, provideIcons } from '@ng-icons/core';
-import { lucideArrowLeft, lucideBan, lucideCheck, lucideEyeOff, lucideHistory, lucideInfo, lucideKeyRound, lucideListTree, lucidePencil, lucidePower, lucideRotateCw } from '@ng-icons/lucide';
+import { lucideArrowLeft, lucideArrowRight, lucideBan, lucideCheck, lucideEyeOff, lucideHistory, lucideInfo, lucideKeyRound, lucideListTree, lucidePencil, lucidePower, lucideRotateCw, lucideX } from '@ng-icons/lucide';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzCardModule } from 'ng-zorro-antd/card';
 import { NzFormModule } from 'ng-zorro-antd/form';
@@ -17,9 +17,9 @@ import { Feature, FeatureDetails, FeatureState } from '@app/core/models/feature.
 import { PageBack } from '@app/core/models/page-header.model';
 import { LanguageService } from '@app/core/services/language/language.service';
 import { SessionService } from '@app/core/services/session/session.service';
-import { FEATURE_KIND, FEATURE_STATE } from '@app/modules/system/feature/config/feature-list.config';
-import { FEATURE_ROUTES } from '@app/modules/system/feature/constants/feature-routes';
-import { FeatureService } from '@app/modules/system/feature/services/feature.service';
+import { FEATURE_KIND, FEATURE_STATE } from '@app/modules/administration/feature/config/feature-list.config';
+import { FEATURE_ROUTES } from '@app/modules/administration/feature/constants/feature-routes';
+import { FeatureService } from '@app/modules/administration/feature/services/feature.service';
 import { ActionFooterComponent } from '@app/shared/components/action-footer/action-footer.component';
 import { PageHeaderComponent } from '@app/shared/components/page-header/page-header.component';
 import { RecordTimelineComponent } from '@app/shared/components/record-timeline/record-timeline.component';
@@ -29,11 +29,13 @@ import { confirmAction } from '@app/shared/utils/confirm-action/confirm-action';
 import { failureKey, failureOf } from '@app/shared/utils/request-failure/request-failure';
 import { revealErrors } from '@app/shared/utils/reveal-errors/reveal-errors';
 
+const SWITCH_ICONS: Record<FeatureState, string> = { On: 'lucidePower', Disabled: 'lucideBan', Hidden: 'lucideEyeOff' };
+
 /** One module or feature, read only, with turning it on, disabling it with a reason, or hiding it. */
 @Component({
     selector: 'feature-detail',
     imports: [ReactiveFormsModule, RouterLink, NgIcon, NzButtonModule, NzCardModule, NzFormModule, NzInputModule, NzModalModule, NzSkeletonModule, TranslatePipe, PageHeaderComponent, StatusTagComponent, ActionFooterComponent, RecordTimelineComponent, RecordDatePipe],
-    providers: [provideIcons({ lucideArrowLeft, lucideBan, lucideCheck, lucideEyeOff, lucideHistory, lucideInfo, lucideKeyRound, lucideListTree, lucidePencil, lucidePower, lucideRotateCw })],
+    providers: [provideIcons({ lucideArrowLeft, lucideArrowRight, lucideBan, lucideCheck, lucideEyeOff, lucideHistory, lucideInfo, lucideKeyRound, lucideListTree, lucidePencil, lucidePower, lucideRotateCw, lucideX })],
     templateUrl: './feature-detail.component.html',
     styleUrl: './feature-detail.component.scss',
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -56,8 +58,10 @@ export class FeatureDetailComponent {
     readonly record = signal<FeatureDetails | null>(null);
     readonly loading = signal(true);
     readonly failed = signal<RequestFailure | null>(null);
-    readonly saving = this._features.saving;
+    /** The switch on its way to the server: its button shows the loader and the others wait. */
+    readonly pending = signal<FeatureState | null>(null);
     readonly disabling = signal(false);
+    readonly disableStep = signal<'reason' | 'confirm'>('reason');
 
     readonly feature = computed<Partial<Feature> | null>(() => this.record()?.details ?? this._seed);
     readonly canEdit = computed(() => this._session.can('system.feature.edit'));
@@ -100,46 +104,68 @@ export class FeatureDetailComponent {
     }
 
     turnOn(): void {
-        this.ask('On', 'lucidePower');
+        this.ask('On', {});
     }
 
     hide(): void {
-        this.ask('Hidden', 'lucideEyeOff');
+        this.ask('Hidden', {});
     }
 
     openDisable(): void {
         const f = this.record()?.details;
         this.reasonForm.reset({ reason_en: f?.disabled_message_en ?? '', reason_bn: f?.disabled_message_bn ?? '' });
+        this.disableStep.set('reason');
         this.disabling.set(true);
     }
 
-    confirmDisable(): void {
-        if (this.saving()) return;
+    /** One dialog: the reasons first, then, in the same dialog, the question with them shown. */
+    toConfirm(): void {
         if (this.reasonForm.invalid) {
             revealErrors(this.reasonForm);
             return;
         }
-        const { reason_en, reason_bn } = this.reasonForm.getRawValue();
-        this.send('Disabled', { reason_en: reason_en.trim(), reason_bn: reason_bn.trim() });
+        this.disableStep.set('confirm');
     }
 
-    private ask(state: FeatureState, icon: string): void {
+    disableNow(): void {
+        if (this.pending()) return;
+        const { reason_en, reason_bn } = this.reasonForm.getRawValue();
+        void this.send('Disabled', { reason_en: reason_en.trim(), reason_bn: reason_bn.trim() });
+    }
+
+    private ask(state: FeatureState, reasons: { reason_en?: string; reason_bn?: string }): void {
         const t = (key: string, params?: object) => this._translate.instant(key, params);
         const name = this.label(this.feature());
-        confirmAction(this._modal, { title: t(`system.feature.switch.${state}.title`, { name }), body: t(`system.feature.switch.${state}.body`), ok: t(`system.feature.switch.${state}.button`), cancel: t('form.confirm.cancel'), danger: state === 'Hidden', icon }).subscribe((confirmed) => {
-            if (confirmed) this.send(state, {});
-        });
+        // The dialog's button shows the work and stays open on a failure, so the same button tries again.
+        confirmAction(this._modal, {
+            title: t(`administration.feature.switch.${state}.title`, { name }),
+            body: t(`administration.feature.switch.${state}.body`),
+            ok: t(`administration.feature.switch.${state}.button`),
+            cancel: t('form.confirm.cancel'),
+            danger: state !== 'On',
+            icon: SWITCH_ICONS[state],
+            run: () => this.send(state, reasons),
+        }).subscribe();
     }
 
-    private send(state: FeatureState, reasons: { reason_en?: string; reason_bn?: string }): void {
-        this._features.switch({ oid: this.oid, state, ...reasons }).subscribe({
-            next: (changed) => {
-                this.disabling.set(false);
-                this._message[changed ? 'success' : 'info'](this._translate.instant(changed ? `system.feature.switch.${state}.done` : 'form.nothingChanged'));
-                this.load();
-            },
-            error: (error: unknown) => this._message.error(this._translate.instant(failureKey(error, 'form.saveFailed'))),
-        });
+    private send(state: FeatureState, reasons: { reason_en?: string; reason_bn?: string }): Promise<boolean> {
+        this.pending.set(state);
+        return new Promise((resolve) =>
+            this._features.switch({ oid: this.oid, state, ...reasons }).subscribe({
+                next: (changed) => {
+                    this.pending.set(null);
+                    this.disabling.set(false);
+                    this._message[changed ? 'success' : 'info'](this._translate.instant(changed ? `administration.feature.switch.${state}.done` : 'form.nothingChanged'));
+                    this.load();
+                    resolve(true);
+                },
+                error: (error: unknown) => {
+                    this.pending.set(null);
+                    this._message.error(this._translate.instant(failureKey(error, 'form.saveFailed')));
+                    resolve(false);
+                },
+            })
+        );
     }
 
     edit(): void {
