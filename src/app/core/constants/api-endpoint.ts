@@ -252,5 +252,9 @@ export class APIEndpoint {
     static readonly GET_MARKETING_COMPARISONS = '/api/v1/marketing/analytics/get-marketing-comparisons';
     static readonly GET_MARKETING_SOURCES = '/api/v1/marketing/analytics/get-marketing-sources';
     static readonly GET_MARKETING_NEXT = '/api/v1/marketing/analytics/get-marketing-next';
+    static readonly GET_FEATURE_LIST = '/api/v1/system/feature/get-feature-list';
+    static readonly GET_FEATURE_DETAILS = '/api/v1/system/feature/get-feature-details';
+    static readonly UPDATE_FEATURE_DETAILS = '/api/v1/system/feature/update-feature-details';
+    static readonly SWITCH_FEATURE = '/api/v1/system/feature/switch-feature';
     static readonly CREATE_PARTNER_PAYMENT = '/api/v1/marketing/partner-payment/create-partner-payment';
 }

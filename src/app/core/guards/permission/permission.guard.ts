@@ -24,5 +24,5 @@ export const permissionGuard: CanActivateFn = (route) => {
     // that load failed and a sign-out is already on its way.
     if (!session.loaded()) return false;
 
-    return session.can(required);
+    return session.can(required) && !session.isSwitchedOff(required);
 };

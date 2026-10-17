@@ -49,6 +49,13 @@ describe('permissionGuard', () => {
         expect(run('dashboard.overview.view')).toBe(true);
     });
 
+    it('refuses a page of a feature the registry has disabled or hidden, even to someone who holds it', async () => {
+        await load({ ...payload(['marketing.partner.view', 'marketing.partner.edit', 'marketing.campaign.view']), switchedOff: ['marketing.partner'] });
+
+        expect(run('marketing.partner.edit')).toBe(false);
+        expect(run('marketing.campaign.view')).toBe(true);
+    });
+
     it('lets an unguarded route through', async () => {
         await load(payload([]));
 

@@ -57,6 +57,7 @@ export class SessionService {
 
     /** A Set, because `can()` is called on every guarded control on every render. */
     private readonly _permissions = computed(() => new Set(this._payload()?.permissions ?? []));
+    private readonly _switchedOff = computed(() => new Set(this._payload()?.switchedOff ?? []));
 
     async load(owner: string): Promise<void> {
         const response = await firstValueFrom(this._http.get<{ data: SessionPayload }>(`${environment.baseUrl}${APIEndpoint.GET_USER_INFO}`, { observe: 'response' }));
@@ -106,6 +107,11 @@ export class SessionService {
      */
     can(code: string): boolean {
         return this._permissions().has(code);
+    }
+
+    /** Whether the feature behind a permission code is disabled or hidden in the registry. */
+    isSwitchedOff(code: string): boolean {
+        return this._switchedOff().has(code.slice(0, code.lastIndexOf('.')));
     }
 
     canAny(...codes: string[]): boolean {

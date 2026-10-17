@@ -57,6 +57,10 @@ export const routes: Routes = [
                 path: 'marketing',
                 loadChildren: () => import('@app/modules/marketing/marketing.routes').then((m) => m.MARKETING_ROUTES),
             },
+            {
+                path: 'system',
+                loadChildren: () => import('@app/modules/system/system.routes').then((m) => m.SYSTEM_ROUTES),
+            },
             // Any address inside the shell that is no page says so, rather than leaving an empty page.
             { path: '**', loadComponent: () => import('@app/layout/components/not-found/not-found.component').then((m) => m.NotFoundComponent) },
         ],

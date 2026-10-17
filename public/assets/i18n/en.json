@@ -4694,5 +4694,111 @@
                 }
             }
         }
+    },
+    "system": {
+        "feature": {
+            "searchPlaceholder": "Search by name, route or permission",
+            "emptyTitle": "Nothing in the registry",
+            "emptyBody": "Modules and features arrive with each release. If none show, the release did not apply.",
+            "view": "View",
+            "edit": "Edit",
+            "detailTitle": "Feature",
+            "detailLead": "What it is called, whether it is on, and who can use it.",
+            "editTitle": "Edit feature",
+            "formLead": "The names and search words people see in the menu, in both languages. Saved changes reach everyone on their next click.",
+            "backToList": "Back to the registry",
+            "loadFailed": {
+                "network": "Could not reach the server. Check your connection and try again.",
+                "forbidden": "You do not have permission to see the feature registry.",
+                "server": "This feature could not be loaded. Try again in a moment."
+            },
+            "section": {
+                "details": "Details"
+            },
+            "labelEn": "Name in English",
+            "labelBn": "Name in Bengali",
+            "labelEnPlaceholder": "For example, Purchase orders",
+            "labelBnPlaceholder": "যেমন, ক্রয় আদেশ",
+            "labelHelper": "What the menu, search and breadcrumbs call it. Page titles are part of the app and do not change.",
+            "description": "Description",
+            "descriptionEn": "Description in English",
+            "descriptionBn": "Description in Bengali",
+            "descriptionEnPlaceholder": "For example, Order stock from suppliers and receive it into a warehouse.",
+            "descriptionBnPlaceholder": "যেমন, সাপ্লায়ারের কাছ থেকে পণ্য অর্ডার করুন এবং গুদামে বুঝে নিন।",
+            "descriptionHelper": "Shown under the name in search and as the menu hint.",
+            "tags": "Search words",
+            "tagsPlaceholder": "Type a word and press Enter, for example, stock",
+            "tagsHelper": "Other words people may search for this by, in either language.",
+            "newBadge": "New badge",
+            "newHelper": "Marks it as new in the menu, so people notice it.",
+            "yes": "Yes",
+            "no": "No",
+            "module": "Module",
+            "topLevel": "Top level",
+            "route": "Address",
+            "notSet": "Not set",
+            "lastTouched": "Last changed by",
+            "lastTouchedOn": "Last changed",
+            "reason": "Reason shown to people",
+            "throughModule": "Its module is {{state}}, so it is too, whatever it says on its own.",
+            "features": "Features in this module",
+            "noFeatures": "This module has no features.",
+            "actions": "Actions and who holds them",
+            "actionsNote": "Who holds each action is set in Roles.",
+            "noActions": "This feature has no actions.",
+            "noRole": "No role",
+            "activity": "Activity",
+            "noActivity": "Nothing has changed since it arrived.",
+            "updated": "Feature saved. Everyone sees the change on their next click.",
+            "confirmEdit": {
+                "title": "Save changes to {{name}}?",
+                "body": "Everyone sees the new names in the menu and search on their next click."
+            },
+            "reasonEn": "Reason in English",
+            "reasonBn": "Reason in Bengali",
+            "reasonEnPlaceholder": "For example, Being rebuilt, back next week",
+            "reasonBnPlaceholder": "যেমন, নতুন করে তৈরি হচ্ছে, আগামী সপ্তাহে ফিরবে",
+            "reasonRequired": "Write the reason people will see.",
+            "kind": {
+                "label": "Kind",
+                "Module": "Module",
+                "Feature": "Feature"
+            },
+            "state": {
+                "label": "State",
+                "On": "On",
+                "Disabled": "Disabled",
+                "Hidden": "Hidden"
+            },
+            "stat": {
+                "on": "On",
+                "disabled": "Disabled",
+                "hidden": "Hidden"
+            },
+            "switch": {
+                "title": "On, disabled or hidden",
+                "locked": "The System module is always on: it is where features are turned back on.",
+                "note": "Disabled and hidden both stop everyone using it, you included. Its records stay, and reports keep counting them.",
+                "noteModule": "Disabling or hiding a module does the same to every feature in it. Records stay, and reports keep counting them.",
+                "On": {
+                    "title": "Turn {{name}} on?",
+                    "body": "Everyone whose role allows it can use it again from their next click.",
+                    "button": "Turn on",
+                    "done": "Turned on."
+                },
+                "Disabled": {
+                    "title": "Disable {{name}}?",
+                    "body": "It stays in the menu, greyed, with this reason. Nobody can open it or use it, you included, until it is turned on.",
+                    "button": "Disable",
+                    "done": "Disabled. Everyone sees it greyed from their next click."
+                },
+                "Hidden": {
+                    "title": "Hide {{name}}?",
+                    "body": "It disappears from the menu and search for everyone, and nobody can open it or use it, you included, until it is turned on.",
+                    "button": "Hide",
+                    "done": "Hidden from everyone."
+                }
+            }
+        }
     }
 }

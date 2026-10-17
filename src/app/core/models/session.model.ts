@@ -72,6 +72,8 @@ export interface SessionPayload {
     business: SessionBusiness;
     /** Flat codes. `can()` runs constantly, so the service holds these as a Set. */
     permissions: string[];
+    /** Features disabled or hidden in the registry among those held, as `module.feature`: their pages are refused. */
+    switchedOff?: string[];
     menu: MenuItem[];
     counters: SessionCounters;
 }
