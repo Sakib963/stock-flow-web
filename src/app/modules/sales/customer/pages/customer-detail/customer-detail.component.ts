@@ -1,3 +1,4 @@
+import { Location } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject, signal, viewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -60,6 +61,7 @@ interface CustomerStat {
 export class CustomerDetailComponent {
     private readonly _route = inject(ActivatedRoute);
     private readonly _router = inject(Router);
+    private readonly _location = inject(Location);
     private readonly _customers = inject(CustomerService);
     private readonly _session = inject(SessionService);
     private readonly _translate = inject(TranslateService);
@@ -143,6 +145,10 @@ export class CustomerDetailComponent {
 
     edit(): void {
         void this._router.navigateByUrl(CUSTOMER_ROUTES.edit(this.oid));
+    }
+
+    goBack(): void {
+        this._location.back();
     }
 
     backToList(): void {

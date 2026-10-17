@@ -1,3 +1,4 @@
+import { Location } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
@@ -53,6 +54,7 @@ type Closing = 'reject' | 'cancel';
 export class StockAdjustmentDetailComponent {
     private readonly _route = inject(ActivatedRoute);
     private readonly _router = inject(Router);
+    private readonly _location = inject(Location);
     private readonly _adjustments = inject(StockAdjustmentService);
     private readonly _session = inject(SessionService);
     private readonly _translate = inject(TranslateService);
@@ -181,6 +183,10 @@ export class StockAdjustmentDetailComponent {
                 this._message.error(this._translate.instant(failureKey(error, 'inventory.stockAdjustment.reportFailed')));
             },
         });
+    }
+
+    goBack(): void {
+        this._location.back();
     }
 
     backToList(): void {

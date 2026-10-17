@@ -1,3 +1,4 @@
+import { Location } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -42,6 +43,7 @@ import { countryName } from '@app/modules/configuration/brand/constants/origin-c
 export class BrandDetailComponent {
     private readonly _route = inject(ActivatedRoute);
     private readonly _router = inject(Router);
+    private readonly _location = inject(Location);
     private readonly _brands = inject(BrandService);
     private readonly _session = inject(SessionService);
     private readonly _translate = inject(TranslateService);
@@ -150,6 +152,10 @@ export class BrandDetailComponent {
                 this._message.error(this._translate.instant(key));
             },
         });
+    }
+
+    goBack(): void {
+        this._location.back();
     }
 
     backToList(): void {

@@ -1,3 +1,4 @@
+import { Location } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
@@ -46,6 +47,7 @@ import { resolveTone } from '@app/shared/utils/tone-map/tone-map';
 export class GiveawayDetailComponent {
     private readonly _route = inject(ActivatedRoute);
     private readonly _router = inject(Router);
+    private readonly _location = inject(Location);
     private readonly _giveaways = inject(GiveawayService);
     private readonly _session = inject(SessionService);
     private readonly _translate = inject(TranslateService);
@@ -89,6 +91,10 @@ export class GiveawayDetailComponent {
             next: (details) => this.record.set(details),
             error: (error: unknown) => this.failed.set(failureOf(error)),
         });
+    }
+
+    goBack(): void {
+        this._location.back();
     }
 
     backToList(): void {

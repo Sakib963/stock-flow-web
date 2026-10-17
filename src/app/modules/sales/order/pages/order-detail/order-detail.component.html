@@ -37,9 +37,6 @@
                         @if (statusTone(); as style) {
                             <status-tag [label]="style.label" [tone]="style.tone" [icon]="style.icon" size="standard" />
                         }
-                        @if (deliveryTone(); as style) {
-                            <status-tag [label]="style.label" [tone]="style.tone" [icon]="style.icon" size="standard" />
-                        }
                     </dd>
                 </div>
                 <div>
@@ -302,6 +299,12 @@
                         ><h2 class="m-0 flex items-center gap-1.5 text-sm font-bold text-ink"><ng-icon name="lucideMapPin" size="14px" class="text-ink-muted" aria-hidden="true" />{{ 'sales.order.section.delivery' | translate }}</h2></ng-template
                     >
                     <dl class="m-0 grid grid-cols-1 gap-x-6 gap-y-3 md:grid-cols-2">
+                        @if (deliveryTone(); as style) {
+                            <div class="md:col-span-2">
+                                <dt class="text-xs text-ink-muted">{{ 'sales.order.parcelLabel' | translate }}</dt>
+                                <dd class="mt-1 mb-0" data-detail="parcel"><status-tag [label]="style.label" [tone]="style.tone" [icon]="style.icon" size="standard" /></dd>
+                            </div>
+                        }
                         <div>
                             <dt class="text-xs text-ink-muted">{{ 'sales.order.recipient' | translate }}</dt>
                             <dd class="mt-1 mb-0 text-sm font-semibold text-ink">{{ online.recipient_name }}</dd>
@@ -408,9 +411,9 @@
     </div>
 
     <action-footer>
-        <button nz-button nzType="default" type="button" class="inline-flex items-center gap-1.5" (click)="backToList()">
+        <button nz-button nzType="default" type="button" class="inline-flex items-center gap-1.5" (click)="goBack()">
             <ng-icon name="lucideArrowLeft" size="14px" aria-hidden="true" />
-            <span>{{ 'sales.order.backToList' | translate }}</span>
+            <span>{{ 'list.back' | translate }}</span>
         </button>
     </action-footer>
 }

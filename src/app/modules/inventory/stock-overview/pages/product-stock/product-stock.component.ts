@@ -1,3 +1,4 @@
+import { Location } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { NgIcon, provideIcons } from '@ng-icons/core';
@@ -69,6 +70,7 @@ import { RecordTimelineComponent } from '@app/shared/components/record-timeline/
 export class ProductStockComponent {
     private readonly _route = inject(ActivatedRoute);
     private readonly _router = inject(Router);
+    private readonly _location = inject(Location);
     private readonly _stock = inject(StockOverviewService);
     private readonly _session = inject(SessionService);
     private readonly _message = inject(NzMessageService);
@@ -215,6 +217,10 @@ export class ProductStockComponent {
                 this._message.error(this._translate.instant(failureKey(error, 'inventory.stockOverview.quick.reportFailed')));
             },
         });
+    }
+
+    goBack(): void {
+        this._location.back();
     }
 
     backToList(): void {

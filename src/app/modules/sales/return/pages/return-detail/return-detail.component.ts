@@ -1,3 +1,4 @@
+import { Location } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
@@ -53,6 +54,7 @@ type Dialog = 'confirm' | 'cancel';
 export class ReturnDetailComponent {
     private readonly _route = inject(ActivatedRoute);
     private readonly _router = inject(Router);
+    private readonly _location = inject(Location);
     private readonly _returns = inject(ReturnService);
     private readonly _session = inject(SessionService);
     private readonly _translate = inject(TranslateService);
@@ -97,6 +99,10 @@ export class ReturnDetailComponent {
             next: (details) => this.record.set(details),
             error: (error: unknown) => this.failed.set(failureOf(error)),
         });
+    }
+
+    goBack(): void {
+        this._location.back();
     }
 
     backToList(): void {

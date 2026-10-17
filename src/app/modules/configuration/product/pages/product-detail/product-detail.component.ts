@@ -1,3 +1,4 @@
+import { Location } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { NgIcon, provideIcons } from '@ng-icons/core';
@@ -54,6 +55,7 @@ import { resolveTone } from '@app/shared/utils/tone-map/tone-map';
 export class ProductDetailComponent {
     private readonly _route = inject(ActivatedRoute);
     private readonly _router = inject(Router);
+    private readonly _location = inject(Location);
     private readonly _products = inject(ProductService);
     private readonly _session = inject(SessionService);
     private readonly _translate = inject(TranslateService);
@@ -203,6 +205,10 @@ export class ProductDetailComponent {
                 },
             });
         });
+    }
+
+    goBack(): void {
+        this._location.back();
     }
 
     backToList(): void {

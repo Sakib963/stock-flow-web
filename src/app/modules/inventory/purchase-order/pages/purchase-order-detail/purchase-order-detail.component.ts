@@ -1,3 +1,4 @@
+import { Location } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -93,6 +94,7 @@ import { RecordTimelineComponent } from '@app/shared/components/record-timeline/
 export class PurchaseOrderDetailComponent {
     private readonly _route = inject(ActivatedRoute);
     private readonly _router = inject(Router);
+    private readonly _location = inject(Location);
     private readonly _orders = inject(PurchaseOrderService);
     private readonly _session = inject(SessionService);
     private readonly _translate = inject(TranslateService);
@@ -325,6 +327,10 @@ export class PurchaseOrderDetailComponent {
                 this._message.error(this._translate.instant(failureKey(error, 'inventory.purchaseOrder.report.failed')));
             },
         });
+    }
+
+    goBack(): void {
+        this._location.back();
     }
 
     backToList(): void {

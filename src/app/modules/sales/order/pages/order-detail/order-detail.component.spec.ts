@@ -107,6 +107,13 @@ describe('OrderDetailComponent', () => {
         expect(quick(delivered.element)).not.toContain('label');
     });
 
+    it('shows the order status once under Status and the parcel status under Parcel, so a delivered order is not tagged Delivered twice', async () => {
+        const { element } = await open(order({ status: 'Delivered', online: { ...order().online!, delivery_status: 'Delivered' } }));
+        expect(element.querySelectorAll('[data-detail="status"] status-tag').length).toBe(1);
+        expect(element.querySelector('[data-detail="status"]')!.textContent).toContain('sales.order.status.Delivered');
+        expect(element.querySelector('[data-detail="parcel"]')!.textContent).toContain('sales.order.delivery.Delivered');
+    });
+
     it('offers only the invoice on a POS sale, which only a return can undo', async () => {
         const { element } = await open(order({ channel: 'POS', status: 'Purchased', online: null }));
         expect(quick(element)).toEqual(['print', 'none']);

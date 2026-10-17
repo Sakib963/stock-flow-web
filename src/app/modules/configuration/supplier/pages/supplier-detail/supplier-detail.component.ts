@@ -1,3 +1,4 @@
+import { Location } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgIcon, provideIcons } from '@ng-icons/core';
@@ -53,6 +54,7 @@ interface SupplierStat {
 export class SupplierDetailComponent {
     private readonly _route = inject(ActivatedRoute);
     private readonly _router = inject(Router);
+    private readonly _location = inject(Location);
     private readonly _suppliers = inject(SupplierService);
     private readonly _session = inject(SessionService);
     private readonly _translate = inject(TranslateService);
@@ -177,6 +179,10 @@ export class SupplierDetailComponent {
                 this._message.error(this._translate.instant(key));
             },
         });
+    }
+
+    goBack(): void {
+        this._location.back();
     }
 
     backToList(): void {

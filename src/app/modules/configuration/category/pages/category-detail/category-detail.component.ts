@@ -1,3 +1,4 @@
+import { Location } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -41,6 +42,7 @@ import { resolveTone } from '@app/shared/utils/tone-map/tone-map';
 export class CategoryDetailComponent {
     private readonly _route = inject(ActivatedRoute);
     private readonly _router = inject(Router);
+    private readonly _location = inject(Location);
     private readonly _categories = inject(CategoryService);
     private readonly _session = inject(SessionService);
     private readonly _translate = inject(TranslateService);
@@ -144,6 +146,10 @@ export class CategoryDetailComponent {
                 this._message.error(this._translate.instant(key));
             },
         });
+    }
+
+    goBack(): void {
+        this._location.back();
     }
 
     backToList(): void {
