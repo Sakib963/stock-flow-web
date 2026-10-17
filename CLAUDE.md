@@ -224,6 +224,19 @@ went wrong and what to do.
 
 ### Forms
 
+- **Every text input and textarea has a placeholder**, translated in both languages
+  (`[attr.placeholder]="'<feature>.<field>Placeholder' | translate"`): a realistic example of what
+  goes there, not the label repeated. A form with placeholders on only some fields is not done;
+  check every field before calling it finished.
+- **An edit with nothing changed calls no API.** Save checks `form.dirty` first and shows
+  `form.nothingChanged` instead; a change kept outside the form (a picked or removed photo) calls
+  `form.markAsDirty()`. Every edit page does this; copy `brand-edit`.
+- **A record opens to read, never straight into a form.** Even a single record such as the business
+  settings has a view page with an Edit button (absent without the edit permission) and its own
+  edit route behind `unsavedChangesGuard`. Cancel and a finished save return to the view.
+- **Every record page ends in an `action-footer` with Back** (`lucideArrowLeft`, `list.back`), and
+  Back calls `Location.back()`, so it returns wherever the person came from. It goes to a fixed
+  route only when the requirement says to, and then its label names the place ("Back to orders").
 - Rules are shown **before** the person types (a checklist that ticks off), not as an error after.
 - Errors sit inline under the field that failed, with `aria-invalid` and `aria-describedby`. The
   outcome of submitting (saved, failed) is an `NzMessageService` message as well.
