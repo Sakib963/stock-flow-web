@@ -65,6 +65,12 @@ export const MARKETING_ROUTES: Routes = [
                 data: { permission: CAMPAIGN_LIST.permission },
                 loadComponent: () => import('./campaign/pages/campaign-detail/campaign-detail.component').then((m) => m.CampaignDetailComponent),
             },
+            {
+                path: 'analytics',
+                canActivate: [permissionGuard],
+                data: { permission: 'marketing.analytics.view' },
+                loadComponent: () => import('./analytics/pages/marketing-analytics/marketing-analytics.component').then((m) => m.MarketingAnalyticsComponent),
+            },
         ],
     },
 ];

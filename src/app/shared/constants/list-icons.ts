@@ -45,6 +45,7 @@ import {
     lucideUndo2,
     lucideWifiOff,
     lucideLock,
+    lucideMinus,
     lucideUsers,
 } from '@ng-icons/lucide';
 
@@ -84,6 +85,7 @@ export const LIST_ICONS = {
     lucideHandCoins,
     lucideInbox,
     lucideLock,
+    lucideMinus,
     lucidePackage,
     lucidePackageCheck,
     lucidePackageMinus,

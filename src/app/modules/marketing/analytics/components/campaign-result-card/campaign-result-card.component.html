@@ -1,0 +1,113 @@
+@let r = result();
+<nz-card [nzTitle]="cardTitle" [attr.data-result]="r.oid">
+    <ng-template #cardTitle>
+        <div class="flex flex-wrap items-center justify-between gap-2">
+            <h3 class="m-0 min-w-0 truncate text-sm font-bold text-ink">
+                @if (canOpen()) {
+                    <a [routerLink]="campaignRoute(r.oid)">{{ r.name }}</a>
+                } @else {
+                    {{ r.name }}
+                }
+                <span class="ml-1 font-mono text-xs font-normal text-ink-muted">{{ r.campaign_no }}</span>
+            </h3>
+            <status-tag [label]="verdict().label" [tone]="verdict().tone" [icon]="verdict().icon" size="standard" data-verdict />
+        </div>
+    </ng-template>
+
+    <p class="mt-0 mb-3 text-xs text-ink-muted">
+        {{ 'marketing.analytics.result.window' | translate: { from: (r.window_from | recordDate: language()), to: (r.window_to | recordDate: language()) } }}
+        @if (r.so_far) {
+            <span class="font-semibold text-ink-body">{{ 'marketing.analytics.result.soFar' | translate }}</span>
+        }
+    </p>
+
+    @if (r.verdict === 'too_little') {
+        <p class="mt-0 mb-3 text-sm text-ink-body" data-reason>{{ 'marketing.analytics.result.reason.' + r.reason | translate: { floor: r.floor } | digits }}</p>
+    }
+
+    <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+        <div>
+            <p class="m-0 mb-1.5 text-xs font-semibold text-ink-muted">{{ 'marketing.analytics.result.promoted' | translate }}</p>
+            <div class="flex flex-col gap-1.5 text-xs">
+                <div>
+                    <span class="flex justify-between"><span class="text-ink-body">{{ 'marketing.analytics.result.before' | translate }}</span><span class="font-mono tabular-nums">{{ r.promoted_before | digits }}</span></span>
+                    <span class="mt-0.5 block h-1.5 rounded-full bg-line"><span class="block h-full rounded-full bg-ink-soft" [style.width.%]="bars().before"></span></span>
+                </div>
+                <div>
+                    <span class="flex justify-between"><span class="text-ink-body">{{ 'marketing.analytics.result.inWindow' | translate }}</span><span class="font-mono tabular-nums">{{ r.promoted_window | digits }}</span></span>
+                    <span class="mt-0.5 block h-1.5 rounded-full bg-line"><span class="block h-full rounded-full bg-primary" [style.width.%]="bars().window"></span></span>
+                </div>
+            </div>
+        </div>
+        <dl class="m-0 grid grid-cols-2 gap-x-3 gap-y-2 text-xs">
+            @if (judged()) {
+                <div>
+                    <dt class="text-ink-muted">{{ 'marketing.analytics.result.trend' | translate }}</dt>
+                    <dd class="m-0 font-mono text-sm font-semibold text-ink tabular-nums">{{ (r.trend_percent! > 0 ? '+' : '') + r.trend_percent | digits }}%</dd>
+                </div>
+                <div>
+                    <dt class="text-ink-muted">{{ 'marketing.analytics.result.extra' | translate }}</dt>
+                    <dd class="m-0 font-mono text-sm font-semibold tabular-nums" [class.text-success-ink]="r.extra! > 0" [class.text-ink]="r.extra! <= 0">{{ r.extra | digits }}</dd>
+                </div>
+                <div>
+                    <dt class="text-ink-muted">{{ 'marketing.analytics.result.extraProfit' | translate }}</dt>
+                    <dd class="m-0 font-mono text-sm font-semibold text-ink tabular-nums">
+                        @if (r.extra_profit === null) {
+                            <span class="font-sans text-xs font-normal text-ink-muted">{{ 'marketing.analytics.result.notShown' | translate }}</span>
+                        } @else {
+                            {{ r.extra_profit | money }}
+                        }
+                    </dd>
+                </div>
+            }
+            <div>
+                <dt class="text-ink-muted">{{ 'marketing.analytics.result.cost' | translate }}</dt>
+                <dd class="m-0 font-mono text-sm font-semibold text-ink tabular-nums">
+                    @if (r.no_cost_recorded && !r.cost) {
+                        <span class="font-sans text-xs font-normal text-ink-muted">{{ 'marketing.analytics.result.noCost' | translate }}</span>
+                    } @else {
+                        {{ r.cost | money }}
+                    }
+                </dd>
+                @if (r.money_hidden) {
+                    <dd class="m-0 text-[11px] text-ink-muted">{{ 'marketing.analytics.result.costHidden' | translate }}</dd>
+                }
+            </div>
+            @if (r.return_per_taka !== null && r.return_per_taka !== undefined) {
+                <div class="col-span-2">
+                    <dt class="text-ink-muted">{{ 'marketing.analytics.result.perTaka' | translate }}</dt>
+                    <dd class="m-0 font-mono text-sm font-semibold text-ink tabular-nums" data-per-taka>{{ r.return_per_taka | money }}</dd>
+                </div>
+            }
+        </dl>
+    </div>
+
+    <p class="mt-3 mb-0 flex items-center gap-1.5 text-xs text-ink-body">
+        <ng-icon name="lucideUsers" size="13px" class="text-ink-muted" aria-hidden="true" />
+        {{ 'marketing.analytics.result.firstTime' | translate: { count: r.first_time, promoted: r.first_time_promoted } | digits }}
+    </p>
+
+    @if (r.not_judged.length) {
+        <p class="mt-2 mb-0 text-xs text-ink-muted" data-not-judged>{{ 'marketing.analytics.result.notJudged' | translate: { products: r.not_judged.join(', ') } }}</p>
+    }
+    @for (overlap of r.overlaps; track overlap.oid) {
+        <p class="mt-2 mb-0 flex items-start gap-1.5 rounded-control border border-warning-border bg-warning-bg px-2.5 py-1.5 text-xs text-ink-body" [attr.data-overlap]="overlap.oid">
+            <ng-icon name="lucideTriangleAlert" size="13px" class="mt-0.5 shrink-0 text-warning-ink" aria-hidden="true" />
+            {{ 'marketing.analytics.result.overlap' | translate: { name: overlap.name, days: overlap.days, products: overlap.products.join(', ') } | digits }}
+        </p>
+    }
+
+    <nz-collapse class="mt-3" [nzBordered]="false" nzGhost>
+        <nz-collapse-panel [nzHeader]="howHeader" data-how>
+            <ol class="m-0 flex flex-col gap-1.5 pl-5 text-xs leading-relaxed text-ink-body">
+                @for (step of steps(); track step.key) {
+                    <li>{{ 'marketing.analytics.how.' + step.key | translate: step.params | digits }}</li>
+                }
+            </ol>
+            <p class="mt-2 mb-0 text-xs text-ink-muted">{{ 'marketing.analytics.how.caveat' | translate }}</p>
+        </nz-collapse-panel>
+    </nz-collapse>
+    <ng-template #howHeader
+        ><span class="inline-flex items-center gap-1.5 text-xs font-semibold text-ink"><ng-icon name="lucideCircleHelp" size="13px" aria-hidden="true" />{{ 'marketing.analytics.how.title' | translate }}</span></ng-template
+    >
+</nz-card>

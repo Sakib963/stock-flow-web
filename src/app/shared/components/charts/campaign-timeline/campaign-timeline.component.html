@@ -1,0 +1,23 @@
+@if (values().length) {
+    <svg class="block h-auto w-full" [attr.viewBox]="'0 0 ' + width + ' ' + height" role="img" [attr.aria-label]="label()">
+        <defs>
+            <linearGradient [attr.id]="gradientId" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" class="timeline-stop" stop-opacity="0.2" />
+                <stop offset="100%" class="timeline-stop" stop-opacity="0" />
+            </linearGradient>
+        </defs>
+        @for (band of shaded(); track band.key) {
+            <rect class="timeline-band" [attr.x]="band.x" y="0" [attr.width]="band.width" [attr.height]="baseline" [attr.data-band]="band.key" />
+            <text class="timeline-band-label" [attr.x]="band.x + 4" [attr.y]="band.labelY">{{ band.label }}</text>
+        }
+        <line class="timeline-axis" x1="0" [attr.y1]="baseline" [attr.x2]="width" [attr.y2]="baseline" vector-effect="non-scaling-stroke" />
+        <polygon [attr.points]="area()" [attr.fill]="'url(#' + gradientId + ')'" />
+        <polyline class="timeline-line" [attr.points]="line()" fill="none" stroke-width="1.75" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke" />
+        @for (pin of pinned(); track pin.key) {
+            <line class="timeline-pin-stem" [attr.x1]="pin.x" [attr.y1]="pin.y" [attr.x2]="pin.x" [attr.y2]="baseline" vector-effect="non-scaling-stroke" />
+            <circle class="timeline-pin" [attr.cx]="pin.x" [attr.cy]="pin.y" r="4" data-pin />
+        }
+        <text class="timeline-tick" x="0" [attr.y]="height - 6">{{ startLabel() }}</text>
+        <text class="timeline-tick" [attr.x]="width" [attr.y]="height - 6" text-anchor="end">{{ endLabel() }}</text>
+    </svg>
+}

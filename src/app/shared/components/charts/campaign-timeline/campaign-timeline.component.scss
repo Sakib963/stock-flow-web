@@ -1,0 +1,28 @@
+// SVG paint takes a colour, not a utility class, so the tokens are set here.
+.timeline-line {
+    stroke: var(--color-primary);
+}
+.timeline-stop {
+    stop-color: var(--color-primary);
+}
+.timeline-band {
+    fill: var(--color-warning-bg);
+}
+.timeline-band-label {
+    fill: var(--color-warning-ink);
+    font-size: 10px;
+    font-weight: 600;
+}
+.timeline-axis,
+.timeline-pin-stem {
+    stroke: var(--color-line);
+}
+.timeline-pin {
+    fill: var(--color-success);
+    stroke: var(--color-surface-page);
+    stroke-width: 1.5;
+}
+.timeline-tick {
+    fill: var(--color-ink-muted);
+    font-size: 10px;
+}
