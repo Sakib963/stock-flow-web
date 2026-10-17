@@ -93,120 +93,73 @@
         </div>
     }
 
-    <!-- The ledger. A blank row is always last; picking a product in it starts the next. -->
     <section class="-mx-4 border-t border-line md:-mx-5" data-form="lines" [attr.aria-label]="'inventory.purchaseOrder.lines' | translate">
         <div class="flex flex-wrap items-center justify-between gap-2 px-4 py-3 md:px-5">
             <h2 class="m-0 flex items-center gap-1.5 text-sm font-bold text-ink">
                 <ng-icon name="lucideListOrdered" size="14px" class="text-ink-muted" aria-hidden="true" />
                 {{ 'inventory.purchaseOrder.lines' | translate }}
-                <span class="rounded-full bg-surface-sunken px-2 text-xs font-semibold text-ink-muted">{{ started().length | digits }}</span>
+                <span class="rounded-full bg-surface-sunken px-2 text-xs font-semibold text-ink-muted">{{ lines().length | digits }}</span>
             </h2>
-            <p class="m-0 hidden text-xs text-ink-muted md:block">{{ 'inventory.purchaseOrder.keyboardHint' | translate }}</p>
+            <button nz-button type="button" class="inline-flex items-center gap-1.5" data-form="add-line" (click)="addLine()">
+                <ng-icon name="lucidePlus" size="14px" aria-hidden="true" />
+                <span>{{ 'inventory.purchaseOrder.addProduct' | translate }}</span>
+            </button>
         </div>
 
-        <nz-table nzTemplateMode nzSize="small" [nzScroll]="{ x: '980px' }" formArrayName="lines">
-            <thead>
-                <tr>
-                    <th nzWidth="40px" class="text-center">#</th>
-                    <th nzWidth="30%"><span class="text-danger" aria-hidden="true">*</span> {{ 'inventory.purchaseOrder.product' | translate }}</th>
-                    <th nzWidth="16%"><span class="text-danger" aria-hidden="true">*</span> {{ 'inventory.purchaseOrder.warehouse' | translate }}</th>
-                    <th nzWidth="14%">{{ 'inventory.purchaseOrder.aisle' | translate }}</th>
-                    <th nzWidth="10%"><span class="text-danger" aria-hidden="true">*</span> {{ 'inventory.purchaseOrder.quantity' | translate }}</th>
-                    <th nzWidth="13%"><span class="text-danger" aria-hidden="true">*</span> {{ 'inventory.purchaseOrder.unitPrice' | translate }}</th>
-                    <th nzWidth="13%" class="text-right">{{ 'inventory.purchaseOrder.lineTotal' | translate }}</th>
-                    <th nzWidth="44px">
-                        <span class="sr-only">{{ 'inventory.purchaseOrder.removeLine' | translate }}</span>
-                    </th>
-                </tr>
-            </thead>
-            <tbody>
-                @for (line of lines.controls; track line; let i = $index) {
-                    <tr [formGroupName]="i" [class.bg-danger-bg]="lineInvalid(i)" [attr.data-line]="i">
-                        <td class="text-center font-mono text-xs text-ink-muted">{{ i + 1 | digits }}</td>
-                        <td>
-                            <nz-select
-                                class="w-full"
-                                formControlName="product_oid"
-                                nzShowSearch
-                                nzServerSearch
-                                [nzLoading]="searching() && searchRow() === i"
-                                [nzPlaceHolder]="'inventory.purchaseOrder.productPlaceholder' | translate"
-                                [nzNotFoundContent]="searching() && searchRow() === i ? loadingChoices : ('inventory.purchaseOrder.productNotFound' | translate)"
-                                [attr.aria-label]="'inventory.purchaseOrder.product' | translate"
-                                [nzDropdownStyle]="{ 'min-width': '440px' }"
-                                (nzOnSearch)="search(i, $event)"
-                                (nzOpenChange)="$event && search(i, '')"
-                            >
-                                @for (group of optionsFor(i); track group.label) {
-                                    <nz-option-group [nzLabel]="group.label">
-                                        @for (product of group.rows; track product.oid) {
-                                            <nz-option nzCustomContent [nzValue]="product.oid" [nzLabel]="product.name">
-                                                <div class="flex items-start justify-between gap-3 py-0.5">
-                                                    <!-- An option's text never wraps and the dropdown grows to fit it, so this column starts at no width, takes what the stock column leaves and truncates. -->
-                                                    <div class="w-0 min-w-0 flex-1">
-                                                        <span class="block truncate text-[13px] font-semibold text-ink">{{ product.name }}</span>
-                                                        <span class="block truncate font-mono text-xs text-ink-muted">{{ product.sku }}</span>
-                                                        @if (product.last_unit_price !== null) {
-                                                            <span class="block truncate text-xs text-ink-muted">{{ 'inventory.purchaseOrder.lastPaid' | translate: { price: (product.last_unit_price | money), supplier: product.last_supplier_name } }}</span>
-                                                        }
-                                                        @if (alreadyOn(product.oid, i)) {
-                                                            <span class="block truncate text-xs font-semibold text-warning-ink">{{ 'inventory.purchaseOrder.alreadyOn' | translate }}</span>
-                                                        }
-                                                    </div>
-                                                    <div class="shrink-0 text-right text-xs">
-                                                        <span class="block font-mono" [class.text-danger]="product.sellable === 0" [class.text-warning-ink]="product.sellable > 0 && product.sellable <= product.restock_threshold" [class.text-ink-body]="product.sellable > product.restock_threshold">
-                                                            {{ 'inventory.purchaseOrder.stockAgainst' | translate: { stock: product.sellable, restock: product.restock_threshold } | digits }}
-                                                        </span>
-                                                        @if (product.sold_30_days !== null) {
-                                                            <span class="block text-ink-muted">{{ 'inventory.purchaseOrder.sold30' | translate: { count: product.sold_30_days } | digits }}</span>
-                                                        }
-                                                    </div>
-                                                </div>
-                                            </nz-option>
-                                        }
-                                    </nz-option-group>
+        @if (lines().length) {
+            <nz-table nzTemplateMode nzSize="small" [nzScroll]="{ x: '760px' }">
+                <thead>
+                    <tr>
+                        <th nzWidth="40px" class="text-center">#</th>
+                        <th>{{ 'inventory.purchaseOrder.product' | translate }}</th>
+                        <th nzWidth="170px">{{ 'inventory.purchaseOrder.warehouse' | translate }}</th>
+                        <th nzWidth="80px" class="text-right">{{ 'inventory.purchaseOrder.quantity' | translate }}</th>
+                        <th nzWidth="110px" class="text-right">{{ 'inventory.purchaseOrder.unitPrice' | translate }}</th>
+                        <th nzWidth="120px" class="text-right">{{ 'inventory.purchaseOrder.lineTotal' | translate }}</th>
+                        <th nzWidth="88px">
+                            <span class="sr-only">{{ 'inventory.purchaseOrder.lineActions' | translate }}</span>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (line of lines(); track $index; let i = $index) {
+                        <tr [class.bg-danger-bg]="incomplete()[i]" [attr.data-line]="i">
+                            <td class="text-center font-mono text-xs text-ink-muted">{{ i + 1 | digits }}</td>
+                            <td>
+                                <span class="block text-[13px] font-semibold text-ink">{{ line.product.name }}</span>
+                                <span class="block font-mono text-xs text-ink-muted">{{ line.product.sku }}</span>
+                            </td>
+                            <td class="text-xs text-ink-body">{{ whereAt(i) }}</td>
+                            <td class="text-right font-mono text-[13px] text-ink">{{ line.quantity ?? '' | digits }}</td>
+                            <td class="text-right font-mono text-[13px] text-ink">
+                                @if (line.unit_price !== null) {
+                                    {{ line.unit_price | money }}
                                 }
-                            </nz-select>
-                        </td>
-                        <td>
-                            <nz-select class="w-full" formControlName="warehouse_oid" nzShowSearch [nzLoading]="warehousesLoading()" [nzNotFoundContent]="warehousesLoading() ? loadingChoices : noMatch" [nzPlaceHolder]="'inventory.purchaseOrder.choose' | translate" [attr.aria-label]="'inventory.purchaseOrder.warehouse' | translate" [attr.aria-invalid]="lineInvalid(i) || null">
-                                @for (warehouse of warehouses(); track warehouse.value) {
-                                    <nz-option [nzValue]="warehouse.value" [nzLabel]="warehouse.label" />
+                            </td>
+                            <td class="text-right font-mono text-[13px] text-ink">
+                                @if (lineTotalAt(i); as total) {
+                                    {{ total | money }}
                                 }
-                            </nz-select>
-                        </td>
-                        <td>
-                            <nz-select class="w-full" formControlName="aisle_oid" [nzDisabled]="!line.controls.warehouse_oid.value" [nzLoading]="aislesLoading()" [nzPlaceHolder]="'inventory.purchaseOrder.noAisle' | translate" [attr.aria-label]="'inventory.purchaseOrder.aisle' | translate">
-                                <nz-option [nzValue]="null" [nzLabel]="'inventory.purchaseOrder.noAisle' | translate" />
-                                @for (aisle of aislesOf(line.controls.warehouse_oid.value); track aisle.value) {
-                                    <nz-option [nzValue]="aisle.value" [nzLabel]="aisle.label" />
-                                }
-                            </nz-select>
-                        </td>
-                        <td>
-                            <nz-input-number class="w-full font-mono" [attr.id]="'po-line-' + i + '-quantity'" formControlName="quantity" [nzMin]="1" [nzMax]="9999" [nzPrecision]="0" [attr.aria-label]="'inventory.purchaseOrder.quantity' | translate" [attr.aria-invalid]="lineInvalid(i) || null" />
-                        </td>
-                        <td>
-                            <nz-input-number class="w-full font-mono" formControlName="unit_price" [nzMin]="0" [nzPrecision]="0" [attr.aria-label]="'inventory.purchaseOrder.unitPrice' | translate" [attr.aria-invalid]="lineInvalid(i) || null" />
-                        </td>
-                        <td class="text-right font-mono text-[13px] text-ink">
-                            @if (lineTotal(i); as total) {
-                                {{ total | money }}
-                            }
-                        </td>
-                        <td class="text-center">
-                            @if (!isBlank(i)) {
-                                <button nz-button nzType="text" nzSize="small" type="button" nz-tooltip [nzTooltipTitle]="'inventory.purchaseOrder.removeLine' | translate" [attr.aria-label]="'inventory.purchaseOrder.removeLine' | translate" (click)="removeLine(i)">
+                            </td>
+                            <td class="text-right whitespace-nowrap">
+                                <button nz-button nzType="text" nzSize="small" type="button" nz-tooltip [nzTooltipTitle]="'inventory.purchaseOrder.editLine' | translate" [attr.aria-label]="'inventory.purchaseOrder.editLine' | translate" data-line-action="edit" (click)="editLine(i)">
+                                    <ng-icon name="lucidePencil" size="14px" class="text-ink-muted" aria-hidden="true" />
+                                </button>
+                                <button nz-button nzType="text" nzSize="small" type="button" nz-tooltip [nzTooltipTitle]="'inventory.purchaseOrder.removeLine' | translate" [attr.aria-label]="'inventory.purchaseOrder.removeLine' | translate" data-line-action="remove" (click)="removeLine(i)">
                                     <ng-icon name="lucideTrash2" size="14px" class="text-ink-muted" aria-hidden="true" />
                                 </button>
-                            }
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </nz-table>
-
-        @if (!started().length) {
+                            </td>
+                        </tr>
+                        @if (incomplete()[i]) {
+                            <tr class="bg-danger-bg" [attr.data-line-problem]="i">
+                                <td></td>
+                                <td colspan="6" class="pt-0 text-xs text-danger-ink" role="alert">{{ 'inventory.purchaseOrder.drawer.incomplete' | translate }}</td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </nz-table>
+        } @else {
             <div class="px-4 py-8 text-center md:px-5" data-form="lines-empty">
                 <p class="m-0 text-[13px] font-semibold text-ink">{{ 'inventory.purchaseOrder.noLinesTitle' | translate }}</p>
                 <p class="mx-auto mt-1 mb-0 max-w-[48ch] text-xs text-ink-muted">{{ 'inventory.purchaseOrder.noLinesBody' | translate }}</p>
@@ -219,6 +172,8 @@
         </div>
     </section>
 </form>
+
+<order-line-drawer [open]="drawerOpen()" [line]="drawerLine()" [carry]="carry()" [onOtherLines]="onOtherLines()" [warehouses]="warehouses()" [aisles]="aisles()" [choicesLoading]="choicesLoading()" (saved)="saveLine($event)" (closed)="closeDrawer()" />
 
 <ng-template #loadingChoices>
     <p class="m-0 flex items-center justify-center gap-2 py-2 text-xs text-ink-muted" role="status">

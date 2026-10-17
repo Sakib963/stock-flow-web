@@ -1,8 +1,8 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, ElementRef, computed, effect, inject, input, output, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, computed, effect, inject, input, output, signal } from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
-import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { NgIcon, provideIcons } from '@ng-icons/core';
-import { lucideListOrdered, lucideRotateCw, lucideTrash2 } from '@ng-icons/lucide';
+import { lucideListOrdered, lucidePencil, lucidePlus, lucideRotateCw, lucideTrash2 } from '@ng-icons/lucide';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
 import { NzFormModule } from 'ng-zorro-antd/form';
@@ -14,51 +14,29 @@ import { NzSpinModule } from 'ng-zorro-antd/spin';
 import { NzTableModule } from 'ng-zorro-antd/table';
 import { NzTooltipModule } from 'ng-zorro-antd/tooltip';
 import { TranslatePipe } from '@ngx-translate/core';
-import { Subject, debounceTime, finalize, switchMap, catchError, of } from 'rxjs';
+import { finalize } from 'rxjs';
 
-import { AisleChoice, PAYMENT_STATUSES, PURCHASE_TYPES, PaymentStatus, PurchasableProduct, PurchaseOrderDetails, PurchaseOrderPayload, PurchaseType, SupplierChoice, WarehouseChoice } from '@app/core/models/purchase-order.model';
+import { AisleChoice, PAYMENT_STATUSES, PURCHASE_TYPES, PaymentStatus, PurchaseLineDraft, PurchaseOrderDetails, PurchaseOrderPayload, PurchaseType, SupplierChoice, WarehouseChoice } from '@app/core/models/purchase-order.model';
 import { LanguageService } from '@app/core/services/language/language.service';
+import { OrderLineDrawerComponent } from '@app/modules/inventory/purchase-order/components/order-line-drawer/order-line-drawer.component';
 import { PurchaseOrderService } from '@app/modules/inventory/purchase-order/services/purchase-order.service';
+import { lineComplete, lineTotal } from '@app/modules/inventory/purchase-order/utils/order-line/order-line';
 import { DigitsPipe } from '@app/shared/pipes/digits/digits.pipe';
 import { MoneyPipe } from '@app/shared/pipes/money/money.pipe';
 import { RecordDatePipe } from '@app/shared/pipes/record-date/record-date.pipe';
-import { categoryGroups } from '@app/shared/utils/category-groups/category-groups';
 import { revealErrors } from '@app/shared/utils/reveal-errors/reveal-errors';
 import { fromDay, toDay } from '@app/shared/utils/calendar-day/calendar-day';
-
-/** What a product looks like on a line: enough to draw it without asking the server again. */
-interface LineProduct {
-    oid: string;
-    name: string;
-    sku: string | null;
-    category_name?: string | null;
-    sub_category_name?: string | null;
-    sellable: number;
-    restock_threshold: number;
-    sold_30_days: number | null;
-    last_unit_price: string | null;
-    last_supplier_name: string | null;
-}
-
-type LineGroup = FormGroup<{
-    product_oid: FormControl<string>;
-    warehouse_oid: FormControl<string>;
-    aisle_oid: FormControl<string | null>;
-    quantity: FormControl<number | null>;
-    unit_price: FormControl<number | null>;
-}>;
 
 /**
  * The purchase order form, rendered by both the create page and the edit page.
  *
- * The products are a ledger: typed straight into rows, with a blank row always last. Picking a
- * product in it starts the next one, carrying the warehouse and aisle down, so a delivery going to
- * one place is typed once. A blank last row is not a line and never blocks saving.
+ * Lines are read only in the table and added or changed one at a time in a drawer, so the product
+ * picker has the full width on a phone. A new line starts in the last line's warehouse and aisle.
  */
 @Component({
     selector: 'purchase-order-form',
-    imports: [DigitsPipe, MoneyPipe, RecordDatePipe, NgIcon, ReactiveFormsModule, NzButtonModule, NzDatePickerModule, NzFormModule, NzInputModule, NzInputNumberModule, NzRadioModule, NzSelectModule, NzSpinModule, NzTableModule, NzTooltipModule, TranslatePipe],
-    providers: [provideIcons({ lucideListOrdered, lucideRotateCw, lucideTrash2 })],
+    imports: [DigitsPipe, MoneyPipe, RecordDatePipe, NgIcon, OrderLineDrawerComponent, ReactiveFormsModule, NzButtonModule, NzDatePickerModule, NzFormModule, NzInputModule, NzInputNumberModule, NzRadioModule, NzSelectModule, NzSpinModule, NzTableModule, NzTooltipModule, TranslatePipe],
+    providers: [provideIcons({ lucideListOrdered, lucidePencil, lucidePlus, lucideRotateCw, lucideTrash2 })],
     templateUrl: './purchase-order-form.component.html',
     styleUrl: './purchase-order-form.component.scss',
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -66,7 +44,6 @@ type LineGroup = FormGroup<{
 export class PurchaseOrderFormComponent {
     private readonly _builder = inject(FormBuilder).nonNullable;
     private readonly _orders = inject(PurchaseOrderService);
-    private readonly _host = inject<ElementRef<HTMLElement>>(ElementRef);
     private readonly _destroy = inject(DestroyRef);
 
     readonly language = inject(LanguageService).current;
@@ -79,8 +56,6 @@ export class PurchaseOrderFormComponent {
 
     readonly submitted = output<void>();
 
-    readonly lines = this._builder.array<LineGroup>([]);
-
     readonly form = this._builder.group({
         supplier_oid: ['', [Validators.required]],
         purchase_type: ['' as PurchaseType | '', [Validators.required]],
@@ -88,7 +63,6 @@ export class PurchaseOrderFormComponent {
         payment_status: ['' as PaymentStatus | '', [Validators.required]],
         paid_amount: [null as number | null],
         special_notes: ['', [Validators.maxLength(1000)]],
-        lines: this.lines,
     });
 
     private readonly _value = toSignal(this.form.valueChanges, { initialValue: this.form.getRawValue() });
@@ -101,18 +75,26 @@ export class PurchaseOrderFormComponent {
     readonly warehousesLoading = signal(true);
     readonly aislesLoading = signal(true);
 
-    /** Every product a line has picked, by oid, so a row draws its name, stock and last price. */
-    readonly products = signal<Record<string, LineProduct>>({});
-    readonly results = signal<PurchasableProduct[]>([]);
-    readonly searching = signal(false);
-    /** The row whose product search is open: the results belong to it alone. */
-    readonly searchRow = signal<number | null>(null);
-    private readonly _search = new Subject<string>();
+    readonly lines = signal<PurchaseLineDraft[]>([]);
+    readonly drawerOpen = signal(false);
+    /** The row the drawer is changing, or null while it adds one. */
+    readonly editingRow = signal<number | null>(null);
+    readonly drawerLine = computed(() => {
+        const row = this.editingRow();
+        return row === null ? null : (this.lines()[row] ?? null);
+    });
+    readonly carry = computed(() => {
+        const last = this.lines()
+            .filter((line) => !!line.warehouse_oid)
+            .at(-1);
+        return last ? { warehouse_oid: last.warehouse_oid, aisle_oid: last.aisle_oid } : null;
+    });
+    readonly onOtherLines = computed(() => new Set(this.lines().filter((_, i) => i !== this.editingRow()).map((line) => line.product.oid)));
+    readonly choicesLoading = computed(() => this.warehousesLoading() || this.aislesLoading());
+    /** A line kept from a draft can still be missing something; Submit waits for it. */
+    readonly incomplete = computed(() => this.lines().map((line) => !lineComplete(line)));
 
-    /** The lines that count: a product picked. The blank row at the end is not a line. */
-    readonly started = computed(() => (this._value().lines ?? []).filter((line) => !!line?.product_oid));
-
-    readonly total = computed(() => this.started().reduce((sum, line) => sum + (Number(line.quantity) || 0) * (Number(line.unit_price) || 0), 0));
+    readonly total = computed(() => this.lines().reduce((sum, line) => sum + (lineTotal(line) ?? 0), 0));
 
     readonly partial = computed(() => this._value().payment_status === 'partially_paid');
 
@@ -121,7 +103,7 @@ export class PurchaseOrderFormComponent {
         const value = this._value();
         const header = [value.supplier_oid, value.purchase_type, value.payment_status].filter((field) => !field).length;
         const paid = value.payment_status === 'partially_paid' && !value.paid_amount ? 1 : 0;
-        const lines = this.started().length ? this.started().filter((line) => !line.warehouse_oid || !line.quantity || line.unit_price === null || line.unit_price === undefined).length : 1;
+        const lines = this.lines().length ? this.incomplete().filter(Boolean).length : 1;
         return header + paid + lines;
     });
 
@@ -140,18 +122,6 @@ export class PurchaseOrderFormComponent {
 
     constructor() {
         this.loadChoices();
-        this.addBlankLine();
-
-        this._search
-            .pipe(
-                debounceTime(250),
-                switchMap((term) => this._orders.searchProducts(term).pipe(catchError(() => of([] as PurchasableProduct[])))),
-                takeUntilDestroyed(this._destroy)
-            )
-            .subscribe((found) => {
-                this.results.set(found);
-                this.searching.set(false);
-            });
 
         // Only a partial payment is typed. Paid and unpaid are what the server records anyway.
         this.form.controls.payment_status.valueChanges.pipe(takeUntilDestroyed(this._destroy)).subscribe((status) => {
@@ -197,66 +167,43 @@ export class PurchaseOrderFormComponent {
         return supplier.label.toLowerCase().includes(needle) || (!!digits && supplier.phone_number.replace(/\D/g, '').includes(digits));
     };
 
-    aislesOf(warehouse: string | null): AisleChoice[] {
-        return warehouse ? this.aisles().filter((aisle) => aisle.warehouse_oid === warehouse) : [];
+    /** Where a line goes, as the table shows it. */
+    whereAt(row: number): string {
+        const line = this.lines()[row];
+        const warehouse = this.warehouses().find((w) => w.value === line.warehouse_oid)?.label;
+        const aisle = this.aisles().find((a) => a.value === line.aisle_oid)?.label;
+        return warehouse ? (aisle ? warehouse + ' › ' + aisle : warehouse) : '';
     }
 
-    search(row: number, term: string): void {
-        this.searchRow.set(row);
-        // From the keystroke, not after the debounce, so the picker never says nothing matches while it is still asking.
-        this.searching.set(true);
-        this._search.next(term);
+    lineTotalAt(row: number): number | null {
+        return lineTotal(this.lines()[row]);
     }
 
-    /** What a row's product picker offers: its own product, then the search results while it is the one searching. */
-    optionsFor(row: number) {
-        const own = this.products()[this.lines.at(row).controls.product_oid.value];
-        const found = this.searchRow() === row ? this.results() : [];
-        return categoryGroups(own && !found.some((p) => p.oid === own.oid) ? [own, ...found] : found);
+    addLine(): void {
+        this.editingRow.set(null);
+        this.drawerOpen.set(true);
     }
 
-    /** How many other lines already carry this product, so it is marked rather than refused: two warehouses is a real case. */
-    alreadyOn(product: string, row: number): boolean {
-        return this.lines.controls.some((line, index) => index !== row && line.controls.product_oid.value === product);
+    editLine(row: number): void {
+        this.editingRow.set(row);
+        this.drawerOpen.set(true);
     }
 
-    private picked(line: LineGroup, product: string): void {
-        const row = this.lines.controls.indexOf(line);
-        if (row < 0 || !product) return;
-        const found = this.results().find((p) => p.oid === product);
-        if (found) this.products.update((known) => ({ ...known, [found.oid]: found }));
-
-        if (found && line.controls.unit_price.value === null && found.last_unit_price !== null) line.controls.unit_price.setValue(Number(found.last_unit_price));
-        if (row === this.lines.length - 1) this.addBlankLine(line);
-
-        // Enter picks, then moves on to the quantity.
-        setTimeout(() => this._host.nativeElement.querySelector<HTMLInputElement>(`#po-line-${row}-quantity input`)?.focus());
+    closeDrawer(): void {
+        this.drawerOpen.set(false);
+        this.editingRow.set(null);
     }
 
-    /** An aisle belongs to one warehouse, so moving the line elsewhere drops an aisle that is not there. */
-    private warehouseChanged(line: LineGroup): void {
-        const aisle = line.controls.aisle_oid.value;
-        if (aisle && !this.aislesOf(line.controls.warehouse_oid.value).some((a) => a.value === aisle)) line.controls.aisle_oid.setValue(null);
+    saveLine(line: PurchaseLineDraft): void {
+        const row = this.editingRow();
+        this.lines.update((lines) => (row === null ? [...lines, line] : lines.map((old, i) => (i === row ? line : old))));
+        this.form.markAsDirty();
+        this.closeDrawer();
     }
 
     removeLine(row: number): void {
-        this.lines.removeAt(row);
-        this.lines.markAsDirty();
-        if (!this.lines.length || this.lines.at(this.lines.length - 1).controls.product_oid.value) this.addBlankLine();
-    }
-
-    isBlank(row: number): boolean {
-        return !this.lines.at(row).controls.product_oid.value;
-    }
-
-    lineTotal(row: number): number | null {
-        const { quantity, unit_price, product_oid } = this.lines.at(row).getRawValue();
-        return product_oid && quantity && unit_price !== null ? quantity * unit_price : null;
-    }
-
-    lineInvalid(row: number): boolean {
-        const line = this.lines.at(row);
-        return !!line.controls.product_oid.value && line.invalid && line.touched;
+        this.lines.update((lines) => lines.filter((_, i) => i !== row));
+        this.form.markAsDirty();
     }
 
     /** Whether the order being edited has been submitted: its payment is then shown, never sent. */
@@ -276,17 +223,15 @@ export class PurchaseOrderFormComponent {
             purchase_type: (raw.purchase_type || null) as PurchaseType | null,
             expected_delivery_date: toDay(raw.expected_delivery_date),
             special_notes: raw.special_notes.trim() || null,
-            products: raw.lines.filter((line) => !!line.product_oid).map((line) => ({ product_oid: line.product_oid, warehouse_oid: line.warehouse_oid || null, aisle_oid: line.aisle_oid || null, quantity: number(line.quantity), unit_price: number(line.unit_price) })),
+            products: this.lines().map((line) => ({ product_oid: line.product.oid, warehouse_oid: line.warehouse_oid, aisle_oid: line.aisle_oid, quantity: number(line.quantity), unit_price: number(line.unit_price) })),
         };
     }
 
     /** Valid once every header field and every started line is complete, and at least one line is. */
     valid(): boolean {
         revealErrors(this.form);
-        for (const line of this.lines.controls) if (line.controls.product_oid.value) line.markAllAsTouched();
-        const lines = this.lines.controls.filter((line) => !!line.controls.product_oid.value);
         const header = ['supplier_oid', 'purchase_type', 'payment_status', 'paid_amount', 'special_notes'].every((key) => this.form.get(key)!.valid);
-        return header && lines.length > 0 && lines.every((line) => line.valid);
+        return header && this.lines().length > 0 && this.incomplete().every((missing) => !missing);
     }
 
     /** A draft needs only its supplier: 20 or 30 lines are rarely typed in one sitting. */
@@ -302,33 +247,17 @@ export class PurchaseOrderFormComponent {
         return control.invalid && control.touched ? true : null;
     }
 
-    private addBlankLine(from?: LineGroup): void {
-        const warehouse = from?.controls.warehouse_oid.value ?? '';
-        const line: LineGroup = this._builder.group({
-            product_oid: [''],
-            warehouse_oid: [warehouse, [Validators.required]],
-            aisle_oid: [from?.controls.aisle_oid.value ?? (null as string | null)],
-            quantity: [null as number | null, [Validators.required, Validators.min(1), Validators.max(9999)]],
-            unit_price: [null as number | null, [Validators.required, Validators.min(0), Validators.max(99999999)]],
-        }) as LineGroup;
-        line.controls.product_oid.valueChanges.pipe(takeUntilDestroyed(this._destroy)).subscribe((product) => this.picked(line, product));
-        line.controls.warehouse_oid.valueChanges.pipe(takeUntilDestroyed(this._destroy)).subscribe(() => this.warehouseChanged(line));
-        this.lines.push(line);
-    }
-
     private fill(record: PurchaseOrderDetails): void {
         const { details, lines } = record;
-        this.products.update((known) => ({
-            ...known,
-            ...Object.fromEntries(lines.map((line) => [line.product_oid, { oid: line.product_oid, name: line.product_name, sku: line.sku, sellable: line.sellable, restock_threshold: line.restock_threshold, sold_30_days: null, last_unit_price: null, last_supplier_name: null }])),
-        }));
-
-        this.lines.clear();
-        for (const line of lines) {
-            this.addBlankLine();
-            this.lines.at(this.lines.length - 1).setValue({ product_oid: line.product_oid, warehouse_oid: line.warehouse_oid ?? '', aisle_oid: line.aisle_oid, quantity: line.ordered_quantity, unit_price: line.ordered_unit_price === null ? null : Number(line.ordered_unit_price) }, { emitEvent: false });
-        }
-        this.addBlankLine(this.lines.at(this.lines.length - 1));
+        this.lines.set(
+            lines.map((line) => ({
+                product: { oid: line.product_oid, name: line.product_name, sku: line.sku, sellable: line.sellable, restock_threshold: line.restock_threshold, sold_30_days: null, last_unit_price: null, last_supplier_name: null },
+                warehouse_oid: line.warehouse_oid,
+                aisle_oid: line.aisle_oid,
+                quantity: line.ordered_quantity,
+                unit_price: line.ordered_unit_price === null ? null : Number(line.ordered_unit_price),
+            }))
+        );
 
         this.form.patchValue({
             supplier_oid: details.supplier_oid,

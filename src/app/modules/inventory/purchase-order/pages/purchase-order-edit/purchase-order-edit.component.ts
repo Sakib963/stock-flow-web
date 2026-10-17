@@ -95,7 +95,7 @@ export class PurchaseOrderEditComponent implements HasUnsavedChanges {
         }
         if (!editor.valid()) {
             // With no product picked there is no field to mark, so say what is missing.
-            this._message.error(this._translate.instant(editor.started().length ? 'form.fixErrors' : 'inventory.purchaseOrder.needsProduct'));
+            this._message.error(this._translate.instant(editor.lines().length ? 'form.fixErrors' : 'inventory.purchaseOrder.needsProduct'));
             return;
         }
 

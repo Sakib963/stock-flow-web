@@ -1,0 +1,141 @@
+<!-- Never wider than the screen: on a phone the drawer is the whole width. -->
+<nz-drawer [nzVisible]="open()" nzWidth="min(480px, 100vw)" nzPlacement="right" [nzTitle]="(line() ? 'inventory.purchaseOrder.drawer.editTitle' : 'inventory.purchaseOrder.drawer.addTitle') | translate" [nzContent]="drawerBody" [nzFooter]="drawerFooter" (nzOnClose)="closed.emit()" />
+
+<ng-template #drawerBody>
+    <form nz-form nzLayout="vertical" [formGroup]="form" (ngSubmit)="save()">
+        <nz-form-item>
+            <nz-form-label nzRequired nzFor="ol-product">{{ 'inventory.purchaseOrder.product' | translate }}</nz-form-label>
+            <nz-form-control>
+                <nz-select
+                    nzId="ol-product"
+                    class="w-full"
+                    nzShowSearch
+                    nzServerSearch
+                    [nzOptionHeightPx]="optionHeight"
+                    [ngModel]="product()?.oid ?? null"
+                    [ngModelOptions]="{ standalone: true }"
+                    [nzLoading]="searching()"
+                    [nzPlaceHolder]="'inventory.purchaseOrder.productPlaceholder' | translate"
+                    [nzNotFoundContent]="searching() || preloading() ? loading : ('inventory.purchaseOrder.productNotFound' | translate)"
+                    (nzOnSearch)="search($event)"
+                    (nzOpenChange)="opened($event)"
+                    (ngModelChange)="pickProduct($event)"
+                >
+                    @for (group of optionGroups(); track group.label) {
+                        <nz-option-group [nzLabel]="group.label">
+                            @for (option of group.rows; track option.oid) {
+                                <nz-option nzCustomContent [nzValue]="option.oid" [nzLabel]="option.name">
+                                    <div class="flex items-start justify-between gap-3">
+                                        <div class="w-0 min-w-0 flex-1">
+                                            <span class="block truncate text-[13px] font-semibold text-ink">{{ option.name }}</span>
+                                            <span class="block truncate font-mono text-xs text-ink-muted">{{ option.sku }}</span>
+                                            @if (onOtherLines().has(option.oid)) {
+                                                <span class="block truncate text-xs font-semibold text-warning-ink">{{ 'inventory.purchaseOrder.alreadyOn' | translate }}</span>
+                                            } @else if (option.last_unit_price !== null) {
+                                                <span class="block truncate text-xs text-ink-muted">{{ 'inventory.purchaseOrder.lastPaid' | translate: { price: (option.last_unit_price | money), supplier: option.last_supplier_name } }}</span>
+                                            }
+                                        </div>
+                                        <span class="shrink-0 text-right font-mono text-xs" [class.text-danger]="option.sellable === 0" [class.text-warning-ink]="option.sellable > 0 && option.sellable <= option.restock_threshold" [class.text-ink-body]="option.sellable > option.restock_threshold">
+                                            {{ 'inventory.purchaseOrder.stockAgainst' | translate: { stock: option.sellable, restock: option.restock_threshold } | digits }}
+                                        </span>
+                                    </div>
+                                </nz-option>
+                            }
+                        </nz-option-group>
+                    }
+                </nz-select>
+            </nz-form-control>
+        </nz-form-item>
+
+        @if (product(); as current) {
+            <!-- What the person checks before deciding how many to buy. -->
+            <dl class="m-0 mb-6 grid grid-cols-2 gap-3 rounded-control bg-surface-sunken px-3 py-2 text-xs" data-drawer="product">
+                <div>
+                    <dt class="text-ink-muted">{{ 'inventory.purchaseOrder.drawer.stock' | translate }}</dt>
+                    <dd class="m-0 font-mono text-ink">{{ 'inventory.purchaseOrder.stockAgainst' | translate: { stock: current.sellable, restock: current.restock_threshold } | digits }}</dd>
+                </div>
+                @if (current.sold_30_days !== null) {
+                    <div>
+                        <dt class="text-ink-muted">{{ 'inventory.purchaseOrder.drawer.sold' | translate }}</dt>
+                        <dd class="m-0 font-mono text-ink">{{ 'inventory.purchaseOrder.sold30' | translate: { count: current.sold_30_days } | digits }}</dd>
+                    </div>
+                }
+                @if (current.last_unit_price !== null) {
+                    <div class="col-span-2">
+                        <dt class="text-ink-muted">{{ 'inventory.purchaseOrder.drawer.lastPaid' | translate }}</dt>
+                        <dd class="m-0 text-ink">{{ 'inventory.purchaseOrder.lastPaid' | translate: { price: (current.last_unit_price | money), supplier: current.last_supplier_name } }}</dd>
+                    </div>
+                }
+            </dl>
+
+            <div class="grid grid-cols-2 gap-x-3">
+                <nz-form-item>
+                    <nz-form-label nzRequired nzFor="ol-warehouse">{{ 'inventory.purchaseOrder.warehouse' | translate }}</nz-form-label>
+                    <nz-form-control>
+                        <nz-select nzId="ol-warehouse" class="w-full" formControlName="warehouse_oid" nzShowSearch [nzLoading]="choicesLoading()" [nzNotFoundContent]="choicesLoading() ? loading : undefined" [nzPlaceHolder]="'inventory.purchaseOrder.choose' | translate">
+                            @for (warehouse of warehouses(); track warehouse.value) {
+                                <nz-option [nzValue]="warehouse.value" [nzLabel]="warehouse.label" />
+                            }
+                        </nz-select>
+                    </nz-form-control>
+                </nz-form-item>
+                <nz-form-item>
+                    <nz-form-label nzFor="ol-aisle">{{ 'inventory.purchaseOrder.aisle' | translate }}</nz-form-label>
+                    <nz-form-control>
+                        <nz-select nzId="ol-aisle" class="w-full" formControlName="aisle_oid" [nzDisabled]="!value().warehouse_oid" [nzPlaceHolder]="'inventory.purchaseOrder.noAisle' | translate">
+                            <nz-option [nzValue]="null" [nzLabel]="'inventory.purchaseOrder.noAisle' | translate" />
+                            @for (aisle of aislesHere(); track aisle.value) {
+                                <nz-option [nzValue]="aisle.value" [nzLabel]="aisle.label" />
+                            }
+                        </nz-select>
+                    </nz-form-control>
+                </nz-form-item>
+            </div>
+
+            <div class="grid grid-cols-2 gap-x-3">
+                <nz-form-item>
+                    <nz-form-label nzRequired nzFor="ol-quantity">{{ 'inventory.purchaseOrder.quantity' | translate }}</nz-form-label>
+                    <nz-form-control>
+                        <nz-input-number nzId="ol-quantity" class="w-full font-mono" formControlName="quantity" [nzMin]="1" [nzMax]="9999" [nzPrecision]="0" [nzPlaceHolder]="'inventory.purchaseOrder.drawer.quantityPlaceholder' | translate" />
+                    </nz-form-control>
+                </nz-form-item>
+                <nz-form-item>
+                    <nz-form-label nzRequired nzFor="ol-price">{{ 'inventory.purchaseOrder.unitPrice' | translate }}</nz-form-label>
+                    <nz-form-control>
+                        <nz-input-number nzId="ol-price" class="w-full font-mono" formControlName="unit_price" [nzMin]="0" [nzMax]="99999999" [nzPrecision]="0" [nzPlaceHolder]="'inventory.purchaseOrder.drawer.pricePlaceholder' | translate" />
+                    </nz-form-control>
+                </nz-form-item>
+            </div>
+
+            <div class="flex items-baseline justify-between border-t border-line pt-3" data-drawer="line-total">
+                <span class="text-xs text-ink-muted">{{ 'inventory.purchaseOrder.lineTotal' | translate }}</span>
+                <span class="font-mono text-base font-bold text-ink tabular-nums">{{ lineTotal() ?? 0 | money }}</span>
+            </div>
+        }
+    </form>
+</ng-template>
+
+<ng-template #drawerFooter>
+    <div class="flex flex-col gap-2">
+        @if (incomplete()) {
+            <p class="m-0 text-xs text-danger-ink" role="alert" data-drawer="problem">{{ 'inventory.purchaseOrder.drawer.incomplete' | translate }}</p>
+        }
+        <div class="flex items-center justify-end gap-2">
+            <button nz-button type="button" class="inline-flex items-center gap-1.5" (click)="closed.emit()">
+                <ng-icon name="lucideX" size="14px" aria-hidden="true" />
+                <span>{{ 'form.cancel' | translate }}</span>
+            </button>
+            <button nz-button nzType="primary" type="button" class="inline-flex items-center gap-1.5" data-drawer="save" (click)="save()">
+                <ng-icon name="lucideCheck" size="14px" aria-hidden="true" />
+                <span>{{ (line() ? 'inventory.purchaseOrder.drawer.saveLine' : 'inventory.purchaseOrder.drawer.addLine') | translate }}</span>
+            </button>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #loading>
+    <p class="m-0 flex items-center justify-center gap-2 py-2 text-xs text-ink-muted" role="status">
+        <nz-spin nzSimple nzSize="small" />
+        {{ 'form.loading' | translate }}
+    </p>
+</ng-template>

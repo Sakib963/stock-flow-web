@@ -185,6 +185,22 @@ export interface PurchasableProduct {
     last_bought_on: string | null;
 }
 
+/** A product as an order line draws it; a line loaded from a saved order knows no sales or last price. */
+export type LineProduct = Pick<PurchasableProduct, 'oid' | 'name' | 'sku' | 'sellable' | 'restock_threshold' | 'category_name' | 'sub_category_name'> & {
+    sold_30_days: number | null;
+    last_unit_price: string | null;
+    last_supplier_name: string | null;
+};
+
+/** One line of the order form. A draft saved earlier can hold a line not yet complete. */
+export interface PurchaseLineDraft {
+    product: LineProduct;
+    warehouse_oid: string | null;
+    aisle_oid: string | null;
+    quantity: number | null;
+    unit_price: number | null;
+}
+
 export interface SupplierChoice {
     value: string;
     label: string;
