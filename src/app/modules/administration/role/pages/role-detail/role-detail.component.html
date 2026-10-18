@@ -1,0 +1,180 @@
+<page-header [back]="back" [title]="'administration.role.detailTitle' | translate" [lead]="'administration.role.detailLead' | translate">
+    @if (canEdit()) {
+        <button nz-button nzType="primary" type="button" class="inline-flex items-center gap-1.5" (click)="edit()" data-role="edit">
+            <ng-icon name="lucidePencil" size="14px" aria-hidden="true" />
+            <span>{{ 'administration.role.edit' | translate }}</span>
+        </button>
+    }
+</page-header>
+
+@if (failed(); as failure) {
+    <div class="sf-empty" role="alert">
+        <p class="m-0 text-sm text-ink-body">{{ 'administration.role.loadFailed.' + failure | translate }}</p>
+        <div class="mt-3 flex items-center justify-center gap-2">
+            <button nz-button nzType="default" type="button" class="inline-flex items-center gap-1.5" (click)="backToList()">
+                <ng-icon name="lucideArrowLeft" size="14px" aria-hidden="true" />
+                <span>{{ 'administration.role.backToList' | translate }}</span>
+            </button>
+            <button nz-button nzType="primary" type="button" class="inline-flex items-center gap-1.5" (click)="load()">
+                <ng-icon name="lucideRotateCw" size="14px" aria-hidden="true" />
+                <span>{{ 'form.retry' | translate }}</span>
+            </button>
+        </div>
+    </div>
+} @else {
+    @if (loading()) {
+        <span class="sr-only" role="status">{{ 'form.loading' | translate }}</span>
+    }
+
+    <nz-card [nzTitle]="detailsTitle" data-detail="details">
+        <ng-template #detailsTitle
+            ><h2 class="m-0 flex items-center gap-1.5 text-sm font-bold text-ink"><ng-icon name="lucideInfo" size="14px" class="text-ink-muted" aria-hidden="true" />{{ 'administration.role.section.details' | translate }}</h2></ng-template
+        >
+        @if (role(); as r) {
+            <dl class="m-0 grid grid-cols-2 gap-x-6 gap-y-4 md:grid-cols-4">
+                <div>
+                    <dt class="text-xs text-ink-muted">{{ 'administration.role.name' | translate }}</dt>
+                    <dd class="mt-1 mb-0 flex items-center gap-1.5 text-sm font-semibold text-ink">
+                        {{ r.name }}
+                        @if (r.is_system) {
+                            <status-tag label="administration.role.locked" tone="neutral" icon="lucideLock" />
+                        }
+                    </dd>
+                </div>
+                <div>
+                    <dt class="text-xs text-ink-muted">{{ 'administration.role.status.label' | translate }}</dt>
+                    <dd class="mt-1 mb-0">
+                        @if (statusTone(); as style) {
+                            <status-tag [label]="style.label" [tone]="style.tone" [icon]="style.icon" size="standard" />
+                        }
+                    </dd>
+                </div>
+                <div>
+                    <dt class="text-xs text-ink-muted">{{ 'administration.role.holders' | translate }}</dt>
+                    <dd class="mt-1 mb-0 text-sm font-semibold text-ink">{{ record()?.holders?.length ?? r.holders ?? 0 | digits }}</dd>
+                </div>
+                <div>
+                    <dt class="text-xs text-ink-muted">{{ 'administration.role.lastTouchedOn' | translate }}</dt>
+                    <dd class="mt-1 mb-0 text-sm font-semibold text-ink">
+                        @if (r.last_action_on) {
+                            {{ r.last_action_on | recordDate: language() : 'date' }}
+                        }
+                    </dd>
+                </div>
+                <div class="col-span-2 border-t border-line-soft pt-4 md:col-span-4">
+                    <dt class="text-xs text-ink-muted">{{ 'administration.role.description' | translate }}</dt>
+                    <dd class="mt-1 mb-0 max-w-[75ch] text-sm leading-relaxed text-ink-body">{{ r.description || ('administration.role.noDescription' | translate) }}</dd>
+                </div>
+            </dl>
+        } @else {
+            <nz-skeleton nzActive [nzTitle]="false" [nzParagraph]="{ rows: 3 }" />
+        }
+    </nz-card>
+
+    <div class="mt-2 grid grid-cols-1 items-start gap-2 md:mt-4 md:gap-4 lg:grid-cols-3">
+        <nz-card class="lg:col-span-2" [nzTitle]="accessTitle" data-detail="access">
+            <ng-template #accessTitle
+                ><h2 class="m-0 flex items-center gap-1.5 text-sm font-bold text-ink"><ng-icon name="lucideKeyRound" size="14px" class="text-ink-muted" aria-hidden="true" />{{ 'administration.role.access' | translate }}</h2></ng-template
+            >
+            @if (record() && tree(); as loaded) {
+                @if (record()?.codes?.length) {
+                    <grant-tree [tree]="loaded" [keep]="ticked()" [showState]="false" />
+                } @else {
+                    <p class="m-0 text-xs text-ink-muted">{{ 'administration.role.nothingGranted' | translate }}</p>
+                }
+            } @else {
+                <nz-skeleton nzActive [nzTitle]="false" [nzParagraph]="{ rows: 6 }" />
+            }
+        </nz-card>
+
+        <div class="flex flex-col gap-2 md:gap-4">
+            <nz-card [nzTitle]="holdersTitle" data-detail="holders">
+                <ng-template #holdersTitle
+                    ><h2 class="m-0 flex items-center gap-1.5 text-sm font-bold text-ink"><ng-icon name="lucideUsers" size="14px" class="text-ink-muted" aria-hidden="true" />{{ 'administration.role.holders' | translate }}</h2></ng-template
+                >
+                @if (record(); as loaded) {
+                    <ul class="m-0 flex list-none flex-col divide-y divide-line-soft p-0">
+                        @for (holder of loaded.holders; track holder.oid) {
+                            <li class="py-2" [attr.data-holder]="holder.email">
+                                <span class="block truncate text-[13px] font-semibold text-ink">{{ holder.name }}</span>
+                                <span class="block truncate text-xs text-ink-muted">{{ holder.email }}</span>
+                            </li>
+                        } @empty {
+                            <li class="py-2 text-xs text-ink-muted">{{ 'administration.role.noHolders' | translate }}</li>
+                        }
+                    </ul>
+                } @else {
+                    <nz-skeleton nzActive [nzTitle]="false" [nzParagraph]="{ rows: 3 }" />
+                }
+            </nz-card>
+
+            @if (canEdit() || canDelete()) {
+                @if (record(); as loaded) {
+                    <nz-card [nzTitle]="actionsTitle" data-detail="actions">
+                        <ng-template #actionsTitle
+                            ><h2 class="m-0 flex items-center gap-1.5 text-sm font-bold text-ink"><ng-icon name="lucidePower" size="14px" class="text-ink-muted" aria-hidden="true" />{{ 'administration.role.quickActions' | translate }}</h2></ng-template
+                        >
+                        @if (loaded.details.is_system) {
+                            <p class="m-0 text-xs text-ink-muted" data-role="system">{{ 'administration.role.systemNote' | translate: { name: loaded.details.name } }}</p>
+                        } @else {
+                            <div class="flex flex-col gap-2">
+                                @if (canEdit()) {
+                                    <button nz-button nzType="default" [nzDanger]="loaded.details.status === 'Active'" type="button" class="inline-flex items-center justify-center gap-1.5" [disabled]="pending() === 'delete' || (loaded.details.status === 'Active' && holdsIt())" [nzLoading]="pending() === 'status'" (click)="toggleStatus()" data-role="status">
+                                        @if (pending() !== 'status') {
+                                            <ng-icon name="lucidePower" size="14px" aria-hidden="true" />
+                                        }
+                                        <span>{{ (loaded.details.status === 'Active' ? 'administration.role.switch.Inactive.button' : 'administration.role.switch.Active.button') | translate }}</span>
+                                    </button>
+                                    @if (loaded.details.status === 'Active' && holdsIt()) {
+                                        <p class="m-0 text-xs text-ink-muted" data-role="own">{{ 'administration.role.switch.own' | translate }}</p>
+                                    }
+                                }
+                                @if (canDelete()) {
+                                    <button nz-button nzType="default" nzDanger type="button" class="inline-flex items-center justify-center gap-1.5" [disabled]="!!loaded.holders.length || pending() === 'status'" [nzLoading]="pending() === 'delete'" (click)="remove()" data-role="delete">
+                                        @if (pending() !== 'delete') {
+                                            <ng-icon name="lucideTrash2" size="14px" aria-hidden="true" />
+                                        }
+                                        <span>{{ 'administration.role.delete.button' | translate }}</span>
+                                    </button>
+                                    @if (loaded.holders.length) {
+                                        <p class="m-0 text-xs text-ink-muted" data-role="delete-reason">{{ 'administration.role.delete.held' | translate: { count: loaded.holders.length } | digits }}</p>
+                                    }
+                                }
+                            </div>
+                        }
+                    </nz-card>
+                }
+            }
+
+            <nz-card [nzTitle]="activityTitle" data-detail="activity">
+                <ng-template #activityTitle
+                    ><h2 class="m-0 flex items-center gap-1.5 text-sm font-bold text-ink"><ng-icon name="lucideHistory" size="14px" class="text-ink-muted" aria-hidden="true" />{{ 'administration.role.activity' | translate }}</h2></ng-template
+                >
+                @if (record(); as loaded) {
+                    @if (loaded.activity.length) {
+                        <record-timeline [entries]="loaded.activity">
+                            <ng-template let-entry>
+                                <p class="m-0 text-[13px] font-semibold text-ink">{{ entry.action }}</p>
+                                @if (entry.description) {
+                                    <p class="mt-0.5 mb-0 text-xs text-ink-body">{{ entry.description }}</p>
+                                }
+                                <p class="mt-0.5 mb-0 text-xs text-ink-muted">{{ entry.user }} &middot; {{ entry.date | recordDate: language() : 'date-time-12' }}</p>
+                            </ng-template>
+                        </record-timeline>
+                    } @else {
+                        <p class="m-0 text-xs text-ink-muted">{{ 'administration.role.noActivity' | translate }}</p>
+                    }
+                } @else {
+                    <nz-skeleton nzActive [nzTitle]="false" [nzParagraph]="{ rows: 4 }" />
+                }
+            </nz-card>
+        </div>
+    </div>
+
+    <action-footer>
+        <button nz-button nzType="default" type="button" class="inline-flex items-center gap-1.5" (click)="goBack()">
+            <ng-icon name="lucideArrowLeft" size="14px" aria-hidden="true" />
+            <span>{{ 'list.back' | translate }}</span>
+        </button>
+    </action-footer>
+}

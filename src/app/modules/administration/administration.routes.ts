@@ -3,9 +3,10 @@ import { firstChildGuard } from '@app/core/guards/first-child/first-child.guard'
 import { permissionGuard } from '@app/core/guards/permission/permission.guard';
 import { unsavedChangesGuard } from '@app/core/guards/unsaved-changes/unsaved-changes.guard';
 import { FEATURE_LIST } from '@app/modules/administration/feature/config/feature-list.config';
+import { ROLE_LIST } from '@app/modules/administration/role/config/role-list.config';
 import { OVERLAY_PROVIDERS } from '@app/shared/constants/overlay-providers';
 
-/** Everything under /app/system. Each URL is the route of its menu item. */
+/** Everything under /app/administration. Each URL is the route of its menu item. */
 export const ADMINISTRATION_ROUTES: Routes = [
     {
         path: '',
@@ -30,6 +31,32 @@ export const ADMINISTRATION_ROUTES: Routes = [
                 canActivate: [permissionGuard],
                 data: { permission: FEATURE_LIST.permission },
                 loadComponent: () => import('./feature/pages/feature-detail/feature-detail.component').then((m) => m.FeatureDetailComponent),
+            },
+            {
+                path: 'roles',
+                canActivate: [permissionGuard],
+                data: { permission: ROLE_LIST.permission },
+                loadComponent: () => import('./role/pages/role-list/role-list.component').then((m) => m.RoleListComponent),
+            },
+            {
+                path: 'roles/new',
+                canActivate: [permissionGuard],
+                canDeactivate: [unsavedChangesGuard],
+                data: { permission: 'administration.role.create' },
+                loadComponent: () => import('./role/pages/role-create/role-create.component').then((m) => m.RoleCreateComponent),
+            },
+            {
+                path: 'roles/:oid/edit',
+                canActivate: [permissionGuard],
+                canDeactivate: [unsavedChangesGuard],
+                data: { permission: 'administration.role.edit' },
+                loadComponent: () => import('./role/pages/role-edit/role-edit.component').then((m) => m.RoleEditComponent),
+            },
+            {
+                path: 'roles/:oid',
+                canActivate: [permissionGuard],
+                data: { permission: ROLE_LIST.permission },
+                loadComponent: () => import('./role/pages/role-detail/role-detail.component').then((m) => m.RoleDetailComponent),
             },
         ],
     },

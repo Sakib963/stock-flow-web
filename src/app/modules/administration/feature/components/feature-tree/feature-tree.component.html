@@ -9,23 +9,9 @@
                 <span>{{ 'form.retry' | translate }}</span>
             </button>
         </div>
-    } @else if (data()) {
+    } @else if (data(); as loaded) {
         <p class="mt-0 mb-3 text-xs text-ink-soft">{{ 'administration.feature.treeNote' | translate }}</p>
-        <nz-tree [nzData]="nodes()" nzBlockNode nzShowLine [nzTreeTemplate]="nodeTemplate" data-registry="tree" />
-        <ng-template #nodeTemplate let-node>
-            @if (node.origin.action; as action) {
-                <span class="flex min-h-6 items-center gap-2 py-0.5" [attr.data-action]="action.code">
-                    <span class="font-mono text-xs text-ink-body">{{ action.code }}</span>
-                </span>
-            } @else {
-                <span class="flex min-h-7 items-center justify-between gap-2 py-0.5" [attr.data-node]="node.key">
-                    <span class="min-w-0 truncate text-[13px] text-ink" [class.font-semibold]="!node.origin.entry?.parent_oid">{{ node.title }}</span>
-                    @if (node.origin.entry; as entry) {
-                        <status-tag [label]="states[entry.state].label" [tone]="states[entry.state].tone" [icon]="states[entry.state].icon" />
-                    }
-                </span>
-            }
-        </ng-template>
+        <grant-tree [tree]="loaded" maxHeight="none" data-registry="tree" />
     } @else {
         <span class="sr-only" role="status">{{ 'form.loading' | translate }}</span>
         <nz-skeleton nzActive [nzTitle]="false" [nzParagraph]="{ rows: 10 }" />

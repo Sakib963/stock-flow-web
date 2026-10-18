@@ -46,7 +46,7 @@ const open = async (details: Partial<Feature> = {}) => {
     vi.spyOn(TestBed.inject(SessionService), 'can').mockReturnValue(true);
     const fixture = TestBed.createComponent(FeatureDetailComponent);
     fixture.detectChanges();
-    const data: FeatureDetails = { details: { ...FEATURE, ...details }, actions: [{ code: 'marketing.partner.view', action: 'view', roles: ['Owner'] }], features: [], activity: [] };
+    const data: FeatureDetails = { details: { ...FEATURE, ...details }, actions: [{ code: 'marketing.partner.view', action: 'view', is_sensitive: false, roles: ['Owner'] }], features: [], activity: [] };
     TestBed.inject(HttpTestingController)
         .expectOne((r) => r.url.endsWith('/get-feature-details/f-1'))
         .flush({ data });

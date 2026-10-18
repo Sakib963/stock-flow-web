@@ -4805,7 +4805,158 @@
             "showTree": "Feature tree",
             "treeTitle": "Feature tree",
             "treeNote": "Every module, its features, and the actions in each, which are what a role is granted.",
-            "closeTree": "Close"
+            "closeTree": "Close",
+            "sensitive": {
+                "mark": "Mark sensitive",
+                "unmark": "Not sensitive",
+                "markConfirm": {
+                    "title": "Mark {{action}} in {{name}} sensitive?",
+                    "body": "Anyone saving a role that gains it will be asked first and told it is sensitive."
+                },
+                "unmarkConfirm": {
+                    "title": "Mark {{action}} in {{name}} not sensitive?",
+                    "body": "Roles can then be given it without the sensitive warning."
+                },
+                "marked": "Marked sensitive.",
+                "unmarked": "No longer marked sensitive."
+            },
+            "reorder": {
+                "button": "Reorder",
+                "title": "Reorder the menu",
+                "note": "Drag a module among the modules, or a feature within its own module. The sidebar follows for everyone once you save.",
+                "save": "Save order",
+                "confirmTitle": "Save the new order?",
+                "confirmBody": "Everyone sees the menu in this order from their next action.",
+                "done": "Order saved.",
+                "failed": {
+                    "network": "Could not reach the server. Check your connection and try again.",
+                    "forbidden": "You do not have permission to change the menu.",
+                    "server": "The order could not be saved. Close this, open Reorder again and try once more."
+                }
+            }
+        },
+        "role": {
+            "add": "New role",
+            "createTitle": "New role",
+            "editTitle": "Edit role",
+            "detailTitle": "Role",
+            "detailLead": "What this role may do, and who holds it.",
+            "formLead": "Name the role, then tick what its holders may do.",
+            "name": "Name",
+            "nameHelper": "A name for the kind of work, such as Store manager or Counter.",
+            "namePlaceholder": "Store manager",
+            "nameTaken": "Another role already has this name. Choose another.",
+            "description": "Description",
+            "descriptionHelper": "Who this role is for, so the next person giving it out knows.",
+            "descriptionPlaceholder": "Runs the store day to day, without the reports meant for the owner",
+            "access": "Access",
+            "accessNote": "Ticking any action also ticks View, since without View the feature is closed. Sensitive actions are meant for the owner.",
+            "count": "{{actions}} actions in {{features}} features, {{sensitive}} sensitive",
+            "searchTree": "Find a feature",
+            "noActions": "Tick at least one action. A role with nothing ticked opens an empty app.",
+            "loadFailed": {
+                "network": "Could not reach the server. Check your connection and try again.",
+                "forbidden": "You do not have permission to see roles.",
+                "server": "This could not be loaded. Try again in a moment."
+            },
+            "backToList": "Back to roles",
+            "created": "Role created.",
+            "updated": "Role saved.",
+            "updatedFor": "Role saved. It applies to {{count}} people from their next action.",
+            "stale": "Someone else changed this role while you were editing. It now shows what they saved; check it and save again.",
+            "lockedForYou": "Only the system admin changes the {{name}} role.",
+            "status": {
+                "label": "Status",
+                "Active": "Active",
+                "Inactive": "Off"
+            },
+            "stat": {
+                "active": "Active",
+                "inactive": "Off"
+            },
+            "searchPlaceholder": "Search by name or description",
+            "holders": "People",
+            "actions": "Actions",
+            "sensitiveCount": "Sensitive",
+            "lastTouched": "Last changed by",
+            "lastTouchedOn": "Last changed",
+            "view": "View",
+            "edit": "Edit",
+            "emptyTitle": "No roles yet",
+            "emptyBody": "Create a role for each kind of work, then give it to people in Users.",
+            "confirmCreate": {
+                "title": "Create this role?",
+                "body": "{{name}} will be added to your roles."
+            },
+            "confirmEdit": {
+                "title": "Save changes?",
+                "body": "Your changes to {{name}} will be saved."
+            },
+            "warning": {
+                "titlePeople": "Change access for {{count}} people?",
+                "titleSensitive": "Give sensitive access?",
+                "okPeople": "Change access for {{count}} people",
+                "self": "You hold this role. Removing access may lock you out of this page.",
+                "sensitiveTitle": "Sensitive access",
+                "sensitiveBody": "These are meant for the owner. Give them only to people you trust with them.",
+                "holders": "Holds this role ({{count}})",
+                "added": "Added",
+                "removed": "Removed",
+                "applies": "This applies to all of them from their next action. Nobody is signed out."
+            },
+            "section": {
+                "details": "Details"
+            },
+            "locked": "Built in",
+            "noDescription": "No description.",
+            "nothingGranted": "This role holds nothing.",
+            "noHolders": "Nobody holds this role.",
+            "quickActions": "On, off or delete",
+            "systemNote": "The {{name}} role is always on and cannot be deleted.",
+            "switch": {
+                "Inactive": {
+                    "title": "Turn {{name}} off?",
+                    "body": "Its {{count}} people lose all access except signing in, their profile and signing out, from their next action.",
+                    "button": "Turn off",
+                    "done": "Role turned off."
+                },
+                "Active": {
+                    "title": "Turn {{name}} on?",
+                    "body": "Its {{count}} people get its access back from their next action.",
+                    "button": "Turn on",
+                    "done": "Role turned on."
+                },
+                "own": "You hold this role, so someone else turns it off."
+            },
+            "delete": {
+                "title": "Delete {{name}}?",
+                "body": "The role is removed for good. Nobody holds it.",
+                "button": "Delete role",
+                "done": "Role deleted.",
+                "held": "{{count}} people hold this role. Give them another role first."
+            },
+            "activity": "History",
+            "noActivity": "No changes yet."
+        }
+    },
+    "access": {
+        "sensitive": "Sensitive",
+        "action": {
+            "view": "View",
+            "create": "Create",
+            "edit": "Edit",
+            "delete": "Delete",
+            "export": "Export",
+            "approve": "Approve",
+            "reject": "Reject",
+            "confirm": "Confirm",
+            "cancel": "Cancel",
+            "dispatch": "Dispatch",
+            "deliver": "Deliver",
+            "refund": "Refund",
+            "convert": "Convert",
+            "reset-password": "Reset password",
+            "reverse": "Reverse"
         }
     }
 }

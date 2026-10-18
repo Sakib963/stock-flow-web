@@ -257,5 +257,14 @@ export class APIEndpoint {
     static readonly GET_FEATURE_DETAILS = '/api/v1/admin/feature/get-feature-details';
     static readonly UPDATE_FEATURE_DETAILS = '/api/v1/admin/feature/update-feature-details';
     static readonly SWITCH_FEATURE = '/api/v1/admin/feature/switch-feature';
+    static readonly MARK_ACTION_SENSITIVE = '/api/v1/admin/feature/mark-action-sensitive';
+    static readonly REORDER_FEATURES = '/api/v1/admin/feature/reorder-features';
+    static readonly GET_ROLE_LIST = '/api/v1/admin/role/get-role-list';
+    static readonly GET_ROLE_TREE = '/api/v1/admin/role/get-role-tree';
+    static readonly GET_ROLE_DETAILS = '/api/v1/admin/role/get-role-details';
+    static readonly CREATE_ROLE = '/api/v1/admin/role/create-role';
+    static readonly UPDATE_ROLE = '/api/v1/admin/role/update-role';
+    static readonly SWITCH_ROLE_STATUS = '/api/v1/admin/role/switch-role-status';
+    static readonly DELETE_ROLE = '/api/v1/admin/role/delete-role';
     static readonly CREATE_PARTNER_PAYMENT = '/api/v1/marketing/partner-payment/create-partner-payment';
 }

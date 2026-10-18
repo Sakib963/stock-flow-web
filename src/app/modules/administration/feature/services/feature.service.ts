@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject, signal } from '@angular/core';
 import { APIEndpoint } from '@app/core/constants/api-endpoint';
-import { FeatureDetails, FeaturePayload, FeatureSwitch, FeatureTree } from '@app/core/models/feature.model';
+import { FeatureDetails, FeatureOrder, FeaturePayload, FeatureSwitch, FeatureTree } from '@app/core/models/feature.model';
 import { environment } from '@env/environment';
 import { Observable, finalize, map } from 'rxjs';
 
@@ -26,6 +26,15 @@ export class FeatureService {
 
     switch(change: FeatureSwitch): Observable<boolean> {
         return this.send(APIEndpoint.SWITCH_FEATURE, change);
+    }
+
+    markSensitive(code: string, is_sensitive: boolean): Observable<boolean> {
+        return this.send(APIEndpoint.MARK_ACTION_SENSITIVE, { code, is_sensitive });
+    }
+
+    /** Whether anything moved. Each group is one level of the menu in its new order. */
+    reorder(groups: FeatureOrder[]): Observable<boolean> {
+        return this.send(APIEndpoint.REORDER_FEATURES, { groups });
     }
 
     private send(endpoint: string, body: object): Observable<boolean> {

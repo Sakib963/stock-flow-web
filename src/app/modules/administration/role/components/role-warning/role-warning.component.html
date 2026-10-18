@@ -1,0 +1,59 @@
+@if (data.selfLoses) {
+    <div class="mb-3 flex items-start gap-2 rounded-control border border-danger-border bg-danger-bg px-3 py-2 text-[13px] text-danger-ink" role="alert" data-warning="self">
+        <ng-icon name="lucideTriangleAlert" size="16px" class="mt-0.5 shrink-0" aria-hidden="true" />
+        <span>{{ 'administration.role.warning.self' | translate }}</span>
+    </div>
+}
+
+@if (data.sensitive.length) {
+    <div class="mb-3 rounded-control border border-warning-border bg-warning-bg px-3 py-2" data-warning="sensitive">
+        <p class="m-0 flex items-center gap-1.5 text-[13px] font-semibold text-warning-ink"><ng-icon name="lucideShieldAlert" size="14px" aria-hidden="true" />{{ 'administration.role.warning.sensitiveTitle' | translate }}</p>
+        <p class="mt-1 mb-1 text-xs text-ink-body">{{ 'administration.role.warning.sensitiveBody' | translate }}</p>
+        <ul class="m-0 list-disc pl-5 text-[13px] text-ink">
+            @for (action of data.sensitive; track action.code) {
+                <li>{{ feature(action) }}: {{ 'access.action.' + action.action | translate }}</li>
+            }
+        </ul>
+    </div>
+}
+
+@if (data.holders.length) {
+    <p class="mt-0 mb-1 text-xs font-semibold text-ink-muted">{{ 'administration.role.warning.holders' | translate: { count: data.holders.length } | digits }}</p>
+    <p class="mt-0 mb-3 text-[13px] text-ink" data-warning="holders">
+        @for (holder of data.holders; track holder.oid; let last = $last) {
+            {{ holder.name }}{{ last ? '' : ', ' }}
+        }
+    </p>
+}
+
+@if (data.added.length) {
+    <p class="mt-0 mb-1 text-xs font-semibold text-success-ink">{{ 'administration.role.warning.added' | translate }}</p>
+    <ul class="mt-0 mb-3 list-disc pl-5 text-[13px] text-ink" data-warning="added">
+        @for (action of data.added; track action.code) {
+            <li>{{ feature(action) }}: {{ 'access.action.' + action.action | translate }}</li>
+        }
+    </ul>
+}
+@if (data.removed.length) {
+    <p class="mt-0 mb-1 text-xs font-semibold text-danger-ink">{{ 'administration.role.warning.removed' | translate }}</p>
+    <ul class="mt-0 mb-3 list-disc pl-5 text-[13px] text-ink" data-warning="removed">
+        @for (action of data.removed; track action.code) {
+            <li>{{ feature(action) }}: {{ 'access.action.' + action.action | translate }}</li>
+        }
+    </ul>
+}
+
+@if (data.holders.length) {
+    <p class="m-0 text-xs text-ink-muted">{{ 'administration.role.warning.applies' | translate }}</p>
+}
+
+<div class="mt-6 flex justify-end gap-2">
+    <button nz-button nzType="default" type="button" class="inline-flex items-center gap-1.5" (click)="close(false)" data-confirm="cancel">
+        <ng-icon name="lucideX" size="14px" aria-hidden="true" />
+        <span>{{ 'form.confirm.cancel' | translate }}</span>
+    </button>
+    <button nz-button nzType="primary" type="button" class="inline-flex items-center gap-1.5" cdkFocusInitial (click)="close(true)" data-confirm="ok">
+        <ng-icon name="lucideCheck" size="14px" aria-hidden="true" />
+        <span>{{ data.ok }}</span>
+    </button>
+</div>

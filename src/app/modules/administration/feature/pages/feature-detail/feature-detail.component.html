@@ -150,7 +150,17 @@
                 <ul class="m-0 flex list-none flex-col divide-y divide-line-soft p-0">
                     @for (action of loaded.actions; track action.code) {
                         <li class="flex flex-col gap-1 py-2 md:flex-row md:items-center md:justify-between md:gap-3" [attr.data-action]="action.code">
-                            <span class="font-mono text-[13px] text-ink">{{ action.code }}</span>
+                            <span class="flex items-center gap-2">
+                                <span class="text-[13px] font-semibold text-ink">{{ 'access.action.' + action.action | translate }}</span>
+                                @if (action.is_sensitive) {
+                                    <status-tag label="access.sensitive" tone="warning" icon="lucideShieldAlert" data-tag="sensitive" />
+                                }
+                                @if (canEdit()) {
+                                    <button nz-button nzType="link" type="button" class="px-1" [nzLoading]="marking() === action.code" [disabled]="!!marking()" (click)="markSensitive(action)" [attr.data-mark]="action.code">
+                                        {{ (action.is_sensitive ? 'administration.feature.sensitive.unmark' : 'administration.feature.sensitive.mark') | translate }}
+                                    </button>
+                                }
+                            </span>
                             <span class="flex flex-wrap gap-1">
                                 @for (role of action.roles; track role) {
                                     <status-tag [label]="{ en: role, bn: role }" tone="neutral" />

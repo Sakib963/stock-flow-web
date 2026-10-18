@@ -1,0 +1,5 @@
+<page-header [back]="back" [title]="'administration.role.createTitle' | translate" [lead]="'administration.role.formLead' | translate" />
+
+<form-page [formId]="editor()?.formId ?? ''" [saving]="roles.saving()" [framed]="false" saveLabel="administration.role.add" (cancel)="cancel()">
+    <role-form (submitted)="save()" />
+</form-page>

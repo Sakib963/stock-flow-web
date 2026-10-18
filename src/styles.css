@@ -245,6 +245,25 @@ body.lang-bn {
     overflow: hidden;
 }
 
+/* The grant tree: a hairline down each level of indent, so which feature sits under which module
+   reads at a glance. Ant draws these only with nzShowLine, which also swaps the carets for +/- boxes.
+   The row's own 4px bottom padding is bridged so the line runs unbroken. */
+.grant-tree .ant-tree-indent {
+    align-self: stretch;
+}
+.grant-tree .ant-tree-indent-unit {
+    position: relative;
+    height: 100%;
+}
+.grant-tree .ant-tree-indent-unit::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: -4px;
+    inset-inline-start: 11px;
+    border-inline-start: 1px solid var(--color-line);
+}
+
 /* The sider's collapsed-rail group flyout. It brings its own surface, so ant's is stripped from
    behind it rather than drawn twice. */
 .overlay-flyout .ant-popover-inner {

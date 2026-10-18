@@ -1,0 +1,43 @@
+<nz-drawer [nzVisible]="open()" nzWidth="min(480px, 100vw)" nzPlacement="right" [nzTitle]="'administration.feature.reorder.title' | translate" [nzContent]="body" [nzFooter]="footer" [nzClosable]="!saving()" [nzMaskClosable]="!saving()" (nzOnClose)="closed.emit()" />
+
+<ng-template #body>
+    @if (failed(); as failure) {
+        <div class="text-center" role="alert">
+            <p class="m-0 text-sm text-ink-body">{{ 'administration.feature.loadFailed.' + failure | translate }}</p>
+            <button nz-button nzType="primary" type="button" class="mt-3 inline-flex items-center gap-1.5" (click)="load()">
+                <ng-icon name="lucideRotateCw" size="14px" aria-hidden="true" />
+                <span>{{ 'form.retry' | translate }}</span>
+            </button>
+        </div>
+    } @else if (data()) {
+        <p class="mt-0 mb-3 text-xs text-ink-soft">{{ 'administration.feature.reorder.note' | translate }}</p>
+        <div class="grant-tree">
+            <nz-tree [nzData]="nodes()" nzBlockNode nzDraggable [nzBeforeDrop]="sameLevel" [nzTreeTemplate]="nodeTemplate" data-registry="reorder" />
+        </div>
+        <ng-template #nodeTemplate let-node>
+            <span class="flex min-h-7 cursor-grab items-center gap-2 py-0.5" [attr.data-node]="node.key">
+                <ng-icon name="lucideGripVertical" size="14px" class="shrink-0 text-ink-muted" aria-hidden="true" />
+                <span class="min-w-0 truncate text-ink" [class.text-sm]="node.level === 0" [class.font-bold]="node.level === 0" [class.text-[13px]]="node.level > 0">{{ node.title }}</span>
+                @if (node.origin.state !== 'On') {
+                    <status-tag [label]="states[node.origin.state].label" [tone]="states[node.origin.state].tone" [icon]="states[node.origin.state].icon" />
+                }
+            </span>
+        </ng-template>
+    } @else {
+        <span class="sr-only" role="status">{{ 'form.loading' | translate }}</span>
+        <nz-skeleton nzActive [nzTitle]="false" [nzParagraph]="{ rows: 10 }" />
+    }
+</ng-template>
+
+<ng-template #footer>
+    <div class="flex justify-end gap-2">
+        <button nz-button nzType="default" type="button" class="inline-flex items-center gap-1.5" [disabled]="saving()" (click)="closed.emit()">
+            <ng-icon name="lucideX" size="14px" aria-hidden="true" />
+            <span>{{ 'form.cancel' | translate }}</span>
+        </button>
+        <button nz-button nzType="primary" type="button" class="inline-flex items-center gap-1.5" [disabled]="!data()" (click)="save()" data-reorder="save">
+            <ng-icon name="lucideCheck" size="14px" aria-hidden="true" />
+            <span>{{ 'administration.feature.reorder.save' | translate }}</span>
+        </button>
+    </div>
+</ng-template>

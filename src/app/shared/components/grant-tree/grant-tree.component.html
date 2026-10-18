@@ -1,0 +1,16 @@
+<div class="grant-tree overscroll-contain pr-1" [class.overflow-y-auto]="maxHeight() !== 'none'" [style.max-height]="maxHeight()">
+    <nz-tree [nzData]="nodes()" nzBlockNode [nzCheckable]="checkable()" [nzCheckedKeys]="checked()" [nzSearchValue]="search()" nzHideUnMatched [nzTreeTemplate]="nodeTemplate" (nzCheckboxChange)="onCheck($event)" (nzClick)="onClick($event)" data-grant="tree" />
+</div>
+<ng-template #nodeTemplate let-node>
+    <span class="flex min-h-6 items-center gap-2 py-0.5" [class.cursor-pointer]="checkable()" [attr.data-node]="node.key">
+        <span class="min-w-0 truncate" [class.text-sm]="node.level === 0" [class.font-bold]="node.level === 0" [class.text-[13px]]="node.level > 0" [class.font-semibold]="node.level > 0 && !node.origin.action" [class.text-ink]="!node.origin.action" [class.text-ink-body]="node.origin.action">{{ node.title }}</span>
+        @if (node.origin.action?.is_sensitive) {
+            <status-tag label="access.sensitive" tone="warning" icon="lucideShieldAlert" data-tag="sensitive" />
+        }
+        @if (showState() && node.origin.entry?.state; as state) {
+            @if (state !== 'On' || !checkable()) {
+                <status-tag [label]="states[state].label" [tone]="states[state].tone" [icon]="states[state].icon" />
+            }
+        }
+    </span>
+</ng-template>

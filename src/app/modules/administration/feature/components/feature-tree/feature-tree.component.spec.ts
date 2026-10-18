@@ -10,7 +10,7 @@ import { FeatureTreeComponent } from './feature-tree.component';
 const entry = (oid: string, slug: string, label: string, parent: string | null, code: string | null) => ({ oid, parent_oid: parent, slug, label, label_bn: label, route: code ? `/app/${slug}` : null, permission_code: code, kind: code ? ('Feature' as const) : ('Module' as const), state: 'On' as const });
 const action = (code: string, label: string) => {
     const [module, feature, verb] = code.split('.');
-    return { code, module, feature, action: verb, label };
+    return { code, module, feature, action: verb, label, label_bn: label, is_sensitive: false };
 };
 const TREE: FeatureTree = {
     features: [entry('dash', 'dashboard', 'Dashboard', null, 'dashboard.overview.view'), entry('inv', 'inventory', 'Inventory', null, null), entry('po', 'inventory-po', 'Purchase orders', 'inv', 'inventory.purchase-order.view')],
@@ -34,11 +34,12 @@ const open = async () => {
 describe('FeatureTreeComponent', () => {
     afterEach(() => document.querySelectorAll('.cdk-overlay-container').forEach((overlay) => (overlay.innerHTML = '')));
 
-    it('hangs each feature under its module and each action under its feature, with no buttons', async () => {
+    it('hangs each feature under its module with each action named by its verb, never its code, and no buttons', async () => {
         await open();
         const tree = document.querySelector('[data-registry="tree"]')!;
-        const order = [...tree.querySelectorAll('[data-node], [data-action]')].map((n) => n.getAttribute('data-node') ?? n.getAttribute('data-action'));
-        expect(order).toEqual(['dash', 'dashboard.overview.view', 'inv', 'po', 'inventory.purchase-order.view', 'inventory.purchase-order.approve', 'inventory.stock-value', 'inventory.stock-value.view']);
+        const order = [...tree.querySelectorAll('[data-node]')].map((n) => n.getAttribute('data-node'));
+        expect(order).toEqual(['dashboard.overview.view', 'm:inv', 'f:po', 'inventory.purchase-order.view', 'inventory.purchase-order.approve', 'inventory.stock-value.view']);
+        expect(tree.textContent).not.toContain('inventory.purchase-order');
         expect(tree.querySelector('button')).toBeNull();
     });
 });

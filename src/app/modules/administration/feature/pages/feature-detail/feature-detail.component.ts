@@ -3,7 +3,7 @@ import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@a
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { NgIcon, provideIcons } from '@ng-icons/core';
-import { lucideArrowLeft, lucideArrowRight, lucideBan, lucideCheck, lucideEyeOff, lucideHistory, lucideInfo, lucideKeyRound, lucideListTree, lucidePencil, lucidePower, lucideRotateCw, lucideX } from '@ng-icons/lucide';
+import { lucideArrowLeft, lucideArrowRight, lucideBan, lucideCheck, lucideEyeOff, lucideHistory, lucideInfo, lucideKeyRound, lucideListTree, lucidePencil, lucidePower, lucideRotateCw, lucideShieldAlert, lucideX } from '@ng-icons/lucide';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzCardModule } from 'ng-zorro-antd/card';
 import { NzFormModule } from 'ng-zorro-antd/form';
@@ -13,7 +13,7 @@ import { NzModalModule, NzModalService } from 'ng-zorro-antd/modal';
 import { NzSkeletonModule } from 'ng-zorro-antd/skeleton';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { RequestFailure } from '@app/core/models/api.model';
-import { Feature, FeatureDetails, FeatureState } from '@app/core/models/feature.model';
+import { Feature, FeatureAction, FeatureDetails, FeatureState } from '@app/core/models/feature.model';
 import { PageBack } from '@app/core/models/page-header.model';
 import { LanguageService } from '@app/core/services/language/language.service';
 import { SessionService } from '@app/core/services/session/session.service';
@@ -35,7 +35,7 @@ const SWITCH_ICONS: Record<FeatureState, string> = { On: 'lucidePower', Disabled
 @Component({
     selector: 'feature-detail',
     imports: [ReactiveFormsModule, RouterLink, NgIcon, NzButtonModule, NzCardModule, NzFormModule, NzInputModule, NzModalModule, NzSkeletonModule, TranslatePipe, PageHeaderComponent, StatusTagComponent, ActionFooterComponent, RecordTimelineComponent, RecordDatePipe],
-    providers: [provideIcons({ lucideArrowLeft, lucideArrowRight, lucideBan, lucideCheck, lucideEyeOff, lucideHistory, lucideInfo, lucideKeyRound, lucideListTree, lucidePencil, lucidePower, lucideRotateCw, lucideX })],
+    providers: [provideIcons({ lucideArrowLeft, lucideArrowRight, lucideBan, lucideCheck, lucideEyeOff, lucideHistory, lucideInfo, lucideKeyRound, lucideListTree, lucidePencil, lucidePower, lucideRotateCw, lucideShieldAlert, lucideX })],
     templateUrl: './feature-detail.component.html',
     styleUrl: './feature-detail.component.scss',
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -61,6 +61,7 @@ export class FeatureDetailComponent {
     /** The switch on its way to the server: its button shows the loader and the others wait. */
     readonly pending = signal<FeatureState | null>(null);
     readonly disabling = signal(false);
+    readonly marking = signal<string | null>(null);
     readonly disableStep = signal<'reason' | 'confirm'>('reason');
 
     readonly feature = computed<Partial<Feature> | null>(() => this.record()?.details ?? this._seed);
@@ -166,6 +167,34 @@ export class FeatureDetailComponent {
                 },
             })
         );
+    }
+
+    markSensitive(action: FeatureAction): void {
+        const t = (key: string, params?: object) => this._translate.instant(key, params);
+        const next = !action.is_sensitive;
+        const copy = next ? 'administration.feature.sensitive.markConfirm' : 'administration.feature.sensitive.unmarkConfirm';
+        const params = { action: t('access.action.' + action.action), name: this.label(this.feature()) };
+        confirmAction(this._modal, {
+            title: t(copy + '.title', params),
+            body: t(copy + '.body', params),
+            ok: t(next ? 'administration.feature.sensitive.mark' : 'administration.feature.sensitive.unmark'),
+            cancel: t('form.confirm.cancel'),
+            icon: 'lucideShieldAlert',
+        }).subscribe((confirmed) => {
+            if (!confirmed) return;
+            this.marking.set(action.code);
+            this._features.markSensitive(action.code, next).subscribe({
+                next: () => {
+                    this.marking.set(null);
+                    this._message.success(t(next ? 'administration.feature.sensitive.marked' : 'administration.feature.sensitive.unmarked'));
+                    this.load();
+                },
+                error: (error: unknown) => {
+                    this.marking.set(null);
+                    this._message.error(t(failureKey(error, 'form.saveFailed')));
+                },
+            });
+        });
     }
 
     edit(): void {

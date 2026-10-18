@@ -2,13 +2,10 @@ import { APIEndpoint } from '@app/core/constants/api-endpoint';
 import { ToneMap } from '@app/core/models/config.model';
 import { FEATURE_STATES } from '@app/core/models/feature.model';
 import { ListShellPageConfig } from '@app/core/models/list-shell-page.model';
+import { FEATURE_STATE } from '@app/shared/constants/feature-state';
 import { FEATURE_ROUTES } from '@app/modules/administration/feature/constants/feature-routes';
 
-export const FEATURE_STATE: ToneMap = {
-    On: { label: 'administration.feature.state.On', tone: 'success', icon: 'lucideCheck' },
-    Disabled: { label: 'administration.feature.state.Disabled', tone: 'warning', icon: 'lucideBan' },
-    Hidden: { label: 'administration.feature.state.Hidden', tone: 'neutral', icon: 'lucideEyeOff' },
-};
+export { FEATURE_STATE };
 
 export const FEATURE_KIND: ToneMap = {
     Module: { label: 'administration.feature.kind.Module', tone: 'neutral' },
@@ -19,7 +16,10 @@ export const FEATURE_LIST: ListShellPageConfig = {
     permission: 'system.feature.view',
     header: {
         count: true,
-        actions: [{ key: 'tree', label: 'administration.feature.showTree', icon: 'lucideListTree', permission: 'system.feature.view', run: { kind: 'emit' } }],
+        actions: [
+            { key: 'reorder', label: 'administration.feature.reorder.button', icon: 'lucideArrowUpDown', permission: 'system.feature.edit', run: { kind: 'emit' } },
+            { key: 'tree', label: 'administration.feature.showTree', icon: 'lucideListTree', permission: 'system.feature.view', run: { kind: 'emit' } },
+        ],
     },
     stats: [
         { key: 'on', label: 'administration.feature.stat.on', icon: 'lucideCheck', tone: 'success' },

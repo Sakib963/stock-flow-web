@@ -1,3 +1,5 @@
+import { GrantAction } from '@app/core/models/role.model';
+
 export const FEATURE_STATES = ['On', 'Disabled', 'Hidden'] as const;
 export type FeatureState = (typeof FEATURE_STATES)[number];
 export type FeatureKind = 'Module' | 'Feature';
@@ -37,6 +39,7 @@ export interface Feature {
 export interface FeatureAction {
     code: string;
     action: string;
+    is_sensitive: boolean;
     roles: string[];
 }
 
@@ -76,5 +79,10 @@ export interface FeatureSwitch {
 /** The Feature tree drawer: every menu entry, and every action the product has. */
 export interface FeatureTree {
     features: { oid: string; parent_oid: string | null; slug: string; label: string; label_bn: string; route: string | null; permission_code: string | null; kind: FeatureKind; state: FeatureState }[];
-    actions: { code: string; module: string; feature: string; action: string; label: string }[];
+    actions: GrantAction[];
+}
+
+export interface FeatureOrder {
+    parent_oid: string | null;
+    oids: string[];
 }

@@ -1,5 +1,6 @@
 import {
     lucideArchive,
+    lucideArrowUpDown,
     lucideGift,
     lucideTrendingUp,
     lucideWallet,
@@ -47,6 +48,7 @@ import {
     lucideUndo2,
     lucideWifiOff,
     lucideLock,
+    lucideShieldAlert,
     lucideMinus,
     lucideUsers,
 } from '@ng-icons/lucide';
@@ -60,6 +62,7 @@ import {
  */
 export const LIST_ICONS = {
     lucideArchive,
+    lucideArrowUpDown,
     lucideGift,
     lucideTrendingUp,
     lucideWallet,
@@ -89,6 +92,7 @@ export const LIST_ICONS = {
     lucideHandCoins,
     lucideInbox,
     lucideLock,
+    lucideShieldAlert,
     lucideMinus,
     lucidePackage,
     lucidePackageCheck,
