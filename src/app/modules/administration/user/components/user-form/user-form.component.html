@@ -1,0 +1,150 @@
+<!-- A file picker closed without choosing fires a native cancel that bubbles; it must not reach anything above. -->
+<form nz-form nzLayout="vertical" class="grid grid-cols-1 items-start gap-x-4 md:grid-cols-3" [id]="formId" [formGroup]="form" (ngSubmit)="submitted.emit()" (cancel)="$event.stopPropagation()">
+    <nz-form-item class="md:col-span-3">
+        <nz-form-label [nzTooltipTitle]="'administration.user.photoHelper' | translate">{{ 'administration.user.photo' | translate }}</nz-form-label>
+        <div class="flex flex-wrap items-center gap-3" data-user="photo">
+            <nz-avatar [nzSize]="56" [nzSrc]="photo() ?? undefined" nzIcon="user" [class.opacity-40]="uploading() !== null" />
+            <nz-upload [nzAccept]="accept" [nzBeforeUpload]="pick" [nzShowUploadList]="false" [nzDisabled]="uploading() !== null">
+                <button nz-button type="button" class="inline-flex items-center gap-1.5" [nzLoading]="uploading() !== null" data-user="pick-photo">
+                    @if (uploading() === null) {
+                        <ng-icon name="lucideCamera" size="14px" aria-hidden="true" />
+                    }
+                    <span>
+                        @if (uploading() !== null) {
+                            {{ 'administration.user.photoUploading' | translate: { percent: uploading() } | digits }}
+                        } @else {
+                            {{ (photo() ? 'administration.user.photoChange' : 'administration.user.photoAdd') | translate }}
+                        }
+                    </span>
+                </button>
+            </nz-upload>
+            @if (photo() || uploading() !== null) {
+                <button nz-button nzDanger type="button" class="inline-flex items-center gap-1.5" (click)="removePhoto()" data-user="remove-photo">
+                    <ng-icon [name]="uploading() !== null ? 'lucideX' : 'lucideTrash2'" size="14px" aria-hidden="true" />
+                    <span>{{ (uploading() !== null ? 'administration.user.photoCancel' : 'administration.user.photoRemove') | translate }}</span>
+                </button>
+            }
+            @if (photoError(); as key) {
+                <p class="m-0 w-full text-xs text-danger-ink" role="alert">{{ key | translate: { size: 15 } | digits }}</p>
+            }
+        </div>
+    </nz-form-item>
+
+    <nz-form-item>
+        <nz-form-label nzRequired nzFor="user-name" [nzTooltipTitle]="'administration.user.nameHelper' | translate">{{ 'administration.user.name' | translate }}</nz-form-label>
+        <nz-form-control [nzErrorTip]="nameError">
+            <input nz-input id="user-name" formControlName="name" autocomplete="off" [attr.placeholder]="'administration.user.namePlaceholder' | translate" [attr.aria-invalid]="invalid('name')" />
+        </nz-form-control>
+        <ng-template #nameError let-control>
+            @if (control.hasError('required')) {
+                {{ 'form.required' | translate }}
+            } @else {
+                {{ 'form.tooLong' | translate: { max: 128 } | digits }}
+            }
+        </ng-template>
+    </nz-form-item>
+
+    <nz-form-item>
+        <nz-form-label [nzRequired]="isNew()" nzFor="user-email" [nzTooltipTitle]="(isNew() ? 'administration.user.emailHelper' : 'administration.user.emailLocked') | translate">{{ 'administration.user.email' | translate }}</nz-form-label>
+        <nz-form-control nzHasFeedback [nzErrorTip]="emailError" [nzValidatingTip]="'form.checking' | translate">
+            <input nz-input id="user-email" type="email" formControlName="email" autocomplete="off" class="font-mono" [attr.placeholder]="'administration.user.emailPlaceholder' | translate" [attr.aria-invalid]="invalid('email')" />
+        </nz-form-control>
+        <ng-template #emailError let-control>
+            @if (control.hasError('taken')) {
+                {{ 'administration.user.emailTaken' | translate }}
+            } @else if (control.hasError('required')) {
+                {{ 'form.required' | translate }}
+            } @else {
+                {{ 'administration.user.emailInvalid' | translate }}
+            }
+        </ng-template>
+    </nz-form-item>
+
+    <nz-form-item>
+        <nz-form-label nzRequired nzFor="user-phone" [nzTooltipTitle]="'administration.user.phoneHelper' | translate">{{ 'administration.user.phone' | translate }}</nz-form-label>
+        <nz-form-control nzHasFeedback [nzErrorTip]="phoneError" [nzValidatingTip]="'form.checking' | translate">
+            <input nz-input id="user-phone" formControlName="mobile_number" inputmode="tel" autocomplete="off" class="font-mono" [attr.placeholder]="'administration.user.phonePlaceholder' | translate" [attr.aria-invalid]="invalid('mobile_number')" />
+        </nz-form-control>
+        <ng-template #phoneError let-control>
+            @if (control.hasError('taken')) {
+                {{ 'administration.user.phoneTaken' | translate }}
+            } @else if (control.hasError('required')) {
+                {{ 'form.required' | translate }}
+            } @else {
+                {{ 'administration.user.phoneInvalid' | translate }}
+            }
+        </ng-template>
+    </nz-form-item>
+
+    <nz-form-item>
+        <nz-form-label nzFor="user-designation" [nzTooltipTitle]="'administration.user.designationHelper' | translate">{{ 'administration.user.designation' | translate }}</nz-form-label>
+        <nz-form-control [nzErrorTip]="'form.tooLong' | translate: { max: 256 } | digits">
+            <input nz-input id="user-designation" formControlName="designation" autocomplete="off" [attr.placeholder]="'administration.user.designationPlaceholder' | translate" [attr.aria-invalid]="invalid('designation')" />
+        </nz-form-control>
+    </nz-form-item>
+
+    <nz-form-item>
+        <nz-form-label nzRequired nzFor="user-role" [nzTooltipTitle]="'administration.user.roleHelper' | translate">{{ 'administration.user.role' | translate }}</nz-form-label>
+        <nz-form-control [nzErrorTip]="roleError">
+            <nz-select nzId="user-role" formControlName="role_oid" nzShowSearch [nzLoading]="rolesLoading()" [nzNotFoundContent]="(rolesLoading() ? 'form.loading' : rolesFailed() ? 'administration.user.rolesFailed' : 'administration.user.noRoles') | translate" [nzPlaceHolder]="'administration.user.rolePlaceholder' | translate" [nzCustomTemplate]="roleSelected">
+                @for (role of roleChoices(); track role.oid) {
+                    <nz-option nzCustomContent [nzValue]="role.oid" [nzLabel]="role.name">
+                        <span class="flex items-center justify-between gap-2">
+                            <span class="min-w-0">
+                                <span class="block truncate text-[13px] font-semibold text-ink">{{ role.name }}</span>
+                                <span class="block truncate text-xs text-ink-muted">{{ 'administration.user.roleHolders' | translate: { count: role.holders } | digits }}{{ role.description ? ' · ' + role.description : '' }}</span>
+                            </span>
+                            @if (role.sensitive.length) {
+                                <status-tag label="administration.user.sensitive" tone="warning" icon="lucideShieldAlert" />
+                            }
+                        </span>
+                    </nz-option>
+                }
+            </nz-select>
+        </nz-form-control>
+        <ng-template #roleSelected let-option>{{ option.nzLabel }}</ng-template>
+        <ng-template #roleError>
+            {{ 'administration.user.roleRequired' | translate }}
+        </ng-template>
+        @if (roleLocked(); as reason) {
+            <p class="mt-1 mb-0 text-xs text-ink-muted" data-user="role-locked">{{ reason | translate }}</p>
+        }
+        @if (rolesFailed()) {
+            <button nz-button nzType="link" type="button" class="inline-flex h-auto items-center gap-1 p-0 text-xs" (click)="loadRoles()">
+                <ng-icon name="lucideRotateCw" size="12px" aria-hidden="true" />
+                <span>{{ 'form.retry' | translate }}</span>
+            </button>
+        }
+        @if (pickedRole(); as role) {
+            @if (role.sensitive.length) {
+                <p class="mt-1 mb-0 flex items-start gap-1.5 text-xs text-warning-ink" data-user="sensitive-note">
+                    <ng-icon name="lucideShieldAlert" size="14px" class="mt-px flex-none" aria-hidden="true" />
+                    <span>{{ 'administration.user.sensitiveNote' | translate: { actions: sensitiveLabel(role) } }}</span>
+                </p>
+            }
+        }
+    </nz-form-item>
+
+    @if (isNew()) {
+        <nz-form-item>
+            <nz-form-label nzRequired nzFor="user-password" [nzTooltipTitle]="'administration.user.passwordHelper' | translate">{{ 'administration.user.password' | translate }}</nz-form-label>
+            <nz-form-control [nzErrorTip]="'administration.user.passwordRule' | translate">
+                <nz-input-wrapper>
+                    <ng-icon nzInputPrefix name="lucideLock" size="14px" class="text-ink-faint" aria-hidden="true" />
+                    <input nz-input id="user-password" formControlName="password" autocomplete="new-password" class="font-mono" [type]="passwordVisible() ? 'text' : 'password'" [attr.placeholder]="'administration.user.passwordPlaceholder' | translate" [attr.aria-invalid]="invalid('password')" aria-describedby="user-password-rules" />
+                    <button nzInputSuffix type="button" class="flex cursor-pointer items-center rounded-sm border-0 bg-transparent p-0 text-ink-faint" (click)="togglePassword()" [attr.aria-pressed]="passwordVisible()" [attr.aria-label]="(passwordVisible() ? 'auth.hidePassword' : 'auth.showPassword') | translate">
+                        <ng-icon [name]="passwordVisible() ? 'lucideEyeOff' : 'lucideEye'" size="14px" aria-hidden="true" />
+                    </button>
+                </nz-input-wrapper>
+            </nz-form-control>
+            <ul id="user-password-rules" class="mt-1 mb-0 flex list-none flex-col gap-1 p-0">
+                @for (rule of rules(); track rule.key) {
+                    <li class="flex items-center gap-1.5 text-xs" [class]="rule.met ? 'font-semibold text-success-ink' : 'text-ink-muted'">
+                        <ng-icon [name]="rule.met ? 'lucideCircleCheck' : 'lucideCircle'" size="13px" class="flex-none" [class]="rule.met ? 'text-success' : 'text-ink-faint'" aria-hidden="true" />
+                        {{ rule.key | translate }}
+                    </li>
+                }
+            </ul>
+        </nz-form-item>
+    }
+</form>

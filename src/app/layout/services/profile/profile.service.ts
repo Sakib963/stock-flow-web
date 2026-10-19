@@ -38,6 +38,11 @@ export class ProfileService {
         return this.write(APIEndpoint.VERIFY_PASSWORD_CHANGE, { otp_oid, otp, new_password });
     }
 
+    /** The first sign-in of an account someone else created: the temporary password proves it is them. */
+    setFirstPassword(current_password: string, new_password: string): Observable<unknown> {
+        return this.write(APIEndpoint.SET_FIRST_PASSWORD, { current_password, new_password });
+    }
+
     private write<T>(endpoint: string, body: object): Observable<T> {
         this.saving.set(true);
         return this._http.post<{ data: T }>(`${this._base}${endpoint}`, body).pipe(

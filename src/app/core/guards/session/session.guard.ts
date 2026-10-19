@@ -1,5 +1,6 @@
 import { inject } from '@angular/core';
-import { CanActivateFn } from '@angular/router';
+import { CanActivateFn, Router } from '@angular/router';
+import { Constants } from '@app/core/constants/constants';
 import { AuthService } from '@app/core/services/auth/auth.service';
 import { SessionService } from '@app/core/services/session/session.service';
 
@@ -18,9 +19,23 @@ import { SessionService } from '@app/core/services/session/session.service';
  * holds both halves.
  */
 export const sessionGuard: CanActivateFn = async () => {
-    const auth = inject(AuthService);
+    const router = inject(Router);
     const session = inject(SessionService);
+    if (!(await ensureSession(inject(AuthService), session))) return false;
+    // An account someone else created sees nothing until its person sets their own password. The
+    // server refuses everything else anyway; this keeps the shell from drawing on top of refusals.
+    return session.user()?.mustChangePassword ? router.createUrlTree([Constants.SET_PASSWORD_ROUTE]) : true;
+};
 
+/** The set-password page is only for an account that still has to set one; anyone else goes to the app. */
+export const mustSetPasswordGuard: CanActivateFn = async () => {
+    const router = inject(Router);
+    const session = inject(SessionService);
+    if (!(await ensureSession(inject(AuthService), session))) return false;
+    return session.user()?.mustChangePassword ? true : router.createUrlTree([Constants.APP_ROUTE]);
+};
+
+const ensureSession = async (auth: AuthService, session: SessionService): Promise<boolean> => {
     const key = auth.sessionKey();
     if (session.loaded() && session.loadedFor() === key) return true;
 

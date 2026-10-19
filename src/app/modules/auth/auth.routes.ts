@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
-import { guestGuard } from '@app/core/guards/auth/auth.guard';
+import { authGuard, guestGuard } from '@app/core/guards/auth/auth.guard';
+import { mustSetPasswordGuard } from '@app/core/guards/session/session.guard';
 
 /**
  * Everything under /auth. Kept with the module rather than in app.routes.ts so the feature owns
@@ -31,6 +32,12 @@ export const AUTH_ROUTES: Routes = [
     {
         path: 'reset-password/done',
         loadComponent: () => import('./pages/reset-done/reset-done.component').then((m) => m.ResetDoneComponent),
+    },
+    {
+        // The first sign-in of an account someone else created: nothing else opens until it is done.
+        path: 'set-password',
+        canActivate: [authGuard, mustSetPasswordGuard],
+        loadComponent: () => import('./pages/set-password/set-password.component').then((m) => m.SetPasswordComponent),
     },
     { path: '', pathMatch: 'full', redirectTo: 'login' },
 ];

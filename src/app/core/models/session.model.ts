@@ -44,6 +44,8 @@ export interface SessionUser {
     photo: string | null;
     designation: string | null;
     role: string | null;
+    /** Set on an account someone else created, until its person sets their own password. */
+    mustChangePassword?: boolean;
 }
 
 export interface SessionBusiness {

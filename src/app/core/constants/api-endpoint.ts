@@ -18,6 +18,7 @@ export class APIEndpoint {
     static readonly SIGN_PROFILE_PHOTO_UPLOAD = '/api/v1/profile/profile-info/sign-profile-photo-upload';
     static readonly CHANGE_PASSWORD = '/api/v1/profile/change-password/change-user-password';
     static readonly VERIFY_PASSWORD_CHANGE = '/api/v1/profile/change-password/verify-otp-for-password-change';
+    static readonly SET_FIRST_PASSWORD = '/api/v1/profile/change-password/set-first-password';
     static readonly SIGN_OUT_SESSION = '/api/v1/auth/sign-out-session';
     static readonly REFRESH_TOKEN = '/api/v1/auth/refresh-token';
     static readonly GET_USER_INFO = '/api/v1/auth/get-user-info';
@@ -259,6 +260,15 @@ export class APIEndpoint {
     static readonly SWITCH_FEATURE = '/api/v1/admin/feature/switch-feature';
     static readonly MARK_ACTION_SENSITIVE = '/api/v1/admin/feature/mark-action-sensitive';
     static readonly REORDER_FEATURES = '/api/v1/admin/feature/reorder-features';
+    static readonly GET_USER_LIST = '/api/v1/admin/user/get-user-list';
+    static readonly GET_USER_DETAILS = '/api/v1/admin/user/get-user-details';
+    static readonly GET_ASSIGNABLE_ROLES = '/api/v1/admin/user/get-assignable-roles';
+    static readonly CHECK_USER_TAKEN = '/api/v1/admin/user/check-user-taken';
+    static readonly CREATE_USER = '/api/v1/admin/user/create-user';
+    static readonly UPDATE_USER = '/api/v1/admin/user/update-user';
+    static readonly SWITCH_USER_STATUS = '/api/v1/admin/user/switch-user-status';
+    static readonly DELETE_USER = '/api/v1/admin/user/delete-user';
+    static readonly SIGN_OUT_USER_EVERYWHERE = '/api/v1/admin/user/sign-out-user-everywhere';
     static readonly GET_ROLE_LIST = '/api/v1/admin/role/get-role-list';
     static readonly GET_ROLE_TREE = '/api/v1/admin/role/get-role-tree';
     static readonly GET_ROLE_DETAILS = '/api/v1/admin/role/get-role-details';

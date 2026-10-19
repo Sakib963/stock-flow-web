@@ -4,6 +4,7 @@ import { permissionGuard } from '@app/core/guards/permission/permission.guard';
 import { unsavedChangesGuard } from '@app/core/guards/unsaved-changes/unsaved-changes.guard';
 import { FEATURE_LIST } from '@app/modules/administration/feature/config/feature-list.config';
 import { ROLE_LIST } from '@app/modules/administration/role/config/role-list.config';
+import { USER_LIST } from '@app/modules/administration/user/config/user-list.config';
 import { OVERLAY_PROVIDERS } from '@app/shared/constants/overlay-providers';
 
 /** Everything under /app/administration. Each URL is the route of its menu item. */
@@ -31,6 +32,32 @@ export const ADMINISTRATION_ROUTES: Routes = [
                 canActivate: [permissionGuard],
                 data: { permission: FEATURE_LIST.permission },
                 loadComponent: () => import('./feature/pages/feature-detail/feature-detail.component').then((m) => m.FeatureDetailComponent),
+            },
+            {
+                path: 'users',
+                canActivate: [permissionGuard],
+                data: { permission: USER_LIST.permission },
+                loadComponent: () => import('./user/pages/user-list/user-list.component').then((m) => m.UserListComponent),
+            },
+            {
+                path: 'users/new',
+                canActivate: [permissionGuard],
+                canDeactivate: [unsavedChangesGuard],
+                data: { permission: 'administration.user.create' },
+                loadComponent: () => import('./user/pages/user-create/user-create.component').then((m) => m.UserCreateComponent),
+            },
+            {
+                path: 'users/:oid/edit',
+                canActivate: [permissionGuard],
+                canDeactivate: [unsavedChangesGuard],
+                data: { permission: 'administration.user.edit' },
+                loadComponent: () => import('./user/pages/user-edit/user-edit.component').then((m) => m.UserEditComponent),
+            },
+            {
+                path: 'users/:oid',
+                canActivate: [permissionGuard],
+                data: { permission: USER_LIST.permission },
+                loadComponent: () => import('./user/pages/user-detail/user-detail.component').then((m) => m.UserDetailComponent),
             },
             {
                 path: 'roles',

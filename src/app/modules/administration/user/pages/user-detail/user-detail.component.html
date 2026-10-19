@@ -1,0 +1,219 @@
+<page-header [back]="back" [title]="'administration.user.detailTitle' | translate" [lead]="'administration.user.detailLead' | translate">
+    @if (canEdit()) {
+        <button nz-button nzType="primary" type="button" class="inline-flex items-center gap-1.5" [disabled]="!!pending()" (click)="edit()" data-role="edit">
+            <ng-icon name="lucidePencil" size="14px" aria-hidden="true" />
+            <span>{{ 'administration.user.edit' | translate }}</span>
+        </button>
+    }
+</page-header>
+
+@if (failed(); as failure) {
+    <div class="sf-empty" role="alert">
+        <p class="m-0 text-sm text-ink-body">{{ 'administration.user.loadFailed.' + failure | translate }}</p>
+        <div class="mt-3 flex items-center justify-center gap-2">
+            <button nz-button nzType="default" type="button" class="inline-flex items-center gap-1.5" (click)="backToList()">
+                <ng-icon name="lucideArrowLeft" size="14px" aria-hidden="true" />
+                <span>{{ 'administration.user.backToList' | translate }}</span>
+            </button>
+            <button nz-button nzType="primary" type="button" class="inline-flex items-center gap-1.5" [nzLoading]="loading()" (click)="load()">
+                @if (!loading()) {
+                    <ng-icon name="lucideRotateCw" size="14px" aria-hidden="true" />
+                }
+                <span>{{ 'form.retry' | translate }}</span>
+            </button>
+        </div>
+    </div>
+} @else {
+    @if (loading()) {
+        <span class="sr-only" role="status">{{ 'form.loading' | translate }}</span>
+    }
+
+    <nz-card [nzTitle]="detailsTitle" data-detail="details">
+        <ng-template #detailsTitle
+            ><h2 class="m-0 flex items-center gap-1.5 text-sm font-bold text-ink"><ng-icon name="lucideInfo" size="14px" class="text-ink-muted" aria-hidden="true" />{{ 'administration.user.section.details' | translate }}</h2></ng-template
+        >
+        @if (user(); as u) {
+            <div class="flex flex-col gap-4 md:flex-row md:items-start">
+                <div class="flex min-w-0 items-center gap-3 md:w-80 md:flex-none">
+                    <nz-avatar [nzSize]="48" [nzSrc]="u.photo ?? undefined" nzIcon="user" class="flex-none" />
+                    <div class="min-w-0">
+                        <p class="m-0 truncate text-sm font-bold text-ink" data-detail="name">{{ u.name }}</p>
+                        <p class="m-0 font-mono text-xs break-all text-ink-muted">{{ u.email }}</p>
+                    </div>
+                </div>
+                <dl class="m-0 grid flex-1 grid-cols-2 gap-x-6 gap-y-4 md:grid-cols-4">
+                    <div>
+                        <dt class="text-xs text-ink-muted">{{ 'administration.user.status.label' | translate }}</dt>
+                        <dd class="mt-1 mb-0 flex flex-wrap items-center gap-1.5">
+                            @if (statusTone(); as style) {
+                                <status-tag [label]="style.label" [tone]="style.tone" [icon]="style.icon" size="standard" />
+                            }
+                            @if (u.must_change_password && u.status === 'Active') {
+                                <status-tag label="administration.user.waitingFirstSignIn" tone="warning" icon="lucideKeyRound" />
+                            }
+                        </dd>
+                    </div>
+                    <div>
+                        <dt class="text-xs text-ink-muted">{{ 'administration.user.role' | translate }}</dt>
+                        <dd class="mt-1 mb-0 text-sm font-semibold text-ink">{{ u.role_name || ('administration.user.noRole' | translate) }}</dd>
+                    </div>
+                    <div>
+                        <dt class="text-xs text-ink-muted">{{ 'administration.user.phone' | translate }}</dt>
+                        <dd class="mt-1 mb-0 font-mono text-sm text-ink">{{ u.mobile_number || ('administration.user.notGiven' | translate) }}</dd>
+                    </div>
+                    <div>
+                        <dt class="text-xs text-ink-muted">{{ 'administration.user.lastSignIn' | translate }}</dt>
+                        <dd class="mt-1 mb-0 text-sm font-semibold text-ink">
+                            @if (u.last_sign_in_on) {
+                                {{ u.last_sign_in_on | recordDate: language() : 'date-time-12' }}
+                            } @else {
+                                {{ 'administration.user.never' | translate }}
+                            }
+                        </dd>
+                    </div>
+                    <div>
+                        <dt class="text-xs text-ink-muted">{{ 'administration.user.designation' | translate }}</dt>
+                        <dd class="mt-1 mb-0 text-sm text-ink">{{ u.designation || ('administration.user.notGiven' | translate) }}</dd>
+                    </div>
+                    <div>
+                        <dt class="text-xs text-ink-muted">{{ 'administration.user.createdOn' | translate }}</dt>
+                        <dd class="mt-1 mb-0 text-sm text-ink">
+                            @if (u.created_on) {
+                                {{ u.created_on | recordDate: language() : 'date' }}
+                            } @else {
+                                <nz-skeleton-element nzType="input" nzActive nzSize="small" class="w-24" />
+                            }
+                        </dd>
+                    </div>
+                </dl>
+            </div>
+        } @else {
+            <nz-skeleton nzActive [nzAvatar]="true" [nzTitle]="false" [nzParagraph]="{ rows: 3 }" />
+        }
+    </nz-card>
+
+    <!-- On a desktop the access card takes exactly the height of the column beside it and its tree
+         scrolls inside, so neither side is left with empty space; the last card on the right takes
+         whatever the right column has spare. -->
+    <div class="mt-2 grid grid-cols-1 gap-2 md:mt-4 md:gap-4 lg:grid-cols-3">
+        <div class="relative lg:col-span-2 lg:min-h-112">
+            <nz-card class="flex flex-col lg:absolute lg:inset-0" [nzBodyStyle]="fillBody" [nzTitle]="accessTitle" data-detail="access">
+                <ng-template #accessTitle
+                    ><h2 class="m-0 flex items-center gap-1.5 text-sm font-bold text-ink"><ng-icon name="lucideKeyRound" size="14px" class="text-ink-muted" aria-hidden="true" />{{ 'administration.user.access' | translate: { role: user()?.role_name ?? '' } }}</h2></ng-template
+                >
+                @if (record(); as loaded) {
+                    @if (loaded.access.actions.length) {
+                        <grant-tree class="block min-h-0 flex-1 max-lg:h-[60vh]" [tree]="loaded.access" [showState]="false" maxHeight="100%" />
+                    } @else {
+                        <p class="m-0 text-xs text-ink-muted">{{ 'administration.user.nothingGranted' | translate }}</p>
+                    }
+                } @else {
+                    <nz-skeleton nzActive [nzTitle]="false" [nzParagraph]="{ rows: 8 }" />
+                }
+            </nz-card>
+        </div>
+
+        <div class="flex flex-col gap-2 md:gap-4">
+            @if (record(); as loaded) {
+                @if (canEdit() || canDelete()) {
+                    <nz-card [nzTitle]="actionsTitle" data-detail="actions">
+                        <ng-template #actionsTitle
+                            ><h2 class="m-0 flex items-center gap-1.5 text-sm font-bold text-ink"><ng-icon name="lucideZap" size="14px" class="text-ink-muted" aria-hidden="true" />{{ 'administration.user.quickActions' | translate }}</h2></ng-template
+                        >
+                        <div class="flex flex-col gap-2">
+                            @if (canEdit()) {
+                                <button nz-button nzType="default" [nzDanger]="loaded.details.status === 'Active'" type="button" class="inline-flex items-center justify-center gap-1.5" [disabled]="(!!pending() && pending() !== 'status') || !!offReason()" [nzLoading]="pending() === 'status'" (click)="toggleStatus()" data-role="status">
+                                    @if (pending() !== 'status') {
+                                        <ng-icon name="lucidePower" size="14px" aria-hidden="true" />
+                                    }
+                                    <span>{{ 'administration.user.switch.' + (loaded.details.status === 'Active' ? 'Inactive' : 'Active') + '.button' | translate }}</span>
+                                </button>
+                                @if (offReason(); as reason) {
+                                    <p class="m-0 text-xs text-ink-muted" data-role="status-reason">{{ reason | translate }}</p>
+                                }
+                                <button nz-button nzType="default" type="button" class="inline-flex items-center justify-center gap-1.5" [disabled]="(!!pending() && pending() !== 'sign-out') || !!signOutReason()" [nzLoading]="pending() === 'sign-out'" (click)="signOutEverywhere()" data-role="sign-out">
+                                    @if (pending() !== 'sign-out') {
+                                        <ng-icon name="lucideLogOut" size="14px" aria-hidden="true" />
+                                    }
+                                    <span>{{ 'administration.user.signOut.button' | translate }}</span>
+                                </button>
+                                @if (signOutReason(); as reason) {
+                                    <p class="m-0 text-xs text-ink-muted" data-role="sign-out-reason">{{ reason | translate }}</p>
+                                }
+                            }
+                            @if (canDelete()) {
+                                <button nz-button nzType="default" nzDanger type="button" class="inline-flex items-center justify-center gap-1.5" [disabled]="(!!pending() && pending() !== 'delete') || !!deleteReason()" [nzLoading]="pending() === 'delete'" (click)="remove()" data-role="delete">
+                                    @if (pending() !== 'delete') {
+                                        <ng-icon name="lucideTrash2" size="14px" aria-hidden="true" />
+                                    }
+                                    <span>{{ 'administration.user.delete.button' | translate }}</span>
+                                </button>
+                                @if (deleteReason(); as reason) {
+                                    <p class="m-0 text-xs text-ink-muted" data-role="delete-reason">{{ reason | translate }}</p>
+                                }
+                            }
+                        </div>
+                    </nz-card>
+                } @else if (deleted() || !loaded.details.within_reach) {
+                    <nz-card [nzTitle]="actionsTitle" data-detail="actions">
+                        <ng-template #actionsTitle
+                            ><h2 class="m-0 flex items-center gap-1.5 text-sm font-bold text-ink"><ng-icon name="lucideZap" size="14px" class="text-ink-muted" aria-hidden="true" />{{ 'administration.user.quickActions' | translate }}</h2></ng-template
+                        >
+                        <p class="m-0 text-xs text-ink-muted" data-role="locked-note">{{ (deleted() ? 'administration.user.deletedNote' : 'administration.user.outOfReach') | translate }}</p>
+                    </nz-card>
+                }
+
+                <nz-card [nzTitle]="sessionsTitle" data-detail="sessions">
+                    <ng-template #sessionsTitle
+                        ><h2 class="m-0 flex items-center gap-1.5 text-sm font-bold text-ink"><ng-icon name="lucideLaptop" size="14px" class="text-ink-muted" aria-hidden="true" />{{ 'administration.user.sessions' | translate }}</h2></ng-template
+                    >
+                    <ul class="m-0 flex list-none flex-col divide-y divide-line-soft p-0">
+                        @for (device of loaded.sessions; track device.id) {
+                            <li class="py-2 first:pt-0 last:pb-0" data-session>
+                                <span class="block truncate text-[13px] font-semibold text-ink">{{ deviceLabel(device) }}</span>
+                                <span class="block truncate text-xs text-ink-muted"
+                                    >{{ 'administration.user.lastUsed' | translate }} {{ device.last_used_on | recordDate: language() : 'relative' }}
+                                    @if (device.ip_address) {
+                                        <span class="font-mono"> &middot; {{ device.ip_address }}</span>
+                                    }
+                                </span>
+                            </li>
+                        } @empty {
+                            <li class="text-xs text-ink-muted">{{ 'administration.user.noSessions' | translate }}</li>
+                        }
+                    </ul>
+                </nz-card>
+
+                <nz-card class="flex-1" [nzTitle]="activityTitle" data-detail="activity">
+                    <ng-template #activityTitle
+                        ><h2 class="m-0 flex items-center gap-1.5 text-sm font-bold text-ink"><ng-icon name="lucideHistory" size="14px" class="text-ink-muted" aria-hidden="true" />{{ 'administration.user.activity' | translate }}</h2></ng-template
+                    >
+                    @if (loaded.activity.length) {
+                        <record-timeline [entries]="loaded.activity">
+                            <ng-template let-entry>
+                                <p class="m-0 text-[13px] font-semibold text-ink">{{ entry.action }}</p>
+                                @if (entry.description) {
+                                    <p class="mt-0.5 mb-0 text-xs text-ink-body">{{ entry.description }}</p>
+                                }
+                                <p class="mt-0.5 mb-0 text-xs text-ink-muted">{{ entry.user }} &middot; {{ entry.date | recordDate: language() : 'date-time-12' }}</p>
+                            </ng-template>
+                        </record-timeline>
+                    } @else {
+                        <p class="m-0 text-xs text-ink-muted">{{ 'administration.user.noActivity' | translate }}</p>
+                    }
+                </nz-card>
+            } @else {
+                <nz-card class="flex-1">
+                    <nz-skeleton nzActive [nzTitle]="false" [nzParagraph]="{ rows: 8 }" />
+                </nz-card>
+            }
+        </div>
+    </div>
+
+    <action-footer>
+        <button nz-button nzType="default" type="button" class="inline-flex items-center gap-1.5" (click)="goBack()">
+            <ng-icon name="lucideArrowLeft" size="14px" aria-hidden="true" />
+            <span>{{ 'list.back' | translate }}</span>
+        </button>
+    </action-footer>
+}

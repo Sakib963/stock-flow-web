@@ -99,6 +99,29 @@
             "doneFoot": "You have not been signed in automatically. Counter machines are shared, so the next person at the keyboard has to be the one who signs in.",
             "errNoAccount": "No account found with that email address. Check the spelling, or ask your shop admin.",
             "resending": "Sending a new code..."
+        },
+        "setPassword": {
+            "title": "Set your own password",
+            "lead": "Welcome, {{name}}. Your account was made with a temporary password. Choose your own before you start.",
+            "current": "Temporary password",
+            "currentPlaceholder": "The password you were given",
+            "currentRequired": "Type the temporary password you were given.",
+            "new": "Your new password",
+            "confirmPlaceholder": "Type it again",
+            "confirmRequired": "Type the new password again.",
+            "mismatch": "The two passwords do not match.",
+            "sameAsTemporary": "Choose a password different from the temporary one.",
+            "wrongTemporary": "That is not the temporary password you were given. Check it and try again.",
+            "tooMany": "Too many tries. Wait a few minutes and try again.",
+            "save": "Set password and continue",
+            "signOut": "Sign out",
+            "signOutFailed": "Could not sign out. Check your connection and try again.",
+            "done": "Your password is set.",
+            "failed": {
+                "network": "Could not reach the server. Check your connection and try again.",
+                "forbidden": "You do not have permission to do that.",
+                "server": "Your password was not set. Try again in a moment."
+            }
         }
     },
     "shell": {
@@ -4937,6 +4960,166 @@
             },
             "activity": "History",
             "noActivity": "No changes yet."
+        },
+        "user": {
+            "add": "New user",
+            "createTitle": "New user",
+            "editTitle": "Edit user",
+            "detailTitle": "User",
+            "detailLead": "Who this is, what their role lets them do, and where they are signed in.",
+            "formLead": "Give the person a role and a temporary password. They set their own password when they first sign in.",
+            "name": "Name",
+            "nameHelper": "The name shown in the app, on receipts and in the history.",
+            "namePlaceholder": "Rahim Uddin",
+            "email": "Email",
+            "emailHelper": "What they sign in with. It cannot be changed later, because the history names people by email.",
+            "emailLocked": "The email cannot be changed: the history names people by it.",
+            "emailPlaceholder": "rahim@example.com",
+            "emailTaken": "Someone already uses this email, now or in the past. Use another email.",
+            "emailInvalid": "Enter an email address such as rahim@example.com.",
+            "phone": "Phone",
+            "phoneHelper": "A mobile number nobody else uses in this app.",
+            "phonePlaceholder": "01712345678",
+            "phoneTaken": "Someone already uses this phone number. Use another number.",
+            "phoneInvalid": "Enter a mobile number of digits, such as 01712345678.",
+            "designation": "Designation",
+            "designationHelper": "Their job title, for your own reference. It gives no access.",
+            "designationPlaceholder": "Counter salesman",
+            "role": "Role",
+            "roleHelper": "Decides what they can do. Only roles holding nothing beyond your own access are listed.",
+            "rolePlaceholder": "Pick a role",
+            "roleRequired": "Pick a role for this person.",
+            "roleHolders": "{{count}} people",
+            "rolesFailed": "The roles could not be loaded.",
+            "noRoles": "No role you can give yet. Make one in Roles first.",
+            "roleRefused": "That role holds access you do not have, so you cannot give it.",
+            "roleLockedSelf": "This is your own account, so someone else has to change your role.",
+            "roleLockedOwner": "This is the only active owner. Make someone else an owner before changing this role.",
+            "sensitive": "Sensitive",
+            "sensitiveNote": "This role holds sensitive actions: {{actions}}.",
+            "password": "Temporary password",
+            "passwordHelper": "Give this to the person. They must replace it with their own when they first sign in.",
+            "passwordPlaceholder": "Welcome-2026",
+            "passwordRule": "The password does not meet every rule below.",
+            "photo": "Photo",
+            "photoHelper": "Optional. Helps others recognise who did what.",
+            "photoAdd": "Add photo",
+            "photoChange": "Change photo",
+            "photoRemove": "Remove",
+            "photoCancel": "Cancel upload",
+            "photoUploading": "Uploading {{percent}}%",
+            "photoWrongType": "This file is not a JPG, PNG or WebP picture.",
+            "photoTooLarge": "That photo is larger than {{size}} MB. Pick a smaller one.",
+            "photoNotSetUp": "Photo upload is not set up yet. Save without a photo for now.",
+            "photoFailed": {
+                "network": "The photo could not be uploaded. Check your connection and try again.",
+                "forbidden": "You do not have permission to do that.",
+                "server": "The photo could not be uploaded. Try again in a moment."
+            },
+            "photoStillUploading": "The photo is still uploading. Wait for it to finish, then save.",
+            "status": {
+                "label": "Status",
+                "Active": "Active",
+                "Inactive": "Turned off",
+                "Deleted": "Deleted"
+            },
+            "stat": {
+                "active": "Active",
+                "inactive": "Turned off",
+                "neverSignedIn": "Never signed in"
+            },
+            "searchPlaceholder": "Search by name, email or phone",
+            "lastSignIn": "Last sign-in",
+            "view": "View",
+            "edit": "Edit",
+            "emptyTitle": "No users yet",
+            "emptyBody": "Add the people who work here, each with a role.",
+            "confirm": {
+                "create": {
+                    "title": "Create this user?",
+                    "body": "{{name}} will be able to sign in with the temporary password and must set their own straight away.",
+                    "button": "Create user"
+                },
+                "edit": {
+                    "title": "Save changes?",
+                    "body": "The changes to {{name}} apply from their next action. Nobody is signed out.",
+                    "button": "Save changes"
+                },
+                "sensitive": {
+                    "title": "Give {{role}}, a role with sensitive actions?",
+                    "body": "{{role}} holds actions meant for the owner: {{actions}}. {{name}} will be able to use them from their next action."
+                }
+            },
+            "created": {
+                "title": "User created",
+                "lead": "{{name}} can sign in now. Send them these details.",
+                "address": "Address",
+                "temporary": "Temporary password",
+                "once": "This password is shown only now. {{name}} sets their own on first sign-in.",
+                "copy": "Copy sign-in details",
+                "copiedButton": "Copied",
+                "copied": "Sign-in details copied. Paste them into a message.",
+                "open": "Open their record",
+                "copyText": "Hello {{name}}, your StockFlow account is ready.\nSign in at: {{address}}\nEmail: {{email}}\nTemporary password: {{password}}\nYou will set your own password when you first sign in."
+            },
+            "updated": "User saved.",
+            "stale": "Someone changed this person while you were editing. Their current details are loaded; check them and save again.",
+            "loadFailed": {
+                "network": "Could not reach the server. Check your connection and try again.",
+                "forbidden": "You do not have permission to see users.",
+                "server": "This could not be loaded. Try again in a moment."
+            },
+            "backToList": "Back to users",
+            "section": {
+                "details": "Details"
+            },
+            "waitingFirstSignIn": "Has not set a password yet",
+            "noRole": "No role",
+            "notGiven": "Not given",
+            "never": "Never",
+            "createdOn": "Added on",
+            "access": "What {{role}} can do",
+            "nothingGranted": "This role grants nothing yet.",
+            "quickActions": "Quick actions",
+            "switch": {
+                "Inactive": {
+                    "title": "Turn off {{name}}?",
+                    "body": "{{name}} is signed out of every device at once and cannot sign in until turned back on.",
+                    "button": "Turn off",
+                    "done": "User turned off."
+                },
+                "Active": {
+                    "title": "Turn on {{name}}?",
+                    "body": "{{name}} can sign in again with their own password.",
+                    "button": "Turn on",
+                    "done": "User turned on."
+                }
+            },
+            "reason": {
+                "self": "This is your own account. Ask someone else who manages users.",
+                "lastOwner": "This is the only active owner. Make someone else an owner first.",
+                "signOutSelf": "To sign out your own devices, use your profile.",
+                "noSessions": "Not signed in on any device right now."
+            },
+            "signOut": {
+                "title": "Sign {{name}} out everywhere?",
+                "body": "{{name}} is signed out of {{count}} devices now. The account stays on, so they can sign in again.",
+                "button": "Sign out everywhere",
+                "done": "Signed out of every device."
+            },
+            "delete": {
+                "title": "Delete {{name}}?",
+                "body": "{{name}} is signed out and can never sign in again. This cannot be undone. Their sales and history stay, still under their name.",
+                "button": "Delete user",
+                "done": "User deleted."
+            },
+            "deletedNote": "This account was deleted. It is kept so the history still names who did what.",
+            "outOfReach": "This person's role holds access you do not have, so you cannot change their account.",
+            "sessions": "Signed in on",
+            "lastUsed": "Last used",
+            "noSessions": "Not signed in on any device.",
+            "activity": "History",
+            "noActivity": "Nothing has changed yet."
         }
     },
     "access": {

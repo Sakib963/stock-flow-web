@@ -1,6 +1,7 @@
 export class Constants {
     static readonly LOGIN_ROUTE = '/auth/login';
     static readonly SESSION_ENDED_ROUTE = '/auth/session-ended';
+    static readonly SET_PASSWORD_ROUTE = '/auth/set-password';
     // Landing after sign in. One route for every role today, because the app shell has not been
     // designed and the old per-role destinations pointed at deleted modules. Revisit with the shell.
     static readonly APP_ROUTE = '/app';

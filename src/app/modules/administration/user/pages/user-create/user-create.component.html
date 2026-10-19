@@ -1,0 +1,5 @@
+<page-header [back]="back" [title]="'administration.user.createTitle' | translate" [lead]="'administration.user.formLead' | translate" />
+
+<form-page [formId]="editor()?.formId ?? ''" [saving]="saving()" [remaining]="editor()?.remaining() ?? 0" saveLabel="administration.user.add" (cancel)="cancel()">
+    <user-form (submitted)="save()" />
+</form-page>

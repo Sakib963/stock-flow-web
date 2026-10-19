@@ -51,6 +51,7 @@ import {
     lucideShieldAlert,
     lucideMinus,
     lucideUsers,
+    lucideUserPlus,
 } from '@ng-icons/lucide';
 
 /**
@@ -113,6 +114,7 @@ export const LIST_ICONS = {
     lucideUndo2,
     lucideWifiOff,
     lucideUsers,
+    lucideUserPlus,
 };
 
 export const isListIcon = (name: string | null | undefined): name is keyof typeof LIST_ICONS => !!name && name in LIST_ICONS;

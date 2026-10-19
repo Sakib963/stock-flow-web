@@ -1,14 +1,14 @@
 import { TestBed } from '@angular/core/testing';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
-import { ActivatedRouteSnapshot, provideRouter, RouterStateSnapshot } from '@angular/router';
+import { ActivatedRouteSnapshot, provideRouter, RouterStateSnapshot, UrlTree } from '@angular/router';
 import { provideTranslateService } from '@ngx-translate/core';
 import { APIEndpoint } from '@app/core/constants/api-endpoint';
 import { SessionPayload } from '@app/core/models/session.model';
 import { tokenInterceptor } from '@app/core/interceptors/token.interceptor';
 import { AuthService } from '@app/core/services/auth/auth.service';
 import { SessionService } from '@app/core/services/session/session.service';
-import { sessionGuard } from './session.guard';
+import { mustSetPasswordGuard, sessionGuard } from './session.guard';
 
 const payload = (name: string): SessionPayload => ({
     version: 'v1',
@@ -51,6 +51,22 @@ describe('sessionGuard', () => {
     afterEach(() => localStorage.clear());
 
     /** Signing in does not reload the page, so this is the only thing that fetches the payload. */
+    it('sends an account that must set its own password to that page instead of the shell', async () => {
+        const result = activate() as unknown as Promise<boolean | UrlTree>;
+        http.expectOne((r) => r.url.includes(APIEndpoint.GET_USER_INFO)).flush({ code: 200, data: { ...payload('Rahim'), user: { ...payload('Rahim').user, mustChangePassword: true } } });
+        const tree = await result;
+        expect(tree instanceof UrlTree && tree.toString()).toBe('/auth/set-password');
+        const page = (await TestBed.runInInjectionContext(() => mustSetPasswordGuard({} as ActivatedRouteSnapshot, {} as RouterStateSnapshot))) as boolean;
+        expect(page).toBe(true);
+    });
+
+    it('keeps everyone else off the set-password page', async () => {
+        const result = TestBed.runInInjectionContext(() => mustSetPasswordGuard({} as ActivatedRouteSnapshot, {} as RouterStateSnapshot)) as Promise<boolean | UrlTree>;
+        flush('Samiha');
+        const tree = await result;
+        expect(tree instanceof UrlTree && tree.toString()).toBe('/app');
+    });
+
     it('loads the boot payload before the shell activates', async () => {
         const result = activate();
         flush('Samiha');

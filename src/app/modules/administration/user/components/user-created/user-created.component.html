@@ -1,0 +1,36 @@
+<div class="flex items-start gap-2">
+    <ng-icon name="lucideCircleCheck" size="20px" class="mt-0.5 flex-none text-success" aria-hidden="true" />
+    <p class="m-0 text-sm text-ink-body">{{ 'administration.user.created.lead' | translate: { name: data.name } }}</p>
+</div>
+
+<!-- Label above value, so a long address gets the whole width instead of breaking mid-word. -->
+<dl class="mt-4 mb-0 flex flex-col gap-2.5 rounded-control bg-surface-sunken p-3 text-sm">
+    <div>
+        <dt class="text-xs text-ink-muted">{{ 'administration.user.created.address' | translate }}</dt>
+        <dd class="m-0 font-mono break-all text-ink">{{ address }}</dd>
+    </div>
+    <div>
+        <dt class="text-xs text-ink-muted">{{ 'administration.user.email' | translate }}</dt>
+        <dd class="m-0 font-mono break-all text-ink" data-created="email">{{ data.email }}</dd>
+    </div>
+    <div>
+        <dt class="text-xs text-ink-muted">{{ 'administration.user.created.temporary' | translate }}</dt>
+        <dd class="m-0 font-mono text-ink" data-created="password">{{ data.password }}</dd>
+    </div>
+</dl>
+
+<p class="mt-3 mb-0 flex items-start gap-2 text-xs text-ink-muted">
+    <ng-icon name="lucideInfo" size="14px" class="mt-px flex-none text-primary" aria-hidden="true" />
+    <span>{{ 'administration.user.created.once' | translate: { name: data.name } }}</span>
+</p>
+
+<div class="mt-6 flex flex-wrap justify-end gap-2">
+    <button nz-button nzType="default" type="button" class="inline-flex items-center gap-1.5" (click)="copy()" data-created="copy">
+        <ng-icon [name]="copied() ? 'lucideCheck' : 'lucideCopy'" size="14px" aria-hidden="true" />
+        <span>{{ (copied() ? 'administration.user.created.copiedButton' : 'administration.user.created.copy') | translate }}</span>
+    </button>
+    <button nz-button nzType="primary" type="button" class="inline-flex items-center gap-1.5" cdkFocusInitial (click)="close()" data-created="done">
+        <ng-icon name="lucideArrowRight" size="14px" aria-hidden="true" />
+        <span>{{ 'administration.user.created.open' | translate }}</span>
+    </button>
+</div>
