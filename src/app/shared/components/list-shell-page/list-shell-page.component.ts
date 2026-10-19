@@ -1,6 +1,6 @@
 import { NgTemplateOutlet } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input, output, untracked } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { ActionEvent, Tone } from '@app/core/models/config.model';
 import { FilterValues } from '@app/core/models/filter.model';
@@ -55,6 +55,8 @@ const STAT_TONES: Record<Tone, string> = {
 })
 export class ListShellPageComponent {
     private readonly _route = inject(ActivatedRoute, { optional: true });
+    // Read once at construction: navigation state is only there while the navigation that opened the page runs.
+    private readonly _opening = (inject(Router, { optional: true })?.currentNavigation()?.extras.state?.['filters'] as FilterValues | undefined) ?? null;
     private readonly _session = inject(SessionService);
     readonly store = inject(ListStore);
 
@@ -137,6 +139,7 @@ export class ListShellPageComponent {
                     sort: config.table.sort ?? null,
                     context,
                     route: this._route?.snapshot.params,
+                    opening: this._opening,
                     include: [...(this.stats().length ? (['stats'] as const) : []), ...(config.table.totals?.length ? (['totals'] as const) : [])],
                 });
             });

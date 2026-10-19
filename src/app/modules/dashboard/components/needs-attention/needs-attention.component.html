@@ -1,0 +1,40 @@
+<nz-card class="[&_.ant-card-body]:p-2" [nzTitle]="title" data-dashboard="attention">
+    <ng-template #title
+        ><h2 class="m-0 flex items-center gap-1.5 text-sm font-bold text-ink">
+            <ng-icon name="lucideInbox" size="14px" class="text-ink-muted" aria-hidden="true" />{{ 'dashboard.attention.title' | translate }}
+            @if (items().length) {
+                <span class="rounded-full bg-surface-sunken px-1.5 text-xs font-semibold text-ink-muted tabular-nums">{{ items().length | digits }}</span>
+            }
+        </h2></ng-template
+    >
+
+    @if (items().length) {
+        <ul class="m-0 grid list-none grid-cols-1 gap-x-4 gap-y-0.5 p-0 md:grid-cols-2">
+            @for (item of items(); track item.key) {
+                <li>
+                    <a [routerLink]="item.route" [state]="item.state" class="group flex items-center gap-3 rounded-control px-2 py-2 transition-colors hover:bg-surface-sunken motion-reduce:transition-none" [attr.data-attention]="item.key">
+                        <span class="flex size-8 flex-none items-center justify-center rounded-full" [class]="item.toneClass">
+                            <ng-icon [name]="item.icon" size="15px" aria-hidden="true" />
+                        </span>
+                        <span class="min-w-0 flex-1">
+                            <span class="block truncate text-[13px] font-semibold text-ink">{{ 'dashboard.attention.' + item.key | translate }}</span>
+                            @if (item.hint) {
+                                <span class="block truncate text-xs text-ink-muted">{{ item.hint }}</span>
+                            }
+                        </span>
+                        <span class="font-mono text-base font-bold text-ink tabular-nums" data-count>{{ item.count | digits }}</span>
+                        <ng-icon name="lucideChevronRight" size="14px" class="flex-none text-ink-faint group-hover:text-primary" aria-hidden="true" />
+                    </a>
+                </li>
+            }
+        </ul>
+    } @else {
+        <div class="flex flex-col items-center justify-center gap-2 px-4 py-6 text-center" data-attention="clear">
+            <span class="flex size-10 items-center justify-center rounded-full bg-success-bg text-success-ink">
+                <ng-icon name="lucideCircleCheck" size="20px" aria-hidden="true" />
+            </span>
+            <p class="m-0 text-sm font-semibold text-ink">{{ 'dashboard.attention.clearTitle' | translate }}</p>
+            <p class="m-0 text-xs text-ink-muted">{{ 'dashboard.attention.clearBody' | translate }}</p>
+        </div>
+    }
+</nz-card>

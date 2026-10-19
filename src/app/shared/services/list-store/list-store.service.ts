@@ -150,6 +150,11 @@ export class ListStore {
             // After the config's own opening position, so what someone left behind wins over it,
             // and before the first request, so the list is never loaded twice to arrive there.
             this.restore();
+            if (setup.opening) {
+                this.page.set(1);
+                this.search.set('');
+                this.filters.set(setup.opening);
+            }
         }
         this._requests.next(first ? 0 : LIST_TIMING.triggerDebounceMs);
     }

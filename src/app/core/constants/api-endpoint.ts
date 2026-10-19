@@ -260,6 +260,7 @@ export class APIEndpoint {
     static readonly SWITCH_FEATURE = '/api/v1/admin/feature/switch-feature';
     static readonly MARK_ACTION_SENSITIVE = '/api/v1/admin/feature/mark-action-sensitive';
     static readonly REORDER_FEATURES = '/api/v1/admin/feature/reorder-features';
+    static readonly GET_DASHBOARD = '/api/v1/dashboard/get-dashboard';
     static readonly GET_USER_LIST = '/api/v1/admin/user/get-user-list';
     static readonly GET_USER_DETAILS = '/api/v1/admin/user/get-user-details';
     static readonly GET_ASSIGNABLE_ROLES = '/api/v1/admin/user/get-assignable-roles';

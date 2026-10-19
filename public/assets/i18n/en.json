@@ -375,12 +375,114 @@
     },
     "dashboard": {
         "title": "Dashboard",
-        "takings": "Today's takings",
-        "needsAttention": "Needs attention",
-        "runningLow": "Running low",
-        "noData": "No data yet",
-        "accessTitle": "What this account can reach",
-        "accessBody": "Sections come from the server, already filtered by role. A narrower role sees fewer."
+        "greeting": {
+            "morning": "Good morning, {{name}}",
+            "afternoon": "Good afternoon, {{name}}",
+            "evening": "Good evening, {{name}}"
+        },
+        "period": {
+            "label": "Period",
+            "today": "Today",
+            "week": "7 days",
+            "month": "This month"
+        },
+        "vs": {
+            "today": "vs yesterday",
+            "week": "vs the 7 days before",
+            "month": "vs the same days before"
+        },
+        "refresh": "Refresh",
+        "loadFailed": {
+            "network": "Could not reach the server. Check your connection and try again.",
+            "forbidden": "You do not have permission to see the dashboard.",
+            "server": "The dashboard could not be loaded. Try again in a moment."
+        },
+        "refreshFailed": {
+            "network": "Could not refresh: check your connection. These are the figures from before.",
+            "forbidden": "Could not refresh: you no longer have permission.",
+            "server": "Could not refresh just now. These are the figures from before."
+        },
+        "sectionFailed": "This part could not be loaded. Try again in a moment.",
+        "nothing": {
+            "title": "Welcome to StockFlow",
+            "body": "Your work appears here as features are given to you."
+        },
+        "forYou": {
+            "title": "For you",
+            "startTitle": "Start",
+            "counter": {
+                "today": "Your counter sales today",
+                "week": "Your counter sales, 7 days",
+                "month": "Your counter sales this month",
+                "sales": "Sales: {{count}}"
+            },
+            "online": {
+                "today": "Online orders you entered today",
+                "week": "Online orders you entered, 7 days",
+                "month": "Online orders you entered this month",
+                "sold": "Became sales: {{count}}"
+            },
+            "waiting": {
+                "title": "Waiting with you",
+                "parked": "Parked carts: {{count}}",
+                "online": "Unfinished online orders: {{count}}"
+            }
+        },
+        "action": {
+            "counterSale": "Counter sale",
+            "onlineOrder": "Online order",
+            "preOrder": "Pre-order",
+            "purchaseOrder": "Purchase order"
+        },
+        "attention": {
+            "title": "Needs attention",
+            "clearTitle": "Nothing is waiting for you",
+            "clearBody": "New work shows here as soon as it needs you.",
+            "orders_to_confirm": "Online orders to confirm",
+            "orders_to_dispatch": "Orders to pack and dispatch",
+            "parcels_with_courier": "Parcels with the courier",
+            "returns_to_confirm": "Returns to confirm",
+            "pre_orders_ready": "Pre-orders ready to make into orders",
+            "pre_orders_overdue": "Pre-orders past their date",
+            "purchase_orders_to_verify": "Purchase orders to verify",
+            "disposals_to_approve": "Disposals to approve",
+            "adjustments_to_verify": "Stock adjustments to verify",
+            "out_of_stock": "Products out of stock",
+            "low_on_stock": "Products low on stock",
+            "expiring": "Products expiring in 30 days",
+            "posts_past_due": "Partner posts past due",
+            "hint": {
+                "oldest": "Oldest {{when}}",
+                "parcels": "Parcels coming back: {{count}}",
+                "expired": "Already expired: {{count}}",
+                "dueSince": "Due since {{date}}"
+            }
+        },
+        "business": {
+            "title": "Business at a glance",
+            "open": "Open sales analytics",
+            "sales": "Sales",
+            "profit": "Profit",
+            "orders": "Orders sold",
+            "average": "Average order",
+            "noBefore": "Nothing to compare with",
+            "withoutCost": "Cost missing for {{count}} units",
+            "byDay": "Sales by day",
+            "top": "Selling best",
+            "units": "{{count}} sold",
+            "noSales": "No sales in this period yet."
+        },
+        "stock": {
+            "title": "Stock at a glance",
+            "open": "Open stock overview",
+            "stock_value": "Stock value",
+            "stock_valueHint": "What the stock on the shelf cost",
+            "expected_revenue": "Probable revenue",
+            "expected_revenueHint": "If every priced unit sells at its price",
+            "profit_full": "Probable profit",
+            "profit_fullHint": "That revenue less cost and budgets",
+            "unpriced": "Batches with no selling price yet: {{count}}. They count in the value, not in the revenue."
+        }
     },
     "list": {
         "back": "Back",

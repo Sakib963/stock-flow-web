@@ -1,5 +1,6 @@
 import { Action, Condition, DateFormat, Endpoint, JsonObject, Params, Text, Tone, ToneMap, ToneStyle } from '@app/core/models/config.model';
 import { RendererRef } from '@app/core/models/renderer.model';
+import { FilterValues } from '@app/core/models/filter.model';
 
 interface ColumnBase {
     /** The row field, a dot path allowed: 'supplier.name'. */
@@ -155,4 +156,6 @@ export interface ListStoreSetup {
     route?: Readonly<Record<string, string | undefined>>;
     /** Asked of the server only when a config shows them. */
     include?: readonly ('stats' | 'totals')[];
+    /** Filters handed over by the link that opened the list, such as a dashboard count. They win over what the tab remembered. */
+    opening?: FilterValues | null;
 }

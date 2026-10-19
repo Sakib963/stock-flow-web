@@ -225,6 +225,17 @@ describe('ListStore', () => {
         expect(sessionStorage.getItem('sf.list.test.list')).toBeNull();
     });
 
+    it('opens on the filters a dashboard link handed over, over what the tab remembered', async () => {
+        sessionStorage.setItem('sf.list.test.list', JSON.stringify({ page: 3, size: 20, sort: null, search: 'sar', filters: { status: 'Inactive' } }));
+        store.configure({ key: 'test.list', source: { endpoint: APIEndpoint.GET_CATEGORY_LIST }, pageSize: 20, opening: { status: 'Pending' } });
+        vi.advanceTimersByTime(0);
+
+        const [request] = pending();
+        expect([request.request.params.get('status'), request.request.params.get('offset'), request.request.params.has('search')]).toEqual(['Pending', '0', false]);
+        answer(request);
+        await vi.advanceTimersByTimeAsync(400);
+    });
+
     it('starts a table that names no key at its config position, remembering nothing', async () => {
         sessionStorage.setItem('sf.list.test.list', JSON.stringify({ page: 4, size: 50, sort: null, search: 'sar', filters: {} }));
         await loaded();
