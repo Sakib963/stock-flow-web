@@ -1,0 +1,14 @@
+<page-header />
+
+<section class="mt-2 grid gap-px overflow-hidden rounded-container border border-line bg-line md:mt-4 md:grid-cols-2" data-report="group">
+    @for (report of reports(); track report.key) {
+        <a class="group flex items-start gap-3 bg-white px-4 py-3 no-underline hover:bg-primary-wash focus-visible:bg-primary-wash md:last:odd:col-span-2" [routerLink]="report.key" [attr.data-report-link]="report.key">
+            <span class="mt-0.5 grid size-8 shrink-0 place-items-center rounded-control bg-surface-sunken text-ink-muted group-hover:text-primary group-focus-visible:text-primary"><ng-icon [name]="report.icon" size="16px" aria-hidden="true" /></span>
+            <span class="min-w-0 flex-1">
+                <span class="block text-sm font-semibold text-ink">{{ 'report.reports.' + report.key + '.title' | translate }}</span>
+                <span class="mt-0.5 block text-[13px] text-ink-muted">{{ 'report.reports.' + report.key + '.lead' | translate }}</span>
+            </span>
+            <ng-icon class="mt-1 shrink-0 text-ink-soft group-hover:text-primary" name="lucideChevronRight" size="16px" aria-hidden="true" />
+        </a>
+    }
+</section>

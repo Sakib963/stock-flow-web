@@ -271,6 +271,7 @@ export class APIEndpoint {
     static readonly MARK_ACTION_SENSITIVE = '/api/v1/admin/feature/mark-action-sensitive';
     static readonly REORDER_FEATURES = '/api/v1/admin/feature/reorder-features';
     static readonly GET_DASHBOARD = '/api/v1/dashboard/get-dashboard';
+
     static readonly GET_USER_LIST = '/api/v1/admin/user/get-user-list';
     static readonly GET_USER_DETAILS = '/api/v1/admin/user/get-user-details';
     static readonly GET_ASSIGNABLE_ROLES = '/api/v1/admin/user/get-assignable-roles';
@@ -289,4 +290,14 @@ export class APIEndpoint {
     static readonly SWITCH_ROLE_STATUS = '/api/v1/admin/role/switch-role-status';
     static readonly DELETE_ROLE = '/api/v1/admin/role/delete-role';
     static readonly CREATE_PARTNER_PAYMENT = '/api/v1/marketing/partner-payment/create-partner-payment';
+
+    // Reports
+    static readonly GET_SALES_REPORT = '/api/v1/report/sales/get-sales-report';
+    static readonly DOWNLOAD_SALES_REPORT = '/api/v1/report/sales/download-sales-report';
+    static readonly GET_STOCK_REPORT = '/api/v1/report/stock/get-stock-report';
+    static readonly DOWNLOAD_STOCK_REPORT = '/api/v1/report/stock/download-stock-report';
+    static readonly GET_CUSTOMER_REPORT = '/api/v1/report/customer/get-customer-report';
+    static readonly DOWNLOAD_CUSTOMER_REPORT = '/api/v1/report/customer/download-customer-report';
+    static readonly GET_MARKETING_REPORT = '/api/v1/report/marketing/get-marketing-report';
+    static readonly DOWNLOAD_MARKETING_REPORT = '/api/v1/report/marketing/download-marketing-report';
 }

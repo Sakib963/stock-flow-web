@@ -5403,5 +5403,449 @@
                 "none": "No page broke on anyone in this period."
             }
         }
+    },
+    "report": {
+        "download": "Download Excel",
+        "print": "Print or save PDF",
+        "printTooMany": "Too many rows to print. Download the Excel file, or narrow the filter.",
+        "periodLine": "{{from}} to {{to}}",
+        "asAtNow": "As at now",
+        "madeOn": "Made {{when}}",
+        "withoutCost": "{{count}} units sold have no cost price, so they count as free and profit reads high.",
+        "emptyBody": "Change the period or a filter to see more.",
+        "notFoundTitle": "Report not found",
+        "notFoundBody": "This report does not exist or your role does not include it. Go back and pick one from the list.",
+        "failed": {
+            "network": "Could not run the report. Check the internet connection, then try again.",
+            "forbidden": "Your role does not include this report. Ask the business admin if you need it.",
+            "server": "Could not run the report. Try again in a moment.",
+            "tooBig": "This report is too big. Choose a shorter period or a narrower filter."
+        },
+        "downloadFailed": {
+            "network": "The file did not download. Check the internet connection, then try again.",
+            "forbidden": "Your role does not include downloading this report.",
+            "server": "The file could not be made. Try again in a moment.",
+            "tooBig": "Too many rows for one file. Choose a shorter period or a narrower filter."
+        },
+        "filter": {
+            "period": "Period",
+            "channel": "Channel",
+            "category": "Category",
+            "warehouse": "Warehouse",
+            "supplier": "Supplier",
+            "dispose-reason": "Reason",
+            "adjustment-reason": "Reason",
+            "expires-by": "Expires within",
+            "customer-status": "Status",
+            "gender": "Gender",
+            "age-band": "Age",
+            "quiet-days": "No purchase for",
+            "campaign-status": "Status"
+        },
+        "total": {
+            "sales_count": "Number of sales"
+        },
+        "column": {
+            "invoice_no": "Invoice",
+            "channel": "Channel",
+            "customer": "Customer",
+            "payment_method": "Paid by",
+            "goods": "Goods at list price",
+            "discount": "Discount",
+            "returns": "Returns",
+            "sales": "Sales",
+            "delivery": "Delivery charge",
+            "customer_total": "Customer total",
+            "received": "Received",
+            "owed": "Owed",
+            "payment_status": "Payment",
+            "cost": "Cost",
+            "profit": "Profit",
+            "sales_count": "Number of sales",
+            "counter_sales": "Counter",
+            "online_sales": "Online",
+            "product": "Product",
+            "sku": "SKU",
+            "category": "Category",
+            "units_sold": "Units sold",
+            "units_returned": "Units returned",
+            "units_kept": "Units kept",
+            "margin": "Margin",
+            "return_no": "Return",
+            "reason": "Reason",
+            "units_restocked": "Back on the shelf",
+            "units_damaged": "Damaged",
+            "value": "Value",
+            "refund": "Refund",
+            "delivery_refunded": "Delivery refunded",
+            "days": "Days",
+            "phone": "Phone",
+            "payment_type": "Terms",
+            "warehouse": "Warehouse",
+            "aisle": "Aisle",
+            "batch": "Batch",
+            "expiry": "Expiry",
+            "batch_status": "Use",
+            "on_hand": "On hand",
+            "held": "Held for orders",
+            "sellable": "Sellable",
+            "in_stock": "In stock",
+            "selling_price": "Selling price",
+            "cost_price": "Cost price",
+            "value_at_cost": "Value at cost",
+            "opening": "Opening",
+            "units_received": "Received",
+            "out_on_orders": "Out on orders",
+            "returned": "Returned",
+            "given_away": "Given away",
+            "disposed": "Disposed",
+            "adjusted": "Adjusted",
+            "closing": "Closing",
+            "restock_at": "Restock at",
+            "sold_30_days": "Sold in 30 days",
+            "last_supplier": "Last supplier",
+            "last_cost": "Last cost",
+            "po_number": "Purchase order",
+            "supplier": "Supplier",
+            "total": "Total",
+            "paid": "Paid",
+            "dispose_no": "Disposal",
+            "from_return": "From a return",
+            "quantity": "Quantity",
+            "adjustment_number": "Adjustment",
+            "units_in": "Units in",
+            "units_out": "Units out",
+            "value_in": "Value in",
+            "value_out": "Value out",
+            "days_left": "Days left",
+            "to_collect": "To collect",
+            "courier": "Courier",
+            "consignment_no": "Consignment",
+            "customer_status": "Status",
+            "district": "District",
+            "gender": "Gender",
+            "age_band": "Age",
+            "first_source": "First source",
+            "first_purchase": "First purchase",
+            "last_purchase": "Last purchase",
+            "bought": "Bought",
+            "customers": "Customers",
+            "sales_value": "Sales value",
+            "share": "Share",
+            "source": "Source",
+            "platform": "Platform",
+            "new_customers": "New customers",
+            "campaign_no": "Campaign",
+            "campaign": "Name",
+            "campaign_status": "Status",
+            "partner_fees": "Partner fees",
+            "ad_spend": "Ad spend",
+            "other_cost": "Other cost",
+            "gift_cost": "Products given",
+            "total_cost": "Total",
+            "partner": "Partner",
+            "amount": "Amount",
+            "reference": "Reference",
+            "agreed_fee": "Agreed fee",
+            "giveaway_no": "Giveaway",
+            "recipient": "Recipient",
+            "preorder_no": "Pre-order",
+            "pre_order_status": "Status",
+            "advance_paid": "Advance paid",
+            "advance_refunded": "Refunded",
+            "held_money": "Held or owed back"
+        },
+        "value": {
+            "channel": {
+                "POS": "Counter",
+                "ONLINE": "Online"
+            },
+            "payment_method": {
+                "cash": "Cash",
+                "bkash": "bKash",
+                "nagad": "Nagad",
+                "card": "Card",
+                "cod": "Cash on delivery",
+                "other": "Other"
+            },
+            "payment_type": {
+                "COD": "Cash on delivery",
+                "ADVANCE": "Advance",
+                "PREPAID": "Prepaid"
+            },
+            "payment_status": {
+                "unpaid": "Unpaid",
+                "partially_paid": "Partly paid",
+                "paid": "Paid",
+                "partially_refunded": "Partly refunded",
+                "refunded": "Refunded"
+            },
+            "purchase_payment": {
+                "unpaid": "Unpaid",
+                "partially_paid": "Partly paid",
+                "paid": "Paid"
+            },
+            "return_reason": {
+                "damaged_on_arrival": "Damaged on arrival",
+                "wrong_item": "Wrong item sent",
+                "size_or_fit": "Size or fit",
+                "changed_mind": "Changed mind",
+                "not_as_described": "Not as described",
+                "entered_by_mistake": "Sale entered by mistake",
+                "other": "Other"
+            },
+            "batch_status": {
+                "ready_for_sale": "For sale",
+                "pending_pricing": "Waiting for a price",
+                "internal_use": "Internal use"
+            },
+            "dispose_reason": {
+                "damaged": "Damaged",
+                "expired": "Expired",
+                "spoiled": "Spoiled",
+                "sample": "Sample",
+                "quality_reject": "Faulty from supplier",
+                "other": "Other"
+            },
+            "adjustment_reason": {
+                "opening_stock": "Opening stock",
+                "found": "Found",
+                "lost": "Lost",
+                "theft": "Theft",
+                "entry_error": "Entry error"
+            },
+            "yes_no": {
+                "true": "Yes",
+                "false": "No"
+            },
+            "courier": {
+                "Pathao": "Pathao",
+                "Steadfast": "Steadfast",
+                "RedX": "RedX",
+                "Paperfly": "Paperfly",
+                "Sundarban": "Sundarban",
+                "OwnRider": "Own rider",
+                "Other": "Other"
+            },
+            "within_days": {
+                "30": "30 days",
+                "60": "60 days",
+                "90": "90 days",
+                "180": "180 days"
+            },
+            "gender": {
+                "Female": "Female",
+                "Male": "Male",
+                "not_given": "Not given",
+                "no_customer": "No customer (walk-in)"
+            },
+            "age_band": {
+                "under_18": "Under 18",
+                "18_24": "18 to 24",
+                "25_34": "25 to 34",
+                "35_44": "35 to 44",
+                "45_plus": "45 and over",
+                "not_given": "Not given",
+                "no_customer": "No customer (walk-in)"
+            },
+            "customer_status": {
+                "Active": "Active",
+                "Inactive": "Inactive"
+            },
+            "campaign_status": {
+                "Planned": "Planned",
+                "Live": "Live",
+                "Completed": "Completed",
+                "Cancelled": "Cancelled"
+            },
+            "pre_order_status": {
+                "Pending": "Pending",
+                "Confirmed": "Confirmed",
+                "Cancelled": "Cancelled"
+            },
+            "quiet_days": {
+                "60": "60 days",
+                "90": "90 days",
+                "180": "180 days"
+            }
+        },
+        "reports": {
+            "sales-register": {
+                "title": "Sales register",
+                "lead": "Every sale in the period with what it was worth, what was paid and what is still owed.",
+                "day": "Date",
+                "emptyTitle": "No sales in this period",
+                "note": "A return is taken off the day of its sale, so a closed month can still go down. Delivery charges are not sales: they pass to the courier. Received is what the business keeps of what was paid."
+            },
+            "daily-sales": {
+                "title": "Daily sales",
+                "lead": "Sales, discounts and returns day by day, at the counter and online.",
+                "day": "Date",
+                "emptyTitle": "No sales in this period",
+                "note": "A return is taken off the day of its sale, so a closed day can still go down. Delivery charges are not sales: they pass to the courier."
+            },
+            "sales-by-product": {
+                "title": "Sales by product",
+                "lead": "What each product sold, kept and earned in the period.",
+                "day": "Date",
+                "emptyTitle": "No product sold in this period",
+                "note": "A return is taken off the period of its sale. Margin is profit divided by sales."
+            },
+            "returns": {
+                "title": "Returns",
+                "lead": "Every confirmed return: what came back, in what state, and what was refunded.",
+                "day": "Confirmed",
+                "emptyTitle": "No return confirmed in this period",
+                "note": "Dated when the return was confirmed. Value beyond the refund lowered what the customer owed. Damaged units also appear in Disposals; their stock left at the sale. Parcels that never reached the customer are not here."
+            },
+            "customer-dues": {
+                "title": "Customer dues",
+                "lead": "Every sale with money still to collect, oldest first.",
+                "day": "Sold on",
+                "emptyTitle": "Nobody owes anything",
+                "note": "As at now, oldest first. A cash on delivery parcel shows here until the courier’s payment is recorded."
+            },
+            "stock-on-hand": {
+                "title": "Stock on hand",
+                "lead": "Every batch in stock with where it is, what is held for orders and what it is worth.",
+                "day": "Date",
+                "emptyTitle": "No stock on hand",
+                "note": "As at now. Sellable is on hand less what online orders hold, on batches ready for sale. Value is on hand at each batch’s own cost."
+            },
+            "stock-movement-summary": {
+                "title": "Stock movement summary",
+                "lead": "Each product’s opening stock, what came in and went out, and its closing stock.",
+                "day": "Date",
+                "emptyTitle": "No stock moved in this period",
+                "note": "Units, signed: opening plus every column is the closing. Out on orders counts parcels when they leave, so a refused parcel is out and then returned. Adjusted includes opening stock entries."
+            },
+            "reorder-list": {
+                "title": "Low and out of stock",
+                "lead": "Products at or below their restock level, and any product that has run out, with what sold lately and who supplied it last.",
+                "day": "Date",
+                "emptyTitle": "Nothing is low or out of stock",
+                "note": "As at now, emptiest first. In stock is on hand less what orders hold; stock kept for own use counts only for a product that is not sold. A product with no restock level shows once it is out."
+            },
+            "purchases-received": {
+                "title": "Purchases received",
+                "lead": "Every purchase order received in the period, with what was paid and what is owed.",
+                "day": "Received",
+                "emptyTitle": "Nothing received in this period",
+                "note": "Dated when the goods were received. Money is on the total recorded on the order; paid is as at now."
+            },
+            "supplier-dues": {
+                "title": "Supplier dues",
+                "lead": "Every received purchase order not fully paid, oldest first.",
+                "day": "Received",
+                "emptyTitle": "Nothing is owed to suppliers",
+                "note": "As at now, oldest first, on the total recorded on each order."
+            },
+            "disposals": {
+                "title": "Disposals",
+                "lead": "Every product written off in the period, by reason, with its cost.",
+                "day": "Approved",
+                "emptyTitle": "Nothing disposed in this period",
+                "note": "Lines marked from a return are damaged returns: a loss, but their stock left at the sale, so they are also in Returns and not in the movement summary’s Disposed."
+            },
+            "stock-adjustments": {
+                "title": "Stock adjustments",
+                "lead": "Every verified correction to stock in the period, in and out, with its value.",
+                "day": "Verified",
+                "emptyTitle": "No adjustment in this period",
+                "note": "Dated when the adjustment was verified. Value is at each batch’s cost."
+            },
+            "profit-by-category": {
+                "title": "Profit by category",
+                "lead": "What each category sold and earned in the period.",
+                "day": "Date",
+                "emptyTitle": "No sales in this period",
+                "note": "A return is taken off the period of its sale. Margin is profit divided by sales."
+            },
+            "cod-with-couriers": {
+                "title": "COD with couriers",
+                "lead": "Delivered parcels whose money the courier collected and is not yet recorded, by courier.",
+                "day": "Delivered",
+                "emptyTitle": "No parcel money waiting",
+                "note": "As at now, by courier and oldest first. A parcel leaves this list once its payment is recorded on the order."
+            },
+            "expiring-stock": {
+                "title": "Expiring stock",
+                "lead": "Batches in stock that expire within the days you choose, soonest first.",
+                "day": "Date",
+                "emptyTitle": "Nothing expires by then",
+                "note": "As at now, soonest first. Days left below 0 have already expired. Without a choice, the next 60 days. Value is on hand at each batch’s cost."
+            },
+            "pre-order-deposits": {
+                "title": "Pre-order deposits held",
+                "lead": "Advances customers paid on bookings not yet delivered, and advances owed back on cancelled ones.",
+                "day": "Booked",
+                "emptyTitle": "No deposit held",
+                "note": "As at now. On a cancelled pre-order, held is the advance still owed back to the customer."
+            },
+            "customer-list": {
+                "title": "Customer list",
+                "lead": "Every customer with what they bought, what they owe, where they live and who they are.",
+                "day": "Date",
+                "emptyTitle": "No customer yet",
+                "note": "As at now, in the channels you sell through. Bought is what the customer kept, delivery included; owed matches Customer dues."
+            },
+            "customers-by-district": {
+                "title": "Customers by district",
+                "lead": "Where your online buyers live: customers and sales by district.",
+                "day": "Date",
+                "emptyTitle": "No online sales in this period",
+                "note": "Online sales only, by the district on each order; counter sales have no place. A customer who bought into two districts counts once in the total."
+            },
+            "customers-by-age-gender": {
+                "title": "Customers by age and gender",
+                "lead": "Who buys: customers and sales by age group and gender.",
+                "day": "Date",
+                "emptyTitle": "No sales in this period",
+                "note": "Age and gender are as recorded on the customer. Walk-in sales with no customer are their own row."
+            },
+            "customers-gone-quiet": {
+                "title": "Customers gone quiet",
+                "lead": "Customers who have not bought for a while, worth most first: the list to call and win back.",
+                "day": "Date",
+                "emptyTitle": "Nobody has gone quiet",
+                "note": "As at now, the customers worth most first. A customer with an order on its way is not listed."
+            },
+            "sales-by-source": {
+                "title": "Sales by source",
+                "lead": "Which page or source brought the sales and the new customers.",
+                "day": "Date",
+                "emptyTitle": "No sales in this period",
+                "note": "Dated by the sale, so it can differ from marketing analytics, which counts orders placed. A new customer is credited to the source of their first kept sale."
+            },
+            "campaign-costs": {
+                "title": "Campaign costs",
+                "lead": "What each campaign cost: partner fees, ads, other costs and products given.",
+                "day": "Posting starts",
+                "emptyTitle": "No campaign in this period",
+                "note": "By the day posting starts. A cancelled campaign counts what was paid to its partners, the others the agreed fees. Products given are at cost and count once given."
+            },
+            "partner-payments": {
+                "title": "Partner payments",
+                "lead": "Every payment made to a partner in the period.",
+                "day": "Paid on",
+                "emptyTitle": "No payment in this period",
+                "note": "Every payment to a partner recorded in the period."
+            },
+            "partner-dues": {
+                "title": "Partner dues",
+                "lead": "What each partner is still owed, campaign by campaign.",
+                "day": "Date",
+                "emptyTitle": "Nothing is owed to partners",
+                "note": "As at now, campaigns not cancelled."
+            },
+            "giveaways": {
+                "title": "Giveaways",
+                "lead": "Every product given away in the period, with its cost.",
+                "day": "Given",
+                "emptyTitle": "Nothing given in this period",
+                "note": "By the day given. A gift that came back with a refused parcel is not counted. Cost is the batch’s cost."
+            }
+        },
+        "emptyBodyNow": "Nothing to show right now. It fills in as soon as there is."
     }
 }
