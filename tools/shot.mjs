@@ -375,6 +375,32 @@ const SALES_OVERVIEW = {
     insights: { headline: { key: 'sales_up', params: { change: 20 } }, waterfall: { key: 'of_every_hundred', params: { profit: 20, discounts: 7, returns: 13 } } },
 };
 
+const counts = { placed: 30, cancelled: 3, business_cancelled: 2, dispatched: 24, failed: 6 };
+const ORDER_FLOW = {
+    applies: true,
+    period: { date_from: '2026-10-01', date_to: '2026-10-31', previous_from: '2026-08-31', previous_to: '2026-09-30' },
+    funnel: { placed: 30, placed_value: 30000, confirmed: 26, confirmed_value: 26000, dispatched: 24, dispatched_value: 24000, delivered: 17, delivered_value: 17000, kept: 16, kept_value: 15500, waiting_confirm: 1, waiting_dispatch: 0, with_courier: 1, returned: 1 },
+    cancel_reasons: [
+        { reason: 'out_of_stock', business: true, before_confirm: 0, after_confirm: 2 },
+        { reason: 'fake_order', business: false, before_confirm: 3, after_confirm: 0 },
+    ],
+    failed_reasons: [{ reason: 'refused', parcels: 6 }],
+    places: [{ oid: 'BD-Dhaka', name_en: 'Dhaka', name_bn: 'ঢাকা', ...counts }],
+    sources: [{ oid: 'SRC-FB', name: 'Main page', platform: 'Facebook', ...counts, dispatched: 4, failed: 1 }],
+    products: [{ oid: 'P-1', name: 'Floral Kurti', units: 40, cancelled_units: 4, business_cancelled_units: 0 }],
+    customers: [],
+    confirming: [{ method: 'PhoneCall', dispatched: 24, failed: 6 }],
+    terms: [{ terms: 'COD', dispatched: 24, failed: 6 }],
+    terms_by_place: [{ oid: 'BD-Dhaka', name_en: 'Dhaka', name_bn: 'ঢাকা', cod_dispatched: 24, cod_failed: 6, advance_dispatched: 3, advance_failed: 0 }],
+    risk: [
+        { shown: 'no_history', placed: 20, kept: 10, failed: 4, returned: 0, cancelled: 2, open: 4 },
+        { shown: 'watch', placed: 10, kept: 6, failed: 2, returned: 0, cancelled: 1, open: 1 },
+    ],
+    speed: { to_confirm: 2.5, to_dispatch: 20, to_deliver: 60 },
+    speed_by_place: [{ oid: 'BD-Dhaka', name_en: 'Dhaka', name_bn: 'ঢাকা', delivered: 17, to_deliver: 60 }],
+    insights: { funnel: { key: 'funnel_leak_deliver', params: { lost: 6, placed: 30 } }, confirming: null, terms: null, places: { key: 'place_refusal', params: { place: { en: 'Dhaka', bn: 'ঢাকা' }, failed: 6, dispatched: 24 } }, risk: null },
+};
+
 const answer = (request, data, extra = {}) => ({ status: 200, headers: cors(request), body: JSON.stringify({ code: 200, message: 'ok', data, ...extra }) });
 
 // Matched on the API path, not the host: a production build points at the deployed server, so
@@ -469,6 +495,7 @@ function handle(request) {
             last_orders: [1, 2, 3, 4, 5].map((n) => ({ oid: 'o-' + n, invoice_no: '26092800' + n, channel: 'ONLINE', status: n === 2 ? 'Returned' : 'Delivered', payment_status: 'paid', total_amount: 1200 + n * 150, created_on: '2026-09-2' + n + 'T10:00:00.000', delivery_status: null })),
         });
     if (url.includes('/get-dashboard')) return answer(request, DASHBOARD);
+    if (url.includes('/get-sales-analytics-orders')) return answer(request, ORDER_FLOW);
     if (url.includes('/get-sales-analytics-overview')) return answer(request, SALES_OVERVIEW);
     if (url.includes('/get-user-card')) return answer(request, { name: 'Ahmad Saif', email: 'ahmad@arithmalabs.test', designation: 'Manager', role: 'Manager', photo: null, active: true });
     console.log('  unmocked API call:', url);

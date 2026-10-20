@@ -4346,7 +4346,8 @@
         "less": "Fewer",
         "more": "More",
         "mapCredit": "Boundaries: {{credit}}",
-        "mapFailed": "The map could not be drawn. Reload the page to try again."
+        "mapFailed": "The map could not be drawn. Reload the page to try again.",
+        "funnelTip": "{{label}}: {{count}}, {{share}}% of {{first}}, worth {{value}}."
     },
     "marketing": {
         "partner": {

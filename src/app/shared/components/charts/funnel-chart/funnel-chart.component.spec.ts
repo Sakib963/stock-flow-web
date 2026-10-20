@@ -24,4 +24,22 @@ describe('FunnelChartComponent', () => {
         ]);
         expect(rows.map((r) => r.last)).toEqual([false, false, true]);
     });
+
+    it('fades every other step while one is pointed at, as the district map does', async () => {
+        await draw([
+            { key: 'placed', label: 'placed', count: 40, value: 0 },
+            { key: 'kept', label: 'kept', count: 30, value: 0 },
+        ]);
+        const fixture = TestBed.createComponent(FunnelChartComponent);
+        fixture.componentRef.setInput('steps', [
+            { key: 'placed', label: 'placed', count: 40, value: 0 },
+            { key: 'kept', label: 'kept', count: 30, value: 0 },
+        ]);
+        fixture.detectChanges();
+        const host = fixture.nativeElement as HTMLElement;
+        host.querySelector('[data-funnel="placed"]')!.dispatchEvent(new Event('mouseenter'));
+        fixture.detectChanges();
+        expect(host.querySelector('[data-funnel="kept"]')?.classList).toContain('opacity-60');
+        expect(host.querySelector('[data-funnel="placed"]')?.classList).not.toContain('opacity-60');
+    });
 });
