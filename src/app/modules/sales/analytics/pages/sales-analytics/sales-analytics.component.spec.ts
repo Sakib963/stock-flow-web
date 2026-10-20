@@ -1,6 +1,7 @@
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
+import { By } from '@angular/platform-browser';
 import { provideRouter } from '@angular/router';
 import { provideNzDateFnsAdapter } from 'ng-zorro-antd/core/time';
 import { provideNzI18n, en_US } from 'ng-zorro-antd/i18n';
@@ -9,6 +10,7 @@ import { APIEndpoint } from '@app/core/constants/api-endpoint';
 import { SalesOverview } from '@app/core/models/sales-analytics.model';
 import { SessionService } from '@app/core/services/session/session.service';
 import { OVERLAY_PROVIDERS } from '@app/shared/constants/overlay-providers';
+import { WaterfallChartComponent } from '@app/shared/components/charts/waterfall-chart/waterfall-chart.component';
 import { SalesAnalyticsComponent } from './sales-analytics.component';
 
 const DATA: SalesOverview = {
@@ -53,7 +55,7 @@ const loaded = async (data: SalesOverview = DATA) => {
     const online = http.match((r) => r.url.includes(APIEndpoint.GET_SALES_ANALYTICS_ORDERS));
     online.forEach((r) => r.flush({ code: 200, message: 'ok', data: { applies: false } }));
     fixture.detectChanges();
-    return { request, online, element: fixture.nativeElement as HTMLElement };
+    return { request, online, fixture, element: fixture.nativeElement as HTMLElement };
 };
 
 describe('SalesAnalyticsComponent', () => {
@@ -90,14 +92,14 @@ describe('SalesAnalyticsComponent', () => {
     });
 
     it('draws the profit waterfall from list price to profit', async () => {
-        const { element } = await loaded();
-        const steps = [...element.querySelectorAll('[data-step]')].map((s) => s.getAttribute('data-step'));
-        expect(steps).toEqual(['list', 'discounts', 'returns', 'cost', 'profit']);
+        const { fixture } = await loaded();
+        const chart = fixture.debugElement.query(By.directive(WaterfallChartComponent)).componentInstance as WaterfallChartComponent;
+        expect(chart.bars().map((bar) => bar.key)).toEqual(['list', 'discounts', 'returns', 'cost', 'profit']);
     });
 
     it('says there is not enough data when nothing sold', async () => {
         const { element } = await loaded({ ...DATA, waterfall: { ...DATA.waterfall, list_price: 0 }, insights: { headline: { key: 'no_sales', params: {} }, waterfall: null } });
-        expect(element.querySelector('[data-step]')).toBeNull();
+        expect(element.querySelector('waterfall-chart')).toBeNull();
     });
 
     it('shows pre-orders and the counter with converted of those decided and sales with no customer', async () => {

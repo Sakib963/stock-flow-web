@@ -124,7 +124,7 @@
                         @if (overview(); as data) {
                             @if (data.insights.waterfall; as insight) {
                                 <p class="mt-0 mb-4 text-sm text-ink-body" data-analytics="waterfall-insight">{{ 'sales.analytics.insight.waterfall.' + insight.key | translate: insight.params | digits }}</p>
-                                <waterfall-chart [steps]="steps()" />
+                                <waterfall-chart [steps]="steps()" [label]="'sales.analytics.waterfall.title' | translate" />
                                 @if (data.waterfall.units_without_cost) {
                                     <p class="mt-3 mb-0 text-xs text-warning-ink">{{ 'sales.analytics.waterfall.withoutCost' | translate: { count: (data.waterfall.units_without_cost | money: 'number') } }}</p>
                                 }

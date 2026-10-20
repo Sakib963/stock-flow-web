@@ -1,8 +1,10 @@
-import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
-import { NzTooltipModule } from 'ng-zorro-antd/tooltip';
-import { TranslatePipe } from '@ngx-translate/core';
-import { DigitsPipe } from '@app/shared/pipes/digits/digits.pipe';
+import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
+import { TranslateService } from '@ngx-translate/core';
+import type { EChartsCoreOption } from 'echarts/core';
+import { LanguageService } from '@app/core/services/language/language.service';
+import { ChartComponent, token } from '@app/shared/components/charts/chart/chart.component';
 import { MoneyPipe } from '@app/shared/pipes/money/money.pipe';
+import { localDigits } from '@app/shared/utils/local-digits/local-digits';
 
 /** A starting amount, what was taken off it step by step, and what was left. */
 export interface WaterfallStep {
@@ -19,13 +21,19 @@ export interface WaterfallStep {
  */
 @Component({
     selector: 'waterfall-chart',
-    imports: [NzTooltipModule, TranslatePipe, DigitsPipe, MoneyPipe],
+    imports: [ChartComponent],
+    providers: [MoneyPipe],
     templateUrl: './waterfall-chart.component.html',
     styleUrl: './waterfall-chart.component.scss',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class WaterfallChartComponent {
+    private readonly _translate = inject(TranslateService);
+    private readonly _money = inject(MoneyPipe);
+    private readonly _language = inject(LanguageService).current;
+
     readonly steps = input.required<WaterfallStep[]>();
+    readonly label = input('');
 
     readonly bars = computed(() => {
         const steps = this.steps();
@@ -46,5 +54,39 @@ export class WaterfallChartComponent {
             }
             return { ...step, left, width: step.value ? Math.max(width, 0.5) : 0, share: Math.round(share(step.value)) };
         });
+    });
+
+    readonly height = computed(() => this.steps().length * 40 + 8);
+
+    readonly options = computed<EChartsCoreOption>(() => {
+        const language = this._language();
+        const bars = this.bars();
+        const colour = (bar: (typeof bars)[number]) => (bar.value < 0 ? token('danger') : bar.kind === 'drop' ? token('danger-border') : bar.kind === 'end' ? token('success') : token('ink-faint'));
+        const amount = (bar: (typeof bars)[number]) => `${bar.kind === 'drop' && bar.value ? '−' : ''}${this._money.transform(bar.value, 'number')}`;
+        return {
+            animationDurationUpdate: 300,
+            grid: { left: 4, right: 96, top: 4, bottom: 4, containLabel: true },
+            xAxis: { type: 'value', max: 100, show: false },
+            yAxis: { type: 'category', inverse: true, data: bars.map((bar) => this._translate.instant(bar.label)), axisLine: { show: false }, axisLabel: { color: token('ink-body'), fontSize: 12 } },
+            tooltip: {
+                trigger: 'item',
+                formatter: (params: { dataIndex: number }) => {
+                    const bar = bars[params.dataIndex];
+                    return localDigits(`${this._translate.instant(bar.label)}: ${amount(bar)} (${bar.share}%)`, language);
+                },
+            },
+            series: [
+                { type: 'bar', stack: 'step', silent: true, itemStyle: { color: 'transparent' }, data: bars.map((bar) => bar.left), barWidth: 22 },
+                {
+                    type: 'bar',
+                    stack: 'step',
+                    barWidth: 22,
+                    data: bars.map((bar) => ({ value: bar.width, itemStyle: { color: colour(bar), borderRadius: 6 } })),
+                    emphasis: { focus: 'self' },
+                    blur: { itemStyle: { opacity: 0.6 }, label: { opacity: 0.6 } },
+                    label: { show: true, position: 'right', distance: 8, color: token('ink'), fontSize: 12, fontFamily: 'IBM Plex Mono, monospace', formatter: (params: { dataIndex: number }) => amount(bars[params.dataIndex]) },
+                },
+            ],
+        };
     });
 }

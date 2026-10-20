@@ -80,7 +80,7 @@ const SESSION = {
     version: '1',
     user: { name: 'Nazmus Sakib', email: 'owner@arithmalabs.test', mobile_number: null, photo: null, designation: 'Owner', role: 'Owner' },
     business: { name: 'Arithma Labs', logoUrl: null, orderSystem: 'BOTH' },
-    permissions: ['dashboard.overview.view', 'configuration.category.view', 'configuration.category.create', 'configuration.category.edit', 'configuration.category.export', 'configuration.brands.view', 'configuration.brands.create', 'configuration.brands.edit', 'configuration.brands.export', 'configuration.supplier.view', 'configuration.supplier.create', 'configuration.supplier.edit', 'configuration.supplier.export', 'configuration.warehouse.view', 'configuration.warehouse.create', 'configuration.warehouse.edit', 'configuration.warehouse.export', 'configuration.aisle.view', 'configuration.aisle.create', 'configuration.aisle.edit', 'configuration.aisle.export', 'configuration.product.view', 'configuration.product.create', 'configuration.product.edit', 'configuration.product.delete', 'configuration.analytics.view', 'inventory.purchase-order.view', 'inventory.purchase-order.create', 'inventory.purchase-order.edit', 'inventory.purchase-order.approve', 'inventory.purchase-order.cancel', 'inventory.purchase-order.export', 'inventory.stock-movement.view', 'inventory.overview.view', 'inventory.overview.edit', 'inventory.stock-value.view', 'sales.online.view', 'sales.online.create', 'sales.customer.view', 'sales.settings.edit', 'sales.order.view', 'sales.order.confirm', 'sales.order.cancel', 'sales.order.dispatch', 'sales.order.deliver', 'sales.pos.view'],
+    permissions: ['dashboard.overview.view', 'configuration.category.view', 'configuration.category.create', 'configuration.category.edit', 'configuration.category.export', 'configuration.brands.view', 'configuration.brands.create', 'configuration.brands.edit', 'configuration.brands.export', 'configuration.supplier.view', 'configuration.supplier.create', 'configuration.supplier.edit', 'configuration.supplier.export', 'configuration.warehouse.view', 'configuration.warehouse.create', 'configuration.warehouse.edit', 'configuration.warehouse.export', 'configuration.aisle.view', 'configuration.aisle.create', 'configuration.aisle.edit', 'configuration.aisle.export', 'configuration.product.view', 'configuration.product.create', 'configuration.product.edit', 'configuration.product.delete', 'configuration.analytics.view', 'inventory.purchase-order.view', 'inventory.purchase-order.create', 'inventory.purchase-order.edit', 'inventory.purchase-order.approve', 'inventory.purchase-order.cancel', 'inventory.purchase-order.export', 'inventory.stock-movement.view', 'inventory.overview.view', 'inventory.overview.edit', 'inventory.stock-value.view', 'sales.online.view', 'sales.online.create', 'sales.customer.view', 'sales.settings.edit', 'sales.order.view', 'sales.order.confirm', 'sales.order.cancel', 'sales.order.dispatch', 'sales.order.deliver', 'sales.pos.view', 'sales.analytics.view'],
     menu: MENU,
     counters: { notifications: 0 },
 };
@@ -350,6 +350,31 @@ const DASHBOARD = {
     stock: { stock_value: 412300, expected_revenue: 688900, profit_full: 276600, unpriced_batches: 2 },
 };
 
+const SALES_OVERVIEW = {
+    period: { date_from: '2026-10-01', date_to: '2026-10-31', previous_from: '2026-08-31', previous_to: '2026-09-30' },
+    channels: ['POS', 'ONLINE'],
+    sources: [{ oid: 'SRC-FB', name: 'Main page', platform: 'Facebook' }],
+    tiles: {
+        sales: { current: 12000, previous: 10000 },
+        profit: { current: 3000, previous: 3000 },
+        orders: { current: 12, previous: 10 },
+        margin: { current: 0.25, previous: 0.3 },
+        refusal: { current: { dispatched: 4, failed: 1 }, previous: { dispatched: 0, failed: 0 } },
+    },
+    daily: [
+        { day: '2026-10-02', sales: 5000, profit: 1000 },
+        { day: '2026-10-05', sales: 7000, profit: 2000 },
+    ],
+    by_channel: [
+        { channel: 'ONLINE', sales: 3000, profit: 900, orders: 3 },
+        { channel: 'POS', sales: 9000, profit: 2100, orders: 9 },
+    ],
+    pre_orders: { booked: 4, booked_value: 4000, converted: 2, cancelled: 1, open: 1, open_now: 3, advance_held: 900 },
+    counter: { sales: 10, units: 15, value: 9000, without_customer: 6 },
+    waterfall: { list_price: 15000, discounts: 1000, returns: 2000, cost: 9000, profit: 3000, units_without_cost: 0 },
+    insights: { headline: { key: 'sales_up', params: { change: 20 } }, waterfall: { key: 'of_every_hundred', params: { profit: 20, discounts: 7, returns: 13 } } },
+};
+
 const answer = (request, data, extra = {}) => ({ status: 200, headers: cors(request), body: JSON.stringify({ code: 200, message: 'ok', data, ...extra }) });
 
 // Matched on the API path, not the host: a production build points at the deployed server, so
@@ -444,6 +469,7 @@ function handle(request) {
             last_orders: [1, 2, 3, 4, 5].map((n) => ({ oid: 'o-' + n, invoice_no: '26092800' + n, channel: 'ONLINE', status: n === 2 ? 'Returned' : 'Delivered', payment_status: 'paid', total_amount: 1200 + n * 150, created_on: '2026-09-2' + n + 'T10:00:00.000', delivery_status: null })),
         });
     if (url.includes('/get-dashboard')) return answer(request, DASHBOARD);
+    if (url.includes('/get-sales-analytics-overview')) return answer(request, SALES_OVERVIEW);
     if (url.includes('/get-user-card')) return answer(request, { name: 'Ahmad Saif', email: 'ahmad@arithmalabs.test', designation: 'Manager', role: 'Manager', photo: null, active: true });
     console.log('  unmocked API call:', url);
     return answer(request, {});
