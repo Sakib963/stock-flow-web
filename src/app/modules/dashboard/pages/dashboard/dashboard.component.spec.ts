@@ -1,4 +1,5 @@
 import { TestBed } from '@angular/core/testing';
+import { By } from '@angular/platform-browser';
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { provideRouter } from '@angular/router';
@@ -6,6 +7,7 @@ import { provideNzI18n, en_US } from 'ng-zorro-antd/i18n';
 import { provideTranslateService } from '@ngx-translate/core';
 import { Dashboard } from '@app/core/models/dashboard.model';
 import { SessionService } from '@app/core/services/session/session.service';
+import { BusinessGlanceComponent } from '@app/modules/dashboard/components/business-glance/business-glance.component';
 import { DashboardComponent } from './dashboard.component';
 
 const PERIOD = { key: 'today' as const, date_from: '2026-10-19', date_to: '2026-10-19', previous_from: '2026-10-18', previous_to: '2026-10-18' };
@@ -82,19 +84,24 @@ describe('DashboardComponent', () => {
             },
         });
         const host: HTMLElement = fixture.nativeElement;
-        expect(host.querySelectorAll('[data-bar]').length).toBe(7);
+        const series = (fixture.debugElement.query(By.directive(BusinessGlanceComponent)).componentInstance as BusinessGlanceComponent).chart()['series'] as { data: number[] }[];
+        expect(series.map((s) => s.data)).toEqual([
+            [0, 0, 2000, 0, 0, 0, 0],
+            [0, 0, 800, 0, 0, 0, 0],
+            [0, 0, 1000, 0, 0, 0, 0],
+        ]);
+        expect(q(host, '[data-dashboard="chart"] chart')).not.toBeNull();
         expect(q(host, '[data-tile="sales"] [data-change]')?.textContent).toContain('100%');
         expect(q(host, '[data-tile="profit"] [data-change]')).toBeNull();
         expect(q(host, '[data-note="without-cost"]')).not.toBeNull();
         expect(q(host, '[data-top="p1"]')).not.toBeNull();
         expect(q(host, '[data-top="p1"] ng-icon[name="lucidePackage"] svg')).not.toBeNull();
         expect(q(host, '[data-top="p1"] [aria-hidden] > span')?.getAttribute('style')).toContain('25%');
-        expect(q(host, '[data-bar="2026-10-15"] [data-before]')?.getAttribute('style')).toContain('50%');
         expect(q(host, '[data-channel="POS"]')?.textContent).toContain('75');
-        expect(q(host, '[data-dashboard="readout"]')?.textContent).toContain('dashboard.business.wholePeriod');
-        (q(host, '[data-bar="2026-10-15"]') as HTMLElement).dispatchEvent(new Event('pointerenter'));
+        q(host, '[data-channel="POS"]')!.dispatchEvent(new Event('mouseenter'));
         fixture.detectChanges();
-        expect(q(host, '[data-dashboard="readout"]')?.textContent).not.toContain('dashboard.business.wholePeriod');
+        expect(q(host, '[data-channel="ONLINE"]')?.classList).toContain('opacity-60');
+        expect(q(host, '[data-channel="POS"]')?.classList).not.toContain('opacity-60');
         expect(q(host, '[data-dashboard="period"]')).not.toBeNull();
     });
 

@@ -9,7 +9,7 @@
         <span class="text-[11px] leading-none text-ink-muted">{{ row.label }}</span>
         <div class="grid grid-cols-24 gap-[3px]">
             @for (cell of row.cells; track cell.hour) {
-                <span class="min-w-0 rounded-[2px]" [class.aspect-square]="!rowHeight()" [style.height.px]="rowHeight()" [class]="cell.shade" nz-tooltip [nzTooltipTitle]="cell.tip" [attr.data-count]="cell.count"></span>
+                <span class="min-w-0 rounded-[2px] transition-opacity duration-150 motion-reduce:transition-none" [class.aspect-square]="!rowHeight()" [style.height.px]="rowHeight()" [class]="cell.shade" [class.opacity-60]="hovered() && hovered() !== row.day + '-' + cell.hour" nz-tooltip [nzTooltipTitle]="cell.tip" [attr.data-count]="cell.count" (mouseenter)="hovered.set(row.day + '-' + cell.hour)" (mouseleave)="hovered.set(null)"></span>
             }
         </div>
     }

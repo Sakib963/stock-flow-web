@@ -33,5 +33,4 @@ describe('BdMapComponent', () => {
         expect(shapes['BD-Sylhet'].shade).toBe('fill-line-soft');
         expect([shapes['BD-Dhaka'].labelled, shapes['BD-Sylhet'].labelled]).toEqual([true, false]);
     });
-
 });

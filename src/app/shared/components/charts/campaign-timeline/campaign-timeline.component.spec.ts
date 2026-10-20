@@ -15,14 +15,25 @@ const open = async (bands: { key: string; from: string; to: string; label: strin
 
 describe('CampaignTimelineComponent', () => {
     it('cuts a window at the edge of the period and leaves out one wholly outside it', async () => {
-        const chart = (await open([{ key: 'a', from: '2026-08-20', to: '2026-09-05', label: 'A' }, { key: 'b', from: '2026-10-01', to: '2026-10-09', label: 'B' }])).componentInstance;
+        const chart = (
+            await open([
+                { key: 'a', from: '2026-08-20', to: '2026-09-05', label: 'A' },
+                { key: 'b', from: '2026-10-01', to: '2026-10-09', label: 'B' },
+            ])
+        ).componentInstance;
         const shaded = chart.shaded();
         expect(shaded.map((b) => b.key)).toEqual(['a']);
         expect(shaded[0].x).toBe(0);
     });
 
     it('pins a posted promise on its day and ignores one outside the period', async () => {
-        const fixture = await open([], [{ key: 'p1', day: '2026-09-04', label: 'Reel' }, { key: 'p2', day: '2026-10-04', label: 'Live' }]);
+        const fixture = await open(
+            [],
+            [
+                { key: 'p1', day: '2026-09-04', label: 'Reel' },
+                { key: 'p2', day: '2026-10-04', label: 'Live' },
+            ]
+        );
         expect((fixture.nativeElement as HTMLElement).querySelectorAll('[data-pin]').length).toBe(1);
     });
 });

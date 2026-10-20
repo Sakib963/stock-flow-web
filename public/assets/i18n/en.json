@@ -471,7 +471,6 @@
             "top": "Selling best",
             "units": "{{count}} sold",
             "noSales": "No sales in this period yet.",
-            "wholePeriod": "This period",
             "before": "Period before",
             "share": "{{percent}}% of sales",
             "channels": "Counter and online",

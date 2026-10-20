@@ -29,6 +29,11 @@ export class SparklineComponent {
         return values.map((value, i) => [(i / (values.length - 1)) * WIDTH, HEIGHT - 1 - ((value - low) / span) * (HEIGHT - 2)] as const);
     });
 
-    readonly line = computed(() => this.points()?.map(([x, y]) => `${x.toFixed(1)},${y.toFixed(1)}`).join(' ') ?? '');
+    readonly line = computed(
+        () =>
+            this.points()
+                ?.map(([x, y]) => `${x.toFixed(1)},${y.toFixed(1)}`)
+                .join(' ') ?? ''
+    );
     readonly area = computed(() => (this.points() ? `0,${HEIGHT} ${this.line()} ${WIDTH},${HEIGHT}` : ''));
 }

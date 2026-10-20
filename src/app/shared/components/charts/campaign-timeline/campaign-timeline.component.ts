@@ -54,7 +54,11 @@ export class CampaignTimelineComponent {
         return TOP + (1 - value / this.max()) * (this.baseline - TOP);
     }
 
-    readonly line = computed(() => this.values().map((v, i) => `${this.x(i).toFixed(1)},${this.y(v.value).toFixed(1)}`).join(' '));
+    readonly line = computed(() =>
+        this.values()
+            .map((v, i) => `${this.x(i).toFixed(1)},${this.y(v.value).toFixed(1)}`)
+            .join(' ')
+    );
     readonly area = computed(() => (this.values().length > 1 ? `0,${this.baseline} ${this.line()} ${WIDTH},${this.baseline}` : ''));
 
     /** A window past either edge of the period is cut at it; one wholly outside is not drawn. */

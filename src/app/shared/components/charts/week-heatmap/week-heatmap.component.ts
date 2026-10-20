@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input, signal } from '@angular/core';
 import { NzTooltipModule } from 'ng-zorro-antd/tooltip';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { LanguageService } from '@app/core/services/language/language.service';
@@ -40,6 +40,7 @@ export class WeekHeatmapComponent {
     readonly rowHeight = input<number | null>(null);
 
     readonly marks = [0, 6, 12, 18];
+    readonly hovered = signal<string | null>(null);
 
     readonly rows = computed(() => {
         const language = this._language();

@@ -29,4 +29,18 @@ describe('WeekHeatmapComponent', () => {
         expect(monday.cells[13].shade).toBe('bg-primary/15');
         expect(monday.cells[0].shade).toBe('bg-line-soft');
     });
+
+    it('fades every other hour while one is pointed at, as the district map does', async () => {
+        await draw([{ day: 1, hour: 12, count: 8 }]);
+        const fixture = TestBed.createComponent(WeekHeatmapComponent);
+        fixture.componentRef.setInput('cells', [{ day: 1, hour: 12, count: 8 }]);
+        fixture.componentRef.setInput('cellKey', 'cell');
+        fixture.componentRef.setInput('label', 'label');
+        fixture.detectChanges();
+        const cells = [...(fixture.nativeElement as HTMLElement).querySelectorAll('[data-count]')];
+        cells[0].dispatchEvent(new Event('mouseenter'));
+        fixture.detectChanges();
+        expect(cells[0].classList).not.toContain('opacity-60');
+        expect(cells[1].classList).toContain('opacity-60');
+    });
 });
