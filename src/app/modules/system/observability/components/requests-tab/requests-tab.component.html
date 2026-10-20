@@ -1,0 +1,7 @@
+<list-filter [config]="config" [values]="values()" (valuesChange)="pick($event)" [narrow]="isPhone()" />
+
+<div class="mt-2 md:mt-4" data-health="requests">
+    <list-table [config]="table" [context]="context()" (action)="onAction($event)" />
+</div>
+
+<request-drawer [oid]="opened()" (closed)="opened.set(null)" />

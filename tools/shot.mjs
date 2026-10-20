@@ -58,7 +58,15 @@ const MENU = [
         isDisabled: false,
         disabledMessage: { en: null, bn: null },
         isNew: false,
-        children: [{ id: 'analytics', label: { en: 'Analytics', bn: 'বিশ্লেষণ' }, description: { en: null, bn: null }, tags: [], icon: 'lucideChartLine', order: 8, route: '/app/configuration/analytics', permission: 'configuration.analytics.view', isDisabled: false, disabledMessage: { en: null, bn: null }, isNew: false, children: [] }, { id: 'products', label: { en: 'Products', bn: 'পণ্য' }, description: { en: null, bn: null }, tags: [], icon: 'lucidePackage', order: 0, route: '/app/configuration/products', permission: 'configuration.product.view', isDisabled: false, disabledMessage: { en: null, bn: null }, isNew: false, children: [] }, { id: 'aisles', label: { en: 'Aisles / Zones', bn: 'আইল' }, description: { en: null, bn: null }, tags: [], icon: 'lucideRows3', order: 7, route: '/app/configuration/aisles', permission: 'configuration.aisle.view', isDisabled: false, disabledMessage: { en: null, bn: null }, isNew: false, children: [] }, { id: 'warehouses', label: { en: 'Warehouses', bn: 'ওয়্যারহাউজ' }, description: { en: null, bn: null }, tags: [], icon: 'lucideWarehouse', order: 6, route: '/app/configuration/warehouses', permission: 'configuration.warehouse.view', isDisabled: false, disabledMessage: { en: null, bn: null }, isNew: false, children: [] }, { id: 'suppliers', label: { en: 'Suppliers', bn: 'সাপ্লায়ার' }, description: { en: null, bn: null }, tags: [], icon: 'lucideFactory', order: 3, route: '/app/configuration/suppliers', permission: 'configuration.supplier.view', isDisabled: false, disabledMessage: { en: null, bn: null }, isNew: false, children: [] }, { id: 'brands', label: { en: 'Brands', bn: 'ব্র্যান্ড' }, description: { en: null, bn: null }, tags: [], icon: 'lucideTag', order: 2, route: '/app/configuration/brands', permission: 'configuration.brands.view', isDisabled: false, disabledMessage: { en: null, bn: null }, isNew: false, children: [] }, { id: 'categories', label: { en: 'Categories', bn: 'ক্যাটাগরি' }, description: { en: 'Create the product groups, like Saree or Cosmetics, that every product is filed under.', bn: 'পণ্যের গ্রুপ তৈরি করুন।' }, tags: [], icon: 'lucideFolderTree', order: 1, route: '/app/configuration/categories', permission: 'configuration.category.view', isDisabled: false, disabledMessage: { en: null, bn: null }, isNew: false, children: [] }],
+        children: [
+            { id: 'analytics', label: { en: 'Analytics', bn: 'বিশ্লেষণ' }, description: { en: null, bn: null }, tags: [], icon: 'lucideChartLine', order: 8, route: '/app/configuration/analytics', permission: 'configuration.analytics.view', isDisabled: false, disabledMessage: { en: null, bn: null }, isNew: false, children: [] },
+            { id: 'products', label: { en: 'Products', bn: 'পণ্য' }, description: { en: null, bn: null }, tags: [], icon: 'lucidePackage', order: 0, route: '/app/configuration/products', permission: 'configuration.product.view', isDisabled: false, disabledMessage: { en: null, bn: null }, isNew: false, children: [] },
+            { id: 'aisles', label: { en: 'Aisles / Zones', bn: 'আইল' }, description: { en: null, bn: null }, tags: [], icon: 'lucideRows3', order: 7, route: '/app/configuration/aisles', permission: 'configuration.aisle.view', isDisabled: false, disabledMessage: { en: null, bn: null }, isNew: false, children: [] },
+            { id: 'warehouses', label: { en: 'Warehouses', bn: 'ওয়্যারহাউজ' }, description: { en: null, bn: null }, tags: [], icon: 'lucideWarehouse', order: 6, route: '/app/configuration/warehouses', permission: 'configuration.warehouse.view', isDisabled: false, disabledMessage: { en: null, bn: null }, isNew: false, children: [] },
+            { id: 'suppliers', label: { en: 'Suppliers', bn: 'সাপ্লায়ার' }, description: { en: null, bn: null }, tags: [], icon: 'lucideFactory', order: 3, route: '/app/configuration/suppliers', permission: 'configuration.supplier.view', isDisabled: false, disabledMessage: { en: null, bn: null }, isNew: false, children: [] },
+            { id: 'brands', label: { en: 'Brands', bn: 'ব্র্যান্ড' }, description: { en: null, bn: null }, tags: [], icon: 'lucideTag', order: 2, route: '/app/configuration/brands', permission: 'configuration.brands.view', isDisabled: false, disabledMessage: { en: null, bn: null }, isNew: false, children: [] },
+            { id: 'categories', label: { en: 'Categories', bn: 'ক্যাটাগরি' }, description: { en: 'Create the product groups, like Saree or Cosmetics, that every product is filed under.', bn: 'পণ্যের গ্রুপ তৈরি করুন।' }, tags: [], icon: 'lucideFolderTree', order: 1, route: '/app/configuration/categories', permission: 'configuration.category.view', isDisabled: false, disabledMessage: { en: null, bn: null }, isNew: false, children: [] },
+        ],
     },
     {
         id: 'inventory',
@@ -72,7 +80,11 @@ const MENU = [
         isDisabled: false,
         disabledMessage: { en: null, bn: null },
         isNew: false,
-        children: [{ id: 'stock-overview', label: { en: 'Stock overview', bn: 'স্টক পরিস্থিতি' }, description: { en: null, bn: null }, tags: [], icon: 'lucideLayers', order: 0, route: '/app/inventory/overview', permission: 'inventory.overview.view', isDisabled: false, disabledMessage: { en: null, bn: null }, isNew: false, children: [] }, { id: 'stock-movements', label: { en: 'Stock movements', bn: 'স্টকের গতিবিধি' }, description: { en: null, bn: null }, tags: [], icon: 'lucideArrowLeftRight', order: 5, route: '/app/inventory/stock-movements', permission: 'inventory.stock-movement.view', isDisabled: false, disabledMessage: { en: null, bn: null }, isNew: false, children: [] }, { id: 'purchase-orders', label: { en: 'Purchase orders', bn: 'ক্রয়াদেশ' }, description: { en: null, bn: null }, tags: [], icon: 'lucideTruck', order: 10, route: '/app/inventory/purchase-orders', permission: 'inventory.purchase-order.view', isDisabled: false, disabledMessage: { en: null, bn: null }, isNew: false, children: [] }],
+        children: [
+            { id: 'stock-overview', label: { en: 'Stock overview', bn: 'স্টক পরিস্থিতি' }, description: { en: null, bn: null }, tags: [], icon: 'lucideLayers', order: 0, route: '/app/inventory/overview', permission: 'inventory.overview.view', isDisabled: false, disabledMessage: { en: null, bn: null }, isNew: false, children: [] },
+            { id: 'stock-movements', label: { en: 'Stock movements', bn: 'স্টকের গতিবিধি' }, description: { en: null, bn: null }, tags: [], icon: 'lucideArrowLeftRight', order: 5, route: '/app/inventory/stock-movements', permission: 'inventory.stock-movement.view', isDisabled: false, disabledMessage: { en: null, bn: null }, isNew: false, children: [] },
+            { id: 'purchase-orders', label: { en: 'Purchase orders', bn: 'ক্রয়াদেশ' }, description: { en: null, bn: null }, tags: [], icon: 'lucideTruck', order: 10, route: '/app/inventory/purchase-orders', permission: 'inventory.purchase-order.view', isDisabled: false, disabledMessage: { en: null, bn: null }, isNew: false, children: [] },
+        ],
     },
 ];
 
@@ -80,7 +92,56 @@ const SESSION = {
     version: '1',
     user: { name: 'Nazmus Sakib', email: 'owner@arithmalabs.test', mobile_number: null, photo: null, designation: 'Owner', role: 'Owner' },
     business: { name: 'Arithma Labs', logoUrl: null, orderSystem: 'BOTH' },
-    permissions: ['dashboard.overview.view', 'configuration.category.view', 'configuration.category.create', 'configuration.category.edit', 'configuration.category.export', 'configuration.brands.view', 'configuration.brands.create', 'configuration.brands.edit', 'configuration.brands.export', 'configuration.supplier.view', 'configuration.supplier.create', 'configuration.supplier.edit', 'configuration.supplier.export', 'configuration.warehouse.view', 'configuration.warehouse.create', 'configuration.warehouse.edit', 'configuration.warehouse.export', 'configuration.aisle.view', 'configuration.aisle.create', 'configuration.aisle.edit', 'configuration.aisle.export', 'configuration.product.view', 'configuration.product.create', 'configuration.product.edit', 'configuration.product.delete', 'configuration.analytics.view', 'inventory.purchase-order.view', 'inventory.purchase-order.create', 'inventory.purchase-order.edit', 'inventory.purchase-order.approve', 'inventory.purchase-order.cancel', 'inventory.purchase-order.export', 'inventory.stock-movement.view', 'inventory.overview.view', 'inventory.overview.edit', 'inventory.stock-value.view', 'sales.online.view', 'sales.online.create', 'sales.customer.view', 'sales.settings.edit', 'sales.order.view', 'sales.order.confirm', 'sales.order.cancel', 'sales.order.dispatch', 'sales.order.deliver', 'sales.pos.view', 'sales.analytics.view'],
+    permissions: [
+        'dashboard.overview.view',
+        'configuration.category.view',
+        'configuration.category.create',
+        'configuration.category.edit',
+        'configuration.category.export',
+        'configuration.brands.view',
+        'configuration.brands.create',
+        'configuration.brands.edit',
+        'configuration.brands.export',
+        'configuration.supplier.view',
+        'configuration.supplier.create',
+        'configuration.supplier.edit',
+        'configuration.supplier.export',
+        'configuration.warehouse.view',
+        'configuration.warehouse.create',
+        'configuration.warehouse.edit',
+        'configuration.warehouse.export',
+        'configuration.aisle.view',
+        'configuration.aisle.create',
+        'configuration.aisle.edit',
+        'configuration.aisle.export',
+        'configuration.product.view',
+        'configuration.product.create',
+        'configuration.product.edit',
+        'configuration.product.delete',
+        'configuration.analytics.view',
+        'inventory.purchase-order.view',
+        'inventory.purchase-order.create',
+        'inventory.purchase-order.edit',
+        'inventory.purchase-order.approve',
+        'inventory.purchase-order.cancel',
+        'inventory.purchase-order.export',
+        'inventory.stock-movement.view',
+        'inventory.overview.view',
+        'inventory.overview.edit',
+        'inventory.stock-value.view',
+        'sales.online.view',
+        'sales.online.create',
+        'sales.customer.view',
+        'sales.settings.edit',
+        'sales.order.view',
+        'sales.order.confirm',
+        'sales.order.cancel',
+        'sales.order.dispatch',
+        'sales.order.deliver',
+        'sales.pos.view',
+        'sales.analytics.view',
+        'system.observability.view',
+    ],
     menu: MENU,
     counters: { notifications: 0 },
 };
@@ -88,9 +149,51 @@ const SESSION = {
 const PHOTO = 'https://res.cloudinary.com/stockflow/image/upload/v1737223331/stockflow/kurti_uozfxa.png';
 const thumb = (url) => url.replace('/image/upload/', '/image/upload/c_fill,w_48,h_48,f_auto,q_auto/');
 const PRODUCTS = [
-    { oid: 'p-1', name: 'Cotton Kurti, maroon', sku: 'COTTKUR', photo: PHOTO, photo_thumb: thumb(PHOTO), unit_type: 'pcs', restock_threshold: 5, status: 'Active', category_oid: 'c-1', category_name: 'Clothing', sub_category_oid: 'sc-1', sub_category_name: 'Kurti', brand_oid: 'b-1', brand_name: 'Aarong', sellable: 4, description: 'Pure cotton, hand block print, free size.', created_on: '2026-09-01T10:00:00.000', last_action_by: 'owner@arithmalabs.test', last_action_by_name: 'Nazmus Sakib', last_action_on: '2026-09-20T10:00:00.000' },
+    {
+        oid: 'p-1',
+        name: 'Cotton Kurti, maroon',
+        sku: 'COTTKUR',
+        photo: PHOTO,
+        photo_thumb: thumb(PHOTO),
+        unit_type: 'pcs',
+        restock_threshold: 5,
+        status: 'Active',
+        category_oid: 'c-1',
+        category_name: 'Clothing',
+        sub_category_oid: 'sc-1',
+        sub_category_name: 'Kurti',
+        brand_oid: 'b-1',
+        brand_name: 'Aarong',
+        sellable: 4,
+        description: 'Pure cotton, hand block print, free size.',
+        created_on: '2026-09-01T10:00:00.000',
+        last_action_by: 'owner@arithmalabs.test',
+        last_action_by_name: 'Nazmus Sakib',
+        last_action_on: '2026-09-20T10:00:00.000',
+    },
     { oid: 'p-2', name: 'Woolen Scarf', sku: 'WSC002', photo: null, photo_thumb: null, unit_type: 'pcs', restock_threshold: 3, status: 'Active', category_oid: 'c-2', category_name: 'Winterwear', sub_category_oid: 'sc-2', sub_category_name: 'Scarf', brand_oid: null, brand_name: null, sellable: 0, description: null, created_on: '2026-09-02T10:00:00.000', last_action_by: 'owner@arithmalabs.test', last_action_by_name: 'Nazmus Sakib', last_action_on: '2026-09-18T10:00:00.000' },
-    { oid: 'p-3', name: 'Aloe Vera Moisturiser', sku: '8901030704284', photo: null, photo_thumb: null, unit_type: 'box', restock_threshold: 10, status: 'Active', category_oid: 'c-3', category_name: 'Skincare', sub_category_oid: 'sc-3', sub_category_name: 'Moisturiser', brand_oid: 'b-2', brand_name: 'Cosrx', sellable: 42, description: null, created_on: '2026-09-03T10:00:00.000', last_action_by: 'owner@arithmalabs.test', last_action_by_name: 'Nazmus Sakib', last_action_on: '2026-09-10T10:00:00.000' },
+    {
+        oid: 'p-3',
+        name: 'Aloe Vera Moisturiser',
+        sku: '8901030704284',
+        photo: null,
+        photo_thumb: null,
+        unit_type: 'box',
+        restock_threshold: 10,
+        status: 'Active',
+        category_oid: 'c-3',
+        category_name: 'Skincare',
+        sub_category_oid: 'sc-3',
+        sub_category_name: 'Moisturiser',
+        brand_oid: 'b-2',
+        brand_name: 'Cosrx',
+        sellable: 42,
+        description: null,
+        created_on: '2026-09-03T10:00:00.000',
+        last_action_by: 'owner@arithmalabs.test',
+        last_action_by_name: 'Nazmus Sakib',
+        last_action_on: '2026-09-10T10:00:00.000',
+    },
 ];
 
 // Orders: one in each state the list shows.
@@ -100,7 +203,27 @@ const ORDERS = [
     ['2610050002', 'POS', 'Purchased', null, 'paid', 890],
     ['2610050001', 'ONLINE', 'Cancelled', 'Preparing', 'partially_paid', 1510],
 ].map(([invoice_no, channel, status, delivery_status, payment_status, total_amount], i) => ({ oid: 'o-' + i, invoice_no, channel, status, delivery_status, payment_status, total_amount, amount_paid: 0, refund_status: i === 3 ? 'ToRefund' : 'None', customer_name: channel === 'POS' ? null : 'Person A', customer_phone: channel === 'POS' ? null : '01987654321', units: 2, created_by: 'owner@arithmalabs.test', created_by_name: 'Nazmus Sakib', created_on: '2026-10-05T10:0' + i + ':00.000' }));
-const ORDER_DETAILS = { ...ORDERS[0], customer_oid: 'cu-1', subtotal: 2900, discount_total: 0, delivery_charge: 60, amount_refunded: 0, payment_type: 'COD', payment_method: 'cod', refund_due: 0, dispatched_on: null, delivered_on: null, cancelled_on: null, cancel_reason_code: null, cancel_reason: null, sold_on: null, notes: 'Ring before coming', items: [{ oid: 'l-1', product_oid: 'p-1', product_name: 'Cotton Kurti, maroon', batch_code: 'B-7KQ2-91X', quantity: 2, returned_qty: 0, unit_price: 1450, discount: 0, total: 2900 }], status_history: [{ kind: 'Order', from_status: null, to_status: 'Pending', reason: null, performed_by: 'owner@arithmalabs.test', performed_by_name: 'Nazmus Sakib', performed_on: '2026-10-05T10:00:00.000' }], online: { recipient_name: 'Person A', recipient_phone: null, address_line: '5/5 Gaznabi Road', area_text: 'Gaznabi Road', postal_code: '1207', district_name_en: 'Dhaka', district_name_bn: 'ঢাকা', thana_name_en: 'Mohammadpur', thana_name_bn: 'মোহাম্মদপুর', source_name: 'Facebook page', confirmed_via: null, confirmed_note: null, confirmed_on: null, confirmed_by: null, risk_own_delivered_rate: 80, risk_flag: 'None', delivery_status: null, packed_on: null, courier: null, consignment_no: null } };
+const ORDER_DETAILS = {
+    ...ORDERS[0],
+    customer_oid: 'cu-1',
+    subtotal: 2900,
+    discount_total: 0,
+    delivery_charge: 60,
+    amount_refunded: 0,
+    payment_type: 'COD',
+    payment_method: 'cod',
+    refund_due: 0,
+    dispatched_on: null,
+    delivered_on: null,
+    cancelled_on: null,
+    cancel_reason_code: null,
+    cancel_reason: null,
+    sold_on: null,
+    notes: 'Ring before coming',
+    items: [{ oid: 'l-1', product_oid: 'p-1', product_name: 'Cotton Kurti, maroon', batch_code: 'B-7KQ2-91X', quantity: 2, returned_qty: 0, unit_price: 1450, discount: 0, total: 2900 }],
+    status_history: [{ kind: 'Order', from_status: null, to_status: 'Pending', reason: null, performed_by: 'owner@arithmalabs.test', performed_by_name: 'Nazmus Sakib', performed_on: '2026-10-05T10:00:00.000' }],
+    online: { recipient_name: 'Person A', recipient_phone: null, address_line: '5/5 Gaznabi Road', area_text: 'Gaznabi Road', postal_code: '1207', district_name_en: 'Dhaka', district_name_bn: 'ঢাকা', thana_name_en: 'Mohammadpur', thana_name_bn: 'মোহাম্মদপুর', source_name: 'Facebook page', confirmed_via: null, confirmed_note: null, confirmed_on: null, confirmed_by: null, risk_own_delivered_rate: 80, risk_flag: 'None', delivery_status: null, packed_on: null, courier: null, consignment_no: null },
+};
 
 const NAMES = ['Accessories', 'Clothing', 'Cosmetics', 'Delivery', 'Footwear', 'Inventory', 'Jersey', 'Packaging', 'Skincare', 'Test Category One', 'Traditional Clothing', 'Winterwear'];
 
@@ -155,25 +278,90 @@ const cors = (request) => ({
     'access-control-allow-methods': 'GET,POST,PUT,PATCH,DELETE,OPTIONS',
 });
 
-
 const ANALYTICS = {
     counts: { product: { active: 26, added: 3 }, category: { active: 11, added: 0 }, subCategory: { active: 45, added: 1 }, brand: { active: 2, added: 0 }, supplier: { active: 13, added: 0 }, warehouse: { active: 3, added: 0 }, aisle: { active: 10, added: 0 } },
     attention: [
-        { key: 'productsWithoutPhoto', total: 15, items: [{ oid: 'p-1', name: 'Aloe Vera Face Wash', detail: null }, { oid: 'p-2', name: 'Anti-Aging Serum', detail: null }, { oid: 'p-3', name: 'Beard Oil', detail: null }, { oid: 'p-4', name: 'Cotton Crew Neck T-Shirt', detail: null }, { oid: 'p-5', name: 'Floral Maxi Dress', detail: null }] },
-        { key: 'productsWithoutBrand', total: 25, items: [{ oid: 'p-1', name: 'Aloe Vera Face Wash', detail: null }, { oid: 'p-6', name: 'Aloe Vera Moisturizer', detail: null }] },
+        {
+            key: 'productsWithoutPhoto',
+            total: 15,
+            items: [
+                { oid: 'p-1', name: 'Aloe Vera Face Wash', detail: null },
+                { oid: 'p-2', name: 'Anti-Aging Serum', detail: null },
+                { oid: 'p-3', name: 'Beard Oil', detail: null },
+                { oid: 'p-4', name: 'Cotton Crew Neck T-Shirt', detail: null },
+                { oid: 'p-5', name: 'Floral Maxi Dress', detail: null },
+            ],
+        },
+        {
+            key: 'productsWithoutBrand',
+            total: 25,
+            items: [
+                { oid: 'p-1', name: 'Aloe Vera Face Wash', detail: null },
+                { oid: 'p-6', name: 'Aloe Vera Moisturizer', detail: null },
+            ],
+        },
         { key: 'productsWithoutThreshold', total: 1, items: [{ oid: 'p-7', name: 'Handmade Gift Box', detail: null }] },
-        { key: 'emptyCategories', total: 4, items: [{ oid: 'c-1', name: 'Footwear', detail: null }, { oid: 'c-2', name: 'Jersey', detail: null }] },
-        { key: 'emptySubCategories', total: 23, items: [{ oid: 's-1', name: 'Cleanser', detail: 'Skincare' }, { oid: 's-2', name: 'Courier Bags', detail: 'Delivery' }] },
+        {
+            key: 'emptyCategories',
+            total: 4,
+            items: [
+                { oid: 'c-1', name: 'Footwear', detail: null },
+                { oid: 'c-2', name: 'Jersey', detail: null },
+            ],
+        },
+        {
+            key: 'emptySubCategories',
+            total: 23,
+            items: [
+                { oid: 's-1', name: 'Cleanser', detail: 'Skincare' },
+                { oid: 's-2', name: 'Courier Bags', detail: 'Delivery' },
+            ],
+        },
         { key: 'emptyBrands', total: 1, items: [{ oid: 'b-2', name: 'COSRX', detail: null }] },
         { key: 'emptyAisles', total: 7, items: [{ oid: 'a-1', name: 'Anchol (আঁচল)', detail: 'Kanthasheelan' }] },
-        { key: 'suppliersNeverBoughtFrom', total: 8, items: [{ oid: 'su-1', name: 'Jutti Heaven', detail: null }, { oid: 'su-2', name: 'Leather Craft BD', detail: null }] },
+        {
+            key: 'suppliersNeverBoughtFrom',
+            total: 8,
+            items: [
+                { oid: 'su-1', name: 'Jutti Heaven', detail: null },
+                { oid: 'su-2', name: 'Leather Craft BD', detail: null },
+            ],
+        },
         { key: 'inactiveCategoriesInUse', total: 0, items: [] },
         { key: 'inactiveBrandsInUse', total: 0, items: [] },
     ],
     spread: {
-        category: { total: 26, rows: [{ oid: 'c-3', name: 'Accessories', products: 7 }, { oid: 'c-4', name: 'Skincare', products: 6 }, { oid: 'c-5', name: 'Traditional Clothing', products: 4 }, { oid: 'c-6', name: 'Cosmetics', products: 3 }, { oid: 'c-7', name: 'Clothing', products: 2 }, { oid: 'c-8', name: 'Delivery', products: 2 }, { oid: 'c-9', name: 'Packaging', products: 2 }], other: null },
-        brand: { total: 26, rows: [{ oid: null, name: null, products: 25 }, { oid: 'b-1', name: "skin'O", products: 1 }], other: null },
-        supplier: { total: 23, rows: [{ oid: 'su-3', name: 'Bengal Traditional Garments Ltd.', products: 18 }, { oid: 'su-4', name: 'Global Distributor Ltd', products: 18 }, { oid: 'su-5', name: 'Deshi Kurtis Co.', products: 5 }, { oid: 'su-6', name: 'Dhaka Saree House', products: 3 }], other: null },
+        category: {
+            total: 26,
+            rows: [
+                { oid: 'c-3', name: 'Accessories', products: 7 },
+                { oid: 'c-4', name: 'Skincare', products: 6 },
+                { oid: 'c-5', name: 'Traditional Clothing', products: 4 },
+                { oid: 'c-6', name: 'Cosmetics', products: 3 },
+                { oid: 'c-7', name: 'Clothing', products: 2 },
+                { oid: 'c-8', name: 'Delivery', products: 2 },
+                { oid: 'c-9', name: 'Packaging', products: 2 },
+            ],
+            other: null,
+        },
+        brand: {
+            total: 26,
+            rows: [
+                { oid: null, name: null, products: 25 },
+                { oid: 'b-1', name: "skin'O", products: 1 },
+            ],
+            other: null,
+        },
+        supplier: {
+            total: 23,
+            rows: [
+                { oid: 'su-3', name: 'Bengal Traditional Garments Ltd.', products: 18 },
+                { oid: 'su-4', name: 'Global Distributor Ltd', products: 18 },
+                { oid: 'su-5', name: 'Deshi Kurtis Co.', products: 5 },
+                { oid: 'su-6', name: 'Dhaka Saree House', products: 3 },
+            ],
+            other: null,
+        },
     },
     warehouses: [
         { oid: 'w-1', name: 'Chandrabindu', onHand: 1608, capacity: 2000, fullRate: 80.4 },
@@ -254,7 +442,9 @@ const PO = {
 // A draft half typed: the scarf has no warehouse, quantity or price yet, and no payment is set.
 PO['po-dra'] = {
     details: { ...PO_HEADER, oid: 'po-dra', status: 'Draft', purchase_type: 'overseas', payment_status: null, paid_amount: '0', total_amount: '36000' },
-    lines: poLines(false).slice(0, 2).map((line, i) => (i === 1 ? { ...line, warehouse_oid: null, warehouse_name: null, aisle_oid: null, aisle_name: null, ordered_quantity: null, ordered_unit_price: null } : line)),
+    lines: poLines(false)
+        .slice(0, 2)
+        .map((line, i) => (i === 1 ? { ...line, warehouse_oid: null, warehouse_name: null, aisle_oid: null, aisle_name: null, ordered_quantity: null, ordered_unit_price: null } : line)),
     stats: { ordered_total: 36000, ordered_units: 80, warehouses: 1, ...PO_OPEN },
 };
 const PO_ACTIVITY = [
@@ -401,6 +591,74 @@ const ORDER_FLOW = {
     insights: { funnel: { key: 'funnel_leak_deliver', params: { lost: 6, placed: 30 } }, confirming: null, terms: null, places: { key: 'place_refusal', params: { place: { en: 'Dhaka', bn: 'ঢাকা' }, failed: 6, dispatched: 24 } }, risk: null },
 };
 
+const HEALTH_DAYS = Array.from({ length: 7 }, (_, i) => ({ day: `2026-10-${String(14 + i).padStart(2, '0')}`, requests: [480, 512, 95, 30, 610, 540, 380][i], people: [3, 3, 1, 1, 4, 3, 2][i] }));
+const HEALTH = {
+    usage: {
+        last_active: { occurred_on: new Date(Date.now() - 4 * 60_000).toISOString(), method: 'GET', route: '/api/v1/sales/order/get-order-list', name: 'Nusrat Sultana', email: 'counter@arithmalabs.test' },
+        daily: HEALTH_DAYS,
+        people_count: 3,
+        month_days: Array.from({ length: 20 }, (_, i) => ({ day: i + 1, requests: Math.round(200 + 300 * Math.abs(Math.sin(i / 3))) })),
+        people: [
+            { oid: 'l-1', name: 'Nusrat Sultana', email: 'counter@arithmalabs.test', requests: 1840, last_seen: new Date(Date.now() - 4 * 60_000).toISOString() },
+            { oid: 'l-2', name: 'Rafi Ahmed', email: 'rafi@arithmalabs.test', requests: 612, last_seen: new Date(Date.now() - 3 * 3_600_000).toISOString() },
+            { oid: 'l-3', name: 'Ahmad Saif', email: 'ahmad@arithmalabs.test', requests: 185, last_seen: '2026-10-18T09:12:00.000Z' },
+        ],
+    },
+    metrics: [
+        { method: 'POST', route: '/api/v1/auth/refresh-token', calls: 874, average_ms: 2134, p95_ms: 3130, slowest_ms: 32318, error_rate: 0.0011, client_errors: 163 },
+        { method: 'GET', route: '/api/v1/auth/get-user-info', calls: 688, average_ms: 728, p95_ms: 2106, slowest_ms: 12957, error_rate: 0, client_errors: 0 },
+        { method: 'GET', route: '/api/v1/sales/order/get-order-list', calls: 412, average_ms: 310, p95_ms: 640, slowest_ms: 1900, error_rate: 0, client_errors: 2 },
+        { method: 'POST', route: '/api/v1/sales/pos/checkout-pos-sale', calls: 96, average_ms: 420, p95_ms: 880, slowest_ms: 1400, error_rate: 0.0208, client_errors: 4 },
+    ],
+    requests: [
+        { oid: 'r-1', occurred_on: new Date(Date.now() - 4 * 60_000).toISOString(), method: 'GET', route: '/api/v1/sales/order/get-order-list', path: '/api/v1/sales/order/get-order-list?offset=0&limit=20', unmatched_route: false, status: 200, duration_ms: 312, ip: '103.120.4.18', country: 'BD', city: 'Dhaka', device: { browser: 'Chrome', os: 'Windows', type: 'desktop' }, login_oid: 'l-1', name: 'Nusrat Sultana', email: 'counter@arithmalabs.test' },
+        { oid: 'r-2', occurred_on: new Date(Date.now() - 9 * 60_000).toISOString(), method: 'POST', route: '/api/v1/sales/pos/checkout-pos-sale', path: '/api/v1/sales/pos/checkout-pos-sale', unmatched_route: false, status: 500, duration_ms: 1204, ip: '103.120.4.18', country: 'BD', city: 'Dhaka', device: { browser: 'Chrome', os: 'Windows', type: 'desktop' }, login_oid: 'l-1', name: 'Nusrat Sultana', email: 'counter@arithmalabs.test' },
+        { oid: 'r-3', occurred_on: new Date(Date.now() - 31 * 60_000).toISOString(), method: 'POST', route: '/api/v1/auth/sign-in', path: '/api/v1/auth/sign-in', unmatched_route: false, status: 401, duration_ms: 88, ip: '45.83.12.7', country: 'NL', city: null, device: null, login_oid: null, name: null, email: null },
+    ],
+    detail: {
+        oid: 'r-2',
+        occurred_on: new Date(Date.now() - 9 * 60_000).toISOString(),
+        method: 'POST',
+        route: '/api/v1/sales/pos/checkout-pos-sale',
+        path: '/api/v1/sales/pos/checkout-pos-sale',
+        unmatched_route: false,
+        status: 500,
+        duration_ms: 1204,
+        request_bytes: 412,
+        response_bytes: 96,
+        ip: '103.120.4.18',
+        country: 'BD',
+        city: 'Dhaka',
+        device: { browser: 'Chrome', os: 'Windows', type: 'desktop' },
+        login_oid: 'l-1',
+        session_oid: 's-1',
+        name: 'Nusrat Sultana',
+        email: 'counter@arithmalabs.test',
+        request_body: { lines: [{ batch_oid: 'b-1', quantity: 2 }], payment_method: 'Cash', password: '[redacted]' },
+        response_body: { code: 500, message: 'Could not finish the sale. Try again in a moment.' },
+        activity: [],
+    },
+    signals: [
+        { key: 'list_sweeping', threshold: 200, matches: [] },
+        { key: 'many_addresses', threshold: 3, matches: [] },
+        { key: 'off_hours', threshold: null, window: [23, 6], matches: [{ oid: 'l-2', name: 'Rafi Ahmed', email: 'rafi@arithmalabs.test', ip: null, count: 42, first_seen: '2026-10-15T18:10:00.000Z', last_seen: '2026-10-19T19:40:00.000Z' }] },
+        { key: 'refusal_burst', threshold: 20, matches: [{ oid: null, name: null, email: null, ip: '45.83.12.7', count: 64, first_seen: '2026-10-20T03:02:00.000Z', last_seen: '2026-10-20T03:14:00.000Z' }] },
+        { key: 'export_taken', threshold: null, matches: [{ oid: 'l-3', name: 'Ahmad Saif', email: 'ahmad@arithmalabs.test', ip: null, count: 3, first_seen: '2026-10-16T08:00:00.000Z', last_seen: '2026-10-18T09:12:00.000Z' }] },
+    ],
+    database: {
+        database_bytes: 25779223,
+        plan_bytes: 5368709120,
+        max_connections: 20,
+        connections: 6,
+        tables: [
+            { name: 'activity_log', bytes: 278528, rows: 309 },
+            { name: 'api_request_log', bytes: 2916352, rows: 3670 },
+        ],
+        daily: HEALTH_DAYS.map((d) => ({ day: d.day, requests: d.requests, bytes: d.requests * 790 })),
+        average_bytes_per_day: 300000,
+    },
+};
+
 const answer = (request, data, extra = {}) => ({ status: 200, headers: cors(request), body: JSON.stringify({ code: 200, message: 'ok', data, ...extra }) });
 
 // Matched on the API path, not the host: a production build points at the deployed server, so
@@ -419,9 +677,21 @@ function handle(request) {
     if (url.includes('/get-purchase-list')) return answer(request, { rows: PO_ROWS, stats: { submitted: 1, overdue: 0, verified: 1, cancelled: 1 } }, { total: PO_ROWS.length });
     if (url.includes('/get-purchase-details/')) return answer(request, { ...PO[url.split('/').pop().split('?')[0]], activity: PO_ACTIVITY });
     if (url.includes('/get-product-list-for-purchase')) return answer(request, PO_PICKER);
-    if (url.includes('/get-supplier-list-for-dropdown')) return answer(request, SUPPLIERS.map((s, i) => ({ value: s.oid, label: s.name, phone_number: s.phone_number, last_ordered_on: i === 0 ? null : '2026-09-12T10:00:00.000' })));
-    if (url.includes('/get-aisle-list-for-dropdown')) return answer(request, AISLES.map((a) => ({ value: a.oid, label: a.name, warehouse_oid: a.warehouse_oid })));
-    if (url.includes('/get-warehouse-list-for-dropdown')) return answer(request, WAREHOUSES.map((w) => ({ value: w.oid, label: w.name })));
+    if (url.includes('/get-supplier-list-for-dropdown'))
+        return answer(
+            request,
+            SUPPLIERS.map((s, i) => ({ value: s.oid, label: s.name, phone_number: s.phone_number, last_ordered_on: i === 0 ? null : '2026-09-12T10:00:00.000' }))
+        );
+    if (url.includes('/get-aisle-list-for-dropdown'))
+        return answer(
+            request,
+            AISLES.map((a) => ({ value: a.oid, label: a.name, warehouse_oid: a.warehouse_oid }))
+        );
+    if (url.includes('/get-warehouse-list-for-dropdown'))
+        return answer(
+            request,
+            WAREHOUSES.map((w) => ({ value: w.oid, label: w.name }))
+        );
     if (url.includes('/get-aisle-list')) return answer(request, { rows: AISLES, stats: { active: 4, inactive: 0, stocked: 3, empty: 1 } }, { total: AISLES.length });
     if (url.includes('/get-aisle-details'))
         return answer(request, {
@@ -475,17 +745,43 @@ function handle(request) {
     if (url.includes('/get-product-details'))
         return answer(request, {
             details: { ...PRODUCTS[0], created_by: 'owner@arithmalabs.test' },
-            stock: { on_hand: 12, held: 8, sellable: 4, batches: [{ oid: 'i-1', batch_code: 'B-240917-01', warehouse_name: 'Main showroom', received_on: '2026-09-17T10:00:00.000', on_hand: 9, held: 8, sellable: 1, cost_price: 450, selling_price: 890 }, { oid: 'i-2', batch_code: 'B-240922-03', warehouse_name: 'Online store room', received_on: '2026-09-22T10:00:00.000', on_hand: 3, held: 0, sellable: 3, cost_price: 470, selling_price: null }] },
+            stock: {
+                on_hand: 12,
+                held: 8,
+                sellable: 4,
+                batches: [
+                    { oid: 'i-1', batch_code: 'B-240917-01', warehouse_name: 'Main showroom', received_on: '2026-09-17T10:00:00.000', on_hand: 9, held: 8, sellable: 1, cost_price: 450, selling_price: 890 },
+                    { oid: 'i-2', batch_code: 'B-240922-03', warehouse_name: 'Online store room', received_on: '2026-09-22T10:00:00.000', on_hand: 3, held: 0, sellable: 3, cost_price: 470, selling_price: null },
+                ],
+            },
             lifetime: { sold: 31, returned: 2, damaged: 1, last_sold_on: '2026-09-25T15:30:00.000' },
             activity: [{ oid: 'log-1', date: '2026-09-20T10:00:00.000', user: 'owner@arithmalabs.test', action: 'Updated product', description: 'Restock level changed from "3" to "5"' }],
         });
-    if (url.includes('/get-sub-category-list-for-dropdown')) return answer(request, [{ value: 'sc-1', label: 'Kurti', groupLabel: 'Clothing' }, { value: 'sc-3', label: 'Moisturiser', groupLabel: 'Skincare' }]);
-    if (url.includes('/get-brand-list-for-dropdown')) return answer(request, [{ value: 'b-1', label: 'Aarong' }, { value: 'b-2', label: 'Cosrx' }]);
+    if (url.includes('/get-sub-category-list-for-dropdown'))
+        return answer(request, [
+            { value: 'sc-1', label: 'Kurti', groupLabel: 'Clothing' },
+            { value: 'sc-3', label: 'Moisturiser', groupLabel: 'Skincare' },
+        ]);
+    if (url.includes('/get-brand-list-for-dropdown'))
+        return answer(request, [
+            { value: 'b-1', label: 'Aarong' },
+            { value: 'b-2', label: 'Cosrx' },
+        ]);
     if (url.includes('/check-product-availability')) return answer(request, { field: 'sku', available: true });
     if (url.includes('/get-configuration-analytics')) return answer(request, ANALYTICS);
     if (url.includes('/get-order-list')) return answer(request, { rows: ORDERS, stats: { pending: 2, to_dispatch: 1, with_courier: 1, to_refund: 1 } }, { total: ORDERS.length });
     if (url.includes('/get-order-details')) return answer(request, ORDER_DETAILS);
-    if (url.includes('/get-online-order-setup')) return answer(request, { sources: [{ oid: 's-1', platform: 'Facebook', name: 'Facebook page' }, { oid: 's-2', platform: 'Instagram', name: 'Instagram' }], delivery_charge_inside: 60, delivery_charge_outside: 120, home_district: { oid: 'BD-Dhaka', name_en: 'Dhaka', name_bn: 'ঢাকা' }, logo_url: null });
+    if (url.includes('/get-online-order-setup'))
+        return answer(request, {
+            sources: [
+                { oid: 's-1', platform: 'Facebook', name: 'Facebook page' },
+                { oid: 's-2', platform: 'Instagram', name: 'Instagram' },
+            ],
+            delivery_charge_inside: 60,
+            delivery_charge_outside: 120,
+            home_district: { oid: 'BD-Dhaka', name_en: 'Dhaka', name_bn: 'ঢাকা' },
+            logo_url: null,
+        });
     if (url.includes('/find-customer-by-phone'))
         return answer(request, {
             phone: '01987654321',
@@ -495,6 +791,12 @@ function handle(request) {
             last_orders: [1, 2, 3, 4, 5].map((n) => ({ oid: 'o-' + n, invoice_no: '26092800' + n, channel: 'ONLINE', status: n === 2 ? 'Returned' : 'Delivered', payment_status: 'paid', total_amount: 1200 + n * 150, created_on: '2026-09-2' + n + 'T10:00:00.000', delivery_status: null })),
         });
     if (url.includes('/get-dashboard')) return answer(request, DASHBOARD);
+    if (url.includes('/get-observability-usage')) return answer(request, HEALTH.usage);
+    if (url.includes('/get-route-metrics')) return answer(request, { rows: HEALTH.metrics });
+    if (url.includes('/get-request-list')) return answer(request, { rows: HEALTH.requests.map((r) => ({ ...r, endpoint: r.method + ' ' + r.route, status_class: Math.floor(r.status / 100) + 'xx', device_name: r.device ? r.device.browser + ' · ' + r.device.os : null })) }, { total: HEALTH.requests.length });
+    if (url.includes('/get-request-details/')) return answer(request, HEALTH.detail);
+    if (url.includes('/get-signals')) return answer(request, { signals: HEALTH.signals });
+    if (url.includes('/get-database-status')) return answer(request, HEALTH.database);
     if (url.includes('/get-sales-analytics-orders')) return answer(request, ORDER_FLOW);
     if (url.includes('/get-sales-analytics-overview')) return answer(request, SALES_OVERVIEW);
     if (url.includes('/get-user-card')) return answer(request, { name: 'Ahmad Saif', email: 'ahmad@arithmalabs.test', designation: 'Manager', role: 'Manager', photo: null, active: true });
@@ -504,7 +806,7 @@ function handle(request) {
 
 const LANG = process.env.SHOT_LANG === 'bn' ? "localStorage.setItem('app_lang', 'bn'); " : '';
 /** SHOT_SEED is more script run before the app starts, such as storage a page restores from. */
-const seed = "try { " + LANG + (process.env.SHOT_SEED ?? '') + "localStorage.setItem('__x9f4c2e8a1b7d6f3c0a5e9b2d4f8a11__', JSON.stringify({ transport: 'body', refresh_token: 'refresh-1', session_id: 'session-1', remember: true })); localStorage.setItem('__x7d2a9f4e1c8b3d6a0f5e2c9b7a41__', 'session-1'); } catch (e) {}";
+const seed = 'try { ' + LANG + (process.env.SHOT_SEED ?? '') + "localStorage.setItem('__x9f4c2e8a1b7d6f3c0a5e9b2d4f8a11__', JSON.stringify({ transport: 'body', refresh_token: 'refresh-1', session_id: 'session-1', remember: true })); localStorage.setItem('__x7d2a9f4e1c8b3d6a0f5e2c9b7a41__', 'session-1'); } catch (e) {}";
 
 const PROBE = `(() => {
     const row = document.querySelector('[data-table="row"]');

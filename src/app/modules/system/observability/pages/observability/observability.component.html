@@ -1,0 +1,37 @@
+<page-header [title]="'system.health.title' | translate" [lead]="'system.health.lead' | translate" />
+
+@if (tab() !== tabs.length - 1) {
+    <list-filter [config]="filterConfig" [values]="filters()" (valuesChange)="filters.set($event)" [narrow]="isPhone()" />
+}
+
+<nz-tabs class="mt-2 md:mt-4 [&_.ant-tabs-nav]:mb-0 [&_.ant-tabs-nav]:rounded-container [&_.ant-tabs-nav]:border [&_.ant-tabs-nav]:border-line [&_.ant-tabs-nav]:bg-white [&_.ant-tabs-nav]:px-4 [&_.ant-tabs-nav::before]:border-b-0" [(nzSelectedIndex)]="tab" [nzDestroyInactiveTabPane]="true" data-health="tabs">
+    @for (t of tabs; track t.key) {
+        <nz-tab [nzTitle]="title">
+            <ng-template #title>
+                <span class="inline-flex items-center gap-1.5" [attr.data-tab]="t.key"><ng-icon [name]="t.icon" size="14px" aria-hidden="true" />{{ 'system.health.tab.' + t.key | translate }}</span>
+            </ng-template>
+            <div class="mt-2 md:mt-4">
+                @switch (t.key) {
+                    @case ('usage') {
+                        <usage-tab [range]="range()" (openRequests)="openRequests($event)" />
+                    }
+                    @case ('metrics') {
+                        <metrics-tab [range]="range()" (openRequests)="openRequests($event)" />
+                    }
+                    @case ('requests') {
+                        <requests-tab [range]="range()" [(filters)]="requestFilters" />
+                    }
+                    @case ('crashes') {
+                        <crashes-tab [range]="range()" />
+                    }
+                    @case ('signals') {
+                        <signals-tab [range]="range()" (openRequests)="openRequests($event)" />
+                    }
+                    @case ('database') {
+                        <database-tab />
+                    }
+                }
+            </div>
+        </nz-tab>
+    }
+</nz-tabs>

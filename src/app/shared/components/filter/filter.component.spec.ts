@@ -9,7 +9,15 @@ import { FilterConfig, FilterField, RemoteChoices } from '@app/core/models/filte
 import { SessionService } from '@app/core/services/session/session.service';
 import { FilterComponent } from './filter.component';
 
-const STATUS = { key: 'status', label: { en: 'Status', bn: 'অবস্থা' }, type: 'select' as const, choices: [{ value: 'Active', label: { en: 'Active', bn: 'চালু' } }, { value: 'Inactive', label: { en: 'Inactive', bn: 'বন্ধ' } }] };
+const STATUS = {
+    key: 'status',
+    label: { en: 'Status', bn: 'অবস্থা' },
+    type: 'select' as const,
+    choices: [
+        { value: 'Active', label: { en: 'Active', bn: 'চালু' } },
+        { value: 'Inactive', label: { en: 'Inactive', bn: 'বন্ধ' } },
+    ],
+};
 
 const CONFIG: FilterConfig = {
     render: 'row',

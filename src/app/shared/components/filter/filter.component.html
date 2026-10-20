@@ -1,7 +1,10 @@
-<div class="flex flex-wrap items-center gap-2" data-filter="controls">
+<div class="flex flex-wrap gap-2" [class.items-center]="!inline()" [class.items-end]="inline()" [class.rounded-container]="inline()" [class.border]="inline()" [class.border-line]="inline()" [class.bg-white]="inline()" [class.p-3]="inline()" data-filter="controls">
     @if (inline()) {
         @for (field of fields(); track field.key) {
-            <ng-container [ngTemplateOutlet]="control" [ngTemplateOutletContext]="{ $implicit: field }" />
+            <div class="flex flex-col gap-1" [attr.data-filter-field]="field.key">
+                <span class="text-[11px] font-semibold text-ink-muted">{{ field.label | text }}</span>
+                <ng-container [ngTemplateOutlet]="control" [ngTemplateOutletContext]="{ $implicit: field }" />
+            </div>
         }
     } @else if (fields().length) {
         <!-- The modal opens from a plain button; every other render hangs the same panel off a
@@ -100,17 +103,17 @@
 <ng-template #control let-field let-block="block" let-draft="draft">
     @switch (field.type) {
         @case ('text') {
-            <input nz-input type="text" class="text-xs" [class.w-40]="!block" [class.w-full]="block" [disabled]="disabled(field)" [ngModel]="valueOf(field, draft)" (ngModelChange)="set(field, $event, draft)" [attr.placeholder]="field.placeholder ?? field.label | text" [attr.aria-label]="field.label | text" />
+            <input nz-input type="text" class="h-8 text-xs" [class.w-44]="!block" [class.w-full]="block" [disabled]="disabled(field)" [ngModel]="valueOf(field, draft)" (ngModelChange)="set(field, $event, draft)" [attr.placeholder]="field.placeholder ?? field.label | text" [attr.aria-label]="field.label | text" />
         }
         @case ('select') {
-            <nz-select class="text-xs" [class.w-40]="!block" [class.w-full]="block" [nzShowSearch]="isRemoteChoices(field)" [nzLoading]="remoteLoading(field)" [nzAllowClear]="!field.required" [nzDisabled]="disabled(field)" [nzPlaceHolder]="field.label | text" [ngModel]="valueOf(field, draft)" (ngModelChange)="set(field, $event, draft)" (nzOpenChange)="$event && loadRemoteFor(field)">
+            <nz-select class="text-xs" [class.w-44]="!block" [class.w-full]="block" [nzShowSearch]="isRemoteChoices(field)" [nzLoading]="remoteLoading(field)" [nzAllowClear]="!field.required" [nzDisabled]="disabled(field)" [nzPlaceHolder]="field.label | text" [ngModel]="valueOf(field, draft)" (ngModelChange)="set(field, $event, draft)" (nzOpenChange)="$event && loadRemoteFor(field)">
                 @for (choice of choicesOf(field); track choice.value) {
                     <nz-option [nzValue]="choice.value" [nzLabel]="choice.label | text" />
                 }
             </nz-select>
         }
         @case ('multi-select') {
-            <nz-select class="text-xs" [class.min-w-44]="!block" [class.w-full]="block" nzMode="multiple" [nzLoading]="remoteLoading(field)" (nzOpenChange)="$event && loadRemoteFor(field)" [nzMaxTagCount]="field.maxTags ?? 2" [nzAllowClear]="!field.required" [nzDisabled]="disabled(field)" [nzPlaceHolder]="field.label | text" [ngModel]="listOf(field, draft)" (ngModelChange)="setList(field, $event, draft)">
+            <nz-select class="text-xs" [class.w-44]="!block" [class.w-full]="block" nzMode="multiple" [nzLoading]="remoteLoading(field)" (nzOpenChange)="$event && loadRemoteFor(field)" [nzMaxTagCount]="field.maxTags ?? 2" [nzAllowClear]="!field.required" [nzDisabled]="disabled(field)" [nzPlaceHolder]="field.label | text" [ngModel]="listOf(field, draft)" (ngModelChange)="setList(field, $event, draft)">
                 @for (choice of choicesOf(field); track choice.value) {
                     <nz-option [nzValue]="choice.value" [nzLabel]="choice.label | text" />
                 }
@@ -124,14 +127,26 @@
             </nz-segmented>
         }
         @case ('date-range') {
-            <nz-range-picker class="text-xs" [class.w-60]="!block" [class.w-full]="block" nzFormat="dd MMM yyyy" nzDropdownClassName="overlay-range" [nzPlaceHolder]="['list.dateStart' | translate, 'list.dateEnd' | translate]" [nzRanges]="rangeSetup()[field.key].presets" [nzDisabledDate]="rangeSetup()[field.key].disabled" [nzAllowClear]="!field.required" [nzDisabled]="disabled(field)" [nzInputReadOnly]="true" [ngModel]="rangeOf(field, draft)" (ngModelChange)="setRange(field, $event, draft)" [attr.aria-label]="field.label | text" />
+            <nz-range-picker
+                class="text-xs"
+                [class.w-60]="!block"
+                [class.w-full]="block"
+                nzFormat="dd MMM yyyy"
+                nzDropdownClassName="overlay-range"
+                [nzPlaceHolder]="['list.dateStart' | translate, 'list.dateEnd' | translate]"
+                [nzRanges]="rangeSetup()[field.key].presets"
+                [nzDisabledDate]="rangeSetup()[field.key].disabled"
+                [nzAllowClear]="!field.required"
+                [nzDisabled]="disabled(field)"
+                [nzInputReadOnly]="true"
+                [ngModel]="rangeOf(field, draft)"
+                (ngModelChange)="setRange(field, $event, draft)"
+                [attr.aria-label]="field.label | text"
+            />
         }
         @case ('toggle') {
-            <span class="inline-flex items-center gap-1.5 text-xs text-ink-muted">
-                <nz-switch nzSize="small" [ngModel]="toggleOf(field, draft)" (ngModelChange)="setToggle(field, $event, draft)" [nzDisabled]="disabled(field)" />
-                @if (!block) {
-                    <span>{{ field.label | text }}</span>
-                }
+            <span class="inline-flex h-8 items-center">
+                <nz-switch nzSize="small" [ngModel]="toggleOf(field, draft)" (ngModelChange)="setToggle(field, $event, draft)" [nzDisabled]="disabled(field)" [attr.aria-label]="field.label | text" />
             </span>
         }
     }

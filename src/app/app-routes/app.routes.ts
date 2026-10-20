@@ -58,6 +58,10 @@ export const routes: Routes = [
                 loadChildren: () => import('@app/modules/marketing/marketing.routes').then((m) => m.MARKETING_ROUTES),
             },
             {
+                path: 'system',
+                loadChildren: () => import('@app/modules/system/system.routes').then((m) => m.SYSTEM_ROUTES),
+            },
+            {
                 path: 'administration',
                 loadChildren: () => import('@app/modules/administration/administration.routes').then((m) => m.ADMINISTRATION_ROUTES),
             },

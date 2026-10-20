@@ -230,6 +230,16 @@ export class APIEndpoint {
     static readonly GET_ACTIVITY_LOG_LIST = '/api/v1/activity-log/get-activity-log-list';
     static readonly GET_ACTIVITY_LOG_SUMMARY = '/api/v1/activity-log/get-activity-log-summary';
 
+    // System health
+    static readonly GET_OBSERVABILITY_USAGE = '/api/v1/system/observability/get-observability-usage';
+    static readonly GET_ROUTE_METRICS = '/api/v1/system/observability/get-route-metrics';
+    static readonly GET_REQUEST_LIST = '/api/v1/system/observability/get-request-list';
+    static readonly GET_REQUEST_DETAILS = '/api/v1/system/observability/get-request-details';
+    static readonly GET_SIGNALS = '/api/v1/system/observability/get-signals';
+    static readonly GET_DATABASE_STATUS = '/api/v1/system/observability/get-database-status';
+    static readonly GET_CRASH_LIST = '/api/v1/system/observability/get-crash-list';
+    static readonly REPORT_CRASH = '/api/v1/profile/crash-report/report-crash';
+
     // Marketing
     static readonly GET_PARTNER_LIST = '/api/v1/marketing/partner/get-partner-list';
     static readonly GET_PARTNER_DETAILS = '/api/v1/marketing/partner/get-partner-details';
@@ -270,6 +280,7 @@ export class APIEndpoint {
     static readonly SWITCH_USER_STATUS = '/api/v1/admin/user/switch-user-status';
     static readonly DELETE_USER = '/api/v1/admin/user/delete-user';
     static readonly SIGN_OUT_USER_EVERYWHERE = '/api/v1/admin/user/sign-out-user-everywhere';
+    static readonly SIGN_OUT_EVERYONE = '/api/v1/admin/user/sign-out-everyone';
     static readonly GET_ROLE_LIST = '/api/v1/admin/role/get-role-list';
     static readonly GET_ROLE_TREE = '/api/v1/admin/role/get-role-tree';
     static readonly GET_ROLE_DETAILS = '/api/v1/admin/role/get-role-details';

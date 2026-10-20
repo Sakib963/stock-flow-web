@@ -1,4 +1,5 @@
-import { ApplicationConfig, inject, provideAppInitializer, provideBrowserGlobalErrorListeners } from '@angular/core';
+import { ApplicationConfig, ErrorHandler, inject, provideAppInitializer, provideBrowserGlobalErrorListeners } from '@angular/core';
+import { CrashReporterService } from '@app/core/services/crash-reporter/crash-reporter.service';
 import { provideRouter, withComponentInputBinding } from '@angular/router';
 import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/http';
 import { provideNzI18n, en_US } from 'ng-zorro-antd/i18n';
@@ -18,6 +19,7 @@ import { SessionService } from '@app/core/services/session/session.service';
 export const appConfig: ApplicationConfig = {
     providers: [
         provideBrowserGlobalErrorListeners(),
+        { provide: ErrorHandler, useClass: CrashReporterService },
         provideRouter(routes, withComponentInputBinding()),
         provideHttpClient(withFetch(), withInterceptors([tokenInterceptor])),
         provideNzI18n(en_US),

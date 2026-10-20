@@ -1,0 +1,46 @@
+@if (signals.failed(); as failure) {
+    <div class="sf-empty rounded-container border border-line bg-white" role="alert">
+        <p>{{ 'system.health.failed.' + failure | translate }}</p>
+    </div>
+} @else if (signals.data(); as list) {
+    <div class="gap-2 transition-opacity md:gap-4 lg:columns-2 motion-reduce:transition-none" [class.opacity-60]="signals.loading()" data-health="signals">
+        @for (signal of list; track signal.key) {
+            <nz-card class="mb-2 block break-inside-avoid md:mb-4" [attr.data-signal]="signal.key">
+                <div class="flex items-start gap-3">
+                    <span class="flex size-9 flex-none items-center justify-center rounded-full" [class]="signal.matches.length ? 'bg-warning-bg text-warning-ink' : 'bg-success-bg text-success-ink'">
+                        <ng-icon [name]="signal.matches.length ? 'lucideShieldAlert' : 'lucideCircleCheck'" size="17px" aria-hidden="true" />
+                    </span>
+                    <div class="min-w-0 flex-1">
+                        <h3 class="m-0 text-sm font-bold text-ink">{{ 'system.health.signals.' + signal.key + '.title' | translate }}</h3>
+                        <p class="mt-0.5 mb-0 text-xs text-ink-muted">{{ 'system.health.signals.' + signal.key + '.means' | translate: { threshold: signal.threshold, from: hour(signal.window?.[0]), to: hour(signal.window?.[1]) } | digits }}</p>
+                    </div>
+                    <span class="flex-none text-xs font-semibold" [class.text-warning-ink]="signal.matches.length" [class.text-success-ink]="!signal.matches.length">
+                        {{ signal.matches.length ? ('system.health.signals.matched' | translate: { count: signal.matches.length } | digits) : ('system.health.signals.clear' | translate) }}
+                    </span>
+                </div>
+                @if (signal.matches.length) {
+                    <ul class="mt-3 mb-0 list-none divide-y divide-line-soft border-t border-line-soft p-0">
+                        @for (match of signal.matches; track match.oid ?? match.ip) {
+                            <li class="flex items-center gap-3 py-2">
+                                <span class="min-w-0 flex-1">
+                                    <span class="block truncate text-[13px] font-semibold text-ink" [class.font-mono]="!!match.ip">{{ match.ip || match.name || match.email }}</span>
+                                    <span class="block text-xs text-ink-muted">{{ match.first_seen | recordDate: language() : 'date-time-12' }} → {{ match.last_seen | recordDate: language() : 'date-time-12' }}</span>
+                                </span>
+                                <span class="font-mono text-sm font-bold text-ink tabular-nums">{{ match.count | money: 'number' }}</span>
+                                <button nz-button type="button" class="inline-flex items-center justify-center" nz-tooltip [nzTooltipTitle]="'system.health.seeRequests' | translate" [attr.aria-label]="'system.health.seeRequests' | translate" (click)="open(match)">
+                                    <ng-icon name="lucideList" size="14px" aria-hidden="true" />
+                                </button>
+                            </li>
+                        }
+                    </ul>
+                }
+            </nz-card>
+        }
+    </div>
+} @else {
+    <div class="grid grid-cols-1 gap-2 md:gap-4 lg:grid-cols-2" role="status" [attr.aria-label]="'form.loading' | translate">
+        @for (i of [1, 2, 3, 4]; track i) {
+            <nz-card><nz-skeleton nzActive [nzAvatar]="true" [nzParagraph]="{ rows: 1 }" /></nz-card>
+        }
+    </div>
+}

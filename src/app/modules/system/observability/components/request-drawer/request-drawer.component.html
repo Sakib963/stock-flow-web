@@ -1,0 +1,73 @@
+<nz-drawer [nzVisible]="!!oid()" [nzWidth]="width()" [nzTitle]="'system.health.requests.detailTitle' | translate" (nzOnClose)="closed.emit()">
+    <ng-container *nzDrawerContent>
+        @if (request.failed(); as failure) {
+            <p class="m-0 text-sm text-ink-body" role="alert">{{ 'system.health.failed.' + failure | translate }}</p>
+        } @else if (request.data(); as r) {
+            @if (r.oid === oid()) {
+                <div class="flex flex-col gap-4" data-health="request-details">
+                    <nz-descriptions nzBordered nzSize="small" [nzColumn]="1">
+                        <nz-descriptions-item [nzTitle]="'system.health.requests.when' | translate">{{ r.occurred_on | recordDate: language() : 'date-time-12' }}</nz-descriptions-item>
+                        <nz-descriptions-item [nzTitle]="'system.health.requests.who' | translate">{{ r.name || r.email || ('system.health.requests.signedOut' | translate) }}</nz-descriptions-item>
+                        <nz-descriptions-item [nzTitle]="'system.health.requests.route' | translate"
+                            ><span class="font-mono text-xs break-all">{{ r.method }} {{ r.path }}</span></nz-descriptions-item
+                        >
+                        <nz-descriptions-item [nzTitle]="'system.health.requests.status' | translate">
+                            @let s = statusStyle(r.status);
+                            <status-tag [label]="s.label" [tone]="s.tone" [icon]="s.icon" size="standard" />
+                        </nz-descriptions-item>
+                        <nz-descriptions-item [nzTitle]="'system.health.requests.duration' | translate"
+                            ><span class="font-mono">{{ r.duration_ms | digits }} ms</span></nz-descriptions-item
+                        >
+                        <nz-descriptions-item [nzTitle]="'system.health.requests.from' | translate">
+                            <span class="font-mono text-xs">{{ r.ip || '-' }}</span>
+                            @if (r.city || r.country) {
+                                <span class="text-ink-muted"> · {{ r.city }} {{ r.country }}</span>
+                            }
+                        </nz-descriptions-item>
+                        <nz-descriptions-item [nzTitle]="'system.health.requests.device' | translate">{{ deviceName(r.device) }}</nz-descriptions-item>
+                        <nz-descriptions-item [nzTitle]="'system.health.requests.requestId' | translate"
+                            ><span class="font-mono text-xs break-all">{{ r.oid }}</span></nz-descriptions-item
+                        >
+                    </nz-descriptions>
+
+                    <section>
+                        <h3 class="m-0 mb-1.5 text-xs font-semibold text-ink-muted">{{ 'system.health.requests.sent' | translate }}</h3>
+                        @if (r.request_body) {
+                            <pre class="m-0 max-h-72 overflow-auto rounded-control border border-line-soft bg-surface-sunken p-3 font-mono text-xs text-ink-body" data-body="request">{{ pretty(r.request_body) }}</pre>
+                        } @else {
+                            <p class="m-0 text-xs text-ink-muted">{{ 'system.health.requests.noBody' | translate }}</p>
+                        }
+                    </section>
+                    @if (r.response_body) {
+                        <section>
+                            <h3 class="m-0 mb-1.5 text-xs font-semibold text-ink-muted">{{ 'system.health.requests.answered' | translate }}</h3>
+                            <pre class="m-0 max-h-72 overflow-auto rounded-control border border-danger-border bg-danger-bg p-3 font-mono text-xs text-ink-body" data-body="response">{{ pretty(r.response_body) }}</pre>
+                        </section>
+                    }
+
+                    <section>
+                        <h3 class="m-0 mb-1.5 text-xs font-semibold text-ink-muted">{{ 'system.health.requests.caused' | translate }}</h3>
+                        @if (r.activity.length) {
+                            <ul class="m-0 flex list-none flex-col gap-2 p-0">
+                                @for (a of r.activity; track a.oid) {
+                                    <li class="rounded-control border border-line-soft px-3 py-2">
+                                        <p class="m-0 text-[13px] font-semibold text-ink">{{ a.title }}</p>
+                                        @if (a.description) {
+                                            <p class="m-0 text-xs text-ink-muted">{{ a.description }}</p>
+                                        }
+                                    </li>
+                                }
+                            </ul>
+                        } @else {
+                            <p class="m-0 text-xs text-ink-muted">{{ 'system.health.requests.noActivity' | translate }}</p>
+                        }
+                    </section>
+                </div>
+            } @else {
+                <nz-skeleton nzActive [nzParagraph]="{ rows: 8 }" />
+            }
+        } @else {
+            <nz-skeleton nzActive [nzParagraph]="{ rows: 8 }" />
+        }
+    </ng-container>
+</nz-drawer>

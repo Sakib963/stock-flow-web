@@ -1,0 +1,72 @@
+@if (usage.failed(); as failure) {
+    <div class="sf-empty rounded-container border border-line bg-white" role="alert" data-health="usage-failed">
+        <p>{{ 'system.health.failed.' + failure | translate }}</p>
+    </div>
+} @else if (usage.data(); as data) {
+    <div class="flex flex-col gap-2 transition-opacity md:gap-4 motion-reduce:transition-none" [class.opacity-60]="usage.loading()" data-health="usage">
+        <section class="grid grid-cols-1 gap-2 sm:grid-cols-3 md:gap-4">
+            <div class="rounded-container border border-line bg-white p-3 md:p-4" data-usage="last-active">
+                <p class="m-0 flex items-center gap-1.5 text-xs font-semibold text-ink-muted"><ng-icon name="lucideClock" size="14px" aria-hidden="true" />{{ 'system.health.usage.lastActive' | translate }}</p>
+                @if (data.last_active; as last) {
+                    <p class="mt-1.5 mb-0 text-xl font-bold text-ink">{{ last.occurred_on | recordDate: language() : 'relative' }}</p>
+                    <p class="mt-1 mb-0 truncate text-xs text-ink-muted" nz-tooltip [nzTooltipTitle]="last.method + ' ' + last.route">
+                        {{ last.name || last.email }} · <span class="font-mono">{{ last.method }} {{ last.route }}</span>
+                    </p>
+                } @else {
+                    <p class="mt-1.5 mb-0 text-sm text-ink-muted">{{ 'system.health.usage.neverActive' | translate }}</p>
+                }
+            </div>
+            <div class="rounded-container border border-line bg-white p-3 md:p-4" data-usage="requests">
+                <p class="m-0 flex items-center gap-1.5 text-xs font-semibold text-ink-muted"><ng-icon name="lucideZap" size="14px" aria-hidden="true" />{{ 'system.health.usage.requests' | translate }}</p>
+                <p class="mt-1.5 mb-0 font-mono text-2xl font-bold text-ink tabular-nums">{{ requests() | money: 'number' }}</p>
+            </div>
+            <div class="rounded-container border border-line bg-white p-3 md:p-4" data-usage="people">
+                <p class="m-0 flex items-center gap-1.5 text-xs font-semibold text-ink-muted"><ng-icon name="lucideUsers" size="14px" aria-hidden="true" />{{ 'system.health.usage.activePeople' | translate }}</p>
+                <p class="mt-1.5 mb-0 font-mono text-2xl font-bold text-ink tabular-nums">{{ data.people_count | money: 'number' }}</p>
+            </div>
+        </section>
+
+        <div class="grid grid-cols-1 gap-2 md:gap-4 lg:grid-cols-3">
+            <nz-card class="lg:col-span-2" [nzTitle]="'system.health.usage.byDay' | translate">
+                @if (data.daily.length) {
+                    <chart [options]="dailyChart()" [height]="240" [label]="'system.health.usage.byDay' | translate" />
+                } @else {
+                    <p class="m-0 text-xs text-ink-muted">{{ 'system.health.usage.none' | translate }}</p>
+                }
+            </nz-card>
+            <nz-card [nzTitle]="'system.health.usage.byMonthDay' | translate">
+                <chart [options]="monthChart()" [height]="240" [label]="'system.health.usage.byMonthDay' | translate" />
+            </nz-card>
+        </div>
+
+        <nz-card [nzTitle]="'system.health.usage.peopleTitle' | translate" [nzBodyStyle]="{ padding: '0' }">
+            @if (data.people.length) {
+                <ul class="m-0 list-none divide-y divide-line-soft p-0">
+                    @for (person of data.people; track person.oid) {
+                        <li class="flex items-center gap-3 px-4 py-2.5" [attr.data-person]="person.oid">
+                            <span class="min-w-0 flex-1">
+                                <span class="block truncate text-[13px] font-semibold text-ink">{{ person.name || person.email }}</span>
+                                <span class="block truncate text-xs text-ink-muted">{{ person.email }}</span>
+                            </span>
+                            <span class="text-right text-xs text-ink-muted">
+                                <span class="block font-mono text-sm font-bold text-ink tabular-nums">{{ person.requests | money: 'number' }}</span>
+                                {{ person.last_seen | recordDate: language() : 'relative' }}
+                            </span>
+                            <button nz-button type="button" class="inline-flex items-center justify-center" nz-tooltip [nzTooltipTitle]="'system.health.seeRequests' | translate" [attr.aria-label]="'system.health.seeRequests' | translate" (click)="openRequests.emit({ person: person.email ?? undefined })">
+                                <ng-icon name="lucideList" size="14px" aria-hidden="true" />
+                            </button>
+                        </li>
+                    }
+                </ul>
+            } @else {
+                <p class="m-0 px-4 py-6 text-center text-xs text-ink-muted">{{ 'system.health.usage.none' | translate }}</p>
+            }
+        </nz-card>
+    </div>
+} @else {
+    <div class="grid grid-cols-1 gap-2 sm:grid-cols-3 md:gap-4" role="status" [attr.aria-label]="'form.loading' | translate">
+        @for (i of [1, 2, 3]; track i) {
+            <nz-card><nz-skeleton nzActive [nzTitle]="{ width: '40%' }" [nzParagraph]="{ rows: 1 }" /></nz-card>
+        }
+    </div>
+}

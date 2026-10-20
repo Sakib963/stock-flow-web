@@ -13,7 +13,10 @@ export const USER_LIST: ListShellPageConfig = {
     permission: 'administration.user.view',
     header: {
         count: true,
-        actions: [{ key: 'create', label: 'administration.user.add', icon: 'lucideUserPlus', permission: 'administration.user.create', primary: true, run: { kind: 'navigate', route: USER_ROUTES.create } }],
+        actions: [
+            { key: 'sign-out-everyone', label: 'administration.user.signOutEveryone.button', icon: 'lucideLogOut', permission: 'administration.user.edit', run: { kind: 'emit' } },
+            { key: 'create', label: 'administration.user.add', icon: 'lucideUserPlus', permission: 'administration.user.create', primary: true, run: { kind: 'navigate', route: USER_ROUTES.create } },
+        ],
     },
     stats: [
         { key: 'active', label: 'administration.user.stat.active', icon: 'lucideCheck', tone: 'success' },

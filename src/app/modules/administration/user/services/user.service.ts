@@ -53,6 +53,10 @@ export class UserService {
         return this.send(APIEndpoint.SIGN_OUT_USER_EVERYWHERE, { oid });
     }
 
+    signOutEveryone(): Observable<{ people: number; devices: number }> {
+        return this.send(APIEndpoint.SIGN_OUT_EVERYONE, {});
+    }
+
     /** The field a 409 names: a taken email or phone. A stale save names none. */
     conflictOf(error: unknown): UserField | 'stale' | null {
         if (!(error instanceof HttpErrorResponse) || error.status !== 409) return null;

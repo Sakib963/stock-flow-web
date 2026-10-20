@@ -1,0 +1,52 @@
+<nz-card [nzBodyStyle]="{ padding: '0' }" data-health="metrics">
+    @if (metrics.failed(); as failure) {
+        <div class="sf-empty" role="alert">
+            <p>{{ 'system.health.failed.' + failure | translate }}</p>
+        </div>
+    } @else {
+        <nz-table #table [nzData]="metrics.data() ?? []" [nzLoading]="metrics.loading()" [nzPageSize]="50" [nzHideOnSinglePage]="true" nzSize="small" [nzScroll]="{ x: '900px' }" [nzNoResult]="empty">
+            <thead>
+                <tr>
+                    <th>{{ 'system.health.metrics.route' | translate }}</th>
+                    <th nzWidth="110px" nzAlign="right" [nzSortFn]="sort.calls" nzSortOrder="descend" [nzSortDirections]="['descend', 'ascend']">{{ 'system.health.metrics.calls' | translate }}</th>
+                    <th nzWidth="110px" nzAlign="right" [nzSortFn]="sort.average" [nzSortDirections]="['descend', 'ascend']">{{ 'system.health.metrics.average' | translate }}</th>
+                    <th nzWidth="110px" nzAlign="right" [nzSortFn]="sort.p95" [nzSortDirections]="['descend', 'ascend']">
+                        <span nz-tooltip [nzTooltipTitle]="'system.health.metrics.p95Hint' | translate">{{ 'system.health.metrics.p95' | translate }}</span>
+                    </th>
+                    <th nzWidth="110px" nzAlign="right" [nzSortFn]="sort.slowest" [nzSortDirections]="['descend', 'ascend']">{{ 'system.health.metrics.slowest' | translate }}</th>
+                    <th nzWidth="110px" nzAlign="right" [nzSortFn]="sort.errors" [nzSortDirections]="['descend', 'ascend']">{{ 'system.health.metrics.errors' | translate }}</th>
+                    <th nzWidth="110px" nzAlign="right" [nzSortFn]="sort.client" [nzSortDirections]="['descend', 'ascend']">{{ 'system.health.metrics.refused' | translate }}</th>
+                    <th nzWidth="56px">
+                        <span class="sr-only">{{ 'system.health.seeRequests' | translate }}</span>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (row of table.data; track row.method + row.route) {
+                    <tr [attr.data-route]="row.route">
+                        <td class="max-w-0">
+                            <span class="block truncate font-mono text-xs text-ink" nz-tooltip [nzTooltipTitle]="row.route"
+                                ><b class="mr-1.5 text-ink-muted">{{ row.method }}</b
+                                >{{ row.route }}</span
+                            >
+                        </td>
+                        <td nzAlign="right" class="font-mono tabular-nums">{{ row.calls | money: 'number' }}</td>
+                        <td nzAlign="right" class="font-mono tabular-nums">{{ row.average_ms | money: 'number' }} ms</td>
+                        <td nzAlign="right" class="font-mono tabular-nums" [class.text-warning-ink]="row.p95_ms >= 1000" [class.font-semibold]="row.p95_ms >= 1000">{{ row.p95_ms | money: 'number' }} ms</td>
+                        <td nzAlign="right" class="font-mono text-ink-muted tabular-nums">{{ row.slowest_ms | money: 'number' }} ms</td>
+                        <td nzAlign="right" class="font-mono tabular-nums" [class.text-danger-ink]="(row.error_rate ?? 0) > 0.01" [class.font-semibold]="(row.error_rate ?? 0) > 0.01">{{ (row.error_rate ?? 0) * 100 | number: '1.0-1' | digits }}%</td>
+                        <td nzAlign="right" class="font-mono text-ink-muted tabular-nums">{{ row.client_errors | money: 'number' }}</td>
+                        <td>
+                            <button nz-button type="button" class="inline-flex items-center justify-center" nz-tooltip [nzTooltipTitle]="'system.health.seeRequests' | translate" [attr.aria-label]="'system.health.seeRequests' | translate" (click)="openRequests.emit({ route: row.route })">
+                                <ng-icon name="lucideList" size="14px" aria-hidden="true" />
+                            </button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </nz-table>
+        <ng-template #empty>
+            <p class="m-0 py-6 text-center text-xs text-ink-muted">{{ 'system.health.none' | translate }}</p>
+        </ng-template>
+    }
+</nz-card>

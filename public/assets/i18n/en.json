@@ -5260,7 +5260,13 @@
             "lastUsed": "Last used",
             "noSessions": "Not signed in on any device.",
             "activity": "History",
-            "noActivity": "Nothing has changed yet."
+            "noActivity": "Nothing has changed yet.",
+            "signOutEveryone": {
+                "title": "Sign everyone out?",
+                "body": "Everyone you manage is signed out of every device now, and has to sign in again. You stay signed in. Use it when a password may have leaked.",
+                "button": "Sign everyone out",
+                "done": "Signed out {{people}} people from {{devices}} devices."
+            }
         }
     },
     "access": {
@@ -5281,6 +5287,121 @@
             "convert": "Convert",
             "reset-password": "Reset password",
             "reverse": "Reverse"
+        }
+    },
+    "system": {
+        "health": {
+            "title": "System health",
+            "lead": "How this business uses StockFlow, how the API behaves, and whether anyone is taking data.",
+            "when": "Period",
+            "tab": {
+                "usage": "Usage",
+                "metrics": "API speed",
+                "requests": "Requests",
+                "signals": "Security",
+                "database": "Database",
+                "crashes": "Crashes"
+            },
+            "failed": {
+                "network": "This could not be loaded. Check your connection and try again.",
+                "forbidden": "You do not have permission to see system health.",
+                "server": "This could not be loaded. Try again in a moment."
+            },
+            "none": "Nothing was recorded in this period.",
+            "seeRequests": "See the requests",
+            "usage": {
+                "lastActive": "Last active",
+                "neverActive": "Nobody has signed in yet.",
+                "requests": "Requests",
+                "activePeople": "People active",
+                "people": "People",
+                "byDay": "Requests and people by day",
+                "byMonthDay": "By day of the month",
+                "peopleTitle": "Who used it",
+                "none": "Nobody used StockFlow in this period."
+            },
+            "metrics": {
+                "route": "Route",
+                "calls": "Calls",
+                "average": "Average",
+                "p95": "Slow tail",
+                "p95Hint": "95 in every 100 calls were at least this fast",
+                "slowest": "Slowest",
+                "errors": "Failed",
+                "refused": "Refused"
+            },
+            "requests": {
+                "person": "Email",
+                "personPlaceholder": "cashier@example.com",
+                "status": "Answer",
+                "statusClass": {
+                    "2xx": "Worked (2xx)",
+                    "3xx": "Unchanged (3xx)",
+                    "4xx": "Refused (4xx)",
+                    "5xx": "Failed (5xx)"
+                },
+                "route": "Route",
+                "routePlaceholder": "/api/v1/sales/order/get-order-list",
+                "ip": "Address",
+                "ipPlaceholder": "203.0.113.9",
+                "requestId": "Request id",
+                "requestIdPlaceholder": "d59d2485-9236-45b6-b17a-6803b8e6c961",
+                "when": "When",
+                "duration": "Took",
+                "from": "From",
+                "device": "Device",
+                "open": "Open the request",
+                "signedOut": "Not signed in",
+                "detailTitle": "Request",
+                "sent": "What was sent",
+                "answered": "What the server answered",
+                "caused": "What it changed",
+                "noBody": "Nothing was sent: a read carries no body.",
+                "noActivity": "It changed nothing in the business.",
+                "who": "Who",
+                "emptyTitle": "Nothing recorded",
+                "durationMs": "Took (ms)"
+            },
+            "signals": {
+                "matched": "{{count}} to look at",
+                "clear": "Nothing found",
+                "list_sweeping": {
+                    "title": "Lists read in bulk",
+                    "means": "One account read more than {{threshold}} lists within an hour. It may be someone copying data out page by page."
+                },
+                "many_addresses": {
+                    "title": "One account, many places",
+                    "means": "One account was used from more than {{threshold}} addresses in a day. It may mean a shared password or a copied session."
+                },
+                "off_hours": {
+                    "title": "Work at night",
+                    "means": "Requests between {{from}} and {{to}} on the business clock, when nobody is usually at work."
+                },
+                "refusal_burst": {
+                    "title": "Repeated refusals",
+                    "means": "More than {{threshold}} refused requests from one address within 15 minutes. It may be someone guessing passwords or probing the API."
+                },
+                "export_taken": {
+                    "title": "Reports downloaded",
+                    "means": "Every report or export taken in the period. These are the largest amounts of data the app hands out."
+                }
+            },
+            "database": {
+                "size": "Database size",
+                "lasts": "At the current rate the storage lasts about {{years}} more years.",
+                "lastsUnknown": "Not enough history yet to say how long the storage lasts.",
+                "tableRows": "{{rows}} rows",
+                "connections": "Connections in use",
+                "connectionsHint": "The plan allows this many at once. The count may miss sessions the app cannot see.",
+                "rowsPerDay": "Requests recorded per day, last 30 days",
+                "lastsUnderYear": "At the current rate the storage runs out within a year."
+            },
+            "crashes": {
+                "page": "Page",
+                "error": "What broke",
+                "open": "Open the crash",
+                "none": "No page broke on anyone in this period."
+            }
         }
     }
 }

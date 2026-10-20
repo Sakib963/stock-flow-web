@@ -52,6 +52,7 @@ import {
     lucideMinus,
     lucideUsers,
     lucideUserPlus,
+    lucideLogOut,
 } from '@ng-icons/lucide';
 
 /**
@@ -62,6 +63,7 @@ import {
  * change as the config that first names it; `isListIcon` lets a spec or a component check a name.
  */
 export const LIST_ICONS = {
+    lucideLogOut,
     lucideArchive,
     lucideArrowUpDown,
     lucideGift,
