@@ -1,5 +1,5 @@
-<page-header [title]="greeting()" [lead]="lead()">
-    <div class="flex flex-wrap items-center gap-2">
+<welcome [data]="data()" [period]="period()">
+    <div class="flex flex-wrap items-center gap-2 max-md:justify-between">
         @if (showPeriod()) {
             <nz-segmented [ngModel]="period()" (ngModelChange)="pick($event)" [nzDisabled]="loading()" [attr.aria-label]="'dashboard.period.label' | translate" data-dashboard="period">
                 @for (p of periods; track p) {
@@ -7,13 +7,11 @@
                 }
             </nz-segmented>
         }
-        <button nz-button nzType="default" type="button" class="inline-flex items-center gap-1.5" [nzLoading]="loading()" (click)="load()" [attr.aria-label]="'dashboard.refresh' | translate" nz-tooltip [nzTooltipTitle]="'dashboard.refresh' | translate" data-dashboard="refresh">
-            @if (!loading()) {
-                <ng-icon name="lucideRefreshCw" size="14px" aria-hidden="true" />
-            }
+        <button nz-button nzType="default" type="button" class="inline-flex size-8 items-center justify-center p-0" [disabled]="loading()" [attr.aria-busy]="loading()" (click)="load()" [attr.aria-label]="'dashboard.refresh' | translate" nz-tooltip [nzTooltipTitle]="'dashboard.refresh' | translate" data-dashboard="refresh">
+            <ng-icon name="lucideRefreshCw" size="14px" class="motion-reduce:animate-none" [class.animate-spin]="loading()" aria-hidden="true" />
         </button>
     </div>
-</page-header>
+</welcome>
 
 @if (failed() && !data()) {
     <div class="sf-empty" role="alert">
@@ -58,10 +56,15 @@
             } @else if (attention(); as rows) {
                 <needs-attention [rows]="rows" />
             }
+            @if (workFailed()) {
+                <ng-container [ngTemplateOutlet]="sectionFailed" />
+            } @else if (work(); as mine) {
+                <your-work [work]="mine" />
+            }
             @if (businessFailed()) {
                 <ng-container [ngTemplateOutlet]="sectionFailed" />
             } @else if (business(); as figures) {
-                <business-glance [data]="figures" [period]="period()" [from]="data()!.period.date_from" [to]="data()!.period.date_to" />
+                <business-glance [data]="figures" [period]="period()" [range]="data()!.period" />
             }
             @if (stockFailed()) {
                 <ng-container [ngTemplateOutlet]="sectionFailed" />

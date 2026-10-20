@@ -1,3 +1,5 @@
+import { ActivityEntry } from '@app/core/models/activity-log.model';
+
 export type DashboardPeriod = 'today' | 'week' | 'month';
 
 /** A section that could not be read says so in its place; the rest of the page still shows. */
@@ -11,20 +13,7 @@ export interface ForYou {
     drafts: { parked: number; online: number };
 }
 
-export type AttentionKey =
-    | 'orders_to_confirm'
-    | 'orders_to_dispatch'
-    | 'parcels_with_courier'
-    | 'returns_to_confirm'
-    | 'pre_orders_ready'
-    | 'pre_orders_overdue'
-    | 'purchase_orders_to_verify'
-    | 'disposals_to_approve'
-    | 'adjustments_to_verify'
-    | 'out_of_stock'
-    | 'low_on_stock'
-    | 'expiring'
-    | 'posts_past_due';
+export type AttentionKey = 'orders_to_confirm' | 'orders_to_dispatch' | 'parcels_with_courier' | 'returns_to_confirm' | 'pre_orders_ready' | 'pre_orders_overdue' | 'purchase_orders_to_verify' | 'disposals_to_approve' | 'adjustments_to_verify' | 'out_of_stock' | 'low_on_stock' | 'expiring' | 'posts_past_due';
 
 export interface AttentionRow {
     key: AttentionKey;
@@ -48,6 +37,8 @@ export interface Business {
     units_without_cost: number;
     /** Only the days that had sales; the page fills the rest. Empty for a single day. */
     daily: { day: string; sales: number; profit: number }[];
+    previous_daily: { day: string; sales: number; profit: number }[];
+    by_channel: { channel: 'POS' | 'ONLINE'; sales: number }[];
     top: { oid: string; name: string; photo_thumb: string | null; units: number; sales: number }[];
 }
 
@@ -58,10 +49,19 @@ export interface StockGlance {
     unpriced_batches: number;
 }
 
+export interface YourWork {
+    today: number;
+    active_days: number;
+    streak: number;
+    week: { day: number; hour: number; count: number }[];
+    recent: Pick<ActivityEntry, 'oid' | 'reference_type' | 'reference_oid' | 'title' | 'description' | 'performed_on' | 'area' | 'record_exists'>[];
+}
+
 export interface Dashboard {
     period: { key: DashboardPeriod; date_from: string; date_to: string; previous_from: string; previous_to: string };
     /** Null when the person holds none of the features it summarises. */
     for_you: ForYou | FailedSection | null;
+    your_work: YourWork | FailedSection | null;
     attention: AttentionRow[] | FailedSection | null;
     business: Business | FailedSection | null;
     stock: StockGlance | FailedSection | null;

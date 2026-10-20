@@ -8,19 +8,18 @@ import { NzCardModule } from 'ng-zorro-antd/card';
 import { NzSegmentedModule } from 'ng-zorro-antd/segmented';
 import { NzSkeletonModule } from 'ng-zorro-antd/skeleton';
 import { NzTooltipModule } from 'ng-zorro-antd/tooltip';
-import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import { RequestFailure } from '@app/core/models/api.model';
-import { AttentionRow, Business, Dashboard, DashboardPeriod, FailedSection, ForYou, StockGlance } from '@app/core/models/dashboard.model';
-import { LanguageService } from '@app/core/services/language/language.service';
+import { AttentionRow, Business, Dashboard, DashboardPeriod, FailedSection, ForYou, StockGlance, YourWork } from '@app/core/models/dashboard.model';
 import { SessionService } from '@app/core/services/session/session.service';
 import { BusinessGlanceComponent } from '@app/modules/dashboard/components/business-glance/business-glance.component';
 import { StockGlanceComponent } from '@app/modules/dashboard/components/stock-glance/stock-glance.component';
 import { ForYouComponent } from '@app/modules/dashboard/components/for-you/for-you.component';
 import { NeedsAttentionComponent } from '@app/modules/dashboard/components/needs-attention/needs-attention.component';
+import { WelcomeComponent } from '@app/modules/dashboard/components/welcome/welcome.component';
+import { YourWorkComponent } from '@app/modules/dashboard/components/your-work/your-work.component';
 import { PERIOD_STORAGE_KEY, QUICK_ACTIONS } from '@app/modules/dashboard/constants/dashboard';
 import { DashboardService } from '@app/modules/dashboard/services/dashboard.service';
-import { PageHeaderComponent } from '@app/shared/components/page-header/page-header.component';
-import { RecordDatePipe } from '@app/shared/pipes/record-date/record-date.pipe';
 import { failureOf } from '@app/shared/utils/request-failure/request-failure';
 
 const PERIODS: readonly DashboardPeriod[] = ['today', 'week', 'month'];
@@ -44,18 +43,15 @@ const storedPeriod = (): DashboardPeriod => {
  */
 @Component({
     selector: 'dashboard',
-    imports: [NgTemplateOutlet, FormsModule, NgIcon, NzButtonModule, NzCardModule, NzSegmentedModule, NzSkeletonModule, NzTooltipModule, TranslatePipe, PageHeaderComponent, ForYouComponent, NeedsAttentionComponent, BusinessGlanceComponent, StockGlanceComponent],
-    providers: [RecordDatePipe, provideIcons({ lucideRefreshCw, lucideRotateCw, lucideSparkles })],
+    imports: [NgTemplateOutlet, FormsModule, NgIcon, NzButtonModule, NzCardModule, NzSegmentedModule, NzSkeletonModule, NzTooltipModule, TranslatePipe, WelcomeComponent, ForYouComponent, NeedsAttentionComponent, YourWorkComponent, BusinessGlanceComponent, StockGlanceComponent],
+    providers: [provideIcons({ lucideRefreshCw, lucideRotateCw, lucideSparkles })],
     templateUrl: './dashboard.component.html',
     styleUrl: './dashboard.component.scss',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DashboardComponent {
     private readonly _dashboard = inject(DashboardService);
-    private readonly _translate = inject(TranslateService);
-    private readonly _dates = inject(RecordDatePipe);
     readonly session = inject(SessionService);
-    readonly language = inject(LanguageService).current;
 
     readonly periods = PERIODS;
     readonly period = signal<DashboardPeriod>(storedPeriod());
@@ -64,24 +60,16 @@ export class DashboardComponent {
     readonly failed = signal<RequestFailure | null>(null);
     private _loadedAt = 0;
 
-    readonly greeting = computed(() => {
-        this.language();
-        const hour = new Date().getHours();
-        const part = hour < 12 ? 'morning' : hour < 17 ? 'afternoon' : 'evening';
-        const first = (this.session.user()?.name ?? '').trim().split(/\s+/)[0] ?? '';
-        return this._translate.instant(`dashboard.greeting.${part}`, { name: first });
-    });
-    readonly lead = computed(() => {
-        const today = this._dates.transform(new Date().toISOString(), this.language(), 'date');
-        const business = this.session.business()?.name;
-        return business ? `${today} · ${business}` : today;
-    });
-
     readonly forYou = computed<ForYou | null>(() => {
         const section = this.data()?.for_you;
         return section && !isFailed(section) ? section : null;
     });
     readonly forYouFailed = computed(() => isFailed(this.data()?.for_you));
+    readonly work = computed<YourWork | null>(() => {
+        const section = this.data()?.your_work;
+        return section && !isFailed(section) ? section : null;
+    });
+    readonly workFailed = computed(() => isFailed(this.data()?.your_work));
     readonly attention = computed<AttentionRow[] | null>(() => {
         const section = this.data()?.attention;
         return section && !isFailed(section) ? section : null;
@@ -101,7 +89,7 @@ export class DashboardComponent {
     readonly hasActions = computed(() => QUICK_ACTIONS.some((action) => this.session.can(action.permission)));
     readonly hasLeft = computed(() => !!this.forYou() || this.forYouFailed() || this.hasActions());
     readonly showPeriod = computed(() => !!this.forYou() || !!this.business());
-    readonly nothing = computed(() => !!this.data() && !this.hasLeft() && this.attention() === null && !this.attentionFailed() && !this.business() && !this.businessFailed() && !this.stock() && !this.stockFailed());
+    readonly nothing = computed(() => !!this.data() && !this.hasLeft() && !this.work() && !this.workFailed() && this.attention() === null && !this.attentionFailed() && !this.business() && !this.businessFailed() && !this.stock() && !this.stockFailed());
 
     constructor() {
         this.load();

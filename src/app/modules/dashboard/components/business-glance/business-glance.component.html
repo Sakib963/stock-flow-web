@@ -32,15 +32,52 @@
         }
     </div>
 
-    <!-- The chart and the top products share one fixed height, so the two end level by design. -->
-    <div class="mt-3 grid grid-cols-1 gap-3 md:mt-4 md:gap-4" [class.lg:grid-cols-3]="hasChart()">
+    @if (channels().length) {
+        <div class="mt-3 md:mt-4" data-dashboard="channels">
+            <div class="flex h-2 gap-0.5 overflow-hidden rounded-full" role="img" [attr.aria-label]="'dashboard.business.channels' | translate">
+                @for (row of channels(); track row.channel) {
+                    <span class="h-full" [class]="row.channel === 'POS' ? 'bg-primary' : 'bg-primary/40'" [style.width.%]="row.share"></span>
+                }
+            </div>
+            <div class="mt-1.5 flex flex-wrap gap-x-4 gap-y-1 text-xs text-ink-muted">
+                @for (row of channels(); track row.channel) {
+                    <span class="inline-flex items-center gap-1.5" [attr.data-channel]="row.channel">
+                        <span class="size-2 rounded-full" [class]="row.channel === 'POS' ? 'bg-primary' : 'bg-primary/40'" aria-hidden="true"></span>
+                        <span>{{ 'dashboard.business.channel.' + row.channel | translate }}</span>
+                        <span class="font-mono font-semibold text-ink tabular-nums">{{ row.sales | money }}</span>
+                        <span class="tabular-nums">{{ row.share | digits }}%</span>
+                    </span>
+                }
+            </div>
+        </div>
+    }
+
+    <div class="mt-3 grid grid-cols-1 gap-3 md:mt-4 md:gap-4" [class.lg:grid-cols-5]="hasChart()">
         @if (hasChart()) {
-            <section class="min-w-0 lg:col-span-2" data-dashboard="chart">
-                <h3 class="m-0 text-xs font-semibold text-ink-muted">{{ 'dashboard.business.byDay' | translate }}</h3>
-                <div class="mt-2 flex h-44 items-end gap-0.5 border-b border-line pb-px" role="img" [attr.aria-label]="'dashboard.business.byDay' | translate">
-                    @for (bar of bars(); track bar.day) {
-                        <div class="flex h-full min-w-0 flex-1 items-end" nz-tooltip [nzTooltipTitle]="(bar.day | recordDate: language() : 'date') + ': ' + (bar.sales | money)">
-                            <div class="w-full rounded-t-sm transition-colors motion-reduce:transition-none" [class]="bar.sales ? 'bg-ink-faint hover:bg-primary' : 'bg-line-soft'" [style.height.%]="bar.sales ? bar.height : 2" [attr.data-bar]="bar.day"></div>
+            @let shown = readout();
+            <section class="min-w-0 lg:col-span-3" data-dashboard="chart">
+                <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+                    <h3 class="m-0 text-xs font-semibold text-ink-muted">{{ 'dashboard.business.byDay' | translate }}</h3>
+                    <p class="m-0 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-ink-muted" data-dashboard="readout">
+                        <span class="font-semibold text-ink">{{ shown.day ? (shown.day | recordDate: language() : 'date') : ('dashboard.business.wholePeriod' | translate) }}</span>
+                        <span class="inline-flex items-center gap-1"
+                            ><span class="size-2 rounded-xs bg-primary/30" aria-hidden="true"></span>{{ 'dashboard.business.sales' | translate }} <b class="font-mono text-ink tabular-nums">{{ shown.sales | money }}</b></span
+                        >
+                        <span class="inline-flex items-center gap-1"
+                            ><span class="size-2 rounded-xs bg-primary" aria-hidden="true"></span>{{ 'dashboard.business.profit' | translate }} <b class="font-mono text-ink tabular-nums">{{ shown.profit | money }}</b></span
+                        >
+                        <span class="inline-flex items-center gap-1"
+                            ><span class="size-2 rounded-xs bg-line" aria-hidden="true"></span>{{ shown.beforeDay ? (shown.beforeDay | recordDate: language() : 'date') : ('dashboard.business.before' | translate) }} <b class="font-mono text-ink tabular-nums">{{ shown.before | money }}</b></span
+                        >
+                    </p>
+                </div>
+                <div class="mt-2 flex h-44 items-end gap-0.5 border-b border-line pb-px" role="group" [attr.aria-label]="'dashboard.business.byDay' | translate" (pointerleave)="$event.pointerType === 'mouse' && hovered.set(null)">
+                    @for (bar of bars(); track bar.day; let i = $index) {
+                        <div class="relative flex h-full min-w-0 flex-1 items-end justify-center rounded-t-sm outline-none focus-visible:shadow-[0_0_0_2px_rgb(74_63_191/0.22)]" tabindex="0" [attr.aria-label]="(bar.day | recordDate: language() : 'date') + ': ' + (bar.sales | money)" (pointerenter)="hovered.set(i)" (pointerdown)="hovered.set(i)" (focus)="hovered.set(i)" (blur)="hovered.set(null)" [attr.data-bar]="bar.day">
+                            <span class="absolute inset-x-0 bottom-0 rounded-t-sm bg-line" [style.height.%]="bar.beforeHeight" data-before></span>
+                            <span class="relative flex w-3/5 flex-col justify-end overflow-hidden rounded-t-sm bg-primary/30 transition-opacity motion-reduce:transition-none" [class.opacity-50]="hovered() !== null && hovered() !== i" [style.height.%]="bar.height">
+                                <span class="w-full bg-primary" [style.height.%]="bar.profitShare"></span>
+                            </span>
                         </div>
                     }
                 </div>
@@ -50,21 +87,30 @@
                 </div>
             </section>
         }
-        <section class="min-w-0" data-dashboard="top">
+        <section class="min-w-0 lg:col-span-2" data-dashboard="top">
             <h3 class="m-0 flex items-center gap-1.5 text-xs font-semibold text-ink-muted"><ng-icon name="lucideTrophy" size="13px" aria-hidden="true" />{{ 'dashboard.business.top' | translate }}</h3>
-            @if (data().top.length) {
-                <ol class="mt-2 mb-0 flex list-none flex-col gap-1 p-0" [class.md:grid]="!hasChart()" [class.md:grid-cols-2]="!hasChart()" [class.md:gap-x-4]="!hasChart()">
-                    @for (product of data().top; track product.oid; let i = $index) {
-                        <li class="flex h-8 items-center gap-2 text-[13px]" [attr.data-top]="product.oid">
+            @if (top().length) {
+                <ol class="mt-2 mb-0 flex list-none flex-col gap-2 p-0" [class.md:grid]="!hasChart()" [class.md:grid-cols-2]="!hasChart()" [class.md:gap-x-6]="!hasChart()">
+                    @for (product of top(); track product.oid; let i = $index) {
+                        <li class="flex items-center gap-2.5 text-[13px]" [attr.data-top]="product.oid">
                             <span class="w-4 flex-none text-right text-xs font-semibold text-ink-muted tabular-nums">{{ i + 1 | digits }}</span>
-                            @if (product.photo_thumb) {
-                                <img [src]="product.photo_thumb" alt="" class="size-6 flex-none rounded-sm border border-line-soft object-cover" />
-                            } @else {
-                                <span class="size-6 flex-none rounded-sm bg-surface-sunken" aria-hidden="true"></span>
-                            }
-                            <span class="min-w-0 flex-1 truncate font-semibold text-ink" nz-tooltip [nzTooltipTitle]="product.name">{{ product.name }}</span>
-                            <span class="flex-none text-xs text-ink-muted tabular-nums">{{ 'dashboard.business.units' | translate: { count: product.units } | digits }}</span>
-                            <span class="w-24 flex-none text-right font-mono font-semibold text-ink tabular-nums">{{ product.sales | money }}</span>
+                            <span class="flex size-8 flex-none items-center justify-center overflow-hidden rounded-control border border-line-soft bg-surface-sunken">
+                                @if (product.photo_thumb) {
+                                    <img [src]="product.photo_thumb" alt="" loading="lazy" class="size-full object-cover" />
+                                } @else {
+                                    <ng-icon name="lucidePackage" size="15px" class="text-ink-faint" aria-hidden="true" />
+                                }
+                            </span>
+                            <span class="min-w-0 flex-1">
+                                <span class="flex items-baseline gap-2">
+                                    <span class="line-clamp-2 min-w-0 flex-1 font-semibold text-ink">{{ product.name }}</span>
+                                    <span class="flex-none font-mono font-semibold text-ink tabular-nums">{{ product.sales | money }}</span>
+                                </span>
+                                <span class="mt-1 flex items-center gap-2 text-[11px] text-ink-muted">
+                                    <span class="h-1 flex-1 overflow-hidden rounded-full bg-line-soft" aria-hidden="true"><span class="block h-full rounded-full bg-primary/60" [style.width.%]="product.share"></span></span>
+                                    <span class="flex-none tabular-nums" data-share>{{ 'dashboard.business.units' | translate: { count: product.units } | digits }} · {{ 'dashboard.business.share' | translate: { percent: product.share } | digits }}</span>
+                                </span>
+                            </span>
                         </li>
                     }
                 </ol>

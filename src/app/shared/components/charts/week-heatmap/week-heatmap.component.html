@@ -9,7 +9,7 @@
         <span class="text-[11px] leading-none text-ink-muted">{{ row.label }}</span>
         <div class="grid grid-cols-24 gap-[3px]">
             @for (cell of row.cells; track cell.hour) {
-                <span class="aspect-square min-w-0 rounded-[2px]" [class]="cell.shade" nz-tooltip [nzTooltipTitle]="cell.tip" [attr.data-count]="cell.count"></span>
+                <span class="min-w-0 rounded-[2px]" [class.aspect-square]="!rowHeight()" [style.height.px]="rowHeight()" [class]="cell.shade" nz-tooltip [nzTooltipTitle]="cell.tip" [attr.data-count]="cell.count"></span>
             }
         </div>
     }

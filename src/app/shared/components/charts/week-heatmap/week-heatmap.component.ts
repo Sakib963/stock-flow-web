@@ -37,6 +37,7 @@ export class WeekHeatmapComponent {
     readonly cellKey = input.required<string>();
     /** A copy key naming the chart for a screen reader. */
     readonly label = input.required<string>();
+    readonly rowHeight = input<number | null>(null);
 
     readonly marks = [0, 6, 12, 18];
 

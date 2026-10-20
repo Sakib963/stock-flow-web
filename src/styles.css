@@ -315,6 +315,11 @@ body.lang-bn {
     align-items: center;
 }
 
+/* Ant forces a link button's padding-top to 0.01px; match the bottom so the label is centred. */
+a.ant-btn {
+    padding-bottom: 0;
+}
+
 /* The image preview centres its picture as an inline-block beside a 50% tall ::before strut.
    Tailwind's preflight makes every img a block, which drops the picture under the strut, so a
    zoomed product photo landed small in the bottom left corner. */

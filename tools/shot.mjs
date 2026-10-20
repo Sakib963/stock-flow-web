@@ -292,6 +292,64 @@ const MOVES = [
     MOVE('m-1', '2026-09-30T09:00:00.000', 'carried_over', 12, 12, null, { batch_code: 'B-R4ZS-9WDN', warehouse_name: 'Online store room', created_by: 'System', created_by_name: null }),
 ];
 
+const DASHBOARD = {
+    period: { key: 'week', date_from: '2026-10-14', date_to: '2026-10-20', previous_from: '2026-10-07', previous_to: '2026-10-13' },
+    for_you: { counter: { sales: 18450, orders: 9, previous_sales: 15200, previous_orders: 8 }, online: { entered: 14, sold: 11, previous_entered: 12 }, drafts: { parked: 1, online: 2 } },
+    your_work: {
+        today: 12,
+        active_days: 21,
+        streak: 6,
+        week: [6, 7, 1, 2, 3, 4, 5].flatMap((day) => Array.from({ length: 11 }, (_, i) => ({ day, hour: 10 + i, count: Math.max(0, Math.round((day === 6 || day === 5 ? 9 : 5) * Math.sin(((i + 1) / 12) * Math.PI) - (day === 5 ? 3 : 0))) })).filter((c) => c.count)),
+        recent: [
+            { oid: 'a-1', reference_type: 'order', reference_oid: 'o-1', title: 'Sold at the counter', description: 'INV-1231: 3 items, 2,450.00 paid in cash', performed_on: new Date(Date.now() - 12 * 60_000).toISOString(), area: 'sales', record_exists: true },
+            { oid: 'a-2', reference_type: 'order', reference_oid: 'o-2', title: 'Online order confirmed', description: 'INV-1229 for Nusrat Jahan, Mirpur', performed_on: new Date(Date.now() - 50 * 60_000).toISOString(), area: 'sales', record_exists: true },
+            { oid: 'a-3', reference_type: 'product', reference_oid: 'p-1', title: 'Updated product', description: 'Cotton Kurti, maroon: selling price 1,200.00', performed_on: new Date(Date.now() - 3 * 3_600_000).toISOString(), area: 'configuration', record_exists: true },
+            { oid: 'a-4', reference_type: 'purchase-order', reference_oid: 'po-ver', title: 'Delivery verified', description: 'PO-2610-0070: 10 of 10 units received, 1 batch created', performed_on: new Date(Date.now() - 5 * 3_600_000).toISOString(), area: 'inventory', record_exists: true },
+            { oid: 'a-5', reference_type: 'product-dispose', reference_oid: 'd-1', title: 'Disposal approved', description: 'DSP-0014: 1 unit damaged in transit', performed_on: new Date(Date.now() - 30 * 3_600_000).toISOString(), area: 'inventory', record_exists: false },
+        ],
+    },
+    attention: [
+        { key: 'orders_to_confirm', count: 4, oldest_on: '2026-10-19T09:00:00.000' },
+        { key: 'orders_to_dispatch', count: 3 },
+        { key: 'returns_to_confirm', count: 1, parcels: 1 },
+        { key: 'low_on_stock', count: 6 },
+    ],
+    business: {
+        current: { sales: 84250, profit: 23900, orders: 41, average: 2055 },
+        previous: { sales: 71300, profit: 20150, orders: 37, average: 1927 },
+        units_without_cost: 0,
+        daily: [
+            { day: '2026-10-14', sales: 9800, profit: 2700 },
+            { day: '2026-10-15', sales: 12400, profit: 3600 },
+            { day: '2026-10-16', sales: 8100, profit: 2200 },
+            { day: '2026-10-18', sales: 21500, profit: 6400 },
+            { day: '2026-10-19', sales: 17300, profit: 4900 },
+            { day: '2026-10-20', sales: 15150, profit: 4100 },
+        ],
+        previous_daily: [
+            { day: '2026-10-07', sales: 7200, profit: 1900 },
+            { day: '2026-10-08', sales: 9900, profit: 2600 },
+            { day: '2026-10-09', sales: 11800, profit: 3100 },
+            { day: '2026-10-10', sales: 6400, profit: 1500 },
+            { day: '2026-10-11', sales: 15600, profit: 4300 },
+            { day: '2026-10-12', sales: 12300, profit: 3400 },
+            { day: '2026-10-13', sales: 8100, profit: 2200 },
+        ],
+        by_channel: [
+            { channel: 'ONLINE', sales: 31950 },
+            { channel: 'POS', sales: 52300 },
+        ],
+        top: [
+            { oid: 'p-1', name: 'Cotton Kurti, maroon', photo_thumb: thumb(PHOTO), units: 18, sales: 21600 },
+            { oid: 'p-3', name: 'Aloe Vera Moisturiser', photo_thumb: null, units: 12, sales: 14400 },
+            { oid: 'p-2', name: 'Woolen Scarf', photo_thumb: null, units: 9, sales: 8100 },
+            { oid: 'p-4', name: 'Heartleaf Pore Deep Cleansing Foam 150ml', photo_thumb: null, units: 4, sales: 5400 },
+            { oid: 'p-5', name: 'Delivery pouch, large', photo_thumb: null, units: 30, sales: 1800 },
+        ],
+    },
+    stock: { stock_value: 412300, expected_revenue: 688900, profit_full: 276600, unpriced_batches: 2 },
+};
+
 const answer = (request, data, extra = {}) => ({ status: 200, headers: cors(request), body: JSON.stringify({ code: 200, message: 'ok', data, ...extra }) });
 
 // Matched on the API path, not the host: a production build points at the deployed server, so
@@ -385,6 +443,7 @@ function handle(request) {
             history: { orders: 5, sales: 4, lifetime_value: 9200, average_order: 1840, delivered: 4, refused_parcels: 1, delivered_rate: 80, last_order_on: '2026-09-28T10:00:00.000', owed: 0, cancelled_fake_or_unreachable: 0 },
             last_orders: [1, 2, 3, 4, 5].map((n) => ({ oid: 'o-' + n, invoice_no: '26092800' + n, channel: 'ONLINE', status: n === 2 ? 'Returned' : 'Delivered', payment_status: 'paid', total_amount: 1200 + n * 150, created_on: '2026-09-2' + n + 'T10:00:00.000', delivery_status: null })),
         });
+    if (url.includes('/get-dashboard')) return answer(request, DASHBOARD);
     if (url.includes('/get-user-card')) return answer(request, { name: 'Ahmad Saif', email: 'ahmad@arithmalabs.test', designation: 'Manager', role: 'Manager', photo: null, active: true });
     console.log('  unmocked API call:', url);
     return answer(request, {});

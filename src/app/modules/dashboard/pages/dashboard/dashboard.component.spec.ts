@@ -21,7 +21,7 @@ const open = async (data: Partial<Dashboard>, held: string[] = []) => {
     fixture.detectChanges();
     TestBed.inject(HttpTestingController)
         .expectOne((r) => r.url.endsWith('/get-dashboard') && r.params.get('period') === 'today')
-        .flush({ data: { period: PERIOD, for_you: null, attention: null, ...data } });
+        .flush({ data: { period: PERIOD, for_you: null, your_work: null, attention: null, ...data } });
     fixture.detectChanges();
     return fixture;
 };
@@ -73,7 +73,12 @@ describe('DashboardComponent', () => {
                 previous: { sales: 1000, profit: 0, orders: 4, average: 250 },
                 units_without_cost: 2,
                 daily: [{ day: '2026-10-15', sales: 2000, profit: 800 }],
-                top: [{ oid: 'p1', name: 'Kurti', photo_thumb: null, units: 4, sales: 2000 }],
+                previous_daily: [{ day: '2026-10-08', sales: 1000, profit: 300 }],
+                top: [{ oid: 'p1', name: 'Kurti', photo_thumb: null, units: 4, sales: 500 }],
+                by_channel: [
+                    { channel: 'ONLINE', sales: 500 },
+                    { channel: 'POS', sales: 1500 },
+                ],
             },
         });
         const host: HTMLElement = fixture.nativeElement;
@@ -82,7 +87,75 @@ describe('DashboardComponent', () => {
         expect(q(host, '[data-tile="profit"] [data-change]')).toBeNull();
         expect(q(host, '[data-note="without-cost"]')).not.toBeNull();
         expect(q(host, '[data-top="p1"]')).not.toBeNull();
+        expect(q(host, '[data-top="p1"] ng-icon[name="lucidePackage"] svg')).not.toBeNull();
+        expect(q(host, '[data-top="p1"] [aria-hidden] > span')?.getAttribute('style')).toContain('25%');
+        expect(q(host, '[data-bar="2026-10-15"] [data-before]')?.getAttribute('style')).toContain('50%');
+        expect(q(host, '[data-channel="POS"]')?.textContent).toContain('75');
+        expect(q(host, '[data-dashboard="readout"]')?.textContent).toContain('dashboard.business.wholePeriod');
+        (q(host, '[data-bar="2026-10-15"]') as HTMLElement).dispatchEvent(new Event('pointerenter'));
+        fixture.detectChanges();
+        expect(q(host, '[data-dashboard="readout"]')?.textContent).not.toContain('dashboard.business.wholePeriod');
         expect(q(host, '[data-dashboard="period"]')).not.toBeNull();
+    });
+
+    it('greets with the date, sums up the day in a sentence and names the first thing waiting', async () => {
+        const host: HTMLElement = (
+            await open({
+                for_you: { counter: { sales: 1800, orders: 3, previous_sales: 1200, previous_orders: 2 }, online: null, drafts: { parked: 0, online: 0 } },
+                attention: [
+                    { key: 'low_on_stock', count: 6 },
+                    { key: 'orders_to_confirm', count: 2 },
+                ],
+            })
+        ).nativeElement;
+        expect(q(host, '[data-dashboard="welcome"] h1')?.textContent).toContain('dashboard.greeting.');
+        expect(q(host, '[data-welcome="day"]')?.textContent?.trim()).not.toBe('');
+        expect(q(host, '[data-welcome="clock"]')).toBeNull();
+        const summary = q(host, '[data-welcome="summary"]')?.textContent ?? '';
+        expect(summary).toContain('dashboard.welcome.counter');
+        expect(summary).toContain('dashboard.welcome.up');
+        expect(summary).toContain('dashboard.welcome.firstUp');
+    });
+
+    it("shows a person's own work: today, active days, streak, when they work and their latest actions", async () => {
+        const recent = [
+            { oid: 'a1', reference_type: 'brand', reference_oid: 'b1', title: 'Created brand', description: 'Cosrx', performed_on: '2026-10-19T03:00:00Z', area: 'configuration' as const, record_exists: true },
+            { oid: 'a2', reference_type: 'order', reference_oid: 'o1', title: 'Sold at the counter', description: null, performed_on: '2026-10-19T02:00:00Z', area: 'sales' as const, record_exists: true },
+        ];
+        const host: HTMLElement = (await open({ your_work: { today: 4, active_days: 12, streak: 3, week: [{ day: 6, hour: 15, count: 9 }], recent } }, ['configuration.brands.view'])).nativeElement;
+        expect(q(host, '[data-work="streak"] dd')?.textContent).toContain('3');
+        expect(q(host, '[data-work="busiest"]')).not.toBeNull();
+        expect(q(host, '[data-heatmap]')).not.toBeNull();
+        expect(q(host, '[data-recent="a1"] a')?.getAttribute('href')).toBe('/app/configuration/brands/b1');
+        expect(q(host, '[data-recent="a2"] a')).toBeNull();
+        expect(q(host, '[data-dashboard="nothing"]')).toBeNull();
+    });
+
+    it('spins the refresh icon and holds the button while loading, centred in its own square', async () => {
+        localStorage.clear();
+        await TestBed.configureTestingModule({
+            imports: [DashboardComponent],
+            providers: [provideRouter([]), provideHttpClient(), provideHttpClientTesting(), provideNzI18n(en_US), provideTranslateService({ fallbackLang: 'en' })],
+        }).compileComponents();
+        const fixture = TestBed.createComponent(DashboardComponent);
+        fixture.detectChanges();
+        const host: HTMLElement = fixture.nativeElement;
+        const button = () => q(host, '[data-dashboard="refresh"]') as HTMLButtonElement;
+        expect(button().disabled).toBe(true);
+        expect(q(host, '[data-dashboard="refresh"] ng-icon')?.classList).toContain('animate-spin');
+        expect(q(host, '[data-dashboard="refresh"] .ant-btn-loading-icon')).toBeNull();
+        TestBed.inject(HttpTestingController)
+            .expectOne((r) => r.url.endsWith('/get-dashboard'))
+            .flush({ data: { period: PERIOD, for_you: null, your_work: null, attention: null } });
+        fixture.detectChanges();
+        expect(button().disabled).toBe(false);
+        expect(q(host, '[data-dashboard="refresh"] ng-icon')?.classList).not.toContain('animate-spin');
+    });
+
+    it('invites a person with no work yet instead of drawing an empty heatmap', async () => {
+        const host: HTMLElement = (await open({ your_work: { today: 0, active_days: 0, streak: 0, week: [], recent: [] } })).nativeElement;
+        expect(q(host, '[data-dashboard="work-none"]')).not.toBeNull();
+        expect(q(host, '[data-heatmap]')).toBeNull();
     });
 
     it('shows the stock worth with a way into the stock overview', async () => {

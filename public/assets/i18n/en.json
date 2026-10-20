@@ -470,7 +470,15 @@
             "byDay": "Sales by day",
             "top": "Selling best",
             "units": "{{count}} sold",
-            "noSales": "No sales in this period yet."
+            "noSales": "No sales in this period yet.",
+            "wholePeriod": "This period",
+            "before": "Period before",
+            "share": "{{percent}}% of sales",
+            "channels": "Counter and online",
+            "channel": {
+                "POS": "Counter",
+                "ONLINE": "Online"
+            }
         },
         "stock": {
             "title": "Stock at a glance",
@@ -482,6 +490,37 @@
             "profit_full": "Probable profit",
             "profit_fullHint": "That revenue less cost and budgets",
             "unpriced": "Batches with no selling price yet: {{count}}. They count in the value, not in the revenue."
+        },
+        "welcome": {
+            "when": {
+                "today": "today",
+                "week": "in the last 7 days",
+                "month": "this month"
+            },
+            "before": {
+                "today": "yesterday",
+                "week": "the 7 days before",
+                "month": "the same days before"
+            },
+            "counter": "You have sold {{amount}} at the counter {{when}}.",
+            "online": "You have entered {{count}} online orders {{when}}.",
+            "onlineOne": "You have entered 1 online order {{when}}.",
+            "business": "The business has sold {{amount}} {{when}}.",
+            "up": "That is {{percent}}% more than {{before}}.",
+            "down": "That is {{percent}}% less than {{before}}.",
+            "same": "The same as {{before}}.",
+            "firstUp": "First up: {{label}}, {{count}}.",
+            "clear": "Nothing is waiting for you."
+        },
+        "work": {
+            "title": "Your work",
+            "today": "Actions today",
+            "active_days": "Active days, last 30",
+            "streak": "Days in a row",
+            "busiest": "Your busiest time in the last 8 weeks: {{day}}, around {{hour}}.",
+            "when": "When you work, last 8 weeks",
+            "recent": "What you did last",
+            "none": "What you do in StockFlow shows here: your busiest hours, your streak and your latest work."
         }
     },
     "list": {
