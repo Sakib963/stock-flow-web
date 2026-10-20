@@ -424,6 +424,21 @@ a.ant-btn {
 }
 
 /* Nothing to show, said in two lines: what is empty, and what to do about it. */
+/* The district map's hover for any list: the item pointed at stays, its siblings fade. */
+@utility sf-fade {
+    & > * {
+        transition: opacity 150ms cubic-bezier(0.215, 0.61, 0.355, 1);
+    }
+    &:has(> :hover) > :not(:hover) {
+        opacity: 0.6;
+    }
+    @media (prefers-reduced-motion: reduce) {
+        & > * {
+            transition: none;
+        }
+    }
+}
+
 @utility sf-empty {
     padding: 26px 16px;
     text-align: center;

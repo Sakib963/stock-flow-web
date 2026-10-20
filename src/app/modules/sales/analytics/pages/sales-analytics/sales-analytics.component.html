@@ -97,12 +97,12 @@
                             <ng-template #splitTitle
                                 ><h3 class="m-0 flex items-center gap-1.5 text-sm font-bold text-ink"><ng-icon name="lucideSplit" size="14px" class="text-ink-muted" aria-hidden="true" />{{ 'sales.analytics.split.title' | translate }}</h3></ng-template
                             >
-                            <div class="flex h-3 overflow-hidden rounded-full bg-line" aria-hidden="true">
+                            <div class="sf-fade flex h-3 overflow-hidden rounded-full bg-line" aria-hidden="true">
                                 @for (row of rows; track row.channel) {
-                                    <span class="h-full" [class.bg-tag-teal-ink]="row.channel === 'POS'" [class.bg-primary]="row.channel === 'ONLINE'" [style.width.%]="row.share"></span>
+                                    <span class="h-full" [class.bg-tag-teal-ink]="row.channel === 'POS'" [class.bg-primary]="row.channel === 'ONLINE'" [style.width.%]="row.share" nz-tooltip [nzTooltipTitle]="('sales.analytics.channel.' + row.channel | translate) + ': ' + (row.sales | money: 'number') + ' · ' + (row.share | digits) + '%'"></span>
                                 }
                             </div>
-                            <div class="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2 sm:gap-4">
+                            <div class="sf-fade mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2 sm:gap-4">
                                 @for (row of rows; track row.channel) {
                                     <div class="flex items-start gap-2.5" [attr.data-channel]="row.channel">
                                         <span class="mt-1 size-2.5 shrink-0 rounded-full" [class.bg-tag-teal-ink]="row.channel === 'POS'" [class.bg-primary]="row.channel === 'ONLINE'"></span>

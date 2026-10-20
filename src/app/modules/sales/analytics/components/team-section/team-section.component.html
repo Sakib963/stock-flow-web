@@ -72,7 +72,7 @@
                 </div>
                 @if (discountProducts().length) {
                     <p class="mt-0 mb-2 text-xs font-semibold text-ink-muted">{{ 'sales.analytics.team.discounts.byProduct' | translate }}</p>
-                    <ul class="m-0 flex list-none flex-col gap-2 p-0">
+                    <ul class="sf-fade m-0 flex list-none flex-col gap-2 p-0">
                         @for (row of discountProducts(); track row.oid) {
                             <li class="grid grid-cols-[minmax(0,9rem)_1fr_auto] items-center gap-x-3" [attr.data-discount-product]="row.oid">
                                 <span class="truncate text-xs text-ink">{{ row.name }}</span>
@@ -113,7 +113,7 @@
                                     }
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody class="sf-fade">
                                 @for (row of people(); track row.email) {
                                     <tr [attr.data-person]="row.email">
                                         <td class="max-w-[14rem] truncate text-ink">{{ row.label }}</td>

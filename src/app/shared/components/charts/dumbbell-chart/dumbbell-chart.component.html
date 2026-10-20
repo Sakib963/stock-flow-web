@@ -2,7 +2,7 @@
     <span class="inline-flex items-center gap-1.5"><span class="size-2.5 rounded-full bg-danger"></span>{{ firstLabel() | translate }}</span>
     <span class="inline-flex items-center gap-1.5"><span class="size-2.5 rounded-full bg-success"></span>{{ secondLabel() | translate }}</span>
 </div>
-<ul class="m-0 flex list-none flex-col gap-2 p-0">
+<ul class="sf-fade m-0 flex list-none flex-col gap-2 p-0">
     @for (row of drawn(); track row.key) {
         <li class="grid grid-cols-[minmax(0,7.5rem)_1fr] items-center gap-x-3 sm:grid-cols-[minmax(0,9rem)_1fr]" [attr.data-dumbbell]="row.key">
             <span class="truncate text-xs text-ink">{{ row.label }}</span>

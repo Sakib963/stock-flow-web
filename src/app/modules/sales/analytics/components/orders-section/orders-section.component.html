@@ -54,7 +54,7 @@
                     @if (reasons().cancelled.length || reasons().failed.length) {
                         @if (reasons().cancelled.length) {
                             <p class="mt-0 mb-2 text-xs font-semibold text-ink-muted">{{ 'sales.analytics.orders.reasons.cancelled' | translate }}</p>
-                            <ul class="m-0 mb-4 flex list-none flex-col gap-2 p-0">
+                            <ul class="sf-fade m-0 mb-4 flex list-none flex-col gap-2 p-0">
                                 @for (row of reasons().cancelled; track row.key) {
                                     <li class="grid grid-cols-[1fr_auto] items-center gap-x-2" [attr.data-reason]="row.key">
                                         <span class="flex min-w-0 items-center gap-1.5 text-xs text-ink">
@@ -72,7 +72,7 @@
                         }
                         @if (reasons().failed.length) {
                             <p class="mt-0 mb-2 text-xs font-semibold text-ink-muted">{{ 'sales.analytics.orders.reasons.failed' | translate }}</p>
-                            <ul class="m-0 flex list-none flex-col gap-2 p-0">
+                            <ul class="sf-fade m-0 flex list-none flex-col gap-2 p-0">
                                 @for (row of reasons().failed; track row.key) {
                                     <li class="grid grid-cols-[1fr_auto] items-center gap-x-2" [attr.data-failed-reason]="row.key">
                                         <span class="truncate text-xs text-ink">{{ row.label | translate }}</span>
@@ -119,7 +119,7 @@
                                         }
                                     </tr>
                                 </thead>
-                                <tbody>
+                                <tbody class="sf-fade">
                                     @for (row of losses(); track row.key) {
                                         <tr [attr.data-loss-row]="row.key">
                                             <td class="max-w-[12rem] truncate text-ink">{{ row.name }}</td>
@@ -170,7 +170,7 @@
                         }
                     </p>
                     @if (confirming().length) {
-                        <ul class="m-0 flex list-none flex-col gap-2.5 p-0">
+                        <ul class="sf-fade m-0 flex list-none flex-col gap-2.5 p-0">
                             @for (row of confirming(); track row.key) {
                                 <li class="grid grid-cols-[minmax(0,8rem)_1fr_auto] items-center gap-x-3" [attr.data-confirm]="row.key">
                                     <span class="truncate text-xs text-ink">{{ row.label | translate }}</span>
@@ -296,7 +296,7 @@
                 @if (flow()) {
                     @if (slowest().length) {
                         <p class="mt-4 mb-2 text-xs font-semibold text-ink-muted">{{ 'sales.analytics.orders.speed.byPlace' | translate }}</p>
-                        <ul class="m-0 flex list-none flex-col gap-2 p-0">
+                        <ul class="sf-fade m-0 flex list-none flex-col gap-2 p-0">
                             @for (row of slowest(); track row.key) {
                                 <li class="grid grid-cols-[minmax(0,7.5rem)_1fr_auto] items-center gap-x-3" [attr.data-speed-place]="row.key">
                                     <span class="truncate text-xs text-ink">{{ row.name }}</span>

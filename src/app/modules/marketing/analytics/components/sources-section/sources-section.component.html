@@ -28,7 +28,7 @@
                             <th>{{ 'marketing.analytics.sources.sales' | translate }}</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody class="sf-fade">
                         @for (row of rows(); track row.oid) {
                             <tr [attr.data-source]="row.oid">
                                 <td>

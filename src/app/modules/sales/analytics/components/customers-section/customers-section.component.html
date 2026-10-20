@@ -40,7 +40,7 @@
                             <div class="mb-3 h-1.5 rounded-full bg-line"><span class="block h-full rounded-full bg-primary" [style.width.%]="(coverage() / districtCount) * 100"></span></div>
                             @if (ranking().length) {
                                 <!-- Every district with a figure, scrolling within the map's height rather than running past it. -->
-                                <ul class="m-0 flex max-h-[24rem] list-none flex-col gap-2 overflow-y-auto p-0 pr-1">
+                                <ul class="sf-fade m-0 flex max-h-[24rem] list-none flex-col gap-2 overflow-y-auto p-0 pr-1">
                                     @for (row of ranking(); track row.oid) {
                                         <li [attr.data-place]="row.oid">
                                             <span class="flex items-baseline justify-between gap-2 text-xs">
@@ -192,7 +192,7 @@
             @if (figures()) {
                 @if (ages(); as a) {
                     @if (a.known) {
-                        <ul class="m-0 flex list-none flex-col gap-2.5 p-0">
+                        <ul class="sf-fade m-0 flex list-none flex-col gap-2.5 p-0">
                             @for (row of a.bands; track row.band) {
                                 <li [attr.data-age]="row.band">
                                     <span class="flex items-baseline justify-between gap-2 text-xs">

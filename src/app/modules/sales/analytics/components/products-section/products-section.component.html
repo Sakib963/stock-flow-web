@@ -40,7 +40,7 @@
                                     <th class="text-right font-semibold">{{ 'sales.analytics.products.best.returned' | translate }}</th>
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody class="sf-fade">
                                 @for (row of products(); track row.oid) {
                                     <tr [attr.data-product]="row.oid">
                                         <td class="max-w-[16rem] truncate text-ink">{{ row.name }}</td>
@@ -100,7 +100,7 @@
             >
             @if (figures()) {
                 @if (together().length) {
-                    <ul class="m-0 flex list-none flex-col gap-2.5 p-0">
+                    <ul class="sf-fade m-0 flex list-none flex-col gap-2.5 p-0">
                         @for (pair of together(); track pair.key) {
                             <li [attr.data-pair]="pair.key">
                                 <span class="flex items-baseline justify-between gap-2 text-xs">
@@ -126,7 +126,7 @@
             >
             @if (figures()) {
                 @if (reasons().length) {
-                    <ul class="m-0 flex list-none flex-col gap-2.5 p-0">
+                    <ul class="sf-fade m-0 flex list-none flex-col gap-2.5 p-0">
                         @for (row of reasons(); track row.reason) {
                             <li [attr.data-return-reason]="row.reason">
                                 <span class="flex items-baseline justify-between gap-2 text-xs">
@@ -160,7 +160,7 @@
                         @for (group of ageDemand(); track group.band) {
                             <div [attr.data-age-group]="group.band">
                                 <p class="mt-0 mb-2 text-xs font-semibold text-ink-muted">{{ 'sales.customer.ageBand.' + group.band | translate }}</p>
-                                <ul class="m-0 flex list-none flex-col gap-2 p-0">
+                                <ul class="sf-fade m-0 flex list-none flex-col gap-2 p-0">
                                     @for (p of group.products; track p.oid) {
                                         <li>
                                             <span class="flex items-baseline justify-between gap-2 text-xs">
@@ -205,7 +205,7 @@
                                     <th class="text-right font-semibold">{{ 'sales.analytics.products.suppliers.damaged' | translate }}</th>
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody class="sf-fade">
                                 @for (row of suppliers(); track row.key) {
                                     <tr [attr.data-supplier]="row.key">
                                         <td class="max-w-[16rem] truncate" [class.text-ink]="row.oid" [class.text-ink-muted]="!row.oid">{{ row.name ?? ('sales.analytics.products.suppliers.none' | translate) }}</td>
