@@ -3759,7 +3759,9 @@
                 "advanceOver": "অগ্রিম আনুমানিক মোটের চেয়ে বেশি।",
                 "method": "অগ্রিম কীভাবে দিয়েছেন বেছে নিন।"
             },
-            "priceShort": "দাম"
+            "priceShort": "দাম",
+            "outOfStock": "স্টকে নেই",
+            "notEnough": "পর্যাপ্ত নেই"
         },
         "deliveryBatch": {
             "add": "নতুন ব্যাচ",

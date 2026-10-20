@@ -56,6 +56,13 @@ const open = async (details: PreOrderDetails, granted = ALL) => {
 const quick = (element: HTMLElement) => [...element.querySelectorAll('[data-quick]')].map((node) => node.getAttribute('data-quick'));
 
 describe('PreOrderDetailComponent', () => {
+    it('marks a product out of stock, or short of what was booked, beside its name', async () => {
+        const lines = [{ ...record().lines[0], oid: 'l-1', sellable: 0 }, { ...record().lines[0], oid: 'l-2', product_oid: 'p-bag', sellable: 1 }, { ...record().lines[0], oid: 'l-3', product_oid: 'p-scarf', sellable: 5 }];
+        const { element } = await open(record({ lines }));
+        const mark = (id: string) => element.querySelector('[data-line="' + id + '"] [data-stock]')?.getAttribute('data-stock') ?? null;
+        expect([mark('p-kurti'), mark('p-bag'), mark('p-scarf')]).toEqual(['out', 'short', null]);
+    });
+
     it('offers each action only in the state and to the person it belongs to', async () => {
         expect(quick((await open(record())).element)).toEqual(['confirm', 'edit', 'cancel']);
         TestBed.resetTestingModule();

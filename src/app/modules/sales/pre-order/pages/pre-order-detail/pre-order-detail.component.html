@@ -202,7 +202,14 @@
                             @for (line of b.lines; track line.oid) {
                                 <tr [attr.data-line]="line.product_oid">
                                     <td>
-                                        <span class="block text-[13px] font-semibold text-ink">{{ line.product_name }}</span>
+                                        <span class="flex flex-wrap items-center gap-1.5">
+                                            <span class="text-[13px] font-semibold text-ink">{{ line.product_name }}</span>
+                                            @if (line.sellable <= 0) {
+                                                <status-tag label="sales.preOrder.outOfStock" tone="danger" data-stock="out" />
+                                            } @else if (line.sellable < line.quantity) {
+                                                <status-tag label="sales.preOrder.notEnough" tone="warning" data-stock="short" />
+                                            }
+                                        </span>
                                         @if (line.sku) {
                                             <span class="block font-mono text-xs text-ink-muted">{{ line.sku }}</span>
                                         }

@@ -3759,7 +3759,9 @@
                 "advanceOver": "The advance is more than the approximate total.",
                 "method": "Pick how the advance was paid."
             },
-            "priceShort": "Price"
+            "priceShort": "Price",
+            "outOfStock": "Out of stock",
+            "notEnough": "Not enough"
         },
         "deliveryBatch": {
             "add": "New batch",
