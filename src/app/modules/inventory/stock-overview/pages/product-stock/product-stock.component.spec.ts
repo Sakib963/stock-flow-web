@@ -69,6 +69,19 @@ describe('ProductStockComponent', () => {
         expect((fixture.nativeElement as HTMLElement).querySelector('[data-batch-actions]')).not.toBeNull();
     });
 
+    it('shows the batches ten to a page, numbered across the pages', async () => {
+        const many = Array.from({ length: 12 }, (_, n) => batch({ oid: `i-${n}`, batch_code: `B-0000-${String(n).padStart(4, '0')}` }));
+        const fixture = await open({ ...STAFF_VIEW, batches: many }, ['inventory.overview.view']);
+        const cmp = fixture.componentInstance;
+        expect(cmp.pagedBatches().length).toBe(10);
+
+        cmp.batchPage.set(2);
+        fixture.detectChanges();
+        expect(cmp.pagedBatches().map((b) => b.oid)).toEqual(['i-10', 'i-11']);
+        const first = (fixture.nativeElement as HTMLElement).querySelector('tbody tr:not([nz-table-measure-row]) td')?.textContent?.trim();
+        expect(first).toBe('11');
+    });
+
     it('hides a sold out batch until asked, and never offers a price for internal use stock', async () => {
         const fixture = await open(OWNER_VIEW, ['inventory.overview.view', 'inventory.overview.edit', 'inventory.stock-value.view']);
         const page = fixture.componentInstance;

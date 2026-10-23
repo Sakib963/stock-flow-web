@@ -25,6 +25,16 @@ describe('the stock overview list config', () => {
         for (const stat of (STOCK_OVERVIEW_LIST.stats ?? []).filter((s) => MONEY.includes(s.key))) expect(stat.permission).toBe(STOCK_VALUE);
     });
 
+    it('shows the last 30 days of sales as sortable quantities anyone may see, and opens stock that has not sold in 60 days from its figure', () => {
+        for (const key of ['sold_30_days', 'days_left', 'last_sold_on']) {
+            const column = table.columns.find((c) => c.key === key);
+            expect(column?.sortable).toBe(true);
+            expect(column?.permission).toBeUndefined();
+        }
+        expect(STOCK_OVERVIEW_LIST.stats?.find((s) => s.key === 'not_selling')?.filter).toEqual({ not_selling: 'true' });
+        expect(STOCK_OVERVIEW_LIST.filter?.fields.find((f) => f.key === 'not_selling')?.type).toBe('toggle');
+    });
+
     it('offers one row action, View, and no row click', () => {
         expect(table.open).toBeUndefined();
         expect(table.rowActions?.map((a) => a.key)).toEqual(['view']);

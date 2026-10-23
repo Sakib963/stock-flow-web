@@ -140,9 +140,9 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @for (batch of batches(); track batch.oid; let i = $index) {
+                        @for (batch of pagedBatches(); track batch.oid; let i = $index) {
                             <tr [attr.data-batch]="batch.batch_code">
-                                <td nzAlign="right" class="text-ink-soft tabular-nums">{{ i + 1 | digits }}</td>
+                                <td nzAlign="right" class="text-ink-soft tabular-nums">{{ (batchPageShown() - 1) * batchPageSize + i + 1 | digits }}</td>
                                 <td>
                                     <span class="inline-flex items-center font-mono text-xs whitespace-nowrap text-ink-body" nz-typography nzCopyable [nzCopyText]="batch.batch_code" [nzCopyTooltips]="['copy.hint' | translate, 'copy.copied' | translate]">{{ batch.batch_code }}</span>
                                     <span class="mt-0.5 block text-xs text-ink-muted">{{ 'inventory.stockOverview.batchStatus.' + batch.status | translate }}</span>
@@ -241,6 +241,7 @@
                         }
                     </tbody>
                 </nz-table>
+                <nz-pagination class="mt-3 flex justify-end" nzSize="small" [nzHideOnSinglePage]="true" [nzPageIndex]="batchPageShown()" [nzPageSize]="batchPageSize" [nzTotal]="batches().length" (nzPageIndexChange)="batchPage.set($event)" data-detail="batches-pager" />
             } @else {
                 <p class="m-0 px-4 py-3 text-xs text-ink-muted">{{ 'inventory.stockOverview.noBatches' | translate }}</p>
             }

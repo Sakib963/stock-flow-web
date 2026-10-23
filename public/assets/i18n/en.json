@@ -1929,7 +1929,8 @@
                 "expiring": "Expired or expiring",
                 "stockValue": "Stock value",
                 "revenue": "Probable revenue",
-                "profit": "Probable profit"
+                "profit": "Probable profit",
+                "notSelling": "Not sold in 60 days"
             },
             "productTitle": "Product stock",
             "productLead": "Every batch of this product, with its price, budget, expiry and stickers.",
@@ -2024,7 +2025,11 @@
                     "server": "The report could not be built just now. Try again in a moment."
                 }
             },
-            "loadOpeningStock": "Load opening stock"
+            "loadOpeningStock": "Load opening stock",
+            "notSellingFilter": "Not sold in 60 days, with stock to sell",
+            "sold30": "Sold, 30 days",
+            "daysLeft": "Days left",
+            "lastSold": "Last sold"
         },
         "stockAdjustment": {
             "add": "New adjustment",

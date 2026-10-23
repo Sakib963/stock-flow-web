@@ -10,6 +10,7 @@ import { NzMenuModule } from 'ng-zorro-antd/menu';
 import { NzSkeletonModule } from 'ng-zorro-antd/skeleton';
 import { NzSwitchModule } from 'ng-zorro-antd/switch';
 import { NzTableModule } from 'ng-zorro-antd/table';
+import { NzPaginationModule } from 'ng-zorro-antd/pagination';
 import { NzTooltipModule } from 'ng-zorro-antd/tooltip';
 import { FormsModule } from '@angular/forms';
 import { NzMessageService } from 'ng-zorro-antd/message';
@@ -62,7 +63,7 @@ import { BudgetTotalsComponent } from '@app/shared/components/budget-totals/budg
 import { RecordTimelineComponent } from '@app/shared/components/record-timeline/record-timeline.component';
 @Component({
     selector: 'product-stock',
-    imports: [RecordTimelineComponent, FormsModule, NgIcon, NzButtonModule, NzCardModule, NzDropdownModule, NzMenuModule, NzSkeletonModule, NzSwitchModule, NzTableModule, NzTooltipModule, RouterLink, TranslatePipe, PageHeaderComponent, StatusTagComponent, ActionFooterComponent, BatchExpiryComponent, BatchPriceDialogComponent, BatchBudgetDialogComponent, StickerDialogComponent, BudgetTotalsComponent, NzTypographyModule, DigitsPipe, MoneyPipe, RecordDatePipe],
+    imports: [RecordTimelineComponent, FormsModule, NgIcon, NzButtonModule, NzCardModule, NzDropdownModule, NzMenuModule, NzPaginationModule, NzSkeletonModule, NzSwitchModule, NzTableModule, NzTooltipModule, RouterLink, TranslatePipe, PageHeaderComponent, StatusTagComponent, ActionFooterComponent, BatchExpiryComponent, BatchPriceDialogComponent, BatchBudgetDialogComponent, StickerDialogComponent, BudgetTotalsComponent, NzTypographyModule, DigitsPipe, MoneyPipe, RecordDatePipe],
     providers: [provideIcons({ lucideArrowLeft, lucideArrowLeftRight, lucideBadgeDollarSign, lucideBanknote, lucideBoxes, lucideCalendarClock, lucideEllipsis, lucideFileSpreadsheet, lucideHistory, lucideInfo, lucideLock, lucidePackageCheck, lucidePercent, lucidePrinter, lucideRotateCw, lucideShoppingCart, lucideSlidersHorizontal, lucideTag, lucideTrash2, lucideTrendingDown, lucideTrendingUp, lucideWallet, lucideWrench, lucideZap })],
     templateUrl: './product-stock.component.html',
     styleUrl: './product-stock.component.scss',
@@ -105,6 +106,11 @@ export class ProductStockComponent {
 
     readonly showSoldOut = signal(false);
     readonly batches = computed(() => (this.record()?.batches ?? []).filter((batch) => this.showSoldOut() || batch.on_hand > 0 || batch.held > 0));
+    readonly batchPageSize = 10;
+    readonly batchPage = signal(1);
+    /** The page asked for, or the last page when showing fewer batches has left it past the end. */
+    readonly batchPageShown = computed(() => Math.min(this.batchPage(), Math.max(1, Math.ceil(this.batches().length / this.batchPageSize))));
+    readonly pagedBatches = computed(() => this.batches().slice((this.batchPageShown() - 1) * this.batchPageSize, this.batchPageShown() * this.batchPageSize));
     readonly soldOut = computed(() => (this.record()?.batches ?? []).filter((batch) => batch.on_hand === 0 && batch.held === 0).length);
 
     /** The batch whose menu is open: it opens on hover, and on a click for touch and keyboard. */
