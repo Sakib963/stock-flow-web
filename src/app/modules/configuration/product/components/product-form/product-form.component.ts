@@ -45,7 +45,7 @@ const SELECTS: readonly ProductFormField[] = ['sub_category_oid', 'brand_oid', '
 @Component({
     selector: 'product-form',
     imports: [DigitsPipe, ReactiveFormsModule, NgIcon, NzButtonModule, NzFormModule, NzInputModule, NzSelectModule, NzSwitchModule, TranslatePipe, TextPipe, ProductPhotoComponent],
-    providers: [ChoicesService, provideIcons({ lucideSparkles })],
+    providers: [provideIcons({ lucideSparkles })],
     templateUrl: './product-form.component.html',
     styleUrl: './product-form.component.scss',
     changeDetection: ChangeDetectionStrategy.OnPush,

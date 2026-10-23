@@ -5,6 +5,7 @@ import { PhotoUpload } from '@app/core/models/photo-upload.model';
 import { ProductDetails, ProductField, ProductPayload, SubCategoryChoice } from '@app/core/models/product.model';
 import { PhotoUploadService } from '@app/shared/services/photo-upload/photo-upload.service';
 import { StockMovementRow } from '@app/core/models/stock-movement.model';
+import { ReferenceCache } from '@app/shared/services/reference-cache/reference-cache.service';
 import { environment } from '@env/environment';
 import { Observable, finalize, map } from 'rxjs';
 
@@ -12,6 +13,7 @@ import { Observable, finalize, map } from 'rxjs';
 export class ProductService {
     private readonly _http = inject(HttpClient);
     private readonly _photos = inject(PhotoUploadService);
+    private readonly _reference = inject(ReferenceCache);
 
     readonly saving = signal(false);
 
@@ -42,9 +44,9 @@ export class ProductService {
         );
     }
 
-    /** Active sub-categories under Active categories, each with its category's name for grouping the picker. */
+    /** Active sub-categories under Active categories, each with its category's name for grouping the picker. Kept (docs/caching). */
     subCategories(): Observable<SubCategoryChoice[]> {
-        return this._http.get<{ data: SubCategoryChoice[] }>(`${environment.baseUrl}${APIEndpoint.GET_SUB_CATEGORY_LIST_FOR_DROPDOWN}`).pipe(map((response) => response.data));
+        return this._reference.keep('sub-categories', () => this._http.get<{ data: SubCategoryChoice[] }>(`${environment.baseUrl}${APIEndpoint.GET_SUB_CATEGORY_LIST_FOR_DROPDOWN}`).pipe(map((response) => response.data)));
     }
 
     remove(oid: string): Observable<void> {

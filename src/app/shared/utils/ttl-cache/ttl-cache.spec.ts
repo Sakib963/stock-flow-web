@@ -1,4 +1,4 @@
-import { of } from 'rxjs';
+import { Subject, of, take, throwError } from 'rxjs';
 import { TtlCache } from './ttl-cache';
 
 describe('TtlCache', () => {
@@ -64,5 +64,68 @@ describe('TtlCache', () => {
         cache.through('cat-1', server.request).subscribe();
 
         expect(server.asked()).toBe(2);
+    });
+});
+
+describe('TtlCache with a version stamp', () => {
+    const asking = (answer: () => string) => {
+        let asked = 0;
+        return {
+            request: () => {
+                asked += 1;
+                return of(answer());
+            },
+            asked: () => asked,
+        };
+    };
+
+    it('drops a young entry as soon as the version it was kept at moves on', () => {
+        let version = '1|100';
+        const cache = new TtlCache<string>(10 * 60 * 1000, () => version);
+        const server = asking(() => `suppliers at ${version}`);
+
+        cache.through('suppliers', server.request).subscribe();
+        cache.through('suppliers', server.request).subscribe();
+        expect(server.asked()).toBe(1);
+
+        version = '1|200';
+        let latest = '';
+        cache.through('suppliers', server.request).subscribe((value) => (latest = value));
+        expect(server.asked()).toBe(2);
+        expect(latest).toBe('suppliers at 1|200');
+    });
+
+    it('shares one request between two pickers asking at the same moment', () => {
+        const cache = new TtlCache<string>(10 * 60 * 1000, () => '1|100');
+        const answer = new Subject<string>();
+        let asked = 0;
+        const request = () => {
+            asked += 1;
+            return answer.asObservable().pipe(take(1));
+        };
+
+        const first: string[] = [];
+        const second: string[] = [];
+        cache.through('warehouses', request).subscribe((value) => first.push(value));
+        cache.through('warehouses', request).subscribe((value) => second.push(value));
+        answer.next('Main store');
+
+        expect(asked).toBe(1);
+        expect(first).toEqual(['Main store']);
+        expect(second).toEqual(['Main store']);
+    });
+
+    it('keeps nothing from a failed request, so the next open asks again', () => {
+        const cache = new TtlCache<string>(10 * 60 * 1000, () => '1|100');
+        let asked = 0;
+        const failing = () => {
+            asked += 1;
+            return throwError(() => new Error('offline'));
+        };
+
+        cache.through('brands', failing).subscribe({ error: () => undefined });
+        cache.through('brands', failing).subscribe({ error: () => undefined });
+
+        expect(asked).toBe(2);
     });
 });

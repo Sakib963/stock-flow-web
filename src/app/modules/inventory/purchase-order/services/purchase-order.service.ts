@@ -2,17 +2,20 @@ import { HttpClient, HttpResponse } from '@angular/common/http';
 import { Injectable, inject, signal } from '@angular/core';
 import { APIEndpoint } from '@app/core/constants/api-endpoint';
 import { AisleChoice, PaymentPayload, PurchasableProduct, PurchaseOrderDetails, PurchaseOrderPayload, PurchaseOrderReport, SupplierChoice, VerifyLinePayload, VerifyResult, WarehouseChoice } from '@app/core/models/purchase-order.model';
+import { ReferenceCache } from '@app/shared/services/reference-cache/reference-cache.service';
 import { environment } from '@env/environment';
 import { Observable, finalize, map } from 'rxjs';
 
 /**
- * Nothing here is cached: an order carries stock, prices and payments, and the product search
- * carries what is on the shelf now.
+ * Only the supplier, warehouse and aisle pickers are kept, through the reference cache (docs/caching).
+ * Nothing else is: an order carries stock, prices and payments, and the product search carries what
+ * is on the shelf now.
  */
 @Injectable({ providedIn: 'root' })
 export class PurchaseOrderService {
     private readonly _http = inject(HttpClient);
     private readonly _base = environment.baseUrl;
+    private readonly _reference = inject(ReferenceCache);
 
     readonly saving = signal(false);
 
@@ -25,16 +28,16 @@ export class PurchaseOrderService {
     }
 
     suppliers(): Observable<SupplierChoice[]> {
-        return this._http.get<{ data: SupplierChoice[] }>(`${this._base}${APIEndpoint.GET_SUPPLIER_LIST_FOR_DROPDOWN}`).pipe(map((response) => response.data));
+        return this._reference.keep('suppliers', () => this._http.get<{ data: SupplierChoice[] }>(`${this._base}${APIEndpoint.GET_SUPPLIER_LIST_FOR_DROPDOWN}`).pipe(map((response) => response.data)));
     }
 
     warehouses(): Observable<WarehouseChoice[]> {
-        return this._http.get<{ data: WarehouseChoice[] }>(`${this._base}${APIEndpoint.GET_WAREHOUSE_LIST_FOR_DROPDOWN}`).pipe(map((response) => response.data));
+        return this._reference.keep('warehouses', () => this._http.get<{ data: WarehouseChoice[] }>(`${this._base}${APIEndpoint.GET_WAREHOUSE_LIST_FOR_DROPDOWN}`).pipe(map((response) => response.data)));
     }
 
     /** Every active aisle, each naming its warehouse, so a line's aisle picker filters without asking again. */
     aisles(): Observable<AisleChoice[]> {
-        return this._http.get<{ data: AisleChoice[] }>(`${this._base}${APIEndpoint.GET_AISLE_LIST_FOR_DROPDOWN}`).pipe(map((response) => response.data));
+        return this._reference.keep('aisles', () => this._http.get<{ data: AisleChoice[] }>(`${this._base}${APIEndpoint.GET_AISLE_LIST_FOR_DROPDOWN}`).pipe(map((response) => response.data)));
     }
 
     create(payload: PurchaseOrderPayload): Observable<{ oid: string; po_number: string }> {

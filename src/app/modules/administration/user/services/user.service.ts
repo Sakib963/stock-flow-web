@@ -4,6 +4,7 @@ import { APIEndpoint } from '@app/core/constants/api-endpoint';
 import { PhotoUpload } from '@app/core/models/photo-upload.model';
 import { AssignableRole, UserDetails, UserField, UserPayload } from '@app/core/models/user.model';
 import { PhotoUploadService } from '@app/shared/services/photo-upload/photo-upload.service';
+import { ReferenceCache } from '@app/shared/services/reference-cache/reference-cache.service';
 import { environment } from '@env/environment';
 import { Observable, finalize, map } from 'rxjs';
 
@@ -11,6 +12,7 @@ import { Observable, finalize, map } from 'rxjs';
 export class UserService {
     private readonly _http = inject(HttpClient);
     private readonly _photos = inject(PhotoUploadService);
+    private readonly _reference = inject(ReferenceCache);
 
     readonly saving = signal(false);
 
@@ -18,8 +20,9 @@ export class UserService {
         return this._http.get<{ data: UserDetails }>(`${environment.baseUrl}${APIEndpoint.GET_USER_DETAILS}/${oid}`).pipe(map((response) => response.data));
     }
 
+    /** Kept (docs/caching): roles change only through the system admin, which raises the config version. */
     assignableRoles(): Observable<AssignableRole[]> {
-        return this._http.get<{ data: AssignableRole[] }>(`${environment.baseUrl}${APIEndpoint.GET_ASSIGNABLE_ROLES}`).pipe(map((response) => response.data));
+        return this._reference.keep('assignable-roles', () => this._http.get<{ data: AssignableRole[] }>(`${environment.baseUrl}${APIEndpoint.GET_ASSIGNABLE_ROLES}`).pipe(map((response) => response.data)));
     }
 
     /** True when nobody else uses this email or phone. */

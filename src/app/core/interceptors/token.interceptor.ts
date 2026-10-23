@@ -6,6 +6,37 @@ import { APIEndpoint } from '@app/core/constants/api-endpoint';
 import { environment } from '@env/environment';
 import { catchError, switchMap, tap, throwError } from 'rxjs';
 
+// Writes to what the kept picker lists show (docs/caching). Purchase orders are here because the
+// supplier list carries each supplier's last order date.
+const REFERENCE_WRITES = new Set(
+    [
+        APIEndpoint.CREATE_CATEGORY,
+        APIEndpoint.UPDATE_CATEGORY_DETAILS,
+        APIEndpoint.CREATE_SUB_CATEGORY,
+        APIEndpoint.UPDATE_SUB_CATEGORY_DETAILS,
+        APIEndpoint.CREATE_BRAND,
+        APIEndpoint.UPDATE_BRAND_DETAILS,
+        APIEndpoint.CREATE_SUPPLIER,
+        APIEndpoint.UPDATE_SUPPLIER_DETAILS,
+        APIEndpoint.CREATE_WAREHOUSE,
+        APIEndpoint.UPDATE_WAREHOUSE_DETAILS,
+        APIEndpoint.CREATE_AISLE,
+        APIEndpoint.UPDATE_AISLE_DETAILS,
+        APIEndpoint.CREATE_PARTNER,
+        APIEndpoint.UPDATE_PARTNER_DETAILS,
+        APIEndpoint.SAVE_MESSAGE_TEMPLATE,
+        APIEndpoint.UPDATE_DELIVERY_CHARGES,
+        APIEndpoint.CREATE_USER,
+        APIEndpoint.UPDATE_USER,
+        APIEndpoint.SWITCH_USER_STATUS,
+        APIEndpoint.DELETE_USER,
+        APIEndpoint.UPDATE_PROFILE_INFO,
+        APIEndpoint.CREATE_PURCHASE_ORDER,
+        APIEndpoint.UPDATE_PURCHASE_ORDER,
+        APIEndpoint.CANCEL_PURCHASE_ORDER,
+    ].map((endpoint) => `${environment.baseUrl}${endpoint}`)
+);
+
 /**
  * Attaches the bearer token to API calls, and renews it once when the server says it has expired.
  *
@@ -33,10 +64,19 @@ export const tokenInterceptor: HttpInterceptorFn = (request, next) => {
     };
 
     return next(authorise(request)).pipe(
-        // Every guarded answer names the server's config version; a newer one makes the session reload.
-        tap((event) => toApi && event instanceof HttpResponse && versions.seen(event.headers.get('X-Config-Version'))),
+        // Every guarded answer names the server's config and reference versions; a newer config one
+        // makes the session reload, and either drops the kept picker lists.
+        tap((event) => {
+            if (!toApi || !(event instanceof HttpResponse)) return;
+            versions.seen(event.headers.get('X-Config-Version'));
+            versions.seenReference(event.headers.get('X-Reference-Version'));
+            if (REFERENCE_WRITES.has(request.url.split('?')[0])) versions.dropReferenceLists();
+        }),
         catchError((error: HttpErrorResponse) => {
-            if (toApi) versions.seen(error.headers?.get('X-Config-Version') ?? null);
+            if (toApi) {
+                versions.seen(error.headers?.get('X-Config-Version') ?? null);
+                versions.seenReference(error.headers?.get('X-Reference-Version') ?? null);
+            }
             if (error.status !== 401 || exempt || !toApi) return throwError(() => error);
 
             // One retry, and only one: the replay is not wrapped in this handler, so a second 401

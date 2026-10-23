@@ -82,7 +82,7 @@ const drawsRemote = (source: RemoteChoices): boolean => !source.search && !sourc
 @Component({
     selector: 'list-filter',
     imports: [NgTemplateOutlet, FormsModule, NgIcon, NzButtonModule, NzDatePickerModule, NzInputModule, NzModalModule, NzPopoverModule, NzSegmentedModule, NzSelectModule, NzSwitchModule, NzTooltipModule, TranslatePipe, TextPipe],
-    providers: [ChoicesService, provideIcons({ lucideCheck, lucideEraser, lucideListFilter, lucideRotateCcw, lucideSearch, lucideX })],
+    providers: [provideIcons({ lucideCheck, lucideEraser, lucideListFilter, lucideRotateCcw, lucideSearch, lucideX })],
     templateUrl: './filter.component.html',
     styleUrl: './filter.component.scss',
     changeDetection: ChangeDetectionStrategy.OnPush,

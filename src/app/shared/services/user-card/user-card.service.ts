@@ -1,14 +1,16 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
-import { Observable, catchError, map, shareReplay, throwError } from 'rxjs';
+import { Observable, catchError, map, throwError } from 'rxjs';
 import { environment } from '@env/environment';
 import { APIEndpoint } from '@app/core/constants/api-endpoint';
-import { ApiResponse, RequestFailure } from '@app/core/models/api.model';
+import { ApiResponse } from '@app/core/models/api.model';
 import { failureOf } from '@app/shared/utils/request-failure/request-failure';
 import { UserCard } from '@app/core/models/user-card.model';
+import { ReferenceCache } from '@app/shared/services/reference-cache/reference-cache.service';
 
 /**
- * Who a name in a list belongs to, fetched the first time somebody asks and kept for the visit.
+ * Who a name in a list belongs to, fetched the first time somebody asks and kept through the
+ * reference cache (docs/caching), so a rename or a new photo shows on the next open.
  *
  * A list can carry the same colleague on forty rows, so the request is made once per address and
  * shared: opening four cards for the same person is one call. Nothing is preloaded with the rows,
@@ -17,29 +19,14 @@ import { UserCard } from '@app/core/models/user-card.model';
 @Injectable({ providedIn: 'root' })
 export class UserCardService {
     private readonly _http = inject(HttpClient);
-    private readonly _cards = new Map<string, Observable<UserCard>>();
+    private readonly _reference = inject(ReferenceCache);
 
     card(email: string): Observable<UserCard> {
-        const key = email.trim().toLowerCase();
-        const held = this._cards.get(key);
-        if (held) return held;
-
-        const request = this._http.get<ApiResponse<UserCard>>(`${environment.baseUrl}${APIEndpoint.GET_USER_CARD}`, { params: { email } }).pipe(
-            map((response) => response.data),
-            catchError((error: HttpErrorResponse) => {
-                // A failure is not cached: the next click should ask again rather than repeat an
-                // error from a connection that has since come back.
-                this._cards.delete(key);
-                return throwError(() => failureOf(error));
-            }),
-            shareReplay({ bufferSize: 1, refCount: false })
+        return this._reference.keep(`user-card:${email.trim().toLowerCase()}`, () =>
+            this._http.get<ApiResponse<UserCard>>(`${environment.baseUrl}${APIEndpoint.GET_USER_CARD}`, { params: { email } }).pipe(
+                map((response) => response.data),
+                catchError((error: HttpErrorResponse) => throwError(() => failureOf(error)))
+            )
         );
-
-        this._cards.set(key, request);
-        return request;
-    }
-
-    forget(): void {
-        this._cards.clear();
     }
 }

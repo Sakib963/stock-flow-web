@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable, inject, signal } from '@angular/core';
 import { APIEndpoint } from '@app/core/constants/api-endpoint';
 import { CampaignDetails, CampaignMove, CampaignPayload, DeliverablePayload, CampaignStatus, PartnerChoice, PartnerPaymentPayload, PromotableProduct } from '@app/core/models/campaign.model';
+import { ReferenceCache } from '@app/shared/services/reference-cache/reference-cache.service';
 import { environment } from '@env/environment';
 import { Observable, finalize, map } from 'rxjs';
 
@@ -11,6 +12,7 @@ const MOVE_ENDPOINT: Record<CampaignMove, string> = { start: APIEndpoint.START_C
 export class CampaignService {
     private readonly _http = inject(HttpClient);
     private readonly _url = (endpoint: string) => `${environment.baseUrl}${endpoint}`;
+    private readonly _reference = inject(ReferenceCache);
 
     readonly saving = signal(false);
 
@@ -18,8 +20,9 @@ export class CampaignService {
         return this._http.get<{ data: CampaignDetails }>(`${this._url(APIEndpoint.GET_CAMPAIGN_DETAILS)}/${oid}`).pipe(map((response) => response.data));
     }
 
+    /** Kept (docs/caching): names and handles only, no fees or dues. */
     partners(): Observable<PartnerChoice[]> {
-        return this._http.get<{ data: PartnerChoice[] }>(this._url(APIEndpoint.GET_PARTNERS_FOR_CAMPAIGN)).pipe(map((response) => response.data));
+        return this._reference.keep('campaign-partners', () => this._http.get<{ data: PartnerChoice[] }>(this._url(APIEndpoint.GET_PARTNERS_FOR_CAMPAIGN)).pipe(map((response) => response.data)));
     }
 
     searchBatches(search: string): Observable<PromotableProduct[]> {

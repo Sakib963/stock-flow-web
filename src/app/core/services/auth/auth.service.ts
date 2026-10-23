@@ -8,6 +8,7 @@ import { ApiResponse } from '@app/core/models/api.model';
 import { environment } from '@env/environment';
 import { Observable, defer, finalize, firstValueFrom, map, shareReplay, tap } from 'rxjs';
 import { TtlCache } from '@app/shared/utils/ttl-cache/ttl-cache';
+import { ConfigVersionService } from '@app/core/services/config-version/config-version.service';
 
 const RENEWAL_LOCK = 'stockflow-token-renewal';
 
@@ -50,6 +51,7 @@ const endReasonOf = (error: HttpErrorResponse): SessionEndReason => {
 export class AuthService {
     private readonly _http = inject(HttpClient);
     private readonly _router = inject(Router);
+    private readonly _versions = inject(ConfigVersionService);
 
     private readonly _status = signal<AuthStatus>('unknown');
     readonly status = this._status.asReadonly();
@@ -282,6 +284,8 @@ export class AuthService {
         this._sessionId = null;
         this.clearStored();
         TtlCache.clearAll();
+        // A list still on its way lands after the clear; moving the stamp means it is never served to whoever signs in next.
+        this._versions.dropReferenceLists();
         this._status.set('anonymous');
     }
 

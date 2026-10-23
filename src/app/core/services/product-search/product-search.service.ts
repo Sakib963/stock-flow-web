@@ -3,7 +3,8 @@ import { Injectable, inject } from '@angular/core';
 import { APIEndpoint } from '@app/core/constants/api-endpoint';
 import { PosBatch } from '@app/core/models/pos.model';
 import { environment } from '@env/environment';
-import { Observable, map, of, tap } from 'rxjs';
+import { TtlCache } from '@app/shared/utils/ttl-cache/ttl-cache';
+import { Observable, map } from 'rxjs';
 
 /** How long the list the online order opens on is reused before it is asked for again. */
 const BROWSE_TTL_MS = 2 * 60 * 1000;
@@ -13,7 +14,9 @@ const BROWSE_TTL_MS = 2 * 60 * 1000;
 export class ProductSearchService {
     private readonly _http = inject(HttpClient);
 
-    private _browse: { at: number; rows: PosBatch[] } | null = null;
+    // A TtlCache so that signing out empties it with every other cache: the next person at a shared
+    // counter must not be shown the last one's list.
+    private readonly _browse = new TtlCache<PosBatch[]>(BROWSE_TTL_MS);
 
     /**
      * The list opened with nothing typed is reused for two minutes, so opening the picker again does
@@ -21,13 +24,12 @@ export class ProductSearchService {
      * order is priced and its stock checked again when it is placed. A typed search always asks.
      */
     search(text: string): Observable<PosBatch[]> {
-        if (!text && this._browse && Date.now() - this._browse.at < BROWSE_TTL_MS) return of(this._browse.rows);
-        return this.ask(text).pipe(tap((rows) => (text ? null : (this._browse = { at: Date.now(), rows }))));
+        return text ? this.ask(text) : this._browse.through('browse', () => this.ask(''));
     }
 
     /** After a sale or an order the list's stock has changed, so the next opening asks again. */
     forget(): void {
-        this._browse = null;
+        this._browse.forget('browse');
     }
 
     private ask(text: string): Observable<PosBatch[]> {

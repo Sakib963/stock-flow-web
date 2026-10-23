@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable, inject, signal } from '@angular/core';
 import { APIEndpoint } from '@app/core/constants/api-endpoint';
 import { MessageTemplate, MessageTemplatePayload } from '@app/core/models/message-template.model';
+import { ReferenceCache } from '@app/shared/services/reference-cache/reference-cache.service';
 import { environment } from '@env/environment';
 import { Observable, finalize, map } from 'rxjs';
 
@@ -9,11 +10,13 @@ import { Observable, finalize, map } from 'rxjs';
 export class SalesSettingsService {
     private readonly _http = inject(HttpClient);
     private readonly _base = environment.baseUrl;
+    private readonly _reference = inject(ReferenceCache);
 
     readonly saving = signal(false);
 
+    /** Kept (docs/caching): every order record reads them, and they change only when someone edits one. */
     templates(): Observable<MessageTemplate[]> {
-        return this._http.get<{ data: MessageTemplate[] }>(`${this._base}${APIEndpoint.GET_MESSAGE_TEMPLATES}`).pipe(map((response) => response.data));
+        return this._reference.keep('message-templates', () => this._http.get<{ data: MessageTemplate[] }>(`${this._base}${APIEndpoint.GET_MESSAGE_TEMPLATES}`).pipe(map((response) => response.data)));
     }
 
     saveTemplate(payload: MessageTemplatePayload): Observable<MessageTemplate> {

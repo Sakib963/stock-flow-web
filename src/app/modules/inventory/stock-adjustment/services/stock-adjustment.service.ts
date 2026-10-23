@@ -3,14 +3,16 @@ import { Injectable, inject, signal } from '@angular/core';
 import { APIEndpoint } from '@app/core/constants/api-endpoint';
 import { AisleChoice, WarehouseChoice } from '@app/core/models/purchase-order.model';
 import { AdjustableProduct, StockAdjustmentPayload, StockAdjustmentRecord } from '@app/core/models/stock-adjustment.model';
+import { ReferenceCache } from '@app/shared/services/reference-cache/reference-cache.service';
 import { environment } from '@env/environment';
 import { Observable, finalize, map } from 'rxjs';
 
-/** Nothing here is cached: an adjustment carries stock, and the batch picker carries what is free now. */
+/** Only the warehouse and aisle pickers are kept (docs/caching): an adjustment carries stock, and the batch picker carries what is free now. */
 @Injectable({ providedIn: 'root' })
 export class StockAdjustmentService {
     private readonly _http = inject(HttpClient);
     private readonly _base = environment.baseUrl;
+    private readonly _reference = inject(ReferenceCache);
 
     readonly saving = signal(false);
 
@@ -23,11 +25,11 @@ export class StockAdjustmentService {
     }
 
     warehouses(): Observable<WarehouseChoice[]> {
-        return this._http.get<{ data: WarehouseChoice[] }>(`${this._base}${APIEndpoint.GET_WAREHOUSE_LIST_FOR_DROPDOWN}`).pipe(map((response) => response.data));
+        return this._reference.keep('warehouses', () => this._http.get<{ data: WarehouseChoice[] }>(`${this._base}${APIEndpoint.GET_WAREHOUSE_LIST_FOR_DROPDOWN}`).pipe(map((response) => response.data)));
     }
 
     aisles(): Observable<AisleChoice[]> {
-        return this._http.get<{ data: AisleChoice[] }>(`${this._base}${APIEndpoint.GET_AISLE_LIST_FOR_DROPDOWN}`).pipe(map((response) => response.data));
+        return this._reference.keep('aisles', () => this._http.get<{ data: AisleChoice[] }>(`${this._base}${APIEndpoint.GET_AISLE_LIST_FOR_DROPDOWN}`).pipe(map((response) => response.data)));
     }
 
     create(payload: StockAdjustmentPayload): Observable<{ oid: string; adjustment_number: string }> {

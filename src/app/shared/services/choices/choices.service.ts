@@ -1,41 +1,27 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Choice, RemoteChoices } from '@app/core/models/filter.model';
-import { TtlCache } from '@app/shared/utils/ttl-cache/ttl-cache';
+import { ReferenceCache } from '@app/shared/services/reference-cache/reference-cache.service';
 import { environment } from '@env/environment';
-import { Observable, map, shareReplay } from 'rxjs';
-
-const TEN_MINUTES = 10 * 60 * 1000;
+import { Observable, map } from 'rxjs';
 
 /**
- * The choices a picker loads from a dropdown endpoint, kept for ten minutes.
- *
- * Provided by the component that shows the picker, never app-wide, so the choices live only as long
- * as the page: reopening a filter reuses them, and leaving the page drops them. Only for reference
- * data such as categories and brands, never for anything carrying stock.
+ * The choices a picker loads from a dropdown endpoint, kept app-wide through the reference cache, so
+ * a list loaded by one page's filter opens the next page's picker at once (docs/caching). Only for
+ * reference data such as categories and brands, never for anything carrying stock.
  */
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class ChoicesService {
     private readonly _http = inject(HttpClient);
-    private readonly _cache = new TtlCache<readonly Choice[]>(TEN_MINUTES);
-    // Two pickers opening at once share the request in flight rather than sending two.
-    private readonly _inFlight = new Map<string, Observable<readonly Choice[]>>();
+    private readonly _reference = inject(ReferenceCache);
 
     load(source: RemoteChoices): Observable<readonly Choice[]> {
-        const key = this.keyOf(source);
-        const pending = this._inFlight.get(key);
-        if (pending) return pending;
-
-        const request = this._cache.through(key, () => this.fetch(source)).pipe(shareReplay({ bufferSize: 1, refCount: false }));
-        this._inFlight.set(key, request);
-        const release = () => this._inFlight.delete(key);
-        request.subscribe({ complete: release, error: release });
-        return request;
+        return this._reference.keep(this.keyOf(source), () => this.fetch(source));
     }
 
     /** After a write that adds to these choices, so the next load asks the server again. */
     forget(source: RemoteChoices): void {
-        this._cache.forget(this.keyOf(source));
+        this._reference.forget(this.keyOf(source));
     }
 
     private fetch(source: RemoteChoices): Observable<readonly Choice[]> {
@@ -57,6 +43,6 @@ export class ChoicesService {
     }
 
     private keyOf(source: RemoteChoices): string {
-        return `${source.endpoint}?${new URLSearchParams(this.paramsOf(source))}`;
+        return `choices:${source.endpoint}?${new URLSearchParams(this.paramsOf(source))}`;
     }
 }

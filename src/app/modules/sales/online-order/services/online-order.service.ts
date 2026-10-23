@@ -3,19 +3,22 @@ import { Injectable, inject, signal } from '@angular/core';
 import { APIEndpoint } from '@app/core/constants/api-endpoint';
 import { Place } from '@app/core/models/customer.model';
 import { ChatReading, DeliveryCharges, OnlineDraft, OnlineDraftPayload, OnlineOrderPayload, OnlineOrderResult, OnlineOrderSetup, PhoneLookup } from '@app/core/models/online-order.model';
+import { ReferenceCache } from '@app/shared/services/reference-cache/reference-cache.service';
 import { environment } from '@env/environment';
 import { Observable, finalize, map } from 'rxjs';
 
-/** Nothing here is cached: a lookup carries a customer's orders, and an order holds stock. */
+/** Only the setup is kept (docs/caching): a lookup carries a customer's orders, and an order holds stock. */
 @Injectable({ providedIn: 'root' })
 export class OnlineOrderService {
     private readonly _http = inject(HttpClient);
     private readonly _base = environment.baseUrl;
+    private readonly _reference = inject(ReferenceCache);
 
     readonly saving = signal(false);
 
+    /** Sources and delivery charges. Kept: the server prices every order again, so an old charge is never saved. */
     setup(): Observable<OnlineOrderSetup> {
-        return this._http.get<{ data: OnlineOrderSetup }>(`${this._base}${APIEndpoint.GET_ONLINE_ORDER_SETUP}`).pipe(map((response) => response.data));
+        return this._reference.keep('online-order-setup', () => this._http.get<{ data: OnlineOrderSetup }>(`${this._base}${APIEndpoint.GET_ONLINE_ORDER_SETUP}`).pipe(map((response) => response.data)));
     }
 
     /** POSTs, so a customer's phone and message stay out of URLs. */

@@ -161,4 +161,25 @@ describe('tokenInterceptor', () => {
         TestBed.inject(HttpTestingController).expectOne(`${environment.baseUrl}/api/v1/anything`).flush({}, { headers: { 'X-Config-Version': '7' } });
         expect(versions.latest()).toBe(7);
     });
+
+    it('moves the kept picker lists on when an answer names a newer reference version', () => {
+        const versions = TestBed.inject(ConfigVersionService);
+        const before = versions.stamp();
+        http.get(`${environment.baseUrl}/api/v1/anything`).subscribe();
+        backend.expectOne(`${environment.baseUrl}/api/v1/anything`).flush({}, { headers: { 'X-Reference-Version': '1792251718589' } });
+        expect(versions.stamp()).not.toBe(before);
+    });
+
+    it('moves them on after this person saves a supplier, but not after a sale', () => {
+        const versions = TestBed.inject(ConfigVersionService);
+        const before = versions.stamp();
+
+        http.post(`${environment.baseUrl}/api/v1/sales/pos/checkout`, {}).subscribe();
+        backend.expectOne(`${environment.baseUrl}/api/v1/sales/pos/checkout`).flush({});
+        expect(versions.stamp()).toBe(before);
+
+        http.post(`${environment.baseUrl}/api/v1/configuration/supplier/create-supplier`, {}).subscribe();
+        backend.expectOne(`${environment.baseUrl}/api/v1/configuration/supplier/create-supplier`).flush({});
+        expect(versions.stamp()).not.toBe(before);
+    });
 });

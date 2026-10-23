@@ -40,7 +40,7 @@ const FIELD_ID: Record<AisleFormField, string> = {
 @Component({
     selector: 'aisle-form',
     imports: [DigitsPipe, ReactiveFormsModule, NgIcon, NzButtonModule, NzDividerModule, NzFormModule, NzInputModule, NzSelectModule, TranslatePipe, TextPipe, WarehouseQuickAddComponent],
-    providers: [ChoicesService, provideIcons({ lucidePlus, lucideSparkles })],
+    providers: [provideIcons({ lucidePlus, lucideSparkles })],
     templateUrl: './aisle-form.component.html',
     styleUrl: './aisle-form.component.scss',
     changeDetection: ChangeDetectionStrategy.OnPush,

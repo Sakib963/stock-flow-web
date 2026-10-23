@@ -38,7 +38,7 @@ const FIELD_ID: Record<SubCategoryFormField, string> = {
 @Component({
     selector: 'sub-category-form',
     imports: [DigitsPipe, ReactiveFormsModule, NgIcon, NzButtonModule, NzDividerModule, NzFormModule, NzInputModule, NzSelectModule, TranslatePipe, TextPipe, CategoryQuickAddComponent],
-    providers: [ChoicesService, provideIcons({ lucidePlus, lucideSparkles })],
+    providers: [provideIcons({ lucidePlus, lucideSparkles })],
     templateUrl: './sub-category-form.component.html',
     styleUrl: './sub-category-form.component.scss',
     changeDetection: ChangeDetectionStrategy.OnPush,
