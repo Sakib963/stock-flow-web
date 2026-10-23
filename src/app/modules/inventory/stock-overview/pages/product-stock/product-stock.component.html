@@ -314,7 +314,7 @@
                 ><h2 class="m-0 flex items-center gap-1.5 text-sm font-bold text-ink"><ng-icon name="lucideArrowLeftRight" size="14px" class="text-ink-muted" aria-hidden="true" />{{ 'inventory.stockMovement.card.title' | translate }}</h2></ng-template
             >
             <ng-template #movementsExtra>
-                <a nz-button nzType="link" nzSize="small" class="inline-flex items-center" [routerLink]="movementListRoute">{{ 'inventory.stockMovement.card.openList' | translate }}</a>
+                <a nz-button nzType="link" nzSize="small" class="inline-flex items-center" [routerLink]="movementListRoute" [state]="{ filters: { product_oid: oid } }">{{ 'inventory.stockMovement.card.openList' | translate }}</a>
             </ng-template>
             @if (movementsFailed(); as failure) {
                 <div class="flex flex-wrap items-center justify-between gap-2" role="alert">
@@ -356,8 +356,8 @@
                                     <td nzAlign="right" class="font-semibold tabular-nums" [class.text-success-ink]="move.quantity > 0" [class.text-danger-ink]="move.quantity < 0">{{ move.quantity > 0 ? '+' : '' }}{{ move.quantity | money: 'number' }}</td>
                                     <td nzAlign="right" class="tabular-nums">{{ move.balance_after | money: 'number' }}</td>
                                     <td>
-                                        @if (move.purchase_oid && canViewOrders()) {
-                                            <a class="text-primary hover:underline" [routerLink]="purchaseRoute(move.purchase_oid)">{{ move.reference }}</a>
+                                        @if (documentRoute(move); as route) {
+                                            <a class="text-primary hover:underline" [routerLink]="route">{{ move.reference }}</a>
                                         } @else if (move.reference) {
                                             {{ move.reference }}
                                         } @else {

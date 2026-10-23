@@ -7,6 +7,7 @@ import { TranslatePipe } from '@ngx-translate/core';
 import { DateFormat, Row, Tone } from '@app/core/models/config.model';
 import { Column } from '@app/core/models/table.model';
 import { LanguageService } from '@app/core/services/language/language.service';
+import { SessionService } from '@app/core/services/session/session.service';
 import { RendererOutletComponent } from '@app/shared/components/renderer-outlet/renderer-outlet.component';
 import { StatusTagComponent } from '@app/shared/components/status-tag/status-tag.component';
 import { DigitsPipe } from '@app/shared/pipes/digits/digits.pipe';
@@ -45,6 +46,7 @@ const DOT: Record<Tone, string> = {
 })
 export class TableCellComponent {
     readonly language = inject(LanguageService).current;
+    private readonly _session = inject(SessionService);
 
     readonly column = input.required<Column>();
     readonly row = input.required<Row>();
@@ -113,7 +115,10 @@ export class TableCellComponent {
 
     readonly linkRoute = computed(() => {
         const column = this.column();
-        return column.type === 'link' ? fillRoute(column.route, this.row()) : null;
+        if (column.type !== 'link') return null;
+        if (typeof column.route === 'string') return fillRoute(column.route, this.row());
+        const pick = column.route.routes[String(readPath(this.row(), column.route.by))];
+        return pick && (!pick.permission || this._session.can(pick.permission)) ? fillRoute(pick.route, this.row()) : null;
     });
 
     readonly linkText = computed(() => {

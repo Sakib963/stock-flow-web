@@ -52,7 +52,8 @@ export interface ProductBatch {
     on_hand: number;
     held: number;
     sellable: number;
-    cost_price: number;
+    /** Left out for someone without inventory.stock-value.view. */
+    cost_price?: number;
     selling_price: number | null;
     /** A plain day, `2027-03-31`, or none. */
     expiry_date: string | null;
@@ -80,6 +81,22 @@ export interface ProductLifetime {
     last_sold_on: string | null;
 }
 
+/**
+ * The last 30 business days of kept sales, read the way sales analytics reads them. Sales and profit
+ * come only to someone with inventory.stock-value.view.
+ */
+export interface ProductRecentSales {
+    days: number;
+    units_sold: number;
+    /** Of units_sold, those confirmed returns took back. */
+    units_returned: number;
+    counter_units: number;
+    online_units: number;
+    sales?: number;
+    profit?: number;
+    units_without_cost?: number;
+}
+
 export interface ProductActivity {
     oid: string;
     date: string;
@@ -92,6 +109,7 @@ export interface ProductDetails {
     details: Product;
     stock: ProductStock;
     lifetime: ProductLifetime;
+    recent: ProductRecentSales;
     activity: ProductActivity[];
 }
 

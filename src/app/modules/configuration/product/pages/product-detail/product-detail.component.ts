@@ -2,7 +2,7 @@ import { Location } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { NgIcon, provideIcons } from '@ng-icons/core';
-import { lucideArrowLeft, lucideArrowLeftRight, lucideBoxes, lucideCalendarClock, lucideChartColumn, lucideHandCoins, lucideHistory, lucideImageOff, lucideInfo, lucideLock, lucidePackageCheck, lucidePencil, lucideRotateCw, lucideShoppingCart, lucideTrash2, lucideTruck, lucideUndo2, lucideZap, lucideCircleX, lucideGift } from '@ng-icons/lucide';
+import { lucideArrowLeft, lucideArrowLeftRight, lucideBoxes, lucideCalendarClock, lucideCalendarRange, lucideChartColumn, lucideHandCoins, lucideHistory, lucideImageOff, lucideInfo, lucideLock, lucidePackageCheck, lucidePencil, lucideRotateCw, lucideShoppingCart, lucideTrash2, lucideTruck, lucideUndo2, lucideZap, lucideCircleX, lucideGift } from '@ng-icons/lucide';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzCardModule } from 'ng-zorro-antd/card';
 import { NzImageModule } from 'ng-zorro-antd/image';
@@ -23,9 +23,9 @@ import { CATEGORY_ROUTES } from '@app/modules/configuration/category/constants/c
 import { PRODUCT_ROUTES } from '@app/modules/configuration/product/constants/product-routes';
 import { SUB_CATEGORY_ROUTES } from '@app/modules/configuration/sub-category/constants/sub-category-routes';
 import { BatchExpiryComponent } from '@app/shared/components/batch-expiry/batch-expiry.component';
-import { PURCHASE_ORDER_ROUTES } from '@app/modules/inventory/purchase-order/constants/purchase-order-routes';
 import { STOCK_MOVEMENT_REASON } from '@app/modules/inventory/stock-movement/config/stock-movement-list.config';
 import { STOCK_MOVEMENT_ROUTES } from '@app/modules/inventory/stock-movement/constants/stock-movement-routes';
+import { documentRoute } from '@app/modules/inventory/stock-movement/constants/movement-documents';
 import { ProductService } from '@app/modules/configuration/product/services/product.service';
 import { ActionFooterComponent } from '@app/shared/components/action-footer/action-footer.component';
 import { PageHeaderComponent } from '@app/shared/components/page-header/page-header.component';
@@ -47,7 +47,7 @@ import { resolveTone } from '@app/shared/utils/tone-map/tone-map';
 @Component({
     selector: 'product-detail',
     imports: [RecordTimelineComponent, NgIcon, NzButtonModule, NzCardModule, NzImageModule, NzSkeletonModule, NzTableModule, NzTooltipModule, RouterLink, TranslatePipe, PageHeaderComponent, StatusTagComponent, ActionFooterComponent, NzTypographyModule, BatchExpiryComponent, DigitsPipe, MoneyPipe, RecordDatePipe],
-    providers: [provideIcons({ lucideArrowLeft, lucideArrowLeftRight, lucideBoxes, lucideCalendarClock, lucideChartColumn, lucideCircleX, lucideGift, lucideHandCoins, lucideHistory, lucideImageOff, lucideInfo, lucideLock, lucidePackageCheck, lucidePencil, lucideRotateCw, lucideShoppingCart, lucideTrash2, lucideTruck, lucideUndo2, lucideZap })],
+    providers: [provideIcons({ lucideArrowLeft, lucideArrowLeftRight, lucideBoxes, lucideCalendarClock, lucideCalendarRange, lucideChartColumn, lucideCircleX, lucideGift, lucideHandCoins, lucideHistory, lucideImageOff, lucideInfo, lucideLock, lucidePackageCheck, lucidePencil, lucideRotateCw, lucideShoppingCart, lucideTrash2, lucideTruck, lucideUndo2, lucideZap })],
     templateUrl: './product-detail.component.html',
     styleUrl: './product-detail.component.scss',
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -85,10 +85,12 @@ export class ProductDetailComponent {
 
     /** The latest movements, for someone who may see the ledger; the card is absent otherwise. */
     readonly canViewMovements = computed(() => this._session.can('inventory.stock-movement.view'));
+    readonly canSeeMoney = computed(() => this._session.can('inventory.stock-value.view'));
     readonly movements = signal<StockMovementRow[] | null>(null);
     readonly movementsFailed = signal<RequestFailure | null>(null);
     readonly movementListRoute = STOCK_MOVEMENT_ROUTES.list;
-    readonly purchaseRoute = PURCHASE_ORDER_ROUTES.detail;
+    readonly documentRoute = (move: StockMovementRow) => documentRoute(move, (permission) => this._session.can(permission));
+
     readonly subCategoryRoute = SUB_CATEGORY_ROUTES.detail;
 
     /**
@@ -124,6 +126,21 @@ export class ProductDetailComponent {
             { key: 'returned', label: 'configuration.product.detailStat.returned', value: lifetime.returned, icon: 'lucideUndo2' },
             { key: 'damaged', label: 'configuration.product.detailStat.damaged', value: lifetime.damaged, icon: 'lucideCircleX' },
         ];
+    });
+
+    /** Kept units over the last 30 days, and what follows from them: how long the sellable stock lasts at that pace. */
+    readonly recent = computed(() => {
+        const loaded = this.record();
+        if (!loaded) return null;
+        const { recent, stock } = loaded;
+        const kept = recent.units_sold - recent.units_returned;
+        return {
+            ...recent,
+            kept,
+            daysLeft: kept > 0 ? Math.floor(stock.sellable / (kept / recent.days)) : null,
+            returnRate: recent.units_sold > 0 ? Math.round((recent.units_returned / recent.units_sold) * 100) : null,
+            margin: recent.sales ? Math.round(((recent.profit ?? 0) / recent.sales) * 100) : null,
+        };
     });
 
     /** Where the stock number stands against the restock level, the same three states the list shows. */

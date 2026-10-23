@@ -62,6 +62,7 @@ export class APIEndpoint {
 
     static readonly GET_PRODUCT_LIST = '/api/v1/configuration/product/get-product-list';
     static readonly GET_PRODUCT_DETAILS = '/api/v1/configuration/product/get-product-details';
+    static readonly GET_PRODUCT_LIST_FOR_DROPDOWN = '/api/v1/configuration/product/get-product-list-for-dropdown';
     static readonly CREATE_PRODUCT = '/api/v1/configuration/product/create-product';
     static readonly UPDATE_PRODUCT_DETAILS = '/api/v1/configuration/product/update-product-details';
     static readonly DELETE_PRODUCT = '/api/v1/configuration/product/delete-product';

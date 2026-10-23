@@ -31,10 +31,20 @@ describe('the stock movements list config', () => {
         expect(Object.keys(reasons?.type === 'status' ? reasons.tones : {})).toEqual(['carried_over', 'received', 'sold', 'dispatched', 'returned', 'disposed', 'dispose_reversed', 'given_away', 'adjusted', 'opening_stock']);
     });
 
-    it('links a received movement to its purchase order, a route the module declares', () => {
+    it('links every kind of document behind a movement to its own record page, each behind the permission that opens it', () => {
         const link = table.columns.find((c) => c.type === 'link');
-        expect(link?.type === 'link' ? link.route : null).toBe('/app/inventory/purchase-orders/:purchase_oid');
+        const route = link?.type === 'link' ? link.route : null;
+        expect(typeof route === 'object' && route?.by).toBe('reference_kind');
+        const documents = typeof route === 'object' && route ? route.routes : {};
+        expect(Object.keys(documents)).toEqual(['purchase-order', 'order', 'return', 'disposal', 'adjustment', 'giveaway']);
+        expect(documents['purchase-order']).toEqual({ route: '/app/inventory/purchase-orders/:reference_oid', permission: 'inventory.purchase-order.view' });
+        expect(documents['order']).toEqual({ route: '/app/sales/orders/:reference_oid', permission: 'sales.order.view' });
         expect(routes.some((r) => r.path === 'purchase-orders/:oid')).toBe(true);
+    });
+
+    it('filters by product for someone who may read the product names', () => {
+        const product = STOCK_MOVEMENT_LIST.filter?.fields.find((f) => f.key === 'product_oid');
+        expect(product).toEqual(expect.objectContaining({ type: 'select', permission: 'configuration.product.view' }));
     });
 
     it('is guarded by the same permission it declares', () => {

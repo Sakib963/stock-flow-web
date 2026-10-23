@@ -10,6 +10,9 @@ import { catchError, switchMap, tap, throwError } from 'rxjs';
 // supplier list carries each supplier's last order date.
 const REFERENCE_WRITES = new Set(
     [
+        APIEndpoint.CREATE_PRODUCT,
+        APIEndpoint.UPDATE_PRODUCT_DETAILS,
+        APIEndpoint.DELETE_PRODUCT,
         APIEndpoint.CREATE_CATEGORY,
         APIEndpoint.UPDATE_CATEGORY_DETAILS,
         APIEndpoint.CREATE_SUB_CATEGORY,

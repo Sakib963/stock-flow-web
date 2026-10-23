@@ -1,7 +1,7 @@
 import { APIEndpoint } from '@app/core/constants/api-endpoint';
 import { ToneMap } from '@app/core/models/config.model';
 import { ListShellPageConfig } from '@app/core/models/list-shell-page.model';
-import { PURCHASE_ORDER_ROUTES } from '@app/modules/inventory/purchase-order/constants/purchase-order-routes';
+import { MOVEMENT_DOCUMENTS } from '@app/modules/inventory/stock-movement/constants/movement-documents';
 
 /** In is success, out is progress or danger, anything that undoes an earlier movement is quiet. */
 export const STOCK_MOVEMENT_REASON: ToneMap = {
@@ -32,6 +32,7 @@ export const STOCK_MOVEMENT_LIST: ListShellPageConfig = {
         search: { placeholder: 'inventory.stockMovement.searchPlaceholder' },
         fields: [
             { key: 'when', label: 'inventory.stockMovement.when', type: 'date-range', fromKey: 'date_from', toKey: 'date_to', presets: ['today', 'yesterday', 'last-7-days', 'this-month', 'last-month'], max: 'today' },
+            { key: 'product_oid', label: 'inventory.stockMovement.product', type: 'select', permission: 'configuration.product.view', choices: { endpoint: APIEndpoint.GET_PRODUCT_LIST_FOR_DROPDOWN } },
             { key: 'reason', label: 'inventory.stockMovement.reason.label', type: 'multi-select', choices: REASONS.map((value) => ({ value, label: `inventory.stockMovement.reason.${value}` })) },
         ],
     },
@@ -47,7 +48,7 @@ export const STOCK_MOVEMENT_LIST: ListShellPageConfig = {
             { key: 'reason', label: 'inventory.stockMovement.reason.label', type: 'status', tones: STOCK_MOVEMENT_REASON, width: 14 },
             { key: 'quantity', label: 'inventory.stockMovement.quantity', type: 'number', signed: true, width: 8, sortable: true },
             { key: 'balance_after', label: 'inventory.stockMovement.balanceAfter', type: 'number', width: 8 },
-            { key: 'reference', label: 'inventory.stockMovement.document', type: 'link', route: PURCHASE_ORDER_ROUTES.detailPattern.replace(':oid', ':purchase_oid'), width: 12 },
+            { key: 'reference', label: 'inventory.stockMovement.document', type: 'link', route: { by: 'reference_kind', routes: MOVEMENT_DOCUMENTS }, width: 12 },
             { key: 'created_by', label: 'inventory.stockMovement.by', type: 'user', name: 'created_by_name', width: 12 },
             { key: 'warehouse_name', label: 'inventory.stockMovement.warehouse', type: 'text', width: 12, hidden: true },
         ],

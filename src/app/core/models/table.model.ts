@@ -55,8 +55,17 @@ export type Column =
     | (ColumnBase & { type: 'user'; name?: string })
     | (ColumnBase & { type: 'tags'; tones?: ToneMap })
     | (ColumnBase & { type: 'image' })
-    | (ColumnBase & { type: 'link'; route: string; text?: string })
+    | (ColumnBase & { type: 'link'; route: string | LinkRoutes; text?: string })
     | (ColumnBase & RendererRef & { type: 'component'; inputs?: JsonObject });
+
+/**
+ * A link whose page depends on the row: `by` names the field that picks one of `routes`. A route the
+ * person may not open, or a row with no match, reads as plain text.
+ */
+export interface LinkRoutes {
+    by: string;
+    routes: Readonly<Record<string, { route: string; permission?: string }>>;
+}
 
 export type ColumnType = Column['type'];
 

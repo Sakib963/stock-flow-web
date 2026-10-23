@@ -24,6 +24,7 @@ import { PRODUCT_ROUTES } from '@app/modules/configuration/product/constants/pro
 import { PURCHASE_ORDER_ROUTES } from '@app/modules/inventory/purchase-order/constants/purchase-order-routes';
 import { STOCK_MOVEMENT_REASON } from '@app/modules/inventory/stock-movement/config/stock-movement-list.config';
 import { STOCK_MOVEMENT_ROUTES } from '@app/modules/inventory/stock-movement/constants/stock-movement-routes';
+import { documentRoute } from '@app/modules/inventory/stock-movement/constants/movement-documents';
 import { BatchBudgetDialogComponent } from '@app/modules/inventory/stock-overview/components/batch-budget-dialog/batch-budget-dialog.component';
 import { BatchPriceDialogComponent } from '@app/modules/inventory/stock-overview/components/batch-price-dialog/batch-price-dialog.component';
 import { StickerDialogComponent } from '@app/modules/inventory/stock-overview/components/sticker-dialog/sticker-dialog.component';
@@ -118,6 +119,7 @@ export class ProductStockComponent {
     readonly movements = signal<StockMovementRow[] | null>(null);
     readonly movementsFailed = signal<RequestFailure | null>(null);
     readonly movementListRoute = STOCK_MOVEMENT_ROUTES.list;
+    readonly documentRoute = (move: StockMovementRow) => documentRoute(move, (permission) => this._session.can(permission));
 
     /** Sellable against the restock level, the same three states the list shows. */
     readonly stockState = computed(() => {

@@ -22,11 +22,12 @@ const DETAILS = {
             batches: [{ oid: 'i-1', batch_code: 'B-0917', warehouse_name: 'Main', received_on: '2026-09-17T10:00:00.000', on_hand: 12, held: 8, sellable: 4, cost_price: 450, selling_price: 890 }],
         },
         lifetime: { sold: 31, returned: 2, damaged: 1, given_away: 3, last_sold_on: null },
+        recent: { days: 30, units_sold: 10, units_returned: 2, counter_units: 5, online_units: 3, sales: 7120, profit: 3520, units_without_cost: 0 },
         activity: [],
     },
 };
 
-const open = async (permissions: string[] = ['configuration.product.view']) => {
+const open = async (permissions: string[] = ['configuration.product.view'], recent: Record<string, number> = DETAILS.data.recent) => {
     await TestBed.configureTestingModule({
         imports: [ProductDetailComponent],
         providers: [provideRouter([]), provideHttpClient(), provideHttpClientTesting(), provideNzI18n(en_US), provideTranslateService({ fallbackLang: 'en' }), ...OVERLAY_PROVIDERS, { provide: ActivatedRoute, useValue: { snapshot: { paramMap: new Map([['oid', 'p-1']]) } } }, { provide: SessionService, useValue: { can: (code: string) => permissions.includes(code), menu: () => [] } }],
@@ -36,7 +37,7 @@ const open = async (permissions: string[] = ['configuration.product.view']) => {
     fixture.detectChanges();
     TestBed.inject(HttpTestingController)
         .expectOne((r) => r.url.includes(APIEndpoint.GET_PRODUCT_DETAILS))
-        .flush(DETAILS);
+        .flush({ ...DETAILS, data: { ...DETAILS.data, recent } });
     fixture.detectChanges();
     return fixture;
 };
@@ -65,6 +66,33 @@ describe('ProductDetailComponent', () => {
         const stats = (await open()).componentInstance.stats();
         expect(stats.find((stat) => stat.key === 'booked')?.value).toBe(6);
         expect(stats.find((stat) => stat.key === 'held')?.value).toBe(8);
+    });
+
+    it('shows the last 30 days: units kept, how long the sellable stock lasts at that pace, the share returned and where it sold', async () => {
+        const fixture = await open();
+        const recent = (fixture.nativeElement as HTMLElement).querySelector('[data-detail="recent"]')?.textContent ?? '';
+
+        expect(fixture.componentInstance.recent()).toEqual(expect.objectContaining({ kept: 8, daysLeft: 15, returnRate: 20 }));
+        expect(recent).toContain('5 · 3');
+    });
+
+    it('says there were no sales instead of counting days of stock left', async () => {
+        const fixture = await open(['configuration.product.view'], { days: 30, units_sold: 0, units_returned: 0, counter_units: 0, online_units: 0 });
+        const recent = (fixture.nativeElement as HTMLElement).querySelector('[data-detail="recent"]')?.textContent ?? '';
+
+        expect(fixture.componentInstance.recent()?.daysLeft).toBeNull();
+        expect(recent).toContain('configuration.product.recent.noRecentSales');
+    });
+
+    it('shows profit and what each batch cost only to someone who may see money', async () => {
+        const owner = (await open(['configuration.product.view', 'inventory.stock-value.view'])).nativeElement as HTMLElement;
+        expect(owner.querySelector('[data-detail="recent"]')?.textContent).toContain('configuration.product.recent.profit');
+        expect(owner.querySelector('[data-detail="batches"]')?.textContent).toContain('configuration.product.batch.cost');
+        TestBed.resetTestingModule();
+
+        const staff = (await open()).nativeElement as HTMLElement;
+        expect(staff.querySelector('[data-detail="recent"]')?.textContent).not.toContain('configuration.product.recent.profit');
+        expect(staff.querySelector('[data-detail="batches"]')?.textContent).not.toContain('configuration.product.batch.cost');
     });
 
     it('lists each batch with where it is, what is held, and what it cost', async () => {
@@ -103,15 +131,15 @@ describe('ProductDetailComponent', () => {
         TestBed.inject(HttpTestingController).expectNone((r) => r.url.includes(APIEndpoint.GET_STOCK_MOVEMENT_LIST));
     });
 
-    it("shows this product's latest movements, newest first, each signed and with its document", async () => {
-        const fixture = await open(['configuration.product.view', 'inventory.stock-movement.view']);
+    it("shows this product's latest movements, newest first, each signed, its document opening where the person may go", async () => {
+        const fixture = await open(['configuration.product.view', 'inventory.stock-movement.view', 'inventory.purchase-order.view']);
         const request = TestBed.inject(HttpTestingController).expectOne((r) => r.url.includes(APIEndpoint.GET_STOCK_MOVEMENT_LIST));
         expect(request.request.params.get('product_oid')).toBe('p-1');
         request.flush({
             data: {
                 rows: [
-                    { oid: 'm-2', created_on: '2026-10-03T10:00:00.000', reason: 'sold', quantity: -2, balance_after: 74, batch_code: 'B-7KQ4-M2XH', reference: 'INV-1203', purchase_oid: null },
-                    { oid: 'm-1', created_on: '2026-10-02T10:00:00.000', reason: 'received', quantity: 76, balance_after: 76, batch_code: 'B-7KQ4-M2XH', reference: 'PO-2609-0142', purchase_oid: 'po-1' },
+                    { oid: 'm-2', created_on: '2026-10-03T10:00:00.000', reason: 'sold', quantity: -2, balance_after: 74, batch_code: 'B-7KQ4-M2XH', reference: 'INV-1203', reference_kind: 'order', reference_oid: 'o-1' },
+                    { oid: 'm-1', created_on: '2026-10-02T10:00:00.000', reason: 'received', quantity: 76, balance_after: 76, batch_code: 'B-7KQ4-M2XH', reference: 'PO-2609-0142', reference_kind: 'purchase-order', reference_oid: 'po-1' },
                 ],
             },
         });
@@ -124,6 +152,8 @@ describe('ProductDetailComponent', () => {
         expect(rows[0]).toContain('-2');
         expect(rows[1]).toContain('+76');
         expect(card.querySelector('a[href*="purchase-orders/po-1"]')?.textContent?.trim()).toBe('PO-2609-0142');
+        expect(card.querySelector('a[href*="orders/o-1"]')).toBeNull();
+        expect(rows[0]).toContain('INV-1203');
     });
 
     it('says the movements could not be loaded and offers to try again, without losing the rest of the page', async () => {

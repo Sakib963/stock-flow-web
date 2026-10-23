@@ -181,6 +181,62 @@
         }
     </div>
 
+    <nz-card class="mt-2 block md:mt-4" [nzTitle]="recentTitle" data-detail="recent">
+        <ng-template #recentTitle
+            ><h2 class="m-0 flex items-center gap-1.5 text-sm font-bold text-ink"><ng-icon name="lucideCalendarRange" size="14px" class="text-ink-muted" aria-hidden="true" />{{ 'configuration.product.recent.title' | translate }}</h2></ng-template
+        >
+        <div class="grid grid-cols-2 gap-px overflow-hidden rounded-container border border-line bg-line" [class.md:grid-cols-5]="canSeeMoney()" [class.md:grid-cols-4]="!canSeeMoney()">
+            @if (recent(); as r) {
+                <div class="bg-white px-4 py-3">
+                    <p class="m-0 text-xs font-semibold text-ink-muted">{{ 'configuration.product.recent.sold' | translate }}</p>
+                    <p class="mt-1 mb-0 font-mono text-xl font-bold text-ink tabular-nums">{{ r.kept | money: 'number' }}</p>
+                    <p class="m-0 text-[11px] text-ink-muted">{{ 'configuration.product.recent.soldHint' | translate }}</p>
+                </div>
+                <div class="bg-white px-4 py-3">
+                    <p class="m-0 text-xs font-semibold text-ink-muted">{{ 'configuration.product.recent.daysLeft' | translate }}</p>
+                    @if (r.daysLeft !== null) {
+                        <p class="mt-1 mb-0 font-mono text-xl font-bold tabular-nums" [class.text-danger-ink]="r.daysLeft < 7" [class.text-warning-ink]="r.daysLeft >= 7 && r.daysLeft < 14" [class.text-ink]="r.daysLeft >= 14">{{ r.daysLeft | money: 'number' }}</p>
+                        <p class="m-0 text-[11px] text-ink-muted">{{ 'configuration.product.recent.daysLeftHint' | translate }}</p>
+                    } @else {
+                        <p class="mt-1 mb-0 text-sm font-semibold text-ink-muted">{{ 'configuration.product.recent.noRecentSales' | translate }}</p>
+                    }
+                </div>
+                <div class="bg-white px-4 py-3">
+                    <p class="m-0 text-xs font-semibold text-ink-muted">{{ 'configuration.product.recent.returned' | translate }}</p>
+                    <p class="mt-1 mb-0 font-mono text-xl font-bold text-ink tabular-nums">{{ r.returnRate === null ? '–' : (r.returnRate | money: 'number') + '%' }}</p>
+                    <p class="m-0 text-[11px] text-ink-muted">{{ 'configuration.product.recent.returnedOf' | translate: { returned: (r.units_returned | money: 'number'), sold: (r.units_sold | money: 'number') } }}</p>
+                </div>
+                <div class="bg-white px-4 py-3">
+                    <p class="m-0 text-xs font-semibold text-ink-muted">{{ 'configuration.product.recent.split' | translate }}</p>
+                    <p class="mt-1 mb-0 font-mono text-xl font-bold text-ink tabular-nums">{{ r.counter_units | money: 'number' }} · {{ r.online_units | money: 'number' }}</p>
+                    <p class="m-0 text-[11px] text-ink-muted">{{ 'configuration.product.recent.splitHint' | translate }}</p>
+                </div>
+                @if (canSeeMoney() && r.sales !== undefined) {
+                    <div class="col-span-2 bg-white px-4 py-3 md:col-span-1">
+                        <p class="m-0 text-xs font-semibold text-ink-muted">{{ 'configuration.product.recent.profit' | translate }}</p>
+                        <p class="mt-1 mb-0 font-mono text-xl font-bold text-ink tabular-nums">{{ r.profit | money }}</p>
+                        <p class="m-0 text-[11px] text-ink-muted">
+                            @if (r.margin !== null) {
+                                {{ 'configuration.product.recent.margin' | translate: { margin: (r.margin | money: 'number'), sales: (r.sales | money) } }}
+                            } @else {
+                                {{ 'configuration.product.recent.noSales' | translate }}
+                            }
+                        </p>
+                        @if (r.units_without_cost) {
+                            <p class="m-0 text-[11px] text-warning-ink">{{ 'configuration.product.recent.withoutCost' | translate: { count: (r.units_without_cost | money: 'number') } }}</p>
+                        }
+                    </div>
+                }
+            } @else {
+                @for (cell of [1, 2, 3, 4]; track cell) {
+                    <div class="bg-white px-4 py-3">
+                        <nz-skeleton nzActive [nzTitle]="false" [nzParagraph]="{ rows: 2 }" />
+                    </div>
+                }
+            }
+        </div>
+    </nz-card>
+
     <nz-card class="mt-2 md:mt-4" [nzTitle]="batchesTitle" data-detail="batches">
         <ng-template #batchesTitle
             ><h2 class="m-0 flex items-center gap-1.5 text-sm font-bold text-ink"><ng-icon name="lucideBoxes" size="14px" class="text-ink-muted" aria-hidden="true" />{{ 'configuration.product.section.batches' | translate }}</h2></ng-template
@@ -197,7 +253,9 @@
                             <th nzAlign="right">{{ 'configuration.product.batch.onHand' | translate }}</th>
                             <th nzAlign="right">{{ 'configuration.product.batch.held' | translate }}</th>
                             <th nzAlign="right">{{ 'configuration.product.batch.sellable' | translate }}</th>
-                            <th nzAlign="right">{{ 'configuration.product.batch.cost' | translate }}</th>
+                            @if (canSeeMoney()) {
+                                <th nzAlign="right">{{ 'configuration.product.batch.cost' | translate }}</th>
+                            }
                             <th nzAlign="right">{{ 'configuration.product.batch.price' | translate }}</th>
                             @if (loaded.details.has_expiry) {
                                 <th nzWidth="190px">{{ 'inventory.expiry.label' | translate }}</th>
@@ -215,7 +273,9 @@
                                 <td nzAlign="right" class="font-mono tabular-nums">{{ batch.on_hand | money: 'number' }}</td>
                                 <td nzAlign="right" class="font-mono tabular-nums">{{ batch.held | money: 'number' }}</td>
                                 <td nzAlign="right" class="font-mono font-semibold tabular-nums">{{ batch.sellable | money: 'number' }}</td>
-                                <td nzAlign="right" class="font-mono tabular-nums">{{ batch.cost_price | money }}</td>
+                                @if (canSeeMoney()) {
+                                    <td nzAlign="right" class="font-mono tabular-nums">{{ batch.cost_price | money }}</td>
+                                }
                                 <td nzAlign="right" class="font-mono tabular-nums">
                                     @if (batch.selling_price !== null) {
                                         {{ batch.selling_price | money }}
@@ -246,7 +306,7 @@
                 ><h2 class="m-0 flex items-center gap-1.5 text-sm font-bold text-ink"><ng-icon name="lucideArrowLeftRight" size="14px" class="text-ink-muted" aria-hidden="true" />{{ 'inventory.stockMovement.card.title' | translate }}</h2></ng-template
             >
             <ng-template #movementsExtra>
-                <a nz-button nzType="link" nzSize="small" class="inline-flex items-center" [routerLink]="movementListRoute">{{ 'inventory.stockMovement.card.openList' | translate }}</a>
+                <a nz-button nzType="link" nzSize="small" class="inline-flex items-center" [routerLink]="movementListRoute" [state]="{ filters: { product_oid: oid } }">{{ 'inventory.stockMovement.card.openList' | translate }}</a>
             </ng-template>
             @if (movementsFailed(); as failure) {
                 <div class="flex flex-wrap items-center justify-between gap-2" role="alert">
@@ -290,8 +350,8 @@
                                     <td nzAlign="right" class="font-semibold tabular-nums" [class.text-success-ink]="move.quantity > 0" [class.text-danger-ink]="move.quantity < 0">{{ move.quantity > 0 ? '+' : '' }}{{ move.quantity | money: 'number' }}</td>
                                     <td nzAlign="right" class="tabular-nums">{{ move.balance_after | money: 'number' }}</td>
                                     <td>
-                                        @if (move.purchase_oid) {
-                                            <a class="text-primary hover:underline" [routerLink]="purchaseRoute(move.purchase_oid)">{{ move.reference }}</a>
+                                        @if (documentRoute(move); as route) {
+                                            <a class="text-primary hover:underline" [routerLink]="route">{{ move.reference }}</a>
                                         } @else if (move.reference) {
                                             {{ move.reference }}
                                         } @else {

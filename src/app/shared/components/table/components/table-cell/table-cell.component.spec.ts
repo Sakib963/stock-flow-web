@@ -4,6 +4,7 @@ import { provideNzI18n, en_US } from 'ng-zorro-antd/i18n';
 import { provideTranslateService } from '@ngx-translate/core';
 import { Row } from '@app/core/models/config.model';
 import { Column } from '@app/core/models/table.model';
+import { SessionService } from '@app/core/services/session/session.service';
 import { TableCellComponent } from './table-cell.component';
 
 const PERSON: Column = { key: 'actor', label: 'Last updated by', type: 'user', name: 'actor_name', width: 20 };
@@ -11,11 +12,11 @@ const PERSON: Column = { key: 'actor', label: 'Last updated by', type: 'user', n
 describe('TableCellComponent', () => {
     // Reset first: a cell is cheap to draw, so some of these compare two rows in one test, and a
     // second configure on a live TestBed is an error rather than a second component.
-    async function render(column: Column, row: Row) {
+    async function render(column: Column, row: Row, permissions: string[] = []) {
         TestBed.resetTestingModule();
         await TestBed.configureTestingModule({
             imports: [TableCellComponent],
-            providers: [provideRouter([]), provideNzI18n(en_US), provideTranslateService({ fallbackLang: 'en' })],
+            providers: [provideRouter([]), provideNzI18n(en_US), provideTranslateService({ fallbackLang: 'en' }), { provide: SessionService, useValue: { can: (code: string) => permissions.includes(code) } }],
         }).compileComponents();
 
         const fixture = TestBed.createComponent(TableCellComponent);
@@ -42,7 +43,7 @@ describe('TableCellComponent', () => {
     });
 
     it('opens a card from the name whenever the row names an account', async () => {
-        const { el } = await render(PERSON, { actor: 'a@x.test', actor_name: 'Samiha Rahman' });
+        const { el } = await render(PERSON, { actor: 'a@x.test', actor_name: 'Nafisa Rahman' });
 
         expect(el.querySelector('button')).not.toBeNull();
     });
@@ -91,5 +92,23 @@ describe('TableCellComponent', () => {
         expect(row).not.toHaveBeenCalled();
         el.querySelector<HTMLElement>('.font-mono')!.click();
         expect(row).toHaveBeenCalledTimes(1);
+    });
+
+    describe('a link whose page depends on the row', () => {
+        const DOCUMENT: Column = { key: 'reference', label: 'Document', type: 'link', width: 12, route: { by: 'kind', routes: { order: { route: '/app/sales/orders/:ref', permission: 'sales.order.view' }, disposal: { route: '/app/inventory/disposals/:ref', permission: 'inventory.product-dispose.view' } } } };
+
+        it('opens the page the row names, for someone who may open it', async () => {
+            const { el } = await render(DOCUMENT, { reference: 'INV-1203', kind: 'order', ref: 'o-1' }, ['sales.order.view']);
+            expect(el.querySelector('a')?.getAttribute('href')).toBe('/app/sales/orders/o-1');
+        });
+
+        it('reads as plain text for someone who may not open that page, or a kind with no page', async () => {
+            const refused = await render(DOCUMENT, { reference: 'DSP-0001', kind: 'disposal', ref: 'd-1' }, ['sales.order.view']);
+            expect(refused.el.querySelector('a')).toBeNull();
+            expect(refused.el.textContent).toContain('DSP-0001');
+
+            const unknown = await render(DOCUMENT, { reference: 'B-001', kind: 'carried_over', ref: 'x' }, ['sales.order.view']);
+            expect(unknown.el.querySelector('a')).toBeNull();
+        });
     });
 });
