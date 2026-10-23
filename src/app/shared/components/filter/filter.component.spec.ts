@@ -153,6 +153,19 @@ describe('FilterComponent', () => {
         });
     });
 
+    it('leaves Clear all off in the filter window until something in it can be cleared', async () => {
+        const { cmp } = await render({ render: 'modal', fields: [STATUS] });
+        cmp.openPanel();
+        expect(cmp.draftClearable()).toBe(false);
+
+        cmp.set(cmp.fields()[0], 'Active', true);
+        expect(cmp.draftClearable()).toBe(true);
+
+        cmp.clearDraft();
+        expect(cmp.draftClearable()).toBe(false);
+        cmp.closePanel();
+    });
+
     describe('a date range', () => {
         const PLACED: FilterConfig = { render: 'modal', fields: [{ key: 'placed', label: { en: 'Placed', bn: 'সময়' }, type: 'date-range', fromKey: 'date_from', toKey: 'date_to', presets: ['today', 'last-7-days'], max: 'today' }] };
         const range = (cmp: FilterComponent) => cmp.fields()[0] as Extract<FilterField, { type: 'date-range' }>;

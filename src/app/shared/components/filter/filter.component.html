@@ -83,7 +83,7 @@
 
 <ng-template #modalFooter>
     <div class="flex items-center gap-2">
-        <button nz-button nzType="text" type="button" class="mr-auto inline-flex items-center gap-1.5" (click)="clearDraft()">
+        <button nz-button nzType="text" type="button" class="mr-auto inline-flex items-center gap-1.5" [disabled]="!draftClearable()" (click)="clearDraft()" data-filter="clear-draft">
             <ng-icon name="lucideEraser" size="14px" aria-hidden="true" />
             <span class="text-xs">{{ 'list.clearFilters' | translate }}</span>
         </button>

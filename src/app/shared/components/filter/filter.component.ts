@@ -341,6 +341,12 @@ export class FilterComponent {
         this._modal.closeAll();
     }
 
+    /** Whether the open form holds anything Clear all would take away; a required field does not count. */
+    readonly draftClearable = computed(() => {
+        const draft = this._draft() ?? this.values();
+        return this.fields().some((field) => !field.required && this.holds(field, draft));
+    });
+
     clearDraft(): void {
         this._draft.set(this.cleared(this._draft() ?? this.values()));
     }
