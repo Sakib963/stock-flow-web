@@ -101,6 +101,24 @@ describe('PageHeaderComponent', () => {
         expect(crumbsOf(el).map((c) => c.text)).toEqual(['Configuration', 'Categories', 'Edit category']);
     });
 
+    it('reads Back to list and goes to the list, wherever the page was opened from', async () => {
+        const { el } = await render([], { title: 'Category details', back: { route: '/app/configuration/categories' } }, '/app/configuration/categories/c-1');
+        const button = el.querySelector<HTMLButtonElement>('[data-page-header="back"]')!;
+
+        expect(button.textContent?.trim()).toBe('list.backToList');
+        expect(button.querySelector('ng-icon')?.getAttribute('name')).toBe('lucideList');
+
+        button.click();
+        await new Promise((resolve) => setTimeout(resolve));
+        expect(TestBed.inject(Router).url).toBe('/app/configuration/categories');
+    });
+
+    it('names its own place when the page is not under a list', async () => {
+        const { el } = await render([], { title: 'Edit category', back: { route: '/app/dashboard', label: 'settings.business.backToSettings' } });
+
+        expect(el.querySelector('[data-page-header="back"]')?.textContent?.trim()).toBe('settings.business.backToSettings');
+    });
+
     it('leaves Home out of the breadcrumb for someone who cannot open the dashboard', async () => {
         const without = await render([]);
         expect(without.el.querySelector('[data-page-header="breadcrumb"]')?.textContent).not.toContain('shell.home');

@@ -1,9 +1,8 @@
-import { Location } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject, input, output } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { NavigationEnd, Router, RouterLink } from '@angular/router';
 import { NgIcon, provideIcons } from '@ng-icons/core';
-import { lucideArrowLeft, lucideEllipsis } from '@ng-icons/lucide';
+import { lucideEllipsis, lucideList } from '@ng-icons/lucide';
 import { NzBreadCrumbModule } from 'ng-zorro-antd/breadcrumb';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzDropdownModule } from 'ng-zorro-antd/dropdown';
@@ -38,14 +37,13 @@ const HOME: Crumb = { label: 'shell.home', route: '/app/dashboard' };
 @Component({
     selector: 'page-header',
     imports: [RouterLink, NgIcon, NzBreadCrumbModule, NzButtonModule, NzDropdownModule, NzMenuModule, NzTooltipModule, TranslatePipe, TextPipe, MoneyPipe],
-    providers: [provideIcons({ ...LIST_ICONS, lucideArrowLeft, lucideEllipsis })],
+    providers: [provideIcons({ ...LIST_ICONS, lucideEllipsis, lucideList })],
     templateUrl: './page-header.component.html',
     styleUrl: './page-header.component.scss',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PageHeaderComponent {
     private readonly _router = inject(Router);
-    private readonly _location = inject(Location);
     private readonly _session = inject(SessionService);
 
     readonly config = input<PageHeaderConfig | null>(null);
@@ -130,8 +128,7 @@ export class PageHeaderComponent {
 
     goBack(): void {
         const back = this.backTarget();
-        if (back === 'history') this._location.back();
-        else if (back) void this._router.navigateByUrl(back.route);
+        if (back) void this._router.navigateByUrl(back.route);
     }
 
     run(action: PageAction): void {

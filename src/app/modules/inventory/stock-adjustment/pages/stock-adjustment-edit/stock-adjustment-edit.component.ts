@@ -41,7 +41,7 @@ export class StockAdjustmentEditComponent implements HasUnsavedChanges {
     private readonly _digits = inject(DigitsPipe);
 
     readonly oid = this._route.snapshot.paramMap.get('oid') ?? '';
-    readonly back: PageBack = { route: STOCK_ADJUSTMENT_ROUTES.detail(this.oid) };
+    readonly back: PageBack = { route: STOCK_ADJUSTMENT_ROUTES.list };
     readonly editor = viewChild(StockAdjustmentFormComponent);
     private readonly _asking = signal(false);
     readonly saving = computed(() => this._asking() || this._adjustments.saving());

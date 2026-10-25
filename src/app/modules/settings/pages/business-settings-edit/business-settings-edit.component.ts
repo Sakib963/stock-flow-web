@@ -49,7 +49,7 @@ export class BusinessSettingsEditComponent {
     private readonly _translate = inject(TranslateService);
     private readonly _router = inject(Router);
 
-    readonly back: PageBack = { route: SETTINGS_PAGES.view };
+    readonly back: PageBack = { route: SETTINGS_PAGES.view, label: 'settings.business.backToSettings' };
     readonly accept = ACCEPT;
     readonly formId = 'business-settings-form';
 

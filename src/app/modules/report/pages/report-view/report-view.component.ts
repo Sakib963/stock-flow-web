@@ -12,6 +12,7 @@ import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { Subscription, map } from 'rxjs';
 import { APIEndpoint } from '@app/core/constants/api-endpoint';
 import { FilterConfig, FilterField, FilterValues } from '@app/core/models/filter.model';
+import { PageBack } from '@app/core/models/page-header.model';
 import { ReportColumn, ReportFilter, ReportGroup, ReportResult, ReportRow } from '@app/core/models/report.model';
 import { Column, TableConfig } from '@app/core/models/table.model';
 import { LanguageService } from '@app/core/services/language/language.service';
@@ -84,6 +85,8 @@ export class ReportViewComponent {
     private readonly _date = new RecordDatePipe();
     readonly language = inject(LanguageService).current;
     readonly isPhone = isPhoneWidth(viewportWidth());
+    /** The group page, one segment up: a report is opened from it. */
+    readonly back: PageBack = { route: '/' + this._route.snapshot.pathFromRoot.flatMap((r) => r.url.map((s) => s.path)).slice(0, -1).join('/'), label: 'report.backToReports' };
 
     readonly group = toSignal(this._route.data.pipe(map((data) => data['group'] as ReportGroup)), { requireSync: true });
     readonly key = toSignal(this._route.paramMap.pipe(map((params) => params.get('report') ?? '')), { requireSync: true });

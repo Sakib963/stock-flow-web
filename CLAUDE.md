@@ -237,6 +237,9 @@ went wrong and what to do.
 - **Every record page ends in an `action-footer` with Back** (`lucideArrowLeft`, `list.back`), and
   Back calls `Location.back()`, so it returns wherever the person came from. It goes to a fixed
   route only when the requirement says to, and then its label names the place ("Back to orders").
+- **The header's back button reads Back to list** (`lucideList`, `list.backToList`) and goes to the
+  list route, from record, edit and create pages alike. A page under no list passes its own `label`
+  ("Back to settings"); a page with nowhere fixed to go has no header back.
 - Rules are shown **before** the person types (a checklist that ticks off), not as an error after.
 - Errors sit inline under the field that failed, with `aria-invalid` and `aria-describedby`. The
   outcome of submitting (saved, failed) is an `NzMessageService` message as well.

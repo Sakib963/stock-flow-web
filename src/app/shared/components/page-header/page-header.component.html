@@ -44,8 +44,8 @@
                  primary action keeps the right edge. -->
             @if (backTarget()) {
                 <button nz-button nzType="default" type="button" class="inline-flex items-center gap-1.5" data-page-header="back" (click)="goBack()">
-                    <ng-icon name="lucideArrowLeft" size="14px" aria-hidden="true" />
-                    <span>{{ 'list.back' | translate }}</span>
+                    <ng-icon name="lucideList" size="14px" aria-hidden="true" />
+                    <span>{{ backTarget()?.label ?? 'list.backToList' | translate }}</span>
                 </button>
             }
             <ng-content />

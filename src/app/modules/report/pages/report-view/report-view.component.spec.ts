@@ -41,7 +41,7 @@ const open = async ({ report = 'sales-register', group = 'sales', granted = ['re
             provideTranslateService({ fallbackLang: 'en' }),
             ...OVERLAY_PROVIDERS,
             { provide: SessionService, useValue: { can: (code: string) => granted.includes(code), menu: () => [], business: () => ({ name: 'Boutique' }) } },
-            { provide: ActivatedRoute, useValue: { data: of({ group }), paramMap: of(convertToParamMap({ report })) } },
+            { provide: ActivatedRoute, useValue: { data: of({ group }), paramMap: of(convertToParamMap({ report })), snapshot: { pathFromRoot: [{ url: [{ path: 'app' }] }, { url: [{ path: 'reports' }] }, { url: [{ path: group }, { path: report }] }] } } },
         ],
     }).compileComponents();
     TestBed.inject(TranslateService).setTranslation('en', { report: { value: { channel: { POS: 'Counter', ONLINE: 'Online' } } } });
@@ -68,6 +68,12 @@ describe('ReportViewComponent', () => {
         const request = await flush(ctx);
         expect(request.request.params.get('report')).toBe('sales-register');
         expect(request.request.params.get('date_from')?.endsWith('-01')).toBe(true);
+    });
+
+    it('goes back to its group of reports, saying so', async () => {
+        const ctx = await open();
+        await flush(ctx);
+        expect(ctx.fixture.componentInstance.back).toEqual({ route: '/app/reports/sales', label: 'report.backToReports' });
     });
 
     it('sends no period to a report that is as at now', async () => {

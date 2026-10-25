@@ -524,6 +524,7 @@
     },
     "list": {
         "back": "Back",
+        "backToList": "Back to list",
         "moreActions": "More actions",
         "retry": "Try again",
         "rendererFailed": "This view could not load. Your filters are kept.",
@@ -4247,6 +4248,7 @@
     "settings": {
         "business": {
             "title": "Business settings",
+            "backToSettings": "Back to settings",
             "lead": "Your business name, logo and contact details, as they appear on receipts, invoices, labels and the tracking page.",
             "editTitle": "Edit business settings",
             "edit": "Edit settings",
@@ -5437,6 +5439,7 @@
         "withoutCost": "{{count}} units sold have no cost price, so they count as free and profit reads high.",
         "emptyBody": "Change the period or a filter to see more.",
         "notFoundTitle": "Report not found",
+        "backToReports": "Back to reports",
         "notFoundBody": "This report does not exist or your role does not include it. Go back and pick one from the list.",
         "failed": {
             "network": "Could not run the report. Check the internet connection, then try again.",

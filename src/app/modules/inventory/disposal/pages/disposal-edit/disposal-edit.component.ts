@@ -41,7 +41,7 @@ export class DisposalEditComponent implements HasUnsavedChanges {
     private readonly _digits = inject(DigitsPipe);
 
     readonly oid = this._route.snapshot.paramMap.get('oid') ?? '';
-    readonly back: PageBack = { route: DISPOSAL_ROUTES.detail(this.oid) };
+    readonly back: PageBack = { route: DISPOSAL_ROUTES.list };
     readonly editor = viewChild(DisposalFormComponent);
     private readonly _asking = signal(false);
     readonly saving = computed(() => this._asking() || this._disposals.saving());

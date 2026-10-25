@@ -56,7 +56,7 @@ export class PurchaseOrderVerifyComponent implements HasUnsavedChanges {
 
     readonly language = inject(LanguageService).current;
     readonly oid = this._route.snapshot.paramMap.get('oid') ?? '';
-    readonly back: PageBack = { route: PURCHASE_ORDER_ROUTES.detail(this.oid) };
+    readonly back: PageBack = { route: PURCHASE_ORDER_ROUTES.list };
 
     readonly record = signal<PurchaseOrderDetails | null>(null);
     readonly loading = signal(true);

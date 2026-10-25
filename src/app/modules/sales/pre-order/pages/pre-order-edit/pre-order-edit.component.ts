@@ -38,7 +38,7 @@ export class PreOrderEditComponent implements HasUnsavedChanges {
 
     private readonly _oid = this._route.snapshot.paramMap.get('oid') ?? '';
 
-    readonly back: PageBack = { route: PRE_ORDER_ROUTES.detail(this._oid) };
+    readonly back: PageBack = { route: PRE_ORDER_ROUTES.list };
     readonly editor = viewChild(PreOrderFormComponent);
     private readonly _asking = signal(false);
     readonly saving = computed(() => this._asking() || this._bookings.saving());

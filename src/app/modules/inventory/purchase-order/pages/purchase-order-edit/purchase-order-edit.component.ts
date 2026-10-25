@@ -42,7 +42,7 @@ export class PurchaseOrderEditComponent implements HasUnsavedChanges {
     private readonly _modal = inject(NzModalService);
 
     readonly oid = this._route.snapshot.paramMap.get('oid') ?? '';
-    readonly back: PageBack = { route: PURCHASE_ORDER_ROUTES.detail(this.oid) };
+    readonly back: PageBack = { route: PURCHASE_ORDER_ROUTES.list };
     readonly editor = viewChild(PurchaseOrderFormComponent);
     private readonly _asking = signal(false);
     readonly saving = computed(() => this._asking() || this._orders.saving());

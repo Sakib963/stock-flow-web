@@ -9,8 +9,12 @@ export interface Crumb {
     route?: string;
 }
 
-/** Where the header's Back button goes. `history` steps back; a route goes somewhere definite. */
-export type PageBack = 'history' | { route: string };
+/** Where the header's Back button goes: always a fixed place, so its label names it. A page that is not under a list names its own place. */
+export interface PageBack {
+    route: string;
+    /** Default: Back to list. */
+    label?: string;
+}
 
 export interface PageHeaderConfig {
     /** Default: the feature's menu label. */
