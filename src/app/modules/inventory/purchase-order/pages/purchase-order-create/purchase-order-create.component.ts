@@ -34,6 +34,7 @@ export class PurchaseOrderCreateComponent implements HasUnsavedChanges {
     private readonly _translate = inject(TranslateService);
     private readonly _modal = inject(NzModalService);
     private readonly _money = inject(MoneyPipe);
+    private readonly _oid = crypto.randomUUID();
 
     readonly back: PageBack = { route: PURCHASE_ORDER_ROUTES.list };
     readonly editor = viewChild(PurchaseOrderFormComponent);
@@ -56,7 +57,7 @@ export class PurchaseOrderCreateComponent implements HasUnsavedChanges {
             return;
         }
 
-        const payload = editor.payload(false);
+        const payload = { ...editor.payload(false), oid: this._oid };
         this._asking.set(true);
         confirmAction(this._modal, {
             title: this._translate.instant('inventory.purchaseOrder.confirmCreate.title'),
@@ -88,7 +89,7 @@ export class PurchaseOrderCreateComponent implements HasUnsavedChanges {
             this._message.error(this._translate.instant('inventory.purchaseOrder.draftNeedsSupplier'));
             return;
         }
-        const payload = editor.payload(true);
+        const payload = { ...editor.payload(true), oid: this._oid };
         this.drafting.set(true);
         this._asking.set(true);
         confirmAction(this._modal, {

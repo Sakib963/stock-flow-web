@@ -436,7 +436,7 @@
     </action-footer>
 }
 
-<nz-modal [nzVisible]="paymentOpen()" [nzTitle]="'inventory.purchaseOrder.recordPayment' | translate" [nzContent]="paymentBody" [nzFooter]="paymentFooter" nzCentered (nzOnCancel)="paymentOpen.set(false)">
+<nz-modal [nzVisible]="paymentOpen()" [nzTitle]="'inventory.purchaseOrder.recordPayment' | translate" [nzContent]="paymentBody" [nzFooter]="paymentFooter" nzCentered [nzClosable]="!saving()" [nzMaskClosable]="!saving()" (nzOnCancel)="saving() || paymentOpen.set(false)">
     <ng-template #paymentBody>
         @if (paymentReview(); as review) {
             <p class="m-0 text-sm text-ink">{{ 'inventory.purchaseOrder.paymentConfirm' | translate: { number: record()?.details?.po_number, fromStatus: ('inventory.purchaseOrder.payment.' + review.from.status | translate), fromAmount: (review.from.amount | money), toStatus: ('inventory.purchaseOrder.payment.' + review.to.status | translate), toAmount: (review.to.amount | money) } }}</p>
@@ -490,7 +490,7 @@
     </ng-template>
 </nz-modal>
 
-<nz-modal [nzVisible]="cancelOpen()" [nzTitle]="'inventory.purchaseOrder.cancelTitle' | translate" [nzContent]="cancelBody" [nzFooter]="cancelFooter" nzCentered (nzOnCancel)="cancelOpen.set(false)">
+<nz-modal [nzVisible]="cancelOpen()" [nzTitle]="'inventory.purchaseOrder.cancelTitle' | translate" [nzContent]="cancelBody" [nzFooter]="cancelFooter" nzCentered [nzClosable]="!saving()" [nzMaskClosable]="!saving()" (nzOnCancel)="saving() || cancelOpen.set(false)">
     <ng-template #cancelBody>
         <form nz-form nzLayout="vertical" [formGroup]="cancelForm" (ngSubmit)="confirmCancel()">
             <p class="mt-0 mb-3 text-[13px] text-ink-body">{{ 'inventory.purchaseOrder.cancelBody' | translate }}</p>
@@ -503,7 +503,7 @@
         </form>
     </ng-template>
     <ng-template #cancelFooter>
-        <button nz-button type="button" class="inline-flex items-center gap-1.5" (click)="cancelOpen.set(false)">
+        <button nz-button type="button" class="inline-flex items-center gap-1.5" [disabled]="saving()" (click)="cancelOpen.set(false)">
             <ng-icon name="lucideArrowLeft" size="14px" aria-hidden="true" />
             <span>{{ 'inventory.purchaseOrder.keepOrder' | translate }}</span>
         </button>
