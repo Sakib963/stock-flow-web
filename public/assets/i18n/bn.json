@@ -2008,6 +2008,7 @@
             },
             "revenueShort": "সম্ভাব্য বিক্রয়",
             "ofReceived": "{{received}}টির মধ্যে",
+            "daysInStock": "{{days}} দিন ধরে মজুত",
             "canSell": "{{count}}টি বিক্রিযোগ্য",
             "plusBudget": "+ বাজেট {{budget}}",
             "upToOff": "সর্বোচ্চ ছাড় {{discount}}",

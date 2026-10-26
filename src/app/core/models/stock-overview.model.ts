@@ -46,6 +46,8 @@ export interface StockBatch {
     intended_use: IntendedUse;
     status: BatchStatus;
     received_on: string;
+    /** Business days since it arrived, while it still holds stock; null once sold out. */
+    days_in_stock: number | null;
     expiry_date: string | null;
     initial_quantity: number;
     on_hand: number;

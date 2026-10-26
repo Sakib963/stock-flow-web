@@ -2008,6 +2008,7 @@
             },
             "revenueShort": "Probable revenue",
             "ofReceived": "of {{received}} received",
+            "daysInStock": "{{days}} days in stock",
             "canSell": "{{count}} can sell",
             "plusBudget": "+ {{budget}} budget",
             "upToOff": "up to {{discount}} off",

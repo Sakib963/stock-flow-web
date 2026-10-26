@@ -152,6 +152,9 @@
                                 </td>
                                 <td>
                                     <span class="block whitespace-nowrap text-ink-body">{{ batch.received_on | recordDate: language() : 'date' }}</span>
+                                    @if (batch.days_in_stock !== null) {
+                                        <span class="block text-xs whitespace-nowrap text-ink-muted">{{ 'inventory.stockOverview.daysInStock' | translate: { days: batch.days_in_stock } | digits }}</span>
+                                    }
                                     <span class="block text-xs text-ink-muted">
                                         @if (batch.purchase_oid && canViewOrders()) {
                                             <a class="text-primary hover:underline" [routerLink]="purchaseRoute(batch.purchase_oid)">{{ batch.po_number }}</a>

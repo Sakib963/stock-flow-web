@@ -11,7 +11,7 @@ import { OVERLAY_PROVIDERS } from '@app/shared/constants/overlay-providers';
 import { ProductStockComponent } from './product-stock.component';
 
 const batch = (over: Partial<StockBatch>): StockBatch => ({
-    oid: 'i-1', batch_code: 'B-7KQ4-M2XH', intended_use: 'for_sale', status: 'ready_for_sale', received_on: '2026-09-30T08:00:00.000', expiry_date: null,
+    oid: 'i-1', batch_code: 'B-7KQ4-M2XH', intended_use: 'for_sale', status: 'ready_for_sale', received_on: '2026-09-30T08:00:00.000', days_in_stock: 26, expiry_date: null,
     initial_quantity: 10, on_hand: 10, held: 2, sellable: 8, selling_price: 500, maximum_discount: 50, priced: true,
     warehouse_name: 'Main', aisle_name: null, purchase_oid: 'po-1', po_number: 'PO-2609-0001', supplier_name: 'Beauty house', ...over,
 });
@@ -19,7 +19,7 @@ const batch = (over: Partial<StockBatch>): StockBatch => ({
 const OWNER_VIEW: ProductStock = {
     product: { oid: 'p-1', name: 'Sun cream', sku: 'SUN', photo: null, status: 'Active', unit_type: 'pcs', restock_threshold: 5, has_expiry: false, category_name: 'Skincare', sub_category_name: 'Creams', brand_name: null },
     figures: { on_hand: 10, held: 2, sellable: 8, batches: 1, unpriced_batches: 0, expired_units: 0, expiring_units: 0, stock_value: 3000, internal_value: 0, expiring_value: 0, expected_revenue: 5000, profit_full: 1800, profit_discounted: 1300 },
-    batches: [batch({ cost_price: 300, budget_per_unit: 20, margin_per_unit: 180 }), batch({ oid: 'i-2', batch_code: 'B-0000-0001', intended_use: 'internal_use', status: 'internal_use', on_hand: 0, held: 0, sellable: 0, selling_price: null, maximum_discount: null, priced: false })],
+    batches: [batch({ cost_price: 300, budget_per_unit: 20, margin_per_unit: 180 }), batch({ oid: 'i-2', batch_code: 'B-0000-0001', intended_use: 'internal_use', status: 'internal_use', on_hand: 0, held: 0, sellable: 0, days_in_stock: null, selling_price: null, maximum_discount: null, priced: false })],
     activity: [],
     sees_money: true,
     business_name: 'StockFlow',
@@ -90,6 +90,13 @@ describe('ProductStockComponent', () => {
         expect(page.batches().map((b) => b.oid)).toEqual(['i-1', 'i-2']);
         expect(page.canPrice(OWNER_VIEW.batches[1])).toBe(false);
         expect(page.canPrice(OWNER_VIEW.batches[0])).toBe(true);
+    });
+
+    it('says how long a batch has held stock, and nothing for a sold out one', async () => {
+        const fixture = await open(OWNER_VIEW, ['inventory.overview.view', 'inventory.stock-value.view']);
+        fixture.componentInstance.showSoldOut.set(true);
+        fixture.detectChanges();
+        expect(text(fixture.nativeElement).match(/inventory\.stockOverview\.daysInStock/g)?.length).toBe(1);
     });
 
     it('offers the stock report only with the export permission, and asks the server for this product', async () => {
