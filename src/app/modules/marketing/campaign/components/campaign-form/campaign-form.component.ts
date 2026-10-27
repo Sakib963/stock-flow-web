@@ -12,11 +12,9 @@ import { NzSelectModule } from 'ng-zorro-antd/select';
 import { NzTableModule } from 'ng-zorro-antd/table';
 import { NzTooltipModule } from 'ng-zorro-antd/tooltip';
 import { TranslatePipe } from '@ngx-translate/core';
-import { finalize } from 'rxjs';
-import { CampaignBatch, CampaignDetails, CampaignPartner, CampaignPayload, PROMOTION_TYPES, PartnerChoice, PromotionType, budgetPerUnit } from '@app/core/models/campaign.model';
+import { CampaignBatch, CampaignDetails, CampaignPartner, CampaignPayload, PROMOTION_TYPES, PromotionType, budgetPerUnit } from '@app/core/models/campaign.model';
 import { BatchDrawerComponent } from '@app/modules/marketing/campaign/components/batch-drawer/batch-drawer.component';
 import { PartnerDrawerComponent } from '@app/modules/marketing/campaign/components/partner-drawer/partner-drawer.component';
-import { CampaignService } from '@app/modules/marketing/campaign/services/campaign.service';
 import { DigitsPipe } from '@app/shared/pipes/digits/digits.pipe';
 import { MoneyPipe } from '@app/shared/pipes/money/money.pipe';
 import { fromDay, toDay } from '@app/shared/utils/calendar-day/calendar-day';
@@ -37,7 +35,6 @@ const number = (value: unknown): number | null => (value === null || value === u
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CampaignFormComponent {
-    private readonly _campaigns = inject(CampaignService);
 
     readonly formId = 'campaign-form';
     readonly types = PROMOTION_TYPES;
@@ -59,9 +56,6 @@ export class CampaignFormComponent {
 
     readonly batches = signal<CampaignBatch[]>([]);
     readonly partners = signal<CampaignPartner[]>([]);
-    readonly partnerChoices = signal<PartnerChoice[]>([]);
-    readonly partnersLoading = signal(true);
-    readonly partnersFailed = signal(false);
 
     readonly batchDrawer = signal(false);
     readonly partnerDrawer = signal(false);
@@ -79,20 +73,10 @@ export class CampaignFormComponent {
     });
 
     constructor() {
-        this.loadPartners();
         effect(() => {
             const record = this.editing();
             if (record) this.fill(record);
         });
-    }
-
-    loadPartners(): void {
-        this.partnersFailed.set(false);
-        this.partnersLoading.set(true);
-        this._campaigns
-            .partners()
-            .pipe(finalize(() => this.partnersLoading.set(false)))
-            .subscribe({ next: (rows) => this.partnerChoices.set(rows), error: () => this.partnersFailed.set(true) });
     }
 
     /** No day before the posting window ends can close the measuring window. */

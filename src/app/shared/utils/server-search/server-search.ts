@@ -30,6 +30,8 @@ export class ServerSearch<T extends { value: string }> {
         return held && !this._term() && !found.some((c) => c.value === held.value) ? [held, ...found] : found;
     });
     readonly loading = computed(() => this._typing() || this._asking());
+    /** The words the shown choices answer, so an empty list can say "no match" rather than "none yet". */
+    readonly term = this._term.asReadonly();
     readonly failed = signal(false);
 
     constructor(fetch: (term: string, offset: number) => Observable<T[]>, destroy: DestroyRef) {

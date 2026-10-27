@@ -5,11 +5,11 @@
         <nz-form-item>
             <nz-form-label nzRequired nzFor="cp-partner">{{ 'marketing.campaign.partner' | translate }}</nz-form-label>
             <nz-form-control>
-                <nz-select nzId="cp-partner" class="w-full" nzShowSearch [ngModel]="partnerOid()" (ngModelChange)="partnerOid.set($event)" [nzLoading]="choicesLoading()" [nzDisabled]="!!line()" [nzPlaceHolder]="'marketing.campaign.partnerPlaceholder' | translate" [nzNotFoundContent]="'marketing.campaign.partnerDrawer.none' | translate">
+                <nz-select nzId="cp-partner" class="w-full" nzShowSearch nzServerSearch [ngModel]="partnerOid()" (ngModelChange)="pick($event)" [nzLoading]="picker.loading()" [nzDisabled]="!!line()" [nzPlaceHolder]="'marketing.campaign.partnerPlaceholder' | translate" [nzNotFoundContent]="partnersEmpty" (nzOnSearch)="picker.search($event)" (nzOpenChange)="picker.opened($event)" (nzScrollToBottom)="picker.more()">
                     @if (line(); as current) {
                         <nz-option [nzValue]="current.partner_oid" [nzLabel]="current.name" />
                     }
-                    @for (partner of offered(); track partner.oid) {
+                    @for (partner of picker.choices(); track partner.oid) {
                         @if (partner.oid !== line()?.partner_oid) {
                             <nz-option [nzValue]="partner.oid" [nzLabel]="partner.name" />
                         }
@@ -31,6 +31,22 @@
                 <input nz-input id="cp-note" type="text" maxlength="500" autocomplete="off" [ngModel]="note()" (ngModelChange)="note.set($event)" [attr.placeholder]="'marketing.campaign.partnerNotePlaceholder' | translate" />
             </nz-form-control>
         </nz-form-item>
+    </div>
+</ng-template>
+
+<ng-template #partnersEmpty>
+    <div class="flex flex-col items-center gap-2 py-2 text-xs text-ink-muted">
+        @if (picker.loading()) {
+            <span role="status">{{ 'form.loading' | translate }}</span>
+        } @else if (picker.failed()) {
+            <span>{{ 'marketing.campaign.partnersFailed' | translate }}</span>
+            <button nz-button type="button" class="inline-flex items-center gap-1.5" (click)="picker.retry()">
+                <ng-icon name="lucideRotateCw" size="14px" aria-hidden="true" />
+                <span>{{ 'list.retry' | translate }}</span>
+            </button>
+        } @else {
+            <span>{{ (picker.term() ? 'list.noChoiceMatch' : 'marketing.campaign.partnerDrawer.none') | translate }}</span>
+        }
     </div>
 </ng-template>
 

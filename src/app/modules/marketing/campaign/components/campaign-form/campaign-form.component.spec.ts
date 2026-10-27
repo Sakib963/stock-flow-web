@@ -17,9 +17,6 @@ const open = async () => {
     }).compileComponents();
     const fixture = TestBed.createComponent(CampaignFormComponent);
     fixture.detectChanges();
-    TestBed.inject(HttpTestingController)
-        .expectOne((r) => r.url.endsWith(APIEndpoint.GET_PARTNERS_FOR_CAMPAIGN))
-        .flush({ data: [{ oid: 'pt-1', name: 'Style Diaries', partner_type: 'Page', platforms: [], handle: null }] });
     return fixture;
 };
 

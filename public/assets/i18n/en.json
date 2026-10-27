@@ -4580,7 +4580,7 @@
             "partnerNote": "Note",
             "partnerNotePlaceholder": "e.g. 1 reel and 2 stories",
             "noPartners": "No partners on this campaign. A discount offer or an ad you run yourself needs none.",
-            "partnersFailed": "The partners could not be loaded. Close and open the page again to try once more.",
+            "partnersFailed": "The partners could not be loaded.",
             "partnerDrawer": {
                 "addTitle": "Add a partner",
                 "editTitle": "Change the fee or note",

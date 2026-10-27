@@ -127,9 +127,6 @@
                 <span>{{ 'marketing.campaign.addPartner' | translate }}</span>
             </button>
         </div>
-        @if (partnersFailed()) {
-            <p class="mx-4 mt-0 mb-3 text-xs text-danger-ink md:mx-5" role="alert">{{ 'marketing.campaign.partnersFailed' | translate }}</p>
-        }
         @if (partners().length) {
             <nz-table nzTemplateMode nzSize="small" [nzScroll]="{ x: '560px' }">
                 <thead>
@@ -174,4 +171,4 @@
 </form>
 
 <campaign-batch-drawer [open]="batchDrawer()" [taken]="takenBatches()" (saved)="addBatch($event)" (closed)="batchDrawer.set(false)" />
-<campaign-partner-drawer [open]="partnerDrawer()" [line]="partnerLine()" [choices]="partnerChoices()" [choicesLoading]="partnersLoading()" [taken]="takenPartners()" (saved)="savePartner($event)" (closed)="closePartner()" />
+<campaign-partner-drawer [open]="partnerDrawer()" [line]="partnerLine()" [taken]="takenPartners()" (saved)="savePartner($event)" (closed)="closePartner()" />

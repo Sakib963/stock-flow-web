@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable, inject, signal } from '@angular/core';
 import { APIEndpoint } from '@app/core/constants/api-endpoint';
 import { CampaignDetails, CampaignMove, CampaignPayload, DeliverablePayload, CampaignStatus, PartnerChoice, PartnerPaymentPayload, PromotableProduct } from '@app/core/models/campaign.model';
-import { ReferenceCache } from '@app/shared/services/reference-cache/reference-cache.service';
+import { SEARCH_PAGE } from '@app/shared/utils/server-search/server-search';
 import { environment } from '@env/environment';
 import { Observable, finalize, map } from 'rxjs';
 
@@ -12,7 +12,6 @@ const MOVE_ENDPOINT: Record<CampaignMove, string> = { start: APIEndpoint.START_C
 export class CampaignService {
     private readonly _http = inject(HttpClient);
     private readonly _url = (endpoint: string) => `${environment.baseUrl}${endpoint}`;
-    private readonly _reference = inject(ReferenceCache);
 
     readonly saving = signal(false);
 
@@ -20,9 +19,9 @@ export class CampaignService {
         return this._http.get<{ data: CampaignDetails }>(`${this._url(APIEndpoint.GET_CAMPAIGN_DETAILS)}/${oid}`).pipe(map((response) => response.data));
     }
 
-    /** Kept (docs/caching): names and handles only, no fees or dues. */
-    partners(): Observable<PartnerChoice[]> {
-        return this._reference.keep('campaign-partners', () => this._http.get<{ data: PartnerChoice[] }>(this._url(APIEndpoint.GET_PARTNERS_FOR_CAMPAIGN)).pipe(map((response) => response.data)));
+    /** Fifty at a time, searched by name or handle on the server, leaving out the ones already on the campaign: names and handles only, no fees or dues. */
+    partners(search: string, offset: number, exclude: readonly string[]): Observable<PartnerChoice[]> {
+        return this._http.get<{ data: PartnerChoice[] }>(this._url(APIEndpoint.GET_PARTNERS_FOR_CAMPAIGN), { params: { search, offset, limit: SEARCH_PAGE, exclude: exclude.join(',') } }).pipe(map((response) => response.data));
     }
 
     searchBatches(search: string): Observable<PromotableProduct[]> {

@@ -173,6 +173,8 @@ export interface PromotableProduct {
 
 export interface PartnerChoice {
     oid: string;
+    /** The oid again, the key every searching picker reads. */
+    value: string;
     name: string;
     partner_type: PartnerType;
     platforms: PartnerPlatform[];
