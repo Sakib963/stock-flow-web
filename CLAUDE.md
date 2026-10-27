@@ -291,8 +291,9 @@ what the old screens got wrong so it is not copied.
 ## Verify
 
 - `npm run verify` must pass: build, utilities check, tokens check.
-- `ng test --watch=false` must pass. Anything touching auth, sessions, guards or the interceptor
-  keeps its specs green.
+- The related specs must pass: `ng test --watch=false --include=<spec> ...` for the changed feature
+  and whatever imports it, never every spec for a feature change. Anything touching auth, sessions,
+  guards or the interceptor keeps every spec green.
 - For a visual change, look at it: `tools/cdp.mjs` drives headless Chrome for screenshots at
   1366x768 and 390x844, in English and Bengali.
-- The pre-commit hook in the workspace runs the build and the tests before any commit in this repo.
+- The pre-commit hook in the workspace runs the build and the specs related to what changed before any commit in this repo; every spec only when a foundation changed (interceptors, guards, core services, app setup).
