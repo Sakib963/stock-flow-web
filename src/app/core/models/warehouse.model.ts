@@ -1,6 +1,8 @@
 /** A warehouse as the list, the form and the detail page see it. */
 export interface Warehouse {
     oid: string;
+    /** The row version an edit sends back, so a form opened before someone else saved is refused. */
+    version?: string;
     name: string;
     code: string;
     location: string | null;

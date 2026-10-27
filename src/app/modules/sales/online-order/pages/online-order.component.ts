@@ -6,7 +6,7 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { ORDER_ROUTES } from '@app/modules/sales/order/constants/order-routes';
 import { NgIcon, provideIcons } from '@ng-icons/core';
-import { lucideEraser, lucideExternalLink, lucideFileClock, lucideHistory, lucidePlay, lucideCheck, lucideCircleAlert, lucideCircleCheck, lucideClipboardPaste, lucideMapPin, lucideMinus, lucidePackage, lucidePencil, lucidePlus, lucidePrinter, lucideRotateCw, lucideScanText, lucideSend, lucideSettings2, lucideTrash2, lucideTriangleAlert, lucideUserRound, lucideX } from '@ng-icons/lucide';
+import { lucideArrowLeft, lucideEraser, lucideExternalLink, lucideFileClock, lucideHistory, lucidePlay, lucideCheck, lucideCircleAlert, lucideCircleCheck, lucideClipboardPaste, lucideMapPin, lucideMinus, lucidePackage, lucidePencil, lucidePlus, lucidePrinter, lucideRotateCw, lucideScanText, lucideSend, lucideSettings2, lucideTrash2, lucideTriangleAlert, lucideUserRound, lucideX } from '@ng-icons/lucide';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzCheckboxModule } from 'ng-zorro-antd/checkbox';
 import { NzDrawerModule } from 'ng-zorro-antd/drawer';
@@ -49,7 +49,7 @@ import { environment } from '@env/environment';
 import { InvoiceContent, invoiceLinks, printInvoice } from '@app/shared/utils/invoice/invoice';
 import { confirmAction } from '@app/shared/utils/confirm-action/confirm-action';
 import { normalizePhone } from '@app/shared/utils/phone/phone';
-import { failureOf } from '@app/shared/utils/request-failure/request-failure';
+import { failureOf, isStale } from '@app/shared/utils/request-failure/request-failure';
 import { viewportWidth } from '@app/shared/utils/viewport/viewport';
 
 type Lookup = { state: 'idle' } | { state: 'loading' } | { state: 'failed'; kind: RequestFailure } | { state: 'done'; result: PhoneLookup };
@@ -92,7 +92,7 @@ const DAY_MS = 24 * 60 * 60 * 1000;
 @Component({
     selector: 'online-order',
     imports: [FormsModule, RouterLink, NgTemplateOutlet, NgIcon, NzButtonModule, NzCheckboxModule, NzDrawerModule, NzFormModule, NzInputModule, NzInputNumberModule, NzModalModule, NzPopoverModule, NzRadioModule, NzSelectModule, NzSkeletonModule, NzSpinModule, NzTableModule, NzTooltipModule, NzTypographyModule, TranslatePipe, PageHeaderComponent, ProductSearchComponent, StatusTagComponent, AddressFormComponent, BookingLinesComponent, DigitsPipe, MoneyPipe, RecordDatePipe],
-    providers: [DigitsPipe, MoneyPipe, provideIcons({ lucideEraser, lucideExternalLink, lucideFileClock, lucideHistory, lucidePlay, lucideCheck, lucideCircleAlert, lucideCircleCheck, lucideClipboardPaste, lucideMapPin, lucideMinus, lucidePackage, lucidePencil, lucidePlus, lucidePrinter, lucideRotateCw, lucideScanText, lucideSend, lucideSettings2, lucideTrash2, lucideTriangleAlert, lucideUserRound, lucideX })],
+    providers: [DigitsPipe, MoneyPipe, provideIcons({ lucideArrowLeft, lucideEraser, lucideExternalLink, lucideFileClock, lucideHistory, lucidePlay, lucideCheck, lucideCircleAlert, lucideCircleCheck, lucideClipboardPaste, lucideMapPin, lucideMinus, lucidePackage, lucidePencil, lucidePlus, lucidePrinter, lucideRotateCw, lucideScanText, lucideSend, lucideSettings2, lucideTrash2, lucideTriangleAlert, lucideUserRound, lucideX })],
     templateUrl: './online-order.component.html',
     styleUrl: './online-order.component.scss',
     host: { class: 'flex min-h-0 flex-col lg:h-full' },
@@ -114,6 +114,7 @@ export class OnlineOrderComponent {
     private readonly _router = inject(Router);
     /** Set on the edit route: the page fills from a Pending order and saves over it (REQ-52). */
     readonly editingOid = inject(ActivatedRoute).snapshot.paramMap.get('oid');
+    private editingVersion = '';
     readonly editingInvoice = signal<string | null>(null);
     /** A booking opened here to become an order (pre-order REQ-07): its lines arrive without a batch. */
     readonly convertOid = this.editingOid ? null : inject(ActivatedRoute).snapshot.queryParamMap.get('convert');
@@ -156,6 +157,12 @@ export class OnlineOrderComponent {
     readonly addressSeed = signal<CustomerAddress | null>(null);
 
     readonly chargesOpen = signal(false);
+    /** Save turns the dialog into its own confirmation; Back returns to the fields. */
+    readonly chargesReview = signal(false);
+    readonly chargesDistrictName = computed(() => {
+        const place = this.districtChoices().find((choice) => choice.oid === this.chargesDistrict());
+        return place ? this.placeName(place) : '';
+    });
     readonly chargesSaving = signal(false);
     readonly chargesDistrict = signal<string | null>(null);
     readonly chargesInside = signal<number | null>(null);
@@ -450,6 +457,7 @@ export class OnlineOrderComponent {
         this.chargesDistrict.set(setup.home_district?.oid ?? null);
         this.chargesInside.set(setup.delivery_charge_inside || null);
         this.chargesOutside.set(setup.delivery_charge_outside || null);
+        this.chargesReview.set(false);
         this.chargesOpen.set(true);
         if (this.districtChoices().length > 1) return;
         this.districtsLoading.set(true);
@@ -465,6 +473,22 @@ export class OnlineOrderComponent {
         });
     }
 
+    /** Asks in the same dialog before saving; charges that say what is already saved close without asking or saving. */
+    reviewCharges(): void {
+        const [district, inside, outside] = [this.chargesDistrict(), this.chargesInside(), this.chargesOutside()];
+        if (!district || inside === null || outside === null) {
+            this._message.warning(this._translate.instant('sales.online.charges.incomplete'));
+            return;
+        }
+        const setup = this.setup();
+        if (setup && district === setup.home_district?.oid && inside === setup.delivery_charge_inside && outside === setup.delivery_charge_outside) {
+            this.chargesOpen.set(false);
+            this._message.info(this._translate.instant('form.nothingChanged'));
+            return;
+        }
+        this.chargesReview.set(true);
+    }
+
     /** The business's own district and its two charges; an order's charge can still be changed on the order (REQ-39). */
     saveCharges(): void {
         const [district, inside, outside] = [this.chargesDistrict(), this.chargesInside(), this.chargesOutside()];
@@ -473,7 +497,7 @@ export class OnlineOrderComponent {
             return;
         }
         this.chargesSaving.set(true);
-        this._orders.saveDeliveryCharges({ home_district_oid: district, delivery_charge_inside: inside, delivery_charge_outside: outside }).subscribe({
+        this._orders.saveDeliveryCharges({ home_district_oid: district, delivery_charge_inside: inside, delivery_charge_outside: outside }, this.setup()?.settings_version ?? '').subscribe({
             next: (saved) => {
                 this.chargesSaving.set(false);
                 this.setup.update((setup) => (setup ? { ...setup, ...saved } : setup));
@@ -576,7 +600,7 @@ export class OnlineOrderComponent {
                         lines: this.lines().map(({ inventory_oid, quantity, discount }) => ({ inventory_oid, quantity, discount })),
                         pre_order_oid: this.booking()?.oid ?? null,
                     },
-                    !!this.editingOid
+                    this.editingOid ? this.editingVersion : null
                 )
                 .subscribe({
                     next: ({ invoice_no, customer_oid, amount_paid, tracking_token }) => {
@@ -737,6 +761,7 @@ export class OnlineOrderComponent {
         this._orders.forEdit(oid).subscribe({
             next: (order) => {
                 this.fill(order);
+                this.editingVersion = order.version ?? '';
                 this.editingInvoice.set(order.invoice_no);
                 if (order.payment_type && order.payment_type !== 'COD') {
                     if (order.payment_method) this.method.set(order.payment_method as PaymentMethod);
@@ -831,6 +856,10 @@ export class OnlineOrderComponent {
      * moderator to check; a blocked customer asks for the tick.
      */
     private failCreate(error: unknown): void {
+        if (isStale(error)) {
+            this._message.error(this._translate.instant('form.changedSinceLoaded'));
+            return;
+        }
         if (error instanceof HttpErrorResponse && (error.status === 409 || error.status === 400)) {
             const data = error.error?.data ?? {};
             if (typeof data.sellable === 'number' && data.inventory_oid) {

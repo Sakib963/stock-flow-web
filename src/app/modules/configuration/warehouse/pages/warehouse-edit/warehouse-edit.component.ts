@@ -94,7 +94,7 @@ export class WarehouseEditComponent implements HasUnsavedChanges {
             confirmAction(this._modal, this.confirmCopy(payload.name)).subscribe((confirmed) => {
                 if (!confirmed) return;
                 this._submitting.set(true);
-                this._warehouses.update(payload).subscribe({
+                this._warehouses.update(payload, this.warehouse()?.version ?? '').subscribe({
                     next: (changed) => {
                         this._submitting.set(false);
                         editor.form.markAsPristine();

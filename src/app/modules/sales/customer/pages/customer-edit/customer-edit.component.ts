@@ -90,7 +90,7 @@ export class CustomerEditComponent implements HasUnsavedChanges {
         }).subscribe((confirmed) => {
             this._asking.set(false);
             if (!confirmed) return;
-            this._customers.update(payload).subscribe({
+            this._customers.update(payload, this.customer()?.version ?? '').subscribe({
                 next: (changed) => {
                     editor.markPristine();
                     this._message[changed ? 'success' : 'info'](this._translate.instant(changed ? 'sales.customer.updated' : 'form.nothingChanged'));

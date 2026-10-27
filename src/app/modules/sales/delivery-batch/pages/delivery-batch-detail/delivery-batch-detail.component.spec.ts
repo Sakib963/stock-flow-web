@@ -42,6 +42,7 @@ const order = (oid: string, over: Partial<BatchOrder> = {}): BatchOrder => ({
 
 const batch = (over: Partial<DeliveryBatchDetails> = {}): DeliveryBatchDetails => ({
     oid: OID,
+    version: '7',
     batch_no: 'DB-2610-0001',
     courier: 'Pathao',
     status: 'Open',
@@ -111,7 +112,7 @@ describe('DeliveryBatchDetailComponent', () => {
         vi.spyOn(fixture.debugElement.injector.get(NzModalService), 'confirm').mockImplementation(() => ({ afterClose: of(true) }) as unknown as NzModalRef);
         page.tick('1', true);
         page.takeOut();
-        expect(http.expectOne((r) => r.url.includes(APIEndpoint.UPDATE_DELIVERY_BATCH_ORDERS)).request.body).toEqual({ oid: OID, order_oids: ['2'] });
+        expect(http.expectOne((r) => r.url.includes(APIEndpoint.UPDATE_DELIVERY_BATCH_ORDERS)).request.body).toEqual({ oid: OID, version: '7', order_oids: ['2'] });
         page.tickAll(true);
         page.takeOut();
         http.expectNone((r) => r.url.includes(APIEndpoint.UPDATE_DELIVERY_BATCH_ORDERS));

@@ -15,6 +15,7 @@ const ALL = ['sales.pre-order.view', 'sales.pre-order.edit', 'sales.pre-order.co
 
 const record = (over: Partial<PreOrderDetails> = {}): PreOrderDetails => ({
     oid: OID,
+    version: '1',
     preorder_no: 'PRE-2610-0001',
     customer_oid: 'c-1',
     customer_name: 'Nusrat',

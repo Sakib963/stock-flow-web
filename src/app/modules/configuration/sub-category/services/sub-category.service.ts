@@ -25,9 +25,9 @@ export class SubCategoryService {
     }
 
     /** Whether anything changed: the server writes nothing when the record already says this. */
-    update(payload: SubCategoryPayload): Observable<boolean> {
+    update(payload: SubCategoryPayload, version: string): Observable<boolean> {
         this.saving.set(true);
-        return this._http.post<{ data?: { changed?: boolean } }>(`${environment.baseUrl}${APIEndpoint.UPDATE_SUB_CATEGORY_DETAILS}`, payload).pipe(
+        return this._http.post<{ data?: { changed?: boolean } }>(`${environment.baseUrl}${APIEndpoint.UPDATE_SUB_CATEGORY_DETAILS}`, { ...payload, version }).pipe(
             map((response) => response?.data?.changed !== false),
             finalize(() => this.saving.set(false))
         );

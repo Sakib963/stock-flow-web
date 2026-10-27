@@ -36,7 +36,7 @@ import { RecordDatePipe } from '@app/shared/pipes/record-date/record-date.pipe';
 import { confirmAction } from '@app/shared/utils/confirm-action/confirm-action';
 import { isLabelable, labelContent, printLabels } from '@app/shared/utils/delivery-label/delivery-label';
 import { saveDownload } from '@app/shared/utils/download-file/download-file';
-import { failureKey, failureOf } from '@app/shared/utils/request-failure/request-failure';
+import { failureKey, failureOf, isStale } from '@app/shared/utils/request-failure/request-failure';
 import { RecordTimelineComponent } from '@app/shared/components/record-timeline/record-timeline.component';
 import { environment } from '@env/environment';
 
@@ -223,7 +223,7 @@ export class DeliveryBatchDetailComponent {
 
     submitAdd(): void {
         if (!this.toAdd().size || this.saving()) return;
-        this.send('add', this._batches.setOrders(this.oid, [...this.orders().map((order) => order.oid), ...this.toAdd()]), 'sales.deliveryBatch.action.add.done');
+        this.send('add', this._batches.setOrders(this.oid, [...this.orders().map((order) => order.oid), ...this.toAdd()], this.record()?.version ?? ''), 'sales.deliveryBatch.action.add.done');
     }
 
     takeOut(): void {
@@ -245,7 +245,8 @@ export class DeliveryBatchDetailComponent {
                     'take-out',
                     this._batches.setOrders(
                         this.oid,
-                        staying.map((order) => order.oid)
+                        staying.map((order) => order.oid),
+                        this.record()?.version ?? ''
                     ),
                     'sales.deliveryBatch.action.takeOut.done'
                 );
@@ -324,7 +325,7 @@ export class DeliveryBatchDetailComponent {
             },
             error: (error: unknown) => {
                 if (error instanceof HttpErrorResponse && (error.status === 409 || error.status === 400)) {
-                    this._message.error(error.error?.message ?? this._translate.instant('sales.deliveryBatch.movedOn'));
+                    this._message.error(isStale(error) ? this._translate.instant('form.changedSinceLoaded') : (error.error?.message ?? this._translate.instant('sales.deliveryBatch.movedOn')));
                     if (error.status === 409) {
                         this.adding.set(false);
                         this.cancelling.set(false);

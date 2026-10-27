@@ -168,7 +168,7 @@ export class BusinessSettingsEditComponent {
                 website: text(value.website),
                 facebook_url: text(value.facebook_url),
                 instagram_url: text(value.instagram_url),
-            })
+            }, this.loaded()?.version ?? '')
             .subscribe({
                 next: () => {
                     this.form.markAsPristine();

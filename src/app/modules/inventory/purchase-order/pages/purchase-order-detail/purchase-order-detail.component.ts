@@ -284,7 +284,7 @@ export class PurchaseOrderDetailComponent {
             return;
         }
         const { payment_status, paid_amount } = this.paymentForm.getRawValue();
-        this._orders.recordPayment({ oid: this.oid, payment_status, paid_amount: payment_status === 'partially_paid' ? Number(paid_amount) : 0 }).subscribe({
+        this._orders.recordPayment({ oid: this.oid, payment_status, paid_amount: payment_status === 'partially_paid' ? Number(paid_amount) : 0 }, this.record()?.details.version ?? '').subscribe({
             next: (changed) => {
                 this.paymentOpen.set(false);
                 this._message[changed ? 'success' : 'info'](this._translate.instant(changed ? 'inventory.purchaseOrder.paymentRecorded' : 'form.nothingChanged'));

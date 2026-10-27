@@ -1,6 +1,8 @@
 /** A brand as the list, the form and the detail page see it. */
 export interface Brand {
     oid: string;
+    /** The row version an edit sends back, so a form opened before someone else saved is refused. */
+    version?: string;
     name: string;
     description: string | null;
     /** ISO 3166-1 alpha-2, such as KR. Optional. */

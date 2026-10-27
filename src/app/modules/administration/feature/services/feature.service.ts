@@ -20,8 +20,8 @@ export class FeatureService {
     }
 
     /** Whether anything changed: the server writes nothing when the feature already says this. */
-    update(payload: FeaturePayload): Observable<boolean> {
-        return this.send(APIEndpoint.UPDATE_FEATURE_DETAILS, payload);
+    update(payload: FeaturePayload, version: string): Observable<boolean> {
+        return this.send(APIEndpoint.UPDATE_FEATURE_DETAILS, { ...payload, version });
     }
 
     switch(change: FeatureSwitch): Observable<boolean> {

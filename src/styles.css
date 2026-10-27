@@ -245,6 +245,21 @@ body.lang-bn {
     overflow: hidden;
 }
 
+/* Every toast. NzMessageService takes no class, so this keys on ant's own. A long message wraps in a
+   readable column beside its icon instead of stretching across the page. */
+.ant-message-notice-content {
+    max-width: 30rem;
+    text-align: start;
+}
+.ant-message-custom-content {
+    display: flex;
+    gap: 0.5rem;
+    align-items: flex-start;
+}
+.ant-message .ant-message-custom-content > .anticon {
+    margin: 0.2em 0 0;
+}
+
 /* The grant tree: a hairline down each level of indent, so which feature sits under which module
    reads at a glance. Ant draws these only with nzShowLine, which also swaps the carets for +/- boxes.
    The row's own 4px bottom padding is bridged so the line runs unbroken. */

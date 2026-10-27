@@ -12,6 +12,8 @@ export type CustomerStatus = 'Active' | 'Inactive';
 /** A customer as the list, the form and the record page see it. Gender and age are null when not known (sales REQ-63). */
 export interface Customer {
     oid: string;
+    /** The row version an edit sends back, so a form opened before someone else saved is refused. */
+    version?: string;
     name: string;
     phone: string;
     gender: CustomerGender | null;
@@ -30,6 +32,8 @@ export interface Customer {
 
 export interface CustomerAddress {
     oid: string;
+    /** The row version an edit sends back, so a form opened before someone else saved is refused. */
+    version?: string;
     label: string | null;
     recipient_name: string;
     recipient_phone: string | null;

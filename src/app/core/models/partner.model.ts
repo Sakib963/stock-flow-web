@@ -12,6 +12,8 @@ export type PartnerStatus = 'Active' | 'Inactive';
 /** Whoever promotes the business: a person, a page or group, or an agency. */
 export interface Partner {
     oid: string;
+    /** The row version an edit sends back, so a form opened before someone else saved is refused. */
+    version?: string;
     name: string;
     partner_type: PartnerType;
     platforms: PartnerPlatform[];

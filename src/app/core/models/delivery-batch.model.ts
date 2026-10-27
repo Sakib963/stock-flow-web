@@ -36,6 +36,8 @@ export interface BatchActivity {
 
 export interface DeliveryBatchDetails {
     oid: string;
+    /** The row version an edit sends back, so a form opened before someone else saved is refused. */
+    version?: string;
     batch_no: string;
     courier: Courier;
     status: DeliveryBatchStatus;

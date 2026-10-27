@@ -31,9 +31,9 @@ export class CampaignService {
     }
 
     /** The oid is made here, so a save repeated after a lost answer finds the campaign it made. */
-    save(payload: CampaignPayload, editing: boolean): Observable<string> {
+    save(payload: CampaignPayload, version: string | null): Observable<string> {
         this.saving.set(true);
-        return this._http.post<{ data: { oid: string } }>(this._url(editing ? APIEndpoint.UPDATE_CAMPAIGN : APIEndpoint.CREATE_CAMPAIGN), payload).pipe(
+        return this._http.post<{ data: { oid: string } }>(this._url(version !== null ? APIEndpoint.UPDATE_CAMPAIGN : APIEndpoint.CREATE_CAMPAIGN), version === null ? payload : { ...payload, version }).pipe(
             map((response) => response.data.oid),
             finalize(() => this.saving.set(false))
         );
@@ -45,8 +45,8 @@ export class CampaignService {
     }
 
     /** Adds a promise when the payload names its partner line, otherwise changes the one it names. */
-    saveDeliverable(payload: DeliverablePayload): Observable<unknown> {
-        return this._http.post(this._url(payload.campaign_partner_oid ? APIEndpoint.CREATE_CAMPAIGN_DELIVERABLE : APIEndpoint.UPDATE_CAMPAIGN_DELIVERABLE), payload);
+    saveDeliverable(payload: DeliverablePayload, version: string | null): Observable<unknown> {
+        return this._http.post(this._url(payload.campaign_partner_oid ? APIEndpoint.CREATE_CAMPAIGN_DELIVERABLE : APIEndpoint.UPDATE_CAMPAIGN_DELIVERABLE), version === null ? payload : { ...payload, version });
     }
 
     removeDeliverable(oid: string): Observable<unknown> {

@@ -115,7 +115,7 @@ export class FeatureEditComponent implements HasUnsavedChanges {
         const t = (key: string, params?: object) => this._translate.instant(key, params);
         confirmAction(this._modal, { title: t('administration.feature.confirmEdit.title', { name: payload.label }), body: t('administration.feature.confirmEdit.body'), ok: t('form.saveChanges'), cancel: t('form.confirm.cancel') }).subscribe((confirmed) => {
             if (!confirmed) return;
-            this._features.update(payload).subscribe({
+            this._features.update(payload, this.feature()?.version ?? '').subscribe({
                 next: (changed) => {
                     this.form.markAsPristine();
                     this._message[changed ? 'success' : 'info'](t(changed ? 'administration.feature.updated' : 'form.nothingChanged'));

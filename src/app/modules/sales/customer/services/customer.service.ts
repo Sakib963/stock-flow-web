@@ -22,8 +22,8 @@ export class CustomerService {
     }
 
     /** Whether anything changed: the server writes nothing when the record already says this. */
-    update(payload: CustomerPayload): Observable<boolean> {
-        return this.write<{ changed?: boolean }>(APIEndpoint.UPDATE_CUSTOMER_DETAILS, payload).pipe(map((data) => data?.changed !== false));
+    update(payload: CustomerPayload, version: string): Observable<boolean> {
+        return this.write<{ changed?: boolean }>(APIEndpoint.UPDATE_CUSTOMER_DETAILS, { ...payload, version }).pipe(map((data) => data?.changed !== false));
     }
 
     flag(oid: string, flag: CustomerFlag, reason: string | null): Observable<boolean> {
@@ -34,8 +34,8 @@ export class CustomerService {
         return this.write(APIEndpoint.CREATE_CUSTOMER_ADDRESS, { customer_oid: customerOid, ...address });
     }
 
-    updateAddress(oid: string, address: AddressPayload): Observable<unknown> {
-        return this.write(APIEndpoint.UPDATE_CUSTOMER_ADDRESS, { oid, ...address });
+    updateAddress(oid: string, address: AddressPayload, version: string): Observable<unknown> {
+        return this.write(APIEndpoint.UPDATE_CUSTOMER_ADDRESS, { oid, version, ...address });
     }
 
     removeAddress(oid: string): Observable<unknown> {

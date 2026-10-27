@@ -73,6 +73,7 @@ describe('PreOrderFormComponent', () => {
     it('keeps a confirmed booking’s products and units, and leaves its prices open', async () => {
         const { fixture, element, form } = await open({
             oid: 'b-1',
+            version: '1',
             preorder_no: 'PRE-2610-0001',
             customer_oid: 'c-1',
             customer_name: 'Nusrat',

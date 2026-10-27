@@ -16,4 +16,10 @@ describe('failureOf', () => {
     it('builds the copy key under the feature that asked', () => {
         expect(failureKey(new HttpErrorResponse({ status: 403 }), 'form.saveFailed')).toBe('form.saveFailed.forbidden');
     });
+
+    it('answers a form opened before someone else saved with the one shared message, whatever the feature', () => {
+        const stale = new HttpErrorResponse({ status: 409, error: { data: { reason: 'changed_since_loaded' } } });
+        expect(failureKey(stale, 'configuration.category.saveFailed')).toBe('form.changedSinceLoaded');
+        expect(failureKey(new HttpErrorResponse({ status: 409, error: { data: { field: 'name' } } }), 'form.saveFailed')).toBe('form.saveFailed.server');
+    });
 });

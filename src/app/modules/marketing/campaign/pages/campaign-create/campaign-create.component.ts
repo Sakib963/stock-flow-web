@@ -49,7 +49,7 @@ export class CampaignCreateComponent implements HasUnsavedChanges {
         const t = (key: string, params?: object) => this._translate.instant(key, params);
         confirmAction(this._modal, { title: t('marketing.campaign.confirmCreate.title'), body: t('marketing.campaign.confirmCreate.body', { name: payload.name }), ok: t('marketing.campaign.add'), cancel: t('form.confirm.cancel') }).subscribe((confirmed) => {
             if (!confirmed) return;
-            this.campaigns.save(payload, false).subscribe({
+            this.campaigns.save(payload, null).subscribe({
                 next: (oid) => {
                     editor.form.markAsPristine();
                     this._message.success(t('marketing.campaign.created'));

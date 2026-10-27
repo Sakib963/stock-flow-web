@@ -87,7 +87,7 @@ export class PartnerEditComponent implements HasUnsavedChanges {
             confirmAction(this._modal, { title: t('marketing.partner.confirmEdit.title'), body: t('marketing.partner.confirmEdit.body', { name: payload.name }), ok: t('form.saveChanges'), cancel: t('form.confirm.cancel') }).subscribe((confirmed) => {
                 if (!confirmed) return;
                 this._submitting.set(true);
-                this._partners.update(payload).subscribe({
+                this._partners.update(payload, this.partner()?.version ?? '').subscribe({
                     next: (changed) => {
                         this._submitting.set(false);
                         editor.form.markAsPristine();

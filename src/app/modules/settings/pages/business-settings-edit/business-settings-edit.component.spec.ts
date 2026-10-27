@@ -15,7 +15,7 @@ import { BusinessSettingsService } from '@app/modules/settings/services/business
 import { OVERLAY_PROVIDERS } from '@app/shared/constants/overlay-providers';
 import { BusinessSettingsEditComponent } from './business-settings-edit.component';
 
-const SETTINGS: BusinessSettings = { name: 'A boutique', logo_url: null, address: null, phone_primary: '01711000111', phone_secondary: null, website: 'https://www.aboutique.test', facebook_url: null, instagram_url: null, edited_on: null, edited_by: null };
+const SETTINGS: BusinessSettings = { version: '7', name: 'A boutique', logo_url: null, address: null, phone_primary: '01711000111', phone_secondary: null, website: 'https://www.aboutique.test', facebook_url: null, instagram_url: null, edited_on: null, edited_by: null };
 
 const open = async (granted = ['settings.business.view', 'settings.business.edit']) => {
     const load = vi.fn(() => Promise.resolve());
@@ -42,7 +42,7 @@ describe('BusinessSettingsEditComponent', () => {
         page.save();
         expect(ask).toHaveBeenCalled();
         const sent = http.expectOne((r) => r.url.includes(APIEndpoint.UPDATE_BUSINESS_SETTINGS));
-        expect(sent.request.body).toEqual({ name: 'A new name', logo_url: null, address: 'House 5, Road 2', phone_primary: '01711000111', phone_secondary: null, website: 'https://www.aboutique.test', facebook_url: null, instagram_url: null });
+        expect(sent.request.body).toEqual({ version: '7', name: 'A new name', logo_url: null, address: 'House 5, Road 2', phone_primary: '01711000111', phone_secondary: null, website: 'https://www.aboutique.test', facebook_url: null, instagram_url: null });
         sent.flush({ code: 200, data: { ...SETTINGS, name: 'A new name' } });
         expect(load).toHaveBeenCalledWith('session-1');
     });

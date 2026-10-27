@@ -9,6 +9,8 @@ export interface Category {
     created_on?: string;
     last_action_by?: string | null;
     last_action_on?: string | null;
+    /** The row version an edit sends back, so a form opened before someone else saved is refused. */
+    version?: string;
 }
 
 export type CategoryStatus = 'Active' | 'Inactive';
@@ -20,6 +22,7 @@ export interface CategoryPayload {
     category_code: string;
     description: string | null;
     status: CategoryStatus;
+    version?: string;
 }
 
 /** The numbers the detail page shows above the record, computed by the server. */

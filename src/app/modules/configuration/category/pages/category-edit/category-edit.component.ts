@@ -90,7 +90,7 @@ export class CategoryEditComponent implements HasUnsavedChanges {
             // Released while the question is open, so Save is not spinning behind the dialog for a
             // write that has not started.
             this._submitting.set(false);
-            const payload = editor.payload();
+            const payload = { ...editor.payload(), version: this.category()?.version };
             confirmAction(this._modal, this.confirmCopy(payload.name)).subscribe((confirmed) => {
                 if (!confirmed) return;
                 this._submitting.set(true);

@@ -7,6 +7,8 @@ export type FeatureKind = 'Module' | 'Feature';
 /** A module or feature of the registry: a menu entry. `state` includes its module's; `own_state` is its own. */
 export interface Feature {
     oid: string;
+    /** The row version an edit sends back, so a form opened before someone else saved is refused. */
+    version?: string;
     slug: string;
     label: string;
     label_bn: string;

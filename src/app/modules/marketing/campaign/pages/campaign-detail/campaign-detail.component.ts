@@ -38,7 +38,7 @@ import { MoneyPipe } from '@app/shared/pipes/money/money.pipe';
 import { RecordDatePipe } from '@app/shared/pipes/record-date/record-date.pipe';
 import { fromDay, toDay } from '@app/shared/utils/calendar-day/calendar-day';
 import { confirmAction } from '@app/shared/utils/confirm-action/confirm-action';
-import { failureKey, failureOf } from '@app/shared/utils/request-failure/request-failure';
+import { failureKey, failureOf, isStale } from '@app/shared/utils/request-failure/request-failure';
 
 /** One campaign: what it promotes, with whom, planned against agreed, and Start, Complete or Cancel. */
 @Component({
@@ -209,7 +209,7 @@ export class CampaignDetailComponent {
                 link: this.dLink().trim() || null,
                 posted_on: this.dPostedShown() ? toDay(this.dPosted()) : null,
                 note: this.dNote().trim() || null,
-            })
+            }, promise.deliverable ? (promise.deliverable.version ?? '') : null)
             .pipe(finalize(() => this.savingDeliverable.set(false)))
             .subscribe({
                 next: () => {
@@ -238,6 +238,11 @@ export class CampaignDetailComponent {
 
     /** A refusal the server explains (a cancelled campaign, a promise with an outcome) is shown in its words, then the page reloads. */
     private refused(error: unknown): void {
+        if (isStale(error)) {
+            this._message.error(this._translate.instant('form.changedSinceLoaded'));
+            this.load();
+            return;
+        }
         if (error instanceof HttpErrorResponse && (error.status === 409 || error.status === 404 || error.status === 400)) {
             this._message.error(error.error?.message ?? this._translate.instant('form.saveFailed'));
             // Only a promise or partner that is gone closes the dialog; otherwise what was typed stays.

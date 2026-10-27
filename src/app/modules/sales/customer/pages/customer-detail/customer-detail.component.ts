@@ -176,7 +176,7 @@ export class CustomerDetailComponent {
         const payload = form.payload();
         this.ask('sales.customer.address.confirmSave', { name: payload.recipient_name }, 'sales.customer.address.save').subscribe((confirmed) => {
             if (!confirmed) return;
-            const request = open === 'new' ? this._customers.addAddress(this.oid, payload) : this._customers.updateAddress(open.oid, payload);
+            const request = open === 'new' ? this._customers.addAddress(this.oid, payload) : this._customers.updateAddress(open.oid, payload, open.version ?? '');
             request.subscribe({
                 next: () => {
                     this.addressOpen.set(null);
@@ -193,7 +193,7 @@ export class CustomerDetailComponent {
         const { label, recipient_name, recipient_phone, address_line, district_oid, thana_oid, area_text, postal_code } = address;
         this.ask('sales.customer.address.confirmDefault', { place: this.placeOf(address) }, 'sales.customer.address.makeDefault').subscribe((confirmed) => {
             if (!confirmed) return;
-            this._customers.updateAddress(address.oid, { label, recipient_name, recipient_phone, address_line, district_oid, thana_oid, area_text, postal_code, is_default: true }).subscribe({
+            this._customers.updateAddress(address.oid, { label, recipient_name, recipient_phone, address_line, district_oid, thana_oid, area_text, postal_code, is_default: true }, address.version ?? '').subscribe({
                 next: () => {
                     this._message.success(this._translate.instant('sales.customer.address.defaultSet'));
                     this.load();

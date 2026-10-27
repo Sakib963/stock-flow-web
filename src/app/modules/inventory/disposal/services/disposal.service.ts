@@ -26,8 +26,8 @@ export class DisposalService {
     }
 
     /** Whether anything changed: the server writes nothing when the disposal already says this. */
-    update(payload: DisposalPayload): Observable<boolean> {
-        return this.write<{ changed?: boolean }>(APIEndpoint.UPDATE_DISPOSAL, payload).pipe(map((data) => data?.changed !== false));
+    update(payload: DisposalPayload, version: string): Observable<boolean> {
+        return this.write<{ changed?: boolean }>(APIEndpoint.UPDATE_DISPOSAL, { ...payload, version }).pipe(map((data) => data?.changed !== false));
     }
 
     approve(oid: string): Observable<{ dispose_no: string }> {

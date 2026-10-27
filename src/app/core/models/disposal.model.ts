@@ -28,6 +28,8 @@ export interface DisposalRow {
 
 export interface DisposalDetails extends DisposalRow {
     reject_reason: string | null;
+    /** The row version an edit sends back, so a form opened before someone else saved is refused. */
+    version?: string;
     cancel_reason: string | null;
     submitted_on: string | null;
     submitted_by: string | null;

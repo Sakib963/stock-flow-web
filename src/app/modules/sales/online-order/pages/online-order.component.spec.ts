@@ -48,6 +48,25 @@ const knownCustomer = (page: OnlineOrderComponent, http: HttpTestingController, 
 };
 
 describe('OnlineOrderComponent', () => {
+    it('asks in the same dialog before saving new delivery charges, and saves nothing when they did not change', async () => {
+        const { page, http } = await open();
+        page.openCharges();
+        http.match((r) => r.url.includes('district'));
+        page.reviewCharges();
+        expect(page.chargesOpen()).toBe(false);
+        http.expectNone((r) => r.url.includes(APIEndpoint.UPDATE_DELIVERY_CHARGES));
+
+        page.openCharges();
+        http.match((r) => r.url.includes('district'));
+        page.chargesInside.set(80);
+        page.reviewCharges();
+        expect(page.chargesReview()).toBe(true);
+        http.expectNone((r) => r.url.includes(APIEndpoint.UPDATE_DELIVERY_CHARGES));
+
+        page.saveCharges();
+        expect(http.expectOne((r) => r.url.includes(APIEndpoint.UPDATE_DELIVERY_CHARGES)).request.body).toMatchObject({ home_district_oid: 'BD-Dhaka', delivery_charge_inside: 80, delivery_charge_outside: 120 });
+    });
+
     it('fills phone, name and address from a pasted message and takes the one place clearly ahead', async () => {
         const { page, http } = await open();
         page.pasteText.set('person a, 01987654321, 5/5, gaznabi road, mohammadpur');

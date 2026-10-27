@@ -45,12 +45,12 @@ export class PurchaseOrderService {
     }
 
     /** Whether anything changed: the server writes nothing when the order already says this. */
-    update(payload: PurchaseOrderPayload): Observable<boolean> {
-        return this.write<{ changed?: boolean }>(APIEndpoint.UPDATE_PURCHASE_ORDER, payload).pipe(map((data) => data?.changed !== false));
+    update(payload: PurchaseOrderPayload, version: string): Observable<boolean> {
+        return this.write<{ changed?: boolean }>(APIEndpoint.UPDATE_PURCHASE_ORDER, { ...payload, version }).pipe(map((data) => data?.changed !== false));
     }
 
-    recordPayment(payload: PaymentPayload): Observable<boolean> {
-        return this.write<{ changed?: boolean }>(APIEndpoint.UPDATE_PURCHASE_ORDER_PAYMENT, payload).pipe(map((data) => data?.changed !== false));
+    recordPayment(payload: PaymentPayload, version: string): Observable<boolean> {
+        return this.write<{ changed?: boolean }>(APIEndpoint.UPDATE_PURCHASE_ORDER_PAYMENT, { ...payload, version }).pipe(map((data) => data?.changed !== false));
     }
 
     verify(oid: string, lines: VerifyLinePayload[]): Observable<VerifyResult> {

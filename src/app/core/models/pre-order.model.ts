@@ -61,12 +61,15 @@ export interface PreOrderDetails {
     converted_invoice_no: string | null;
     created_on: string;
     created_by: string;
+    /** The row version an edit sends back, so a form opened before someone else saved is refused. */
+    version: string;
     lines: PreOrderLine[];
     activity: PreOrderActivity[];
 }
 
 export interface PreOrderPayload {
     oid: string;
+    version?: string;
     customer: { phone: string; name: string | null };
     lines: { product_oid: string; quantity: number; unit_price: number }[];
     advance_paid: number;

@@ -37,8 +37,8 @@ export class StockAdjustmentService {
     }
 
     /** Whether anything changed: the server writes nothing when the adjustment already says this. */
-    update(payload: StockAdjustmentPayload): Observable<boolean> {
-        return this.write<{ changed?: boolean }>(APIEndpoint.UPDATE_STOCK_ADJUSTMENT, payload).pipe(map((data) => data?.changed !== false));
+    update(payload: StockAdjustmentPayload, version: string): Observable<boolean> {
+        return this.write<{ changed?: boolean }>(APIEndpoint.UPDATE_STOCK_ADJUSTMENT, { ...payload, version }).pipe(map((data) => data?.changed !== false));
     }
 
     verify(oid: string): Observable<{ units_in: number; units_out: number }> {

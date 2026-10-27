@@ -94,7 +94,7 @@ export class SupplierEditComponent implements HasUnsavedChanges {
             confirmAction(this._modal, this.confirmCopy(payload.name)).subscribe((confirmed) => {
                 if (!confirmed) return;
                 this._submitting.set(true);
-                this._suppliers.update(payload).subscribe({
+                this._suppliers.update(payload, this.supplier()?.version ?? '').subscribe({
                     next: (changed) => {
                         this._submitting.set(false);
                         editor.form.markAsPristine();

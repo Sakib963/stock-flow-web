@@ -53,6 +53,8 @@ export type DeliverableStatus = (typeof DELIVERABLE_STATUSES)[number];
 /** One promised piece of work. Its status is set by a person; `past_due` is only a hint (REQ-12). */
 export interface Deliverable {
     oid: string;
+    /** The row version an edit sends back, so a form opened before someone else saved is refused. */
+    version?: string;
     kind: DeliverableKind;
     quantity: number;
     due_on: string;
@@ -95,6 +97,8 @@ export interface CampaignPartner {
 
 export interface Campaign {
     oid: string;
+    /** The row version an edit sends back, so a form opened before someone else saved is refused. */
+    version?: string;
     campaign_no: string;
     name: string;
     promotion_type: PromotionType;

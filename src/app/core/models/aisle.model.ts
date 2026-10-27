@@ -3,6 +3,8 @@ import { WarehouseActivity } from '@app/core/models/warehouse.model';
 /** An aisle or zone inside a warehouse, as the list, the form and the detail page see it. */
 export interface Aisle {
     oid: string;
+    /** The row version an edit sends back, so a form opened before someone else saved is refused. */
+    version?: string;
     name: string;
     code: string;
     warehouse_oid: string;

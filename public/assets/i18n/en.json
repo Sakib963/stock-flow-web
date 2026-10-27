@@ -2423,6 +2423,7 @@
         "remaining": "{{count}} still to fill in",
         "fixErrors": "Check the fields marked below.",
         "nothingChanged": "Nothing changed, so nothing was saved.",
+        "changedSinceLoaded": "Someone changed this after you opened it, so your changes were not saved. Reload the page to see their change, then make yours again.",
         "saveFailed": {
             "network": "Could not reach the server. Check your connection and try again.",
             "forbidden": "You do not have permission to save this. Ask your admin if you should.",
@@ -3187,6 +3188,9 @@
                 "inside": "Inside the district",
                 "outside": "Outside the district",
                 "save": "Save charges",
+                "confirm": "Suggest {{inside}} for orders inside {{district}} and {{outside}} for orders outside it?",
+                "confirmLead": "Only new orders take the new charges. Orders already placed keep theirs.",
+                "confirmSave": "Yes, save charges",
                 "saved": "Delivery charges saved.",
                 "incomplete": "Pick the district and give both charges.",
                 "unset": "The delivery charges are not set yet. Ask whoever runs sales settings.",

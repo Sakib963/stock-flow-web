@@ -94,7 +94,7 @@ export class ProductEditComponent implements HasUnsavedChanges {
             confirmAction(this._modal, this.confirmCopy(payload.name)).subscribe((confirmed) => {
                 if (!confirmed) return;
                 this._submitting.set(true);
-                this._products.update(payload).subscribe({
+                this._products.update(payload, this.product()?.version ?? '').subscribe({
                     next: (changed) => {
                         this._submitting.set(false);
                         editor.form.markAsPristine();

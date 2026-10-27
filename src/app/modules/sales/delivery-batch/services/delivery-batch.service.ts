@@ -30,8 +30,8 @@ export class DeliveryBatchService {
         return this.write(APIEndpoint.CREATE_DELIVERY_BATCH, body);
     }
 
-    setOrders(oid: string, order_oids: string[]): Observable<{ oid: string; changed: boolean }> {
-        return this.write(APIEndpoint.UPDATE_DELIVERY_BATCH_ORDERS, { oid, order_oids });
+    setOrders(oid: string, order_oids: string[], version: string): Observable<{ oid: string; changed: boolean }> {
+        return this.write(APIEndpoint.UPDATE_DELIVERY_BATCH_ORDERS, { oid, version, order_oids });
     }
 
     handOver(oid: string): Observable<{ dispatched: number; left_out: LeftOutOrder[] }> {

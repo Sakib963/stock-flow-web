@@ -1,6 +1,8 @@
 /** A product as the list, the form and the detail page see it. */
 export interface Product {
     oid: string;
+    /** The row version an edit sends back, so a form opened before someone else saved is refused. */
+    version?: string;
     name: string;
     /** The code a scanner reads. The server makes one when the form sends none. */
     sku: string | null;

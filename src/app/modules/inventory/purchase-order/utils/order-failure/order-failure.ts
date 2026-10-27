@@ -1,5 +1,5 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { failureKey } from '@app/shared/utils/request-failure/request-failure';
+import { failureKey, isStale } from '@app/shared/utils/request-failure/request-failure';
 
 /**
  * The copy key for a purchase order write that failed.
@@ -9,6 +9,7 @@ import { failureKey } from '@app/shared/utils/request-failure/request-failure';
  * what to do in the reader's language; the server's own sentence is English and stays in the log.
  */
 export const orderFailureKey = (error: unknown, namespace: string): string => {
+    if (isStale(error)) return 'form.changedSinceLoaded';
     if (error instanceof HttpErrorResponse && error.status === 400) return 'inventory.purchaseOrder.refused';
     if (error instanceof HttpErrorResponse && error.status === 409) return 'inventory.purchaseOrder.moved';
     return failureKey(error, namespace);

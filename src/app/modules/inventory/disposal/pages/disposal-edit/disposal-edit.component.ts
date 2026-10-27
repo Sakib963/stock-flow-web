@@ -49,6 +49,8 @@ export class DisposalEditComponent implements HasUnsavedChanges {
     readonly submitting = computed(() => this.saving() && !this.drafting());
 
     readonly record = signal<DisposalRecord | null>(null);
+    /** The row version the next save sends. A draft save stays on this page, so it is read again after one. */
+    private _version = '';
     readonly loading = signal(true);
     readonly failed = signal<RequestFailure | null>(null);
     readonly closed = computed(() => {
@@ -68,6 +70,7 @@ export class DisposalEditComponent implements HasUnsavedChanges {
         this._disposals.details(this.oid).subscribe({
             next: (record) => {
                 this.record.set(record);
+                this._version = record.details.version ?? '';
                 this.loading.set(false);
             },
             error: (error: unknown) => {
@@ -103,7 +106,7 @@ export class DisposalEditComponent implements HasUnsavedChanges {
         }).subscribe((confirmed) => {
             this._asking.set(false);
             if (!confirmed) return;
-            this._disposals.update(payload).subscribe({
+            this._disposals.update(payload, this._version).subscribe({
                 next: (changed) => {
                     editor.form.markAsPristine();
                     if (changed) this._message.success(this._translate.instant(this.draft() ? 'inventory.disposal.submittedMessage' : 'inventory.disposal.updated', { number }));
@@ -137,12 +140,13 @@ export class DisposalEditComponent implements HasUnsavedChanges {
                 return;
             }
             this._disposals
-                .update(payload)
+                .update(payload, this._version)
                 .pipe(finalize(() => this.drafting.set(false)))
                 .subscribe({
                     next: (changed) => {
                         editor.form.markAsPristine();
                         this._message[changed ? 'success' : 'info'](this._translate.instant(changed ? 'inventory.disposal.draftSaved' : 'form.nothingChanged'));
+                        if (changed) this._disposals.details(this.oid).subscribe({ next: (record) => (this._version = record.details.version ?? '') });
                     },
                     error: (error: unknown) => this.fail(error),
                 });

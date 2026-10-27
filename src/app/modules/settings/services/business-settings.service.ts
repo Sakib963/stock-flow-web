@@ -20,9 +20,9 @@ export class BusinessSettingsService {
         return this._http.get<{ data: BusinessSettings }>(`${this._base}${APIEndpoint.GET_BUSINESS_SETTINGS}`).pipe(map((response) => response.data));
     }
 
-    save(changes: BusinessSettingsChanges): Observable<BusinessSettings> {
+    save(changes: BusinessSettingsChanges, version: string): Observable<BusinessSettings> {
         this.saving.set(true);
-        return this._http.post<{ data: BusinessSettings }>(`${this._base}${APIEndpoint.UPDATE_BUSINESS_SETTINGS}`, changes).pipe(
+        return this._http.post<{ data: BusinessSettings }>(`${this._base}${APIEndpoint.UPDATE_BUSINESS_SETTINGS}`, { ...changes, version }).pipe(
             map((response) => response.data),
             finalize(() => this.saving.set(false))
         );

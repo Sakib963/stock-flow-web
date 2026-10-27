@@ -17,7 +17,7 @@ import { PRE_ORDER_ROUTES } from '@app/modules/sales/pre-order/constants/pre-ord
 import { PreOrderService } from '@app/modules/sales/pre-order/services/pre-order.service';
 import { PageHeaderComponent } from '@app/shared/components/page-header/page-header.component';
 import { confirmAction } from '@app/shared/utils/confirm-action/confirm-action';
-import { failureKey, failureOf } from '@app/shared/utils/request-failure/request-failure';
+import { failureKey, failureOf, isStale } from '@app/shared/utils/request-failure/request-failure';
 
 @Component({
     selector: 'pre-order-edit',
@@ -80,7 +80,7 @@ export class PreOrderEditComponent implements HasUnsavedChanges {
             this._message.error(this._translate.instant('form.fixErrors'));
             return;
         }
-        const payload = editor.payload(this._oid);
+        const payload = { ...editor.payload(this._oid), version: this.booking()?.version };
         this._asking.set(true);
         confirmAction(this._modal, {
             title: this._translate.instant('sales.preOrder.confirmEdit.title', { number: this.booking()?.preorder_no }),
@@ -97,7 +97,7 @@ export class PreOrderEditComponent implements HasUnsavedChanges {
                     void this._router.navigateByUrl(PRE_ORDER_ROUTES.detail(this._oid));
                 },
                 error: (error: unknown) => {
-                    const refused = error instanceof HttpErrorResponse && (error.status === 409 || error.status === 400) ? (error.error?.message as string | undefined) : undefined;
+                    const refused = !isStale(error) && error instanceof HttpErrorResponse && (error.status === 409 || error.status === 400) ? (error.error?.message as string | undefined) : undefined;
                     this._message.error(refused ?? this._translate.instant(failureKey(error, 'form.saveFailed')));
                 },
             });

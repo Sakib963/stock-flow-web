@@ -94,7 +94,7 @@ export class AisleEditComponent implements HasUnsavedChanges {
             confirmAction(this._modal, this.confirmCopy(payload.name)).subscribe((confirmed) => {
                 if (!confirmed) return;
                 this._submitting.set(true);
-                this._aisles.update(payload).subscribe({
+                this._aisles.update(payload, this.aisle()?.version ?? '').subscribe({
                     next: (changed) => {
                         this._submitting.set(false);
                         editor.form.markAsPristine();

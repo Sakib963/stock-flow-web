@@ -16,7 +16,7 @@ import { CampaignService } from '@app/modules/marketing/campaign/services/campai
 import { FormPageComponent } from '@app/shared/components/form-page/form-page.component';
 import { PageHeaderComponent } from '@app/shared/components/page-header/page-header.component';
 import { confirmAction } from '@app/shared/utils/confirm-action/confirm-action';
-import { failureKey, failureOf } from '@app/shared/utils/request-failure/request-failure';
+import { failureKey, failureOf, isStale } from '@app/shared/utils/request-failure/request-failure';
 
 /** Changing a Planned or Live campaign: load it, hand it to the form, save what comes back. */
 @Component({
@@ -85,7 +85,7 @@ export class CampaignEditComponent implements HasUnsavedChanges {
         const t = (key: string, params?: object) => this._translate.instant(key, params);
         confirmAction(this._modal, { title: t('marketing.campaign.confirmEdit.title'), body: t('marketing.campaign.confirmEdit.body', { name: payload.name }), ok: t('form.saveChanges'), cancel: t('form.confirm.cancel') }).subscribe((confirmed) => {
             if (!confirmed) return;
-            this.campaigns.save(payload, true).subscribe({
+            this.campaigns.save(payload, this.record()?.details.version ?? '').subscribe({
                 next: () => {
                     editor.form.markAsPristine();
                     this._message.success(t('marketing.campaign.updated'));
@@ -93,7 +93,7 @@ export class CampaignEditComponent implements HasUnsavedChanges {
                 },
                 error: (error: unknown) => {
                     // A campaign completed or cancelled meanwhile: the server says so in its own words.
-                    if (error instanceof HttpErrorResponse && error.status === 409) {
+                    if (!isStale(error) && error instanceof HttpErrorResponse && error.status === 409) {
                         this._message.error(error.error?.message ?? t('form.saveFailed'));
                         return;
                     }

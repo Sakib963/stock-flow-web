@@ -51,6 +51,8 @@ export class PurchaseOrderEditComponent implements HasUnsavedChanges {
     readonly submitting = computed(() => this.saving() && !this.drafting());
 
     readonly record = signal<PurchaseOrderDetails | null>(null);
+    /** The row version the next save sends. A draft save stays on this page, so it is read again after one. */
+    private _version = '';
     readonly loading = signal(true);
     readonly failed = signal<RequestFailure | null>(null);
     /** The status of an order that can no longer be edited, or null while it still can. */
@@ -72,6 +74,7 @@ export class PurchaseOrderEditComponent implements HasUnsavedChanges {
         this._orders.details(this.oid).subscribe({
             next: (record) => {
                 this.record.set(record);
+                this._version = record.details.version ?? '';
                 this.loading.set(false);
             },
             error: (error: unknown) => {
@@ -110,7 +113,7 @@ export class PurchaseOrderEditComponent implements HasUnsavedChanges {
         }).subscribe((confirmed) => {
             this._asking.set(false);
             if (!confirmed) return;
-            this._orders.update(payload).subscribe({
+            this._orders.update(payload, this._version).subscribe({
                 next: (changed) => {
                     editor.form.markAsPristine();
                     if (changed) this._message.success(this._translate.instant(this.draft() ? 'inventory.purchaseOrder.submittedMessage' : 'inventory.purchaseOrder.updated'));
@@ -145,12 +148,13 @@ export class PurchaseOrderEditComponent implements HasUnsavedChanges {
                 return;
             }
             this._orders
-                .update(payload)
+                .update(payload, this._version)
                 .pipe(finalize(() => this.drafting.set(false)))
                 .subscribe({
                     next: (changed) => {
                         editor.form.markAsPristine();
                         this._message[changed ? 'success' : 'info'](this._translate.instant(changed ? 'inventory.purchaseOrder.draftSaved' : 'form.nothingChanged'));
+                        if (changed) this._orders.details(this.oid).subscribe({ next: (record) => (this._version = record.details.version ?? '') });
                     },
                     error: (error: unknown) => this._message.error(this._translate.instant(orderFailureKey(error, 'form.saveFailed'))),
                 });

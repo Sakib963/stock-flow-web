@@ -1,5 +1,5 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { failureKey } from '@app/shared/utils/request-failure/request-failure';
+import { failureKey, isStale } from '@app/shared/utils/request-failure/request-failure';
 
 /**
  * The copy for an disposal write that failed, with the line it names when there is one.
@@ -9,6 +9,7 @@ import { failureKey } from '@app/shared/utils/request-failure/request-failure';
  * stays in the log; the person reads which line to fix in their own language.
  */
 export const disposalFailure = (error: unknown, namespace: string): { key: string; params: Record<string, unknown> } => {
+    if (isStale(error)) return { key: 'form.changedSinceLoaded', params: {} };
     if (error instanceof HttpErrorResponse && (error.status === 400 || error.status === 409)) {
         const line = error.error?.data?.line;
         if (typeof line === 'number') return { key: error.status === 400 ? 'inventory.disposal.lineRefused' : 'inventory.disposal.lineNoLongerFits', params: { line: line + 1 } };

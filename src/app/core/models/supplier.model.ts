@@ -1,6 +1,8 @@
 /** A supplier as the list, the form and the detail page see it. */
 export interface Supplier {
     oid: string;
+    /** The row version an edit sends back, so a form opened before someone else saved is refused. */
+    version?: string;
     name: string;
     contact_person: string | null;
     phone_number: string;

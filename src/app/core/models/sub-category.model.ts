@@ -3,6 +3,8 @@ import { CategoryActivity, CategoryStats } from '@app/core/models/category.model
 /** A sub-category as the list, the form and the detail page see it. `category_code` is the sub-category's own code: the column has always had that name. */
 export interface SubCategory {
     oid: string;
+    /** The row version an edit sends back, so a form opened before someone else saved is refused. */
+    version?: string;
     name: string;
     category_code: string;
     category_oid: string;

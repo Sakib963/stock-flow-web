@@ -10,6 +10,8 @@ export interface OrderSource {
 /** What the page needs before the first order: where orders come in, and the two delivery charges. */
 export interface OnlineOrderSetup {
     sources: OrderSource[];
+    /** The settings row version the delivery charges form sends back. */
+    settings_version?: string;
     delivery_charge_inside: number;
     delivery_charge_outside: number;
     home_district: Place | null;
@@ -86,6 +88,8 @@ export interface OnlineOrderResult {
 /** A half-made order kept on the server: its lines priced now, and the address as far as it was typed. */
 export interface OnlineDraft {
     oid: string;
+    /** The row version an edit sends back, so a form opened before someone else saved is refused. */
+    version?: string;
     invoice_no: string;
     draft_label: string | null;
     customer_name: string | null;

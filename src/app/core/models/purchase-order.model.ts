@@ -30,6 +30,8 @@ export interface PurchaseOrderRow {
 
 export interface PurchaseOrderHeader {
     oid: string;
+    /** The row version an edit sends back, so a form opened before someone else saved is refused. */
+    version?: string;
     po_number: string;
     status: PurchaseOrderStatus;
     /** Empty only on a Draft. */
