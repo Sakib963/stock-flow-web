@@ -1,6 +1,6 @@
 # stock-flow-web: agent guide
 
-The Angular app, rebuilt from a fresh scaffold on `feat/app-revamp`. The workspace guide
+The Angular app, rebuilt from a fresh scaffold, on `dev` (work in `feat/` and `fix/` branches off it). The workspace guide
 (`../CLAUDE.md`) holds the business rules, access control, engineering practice and writing style;
 this file holds what is specific to the web app. Both apply.
 
@@ -8,7 +8,7 @@ this file holds what is specific to the web app. Both apply.
 folder layout, list config, create and edit pages over one form component, record page, and how
 each loads, confirms, saves and fails. `stock-flow-documents/docs/category/category.md` says why.
 `modules/auth` and `layout/` are the references for the shell. The old
-generations (`refactor/order-sales-core`, `dev`) are read for business logic only, never for
+generations (`refactor/order-sales-core`, the tag `archive/old-dev`) are read for business logic only, never for
 structure or UI. The one exception is the list page config, whose contract lives in
 `stock-flow-documents/docs/list-page/list-page.md` and learns from the old `TableConfig`.
 
