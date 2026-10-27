@@ -54,7 +54,7 @@
     <nz-form-item>
         <nz-form-label nzRequired nzFor="product-sub-category" [nzTooltipTitle]="'configuration.product.subCategoryHelper' | translate">{{ 'configuration.product.subCategory' | translate }}</nz-form-label>
         <nz-form-control [nzErrorTip]="subCategoryError">
-            <nz-select nzId="product-sub-category" formControlName="sub_category_oid" nzShowSearch [nzLoading]="pickersLoading()" [nzPlaceHolder]="'configuration.product.subCategoryPlaceholder' | translate" [nzNotFoundContent]="noChoices">
+            <nz-select nzId="product-sub-category" formControlName="sub_category_oid" nzShowSearch nzServerSearch [nzLoading]="subCategoryPicker.loading()" [nzPlaceHolder]="'configuration.product.subCategoryPlaceholder' | translate" [nzNotFoundContent]="subCategoryEmpty" (nzOnSearch)="subCategoryPicker.search($event)" (nzOpenChange)="subCategoryPicker.opened($event)" (nzScrollToBottom)="subCategoryPicker.more()">
                 @for (group of subCategoryGroups(); track group.label) {
                     <nz-option-group [nzLabel]="group.label | text">
                         @for (choice of group.options; track choice.value) {
@@ -79,8 +79,8 @@
     <nz-form-item>
         <nz-form-label nzFor="product-brand" [nzTooltipTitle]="'configuration.product.brandHelper' | translate">{{ 'configuration.product.brand' | translate }}</nz-form-label>
         <nz-form-control [nzErrorTip]="brandError">
-            <nz-select nzId="product-brand" formControlName="brand_oid" nzShowSearch nzAllowClear [nzLoading]="pickersLoading()" [nzPlaceHolder]="'configuration.product.brandPlaceholder' | translate" [nzNotFoundContent]="noChoices">
-                @for (brand of brands(); track brand.value) {
+            <nz-select nzId="product-brand" formControlName="brand_oid" nzShowSearch nzServerSearch nzAllowClear [nzLoading]="brandPicker.loading()" [nzPlaceHolder]="'configuration.product.brandPlaceholder' | translate" [nzNotFoundContent]="brandEmpty" (nzOnSearch)="brandPicker.search($event)" (nzOpenChange)="brandPicker.opened($event)" (nzScrollToBottom)="brandPicker.more()">
+                @for (brand of brandPicker.choices(); track brand.value) {
                     <nz-option [nzValue]="brand.value" [nzLabel]="brand.label | text" />
                 }
             </nz-select>
@@ -151,13 +151,24 @@
     </nz-form-item>
 </form>
 
-<ng-template #noChoices>
-    <p class="m-0 py-2 text-center text-xs text-ink-muted">
-        @if (pickersFailed()) {
-            {{ 'configuration.product.pickersFailed' | translate }}
-            <button nz-button nzType="link" nzSize="small" type="button" (click)="loadPickers()">{{ 'form.retry' | translate }}</button>
+<ng-template #subCategoryEmpty>
+    <ng-container [ngTemplateOutlet]="pickerEmpty" [ngTemplateOutletContext]="{ $implicit: subCategoryPicker }" />
+</ng-template>
+<ng-template #brandEmpty>
+    <ng-container [ngTemplateOutlet]="pickerEmpty" [ngTemplateOutletContext]="{ $implicit: brandPicker }" />
+</ng-template>
+<ng-template #pickerEmpty let-picker>
+    <div class="flex flex-col items-center gap-2 py-2 text-xs text-ink-muted">
+        @if (picker.loading()) {
+            <span role="status">{{ 'form.loading' | translate }}</span>
+        } @else if (picker.failed()) {
+            <span>{{ 'configuration.product.pickersFailed' | translate }}</span>
+            <button nz-button type="button" class="inline-flex items-center gap-1.5" (click)="picker.retry()">
+                <ng-icon name="lucideRotateCw" size="14px" aria-hidden="true" />
+                <span>{{ 'list.retry' | translate }}</span>
+            </button>
         } @else {
-            {{ 'configuration.product.noMatch' | translate }}
+            <span>{{ 'configuration.product.noMatch' | translate }}</span>
         }
-    </p>
+    </div>
 </ng-template>

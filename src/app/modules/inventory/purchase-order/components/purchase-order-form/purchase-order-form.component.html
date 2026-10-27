@@ -4,8 +4,8 @@
         <nz-form-item>
             <nz-form-label nzRequired nzFor="po-supplier" [nzTooltipTitle]="'inventory.purchaseOrder.supplierHelper' | translate">{{ 'inventory.purchaseOrder.supplier' | translate }}</nz-form-label>
             <nz-form-control [nzErrorTip]="'inventory.purchaseOrder.supplierRequired' | translate">
-                <nz-select nzId="po-supplier" formControlName="supplier_oid" nzShowSearch nzServerSearch nzAllowClear [nzLoading]="suppliersLoading()" [nzNotFoundContent]="suppliersLoading() ? loadingChoices : supplierSearchFailed() ? suppliersFailed : noMatch" (nzOnSearch)="searchSuppliers($event)" (nzOpenChange)="supplierPickerOpened($event)" (nzScrollToBottom)="moreSuppliers()" [nzPlaceHolder]="'inventory.purchaseOrder.supplierPlaceholder' | translate" [attr.aria-invalid]="invalid('supplier_oid')">
-                    @for (supplier of suppliers(); track supplier.value) {
+                <nz-select nzId="po-supplier" formControlName="supplier_oid" nzShowSearch nzServerSearch nzAllowClear [nzLoading]="supplierPicker.loading()" [nzNotFoundContent]="supplierPicker.loading() ? loadingChoices : supplierPicker.failed() ? suppliersFailed : noMatch" (nzOnSearch)="supplierPicker.search($event)" (nzOpenChange)="supplierPicker.opened($event)" (nzScrollToBottom)="supplierPicker.more()" [nzPlaceHolder]="'inventory.purchaseOrder.supplierPlaceholder' | translate" [attr.aria-invalid]="invalid('supplier_oid')">
+                    @for (supplier of supplierPicker.choices(); track supplier.value) {
                         <nz-option nzCustomContent [nzValue]="supplier.value" [nzLabel]="supplier.label">
                             <span class="block text-[13px] text-ink">{{ supplier.label }}</span>
                             <span class="block text-xs text-ink-muted">
@@ -188,7 +188,7 @@
 <ng-template #suppliersFailed>
     <div class="flex flex-col items-center gap-2 py-2 text-xs text-ink-muted">
         <span>{{ 'list.choicesFailed' | translate }}</span>
-        <button nz-button type="button" class="inline-flex items-center gap-1.5" (click)="retrySuppliers()">
+        <button nz-button type="button" class="inline-flex items-center gap-1.5" (click)="supplierPicker.retry()">
             <ng-icon name="lucideRotateCw" size="14px" aria-hidden="true" />
             <span>{{ 'list.retry' | translate }}</span>
         </button>

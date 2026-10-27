@@ -1,8 +1,9 @@
-import { ChangeDetectionStrategy, Component, ElementRef, afterNextRender, computed, effect, inject, input, output, signal } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { NgTemplateOutlet } from '@angular/common';
+import { ChangeDetectionStrategy, Component, DestroyRef, ElementRef, afterNextRender, computed, effect, inject, input, output, signal } from '@angular/core';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { NgIcon, provideIcons } from '@ng-icons/core';
-import { lucideSparkles } from '@ng-icons/lucide';
+import { lucideRotateCw, lucideSparkles } from '@ng-icons/lucide';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzFormModule } from 'ng-zorro-antd/form';
 import { NzInputModule } from 'ng-zorro-antd/input';
@@ -11,20 +12,18 @@ import { NzSwitchModule } from 'ng-zorro-antd/switch';
 import { TranslatePipe } from '@ngx-translate/core';
 import { Observable, filter, map, startWith, take } from 'rxjs';
 
-import { APIEndpoint } from '@app/core/constants/api-endpoint';
-import { Choice, RemoteChoices } from '@app/core/models/filter.model';
+import { Choice } from '@app/core/models/filter.model';
 import { Product, ProductField, ProductFormField, ProductPayload, ProductStatus, ProductUnit, SubCategoryChoice } from '@app/core/models/product.model';
 import { PRODUCT_UNITS } from '@app/modules/configuration/product/constants/product-copy';
 import { ProductPhotoComponent } from '@app/modules/configuration/product/components/product-photo/product-photo.component';
 import { ProductService } from '@app/modules/configuration/product/services/product.service';
-import { ChoicesService } from '@app/shared/services/choices/choices.service';
 import { CodeGeneratorService } from '@app/shared/services/code-generator/code-generator.service';
 import { DigitsPipe } from '@app/shared/pipes/digits/digits.pipe';
 import { TextPipe } from '@app/shared/pipes/text/text.pipe';
 import { revealErrors } from '@app/shared/utils/reveal-errors/reveal-errors';
+import { ServerSearch } from '@app/shared/utils/server-search/server-search';
 import { uniqueValue } from '@app/shared/utils/unique-value/unique-value';
 
-const BRANDS: RemoteChoices = { endpoint: APIEndpoint.GET_BRAND_LIST_FOR_DROPDOWN };
 
 const FIELD_ID: Record<ProductFormField, string> = {
     name: 'product-name',
@@ -44,8 +43,8 @@ const SELECTS: readonly ProductFormField[] = ['sub_category_oid', 'brand_oid', '
 /** The product form, rendered by both the create page and the edit page. */
 @Component({
     selector: 'product-form',
-    imports: [DigitsPipe, ReactiveFormsModule, NgIcon, NzButtonModule, NzFormModule, NzInputModule, NzSelectModule, NzSwitchModule, TranslatePipe, TextPipe, ProductPhotoComponent],
-    providers: [provideIcons({ lucideSparkles })],
+    imports: [DigitsPipe, NgTemplateOutlet, ReactiveFormsModule, NgIcon, NzButtonModule, NzFormModule, NzInputModule, NzSelectModule, NzSwitchModule, TranslatePipe, TextPipe, ProductPhotoComponent],
+    providers: [provideIcons({ lucideRotateCw, lucideSparkles })],
     templateUrl: './product-form.component.html',
     styleUrl: './product-form.component.scss',
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -53,7 +52,6 @@ const SELECTS: readonly ProductFormField[] = ['sub_category_oid', 'brand_oid', '
 export class ProductFormComponent {
     private readonly _builder = inject(FormBuilder).nonNullable;
     private readonly _products = inject(ProductService);
-    private readonly _choices = inject(ChoicesService);
     private readonly _codes = inject(CodeGeneratorService);
     private readonly _host = inject<ElementRef<HTMLElement>>(ElementRef);
 
@@ -91,29 +89,15 @@ export class ProductFormComponent {
 
     readonly checking = computed(() => this._status() === 'PENDING');
 
-    private readonly _subCategories = signal<readonly SubCategoryChoice[]>([]);
-    private readonly _brands = signal<readonly Choice[]>([]);
-    readonly pickersLoading = signal(true);
-    readonly pickersFailed = signal(false);
+    /** Searched on the server: a catalogue's sub-categories and brands grow for years. */
+    readonly subCategoryPicker = new ServerSearch<SubCategoryChoice>((term, offset) => this._products.subCategories(term, offset), inject(DestroyRef));
+    readonly brandPicker = new ServerSearch<Choice>((term, offset) => this._products.brands(term, offset), inject(DestroyRef));
 
-    /**
-     * Grouped by category. The record's own sub-category is added when it has since been turned
-     * Inactive, so the picker names it rather than showing a bare id.
-     */
+    /** Grouped by category. The record's own sub-category is held, so an inactive one is still named rather than a bare id. */
     readonly subCategoryGroups = computed(() => {
-        const record = this.editing();
-        const loaded = this._subCategories();
-        const all = record?.sub_category_name && !loaded.some((choice) => choice.value === record.sub_category_oid) ? [{ value: record.sub_category_oid, label: record.sub_category_name, groupLabel: record.category_name ?? '' }, ...loaded] : loaded;
         const groups = new Map<string, SubCategoryChoice[]>();
-        for (const choice of all) groups.set(choice.groupLabel, [...(groups.get(choice.groupLabel) ?? []), choice]);
+        for (const choice of this.subCategoryPicker.choices()) groups.set(choice.groupLabel, [...(groups.get(choice.groupLabel) ?? []), choice]);
         return [...groups].map(([label, options]) => ({ label, options }));
-    });
-
-    readonly brands = computed<readonly Choice[]>(() => {
-        const record = this.editing();
-        const loaded = this._brands();
-        if (!record?.brand_oid || !record.brand_name || loaded.some((choice) => choice.value === record.brand_oid)) return loaded;
-        return [{ value: record.brand_oid, label: record.brand_name }, ...loaded];
     });
 
     constructor() {
@@ -121,11 +105,18 @@ export class ProductFormComponent {
             for (const field of SELECTS) this._host.nativeElement.querySelector(`#${FIELD_ID[field]}`)?.setAttribute('aria-describedby', `${FIELD_ID[field]}-help`);
         });
 
-        this.loadPickers();
+        this.subCategoryPicker.start();
+        this.brandPicker.start();
+        // A chosen value stays named while the person searches for something else.
+        this.form.controls.sub_category_oid.valueChanges.pipe(takeUntilDestroyed()).subscribe((oid) => this.subCategoryPicker.holdValue(oid));
+        this.form.controls.brand_oid.valueChanges.pipe(takeUntilDestroyed()).subscribe((oid) => this.brandPicker.holdValue(oid));
 
         effect(() => {
             const record = this.editing();
             if (!record) return;
+
+            this.subCategoryPicker.hold(record.sub_category_name ? { value: record.sub_category_oid, label: record.sub_category_name, groupLabel: record.category_name ?? '' } : null);
+            this.brandPicker.hold(record.brand_oid && record.brand_name ? { value: record.brand_oid, label: record.brand_name } : null);
 
             this.form.setValue({
                 name: record.name,
@@ -141,22 +132,6 @@ export class ProductFormComponent {
             });
             this.form.markAsPristine();
         });
-    }
-
-    loadPickers(): void {
-        this.pickersLoading.set(true);
-        this.pickersFailed.set(false);
-        this._products.subCategories().subscribe({
-            next: (choices) => {
-                this._subCategories.set(choices);
-                this.pickersLoading.set(false);
-            },
-            error: () => {
-                this.pickersLoading.set(false);
-                this.pickersFailed.set(true);
-            },
-        });
-        this._choices.load(BRANDS).subscribe({ next: (choices) => this._brands.set(choices), error: () => this.pickersFailed.set(true) });
     }
 
     photoChanged(url: string | null): void {

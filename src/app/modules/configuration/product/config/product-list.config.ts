@@ -35,7 +35,7 @@ export const PRODUCT_LIST: ListShellPageConfig = {
                 ],
             },
             { key: 'category_oid', label: 'configuration.product.category', type: 'select', choices: { endpoint: APIEndpoint.GET_CATEGORY_LIST_FOR_DROPDOWN } },
-            { key: 'brand_oid', label: 'configuration.product.brand', type: 'select', choices: { endpoint: APIEndpoint.GET_BRAND_LIST_FOR_DROPDOWN } },
+            { key: 'brand_oid', label: 'configuration.product.brand', type: 'select', choices: { endpoint: APIEndpoint.GET_BRAND_LIST_FOR_DROPDOWN, search: { key: 'search' }, resolve: { key: 'oids' } } },
         ],
     },
     table: {

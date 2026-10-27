@@ -3,11 +3,9 @@ import { Injectable, inject, signal } from '@angular/core';
 import { APIEndpoint } from '@app/core/constants/api-endpoint';
 import { AisleChoice, PaymentPayload, PurchasableProduct, PurchaseOrderDetails, PurchaseOrderPayload, PurchaseOrderReport, SupplierChoice, VerifyLinePayload, VerifyResult, WarehouseChoice } from '@app/core/models/purchase-order.model';
 import { ReferenceCache } from '@app/shared/services/reference-cache/reference-cache.service';
+import { SEARCH_PAGE } from '@app/shared/utils/server-search/server-search';
 import { environment } from '@env/environment';
 import { Observable, finalize, map } from 'rxjs';
-
-/** A page of the supplier picker, the size every searching picker uses; a shorter page is the last. */
-export const SUPPLIER_PAGE = 50;
 
 /**
  * Only the warehouse and aisle pickers are kept, through the reference cache (docs/caching).
@@ -32,7 +30,7 @@ export class PurchaseOrderService {
 
     /** Fifty at a time, searched by name or phone on the server: a supplier list grows for years. */
     suppliers(search: string, offset: number): Observable<SupplierChoice[]> {
-        return this._http.get<{ data: SupplierChoice[] }>(`${this._base}${APIEndpoint.GET_SUPPLIER_LIST_FOR_DROPDOWN}`, { params: { search, offset, limit: SUPPLIER_PAGE } }).pipe(map((response) => response.data));
+        return this._http.get<{ data: SupplierChoice[] }>(`${this._base}${APIEndpoint.GET_SUPPLIER_LIST_FOR_DROPDOWN}`, { params: { search, offset, limit: SEARCH_PAGE } }).pipe(map((response) => response.data));
     }
 
     /** The saved supplier of an order being edited, named without loading the list. */

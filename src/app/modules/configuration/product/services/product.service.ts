@@ -2,10 +2,11 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable, inject, signal } from '@angular/core';
 import { APIEndpoint } from '@app/core/constants/api-endpoint';
 import { PhotoUpload } from '@app/core/models/photo-upload.model';
+import { Choice } from '@app/core/models/filter.model';
 import { ProductDetails, ProductField, ProductPayload, SubCategoryChoice } from '@app/core/models/product.model';
 import { PhotoUploadService } from '@app/shared/services/photo-upload/photo-upload.service';
 import { StockMovementRow } from '@app/core/models/stock-movement.model';
-import { ReferenceCache } from '@app/shared/services/reference-cache/reference-cache.service';
+import { SEARCH_PAGE } from '@app/shared/utils/server-search/server-search';
 import { environment } from '@env/environment';
 import { Observable, finalize, map } from 'rxjs';
 
@@ -13,7 +14,6 @@ import { Observable, finalize, map } from 'rxjs';
 export class ProductService {
     private readonly _http = inject(HttpClient);
     private readonly _photos = inject(PhotoUploadService);
-    private readonly _reference = inject(ReferenceCache);
 
     readonly saving = signal(false);
 
@@ -44,9 +44,14 @@ export class ProductService {
         );
     }
 
-    /** Active sub-categories under Active categories, each with its category's name for grouping the picker. Kept (docs/caching). */
-    subCategories(): Observable<SubCategoryChoice[]> {
-        return this._reference.keep('sub-categories', () => this._http.get<{ data: SubCategoryChoice[] }>(`${environment.baseUrl}${APIEndpoint.GET_SUB_CATEGORY_LIST_FOR_DROPDOWN}`).pipe(map((response) => response.data)));
+    /** Active sub-categories under Active categories, fifty at a time, searched by their name or their category's. */
+    subCategories(search: string, offset: number): Observable<SubCategoryChoice[]> {
+        return this._http.get<{ data: SubCategoryChoice[] }>(`${environment.baseUrl}${APIEndpoint.GET_SUB_CATEGORY_LIST_FOR_DROPDOWN}`, { params: { search, offset, limit: SEARCH_PAGE } }).pipe(map((response) => response.data));
+    }
+
+    /** Active brands, fifty at a time, searched by name. */
+    brands(search: string, offset: number): Observable<Choice[]> {
+        return this._http.get<{ data: Choice[] }>(`${environment.baseUrl}${APIEndpoint.GET_BRAND_LIST_FOR_DROPDOWN}`, { params: { search, offset, limit: SEARCH_PAGE } }).pipe(map((response) => response.data));
     }
 
     remove(oid: string): Observable<void> {

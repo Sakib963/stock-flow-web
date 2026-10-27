@@ -59,8 +59,8 @@ export const STOCK_OVERVIEW_LIST: ListShellPageConfig = {
             },
             { key: 'not_selling', label: 'inventory.stockOverview.notSellingFilter', type: 'toggle' },
             { key: 'category_oid', label: 'inventory.stockOverview.category', type: 'select', choices: { endpoint: APIEndpoint.GET_CATEGORY_LIST_FOR_DROPDOWN } },
-            { key: 'sub_category_oid', label: 'inventory.stockOverview.subCategory', type: 'select', choices: { endpoint: APIEndpoint.GET_SUB_CATEGORY_LIST_FOR_DROPDOWN } },
-            { key: 'brand_oid', label: 'inventory.stockOverview.brand', type: 'select', choices: { endpoint: APIEndpoint.GET_BRAND_LIST_FOR_DROPDOWN } },
+            { key: 'sub_category_oid', label: 'inventory.stockOverview.subCategory', type: 'select', choices: { endpoint: APIEndpoint.GET_SUB_CATEGORY_LIST_FOR_DROPDOWN, search: { key: 'search' }, resolve: { key: 'oids' } } },
+            { key: 'brand_oid', label: 'inventory.stockOverview.brand', type: 'select', choices: { endpoint: APIEndpoint.GET_BRAND_LIST_FOR_DROPDOWN, search: { key: 'search' }, resolve: { key: 'oids' } } },
         ],
     },
     table: {
