@@ -31,7 +31,7 @@ structure or UI. The one exception is the list page config, whose contract lives
 | `src/app/shared/` | Components used by more than one feature (`page-header`). One exception: a child feature's quick-add of its missing parent renders the parent feature's own form in place (sub-category's drawer renders `CategoryFormComponent`), so the parent's checks come with it |
 | `src/app/layout/` | The shell: sider, header bar, panels, `constants/`, `services/` |
 | `src/app/app-routes/app.routes.ts` | The map of the app. A module owns its own routes file |
-| `public/assets/i18n/en.json`, `bn.json` | The only translation files loaded. The subfolders beside them are from the old app |
+| `public/assets/i18n/en.json`, `bn.json` | The only translation files |
 | `tools/` | `check-utilities.js`, `check-tokens.js`, `verify-values.js`, and `cdp.mjs` for driving Chrome |
 
 - **Nothing loose at a folder root.** Constants, models and helpers live under `constants/`,
