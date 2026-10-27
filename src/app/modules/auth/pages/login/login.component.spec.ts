@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { provideRouter } from '@angular/router';
+import { Router, provideRouter } from '@angular/router';
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { provideNzI18n, en_US } from 'ng-zorro-antd/i18n';
@@ -8,6 +8,7 @@ import { NzMessageService } from 'ng-zorro-antd/message';
 import { LoginComponent } from './login.component';
 import { APIEndpoint } from '@app/core/constants/api-endpoint';
 import { Constants } from '@app/core/constants/constants';
+import { environment } from '@env/environment';
 
 describe('LoginComponent', () => {
     beforeEach(async () => {
@@ -191,5 +192,54 @@ describe('LoginComponent', () => {
         await fixture.whenStable();
 
         expect(cmp.failureKey()).toBe('auth.errNetwork');
+    });
+
+    describe('a guest visit', () => {
+        const isGuest = (r: { url: string }) => r.url.endsWith(APIEndpoint.GUEST_SIGN_IN);
+
+        it('offers the guest visit only in a build that has it, asking the server nothing to decide', async () => {
+            const { el } = await render();
+            expect(el.querySelector('[data-login="guest"]')).toBeTruthy();
+            TestBed.inject(HttpTestingController).expectNone(isGuest);
+
+            const kept = environment.guestAccess;
+            (environment as { guestAccess: boolean }).guestAccess = false;
+            const off = await render();
+            expect(off.el.querySelector('[data-login="guest"]')).toBeNull();
+            (environment as { guestAccess: boolean }).guestAccess = kept;
+        });
+
+        it('signs a guest in with one press, greets them by name and opens the app', async () => {
+            const { cmp } = await render();
+            const navigate = vi.spyOn(TestBed.inject(Router), 'navigateByUrl').mockResolvedValue(true);
+            const success = vi.spyOn(TestBed.inject(NzMessageService), 'success');
+
+            cmp.continueAsGuest();
+            expect(cmp.guestLoading()).toBe(true);
+            const request = TestBed.inject(HttpTestingController).expectOne(isGuest);
+            expect(request.request.withCredentials).toBe(true);
+            request.flush({ code: 200, message: 'ok', data: { access_token: 'a', expires_in: 900, session_id: 's', refresh_transport: 'body', refresh_token: 'r', user: { id: 'g1', email: 'guest-1@guest.invalid', name: 'Rizz Rickshaw', role: 'Guest' }, guest: { hours: 24 } } });
+
+            expect(success).toHaveBeenCalledWith('auth.guest.welcome', expect.anything());
+            expect(navigate).toHaveBeenCalledWith(Constants.APP_ROUTE);
+        });
+
+        it('says what to do when a guest visit is refused, and the button asks again', async () => {
+            const { cmp } = await render();
+            const http = TestBed.inject(HttpTestingController);
+
+            cmp.continueAsGuest();
+            http.expectOne(isGuest).flush({ code: 429 }, { status: 429, statusText: 'Too Many Requests' });
+            expect(cmp.guestFailureKey()).toBe('auth.guest.errThrottled');
+            expect(cmp.guestLoading()).toBe(false);
+
+            cmp.continueAsGuest();
+            http.expectOne(isGuest).flush({ code: 503 }, { status: 503, statusText: 'Service Unavailable' });
+            expect(cmp.guestFailureKey()).toBe('auth.guest.errUnavailable');
+
+            cmp.continueAsGuest();
+            http.expectOne(isGuest).error(new ProgressEvent('error'));
+            expect(cmp.guestFailureKey()).toBe('auth.errNetwork');
+        });
     });
 });

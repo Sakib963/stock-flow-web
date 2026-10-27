@@ -71,6 +71,27 @@
                             ],
                             "outputHashing": "all"
                         },
+                        "dev": {
+                            "fileReplacements": [
+                                {
+                                    "replace": "src/environments/environment.ts",
+                                    "with": "src/environments/environment.dev.ts"
+                                }
+                            ],
+                            "budgets": [
+                                {
+                                    "type": "initial",
+                                    "maximumWarning": "1.2mb",
+                                    "maximumError": "2mb"
+                                },
+                                {
+                                    "type": "anyComponentStyle",
+                                    "maximumWarning": "22kb",
+                                    "maximumError": "30kb"
+                                }
+                            ],
+                            "outputHashing": "all"
+                        },
                         "development": {
                             "optimization": false,
                             "extractLicenses": false,
@@ -85,6 +106,9 @@
                     "configurations": {
                         "production": {
                             "buildTarget": "stock-flow-web:build:production"
+                        },
+                        "dev": {
+                            "buildTarget": "stock-flow-web:build:dev"
                         },
                         "development": {
                             "buildTarget": "stock-flow-web:build:development"

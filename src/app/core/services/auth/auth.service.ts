@@ -3,7 +3,7 @@ import { DestroyRef, Injectable, computed, inject, signal } from '@angular/core'
 import { NavigationExtras, Router } from '@angular/router';
 import { APIEndpoint } from '@app/core/constants/api-endpoint';
 import { Constants } from '@app/core/constants/constants';
-import { ActiveSession, AuthStatus, LoginFailure, PendingSignOut, RefusalDetail, SessionEndReason, SignInGrant, StoredSession, TokenGrant } from '@app/core/models/auth.model';
+import { ActiveSession, AuthStatus, GuestGrant, LoginFailure, PendingSignOut, RefusalDetail, SessionEndReason, SignInGrant, StoredSession, TokenGrant } from '@app/core/models/auth.model';
 import { ApiResponse } from '@app/core/models/api.model';
 import { environment } from '@env/environment';
 import { Observable, defer, finalize, firstValueFrom, map, shareReplay, tap } from 'rxjs';
@@ -122,6 +122,17 @@ export class AuthService {
             }),
             map(() => undefined),
             finalize(() => this.loading.set(false))
+        );
+    }
+
+    /** A visitor to the dev deployment, signed in as a temporary guest with a name the server picks. */
+    loginAsGuest(): Observable<{ name: string; hours: number }> {
+        return this._http.post<ApiResponse<GuestGrant>>(this.url(APIEndpoint.GUEST_SIGN_IN), {}, { withCredentials: true }).pipe(
+            tap((response) => {
+                if (response.data.refresh_transport === 'cookie') this.clearPending();
+                this.accept(response.data, false);
+            }),
+            map((response) => ({ name: response.data.user.name, hours: response.data.guest.hours }))
         );
     }
 

@@ -68,6 +68,22 @@
                     <ng-icon name="lucideArrowRight" size="16px" />
                 }
             </button>
+
+            @if (guestAccess) {
+                <div class="mt-4 rounded-container border border-line-soft bg-surface-sunken p-3" data-login="guest">
+                    <p class="m-0 text-shell-title font-semibold text-ink">{{ 'auth.guest.title' | translate }}</p>
+                    <p class="mt-1 mb-2.5 text-xs/[1.6] text-ink-muted">{{ 'auth.guest.body' | translate }}</p>
+                    <button nz-button nzBlock type="button" class="flex items-center justify-center gap-2" [nzLoading]="guestLoading()" [disabled]="loading()" (click)="continueAsGuest()">
+                        @if (!guestLoading()) {
+                            <ng-icon name="lucideUser" size="16px" aria-hidden="true" />
+                        }
+                        {{ 'auth.guest.button' | translate }}
+                    </button>
+                    @if (guestFailureKey(); as key) {
+                        <p class="mt-2 mb-0 text-xs text-danger-ink" role="alert">{{ key | translate }}</p>
+                    }
+                </div>
+            }
         </div>
 
         <div class="max-md:mt-auto">

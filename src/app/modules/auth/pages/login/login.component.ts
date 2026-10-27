@@ -8,16 +8,17 @@ import { NzCheckboxModule } from 'ng-zorro-antd/checkbox';
 import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { NgIcon, provideIcons } from '@ng-icons/core';
-import { lucideArrowRight, lucideEye, lucideEyeOff, lucideLock, lucideMail } from '@ng-icons/lucide';
+import { lucideArrowRight, lucideEye, lucideEyeOff, lucideLock, lucideMail, lucideUser } from '@ng-icons/lucide';
 import { AuthService } from '@app/core/services/auth/auth.service';
 import { LoginFailure } from '@app/core/models/auth.model';
 import { AuthShellComponent } from '@app/modules/auth/components/auth-shell/auth-shell.component';
 import { Constants } from '@app/core/constants/constants';
+import { environment } from '@env/environment';
 
 @Component({
     selector: 'login',
     imports: [ReactiveFormsModule, RouterLink, TranslatePipe, NzButtonModule, NzCheckboxModule, NzInputModule, NgIcon, AuthShellComponent],
-    providers: [provideIcons({ lucideArrowRight, lucideEye, lucideEyeOff, lucideLock, lucideMail })],
+    providers: [provideIcons({ lucideArrowRight, lucideEye, lucideEyeOff, lucideLock, lucideMail, lucideUser })],
     templateUrl: './login.component.html',
     styleUrl: './login.component.scss',
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -67,6 +68,11 @@ export class LoginComponent implements AfterViewInit {
         return keys[failure];
     });
 
+    /** Decided by the build, never by asking the server: a client's build has no guests (docs/guest-access). */
+    readonly guestAccess = environment.guestAccess;
+    readonly guestLoading = signal(false);
+    readonly guestFailureKey = signal<string | null>(null);
+
     /** A rejected credential marks both fields, without saying which one was wrong. */
     readonly credentialsRejected = computed(() => this.failure() === 'credentials');
 
@@ -111,6 +117,23 @@ export class LoginComponent implements AfterViewInit {
 
     togglePasswordVisible(): void {
         this.passwordVisible.update((visible) => !visible);
+    }
+
+    continueAsGuest(): void {
+        if (this.guestLoading() || this.loading()) return;
+        this.guestFailureKey.set(null);
+        this.guestLoading.set(true);
+        this._auth.loginAsGuest().subscribe({
+            next: ({ name, hours }) => {
+                this._message.success(this._translate.instant('auth.guest.welcome', { name, hours }), { nzDuration: 6000 });
+                void this._router.navigateByUrl(Constants.APP_ROUTE).finally(() => this.guestLoading.set(false));
+            },
+            error: (error: HttpErrorResponse) => {
+                this.guestLoading.set(false);
+                const keys: Record<number, string> = { 0: 'auth.errNetwork', 429: 'auth.guest.errThrottled', 503: 'auth.guest.errUnavailable' };
+                this.guestFailureKey.set(keys[error.status] ?? 'auth.errServer');
+            },
+        });
     }
 
     handleSubmit(): void {

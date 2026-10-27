@@ -122,6 +122,14 @@
                 "forbidden": "You do not have permission to do that.",
                 "server": "Your password was not set. Try again in a moment."
             }
+        },
+        "guest": {
+            "title": "Just looking around?",
+            "body": "Try StockFlow as a guest: a temporary account with a random name that ends on its own. What you create stays in the demo.",
+            "button": "Continue as guest",
+            "welcome": "You're {{name}}, a guest for {{hours}} hours. Look around.",
+            "errThrottled": "Too many guest visits from this device. Try again in an hour.",
+            "errUnavailable": "Guest visits are not available right now. Try again later."
         }
     },
     "shell": {

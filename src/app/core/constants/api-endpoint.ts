@@ -2,6 +2,7 @@
 // Endpoints arrive with the features that use them.
 export class APIEndpoint {
     static readonly SIGN_IN = '/api/v1/auth/sign-in';
+    static readonly GUEST_SIGN_IN = '/api/v1/auth/guest-sign-in';
     static readonly SIGN_OUT = '/api/v1/auth/sign-out';
     static readonly SIGN_OUT_EVERYWHERE = '/api/v1/auth/sign-out-everywhere';
     static readonly GET_SESSIONS = '/api/v1/auth/get-sessions';

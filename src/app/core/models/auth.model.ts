@@ -23,6 +23,11 @@ export interface SignInGrant extends TokenGrant {
     user: { id: string; email: string; name: string; role: string | null };
 }
 
+/** A guest is signed in like anyone else, and told who they are and for how long. */
+export interface GuestGrant extends SignInGrant {
+    guest: { hours: number };
+}
+
 /** What survives a reload, shared by every tab. Never the access token, which lives in memory only. */
 export interface StoredSession {
     transport: RefreshTransport;
