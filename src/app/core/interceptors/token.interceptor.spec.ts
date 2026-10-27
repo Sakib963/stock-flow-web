@@ -30,7 +30,7 @@ describe('tokenInterceptor', () => {
         auth = TestBed.inject(AuthService);
 
         auth.login({ email: 'owner@shop.com', password: 'correct', remember: true }).subscribe();
-        backend.expectOne((r) => r.url.includes(APIEndpoint.SIGN_IN)).flush({ code: 200, data: { ...grant('expired', 'refresh-1'), user: { id: 'u1', email: 'owner@shop.com', name: 'Samiha', role: 'Owner' } } });
+        backend.expectOne((r) => r.url.includes(APIEndpoint.SIGN_IN)).flush({ code: 200, data: { ...grant('expired', 'refresh-1'), user: { id: 'u1', email: 'owner@shop.com', name: 'Test', role: 'Owner' } } });
     });
 
     afterEach(() => {

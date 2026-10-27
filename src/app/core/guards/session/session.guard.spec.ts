@@ -32,7 +32,7 @@ describe('sessionGuard', () => {
     /** The session id is the key: it survives a renewal and changes only at sign-in. */
     const signIn = (sessionId: string) => {
         auth.login({ email: 'owner@shop.com', password: 'correct', remember: true }).subscribe();
-        http.expectOne((r) => r.url.includes(APIEndpoint.SIGN_IN)).flush({ code: 200, data: { ...grant(sessionId), user: { id: 'u1', email: 'owner@shop.com', name: 'Samiha', role: 'Owner' } } });
+        http.expectOne((r) => r.url.includes(APIEndpoint.SIGN_IN)).flush({ code: 200, data: { ...grant(sessionId), user: { id: 'u1', email: 'owner@shop.com', name: 'Test', role: 'Owner' } } });
     };
 
     const flush = (name: string) => http.expectOne((r) => r.url.includes(APIEndpoint.GET_USER_INFO)).flush({ code: 200, data: payload(name) });
@@ -62,14 +62,14 @@ describe('sessionGuard', () => {
 
     it('keeps everyone else off the set-password page', async () => {
         const result = TestBed.runInInjectionContext(() => mustSetPasswordGuard({} as ActivatedRouteSnapshot, {} as RouterStateSnapshot)) as Promise<boolean | UrlTree>;
-        flush('Samiha');
+        flush('Test');
         const tree = await result;
         expect(tree instanceof UrlTree && tree.toString()).toBe('/app');
     });
 
     it('loads the boot payload before the shell activates', async () => {
         const result = activate();
-        flush('Samiha');
+        flush('Test');
 
         expect(await result).toBe(true);
         expect(session.loaded()).toBe(true);
@@ -77,7 +77,7 @@ describe('sessionGuard', () => {
 
     it('does not fetch again for the same signed-in person', async () => {
         const first = activate();
-        flush('Samiha');
+        flush('Test');
         await first;
 
         expect(await activate()).toBe(true);
@@ -87,7 +87,7 @@ describe('sessionGuard', () => {
     /** Two people share the counter machine. The second must not inherit the first one's menu. */
     it('refetches when a different person signs in on the same machine', async () => {
         const first = activate();
-        flush('Samiha');
+        flush('Test');
         await first;
 
         signIn('session-b');
@@ -101,7 +101,7 @@ describe('sessionGuard', () => {
     /** Renewing the access token every 15 minutes must not refetch a menu that has not changed. */
     it('does not refetch when only the access token was renewed', async () => {
         const first = activate();
-        flush('Samiha');
+        flush('Test');
         await first;
 
         auth.renewAccessToken().subscribe();

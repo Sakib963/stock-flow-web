@@ -120,7 +120,7 @@ describe('LoginComponent', () => {
         const http = TestBed.inject(HttpTestingController);
         const request = http.expectOne((r) => r.url.includes(APIEndpoint.SIGN_IN));
         expect(request.request.body.remember).toBe(true);
-        request.flush({ code: 200, message: 'ok', data: { access_token: 'a', expires_in: 900, session_id: 's', refresh_transport: 'body', refresh_token: 'r', user: { id: 'u1', email: 'owner@shop.com', name: 'Samiha', role: 'Owner' } } });
+        request.flush({ code: 200, message: 'ok', data: { access_token: 'a', expires_in: 900, session_id: 's', refresh_transport: 'body', refresh_token: 'r', user: { id: 'u1', email: 'owner@shop.com', name: 'Test', role: 'Owner' } } });
         await fixture.whenStable();
 
         expect(JSON.parse(localStorage.getItem(Constants.AUTH_STORE_KEY) ?? '{}')).toEqual({ transport: 'body', refresh_token: 'r', session_id: 's', remember: true });

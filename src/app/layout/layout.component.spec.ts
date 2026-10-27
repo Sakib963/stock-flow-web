@@ -60,7 +60,7 @@ const item = (id: string): MenuItem => menu.find((i) => i.id === id)!;
 
 const payload: SessionPayload = {
     version: 'v1',
-    user: { name: 'Samiha Rahman', email: 'samiha@shop.com', mobile_number: null, photo: null, designation: 'Owner', role: 'Admin' },
+    user: { name: 'Test Owner', email: 'test.owner@shop.com', mobile_number: null, photo: null, designation: 'Owner', role: 'Admin' },
     business: { name: 'Arithma Labs', logoUrl: null, orderSystem: 'both', timeZone: 'Asia/Dhaka' },
     permissions: [],
     menu,

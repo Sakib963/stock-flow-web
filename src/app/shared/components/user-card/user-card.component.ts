@@ -19,7 +19,7 @@ const initialsOf = (name: string): string =>
  * Who a colleague is: photo, name, designation and email, fetched when the card opens.
 
  *
- *   <user-card [email]="'samiha@shop.test'" [fallbackName]="'Samiha Rahman'" />
+ *   <user-card [email]="'test.owner@shop.test'" [fallbackName]="'Test Owner'" />
  */
 @Component({
     selector: 'user-card',

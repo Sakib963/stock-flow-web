@@ -10,7 +10,7 @@ import { permissionGuard } from './permission.guard';
 
 const payload = (permissions: string[]): SessionPayload => ({
     version: 'v1',
-    user: { name: 'Samiha', email: 'owner@shop.com', mobile_number: null, photo: null, designation: null, role: 'Staff' },
+    user: { name: 'Test', email: 'owner@shop.com', mobile_number: null, photo: null, designation: null, role: 'Staff' },
     business: { name: 'Arithma Labs', logoUrl: null, orderSystem: 'both', timeZone: 'Asia/Dhaka' },
     permissions,
     menu: [],

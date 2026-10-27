@@ -11,7 +11,7 @@ import { AuthService } from '@app/core/services/auth/auth.service';
 
 const payload = (permissions: string[], menu: SessionPayload['menu'] = []): SessionPayload => ({
     version: 'v1',
-    user: { name: 'Samiha', email: 'owner@shop.com', mobile_number: null, photo: null, designation: null, role: 'Owner' },
+    user: { name: 'Test', email: 'owner@shop.com', mobile_number: null, photo: null, designation: null, role: 'Owner' },
     business: { name: 'Arithma Labs', logoUrl: null, orderSystem: 'both', timeZone: 'Asia/Dhaka' },
     permissions,
     menu,
@@ -49,7 +49,7 @@ describe('shell routing after sign-in', () => {
         TestBed.inject(AuthService).login({ email: 'owner@shop.com', password: 'secret', remember: true }).subscribe();
         http.expectOne((r) => r.url.includes(APIEndpoint.SIGN_IN)).flush({
             code: 200,
-            data: { access_token: 'token', expires_in: 900, session_id: 'session-1', refresh_transport: 'cookie', user: { id: 'u1', email: 'owner@shop.com', name: 'Samiha', role: 'Owner' } },
+            data: { access_token: 'token', expires_in: 900, session_id: 'session-1', refresh_transport: 'cookie', user: { id: 'u1', email: 'owner@shop.com', name: 'Test', role: 'Owner' } },
         });
     });
 

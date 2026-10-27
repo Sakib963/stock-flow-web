@@ -29,7 +29,7 @@ describe('AuthService', () => {
 
     const signIn = (remember: boolean, transport: RefreshTransport = 'body') => {
         auth.login({ email: 'owner@shop.com', password: 'correct', remember }).subscribe();
-        backend.expectOne((r) => r.url.includes(APIEndpoint.SIGN_IN)).flush({ code: 200, message: 'ok', data: { ...grant(1, transport), user: { id: 'u1', email: 'owner@shop.com', name: 'Samiha', role: 'Owner' } } });
+        backend.expectOne((r) => r.url.includes(APIEndpoint.SIGN_IN)).flush({ code: 200, message: 'ok', data: { ...grant(1, transport), user: { id: 'u1', email: 'owner@shop.com', name: 'Test', role: 'Owner' } } });
     };
 
     const renewal = async () => {
