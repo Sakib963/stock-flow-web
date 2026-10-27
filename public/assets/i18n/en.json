@@ -530,6 +530,8 @@
         "rendererFailed": "This view could not load. Your filters are kept.",
         "loading": "Loading the list",
         "range": "Displaying {{from}}-{{to}} out of {{total}} records",
+        "noChoiceMatch": "Nothing matches. Try another word.",
+        "choicesFailed": "Could not load the list.",
         "noMatchTitle": "Nothing matches these filters",
         "noMatchBody": "Clear one of them and the list comes back.",
         "errorTitle": "Could not load the list",

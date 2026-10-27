@@ -96,7 +96,7 @@ describe('FilterComponent', () => {
     it('leaves out a field it cannot draw yet rather than showing a control that does nothing', async () => {
         const remote: FilterConfig = {
             ...CONFIG,
-            fields: [STATUS, { key: 'total', label: { en: 'Total', bn: 'মোট' }, type: 'number-range', fromKey: 'min', toKey: 'max', format: 'money' }, { key: 'supplier', label: { en: 'Supplier', bn: 'সরবরাহকারী' }, type: 'select', choices: { endpoint: APIEndpoint.GET_CATEGORY_LIST, search: { key: 'search' } } }],
+            fields: [STATUS, { key: 'total', label: { en: 'Total', bn: 'মোট' }, type: 'number-range', fromKey: 'min', toKey: 'max', format: 'money' }, { key: 'supplier', label: { en: 'Supplier', bn: 'সরবরাহকারী' }, type: 'multi-select', choices: { endpoint: APIEndpoint.GET_CATEGORY_LIST, search: { key: 'search' } } }],
         };
         const { cmp } = await render(remote);
 
@@ -150,6 +150,116 @@ describe('FilterComponent', () => {
         it('leaves out a remote field whose endpoint the person may not call', async () => {
             const { cmp } = await render({ render: 'modal', fields: [STATUS, { ...CATEGORY, permission: 'configuration.brands.view' }] });
             expect(cmp.fields().map((f) => f.key)).toEqual(['status']);
+        });
+    });
+
+    describe('a long list searched on the server', () => {
+        const PRODUCT: FilterField = { key: 'product_oid', label: { en: 'Product', bn: 'পণ্য' }, type: 'select', choices: { endpoint: APIEndpoint.GET_PRODUCT_LIST_FOR_DROPDOWN, search: { key: 'search' }, resolve: { key: 'oids' } } };
+        const MODAL: FilterConfig = { render: 'modal', fields: [PRODUCT] };
+        const isProducts = (r: { url: string }) => r.url.endsWith(APIEndpoint.GET_PRODUCT_LIST_FOR_DROPDOWN);
+        const page = (from: number, count: number) => ({ code: 200, message: 'ok', data: Array.from({ length: count }, (_, i) => ({ value: `p${from + i}`, label: `Kurti ${from + i}` })) });
+
+        afterEach(() => {
+            TestBed.inject(HttpTestingController).verify();
+            vi.useRealTimers();
+        });
+
+        it('opens on the first fifty, and scrolling to the end brings the next fifty until a short page', async () => {
+            const { cmp } = await render(MODAL);
+            const http = TestBed.inject(HttpTestingController);
+            cmp.openPanel();
+            const field = cmp.fields()[0];
+
+            const first = http.expectOne(isProducts);
+            expect(first.request.params.get('offset')).toBe('0');
+            expect(first.request.params.get('limit')).toBe('50');
+            first.flush(page(0, 50));
+
+            cmp.more(field);
+            const second = http.expectOne(isProducts);
+            expect(second.request.params.get('offset')).toBe('50');
+            second.flush(page(50, 7));
+            expect(cmp.choicesOf(field).length).toBe(57);
+
+            cmp.more(field);
+            http.expectNone(isProducts);
+            cmp.closePanel();
+        });
+
+        it('shows it is searching from the first keystroke and asks the server once typing pauses', async () => {
+            vi.useFakeTimers();
+            const { cmp } = await render(MODAL);
+            const http = TestBed.inject(HttpTestingController);
+            cmp.openPanel();
+            const field = cmp.fields()[0];
+            http.expectOne(isProducts).flush(page(0, 50));
+
+            cmp.onSearch(field, 'sil');
+            cmp.onSearch(field, 'silk');
+            expect(cmp.remoteLoading(field)).toBe(true);
+            http.expectNone(isProducts);
+
+            vi.advanceTimersByTime(300);
+            const asked = http.expectOne(isProducts);
+            expect(asked.request.params.get('search')).toBe('silk');
+            asked.flush({ code: 200, message: 'ok', data: [{ value: 's1', label: 'Silk Saree' }] });
+            expect(cmp.remoteLoading(field)).toBe(false);
+            expect(cmp.choicesOf(field)).toEqual([{ value: 's1', label: 'Silk Saree' }]);
+            cmp.closePanel();
+        });
+
+        it('reopens on the first page rather than the last search, since the search box opens empty', async () => {
+            vi.useFakeTimers();
+            const { cmp } = await render(MODAL);
+            const http = TestBed.inject(HttpTestingController);
+            const field = cmp.fields()[0];
+            cmp.loadRemoteFor(field);
+            http.expectOne(isProducts).flush(page(0, 50));
+            cmp.onSearch(field, 'silk');
+            vi.advanceTimersByTime(300);
+            http.expectOne(isProducts).flush({ code: 200, message: 'ok', data: [{ value: 's1', label: 'Silk Saree' }] });
+
+            cmp.loadRemoteFor(field);
+            const reopened = http.expectOne(isProducts);
+            expect(reopened.request.params.get('search')).toBe('');
+            reopened.flush(page(0, 50));
+            expect(cmp.choicesOf(field).length).toBe(50);
+        });
+
+        it('says the list could not load, not that nothing matches, and an older failure never ends a newer search', async () => {
+            vi.useFakeTimers();
+            const { cmp } = await render(MODAL);
+            const http = TestBed.inject(HttpTestingController);
+            const field = cmp.fields()[0];
+            cmp.loadRemoteFor(field);
+            const first = http.expectOne(isProducts);
+
+            cmp.onSearch(field, 'silk');
+            first.flush('down', { status: 500, statusText: 'Server Error' });
+            expect(cmp.remoteLoading(field)).toBe(true);
+            expect(cmp.remoteFailed(field)).toBe(false);
+
+            vi.advanceTimersByTime(300);
+            http.expectOne(isProducts).flush('down', { status: 500, statusText: 'Server Error' });
+            expect(cmp.remoteLoading(field)).toBe(false);
+            expect(cmp.remoteFailed(field)).toBe(true);
+
+            cmp.retry(field);
+            const again = http.expectOne(isProducts);
+            expect(again.request.params.get('search')).toBe('silk');
+            again.flush({ code: 200, message: 'ok', data: [{ value: 's1', label: 'Silk Saree' }] });
+            expect(cmp.remoteFailed(field)).toBe(false);
+            expect(cmp.choicesOf(field)).toEqual([{ value: 's1', label: 'Silk Saree' }]);
+        });
+
+        it('names a product from the URL by asking for that one, never the whole list', async () => {
+            const { cmp } = await render(MODAL, { product_oid: 'p7' });
+            const asked = TestBed.inject(HttpTestingController).expectOne(isProducts);
+            expect(asked.request.params.get('oids')).toBe('p7');
+            expect(asked.request.params.has('offset')).toBe(false);
+            asked.flush({ code: 200, message: 'ok', data: [{ value: 'p7', label: 'Kurti 7' }] });
+
+            expect(cmp.chips().map((c) => c.text)).toEqual(['Product: Kurti 7']);
         });
     });
 

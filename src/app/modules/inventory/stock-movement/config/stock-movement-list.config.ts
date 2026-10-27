@@ -32,7 +32,7 @@ export const STOCK_MOVEMENT_LIST: ListShellPageConfig = {
         search: { placeholder: 'inventory.stockMovement.searchPlaceholder' },
         fields: [
             { key: 'when', label: 'inventory.stockMovement.when', type: 'date-range', fromKey: 'date_from', toKey: 'date_to', presets: ['today', 'yesterday', 'last-7-days', 'this-month', 'last-month'], max: 'today' },
-            { key: 'product_oid', label: 'inventory.stockMovement.product', type: 'select', permission: 'configuration.product.view', choices: { endpoint: APIEndpoint.GET_PRODUCT_LIST_FOR_DROPDOWN } },
+            { key: 'product_oid', label: 'inventory.stockMovement.product', type: 'select', permission: 'configuration.product.view', choices: { endpoint: APIEndpoint.GET_PRODUCT_LIST_FOR_DROPDOWN, search: { key: 'search' }, resolve: { key: 'oids' } } },
             { key: 'reason', label: 'inventory.stockMovement.reason.label', type: 'multi-select', choices: REASONS.map((value) => ({ value, label: `inventory.stockMovement.reason.${value}` })) },
         ],
     },

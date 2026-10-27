@@ -2,7 +2,7 @@ import { NgTemplateOutlet } from '@angular/common';
 import { ChangeDetectionStrategy, Component, TemplateRef, computed, effect, inject, input, model, signal, untracked, viewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { NgIcon, provideIcons } from '@ng-icons/core';
-import { lucideCheck, lucideEraser, lucideListFilter, lucideRotateCcw, lucideSearch, lucideX } from '@ng-icons/lucide';
+import { lucideCheck, lucideEraser, lucideListFilter, lucideRotateCcw, lucideRotateCw, lucideSearch, lucideX } from '@ng-icons/lucide';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
 import { NzInputModule } from 'ng-zorro-antd/input';
@@ -17,7 +17,7 @@ import { Text } from '@app/core/models/config.model';
 import { Choice, DateBound, DatePreset, FilterField, FilterConfig, FilterValues, RemoteChoices } from '@app/core/models/filter.model';
 import { LanguageService } from '@app/core/services/language/language.service';
 import { SessionService } from '@app/core/services/session/session.service';
-import { ChoicesService } from '@app/shared/services/choices/choices.service';
+import { ChoicesService, pageSizeOf } from '@app/shared/services/choices/choices.service';
 import { TextPipe } from '@app/shared/pipes/text/text.pipe';
 import { resolveText } from '@app/shared/utils/resolve-text/resolve-text';
 import { matches } from '@app/shared/utils/condition/condition';
@@ -59,11 +59,12 @@ const boundDay = (bound: DateBound, today: string): string => (bound === 'today'
 const warned = new Set<string>();
 
 /**
- * Remote choices this build can load: an endpoint and fixed params. Server search, paging, label
- * resolution and a param that follows another filter are not built yet, and a picker loading the
- * wrong list is worse than no picker.
+ * Remote choices this build can load: an endpoint and fixed params, and for a single select a server
+ * search that pages on scroll and names held values through `resolve`. Groups, a second line, a
+ * minimum before searching and a param that follows another filter are not built yet, and a picker
+ * loading the wrong list is worse than no picker.
  */
-const drawsRemote = (source: RemoteChoices): boolean => !source.search && !source.pageSize && !source.resolve && !source.group && !source.sub && Object.values(source.params ?? {}).every((param) => typeof param !== 'object');
+const drawsRemote = (source: RemoteChoices, type: FilterField['type']): boolean => (!source.search || (type === 'select' && !source.search.minChars)) && !source.group && !source.sub && Object.values(source.params ?? {}).every((param) => typeof param !== 'object');
 
 /**
  * Search and the fields that narrow a list, with what is applied read back as chips.
@@ -82,7 +83,7 @@ const drawsRemote = (source: RemoteChoices): boolean => !source.search && !sourc
 @Component({
     selector: 'list-filter',
     imports: [NgTemplateOutlet, FormsModule, NgIcon, NzButtonModule, NzDatePickerModule, NzInputModule, NzModalModule, NzPopoverModule, NzSegmentedModule, NzSelectModule, NzSwitchModule, NzTooltipModule, TranslatePipe, TextPipe],
-    providers: [provideIcons({ lucideCheck, lucideEraser, lucideListFilter, lucideRotateCcw, lucideSearch, lucideX })],
+    providers: [provideIcons({ lucideCheck, lucideEraser, lucideListFilter, lucideRotateCcw, lucideRotateCw, lucideSearch, lucideX })],
     templateUrl: './filter.component.html',
     styleUrl: './filter.component.scss',
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -122,7 +123,7 @@ export class FilterComponent {
         this.config().fields.filter((field) => {
             // A remote field someone cannot load is absent, not an empty picker that answers 403.
             if (field.permission && !this._session.can(field.permission)) return false;
-            const drawnChoices = !('choices' in field) || Array.isArray(field.choices) || ((field.type === 'select' || field.type === 'multi-select') && drawsRemote(field.choices as RemoteChoices));
+            const drawnChoices = !('choices' in field) || Array.isArray(field.choices) || ((field.type === 'select' || field.type === 'multi-select') && drawsRemote(field.choices as RemoteChoices, field.type));
             if (DRAWN.has(field.type) && drawnChoices) return true;
             const id = `${field.key}:${field.type}`;
             if (!warned.has(id)) {
@@ -150,9 +151,111 @@ export class FilterComponent {
     private readonly _remote = signal<Readonly<Record<string, readonly Choice[]>>>({});
     private readonly _remoteLoading = signal<ReadonlySet<string>>(new Set());
 
+    /** Held values named through `resolve`, kept apart so a new search never drops the chosen one's name. */
+    private readonly _named = signal<Readonly<Record<string, readonly Choice[]>>>({});
+    /** A searching field: what was asked for, how far it has scrolled, and whether the last page was the end. */
+    private readonly _paging = new Map<string, { term: string; offset: number; done: boolean }>();
+    private readonly _typing = new Map<string, ReturnType<typeof setTimeout>>();
+
     choicesOf(field: FilterField): readonly Choice[] {
         if (!('choices' in field)) return [];
-        return Array.isArray(field.choices) ? field.choices : (this._remote()[field.key] ?? []);
+        if (Array.isArray(field.choices)) return field.choices;
+        const found = this._remote()[field.key] ?? [];
+        const named = (this._named()[field.key] ?? []).filter((choice) => !found.some((c) => c.value === choice.value));
+        return named.length ? [...named, ...found] : found;
+    }
+
+    isSearching(field: FilterField): boolean {
+        return !!this.remoteOf(field)?.search;
+    }
+
+    /** Debounced, but the picker shows it is asking from the first keystroke, never "nothing matches" meanwhile. */
+    onSearch(field: FilterField, term: string): void {
+        clearTimeout(this._typing.get(field.key));
+        // Any answer still on its way is for words no longer in the box.
+        this._paging.set(field.key, { term: term.trim(), offset: 0, done: false });
+        this.markLoading(field.key, true);
+        this._typing.set(
+            field.key,
+            setTimeout(() => this.searchFor(field, term.trim()), 300)
+        );
+    }
+
+    /** Asks again for what failed: the same words, from the first page. */
+    retry(field: FilterField): void {
+        this.searchFor(field, this._paging.get(field.key)?.term ?? '');
+    }
+
+    /** The next page when the list is scrolled to its end. */
+    more(field: FilterField): void {
+        const source = this.remoteOf(field);
+        const paging = this._paging.get(field.key);
+        if (!source?.search || !paging || paging.done || this.remoteLoading(field)) return;
+        this.fetchPage(field, source, paging.term, paging.offset + pageSizeOf(source));
+    }
+
+    private searchFor(field: FilterField, term: string): void {
+        const source = this.remoteOf(field);
+        if (source) this.fetchPage(field, source, term, 0);
+    }
+
+    private fetchPage(field: FilterField, source: RemoteChoices, term: string, offset: number): void {
+        const asked = { term, offset, done: false };
+        this._paging.set(field.key, asked);
+        this.markFailed(field.key, false);
+        this.markLoading(field.key, true);
+        // A slower answer to an older search must neither replace the newer one nor end its loading.
+        const current = () => this._paging.get(field.key) === asked;
+        this._choices.page(source, term, offset).subscribe({
+            next: (choices) => {
+                if (!current()) return;
+                asked.done = choices.length < pageSizeOf(source);
+                this._remote.update((all) => ({ ...all, [field.key]: offset ? [...(all[field.key] ?? []), ...choices] : choices }));
+                this.markLoading(field.key, false);
+            },
+            // The picker says it could not load rather than that nothing matches; opening it again asks again.
+            error: () => {
+                if (!current()) return;
+                this.markLoading(field.key, false);
+                this.markFailed(field.key, true);
+            },
+        });
+    }
+
+    private readonly _failed = signal<ReadonlySet<string>>(new Set());
+
+    remoteFailed(field: FilterField): boolean {
+        return this._failed().has(field.key);
+    }
+
+    private markFailed(key: string, on: boolean): void {
+        if (this._failed().has(key) === on) return;
+        this._failed.update((keys) => {
+            const next = new Set(keys);
+            if (on) next.add(key);
+            else next.delete(key);
+            return next;
+        });
+    }
+
+    private resolveHeld(field: FilterField, source: RemoteChoices, raw: string): void {
+        const known = this.choicesOf(field);
+        const missing = raw.split(SEPARATOR).filter((value) => value && !known.some((c) => c.value === value));
+        if (!missing.length) return;
+        this._choices.named(source, missing).subscribe({
+            next: (choices) => this._named.update((all) => ({ ...all, [field.key]: [...(all[field.key] ?? []), ...choices] })),
+            // The chip keeps the raw value; the list itself is unaffected.
+            error: () => undefined,
+        });
+    }
+
+    private markLoading(key: string, on: boolean): void {
+        this._remoteLoading.update((keys) => {
+            const next = new Set(keys);
+            if (on) next.add(key);
+            else next.delete(key);
+            return next;
+        });
     }
 
     remoteLoading(field: FilterField): boolean {
@@ -173,7 +276,14 @@ export class FilterComponent {
      */
     loadRemoteFor(field: FilterField): void {
         const source = this.remoteOf(field);
-        if (!source || this._remote()[field.key] || this._remoteLoading().has(field.key)) return;
+        if (!source || this._remoteLoading().has(field.key)) return;
+        // The picker opens with an empty search box, so it shows the first page, not the last search.
+        if (source.search) {
+            const paging = this._paging.get(field.key);
+            if (paging?.term === '' && paging.offset === 0 && this._remote()[field.key] && !this.remoteFailed(field)) return;
+            return this.searchFor(field, '');
+        }
+        if (this._remote()[field.key]) return;
 
         this._remoteLoading.update((keys) => new Set(keys).add(field.key));
         const done = () =>
@@ -201,7 +311,14 @@ export class FilterComponent {
         effect(() => {
             const values = this.values();
             const pending = this.fields().filter((field) => this.remoteOf(field) && !isEmptyValue(values[field.key]));
-            untracked(() => pending.forEach((field) => this.loadRemoteFor(field)));
+            untracked(() =>
+                pending.forEach((field) => {
+                    const source = this.remoteOf(field)!;
+                    // A searching list is never loaded whole just to name a chip.
+                    if (source.search) this.resolveHeld(field, source, String(values[field.key]));
+                    else this.loadRemoteFor(field);
+                })
+            );
         });
     }
 
