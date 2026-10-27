@@ -6,8 +6,11 @@ import { ReferenceCache } from '@app/shared/services/reference-cache/reference-c
 import { environment } from '@env/environment';
 import { Observable, finalize, map } from 'rxjs';
 
+/** A page of the supplier picker, the size every searching picker uses; a shorter page is the last. */
+export const SUPPLIER_PAGE = 50;
+
 /**
- * Only the supplier, warehouse and aisle pickers are kept, through the reference cache (docs/caching).
+ * Only the warehouse and aisle pickers are kept, through the reference cache (docs/caching).
  * Nothing else is: an order carries stock, prices and payments, and the product search carries what
  * is on the shelf now.
  */
@@ -27,8 +30,14 @@ export class PurchaseOrderService {
         return this._http.get<{ data: PurchasableProduct[] }>(`${this._base}${APIEndpoint.GET_PRODUCT_LIST_FOR_PURCHASE}`, { params: { search, limit: 20 } }).pipe(map((response) => response.data));
     }
 
-    suppliers(): Observable<SupplierChoice[]> {
-        return this._reference.keep('suppliers', () => this._http.get<{ data: SupplierChoice[] }>(`${this._base}${APIEndpoint.GET_SUPPLIER_LIST_FOR_DROPDOWN}`).pipe(map((response) => response.data)));
+    /** Fifty at a time, searched by name or phone on the server: a supplier list grows for years. */
+    suppliers(search: string, offset: number): Observable<SupplierChoice[]> {
+        return this._http.get<{ data: SupplierChoice[] }>(`${this._base}${APIEndpoint.GET_SUPPLIER_LIST_FOR_DROPDOWN}`, { params: { search, offset, limit: SUPPLIER_PAGE } }).pipe(map((response) => response.data));
+    }
+
+    /** The saved supplier of an order being edited, named without loading the list. */
+    supplier(oid: string): Observable<SupplierChoice | null> {
+        return this._http.get<{ data: SupplierChoice[] }>(`${this._base}${APIEndpoint.GET_SUPPLIER_LIST_FOR_DROPDOWN}`, { params: { oids: oid } }).pipe(map((response) => response.data[0] ?? null));
     }
 
     warehouses(): Observable<WarehouseChoice[]> {

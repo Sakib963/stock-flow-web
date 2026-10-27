@@ -284,7 +284,7 @@ export class ReportViewComponent {
             case 'warehouse':
                 return [{ key: 'warehouse_oid', label, type: 'select', permission: 'configuration.warehouse.view', choices: { endpoint: APIEndpoint.GET_WAREHOUSE_LIST_FOR_DROPDOWN } }];
             case 'supplier':
-                return [{ key: 'supplier_oid', label, type: 'select', permission: 'configuration.supplier.view', choices: { endpoint: APIEndpoint.GET_SUPPLIER_LIST_FOR_DROPDOWN } }];
+                return [{ key: 'supplier_oid', label, type: 'select', permission: 'configuration.supplier.view', choices: { endpoint: APIEndpoint.GET_SUPPLIER_LIST_FOR_DROPDOWN, search: { key: 'search' }, resolve: { key: 'oids' } } }];
             case 'dispose-reason':
                 return [{ key: 'reason', label, type: 'select', choices: DISPOSE_REASONS.map((r) => ({ value: r, label: `report.value.dispose_reason.${r}` })) }];
             case 'expires-by':

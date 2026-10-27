@@ -14,12 +14,12 @@ import { NzSpinModule } from 'ng-zorro-antd/spin';
 import { NzTableModule } from 'ng-zorro-antd/table';
 import { NzTooltipModule } from 'ng-zorro-antd/tooltip';
 import { TranslatePipe } from '@ngx-translate/core';
-import { finalize } from 'rxjs';
+import { EMPTY, Subject, catchError, debounceTime, finalize, map, switchMap } from 'rxjs';
 
 import { AisleChoice, PAYMENT_STATUSES, PURCHASE_TYPES, PaymentStatus, PurchaseLineDraft, PurchaseOrderDetails, PurchaseOrderPayload, PurchaseType, SupplierChoice, WarehouseChoice } from '@app/core/models/purchase-order.model';
 import { LanguageService } from '@app/core/services/language/language.service';
 import { OrderLineDrawerComponent } from '@app/modules/inventory/purchase-order/components/order-line-drawer/order-line-drawer.component';
-import { PurchaseOrderService } from '@app/modules/inventory/purchase-order/services/purchase-order.service';
+import { PurchaseOrderService, SUPPLIER_PAGE } from '@app/modules/inventory/purchase-order/services/purchase-order.service';
 import { lineComplete, lineTotal } from '@app/modules/inventory/purchase-order/utils/order-line/order-line';
 import { DigitsPipe } from '@app/shared/pipes/digits/digits.pipe';
 import { MoneyPipe } from '@app/shared/pipes/money/money.pipe';
@@ -67,11 +67,28 @@ export class PurchaseOrderFormComponent {
 
     private readonly _value = toSignal(this.form.valueChanges, { initialValue: this.form.getRawValue() });
 
-    readonly suppliers = signal<SupplierChoice[]>([]);
+    /** The saved or chosen supplier, kept apart from the search results so a new search never drops its name. */
+    private readonly _heldSupplier = signal<SupplierChoice | null>(null);
+    private readonly _foundSuppliers = signal<SupplierChoice[]>([]);
+    /** The words of the current search. While there are some, the held supplier is not listed, so "No match" can show. */
+    private readonly _supplierTerm = signal('');
+    readonly suppliers = computed(() => {
+        const held = this._heldSupplier();
+        const found = this._foundSuppliers();
+        return held && !this._supplierTerm() && !found.some((s) => s.value === held.value) ? [held, ...found] : found;
+    });
+    readonly supplierSearchFailed = signal(false);
+    /** Loading runs from the keystroke until the new search answers, so an older answer landing meanwhile cannot end it. */
+    private readonly _supplierTyping = signal(false);
+    private readonly _supplierAsking = signal(true);
+    readonly suppliersLoading = computed(() => this._supplierTyping() || this._supplierAsking());
+    /** Every ask for suppliers goes through here, so a slower answer to an older search is dropped. */
+    private readonly _supplierAsk = new Subject<{ term: string; offset: number }>();
+    private readonly _supplierTyped = new Subject<string>();
+    private _supplierPage = { term: '', offset: 0, done: false };
     readonly warehouses = signal<WarehouseChoice[]>([]);
     readonly aisles = signal<AisleChoice[]>([]);
     readonly choicesFailed = signal(false);
-    readonly suppliersLoading = signal(true);
     readonly warehousesLoading = signal(true);
     readonly aislesLoading = signal(true);
 
@@ -121,6 +138,40 @@ export class PurchaseOrderFormComponent {
     });
 
     constructor() {
+        this._supplierAsk
+            .pipe(
+                switchMap((ask) => {
+                    // Recorded when asked, not when answered, so Try again repeats the words that failed.
+                    const before = this._supplierPage;
+                    this._supplierPage = { ...ask, done: true };
+                    this._supplierTerm.set(ask.term);
+                    this._supplierTyping.set(false);
+                    this._supplierAsking.set(true);
+                    this.supplierSearchFailed.set(false);
+                    return this._orders.suppliers(ask.term, ask.offset).pipe(
+                        map((rows) => ({ ask, rows })),
+                        catchError(() => {
+                            // A failed next page leaves the list as it was, and scrolling again asks again.
+                            if (ask.offset) this._supplierPage = { ...before, done: false };
+                            else this.supplierSearchFailed.set(true);
+                            return EMPTY;
+                        }),
+                        finalize(() => this._supplierAsking.set(false))
+                    );
+                }),
+                takeUntilDestroyed(this._destroy)
+            )
+            .subscribe(({ ask, rows }) => {
+                this._supplierPage = { ...ask, done: rows.length < SUPPLIER_PAGE };
+                this._foundSuppliers.update((found) => (ask.offset ? [...found, ...rows] : rows));
+            });
+        this._supplierTyped.pipe(debounceTime(300), takeUntilDestroyed(this._destroy)).subscribe((term) => this._supplierAsk.next({ term, offset: 0 }));
+        // A chosen supplier stays named while the person searches for something else.
+        this.form.controls.supplier_oid.valueChanges.pipe(takeUntilDestroyed(this._destroy)).subscribe((oid) => {
+            const chosen = this.suppliers().find((s) => s.value === oid);
+            if (chosen) this._heldSupplier.set(chosen);
+        });
+
         this.loadChoices();
 
         // Only a partial payment is typed. Paid and unpaid are what the server records anyway.
@@ -141,13 +192,11 @@ export class PurchaseOrderFormComponent {
     loadChoices(): void {
         this.choicesFailed.set(false);
         const fail = () => this.choicesFailed.set(true);
-        this.suppliersLoading.set(true);
         this.warehousesLoading.set(true);
         this.aislesLoading.set(true);
-        this._orders
-            .suppliers()
-            .pipe(finalize(() => this.suppliersLoading.set(false)))
-            .subscribe({ next: (rows) => this.suppliers.set(rows), error: fail });
+        this._supplierAsk.next({ term: '', offset: 0 });
+        const saved = this.editing()?.details.supplier_oid;
+        if (saved && !this._heldSupplier()) this.nameSavedSupplier(saved);
         this._orders
             .warehouses()
             .pipe(finalize(() => this.warehousesLoading.set(false)))
@@ -158,14 +207,31 @@ export class PurchaseOrderFormComponent {
             .subscribe({ next: (rows) => this.aisles.set(rows), error: fail });
     }
 
-    /** Name or phone, the way someone finds a supplier they know by either. */
-    matchSupplier = (term: string, option: { nzValue: string }): boolean => {
-        const supplier = this.suppliers().find((s) => s.value === option.nzValue);
-        if (!supplier) return false;
-        const needle = term.trim().toLowerCase();
-        const digits = needle.replace(/\D/g, '');
-        return supplier.label.toLowerCase().includes(needle) || (!!digits && supplier.phone_number.replace(/\D/g, '').includes(digits));
-    };
+    /** Name or phone, searched on the server; the picker shows it is asking from the first keystroke. */
+    searchSuppliers(term: string): void {
+        this._supplierTyping.set(true);
+        this._supplierTyped.next(term.trim());
+    }
+
+    /** A failure here shows the form's could-not-load banner, whose Try again asks again. */
+    private nameSavedSupplier(oid: string): void {
+        this._orders.supplier(oid).subscribe({ next: (supplier) => this._heldSupplier.set(supplier), error: () => this.choicesFailed.set(true) });
+    }
+
+    /** The picker opens with an empty search box, so it shows the first page, not the last search. */
+    supplierPickerOpened(open: boolean): void {
+        if (open && (this._supplierPage.term !== '' || this.supplierSearchFailed())) this._supplierAsk.next({ term: '', offset: 0 });
+    }
+
+    moreSuppliers(): void {
+        const page = this._supplierPage;
+        if (page.done || this.suppliersLoading()) return;
+        this._supplierAsk.next({ term: page.term, offset: page.offset + SUPPLIER_PAGE });
+    }
+
+    retrySuppliers(): void {
+        this._supplierAsk.next({ term: this._supplierPage.term, offset: 0 });
+    }
 
     /** Where a line goes, as the table shows it. */
     whereAt(row: number): string {
@@ -259,6 +325,7 @@ export class PurchaseOrderFormComponent {
             }))
         );
 
+        this.nameSavedSupplier(details.supplier_oid);
         this.form.patchValue({
             supplier_oid: details.supplier_oid,
             purchase_type: details.purchase_type ?? '',

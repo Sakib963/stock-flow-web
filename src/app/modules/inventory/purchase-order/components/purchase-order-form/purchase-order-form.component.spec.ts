@@ -105,6 +105,9 @@ describe('PurchaseOrderFormComponent', () => {
         const fixture = await open();
         fixture.componentRef.setInput('editing', { details: { oid: 'po-1', supplier_oid: 's-1', purchase_type: 'advance', expected_delivery_date: null, payment_status: 'paid', paid_amount: '36000', special_notes: null }, lines: [{ product_oid: 'p-1', product_name: 'Cotton kurti', sku: 'KURTI', sellable: 4, restock_threshold: 20, warehouse_oid: 'w-1', aisle_oid: null, ordered_quantity: 80, ordered_unit_price: '450' }], stats: {}, activity: [] } as never);
         fixture.detectChanges();
+        const named = TestBed.inject(HttpTestingController).expectOne((r) => r.url.endsWith(APIEndpoint.GET_SUPPLIER_LIST_FOR_DROPDOWN));
+        expect(named.request.params.get('oids')).toBe('s-1');
+        named.flush({ data: [{ value: 's-1', label: 'Garment house', phone_number: '01711-000000', last_ordered_on: null }] });
 
         const payload = fixture.componentInstance.payload();
         expect(payload.payment_status).toBeUndefined();
@@ -123,5 +126,102 @@ describe('PurchaseOrderFormComponent', () => {
         const payload = form.payload(true);
         expect(payload.draft).toBe(true);
         expect(payload.products).toEqual([{ product_oid: 'p-1', warehouse_oid: null, aisle_oid: null, quantity: null, unit_price: null }]);
+    });
+    describe('the supplier picker, searched on the server', () => {
+        const isSuppliers = (r: { url: string }) => r.url.endsWith(APIEndpoint.GET_SUPPLIER_LIST_FOR_DROPDOWN);
+        const supplier = (i: number) => ({ value: `s-${i}`, label: `Supplier ${i}`, phone_number: '01711-000000', last_ordered_on: null });
+
+        afterEach(() => vi.useRealTimers());
+
+        it('asks the server once typing pauses, showing it is searching from the first keystroke', async () => {
+            vi.useFakeTimers();
+            const form = (await open()).componentInstance;
+            const http = TestBed.inject(HttpTestingController);
+
+            form.searchSuppliers('garm');
+            expect(form.suppliersLoading()).toBe(true);
+            http.expectNone(isSuppliers);
+            vi.advanceTimersByTime(300);
+
+            const asked = http.expectOne(isSuppliers);
+            expect(asked.request.params.get('search')).toBe('garm');
+            asked.flush({ data: [supplier(1)] });
+            expect(form.suppliersLoading()).toBe(false);
+            expect(form.suppliers().map((s) => s.label)).toEqual(['Supplier 1']);
+        });
+
+        it('brings the next fifty when the list is scrolled to its end, and stops after a short page', async () => {
+            await TestBed.configureTestingModule({
+                imports: [PurchaseOrderFormComponent],
+                providers: [provideHttpClient(), provideHttpClientTesting(), provideNzI18n(en_US), provideNzDateFnsAdapter(), provideTranslateService({ fallbackLang: 'en' })],
+            }).compileComponents();
+            const form = TestBed.createComponent(PurchaseOrderFormComponent).componentInstance;
+            const http = TestBed.inject(HttpTestingController);
+            http.expectOne(isSuppliers).flush({ data: Array.from({ length: 50 }, (_, i) => supplier(i)) });
+            http.expectOne((r) => r.url.endsWith(APIEndpoint.GET_WAREHOUSE_LIST_FOR_DROPDOWN)).flush({ data: [] });
+            http.expectOne((r) => r.url.endsWith(APIEndpoint.GET_AISLE_LIST_FOR_DROPDOWN)).flush({ data: [] });
+
+            form.moreSuppliers();
+            const next = http.expectOne(isSuppliers);
+            expect(next.request.params.get('offset')).toBe('50');
+            next.flush({ data: [supplier(50)] });
+            expect(form.suppliers()).toHaveLength(51);
+
+            form.moreSuppliers();
+            http.expectNone(isSuppliers);
+        });
+
+        it('keeps showing it is searching while an older answer lands during the pause, and lists the chosen supplier only when nothing is typed', async () => {
+            vi.useFakeTimers();
+            const form = (await open()).componentInstance;
+            const http = TestBed.inject(HttpTestingController);
+            form.form.controls.supplier_oid.setValue('s-1');
+
+            form.searchSuppliers('zzz');
+            form.retrySuppliers();
+            form.searchSuppliers('zzzz');
+            http.expectOne(isSuppliers).flush({ data: [supplier(1)] });
+            expect(form.suppliersLoading()).toBe(true);
+
+            vi.advanceTimersByTime(300);
+            http.expectOne(isSuppliers).flush({ data: [] });
+            expect(form.suppliersLoading()).toBe(false);
+            expect(form.suppliers()).toEqual([]);
+        });
+
+        it('asks for a failed next page again when the list is scrolled again', async () => {
+            await TestBed.configureTestingModule({
+                imports: [PurchaseOrderFormComponent],
+                providers: [provideHttpClient(), provideHttpClientTesting(), provideNzI18n(en_US), provideNzDateFnsAdapter(), provideTranslateService({ fallbackLang: 'en' })],
+            }).compileComponents();
+            const form = TestBed.createComponent(PurchaseOrderFormComponent).componentInstance;
+            const http = TestBed.inject(HttpTestingController);
+            http.expectOne(isSuppliers).flush({ data: Array.from({ length: 50 }, (_, i) => supplier(i)) });
+            http.expectOne((r) => r.url.endsWith(APIEndpoint.GET_WAREHOUSE_LIST_FOR_DROPDOWN)).flush({ data: [] });
+            http.expectOne((r) => r.url.endsWith(APIEndpoint.GET_AISLE_LIST_FOR_DROPDOWN)).flush({ data: [] });
+
+            form.moreSuppliers();
+            http.expectOne(isSuppliers).flush('down', { status: 500, statusText: 'Server Error' });
+            expect(form.suppliers()).toHaveLength(50);
+
+            form.moreSuppliers();
+            expect(http.expectOne(isSuppliers).request.params.get('offset')).toBe('50');
+        });
+
+        it('says the suppliers could not load and asks again for the same words from Try again', async () => {
+            vi.useFakeTimers();
+            const form = (await open()).componentInstance;
+            const http = TestBed.inject(HttpTestingController);
+            form.searchSuppliers('garm');
+            vi.advanceTimersByTime(300);
+            http.expectOne(isSuppliers).flush('down', { status: 500, statusText: 'Server Error' });
+            expect(form.supplierSearchFailed()).toBe(true);
+
+            form.retrySuppliers();
+            const again = http.expectOne(isSuppliers);
+            expect(again.request.params.get('search')).toBe('garm');
+            again.flush({ data: [supplier(1)] });
+            expect(form.supplierSearchFailed()).toBe(false);
+        });
     });
 });

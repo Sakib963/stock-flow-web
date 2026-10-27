@@ -58,7 +58,7 @@ export const PURCHASE_ORDER_LIST: ListShellPageConfig = {
                     { value: 'unpaid', label: 'inventory.purchaseOrder.payment.unpaid' },
                 ],
             },
-            { key: 'supplier_oid', label: 'inventory.purchaseOrder.supplier', type: 'select', choices: { endpoint: APIEndpoint.GET_SUPPLIER_LIST_FOR_DROPDOWN } },
+            { key: 'supplier_oid', label: 'inventory.purchaseOrder.supplier', type: 'select', choices: { endpoint: APIEndpoint.GET_SUPPLIER_LIST_FOR_DROPDOWN, search: { key: 'search' }, resolve: { key: 'oids' } } },
         ],
     },
     table: {
