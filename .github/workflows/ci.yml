@@ -1,0 +1,40 @@
+name: CI
+
+on:
+    push:
+        branches: [dev, 'feat/**', 'fix/**']
+    pull_request:
+        branches: [dev]
+
+concurrency:
+    group: ci-${{ github.ref }}
+    cancel-in-progress: ${{ github.ref != 'refs/heads/dev' }}
+
+jobs:
+    check:
+        runs-on: ubuntu-latest
+        timeout-minutes: 20
+        steps:
+            - uses: actions/checkout@v5
+
+            - uses: actions/setup-node@v5
+              with:
+                  node-version-file: .nvmrc
+                  cache: npm
+
+            - run: npm ci
+
+            # The real files are git-ignored; a build and the specs only need their shape.
+            - run: node tools/write-environment.mjs environment.ts environment.production.ts
+              env:
+                  API_BASE_URL: https://api.invalid
+                  TRACKER_URL: https://tracker.invalid
+                  CLOUDINARY_CLOUD_NAME: ci
+                  CLOUDINARY_UPLOAD_PRESET: ci
+                  GUEST_ACCESS: 'false'
+
+            - run: npm run verify
+
+            - run: npx ng test --watch=false
+
+            - run: npm audit --omit=dev --audit-level=high
