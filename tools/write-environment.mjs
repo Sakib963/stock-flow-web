@@ -7,7 +7,7 @@
 // (true or false), and BENGALI_TIME_IN_WORDS when a business wants it. A missing one is an error
 // rather than a default, so a build can never quietly point at the wrong server. An existing file is
 // never overwritten, so running it on the laptop cannot clobber the local copies.
-import { existsSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 
 const NAMES = ['environment.ts', 'environment.dev.ts', 'environment.production.ts'];
 const REQUIRED = ['API_BASE_URL', 'TRACKER_URL', 'CLOUDINARY_CLOUD_NAME', 'CLOUDINARY_UPLOAD_PRESET', 'GUEST_ACCESS'];
@@ -20,6 +20,7 @@ if (missing.length) fail(`Missing: ${missing.join(', ')}.`);
 if (!['true', 'false'].includes(process.env.GUEST_ACCESS)) fail('GUEST_ACCESS must be true or false.');
 
 const { version } = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8'));
+mkdirSync(new URL('../src/environments/', import.meta.url), { recursive: true });
 
 for (const name of targets) {
     const path = new URL(`../src/environments/${name}`, import.meta.url);
