@@ -24,14 +24,16 @@ jobs:
 
             - run: npm ci
 
-            # The real files are git-ignored; a build and the specs only need their shape.
-            - run: node tools/write-environment.mjs environment.ts environment.production.ts
+            # The real files are git-ignored; a build and the specs only need their shape. The local
+            # environment.ts offers the guest visit, as on the laptop; a production build never does.
+            - run: |
+                  GUEST_ACCESS=true node tools/write-environment.mjs environment.ts
+                  GUEST_ACCESS=false node tools/write-environment.mjs environment.production.ts
               env:
                   API_BASE_URL: https://api.invalid
                   TRACKER_URL: https://tracker.invalid
                   CLOUDINARY_CLOUD_NAME: ci
                   CLOUDINARY_UPLOAD_PRESET: ci
-                  GUEST_ACCESS: 'false'
 
             - run: npm run verify
 

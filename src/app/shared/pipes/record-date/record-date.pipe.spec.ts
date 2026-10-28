@@ -3,9 +3,9 @@ import { environment } from '@env/environment';
 
 describe('RecordDatePipe', () => {
     const pipe = new RecordDatePipe();
-    // Built from local parts, not a UTC string: the pipe formats in the reader's zone, so a fixed
-    // instant would read as a different hour on a machine set to another one.
-    const afternoon = new Date(2026, 7, 24, 14, 5).toISOString();
+    // The pipe formats in the business zone, Asia/Dhaka until the session sets another, whatever the
+    // machine's own zone is: 08:05 UTC is 14:05 there.
+    const afternoon = '2026-08-24T08:05:00Z';
 
     it('writes a list date as day, short month and year', () => {
         expect(pipe.transform('2026-08-24T10:00:00Z', 'en')).toBe('24 Aug 2026');
@@ -24,7 +24,7 @@ describe('RecordDatePipe', () => {
     });
 
     it('writes the slashed forms with two digits, so a column of them lines up', () => {
-        expect(pipe.transform(new Date(2026, 0, 7, 10, 0).toISOString(), 'en', 'slashed')).toBe('07/01/2026');
+        expect(pipe.transform('2026-01-07T04:00:00Z', 'en', 'slashed')).toBe('07/01/2026');
     });
 
     it('carries the time in both clocks when a column asks for it', () => {
@@ -34,7 +34,7 @@ describe('RecordDatePipe', () => {
     });
 
     it('keeps AM and PM in a Bengali 12 hour time, unless the deployment asks for words', () => {
-        const morning = new Date(2026, 8, 30, 11, 35).toISOString();
+        const morning = '2026-09-30T05:35:00Z';
         expect(pipe.transform(morning, 'bn', 'date-time-12')).toMatch(/১১:৩৫\s?AM$/);
 
         (environment as { bengaliTimeInWords?: boolean }).bengaliTimeInWords = true;

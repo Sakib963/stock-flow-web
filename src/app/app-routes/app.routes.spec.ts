@@ -28,9 +28,10 @@ describe('shell routing after sign-in', () => {
     let router: Router;
     let http: HttpTestingController;
 
-    /** The payload request is fired from inside the guard, so it appears a few microtasks in. */
+    /** The payload request is fired from inside the guard, after the lazy route has loaded: on a busy
+     * machine that can take seconds, so the wait is long and ends as soon as the request appears. */
     const flushBootPayload = async (permissions: string[], menu: SessionPayload['menu'] = []) => {
-        for (let attempt = 0; attempt < 50; attempt++) {
+        for (let attempt = 0; attempt < 500; attempt++) {
             const open = http.match((r) => r.url.includes(APIEndpoint.GET_USER_INFO));
             if (open.length) return open[0].flush({ code: 200, data: payload(permissions, menu) });
             await new Promise((resolve) => setTimeout(resolve, 10));
