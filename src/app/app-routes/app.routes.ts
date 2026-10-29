@@ -35,7 +35,7 @@ export const routes: Routes = [
             {
                 // A person's own account: every signed-in person has it, so no permission.
                 path: 'change-password',
-                loadComponent: () => import('@app/modules/profile/pages/change-password/change-password.component').then((m) => m.ChangePasswordComponent),
+                loadChildren: () => import('@app/modules/profile/profile.routes').then((m) => m.PROFILE_ROUTES),
             },
             {
                 path: 'activity-log',

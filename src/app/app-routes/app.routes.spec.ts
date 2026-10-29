@@ -100,6 +100,13 @@ describe('shell routing after sign-in', () => {
         expect(router.url).toBe('/app/sales/orders');
     });
 
+    it('opens change password with what it needs to ask before sending, so the page is never left empty', async () => {
+        const navigation = router.navigateByUrl('/app/change-password');
+        await flushBootPayload(['dashboard.overview.view']);
+        expect(await navigation).toBe(true);
+        expect(router.url).toBe('/app/change-password');
+    });
+
     it('opens the business settings page with what it needs to ask before saving', async () => {
         const navigation = router.navigateByUrl('/app/settings');
         await flushBootPayload(['settings.business.view', 'settings.business.edit']);
