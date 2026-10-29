@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
-import { RouterLink, RouterLinkActive } from '@angular/router';
+import { RouterLink } from '@angular/router';
 import { NzPopoverModule } from 'ng-zorro-antd/popover';
 import { NzTooltipModule } from 'ng-zorro-antd/tooltip';
 import { TranslatePipe } from '@ngx-translate/core';
@@ -27,7 +27,7 @@ import { environment } from '@env/environment';
  */
 @Component({
     selector: 'sider',
-    imports: [RouterLink, RouterLinkActive, NzPopoverModule, NzTooltipModule, TranslatePipe, NgIcon, BadgeComponent],
+    imports: [RouterLink, NzPopoverModule, NzTooltipModule, TranslatePipe, NgIcon, BadgeComponent],
     providers: [provideIcons({ ...SHELL_MENU_ICONS, lucideChevronDown, lucideX })],
     // The host draws no box of its own, so `.shell__sider` stays the direct flex child of the
     // shell body, and the drawer body's child on a phone.

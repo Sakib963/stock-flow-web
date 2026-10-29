@@ -133,6 +133,15 @@
     /* The width transition the sider and the brand block share. */
     --ease-width: cubic-bezier(0.215, 0.61, 0.355, 1);
 
+    /* A page arriving in the shell. */
+    --animate-page-in: page-in 200ms cubic-bezier(0.215, 0.61, 0.355, 1);
+    @keyframes page-in {
+        from {
+            opacity: 0;
+            transform: translateY(4px);
+        }
+    }
+
     --font-sans: 'Mulish', system-ui, -apple-system, 'Segoe UI', sans-serif;
     --font-bangla: 'Hind Siliguri', 'Mulish', sans-serif;
     --font-mono: 'IBM Plex Mono', ui-monospace, monospace;

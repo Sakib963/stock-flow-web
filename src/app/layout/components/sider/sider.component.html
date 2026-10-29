@@ -83,11 +83,9 @@
                                 @for (child of item.children; track child.id) {
                                     <a
                                         class="shell__nav--child relative m-0 flex h-7.75 flex-none items-center gap-1.75 rounded-control pr-2.5 pl-1.75 text-left text-shell-row/none font-medium bn:leading-normal whitespace-nowrap no-underline transition-[background,color] duration-150 [&.is-active]:transition-none"
-                                        [class]="childClasses(child, rla.isActive)"
+                                        [class]="childClasses(child, nav.isActive(child))"
                                         [class.is-disabled]="child.isDisabled"
                                         [routerLink]="child.isDisabled ? null : child.route"
-                                        routerLinkActive="is-active"
-                                        #rla="routerLinkActive"
                                         [attr.tabindex]="nav.isOpen(item.id) && !state.railCollapsed() ? null : -1"
                                         (click)="child.isDisabled && nav.explainDisabled(child, $event)"
                                         nz-tooltip
@@ -112,17 +110,15 @@
             } @else {
                 <a
                     class="group relative flex h-9.5 flex-none items-center gap-2.75 rounded-control text-left text-shell-title/none font-semibold bn:leading-normal whitespace-nowrap no-underline transition-[background,color] duration-150 [&.is-active]:transition-none"
-                    [class]="railClasses(item, rla.isActive)"
+                    [class]="railClasses(item, nav.isActive(item))"
                     [routerLink]="item.isDisabled ? null : item.route"
-                    routerLinkActive="is-active"
-                    #rla="routerLinkActive"
                     (click)="item.isDisabled && nav.explainDisabled(item, $event)"
                     nz-tooltip
                     nzTooltipPlacement="right"
                     [nzTooltipTrigger]="state.railCollapsed() ? 'hover' : null"
                     [nzTooltipTitle]="state.railCollapsed() ? nav.rowTitle(item) : ''"
                 >
-                    <ng-icon [name]="item.icon || iconFallback" size="18px" strokeWidth="1.8" class="flex-none" [class]="iconClasses(item, rla.isActive)" />
+                    <ng-icon [name]="item.icon || iconFallback" size="18px" strokeWidth="1.8" class="flex-none" [class]="iconClasses(item, nav.isActive(item))" />
                     @if (!state.railCollapsed()) {
                         <span class="flex-1 overflow-hidden text-ellipsis">{{ session.label(item) }}</span>
                         @if (item.isDisabled) {
@@ -154,7 +150,7 @@
         <div class="max-w-66 min-w-49 rounded-container border border-sider-border bg-white p-1.5 shadow-panel">
             <div class="mb-1.25 truncate border-b border-line-soft px-2.5 pt-1.25 pb-1.75 text-shell-hint/none font-bold text-ink">{{ session.label(group) }}</div>
             @for (child of group.children; track child.id) {
-                <a class="flex h-7.75 items-center gap-2 rounded-control px-2.5 text-shell-row/none font-medium bn:leading-normal whitespace-nowrap no-underline" [class]="flyoutClasses(child, rla.isActive)" [routerLink]="child.isDisabled ? null : child.route" routerLinkActive="is-active" #rla="routerLinkActive" (click)="child.isDisabled && nav.explainDisabled(child, $event)" nz-tooltip nzTooltipPlacement="right" [nzTooltipTitle]="child.isDisabled ? session.disabledMessage(child) : session.description(child)">
+                <a class="flex h-7.75 items-center gap-2 rounded-control px-2.5 text-shell-row/none font-medium bn:leading-normal whitespace-nowrap no-underline" [class]="flyoutClasses(child, nav.isActive(child))" [routerLink]="child.isDisabled ? null : child.route" (click)="child.isDisabled && nav.explainDisabled(child, $event)" nz-tooltip nzTooltipPlacement="right" [nzTooltipTitle]="child.isDisabled ? session.disabledMessage(child) : session.description(child)">
                     @if (showChildIcons) {
                         <ng-icon [name]="child.icon || iconFallback" size="15px" strokeWidth="1.8" class="flex-none" aria-hidden="true" />
                     }

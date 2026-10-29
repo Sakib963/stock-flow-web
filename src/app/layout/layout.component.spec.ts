@@ -68,6 +68,9 @@ const payload: SessionPayload = {
 };
 
 describe('LayoutComponent', () => {
+    /** Lets the slow page's code arrive, so a test can look at the shell while it is downloading. */
+    let arrive: () => void = () => undefined;
+
     beforeEach(async () => {
         localStorage.clear();
         await TestBed.configureTestingModule({
@@ -80,6 +83,8 @@ describe('LayoutComponent', () => {
                     { path: 'app/sales/online', children: [] },
                     { path: 'app/sales/returns', children: [] },
                     { path: 'app/inventory/products', children: [] },
+                    { path: 'app/slow', loadChildren: () => new Promise((resolve) => (arrive = () => resolve([]))) },
+                    { path: 'app/refused', canActivate: [() => false], children: [] },
                 ]),
                 provideHttpClient(),
                 provideHttpClientTesting(),
@@ -162,6 +167,30 @@ describe('LayoutComponent', () => {
     it('treats a child route as its page, so a detail screen keeps the rail where it was', async () => {
         const { nav } = await render('/app/inventory/products');
         expect(nav.activeGroup()).toBe('inventory');
+    });
+
+    it('marks the clicked row at once and shows the loader while its page downloads', async () => {
+        const { nav } = await render();
+        const slow = leaf('slow', '/app/slow');
+
+        const going = TestBed.inject(Router).navigateByUrl('/app/slow');
+        await new Promise((resolve) => setTimeout(resolve));
+        expect(nav.isActive(slow)).toBe(true);
+        expect(nav.isActive(item('dashboard'))).toBe(false);
+        expect(nav.loadingPage()).toBe(true);
+
+        arrive();
+        await going;
+        expect(nav.isActive(slow)).toBe(true);
+        expect(nav.loadingPage()).toBe(false);
+    });
+
+    it('puts the mark back on the page being shown when a navigation is refused', async () => {
+        const { nav } = await render();
+
+        expect(await TestBed.inject(Router).navigateByUrl('/app/refused')).toBe(false);
+        expect(nav.isActive(leaf('refused', '/app/refused'))).toBe(false);
+        expect(nav.isActive(item('dashboard'))).toBe(true);
     });
 
     it('opens one group at a time: opening a second closes the first', async () => {

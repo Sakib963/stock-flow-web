@@ -4,6 +4,7 @@ import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { filter } from 'rxjs';
 import { NzDrawerModule } from 'ng-zorro-antd/drawer';
 import { NzModalModule } from 'ng-zorro-antd/modal';
+import { NzSpinModule } from 'ng-zorro-antd/spin';
 import { TranslatePipe } from '@ngx-translate/core';
 import { AccountMenuComponent } from '@app/layout/components/account-menu/account-menu.component';
 import { HeaderBarComponent } from '@app/layout/components/header-bar/header-bar.component';
@@ -33,7 +34,7 @@ import { DigitsPipe } from '@app/shared/pipes/digits/digits.pipe';
  */
 @Component({
     selector: 'layout',
-    imports: [DigitsPipe, RouterOutlet, NzDrawerModule, NzModalModule, TranslatePipe, HeaderBarComponent, SiderComponent, SearchPanelComponent, NotificationPanelComponent, NotesPanelComponent, AccountMenuComponent, ShortcutsDialogComponent, SessionsDialogComponent, ProfileDialogComponent],
+    imports: [DigitsPipe, RouterOutlet, NzDrawerModule, NzModalModule, NzSpinModule, TranslatePipe, HeaderBarComponent, SiderComponent, SearchPanelComponent, NotificationPanelComponent, NotesPanelComponent, AccountMenuComponent, ShortcutsDialogComponent, SessionsDialogComponent, ProfileDialogComponent],
     host: {
         class: 'block h-dvh',
         '(document:keydown)': 'onGlobalKey($event)',

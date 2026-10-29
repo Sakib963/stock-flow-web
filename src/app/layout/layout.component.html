@@ -13,7 +13,13 @@
         <header-bar />
 
         <main class="min-h-0 flex-1 overflow-y-auto p-2 md:p-4">
-            <router-outlet />
+            <!-- Spins only while a page's code downloads on its first visit. The delay keeps a page
+                 whose code is already here from flashing it. -->
+            <nz-spin class="block min-h-full" [nzSpinning]="nav.loadingPage()" [nzDelay]="150">
+                <div class="*:not-[router-outlet]:animate-page-in motion-reduce:*:animate-none">
+                    <router-outlet />
+                </div>
+            </nz-spin>
         </main>
     </div>
 

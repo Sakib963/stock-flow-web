@@ -1,6 +1,6 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { NavigationEnd, Router } from '@angular/router';
+import { NavigationCancel, NavigationEnd, NavigationError, NavigationSkipped, NavigationStart, RouteConfigLoadStart, Router } from '@angular/router';
 import { filter, map } from 'rxjs';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { TranslateService } from '@ngx-translate/core';
@@ -51,9 +51,21 @@ export class ShellNavService {
         { initialValue: this._router.url }
     );
 
+    /**
+     * Where a navigation under way is going, and whether it is waiting on its page's code.
+     *
+     * A page's code is fetched on its first visit, and the router only reports the new URL once it
+     * has arrived, so the menu and the page sat still for that whole download. The menu marks the
+     * clicked row from the start instead, and the shell shows a loader while the code arrives.
+     */
+    readonly pendingUrl = signal<string | null>(null);
+    readonly loadingPage = signal(false);
+
+    private readonly _shownUrl = computed(() => this.pendingUrl() ?? this.url());
+
     /** The top-level group holding the page being shown, or null when the page sits at the root. */
     readonly activeGroup = computed(() => {
-        const url = this.url();
+        const url = this._shownUrl();
         for (const item of this.session.menu()) {
             if (item.children.length && this.containsRoute(item, url)) return item.id;
         }
@@ -62,6 +74,22 @@ export class ShellNavService {
 
     /** Every navigable page, flattened. Groups are dropped: navigating to a header does nothing. */
     readonly leaves = computed(() => this.leavesOf(this.session.menu()));
+
+    constructor() {
+        this._router.events.subscribe((e) => {
+            if (e instanceof NavigationStart) this.pendingUrl.set(e.url);
+            else if (e instanceof RouteConfigLoadStart) this.loadingPage.set(this.pendingUrl() !== null);
+            else if (e instanceof NavigationEnd || e instanceof NavigationCancel || e instanceof NavigationError || e instanceof NavigationSkipped) {
+                this.pendingUrl.set(null);
+                this.loadingPage.set(false);
+            }
+        });
+    }
+
+    /** The row for the page being shown, or the one being opened while its page loads. */
+    isActive(item: MenuItem): boolean {
+        return !!item.route && this.matchesRoute(item.route, this._shownUrl());
+    }
 
     toggleGroup(id: string): void {
         this.openGroup.update((open) => (open === id ? null : id));
