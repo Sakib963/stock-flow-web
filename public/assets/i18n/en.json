@@ -386,7 +386,8 @@
             "required": "This page needs the new version of StockFlow. Reload to continue.",
             "reload": "Reload",
             "later": "Later"
-        }
+        },
+        "guestNoPassword": "A guest visit has no password to change"
     },
     "dashboard": {
         "title": "Dashboard",
@@ -2455,7 +2456,8 @@
         },
         "confirm": {
             "cancel": "Not yet"
-        }
+        },
+        "guestCannotSave": "Guests can look around but cannot save changes. Nothing was saved."
     },
     "codeGenerator": {
         "title": "Suggested code",

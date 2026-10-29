@@ -22,4 +22,10 @@ describe('failureOf', () => {
         expect(failureKey(stale, 'configuration.category.saveFailed')).toBe('form.changedSinceLoaded');
         expect(failureKey(new HttpErrorResponse({ status: 409, error: { data: { field: 'name' } } }), 'form.saveFailed')).toBe('form.saveFailed.server');
     });
+
+    it("tells a guest nothing was saved, whatever the feature, and keeps a person's own refusal as it was", () => {
+        const guest = new HttpErrorResponse({ status: 403, error: { data: { reason: 'guest' } } });
+        expect(failureKey(guest, 'shell.notes.saveFailed')).toBe('form.guestCannotSave');
+        expect(failureKey(new HttpErrorResponse({ status: 403 }), 'shell.notes.saveFailed')).toBe('shell.notes.saveFailed.forbidden');
+    });
 });

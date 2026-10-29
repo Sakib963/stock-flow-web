@@ -30,12 +30,12 @@
                         <ng-icon name="lucideChevronRight" size="16px" class="flex-none text-ink-faint transition-colors duration-200 group-hover:text-primary" aria-hidden="true" />
                     </span>
                 </li>
-                <li nz-menu-item class="group" [nzPaddingLeft]="16" routerLink="/app/change-password" data-shell="change-password">
+                <li nz-menu-item class="group" [nzPaddingLeft]="16" [nzDisabled]="!!session.user()?.isGuest" [routerLink]="session.user()?.isGuest ? null : '/app/change-password'" data-shell="change-password">
                     <span class="flex items-center gap-3">
                         <span class="flex size-9 flex-none items-center justify-center rounded-control bg-surface-sunken text-ink-muted transition-colors duration-200 group-hover:bg-white group-hover:text-primary"><ng-icon name="lucideKeyRound" size="18px" aria-hidden="true" /></span>
                         <span class="flex min-w-0 flex-1 flex-col gap-0.5">
                             <span class="truncate text-sm font-bold text-ink transition-colors duration-200 group-hover:text-primary">{{ 'shell.changePassword' | translate }}</span>
-                            <span class="truncate text-xs text-ink-soft">{{ 'shell.changePasswordHint' | translate }}</span>
+                            <span class="truncate text-xs text-ink-soft">{{ (session.user()?.isGuest ? 'shell.guestNoPassword' : 'shell.changePasswordHint') | translate }}</span>
                         </span>
                         <ng-icon name="lucideChevronRight" size="16px" class="flex-none text-ink-faint transition-colors duration-200 group-hover:text-primary" aria-hidden="true" />
                     </span>

@@ -512,6 +512,23 @@ describe('LayoutComponent', () => {
         expect(overlay('.ant-drawer-open account-menu')).toBeTruthy();
     });
 
+    it('disables Change password for a guest, saying why', async () => {
+        const load = TestBed.inject(SessionService).load('session-guest');
+        TestBed.inject(HttpTestingController)
+            .expectOne((r) => r.url.includes(APIEndpoint.GET_USER_INFO))
+            .flush({ code: 200, data: { ...payload, user: { ...payload.user, isGuest: true } } });
+        await load;
+        const { fixture, el } = await render();
+
+        el.querySelector<HTMLButtonElement>('[data-shell=account]')!.click();
+        fixture.detectChanges();
+        await fixture.whenStable();
+
+        const item = overlay('[data-shell=change-password]')!;
+        expect(item.classList).toContain('ant-menu-item-disabled');
+        expect(item.textContent).toContain('shell.guestNoPassword');
+    });
+
     it('keeps sign out on the drawer floor, out of the scrolling region, and closes on the drawer X', async () => {
         const { fixture, el, state } = await render();
 

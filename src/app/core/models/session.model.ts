@@ -46,6 +46,7 @@ export interface SessionUser {
     role: string | null;
     /** Set on an account someone else created, until its person sets their own password. */
     mustChangePassword?: boolean;
+    isGuest?: boolean;
 }
 
 export interface SessionBusiness {

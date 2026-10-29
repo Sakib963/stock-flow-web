@@ -17,5 +17,12 @@ export const failureOf = (error: unknown): RequestFailure => {
 /** Someone saved the record after this form loaded it. Every form answers it with the same copy. */
 export const isStale = (error: unknown): boolean => error instanceof HttpErrorResponse && error.status === 409 && error.error?.data?.reason === 'changed_since_loaded';
 
+/** The server refuses every change a guest sends, whatever the Guest role grants. */
+export const isGuestRefusal = (error: unknown): boolean => error instanceof HttpErrorResponse && error.status === 403 && error.error?.data?.reason === 'guest';
+
 /** The copy key for a failure, under a feature's own namespace. */
-export const failureKey = (error: unknown, namespace: string): string => (isStale(error) ? 'form.changedSinceLoaded' : `${namespace}.${failureOf(error)}`);
+export const failureKey = (error: unknown, namespace: string): string => {
+    if (isStale(error)) return 'form.changedSinceLoaded';
+    if (isGuestRefusal(error)) return 'form.guestCannotSave';
+    return `${namespace}.${failureOf(error)}`;
+};
