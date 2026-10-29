@@ -1,17 +1,26 @@
-<nz-modal [nzVisible]="update.required() || update.available()" [nzTitle]="'shell.update.title' | translate" [nzFooter]="null" [nzClosable]="false" [nzMaskClosable]="false" [nzKeyboard]="false" [nzCentered]="true">
+<nz-modal [nzVisible]="update.required() || update.available()" [nzFooter]="null" [nzClosable]="false" [nzMaskClosable]="false" [nzKeyboard]="false" [nzCentered]="true" [nzAutofocus]="null" [nzWidth]="400" [nzBodyStyle]="{ padding: '32px 28px 24px' }">
     <ng-container *nzModalContent>
-        <p class="m-0" data-update="body">{{ (update.required() ? 'shell.update.required' : 'shell.update.body') | translate }}</p>
-        <div class="mt-6 flex justify-end gap-2">
-            @if (!update.required()) {
-                <button nz-button nzType="default" type="button" class="inline-flex items-center gap-1.5" (click)="update.later()" data-update="later">
-                    <ng-icon name="lucideClock" size="14px" aria-hidden="true" />
-                    <span>{{ 'shell.update.later' | translate }}</span>
+        <div class="flex flex-col items-center text-center">
+            <span class="relative mb-5 flex size-16 items-center justify-center" aria-hidden="true">
+                <span class="absolute inset-0 animate-ping rounded-full bg-primary-wash opacity-70 [animation-duration:2s] motion-reduce:hidden"></span>
+                <span class="relative flex size-16 items-center justify-center rounded-full bg-primary-wash text-primary ring-8 ring-primary-wash/40">
+                    <ng-icon [name]="update.required() ? 'lucideRefreshCw' : 'lucideSparkles'" size="28px" strokeWidth="1.8" />
+                </span>
+            </span>
+            <h2 class="m-0 text-lg/snug font-bold text-ink">{{ 'shell.update.title' | translate }}</h2>
+            <p class="mt-2 mb-0 max-w-80 text-sm/relaxed text-ink-muted" data-update="body">{{ (update.required() ? 'shell.update.required' : 'shell.update.body') | translate }}</p>
+            <div class="mt-7 flex w-full gap-2">
+                @if (!update.required()) {
+                    <button nz-button nzType="default" type="button" class="inline-flex flex-1 items-center justify-center gap-1.5" (click)="update.later()" data-update="later">
+                        <ng-icon name="lucideClock" size="14px" aria-hidden="true" />
+                        <span>{{ 'shell.update.later' | translate }}</span>
+                    </button>
+                }
+                <button nz-button nzType="primary" type="button" class="inline-flex flex-1 items-center justify-center gap-1.5" (click)="update.reload()" data-update="reload">
+                    <ng-icon name="lucideRefreshCw" size="14px" aria-hidden="true" />
+                    <span>{{ 'shell.update.reload' | translate }}</span>
                 </button>
-            }
-            <button nz-button nzType="primary" type="button" class="inline-flex items-center gap-1.5" cdkFocusInitial (click)="update.reload()" data-update="reload">
-                <ng-icon name="lucideRefreshCw" size="14px" aria-hidden="true" />
-                <span>{{ 'shell.update.reload' | translate }}</span>
-            </button>
+            </div>
         </div>
     </ng-container>
 </nz-modal>
