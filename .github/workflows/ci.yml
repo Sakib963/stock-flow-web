@@ -75,6 +75,7 @@ jobs:
                   CLOUDINARY_CLOUD_NAME: stockflow
                   CLOUDINARY_UPLOAD_PRESET: stockflow
                   GUEST_ACCESS: 'true'
+                  BUILD_ID: ${{ github.sha }}
 
             - run: npx ng build --configuration=dev
 

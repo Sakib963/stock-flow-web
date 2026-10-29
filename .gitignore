@@ -47,3 +47,5 @@ src/environments
 # Screenshots from tools/shot.mjs, regenerated on demand.
 tools/shots/
 
+# Written by tools/write-environment.mjs on a deploy
+public/version.json

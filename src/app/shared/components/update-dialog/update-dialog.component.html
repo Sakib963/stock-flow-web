@@ -1,0 +1,17 @@
+<nz-modal [nzVisible]="update.required() || update.available()" [nzTitle]="'shell.update.title' | translate" [nzFooter]="null" [nzClosable]="false" [nzMaskClosable]="false" [nzKeyboard]="false" [nzCentered]="true">
+    <ng-container *nzModalContent>
+        <p class="m-0" data-update="body">{{ (update.required() ? 'shell.update.required' : 'shell.update.body') | translate }}</p>
+        <div class="mt-6 flex justify-end gap-2">
+            @if (!update.required()) {
+                <button nz-button nzType="default" type="button" class="inline-flex items-center gap-1.5" (click)="update.later()" data-update="later">
+                    <ng-icon name="lucideClock" size="14px" aria-hidden="true" />
+                    <span>{{ 'shell.update.later' | translate }}</span>
+                </button>
+            }
+            <button nz-button nzType="primary" type="button" class="inline-flex items-center gap-1.5" cdkFocusInitial (click)="update.reload()" data-update="reload">
+                <ng-icon name="lucideRefreshCw" size="14px" aria-hidden="true" />
+                <span>{{ 'shell.update.reload' | translate }}</span>
+            </button>
+        </div>
+    </ng-container>
+</nz-modal>

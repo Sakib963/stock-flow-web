@@ -379,6 +379,13 @@
             "codeResent": "A new code is on its way. The earlier one no longer works.",
             "sendAgainIn": "You can ask for another in {{seconds}}s",
             "sendTooMany": "Too many tries. Wait a few minutes and try again."
+        },
+        "update": {
+            "title": "A new version of StockFlow is ready",
+            "body": "Reload to start using it. Save anything you are working on first.",
+            "required": "This page needs the new version of StockFlow. Reload to continue.",
+            "reload": "Reload",
+            "later": "Later"
         }
     },
     "dashboard": {

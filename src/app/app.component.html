@@ -1,1 +1,7 @@
 <router-outlet />
+
+<!-- Fetched while the app is idle, before a deploy can take its code away: the dialog has to open
+     when the old version can no longer load anything. -->
+@defer (when update.available() || update.required(); prefetch on idle) {
+    <update-dialog />
+}

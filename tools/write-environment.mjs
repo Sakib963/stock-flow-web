@@ -4,7 +4,9 @@
 //   node tools/write-environment.mjs environment.ts environment.dev.ts
 //
 // Reads API_BASE_URL, TRACKER_URL, CLOUDINARY_CLOUD_NAME, CLOUDINARY_UPLOAD_PRESET and GUEST_ACCESS
-// (true or false), and BENGALI_TIME_IN_WORDS when a business wants it. A missing one is an error
+// (true or false), BENGALI_TIME_IN_WORDS when a business wants it, and BUILD_ID, the commit a deploy
+// is built from, which also goes to public/version.json so an open tab can tell it is behind
+// (AppUpdateService). Without BUILD_ID the app never checks. A missing required one is an error
 // rather than a default, so a build can never quietly point at the wrong server. An existing file is
 // never overwritten, so running it on the laptop cannot clobber the local copies.
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
@@ -30,12 +32,18 @@ for (const name of targets) {
         guestAccess: process.env.GUEST_ACCESS === 'true',
         baseUrl: process.env.API_BASE_URL,
         version,
+        build: process.env.BUILD_ID || null,
         trackerUrl: process.env.TRACKER_URL,
         bengaliTimeInWords: process.env.BENGALI_TIME_IN_WORDS === 'true',
         cloudinary: { cloudName: process.env.CLOUDINARY_CLOUD_NAME, uploadPreset: process.env.CLOUDINARY_UPLOAD_PRESET },
     };
     writeFileSync(path, `export const environment = ${JSON.stringify(environment, null, 4)};\n`);
     console.log(`Wrote src/environments/${name}`);
+}
+
+if (process.env.BUILD_ID) {
+    writeFileSync(new URL('../public/version.json', import.meta.url), `${JSON.stringify({ build: process.env.BUILD_ID })}\n`);
+    console.log('Wrote public/version.json');
 }
 
 function fail(message) {

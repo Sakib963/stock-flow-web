@@ -1,11 +1,15 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { AppUpdateService } from '@app/core/services/app-update/app-update.service';
+import { UpdateDialogComponent } from '@app/shared/components/update-dialog/update-dialog.component';
 
 @Component({
-    selector: 'app-root',
-    imports: [RouterOutlet],
+    selector: 'root',
+    imports: [RouterOutlet, UpdateDialogComponent],
     templateUrl: './app.component.html',
     styleUrl: './app.component.scss',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AppComponent {}
+export class AppComponent {
+    readonly update = inject(AppUpdateService);
+}
