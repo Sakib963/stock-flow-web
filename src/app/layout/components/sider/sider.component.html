@@ -139,8 +139,8 @@
                 <span class="font-medium text-ink-soft">v{{ version }}</span>
             </span>
         }
-        <a class="font-semibold text-ink-soft no-underline hover:text-primary hover:underline" href="https://sakib.app" target="_blank" rel="noopener noreferrer" nz-tooltip nzTooltipPlacement="top" nzTooltipTitle="Arithma Labs">
-            {{ state.railCollapsed() ? 'AL' : 'Arithma Labs' }}
+        <a class="font-semibold text-ink-soft no-underline hover:text-primary hover:underline" href="https://sakib.app" target="_blank" rel="noopener noreferrer" nz-tooltip nzTooltipPlacement="top" [nzTooltipTitle]="'auth.attribution' | translate">
+            {{ state.railCollapsed() ? 'S' : ('auth.attribution' | translate) }}
         </a>
     </div>
 </nav>
