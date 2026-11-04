@@ -1,17 +1,55 @@
 # StockFlow
 
-**StockFlow** is a demo Inventory/Warehouse Management System designed to help warehouse managers and business owners efficiently track and manage product inventory, batches, and sales with detailed purchase information. This project is built using Angular for the frontend, Express.js for the backend, and PostgreSQL for data storage.
+Sales and inventory management for small shops. One app for the counter, the online inbox, and the stock room.
 
-## Features
+**[Live preview](https://sakib963.github.io/stock-flow-web/)** · frontend only, sample data, sign in as guest
 
-- **Product Management**: Add and manage product types and categories.
-- **Inventory Tracking**: Record and track product batches with quantity, purchase date, and variable pricing.
-- **Sales Tracking**: Track sales by batch to differentiate prices based on purchase history.
-- **Barcode Generation**: Generate barcodes for easy product identification and tracking.
-- **Analytics**: View inventory and sales data to support decision-making.
+## What it does
 
-## Technology Stack
+**Selling**
 
-- **Frontend**: Angular
-- **Backend**: Express.js
-- **Database**: PostgreSQL
+- POS checkout with invoices and thermal-printer receipts
+- Online orders with pre-orders, cancellations, and partial returns
+- Returned items sorted into restock or disposal
+
+**Stock**
+
+- Product batches with purchase date and per-batch pricing
+- Multi-warehouse inventory and stock overview
+- Purchase orders, barcode generation, product disposal
+
+**Running the shop**
+
+- Campaigns and discounts
+- Roles and permissions down to each action
+- Manager view of invoices, returns, and disposed items
+- Attendance tracking, internal notes, email OTP password reset
+
+## Stack
+
+| Layer    | Tech                                   |
+| -------- | -------------------------------------- |
+| Frontend | Angular, NG-ZORRO, TypeScript          |
+| Backend  | Node.js, Express 5                     |
+| Database | PostgreSQL                             |
+| Testing  | Vitest, about 2,100 unit and API tests |
+
+## Repositories
+
+- `stock-flow-web`: this repo, the Angular client
+- `stock-flow-server`: the REST API
+
+## Run locally
+
+```bash
+git clone https://github.com/Sakib963/stock-flow-web.git
+cd stock-flow-web
+npm install
+npm start
+```
+
+The app runs at `http://localhost:4200`. Point it at a running `stock-flow-server` for real data.
+
+---
+
+Built by [Abdullah Nazmus Sakib](https://sakib.app)
